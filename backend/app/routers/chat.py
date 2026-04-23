@@ -1,19 +1,28 @@
 """
 채팅 / 오케스트레이터 엔드포인트.
-
-Phase 1 → Phase 2: 실제 Claude 에이전트 호출.
-- /api/chat           일반 대화 (오케스트레이터 라우팅)
-- /api/chat/briefing  아침 현황 보고 (전 에이전트 실행)
+- /api/chat                일반 대화 (오케스트레이터 라우팅)
+- /api/chat/briefing       아침 현황 보고 (전 에이전트 실행)
+- /api/chat/conversations  대화 목록
+- /api/chat/conversations/{id}  특정 대화 메시지
 """
 import uuid
-from typing import Any
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from app.auth import require_bearer
+from app.services import conversations as conv_svc
 
 router = APIRouter(prefix="/api/chat", tags=["chat"], dependencies=[Depends(require_bearer)])
+
+AGENT_DISPLAY = {
+    "sales":        "세일즈 에이전트",
+    "finance":      "파이낸스 에이전트",
+    "warehouse":    "웨어하우스 에이전트",
+    "cs":           "CS 에이전트",
+    "tester":       "테스터 에이전트",
+    "orchestrator": "오케스트레이터",
+}
 
 
 class ChatRequest(BaseModel):
@@ -36,13 +45,23 @@ class ChatResponse(BaseModel):
     routed_to: list[str]
 
 
-AGENT_DISPLAY = {
-    "sales": "세일즈 에이전트",
-    "finance": "파이낸스 에이전트",
-    "warehouse": "웨어하우스 에이전트",
-    "cs": "CS 에이전트",
-    "orchestrator": "오케스트레이터",
-}
+def _save_results(conversation_id: str, user_message: str, results: list[dict]) -> None:
+    """대화 내용을 DB에 저장 (오류 시 무시)."""
+    try:
+        conv_svc.ensure_conversation(conversation_id, user_message)
+        conv_svc.save_user_message(conversation_id, user_message)
+        for r in results:
+            if r.get("message"):
+                conv_svc.save_agent_message(
+                    conversation_id=conversation_id,
+                    agent_type=r["agent_type"],
+                    agent_display=AGENT_DISPLAY.get(r["agent_type"], r["agent_type"]),
+                    content=r["message"],
+                    cost_usd=r.get("cost_usd", 0.0),
+                    run_id=r.get("run_id"),
+                )
+    except Exception:
+        pass  # 저장 실패가 응답을 깨지 않도록
 
 
 @router.post("", response_model=ChatResponse)
@@ -51,8 +70,10 @@ def chat(req: ChatRequest) -> ChatResponse:
 
     conversation_id = req.conversation_id or str(uuid.uuid4())
     agent_types = route(req.message)
-
     results = run_agents(req.message, conversation_id, agent_types)
+
+    _save_results(conversation_id, req.message, results)
+
     agents = [
         AgentResult(
             run_id=r["run_id"],
@@ -64,21 +85,18 @@ def chat(req: ChatRequest) -> ChatResponse:
         )
         for r in results
     ]
-
-    return ChatResponse(
-        conversation_id=conversation_id,
-        agents=agents,
-        routed_to=agent_types,
-    )
+    return ChatResponse(conversation_id=conversation_id, agents=agents, routed_to=agent_types)
 
 
 @router.post("/briefing", response_model=ChatResponse)
 def morning_briefing(req: ChatRequest | None = None) -> ChatResponse:
-    """아침 현황 보고 — 전 에이전트 일괄 실행."""
     from app.agents.orchestrator import run_morning_briefing
 
     conversation_id = (req.conversation_id if req else None) or str(uuid.uuid4())
+    user_message = "☀️ 아침 현황 보고"
     results = run_morning_briefing(conversation_id)
+
+    _save_results(conversation_id, user_message, results)
 
     agents = [
         AgentResult(
@@ -91,9 +109,19 @@ def morning_briefing(req: ChatRequest | None = None) -> ChatResponse:
         )
         for r in results
     ]
-
     return ChatResponse(
         conversation_id=conversation_id,
         agents=agents,
         routed_to=["sales", "finance", "warehouse", "cs"],
     )
+
+
+@router.get("/conversations")
+def list_conversations() -> list[dict]:
+    return conv_svc.list_conversations()
+
+
+@router.get("/conversations/{conversation_id}")
+def get_conversation(conversation_id: str) -> dict:
+    messages = conv_svc.get_messages(conversation_id)
+    return {"conversation_id": conversation_id, "messages": messages}

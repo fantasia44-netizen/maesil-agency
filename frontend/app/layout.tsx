@@ -16,6 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <nav>
             <Link href="/">대시보드</Link>
             <Link href="/chat">대화</Link>
+            <Link href="/history">이전 대화</Link>
             <Link href="/settings">설정</Link>
           </nav>
         </header>
