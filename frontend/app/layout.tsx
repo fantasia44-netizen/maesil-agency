@@ -15,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="brand">maesil-agency</div>
           <nav>
             <Link href="/">대시보드</Link>
+            <Link href="/chat">대화</Link>
             <Link href="/settings">설정</Link>
           </nav>
         </header>
