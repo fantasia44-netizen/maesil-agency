@@ -24,12 +24,25 @@ type KeyCard = {
 };
 
 const KEY_CARDS: KeyCard[] = [
-  { name: "render_api", kind: "render", label: "Render API Token",
-    hint: "Render Account Settings → API Keys 에서 발급" },
+  // ── 에이전트 핵심 ──
+  { name: "anthropic_api_key", kind: "anthropic", label: "Anthropic API Key",
+    hint: "Phase 2+ 에이전트 실행에 필수 — Anthropic Console에서 발급" },
+  // ── DB 연결 ──
   { name: "m_insight_service_role", kind: "supabase", label: "maesil-insight Service Role Key",
-    hint: "Supabase 프로젝트 → Settings → API → service_role" },
-  { name: "anthropic_api", kind: "anthropic", label: "Anthropic API Key",
-    hint: "Phase 2 에이전트용 — 지금은 선택" },
+    hint: "Supabase 프로젝트 → Settings → API → service_role (CS 에이전트 / 매요AI 분석)" },
+  // ── Operator ID ──
+  { name: "autotool_operator_id", kind: "config", label: "autotool Operator ID",
+    hint: "autotool DB의 내 operator_id (UUID) — Sales/Finance/Warehouse 에이전트에 필수" },
+  { name: "maesil-insight_operator_id", kind: "config", label: "maesil-insight Operator ID",
+    hint: "maesil-insight DB의 내 operator_id (UUID) — CS 에이전트에 필수" },
+  // ── maesil-insight URL ──
+  { name: "maesil_insight_url", kind: "config", label: "maesil-insight 서비스 URL",
+    hint: "예: https://maesil-insight.onrender.com (Tester 에이전트 하네스 API 호출용)" },
+  { name: "harness_api_token", kind: "other", label: "Harness API Token",
+    hint: "maesil-insight의 HARNESS_API_TOKEN 환경변수 값 (Tester 에이전트용)" },
+  // ── 인프라 ──
+  { name: "render_api", kind: "render", label: "Render API Token",
+    hint: "Render Account Settings → API Keys (프로그램 상태 수집용)" },
 ];
 
 export default function SettingsPage() {

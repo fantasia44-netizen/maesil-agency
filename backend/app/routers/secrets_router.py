@@ -27,6 +27,17 @@ def upsert_secret(body: SecretUpsert) -> dict:
     if not body.name or not body.value or not body.kind:
         raise HTTPException(status_code=400, detail="name, value, kind are required")
     secrets_svc.upsert_secret(body.name, body.value, body.kind, body.notes)
+
+    # maesil-insight URL이 등록되면 db_registry에도 동기화
+    if body.name == "maesil_insight_url":
+        try:
+            from app.db.autotool_client import get_autotool_client
+            get_autotool_client().schema("agent_work").table("db_registry").update({
+                "supabase_url": body.value,
+            }).eq("name", "maesil-insight").execute()
+        except Exception:
+            pass
+
     return {"ok": True}
 
 
