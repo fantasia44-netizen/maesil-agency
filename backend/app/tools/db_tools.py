@@ -9,7 +9,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-from app.config.query_templates import QUERY_TEMPLATES
+from app.agent_config.query_templates import QUERY_TEMPLATES
 from app.db.autotool_client import get_autotool_client
 from app.db.registry_client import get_db_client
 
