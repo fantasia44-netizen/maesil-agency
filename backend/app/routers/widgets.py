@@ -10,6 +10,15 @@ from app.auth import require_bearer
 
 router = APIRouter(prefix="/api/widgets", tags=["widgets"], dependencies=[Depends(require_bearer)])
 
+# 에이전트 정의 (코드에서 관리, Phase별 확장)
+AGENT_REGISTRY = [
+    {"agent_type": "orchestrator", "display_name": "오케스트레이터", "phase": 1},
+    {"agent_type": "sales",        "display_name": "세일즈 에이전트",  "phase": 2},
+    {"agent_type": "finance",      "display_name": "파이낸스 에이전트","phase": 2},
+    {"agent_type": "warehouse",    "display_name": "웨어하우스 에이전트","phase": 3},
+    {"agent_type": "cs",           "display_name": "CS 에이전트",      "phase": 3},
+]
+
 
 @router.get("/system-status")
 def system_status() -> dict:
@@ -49,3 +58,43 @@ def system_status() -> dict:
         )
 
     return {"programs": cards}
+
+
+@router.get("/agent-status")
+def agent_status() -> dict:
+    client = get_autotool_client()
+
+    # 에이전트 타입별 마지막 실행 1건씩 조회
+    runs_resp = (
+        client.schema("agent_work")
+        .table("runs")
+        .select("agent_type, status, started_at, ended_at, error_reason, cost_usd")
+        .order("started_at", desc=True)
+        .limit(200)
+        .execute()
+    )
+    runs = runs_resp.data or []
+
+    # 에이전트 타입별 최신 run만 추출
+    latest: dict = {}
+    for r in runs:
+        atype = r["agent_type"]
+        if atype not in latest:
+            latest[atype] = r
+
+    cards = []
+    for agent in AGENT_REGISTRY:
+        atype = agent["agent_type"]
+        run = latest.get(atype)
+        cards.append({
+            "agent_type": atype,
+            "display_name": agent["display_name"],
+            "phase": agent["phase"],
+            "status": run["status"] if run else "idle",
+            "last_run_at": run["started_at"] if run else None,
+            "last_ended_at": run["ended_at"] if run else None,
+            "error_reason": run.get("error_reason") if run else None,
+            "cost_usd": run.get("cost_usd") if run else None,
+        })
+
+    return {"agents": cards}
