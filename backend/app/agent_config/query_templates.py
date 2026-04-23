@@ -7,7 +7,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
 
     # ───────────── SALES ─────────────
     "sales.today_revenue_by_channel": {
-        "db": "autotool",
+        "db": "maesil-insight",
         "allowed_agents": ["sales", "orchestrator"],
         "description": "오늘 채널별 주문수/매출",
         "sql": """
@@ -25,7 +25,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
     },
 
     "sales.date_range_revenue": {
-        "db": "autotool",
+        "db": "maesil-insight",
         "allowed_agents": ["sales", "finance", "orchestrator"],
         "description": "기간별 채널별 매출",
         "sql": """
@@ -44,7 +44,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
     },
 
     "sales.monthly_summary": {
-        "db": "autotool",
+        "db": "maesil-insight",
         "allowed_agents": ["sales", "finance", "orchestrator"],
         "description": "월별 매출 요약",
         "sql": """
@@ -63,7 +63,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
     },
 
     "sales.top_products": {
-        "db": "autotool",
+        "db": "maesil-insight",
         "allowed_agents": ["sales", "orchestrator"],
         "description": "기간 내 상위 판매 상품",
         "sql": """
@@ -83,7 +83,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
 
     # ───────────── FINANCE ─────────────
     "finance.ad_spend_by_channel": {
-        "db": "autotool",
+        "db": "maesil-insight",
         "allowed_agents": ["finance", "sales", "orchestrator"],
         "description": "기간별 채널별 광고비",
         "sql": """
@@ -103,7 +103,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
     },
 
     "finance.pnl_costs": {
-        "db": "autotool",
+        "db": "maesil-insight",
         "allowed_agents": ["finance", "orchestrator"],
         "description": "월별 손익 비용 항목",
         "sql": """
@@ -117,7 +117,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
     },
 
     "finance.daily_profit_snapshot": {
-        "db": "autotool",
+        "db": "maesil-insight",
         "allowed_agents": ["finance", "orchestrator"],
         "description": "일별 손익 스냅샷",
         "sql": """
@@ -133,7 +133,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
     },
 
     "finance.settlement_summary": {
-        "db": "autotool",
+        "db": "maesil-insight",
         "allowed_agents": ["finance", "orchestrator"],
         "description": "채널별 정산 요약",
         "sql": """
@@ -151,7 +151,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
 
     # ───────────── WAREHOUSE ─────────────
     "warehouse.low_stock_items": {
-        "db": "autotool",
+        "db": "maesil-insight",
         "allowed_agents": ["warehouse", "orchestrator"],
         "description": "안전재고 이하 상품 목록",
         "sql": """
@@ -168,7 +168,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
     },
 
     "warehouse.inventory_status": {
-        "db": "autotool",
+        "db": "maesil-insight",
         "allowed_agents": ["warehouse", "orchestrator"],
         "description": "전체 재고 현황",
         "sql": """
@@ -183,7 +183,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
     },
 
     "warehouse.purchase_plans": {
-        "db": "autotool",
+        "db": "maesil-insight",
         "allowed_agents": ["warehouse", "orchestrator"],
         "description": "발주 계획 목록",
         "sql": """
