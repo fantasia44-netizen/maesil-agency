@@ -111,16 +111,58 @@ def run_agents(
     return results
 
 
+BRIEFING_MESSAGES = {
+    "sales": (
+        "오늘 아침 매출 현황 보고를 작성해주세요. "
+        "오늘 채널별 주문수와 매출을 조회하고, 어제와 비교해서 간결하게 정리해주세요. "
+        "template: sales.today_revenue_by_channel"
+    ),
+    "finance": (
+        "오늘 아침 재무 현황 보고를 작성해주세요. "
+        "이번 달 광고비와 손익 현황을 조회해서 간결하게 정리해주세요. "
+        "template: finance.ad_spend_by_channel, finance.daily_profit_snapshot"
+    ),
+    "warehouse": (
+        "오늘 아침 재고 현황 보고를 작성해주세요. "
+        "안전재고 이하 상품이 있는지 확인하고 발주 필요 여부를 알려주세요. "
+        "template: warehouse.low_stock_items"
+    ),
+    "cs": (
+        "오늘 아침 CS 현황 보고를 작성해주세요. "
+        "최근 고객 문의량과 매요AI 레이어별 통계를 조회해서 간결하게 정리해주세요. "
+        "template: cs.volume_by_day, cs.maeyo_question_log"
+    ),
+}
+
+
 def run_morning_briefing(conversation_id: str) -> list[dict[str, Any]]:
-    """아침 현황 보고 — Sales + Finance + Warehouse + CS 순차 실행."""
-    from datetime import date
-    today = date.today().isoformat()
-    message = (
-        f"오늘({today}) 아침 현황 보고를 작성해주세요. "
-        "오늘 매출 현황, 주요 지표, 특이사항을 중심으로 간결하게 정리해주세요."
-    )
-    return run_agents(
-        message,
-        conversation_id,
-        ["sales", "finance", "warehouse", "cs"],
-    )
+    """아침 현황 보고 — 각 에이전트에 맞는 메시지로 개별 실행."""
+    from app.agents.sales import SalesAgent
+    from app.agents.finance import FinanceAgent
+    from app.agents.warehouse import WarehouseAgent
+    from app.agents.cs import CSAgent
+
+    AGENT_MAP = {
+        "sales": SalesAgent,
+        "finance": FinanceAgent,
+        "warehouse": WarehouseAgent,
+        "cs": CSAgent,
+    }
+
+    results = []
+    for atype, cls in AGENT_MAP.items():
+        run_id = str(uuid.uuid4())
+        message = BRIEFING_MESSAGES[atype]
+        try:
+            agent = cls()
+            result = agent.run(message, conversation_id, run_id)
+            results.append(result)
+        except Exception as e:
+            results.append({
+                "run_id": run_id,
+                "agent_type": atype,
+                "message": f"[에이전트 실행 오류] {e}",
+                "status": "failed",
+                "cost_usd": 0,
+            })
+    return results
