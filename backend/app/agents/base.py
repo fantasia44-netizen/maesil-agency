@@ -24,7 +24,7 @@ MAX_TOOL_ROUNDS = 8
 
 
 def _get_anthropic_client() -> anthropic.Anthropic:
-    api_key = get_secret("anthropic_api_key")
+    api_key = get_secret("anthropic_api_key") or get_secret("anthropic_api")
     if not api_key:
         raise ValueError("Anthropic API 키가 설정되지 않았습니다. /settings에서 'anthropic_api_key'를 등록하세요.")
     return anthropic.Anthropic(api_key=api_key)
