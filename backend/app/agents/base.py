@@ -138,10 +138,28 @@ class BaseAgent:
         _log_tool_call(run_id, tool_name, tool_input)
 
         if tool_name == "query_db":
+            from datetime import date, timedelta
             template_key = tool_input["template_key"]
             params = tool_input.get("params", {})
+            # 공통 파라미터 자동 주입
             if operator_id and "operator_id" not in params:
                 params["operator_id"] = operator_id
+            today = date.today().isoformat()
+            yesterday = (date.today() - timedelta(days=1)).isoformat()
+            month_start = date.today().strftime("%Y-%m-01")
+            year_month = date.today().strftime("%Y-%m")
+            defaults = {
+                "target_date": today,
+                "compare_date": yesterday,
+                "date_from": month_start,
+                "date_to": today,
+                "year_month_from": year_month,
+                "since": month_start + "T00:00:00+00:00",
+                "limit": 20,
+            }
+            for k, v in defaults.items():
+                if k not in params:
+                    params[k] = v
             rows = run_readonly_sql(template_key, params, self.agent_type, run_id)
             return {"rows": rows, "count": len(rows)}
 
