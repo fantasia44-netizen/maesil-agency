@@ -28,8 +28,8 @@ def upsert_secret(body: SecretUpsert) -> dict:
         raise HTTPException(status_code=400, detail="name, value, kind are required")
     secrets_svc.upsert_secret(body.name, body.value, body.kind, body.notes)
 
-    # maesil-insight URL이 등록되면 db_registry에도 동기화
-    if body.name == "maesil_insight_url":
+    # maesil-insight Supabase URL이 등록되면 db_registry에도 동기화
+    if body.name == "maesil_insight_supabase_url":
         try:
             from app.db.autotool_client import get_autotool_client
             get_autotool_client().schema("agent_work").table("db_registry").update({

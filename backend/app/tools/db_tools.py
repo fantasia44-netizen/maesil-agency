@@ -63,15 +63,20 @@ def run_readonly_sql(
         else:
             client = get_db_client(db_name)
 
-        result = client.rpc("", {}).execute() if False else None  # unused branch
-
-        # Supabase Python SDK는 raw SQL을 직접 지원하지 않으므로
-        # postgrest RPC를 우회해 execute_sql 방식 사용
-        result = client.postgrest.rpc(
-            "execute_readonly_sql",
-            {"query": sql},
-        ).execute()
+        # autotool은 agent_work 스키마에서 함수 호출, 나머지는 public
+        if db_name == "autotool":
+            result = client.schema("agent_work").rpc(
+                "execute_readonly_sql", {"query": sql}
+            ).execute()
+        else:
+            result = client.rpc(
+                "execute_readonly_sql", {"query": sql}
+            ).execute()
         rows = result.data or []
+        # RPC가 jsonb 반환 시 언패킹
+        if isinstance(rows, list) and len(rows) == 1 and isinstance(rows[0], dict) and "execute_readonly_sql" in rows[0]:
+            import json
+            rows = rows[0]["execute_readonly_sql"] or []
 
     except Exception as e:
         # execute_readonly_sql RPC가 없을 경우 fallback: table API 불가, 에러 반환

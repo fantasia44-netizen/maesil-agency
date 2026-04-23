@@ -36,6 +36,8 @@ const KEY_CARDS: KeyCard[] = [
   { name: "maesil-insight_operator_id", kind: "config", label: "maesil-insight Operator ID",
     hint: "maesil-insight DB의 내 operator_id (UUID) — CS 에이전트에 필수" },
   // ── maesil-insight URL ──
+  { name: "maesil_insight_supabase_url", kind: "config", label: "maesil-insight Supabase URL",
+    hint: "Supabase 프로젝트 → Settings → API → Project URL (CS 에이전트 DB 접속용)" },
   { name: "maesil_insight_url", kind: "config", label: "maesil-insight 서비스 URL",
     hint: "예: https://maesil-insight.onrender.com (Tester 에이전트 하네스 API 호출용)" },
   { name: "harness_api_token", kind: "other", label: "Harness API Token",
