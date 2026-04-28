@@ -5,24 +5,26 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import alert_channels, alerts, chat, health, programs, secrets_router, widgets
+from app.routers import alert_channels, alerts, auth_router, chat, health, programs, secrets_router, widgets
 
 logger = logging.getLogger(__name__)
 
 
 async def _poll_loop():
-    """3분마다 Render 로그 폴링 + 알림 발송."""
+    """배포 직후 1회 즉시 실행 후 3분 간격 반복."""
     import asyncio
     from app.services import alert_dispatcher, render_logs
 
+    # 첫 실행은 즉시 (수집전 문제 방지)
+    await asyncio.sleep(10)  # 서버 완전 기동 대기
     while True:
-        await asyncio.sleep(180)  # 3분
         try:
             render_logs.poll_all()
             alert_dispatcher.dispatch_pending(limit=100)
             logger.info("[scheduler] poll cycle done")
         except Exception as e:
             logger.error("[scheduler] poll error: %s", e)
+        await asyncio.sleep(180)  # 3분 후 반복
 
 
 @asynccontextmanager
@@ -46,6 +48,7 @@ app.add_middleware(
 )
 
 app.include_router(health.router)
+app.include_router(auth_router.router)
 app.include_router(secrets_router.router)
 app.include_router(widgets.router)
 app.include_router(chat.router)
@@ -57,3 +60,42 @@ app.include_router(alerts.router)
 @app.get("/")
 def root() -> dict:
     return {"service": "maesil-agency", "version": app.version}
+
+
+@app.get("/admin/inspect-insight")
+def inspect_insight(token: str = "") -> dict:
+    """임시: maesil-insight 스키마 탐색 (슈퍼어드민 전용, 작업 후 제거)."""
+    from app.config import settings
+    if token != settings.api_bearer_token:
+        from fastapi import HTTPException
+        raise HTTPException(403, "forbidden")
+    try:
+        from app.db.registry_client import get_db_client
+        client = get_db_client("maesil-insight")
+
+        # 테이블 목록
+        tables_r = client.rpc("execute_readonly_sql", {
+            "query": """
+                SELECT table_name FROM information_schema.tables
+                WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
+                ORDER BY table_name
+            """
+        }).execute()
+
+        # operator/user 관련 컬럼
+        cols_r = client.rpc("execute_readonly_sql", {
+            "query": """
+                SELECT table_name, column_name, data_type
+                FROM information_schema.columns
+                WHERE table_schema = 'public'
+                  AND table_name ILIKE ANY(ARRAY['%operat%','%user%','%account%','%member%','%company%','%compan%'])
+                ORDER BY table_name, ordinal_position
+            """
+        }).execute()
+
+        return {
+            "tables": [r.get("table_name") for r in (tables_r.data or [])],
+            "operator_related_columns": cols_r.data or [],
+        }
+    except Exception as e:
+        return {"error": str(e)}

@@ -1,7 +1,8 @@
 """
 Alerts router:
-  - POST /api/alerts/poll       — Render Cron Job이 3분 간격으로 호출 (로그 폴링 + 발송)
+  - POST /api/alerts/poll       — 로그 폴링 + 미발송 이벤트 dispatch
   - GET  /api/alerts/recent     — 위젯/대시보드용 최근 알림 N건
+  - GET  /api/alerts/{id}       — 단일 알림 이벤트 조회 (채팅 alert_id 연동)
   - POST /api/alerts/{id}/ack   — 위젯에서 알림 확인 처리
   - POST /api/alerts/test       — 수동 테스트용 (가짜 이벤트 1건 생성 + 발송)
 """
@@ -46,6 +47,16 @@ def recent(
         q = q.is_("acknowledged_at", "null")
     resp = q.execute()
     return {"events": resp.data or []}
+
+
+@router.get("/{event_id}")
+def get_alert(event_id: str) -> dict:
+    """단일 알림 이벤트 조회 — 채팅 페이지 alert_id 파라미터 연동."""
+    resp = _events_table().select("*").eq("id", event_id).limit(1).execute()
+    rows = resp.data or []
+    if not rows:
+        raise HTTPException(404, detail="event not found")
+    return rows[0]
 
 
 class AckBody(BaseModel):

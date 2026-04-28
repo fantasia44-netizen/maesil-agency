@@ -74,6 +74,7 @@ def run_agents(
     message: str,
     conversation_id: str,
     agent_types: list[str],
+    operator_id: str | None = None,
 ) -> list[dict[str, Any]]:
     """여러 에이전트를 순차 실행하고 결과 목록 반환."""
     from app.agents.sales import SalesAgent
@@ -98,7 +99,7 @@ def run_agents(
         run_id = str(uuid.uuid4())
         try:
             agent = cls()
-            result = agent.run(message, conversation_id, run_id)
+            result = agent.run(message, conversation_id, run_id, operator_id=operator_id)
             results.append(result)
         except Exception as e:
             results.append({
@@ -135,7 +136,10 @@ BRIEFING_MESSAGES = {
 }
 
 
-def run_morning_briefing(conversation_id: str) -> list[dict[str, Any]]:
+def run_morning_briefing(
+    conversation_id: str,
+    operator_id: str | None = None,
+) -> list[dict[str, Any]]:
     """아침 현황 보고 — 각 에이전트에 맞는 메시지로 개별 실행."""
     from app.agents.sales import SalesAgent
     from app.agents.finance import FinanceAgent
@@ -155,7 +159,7 @@ def run_morning_briefing(conversation_id: str) -> list[dict[str, Any]]:
         message = BRIEFING_MESSAGES[atype]
         try:
             agent = cls()
-            result = agent.run(message, conversation_id, run_id)
+            result = agent.run(message, conversation_id, run_id, operator_id=operator_id)
             results.append(result)
         except Exception as e:
             results.append({

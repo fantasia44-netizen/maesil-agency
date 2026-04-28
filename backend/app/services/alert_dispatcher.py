@@ -69,6 +69,12 @@ def _meets_severity(channel_min: str, event_sev: str) -> bool:
     return SEV_RANK.get(event_sev, 0) >= SEV_RANK.get(channel_min, 0)
 
 
+def _chat_url(event_id: str) -> str:
+    import os
+    base = os.environ.get("FRONTEND_URL", "https://maesil-agency-frontend.onrender.com").rstrip("/")
+    return f"{base}/chat?alert_id={event_id}"
+
+
 def _format_email_html(event: dict, analysis: "dev_agent.ErrorAnalysis | None" = None) -> tuple[str, str]:
     """(subject, html) 반환. analysis 있으면 AI 분석 섹션 포함."""
     sev = (event.get("severity") or "error").upper()
@@ -117,6 +123,24 @@ def _format_email_html(event: dict, analysis: "dev_agent.ErrorAnalysis | None" =
         </div>
       </div>"""
 
+    event_id = event.get("id") or ""
+    chat_link = _chat_url(event_id) if event_id else ""
+
+    chat_button = ""
+    if chat_link:
+        chat_button = f"""
+      <div style="margin-top:20px;text-align:center;">
+        <a href="{html_lib.escape(chat_link)}"
+           style="display:inline-block;background:#0f172a;color:#fff;text-decoration:none;
+                  padding:11px 28px;border-radius:8px;font-size:14px;font-weight:600;
+                  letter-spacing:0.02em;">
+          💬 채팅에서 분석하기
+        </a>
+        <p style="color:#94a3b8;font-size:11px;margin-top:8px;">
+          개발 AI와 대화해 원인 분석 및 수정 방향을 확인하세요.
+        </p>
+      </div>"""
+
     html = f"""
     <div style="font-family:-apple-system,sans-serif;max-width:640px;margin:0 auto;">
       <div style="border-left:4px solid {color};padding:12px 16px;background:#fafafa;">
@@ -132,6 +156,7 @@ def _format_email_html(event: dict, analysis: "dev_agent.ErrorAnalysis | None" =
                     border-radius:6px;overflow:auto;
                     white-space:pre-wrap;word-break:break-all;">{safe_msg}</pre>
       </div>
+      {chat_button}
       <p style="color:#64748b;font-size:12px;margin-top:16px;">
         maesil-agency 감시 시스템 자동 발송 · 채널 설정은 /settings 에서 변경
       </p>

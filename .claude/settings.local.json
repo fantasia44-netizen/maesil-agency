@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth *)",
+      "Bash(git clone *)",
+      "Bash(git init *)",
+      "Bash(git remote *)",
+      "Bash(git fetch *)",
+      "Bash(git checkout *)",
+      "Bash(python -c ' *)",
+      "Bash(npx tsc *)",
+      "Bash(git add *)",
+      "Bash(git config *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git pull *)",
+      "Bash(git push *)",
+      "Bash(git reset *)",
+      "Bash(git commit -m 'fix: 007 SQL FK 순서 수정 — db_registry_name null 후 db_registry rename *)",
+      "Bash(git commit -m 'fix: 구 AUTOTOOL_* 환경변수 폴백 — Render 전환 전까지 호환 *)",
+      "Read(//mnt/c/**)",
+      "Bash(dir \"C:\\\\\\\\maesil-agency\")",
+      "Bash(python inspect_insight.py)",
+      "Bash(python3 -c \"from passlib.context import CryptContext; ctx = CryptContext\\(schemes=['bcrypt']\\); print\\(ctx.hash\\('kdh801023!'\\)\\)\")",
+      "Bash(python -c \"from passlib.context import CryptContext; ctx = CryptContext\\(schemes=['bcrypt']\\); print\\(ctx.hash\\('kdh801023!'\\)\\)\")",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(python3 -c ' *)",
+      "Bash(node -e ' *)",
+      "Bash(where python *)",
+      "Bash(where python3 *)",
+      "Bash(python -c \"import bcrypt; h = bcrypt.hashpw\\('kdh801023!'.encode\\(\\), bcrypt.gensalt\\(12\\)\\); print\\(h.decode\\(\\)\\)\")",
+      "Bash(python -c \"from passlib.hash import bcrypt; print\\(bcrypt.hash\\('kdh801023!'\\)\\)\")",
+      "Bash(python -m pip install bcrypt passlib -q)"
+    ]
+  }
+}

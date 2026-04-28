@@ -10,10 +10,10 @@ import uuid
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from app.auth import require_bearer
+from app.auth import UserContext, get_current_user
 from app.services import conversations as conv_svc
 
-router = APIRouter(prefix="/api/chat", tags=["chat"], dependencies=[Depends(require_bearer)])
+router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 AGENT_DISPLAY = {
     "sales":        "세일즈 에이전트",
@@ -52,10 +52,15 @@ class ChatResponse(BaseModel):
     routed_to: list[str]
 
 
-def _save_results(conversation_id: str, user_message: str, results: list[dict]) -> None:
+def _save_results(
+    conversation_id: str,
+    user_message: str,
+    results: list[dict],
+    user_id: str | None = None,
+) -> None:
     """대화 내용을 DB에 저장 (오류 시 무시)."""
     try:
-        conv_svc.ensure_conversation(conversation_id, user_message)
+        conv_svc.ensure_conversation(conversation_id, user_message, user_id=user_id)
         conv_svc.save_user_message(conversation_id, user_message)
         for r in results:
             if r.get("message"):
@@ -72,16 +77,16 @@ def _save_results(conversation_id: str, user_message: str, results: list[dict]) 
 
 
 @router.post("", response_model=ChatResponse)
-def chat(req: ChatRequest) -> ChatResponse:
+def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> ChatResponse:
     from app.services import dev_chat_agent
 
     conversation_id = req.conversation_id or str(uuid.uuid4())
     msg_lower = req.message.lower()
 
-    # ── 개발 에이전트 우선 라우팅 ──
-    is_dev = any(k in msg_lower for k in DEV_KEYWORDS)
-    is_approve = dev_chat_agent.is_approve(req.message)
-    is_cancel = dev_chat_agent.is_cancel(req.message)
+    # ── customer는 개발 에이전트 사용 불가 ──
+    is_dev = user.is_super_admin and any(k in msg_lower for k in DEV_KEYWORDS)
+    is_approve = user.is_super_admin and dev_chat_agent.is_approve(req.message)
+    is_cancel = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
 
     if is_approve and conversation_id in dev_chat_agent._pending:
         response_text = dev_chat_agent.execute_pending(conversation_id)
@@ -90,7 +95,6 @@ def chat(req: ChatRequest) -> ChatResponse:
         response_text = dev_chat_agent.cancel_pending(conversation_id)
         agent_type = "developer"
     elif is_dev:
-        # 이전 대화 컨텍스트 조회
         try:
             ctx = conv_svc.get_messages(conversation_id)
         except Exception:
@@ -98,11 +102,12 @@ def chat(req: ChatRequest) -> ChatResponse:
         response_text = dev_chat_agent.analyze_and_propose(req.message, conversation_id, ctx)
         agent_type = "developer"
     else:
-        # 기존 오케스트레이터 흐름
+        # 오케스트레이터 흐름 — operator_id는 JWT에서
         from app.agents.orchestrator import route, run_agents
+        operator_id = user.operator_id  # customer: insight_operator_id, super_admin: secrets에서
         agent_types = route(req.message)
-        results = run_agents(req.message, conversation_id, agent_types)
-        _save_results(conversation_id, req.message, results)
+        results = run_agents(req.message, conversation_id, agent_types, operator_id=operator_id)
+        _save_results(conversation_id, req.message, results, user_id=user.id)
         agents = [
             AgentResult(
                 run_id=r["run_id"],
@@ -124,7 +129,7 @@ def chat(req: ChatRequest) -> ChatResponse:
         "message": response_text,
         "status": "success",
         "cost_usd": 0.0,
-    }])
+    }], user_id=user.id)
 
     return ChatResponse(
         conversation_id=conversation_id,
@@ -140,14 +145,17 @@ def chat(req: ChatRequest) -> ChatResponse:
 
 
 @router.post("/briefing", response_model=ChatResponse)
-def morning_briefing(req: ChatRequest | None = None) -> ChatResponse:
+def morning_briefing(
+    req: ChatRequest | None = None,
+    user: UserContext = Depends(get_current_user),
+) -> ChatResponse:
     from app.agents.orchestrator import run_morning_briefing
 
     conversation_id = (req.conversation_id if req else None) or str(uuid.uuid4())
     user_message = "☀️ 아침 현황 보고"
-    results = run_morning_briefing(conversation_id)
+    results = run_morning_briefing(conversation_id, operator_id=user.operator_id)
 
-    _save_results(conversation_id, user_message, results)
+    _save_results(conversation_id, user_message, results, user_id=user.id)
 
     agents = [
         AgentResult(
@@ -168,11 +176,11 @@ def morning_briefing(req: ChatRequest | None = None) -> ChatResponse:
 
 
 @router.get("/conversations")
-def list_conversations() -> list[dict]:
-    return conv_svc.list_conversations()
+def list_conversations(user: UserContext = Depends(get_current_user)) -> list[dict]:
+    return conv_svc.list_conversations(user_id=user.id)
 
 
 @router.get("/conversations/{conversation_id}")
-def get_conversation(conversation_id: str) -> dict:
+def get_conversation(conversation_id: str, user: UserContext = Depends(get_current_user)) -> dict:
     messages = conv_svc.get_messages(conversation_id)
     return {"conversation_id": conversation_id, "messages": messages}

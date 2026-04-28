@@ -50,15 +50,22 @@ class BaseAgent:
         message: str,
         conversation_id: str,
         run_id: str | None = None,
+        operator_id: str | None = None,
     ) -> dict[str, Any]:
-        """메시지를 받아 에이전트를 실행하고 결과 반환."""
+        """메시지를 받아 에이전트를 실행하고 결과 반환.
+
+        operator_id: JWT에서 주입 (customer의 insight_operator_id).
+                     None이면 secrets 테이블의 기본값을 폴백으로 사용.
+        """
         run_id = run_id or str(uuid.uuid4())
         started_at = datetime.now(timezone.utc).isoformat()
         _log_run_start(run_id, conversation_id, self.agent_type, self.model)
 
         try:
             client = _get_anthropic_client()
-            operator_id = get_operator_id("maesil-total")
+            # operator_id 미전달 시 secrets 테이블 폴백 (super_admin 직접 실행 등)
+            if operator_id is None:
+                operator_id = get_operator_id("maesil-insight") or get_operator_id("maesil-total")
 
             system = self.get_system_prompt()
             if operator_id:

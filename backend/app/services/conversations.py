@@ -8,16 +8,25 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def ensure_conversation(conversation_id: str, first_message: str) -> str:
+def ensure_conversation(
+    conversation_id: str,
+    first_message: str,
+    user_id: str | None = None,
+) -> str:
     """conversation_id가 없으면 생성, 있으면 updated_at 갱신."""
     client = get_maesil_total_client()
     title = first_message[:50] + ("…" if len(first_message) > 50 else "")
     now = _now()
-    client.schema("agent_work").table("conversations").upsert({
-        "id": conversation_id,
-        "title": title,
+    payload: dict = {
+        "id":         conversation_id,
+        "title":      title,
         "updated_at": now,
-    }, on_conflict="id").execute()
+    }
+    if user_id:
+        payload["user_id"] = user_id
+    client.schema("agent_work").table("conversations").upsert(
+        payload, on_conflict="id"
+    ).execute()
     return conversation_id
 
 
@@ -52,17 +61,18 @@ def save_agent_message(
     }).execute()
 
 
-def list_conversations(limit: int = 50) -> list[dict]:
-    resp = (
+def list_conversations(limit: int = 50, user_id: str | None = None) -> list[dict]:
+    q = (
         get_maesil_total_client()
         .schema("agent_work")
         .table("conversations")
         .select("id, title, created_at, updated_at")
         .order("updated_at", desc=True)
         .limit(limit)
-        .execute()
     )
-    return resp.data or []
+    if user_id:
+        q = q.eq("user_id", user_id)
+    return q.execute().data or []
 
 
 def get_messages(conversation_id: str) -> list[dict]:

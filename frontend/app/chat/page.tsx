@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { apiFetch, hasToken } from "../../lib/api";
 
 type AgentResult = {
@@ -26,35 +27,83 @@ type Message = {
   ts: Date;
 };
 
+type AlertEvent = {
+  id: string;
+  program_name: string | null;
+  severity: string;
+  source: string;
+  title: string;
+  message: string;
+  created_at: string;
+};
+
 const AGENT_COLOR: Record<string, string> = {
   sales:        "#16a34a",
   finance:      "#2563eb",
   warehouse:    "#b45309",
   cs:           "#7c3aed",
+  developer:    "#0891b2",
   orchestrator: "#475569",
 };
 
 const AGENT_EMOJI: Record<string, string> = {
-  sales:    "📈",
-  finance:  "💰",
-  warehouse:"📦",
-  cs:       "💬",
+  sales:     "📈",
+  finance:   "💰",
+  warehouse: "📦",
+  cs:        "💬",
+  developer: "👨‍💻",
   orchestrator: "🤖",
 };
 
-export default function ChatPage() {
+function ChatPageInner() {
+  const searchParams = useSearchParams();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [totalCost, setTotalCost] = useState(0);
+  const [alertBanner, setAlertBanner] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const alertSentRef = useRef(false);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  async function send(overrideMessage?: string) {
+  // alert_id URL 파라미터가 있으면 알림 컨텍스트 로드 후 자동 전송
+  useEffect(() => {
+    const alertId = searchParams.get("alert_id");
+    if (!alertId || alertSentRef.current) return;
+    alertSentRef.current = true;
+
+    async function loadAlert() {
+      if (!hasToken()) return;
+      try {
+        const event = await apiFetch<AlertEvent>(`/api/alerts/${alertId}`);
+        const sev = (event.severity || "error").toUpperCase();
+        const prog = event.program_name || "(프로그램 미특정)";
+        setAlertBanner(`📨 알림에서 연결됨 · ${sev} · ${prog} — ${event.title}`);
+
+        const autoMsg =
+          `[에러 알림 자동 연결]\n` +
+          `프로그램: ${prog}\n` +
+          `심각도: ${sev}\n` +
+          `제목: ${event.title}\n\n` +
+          `${event.message}\n\n` +
+          `이 에러를 분석하고 수정 방향을 알려주세요.`;
+
+        // sendMsg는 동기적으로 읽는 state 없이 override 사용
+        await sendMsg(autoMsg);
+      } catch {
+        // 알림 로드 실패 시 무시 (일반 채팅 계속 사용 가능)
+      }
+    }
+
+    loadAlert();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function sendMsg(overrideMessage?: string) {
     const text = (overrideMessage ?? input).trim();
     if (!text || loading) return;
     if (!hasToken()) {
@@ -103,13 +152,34 @@ export default function ChatPage() {
   }
 
   function onKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMsg(); }
   }
 
-  function reset() { setMessages([]); setConversationId(null); setTotalCost(0); }
+  function reset() {
+    setMessages([]);
+    setConversationId(null);
+    setTotalCost(0);
+    setAlertBanner(null);
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 120px)" }}>
+      {/* 알림 연결 배너 */}
+      {alertBanner && (
+        <div style={{
+          background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 8,
+          padding: "8px 14px", marginBottom: "0.75rem",
+          display: "flex", alignItems: "center", gap: 10,
+          fontSize: "0.82rem", color: "#1e40af",
+        }}>
+          <span style={{ flex: 1 }}>{alertBanner}</span>
+          <button
+            onClick={() => setAlertBanner(null)}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#60a5fa", fontSize: "1rem", lineHeight: 1 }}
+          >×</button>
+        </div>
+      )}
+
       {/* 헤더 */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
         <div>
@@ -127,7 +197,7 @@ export default function ChatPage() {
           <button
             className="btn"
             style={{ fontSize: "0.78rem" }}
-            onClick={() => send("__briefing__")}
+            onClick={() => sendMsg("__briefing__")}
             disabled={loading}
           >
             ☀️ 아침 브리핑
@@ -138,7 +208,7 @@ export default function ChatPage() {
 
       {/* 메시지 영역 */}
       <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "1rem", padding: "0.5rem 0" }}>
-        {messages.length === 0 && (
+        {messages.length === 0 && !loading && (
           <div style={{ textAlign: "center", color: "#94a3b8", marginTop: "4rem", fontSize: "0.9rem", lineHeight: 2 }}>
             매출·재무·재고·CS 관련 질문을 입력하거나<br />
             <strong>☀️ 아침 브리핑</strong> 버튼으로 전체 현황 보고를 받으세요.
@@ -156,6 +226,7 @@ export default function ChatPage() {
                     borderRadius: "14px 14px 4px 14px",
                     background: "#0f172a", color: "#fff",
                     fontSize: "0.88rem", lineHeight: 1.55,
+                    whiteSpace: "pre-wrap",
                   }}>
                     {m.text}
                   </div>
@@ -180,7 +251,7 @@ export default function ChatPage() {
                     </div>
                     <div style={{ maxWidth: "80%" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.2rem" }}>
-                        <span style={{ fontSize: "0.72rem", color: AGENT_COLOR[a.agent_type], fontWeight: 700 }}>
+                        <span style={{ fontSize: "0.72rem", color: AGENT_COLOR[a.agent_type] ?? "#475569", fontWeight: 700 }}>
                           {a.agent_display}
                         </span>
                         {a.status === "failed" && (
@@ -239,7 +310,7 @@ export default function ChatPage() {
         />
         <button
           className="btn primary"
-          onClick={() => send()}
+          onClick={() => sendMsg()}
           disabled={loading || !input.trim()}
           style={{ height: 56, minWidth: 56, fontSize: "1.1rem" }}
         >
@@ -247,5 +318,17 @@ export default function ChatPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh", color: "#94a3b8" }}>
+        로딩 중…
+      </div>
+    }>
+      <ChatPageInner />
+    </Suspense>
   );
 }
