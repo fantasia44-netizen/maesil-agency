@@ -243,25 +243,29 @@ def analyze_and_propose(
                 except Exception as e:
                     logger.warning("파일 읽기 실패 %s/%s: %s", repo, fp, e)
 
-            # 2차 폴백: GitHub code search (트리 검색 X — 대용량 레포 타임아웃 방지)
+            # 2차 폴백: GitHub code search (대괄호 없는 안정적 쿼리)
             if not file_info:
                 code_search_queries = []
                 if failing_symbol:
                     cls_name_orig = failing_symbol.split(".")[0]
-                    # 에러 로그 문자열 직접 검색 (가장 정확)
+                    # 괄호 없이 클래스명 단독 검색 (대괄호는 GitHub search 특수문자)
                     code_search_queries += [
-                        f'"[{cls_name_orig}]"',           # "[AgencyLog]"
                         f"class {cls_name_orig}",          # class AgencyLog
-                        f"def {cls_name_orig.lower()}",    # def agencylog
+                        cls_name_orig,                     # AgencyLog (단독)
                     ]
                 # 모듈명으로도 검색
                 for fp in file_paths[:2]:
                     base = fp.split("/")[-1].replace(".py", "")
-                    code_search_queries.append(base)
+                    if base not in code_search_queries:
+                        code_search_queries.append(base)
 
                 logger.warning("1차 경로 실패 → code search: %s (repo=%s)", code_search_queries[:2], repo)
                 for query in code_search_queries:
-                    found_paths = github_client.search_code_in_repo(repo, query)
+                    try:
+                        found_paths = github_client.search_code_in_repo(repo, query)
+                    except Exception as e:
+                        logger.warning("code search 예외 [%s]: %s", query, e)
+                        found_paths = []
                     for candidate in found_paths[:3]:
                         try:
                             f = github_client.get_file(repo, candidate, branch)
@@ -279,11 +283,49 @@ def analyze_and_propose(
                     if file_info:
                         break
 
+            # 3차 폴백: 디렉터리 직접 탐색 (code search 인덱싱/rate-limit 실패 대비)
+            if not file_info and failing_symbol:
+                cls_lower = failing_symbol.split(".")[0].lower()
+                snake = re.sub(r'(?<!^)(?=[A-Z])', '_', failing_symbol.split(".")[0]).lower()
+                search_dirs = [
+                    "app/services", "app", "app/utils", "app/models", "app/core",
+                    "src/services", "src", "utils", "core", "logs", "",
+                ]
+                logger.warning("3차 디렉터리 탐색 시작: %s / %s (repo=%s)", cls_lower, snake, repo)
+                for dir_path in search_dirs:
+                    try:
+                        dir_files = github_client.list_files(repo, dir_path, branch)
+                        relevant = [
+                            f for f in dir_files
+                            if cls_lower in f.split("/")[-1].lower()
+                            or snake in f.split("/")[-1].lower()
+                        ]
+                        for candidate in relevant[:3]:
+                            try:
+                                f = github_client.get_file(repo, candidate, branch)
+                                if cls_lower in f["content"].lower():
+                                    snippet = _extract_relevant_section(f["content"], failing_symbol)
+                                    code_context += f"\n\n### {candidate}\n```\n{snippet}\n```"
+                                    file_info = {"repo": repo, "path": candidate, "sha": f["sha"],
+                                                 "branch": branch, "original": f["content"]}
+                                    logger.warning("3차(디렉터리) 파일 발견: %s/%s", dir_path, candidate)
+                                    break
+                            except Exception:
+                                continue
+                        if file_info:
+                            break
+                    except Exception:
+                        continue
+
             if not file_info:
+                tried_dirs = ["app/services", "app", "app/utils", "src", "utils", "core", "logs"]
                 code_context = (
-                    f"\n\n(파일 읽기 실패 — 레포 `{repo}`)\n"
-                    f"시도한 경로: {file_paths[:4]}\n"
-                    f"실패 심볼: {failing_symbol}"
+                    f"\n\n⚠️ 파일을 찾지 못했습니다 (레포: `{repo}`)\n"
+                    f"- 시도한 직접 경로: {file_paths[:4]}\n"
+                    f"- code search 쿼리: `class {failing_symbol.split('.')[0] if failing_symbol else '?'}`\n"
+                    f"- 탐색한 디렉터리: {tried_dirs}\n"
+                    f"- 찾는 심볼: `{failing_symbol}`\n"
+                    f"→ 파일명이나 클래스명이 다르거나 레포 구조가 비표준일 수 있습니다."
                 )
 
             # 파일은 찾았으나 실패 심볼 클래스가 없는 경우 → 클래스 정의 파일 추가 탐색
