@@ -53,8 +53,8 @@ const KEY_CARDS: KeyCard[] = [
   { name: "m_insight_service_role", kind: "supabase", label: "maesil-insight Service Role Key",
     hint: "Supabase 프로젝트 → Settings → API → service_role (CS 에이전트 / 매요AI 분석)" },
   // ── Operator ID ──
-  { name: "maesil_total_operator_id", kind: "config", label: "autotool Operator ID",
-    hint: "autotool DB의 내 operator_id (UUID) — Sales/Finance/Warehouse 에이전트에 필수" },
+  { name: "maesil_total_operator_id", kind: "config", label: "maesil-total Operator ID",
+    hint: "maesil-total DB의 내 operator_id (UUID) — Sales/Finance/Warehouse 에이전트에 필수" },
   { name: "maesil-insight_operator_id", kind: "config", label: "maesil-insight Operator ID",
     hint: "maesil-insight DB의 내 operator_id (UUID) — CS 에이전트에 필수" },
   // ── maesil-insight URL ──
@@ -299,7 +299,7 @@ export default function SettingsPage() {
       <h2 style={{ margin: "1.5rem 0 0.75rem 0", fontSize: "1.05rem" }}>시스템 키</h2>
       <p className="muted" style={{ marginTop: 0 }}>
         각 외부 시스템(Render, 다른 Supabase 프로젝트, Anthropic 등) 접속 키를 등록합니다.
-        여기서 저장한 값은 autotool DB <code>agent_work.secrets</code>에 저장되며, 백엔드만 조회합니다.
+        여기서 저장한 값은 maesil-total DB <code>agent_work.secrets</code>에 저장되며, 백엔드만 조회합니다.
       </p>
 
       {err && (
