@@ -21,7 +21,14 @@ AGENT_DISPLAY = {
     "warehouse":    "웨어하우스 에이전트",
     "cs":           "CS 에이전트",
     "tester":       "테스터 에이전트",
+    "developer":    "개발 에이전트",
     "orchestrator": "오케스트레이터",
+}
+
+DEV_KEYWORDS = {
+    "에러", "error", "버그", "bug", "수정", "fix", "코드", "code",
+    "배포", "deploy", "로그", "log", "traceback", "exception",
+    "pr", "커밋", "commit", "github", "깃", "고쳐", "분석",
 }
 
 
@@ -66,26 +73,70 @@ def _save_results(conversation_id: str, user_message: str, results: list[dict]) 
 
 @router.post("", response_model=ChatResponse)
 def chat(req: ChatRequest) -> ChatResponse:
-    from app.agents.orchestrator import route, run_agents
+    from app.services import dev_chat_agent
 
     conversation_id = req.conversation_id or str(uuid.uuid4())
-    agent_types = route(req.message)
-    results = run_agents(req.message, conversation_id, agent_types)
+    msg_lower = req.message.lower()
 
-    _save_results(conversation_id, req.message, results)
+    # ── 개발 에이전트 우선 라우팅 ──
+    is_dev = any(k in msg_lower for k in DEV_KEYWORDS)
+    is_approve = dev_chat_agent.is_approve(req.message)
+    is_cancel = dev_chat_agent.is_cancel(req.message)
 
-    agents = [
-        AgentResult(
-            run_id=r["run_id"],
-            agent_type=r["agent_type"],
-            agent_display=AGENT_DISPLAY.get(r["agent_type"], r["agent_type"]),
-            message=r["message"],
-            status=r.get("status", "unknown"),
-            cost_usd=r.get("cost_usd", 0.0),
-        )
-        for r in results
-    ]
-    return ChatResponse(conversation_id=conversation_id, agents=agents, routed_to=agent_types)
+    if is_approve and conversation_id in dev_chat_agent._pending:
+        response_text = dev_chat_agent.execute_pending(conversation_id)
+        agent_type = "developer"
+    elif is_cancel:
+        response_text = dev_chat_agent.cancel_pending(conversation_id)
+        agent_type = "developer"
+    elif is_dev:
+        # 이전 대화 컨텍스트 조회
+        try:
+            ctx = conv_svc.get_messages(conversation_id)
+        except Exception:
+            ctx = []
+        response_text = dev_chat_agent.analyze_and_propose(req.message, conversation_id, ctx)
+        agent_type = "developer"
+    else:
+        # 기존 오케스트레이터 흐름
+        from app.agents.orchestrator import route, run_agents
+        agent_types = route(req.message)
+        results = run_agents(req.message, conversation_id, agent_types)
+        _save_results(conversation_id, req.message, results)
+        agents = [
+            AgentResult(
+                run_id=r["run_id"],
+                agent_type=r["agent_type"],
+                agent_display=AGENT_DISPLAY.get(r["agent_type"], r["agent_type"]),
+                message=r["message"],
+                status=r.get("status", "unknown"),
+                cost_usd=r.get("cost_usd", 0.0),
+            )
+            for r in results
+        ]
+        return ChatResponse(conversation_id=conversation_id, agents=agents, routed_to=agent_types)
+
+    # 개발 에이전트 결과 저장
+    run_id = str(uuid.uuid4())
+    _save_results(conversation_id, req.message, [{
+        "run_id": run_id,
+        "agent_type": agent_type,
+        "message": response_text,
+        "status": "success",
+        "cost_usd": 0.0,
+    }])
+
+    return ChatResponse(
+        conversation_id=conversation_id,
+        agents=[AgentResult(
+            run_id=run_id,
+            agent_type=agent_type,
+            agent_display=AGENT_DISPLAY["developer"],
+            message=response_text,
+            status="success",
+        )],
+        routed_to=[agent_type],
+    )
 
 
 @router.post("/briefing", response_model=ChatResponse)

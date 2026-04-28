@@ -1,0 +1,299 @@
+"""
+dev_chat_agent — 대화형 개발 에이전트.
+
+흐름:
+  1. 유저 메시지 수신 (에러 설명 or 수정 요청)
+  2. 프로그램 레지스트리에서 github_repo 조회
+  3. 스택트레이스에서 파일 경로 추출 → 코드 읽기
+  4. Claude로 원인 분석 + 수정 코드 생성
+  5. 수정안 제시 (diff + 설명)
+  6. pending_actions 에 저장 → 승인 대기
+  7. 유저 '승인' → PR 생성 + 링크 반환
+
+승인 키워드: 승인, 실행, 확인, ok, yes, ㅇㅋ, 적용
+"""
+from __future__ import annotations
+
+import json
+import logging
+import re
+import uuid
+from datetime import datetime, timezone
+from typing import Any
+
+from app.db.maesil_total_client import get_maesil_total_client
+from app.services import github_client
+
+logger = logging.getLogger(__name__)
+
+APPROVE_KEYWORDS = {"승인", "실행", "확인", "ok", "yes", "ㅇㅋ", "적용", "해줘", "실행해", "고쳐줘"}
+
+# 메모리 내 pending actions (프로세스 수명 동안 유지)
+# { conversation_id: { action_id, repo, branch, path, new_content, sha, pr_title, pr_body, commit_msg } }
+_pending: dict[str, dict[str, Any]] = {}
+
+
+# ─────────────────────────────────────────────────────────────────
+# helpers
+# ─────────────────────────────────────────────────────────────────
+
+def _get_program(name: str) -> dict | None:
+    resp = (
+        get_maesil_total_client()
+        .schema("agent_work")
+        .table("program_registry")
+        .select("name, display_name, github_repo, host_provider")
+        .eq("name", name)
+        .limit(1)
+        .execute()
+    )
+    rows = resp.data or []
+    return rows[0] if rows else None
+
+
+def _all_programs() -> list[dict]:
+    resp = (
+        get_maesil_total_client()
+        .schema("agent_work")
+        .table("program_registry")
+        .select("name, display_name, github_repo")
+        .eq("is_active", True)
+        .execute()
+    )
+    return resp.data or []
+
+
+def _extract_file_paths(text: str) -> list[str]:
+    """스택트레이스/로그에서 파일 경로 패턴 추출."""
+    patterns = [
+        r'File "([^"]+\.py)"',           # Python traceback
+        r'at ([^\s]+\.py):',             # 일반
+        r'([a-zA-Z_/]+\.py)',            # 단순 .py 경로
+        r'([a-zA-Z_/]+\.(ts|tsx|js|jsx))',  # JS/TS
+    ]
+    found = []
+    for pat in patterns:
+        for m in re.finditer(pat, text):
+            p = m.group(1)
+            # /opt/render/project/src/ 같은 prefix 제거
+            p = re.sub(r'^.*?/src/', '', p)
+            p = re.sub(r'^.*?/project/', '', p)
+            if p and p not in found and not p.startswith('/'):
+                found.append(p)
+    return found[:5]  # 최대 5개
+
+
+def _detect_program_from_text(text: str, programs: list[dict]) -> dict | None:
+    """메시지에서 프로그램 이름 감지."""
+    text_lower = text.lower()
+    for p in programs:
+        name = p["name"].lower()
+        display = (p.get("display_name") or "").lower()
+        if name in text_lower or (display and display in text_lower):
+            return p
+    return None
+
+
+def _call_claude(system: str, user: str, max_tokens: int = 2000) -> str:
+    from app.services.secrets import get_secret
+    import anthropic
+
+    api_key = get_secret("anthropic_api_key")
+    if not api_key:
+        raise RuntimeError("anthropic_api_key 미설정")
+
+    client = anthropic.Anthropic(api_key=api_key)
+    resp = client.messages.create(
+        model="claude-sonnet-4-5",
+        max_tokens=max_tokens,
+        system=system,
+        messages=[{"role": "user", "content": user}],
+    )
+    return resp.content[0].text.strip()
+
+
+# ─────────────────────────────────────────────────────────────────
+# 핵심 분석 + 수정안 생성
+# ─────────────────────────────────────────────────────────────────
+
+def analyze_and_propose(
+    user_message: str,
+    conversation_id: str,
+    context_messages: list[dict] | None = None,
+) -> str:
+    """분석 + 수정안 제시. pending action 저장. 응답 텍스트 반환."""
+
+    programs = _all_programs()
+    program = _detect_program_from_text(user_message, programs)
+
+    # 코드 컨텍스트 수집
+    code_context = ""
+    file_info: dict | None = None
+
+    if program and program.get("github_repo"):
+        repo = program["github_repo"]
+        try:
+            branch = github_client.get_default_branch(repo)
+            file_paths = _extract_file_paths(user_message)
+
+            for fp in file_paths:
+                try:
+                    f = github_client.get_file(repo, fp, branch)
+                    code_context += f"\n\n### {fp}\n```\n{f['content'][:3000]}\n```"
+                    file_info = {"repo": repo, "path": fp, "sha": f["sha"], "branch": branch,
+                                 "original": f["content"]}
+                    break  # 첫 번째 파일만 (컨텍스트 크기 관리)
+                except FileNotFoundError:
+                    continue
+                except Exception as e:
+                    logger.warning("파일 읽기 실패 %s/%s: %s", repo, fp, e)
+
+            if not file_info and file_paths:
+                code_context = f"\n\n(파일 읽기 시도: {file_paths} — 접근 실패)"
+
+        except Exception as e:
+            code_context = f"\n\n(GitHub 접근 실패: {e})"
+
+    # 이전 대화 컨텍스트
+    history = ""
+    if context_messages:
+        for m in context_messages[-6:]:
+            role = "유저" if m.get("role") == "user" else "에이전트"
+            history += f"\n{role}: {m.get('content', '')[:300]}"
+
+    # Claude 호출
+    system_prompt = """당신은 시니어 풀스택 개발자 AI 에이전트입니다.
+유저가 제시한 에러나 문제를 분석하고 구체적인 수정 방향을 제시합니다.
+코드 수정이 필요한 경우 수정된 코드를 제시하고, 유저의 승인을 기다립니다.
+응답은 한국어로 작성하세요.
+
+중요: 코드 수정을 제안할 때는 반드시 다음 형식을 포함하세요:
+[PROPOSED_FIX]
+파일: <파일경로>
+```
+<수정된 전체 파일 내용 또는 변경 부분>
+```
+커밋메시지: <fix: 간단한 설명>
+PR제목: <간단한 제목>
+[/PROPOSED_FIX]"""
+
+    user_prompt = f"""요청: {user_message}
+
+프로그램: {program['name'] if program else '미특정'}
+레포: {program.get('github_repo', '미등록') if program else '미등록'}
+{history}
+{code_context}
+
+위 정보를 바탕으로 분석하고 수정 방향을 제시해주세요.
+코드 수정이 가능하면 [PROPOSED_FIX] 블록을 포함해주세요."""
+
+    try:
+        response = _call_claude(system_prompt, user_prompt)
+    except Exception as e:
+        return f"⚠️ AI 분석 실패: {e}"
+
+    # PROPOSED_FIX 파싱 → pending action 저장
+    fix_match = re.search(r'\[PROPOSED_FIX\](.*?)\[/PROPOSED_FIX\]', response, re.DOTALL)
+    if fix_match and file_info:
+        fix_block = fix_match.group(1).strip()
+        code_match = re.search(r'```(?:\w+)?\n(.*?)```', fix_block, re.DOTALL)
+        commit_match = re.search(r'커밋메시지:\s*(.+)', fix_block)
+        pr_title_match = re.search(r'PR제목:\s*(.+)', fix_block)
+
+        if code_match:
+            new_code = code_match.group(1)
+            commit_msg = commit_match.group(1).strip() if commit_match else "fix: AI 자동 수정"
+            pr_title = pr_title_match.group(1).strip() if pr_title_match else commit_msg
+
+            action_id = str(uuid.uuid4())[:8]
+            branch_name = f"fix/agency-{action_id}"
+
+            _pending[conversation_id] = {
+                "action_id": action_id,
+                "repo": file_info["repo"],
+                "branch": branch_name,
+                "base_branch": file_info["branch"],
+                "path": file_info["path"],
+                "new_content": new_code,
+                "sha": file_info["sha"],
+                "commit_msg": commit_msg,
+                "pr_title": pr_title,
+                "pr_body": f"## AI 자동 수정\n\n{response[:1000]}\n\n---\n*maesil-agency 자동 생성*",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }
+
+            response += f"\n\n---\n✅ **수정안 준비 완료** (action: `{action_id}`)\n`승인` 이라고 입력하면 PR을 생성합니다. `취소` 로 취소 가능."
+
+    return response
+
+
+# ─────────────────────────────────────────────────────────────────
+# 승인 처리
+# ─────────────────────────────────────────────────────────────────
+
+def execute_pending(conversation_id: str) -> str:
+    """pending action 실행 → PR 생성."""
+    action = _pending.get(conversation_id)
+    if not action:
+        return "⚠️ 대기 중인 수정안이 없습니다. 먼저 수정 요청을 해주세요."
+
+    repo = action["repo"]
+    branch = action["branch"]
+    base = action["base_branch"]
+
+    try:
+        # 1) 브랜치 생성
+        github_client.create_branch(repo, branch, from_branch=base)
+
+        # 2) 파일 커밋
+        github_client.commit_file(
+            repo=repo,
+            path=action["path"],
+            new_content=action["new_content"],
+            commit_message=action["commit_msg"],
+            branch=branch,
+            sha=action["sha"],
+        )
+
+        # 3) PR 생성
+        pr = github_client.create_pr(
+            repo=repo,
+            title=action["pr_title"],
+            body=action["pr_body"],
+            head=branch,
+            base=base,
+        )
+
+        # 완료 후 삭제
+        del _pending[conversation_id]
+
+        return (
+            f"✅ **PR 생성 완료**\n\n"
+            f"**{action['pr_title']}**\n"
+            f"🔗 {pr['html_url']}\n\n"
+            f"PR을 검토 후 머지하면 Render가 자동 재배포합니다."
+        )
+
+    except Exception as e:
+        logger.exception("execute_pending 실패")
+        return f"❌ PR 생성 실패: {e}"
+
+
+def cancel_pending(conversation_id: str) -> str:
+    if conversation_id in _pending:
+        del _pending[conversation_id]
+        return "🚫 수정안을 취소했습니다."
+    return "취소할 대기 중인 수정안이 없습니다."
+
+
+def is_approve(text: str) -> bool:
+    t = text.strip().lower()
+    return any(k in t for k in APPROVE_KEYWORDS) and len(t) < 20
+
+
+def is_cancel(text: str) -> bool:
+    t = text.strip().lower()
+    return any(k in t for k in {"취소", "cancel", "no", "아니", "ㄴ"}) and len(t) < 10
+
+
+__all__ = ["analyze_and_propose", "execute_pending", "cancel_pending", "is_approve", "is_cancel"]
