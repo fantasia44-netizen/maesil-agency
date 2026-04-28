@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from typing import Iterable
 
 from app.db.maesil_total_client import get_maesil_total_client
-from app.services import notify_client
+from app.services import dev_agent, notify_client
 
 logger = logging.getLogger(__name__)
 
@@ -69,8 +69,8 @@ def _meets_severity(channel_min: str, event_sev: str) -> bool:
     return SEV_RANK.get(event_sev, 0) >= SEV_RANK.get(channel_min, 0)
 
 
-def _format_email_html(event: dict) -> tuple[str, str]:
-    """(subject, html) 반환."""
+def _format_email_html(event: dict, analysis: "dev_agent.ErrorAnalysis | None" = None) -> tuple[str, str]:
+    """(subject, html) 반환. analysis 있으면 AI 분석 섹션 포함."""
     sev = (event.get("severity") or "error").upper()
     program = event.get("program_name") or "(unknown)"
     title = event.get("title") or "알림"
@@ -84,6 +84,39 @@ def _format_email_html(event: dict) -> tuple[str, str]:
     safe_msg = html_lib.escape(msg[:3000])
     safe_program = html_lib.escape(program)
 
+    # AI 분석 섹션 (있을 때만)
+    ai_section = ""
+    if analysis and analysis.ok:
+        conf_color = {"high": "#16a34a", "medium": "#d97706", "low": "#94a3b8"}.get(analysis.confidence, "#94a3b8")
+        ai_section = f"""
+      <div style="margin-top:16px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
+        <div style="background:#f8fafc;padding:10px 16px;border-bottom:1px solid #e2e8f0;
+                    display:flex;align-items:center;gap:8px;">
+          <span style="font-size:14px;">🤖</span>
+          <span style="font-weight:600;font-size:13px;">AI 에러 분석</span>
+          <span style="margin-left:auto;font-size:11px;color:{conf_color};font-weight:600;">
+            신뢰도: {html_lib.escape(analysis.confidence)}
+          </span>
+        </div>
+        <div style="padding:12px 16px;">
+          <div style="margin-bottom:10px;">
+            <div style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;
+                        letter-spacing:0.05em;margin-bottom:4px;">■ 원인 추정</div>
+            <div style="font-size:13px;color:#1e293b;">{html_lib.escape(analysis.root_cause)}</div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <div style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;
+                        letter-spacing:0.05em;margin-bottom:4px;">■ 영향 범위</div>
+            <div style="font-size:13px;color:#1e293b;">{html_lib.escape(analysis.impact)}</div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;
+                        letter-spacing:0.05em;margin-bottom:4px;">■ 수정 방향</div>
+            <div style="font-size:13px;color:#1e293b;white-space:pre-line;">{html_lib.escape(analysis.fix_suggestion)}</div>
+          </div>
+        </div>
+      </div>"""
+
     html = f"""
     <div style="font-family:-apple-system,sans-serif;max-width:640px;margin:0 auto;">
       <div style="border-left:4px solid {color};padding:12px 16px;background:#fafafa;">
@@ -91,9 +124,14 @@ def _format_email_html(event: dict) -> tuple[str, str]:
         <div style="font-size:18px;margin-top:4px;font-weight:600;">{safe_title}</div>
         <div style="color:#475569;font-size:13px;margin-top:6px;">프로그램: <strong>{safe_program}</strong> · {html_lib.escape(created)}</div>
       </div>
-      <pre style="background:#0f172a;color:#e2e8f0;padding:12px;font-size:12px;
-                  border-radius:6px;overflow:auto;margin-top:12px;
-                  white-space:pre-wrap;word-break:break-all;">{safe_msg}</pre>
+      {ai_section}
+      <div style="margin-top:12px;">
+        <div style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;
+                    letter-spacing:0.05em;margin-bottom:6px;">■ 원문 로그</div>
+        <pre style="background:#0f172a;color:#e2e8f0;padding:12px;font-size:12px;
+                    border-radius:6px;overflow:auto;
+                    white-space:pre-wrap;word-break:break-all;">{safe_msg}</pre>
+      </div>
       <p style="color:#64748b;font-size:12px;margin-top:16px;">
         maesil-agency 감시 시스템 자동 발송 · 채널 설정은 /settings 에서 변경
       </p>
@@ -116,7 +154,22 @@ def _send_to_channel(event: dict, channel: dict) -> dict:
         target = (channel.get("target") or "").strip()
         if not target:
             return {**base, "ok": False, "error": "email target 미설정"}
-        subject, html = _format_email_html(event)
+
+        # error/critical 이벤트만 AI 분석 (info/warning은 스킵해서 API 비용 절감)
+        analysis = None
+        if SEV_RANK.get(event.get("severity", "info"), 0) >= SEV_RANK["error"]:
+            try:
+                analysis = dev_agent.analyze_error(
+                    program_name=event.get("program_name") or "unknown",
+                    severity=event.get("severity", "error"),
+                    title=event.get("title") or "",
+                    message=event.get("message") or "",
+                    source=event.get("source") or "render-logs",
+                )
+            except Exception as e:
+                logger.warning("dev_agent 호출 실패 (이메일은 계속): %s", e)
+
+        subject, html = _format_email_html(event, analysis)
         result = notify_client.send_email(target, subject, html)
         return {**base, "ok": bool(result.get("ok")), "error": result.get("error"), "external_id": result.get("id")}
 
