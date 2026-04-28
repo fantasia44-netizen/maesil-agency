@@ -142,26 +142,50 @@ def analyze_and_propose(
     code_context = ""
     file_info: dict | None = None
 
-    if program and program.get("github_repo"):
+    if program and not program.get("github_repo"):
+        code_context = (
+            f"\n\n⚠️ **{program.get('display_name', program['name'])} GitHub 레포 미등록**\n"
+            "Settings → 프로그램 관리에서 github_repo를 등록하면 코드를 직접 읽고 수정안을 제시합니다."
+        )
+    elif program and program.get("github_repo"):
         repo = program["github_repo"]
         try:
             branch = github_client.get_default_branch(repo)
             file_paths = _extract_file_paths(user_message)
 
+            # 1차: 추출된 경로 후보로 직접 시도
             for fp in file_paths:
                 try:
                     f = github_client.get_file(repo, fp, branch)
                     code_context += f"\n\n### {fp}\n```\n{f['content'][:3000]}\n```"
                     file_info = {"repo": repo, "path": fp, "sha": f["sha"], "branch": branch,
                                  "original": f["content"]}
-                    break  # 첫 번째 파일만 (컨텍스트 크기 관리)
+                    break
                 except FileNotFoundError:
                     continue
                 except Exception as e:
                     logger.warning("파일 읽기 실패 %s/%s: %s", repo, fp, e)
 
+            # 2차 폴백: 레포 트리 전체 검색으로 파일 찾기
             if not file_info and file_paths:
-                code_context = f"\n\n(파일 읽기 시도: {file_paths} — 접근 실패)"
+                logger.info("경로 후보 실패 → 레포 트리 검색: %s", file_paths)
+                for fp in file_paths:
+                    basename = fp.split("/")[-1].replace(".py", "").replace(".ts", "")
+                    found = github_client.find_file_in_repo(repo, basename, branch)
+                    for candidate in found[:3]:
+                        try:
+                            f = github_client.get_file(repo, candidate, branch)
+                            code_context += f"\n\n### {candidate} (트리검색)\n```\n{f['content'][:3000]}\n```"
+                            file_info = {"repo": repo, "path": candidate, "sha": f["sha"],
+                                         "branch": branch, "original": f["content"]}
+                            break
+                        except Exception:
+                            continue
+                    if file_info:
+                        break
+
+            if not file_info:
+                code_context = f"\n\n(파일 읽기 시도: {file_paths} — 레포 `{repo}` 에서 파일을 찾지 못했습니다)"
 
         except Exception as e:
             code_context = f"\n\n(GitHub 접근 실패: {e})"

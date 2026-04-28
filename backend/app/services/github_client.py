@@ -64,6 +64,30 @@ def get_default_branch(repo: str) -> str:
     return r.json().get("default_branch", "main")
 
 
+def get_repo_tree(repo: str, branch: str = "main") -> list[str]:
+    """레포 전체 파일 경로 목록 (재귀). 파일 찾기 폴백용."""
+    r = httpx.get(
+        f"{BASE}/repos/{repo}/git/trees/{branch}",
+        headers=_headers(),
+        params={"recursive": "1"},
+        timeout=15,
+    )
+    r.raise_for_status()
+    data = r.json()
+    return [item["path"] for item in data.get("tree", []) if item.get("type") == "blob"]
+
+
+def find_file_in_repo(repo: str, filename: str, branch: str = "main") -> list[str]:
+    """레포 트리에서 파일명이 포함된 경로 목록 반환 (대소문자 무시)."""
+    try:
+        all_paths = get_repo_tree(repo, branch)
+        lower = filename.lower().replace(".py", "").replace(".ts", "")
+        return [p for p in all_paths if lower in p.lower().split("/")[-1]]
+    except Exception as e:
+        logger.warning("find_file_in_repo 실패 %s/%s: %s", repo, filename, e)
+        return []
+
+
 def get_recent_commits(repo: str, branch: str = "main", n: int = 5) -> list[dict]:
     """최근 커밋 n건. [{sha, message, author, date}]"""
     r = httpx.get(
@@ -159,6 +183,6 @@ def create_pr(
 
 
 __all__ = [
-    "get_file", "list_files", "get_default_branch", "get_recent_commits",
-    "create_branch", "commit_file", "create_pr",
+    "get_file", "list_files", "get_default_branch", "get_repo_tree", "find_file_in_repo",
+    "get_recent_commits", "create_branch", "commit_file", "create_pr",
 ]
