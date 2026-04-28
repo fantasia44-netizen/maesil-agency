@@ -38,6 +38,8 @@ DEV_KEYWORDS = {
     "배포", "deploy", "로그", "log",
     # 버전관리
     "pr", "커밋", "commit", "github", "깃",
+    # 레포지토리
+    "레포", "repo", "레포지토리", "repository", "저장소",
     # 분석/파악
     "분석", "파악", "원인", "디버그", "debug",
     # 개발 에이전트 직접 호출
@@ -132,6 +134,18 @@ def _is_dev_intent(message: str) -> bool:
         return False
 
 
+def _last_agent_in_conversation(conversation_id: str) -> str | None:
+    """대화의 마지막 에이전트 타입 반환. DB 오류 시 None."""
+    try:
+        msgs = conv_svc.get_messages(conversation_id)
+        for m in reversed(msgs):
+            if m.get("role") == "assistant" and m.get("agent_type"):
+                return m["agent_type"]
+    except Exception:
+        pass
+    return None
+
+
 @router.post("", response_model=ChatResponse)
 def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> ChatResponse:
     from app.services import dev_chat_agent
@@ -140,8 +154,15 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
     msg_lower = req.message.lower().strip()
 
     # ── 1. 개발 에이전트 라우팅 (super_admin 전용) ──────────────────
-    is_dev     = user.is_super_admin and (
-        any(k in msg_lower for k in DEV_KEYWORDS) or _is_dev_intent(req.message)
+    # 이전 대화 맥락 확인: 마지막 에이전트가 developer면 계속 developer로
+    is_dev_context = (
+        user.is_super_admin and
+        _last_agent_in_conversation(conversation_id) == "developer"
+    )
+    is_dev = user.is_super_admin and (
+        is_dev_context or
+        any(k in msg_lower for k in DEV_KEYWORDS) or
+        _is_dev_intent(req.message)
     )
     is_approve = user.is_super_admin and dev_chat_agent.is_approve(req.message)
     is_cancel  = user.is_super_admin and dev_chat_agent.is_cancel(req.message)

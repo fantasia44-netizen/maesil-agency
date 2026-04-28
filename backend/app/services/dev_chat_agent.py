@@ -138,6 +138,13 @@ def analyze_and_propose(
     programs = _all_programs()
     program = _detect_program_from_text(user_message, programs)
 
+    # 현재 메시지에서 못 찾으면 대화 컨텍스트에서 프로그램 탐지
+    if not program and context_messages:
+        for m in reversed(context_messages[-10:]):
+            program = _detect_program_from_text(m.get("content", ""), programs)
+            if program:
+                break
+
     # 코드 컨텍스트 수집
     code_context = ""
     file_info: dict | None = None
