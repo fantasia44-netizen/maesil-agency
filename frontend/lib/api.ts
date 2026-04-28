@@ -48,10 +48,12 @@ export function isSuperAdmin(): boolean {
 }
 
 // ── API 호출 ─────────────────────────────────────────────────────────
+// 에이전트 실행은 60초까지 걸릴 수 있으므로 기본 60초
+// 단순 데이터 조회는 apiFetch(path, {}, 15000) 으로 명시 가능
 export async function apiFetch<T = unknown>(
   path: string,
   init: RequestInit = {},
-  timeoutMs = 15000,
+  timeoutMs = 60000,
 ): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
