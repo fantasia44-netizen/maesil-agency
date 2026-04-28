@@ -32,10 +32,6 @@ class CSAgent(BaseAgent):
 - 허용된 템플릿 키 외 SQL 작성 금지
 """
 
-    def run(self, message: str, conversation_id: str, run_id: str | None = None) -> dict:
-        """CS 에이전트는 maesil-insight operator_id도 필요."""
-        return super().run(message, conversation_id, run_id)
-
     def get_tools(self) -> list[dict]:
         # CS 에이전트용 추가 도구 포함 (maesil-insight operator_id 힌트)
         tools = COMMON_TOOLS.copy()
