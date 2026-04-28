@@ -22,6 +22,7 @@ type Program = {
   host_provider: string | null;
   host_service_id: string | null;
   health_url: string | null;
+  github_repo: string | null;
   is_active: boolean;
   notes: string | null;
 };
@@ -67,6 +68,8 @@ const KEY_CARDS: KeyCard[] = [
   // ── 인프라 ──
   { name: "render_api", kind: "render", label: "Render API Token",
     hint: "Render Account Settings → API Keys (프로그램 상태 수집용)" },
+  { name: "github_token", kind: "other", label: "GitHub Personal Access Token",
+    hint: "github.com/settings/tokens → repo 권한 (코드 읽기/PR 생성/커밋용)" },
 ];
 
 export default function SettingsPage() {
@@ -416,6 +419,15 @@ export default function SettingsPage() {
                   value={edit.health_url ?? p.health_url ?? ""}
                   onChange={(e) => setEditingProgram({ ...editingProgram, [p.name]: { ...edit, health_url: e.target.value } })}
                   placeholder="https://example.com/health"
+                />
+              </div>
+              <div className="config-field">
+                <label>GitHub 레포 (선택)</label>
+                <input
+                  type="text"
+                  value={(edit as any).github_repo ?? p.github_repo ?? ""}
+                  onChange={(e) => setEditingProgram({ ...editingProgram, [p.name]: { ...edit, github_repo: e.target.value } })}
+                  placeholder="fantasia44-netizen/maesil-total"
                 />
               </div>
               <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>

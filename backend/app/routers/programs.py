@@ -33,6 +33,7 @@ class ProgramPatch(BaseModel):
     host_provider: str | None = None
     host_service_id: str | None = None
     health_url: str | None = None
+    github_repo: str | None = None   # 예: "fantasia44-netizen/maesil-total"
     notes: str | None = None
     is_active: bool | None = None
 
@@ -79,6 +80,8 @@ def update_program(name: str, body: ProgramPatch) -> dict:
         update["host_service_id"] = body.host_service_id.strip() or None
     if body.health_url is not None:
         update["health_url"] = body.health_url.strip() or None
+    if body.github_repo is not None:
+        update["github_repo"] = body.github_repo.strip() or None
     if body.notes is not None:
         update["notes"] = body.notes
     if body.is_active is not None:
