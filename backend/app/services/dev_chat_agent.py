@@ -292,36 +292,69 @@ def analyze_and_propose(
                     if file_info:
                         break
 
-            # 3차 폴백: 루트 동적 탐색 (실제 존재하는 디렉터리 파악 → 내용 기반 검색)
+            # 3차 폴백: 루트 동적 탐색 (비코드 디렉터리 스킵 + 시간 제한)
             if not file_info and failing_symbol:
+                import time as _time
                 cls_lower = failing_symbol.split(".")[0].lower()
-                logger.warning("3차 동적탐색 시작: %s (repo=%s)", cls_lower, repo)
+                _t0 = _time.monotonic()
+                MAX_SECS = 18  # 전체 3차 탐색 제한 시간
+
+                # 건너뛸 비코드 디렉터리
+                SKIP_DIRS = {
+                    '.claude', '.git', '.github', 'doc', 'docs', 'logo', 'data',
+                    'node_modules', '__pycache__', 'static', 'assets', 'images',
+                    'public', 'dist', 'build', 'test', 'tests', 'spec',
+                }
+                # 높은 우선순위 키워드 (Python 패키지일 가능성 높음)
+                HIGH_PRI = {'app', 'src', 'lib', 'core', 'service', 'model',
+                            'blueprint', 'api', 'backend', 'module', 'pkg'}
 
                 all_py_candidates: list[str] = []
 
-                # 루트 탐색 (파일 + 디렉터리 목록)
+                # 루트 탐색
                 root_dirs: list[str] = []
                 try:
                     root_entries = github_client.list_dir_entries(repo, "", branch)
-                    root_dirs = [e["path"] for e in root_entries if e["type"] == "dir"][:10]
+                    root_dirs_raw = [e["path"] for e in root_entries if e["type"] == "dir"]
                     all_py_candidates.extend(
                         e["path"] for e in root_entries
                         if e["type"] == "file" and e["path"].endswith(".py")
                     )
-                    logger.warning("루트 디렉터리 발견: %s", root_dirs)
+                    # 비코드 디렉터리 제외 + 우선순위 정렬
+                    def _dir_priority(d: str) -> int:
+                        n = d.lower()
+                        if n in SKIP_DIRS or n.startswith('.'):
+                            return 999
+                        if any(kw in n for kw in HIGH_PRI):
+                            return 0
+                        return 50
+                    root_dirs = sorted(
+                        [d for d in root_dirs_raw if d.lower() not in SKIP_DIRS
+                         and not d.startswith('.')],
+                        key=_dir_priority,
+                    )[:8]  # 최대 8개
+                    logger.warning("루트 디렉터리 발견: %s", root_dirs_raw)
+                    logger.warning("탐색 순서: %s", root_dirs)
                 except Exception as e:
                     logger.warning("루트 탐색 실패: %s", e)
 
-                # 각 루트 디렉터리 → 파일 목록 + 하위 디렉터리 탐색 (2레벨)
+                # 각 루트 디렉터리 → 1레벨만 (서브디렉터리 재귀 없음)
                 for d in root_dirs:
+                    if _time.monotonic() - _t0 > MAX_SECS:
+                        logger.warning("3차: 시간 초과 (%ds)", MAX_SECS)
+                        break
                     try:
                         d_entries = github_client.list_dir_entries(repo, d, branch)
+                        # 이 디렉터리의 .py 파일
                         all_py_candidates.extend(
                             e["path"] for e in d_entries
                             if e["type"] == "file" and e["path"].endswith(".py")
                         )
-                        # 2레벨 하위 디렉터리
-                        for sub_d in (e["path"] for e in d_entries if e["type"] == "dir"):
+                        # 서브디렉터리도 1단계만 (최대 3개, 시간 초과 주의)
+                        sub_dirs_here = [e["path"] for e in d_entries if e["type"] == "dir"][:3]
+                        for sub_d in sub_dirs_here:
+                            if _time.monotonic() - _t0 > MAX_SECS:
+                                break
                             try:
                                 sub_files = github_client.list_files(repo, sub_d, branch)
                                 all_py_candidates.extend(f for f in sub_files if f.endswith(".py"))
@@ -330,9 +363,12 @@ def analyze_and_propose(
                     except Exception:
                         continue
 
-                # 내용 검사 (이미 시도한 경로 제외, 최대 25개)
+                # 내용 검사 (이미 시도한 경로 제외, 최대 20개)
                 tried_paths = set(file_paths)
-                for candidate in all_py_candidates[:25]:
+                for candidate in all_py_candidates[:20]:
+                    if _time.monotonic() - _t0 > MAX_SECS:
+                        logger.warning("3차: 파일 읽기 시간 초과")
+                        break
                     if candidate in tried_paths:
                         continue
                     tried_paths.add(candidate)
