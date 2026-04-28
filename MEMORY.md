@@ -14,6 +14,20 @@
 - **DB**: Supabase (`maesil-total` 프로젝트, `agent_work` 스키마)
 - **AI**: Anthropic Claude (Haiku for 빠른 분석, Sonnet for 코드 수정)
 - **이메일 게이트웨이**: maesil-insight 서비스 경유
+- **인증**: JWT (PyJWT + passlib bcrypt), 30일 만료
+
+---
+
+## 유저 역할 구조
+
+| 역할 | 설명 | 접근 가능 화면 |
+|------|------|--------------|
+| `super_admin` | 개발자/오너 (본인) | 전체 (대시보드, 설정, 이전 대화, 개발 에이전트 포함) |
+| `customer` | 매실인사이트 이용 고객 대표 | 대화, 이전 대화만 |
+
+- **데이터 격리**: `insight_operator_id` (maesil-insight의 operator UUID) 기반
+- 고객은 자신의 maesil-insight 데이터만 조회 가능
+- super_admin은 operator_id 지정 없이 모든 데이터 조회
 
 ---
 
@@ -22,36 +36,63 @@
 ```
 Render (maesil-agency backend)
   ├── FastAPI
-  │   ├── /api/chat          — 오케스트레이터 채팅
-  │   ├── /api/alerts/*      — 알림 CRUD
-  │   ├── /api/programs/*    — 프로그램 레지스트리
-  │   └── /api/settings/*    — 시크릿 관리
-  └── asyncio lifespan scheduler (180초 간격)
-       ├── render_logs.poll_all()       — Render 로그 폴링
-       └── alert_dispatcher.dispatch_pending() — 이메일 발송
+  │   ├── /api/auth/*          — JWT 인증 (login, me, users CRUD)
+  │   ├── /api/chat            — 오케스트레이터 채팅
+  │   ├── /api/chat/from-alert/{id} — 이메일 알림 → 채팅 자동 연결
+  │   ├── /api/alerts/*        — 알림 CRUD
+  │   ├── /api/programs/*      — 프로그램 레지스트리
+  │   └── /api/secrets/*       — 시크릿 관리
+  └── asyncio lifespan scheduler (10초 후 첫 실행, 이후 180초 간격)
+       ├── render_logs.poll_all()               — Render 로그 폴링
+       └── alert_dispatcher.dispatch_pending()  — 이메일 발송
 
 Supabase (maesil-total, agent_work 스키마)
-  ├── program_registry       — 감시 대상 프로그램 목록
-  ├── program_log_cursor     — 로그 폴링 커서 (last_seen_at)
-  ├── alert_events           — 에러 이벤트 저장
-  ├── alert_channels         — 발송 채널 설정
-  ├── conversations          — 채팅 대화 목록
-  ├── messages               — 채팅 메시지
-  └── secrets                — API 키 저장소
+  ├── users                    — JWT 인증 유저 테이블 (009_users_auth.sql)
+  ├── program_registry         — 감시 대상 프로그램 목록
+  ├── program_log_cursor       — 로그 폴링 커서 (last_seen_at)
+  ├── alert_events             — 에러 이벤트 저장
+  ├── alert_channels           — 발송 채널 설정 (+ user_id 컬럼)
+  ├── conversations            — 채팅 대화 목록 (+ user_id 컬럼)
+  ├── conversation_messages    — 채팅 메시지
+  └── secrets                  — API 키 저장소
 ```
 
 ---
 
-## 해결한 주요 버그
+## SQL 마이그레이션 실행 목록
 
-### 1. SupabaseException: Invalid URL
-- **원인**: Render 환경변수에서 MAESIL_TOTAL_SUPABASE_URL과 MAESIL_TOTAL_SERVICE_ROLE_KEY 값이 서로 뒤바뀌어 있었음
-- **해결**: Render 대시보드에서 두 값을 직접 교체
-- **코드**: `backend/app/db/maesil_total_client.py` — `os.environ` 직접 읽기로 진단 print 추가했었음 (현재도 남아있음, 안정 확인 후 제거 가능)
+Supabase SQL Editor에서 실행한 순서:
 
-### 2. httpx.RemoteProtocolError: Server disconnected
-- **원인**: Supabase 클라이언트를 `@lru_cache` 싱글톤으로 유지하면 HTTP/2 연결이 idle 후 서버에서 끊기는데 클라이언트가 재사용 시도
-- **해결**: 싱글톤 제거. 자격증명은 모듈 로드 시 1회만 읽고(`_SUPABASE_URL`, `_SUPABASE_KEY`), `get_maesil_total_client()`는 매 호출마다 새 클라이언트 생성
+```
+001 ~ 005  — 초기 스키마 (program_registry, secrets 등)
+006_alert_system.sql     — alert_events, alert_channels 테이블
+006_conversations.sql    — conversations, conversation_messages 테이블
+007_*.sql                — (있을 경우)
+008_github_repo.sql      — program_registry에 github_repo 컬럼 추가
+009_users_auth.sql       — users 테이블, conversations/alert_channels에 user_id 추가
+010_insert_superadmin.sql — super_admin 초기 계정 생성 (1회 실행 후 삭제 권장)
+```
+
+### 009_users_auth.sql 내용
+```sql
+CREATE TABLE IF NOT EXISTS agent_work.users (
+    id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    email           text UNIQUE NOT NULL,
+    password_hash   text NOT NULL,
+    role            text NOT NULL DEFAULT 'customer' CHECK (role IN ('super_admin', 'customer')),
+    insight_operator_id  uuid,
+    display_name    text,
+    is_active       bool NOT NULL DEFAULT true,
+    created_by      uuid REFERENCES agent_work.users(id) ON DELETE SET NULL,
+    last_login_at   timestamptz,
+    created_at      timestamptz NOT NULL DEFAULT now(),
+    updated_at      timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE agent_work.conversations
+    ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES agent_work.users(id) ON DELETE SET NULL;
+ALTER TABLE agent_work.alert_channels
+    ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES agent_work.users(id) ON DELETE CASCADE;
+```
 
 ---
 
@@ -61,9 +102,78 @@ Supabase (maesil-total, agent_work 스키마)
 |--------|------|------|
 | `MAESIL_TOTAL_SUPABASE_URL` | Supabase 프로젝트 URL | ✅ |
 | `MAESIL_TOTAL_SERVICE_ROLE_KEY` | Supabase service role key | ✅ |
-| `API_BEARER_TOKEN` | API 인증 토큰 | ✅ |
+| `JWT_SECRET` | JWT 서명 시크릿 (30자 이상 랜덤값 권장) | ✅ |
+| `API_BEARER_TOKEN` | 구형 호환 (일부 내부 API 인증) | ✅ |
 | `CORS_ORIGINS` | 허용 도메인 (콤마 구분) | ✅ |
-| `FRONTEND_URL` | 프론트엔드 URL (이메일 채팅링크용) | 선택 (기본: https://maesil-agency-frontend.onrender.com) |
+| `FRONTEND_URL` | 프론트엔드 URL (이메일 채팅링크용) | 선택 |
+
+> **JWT_SECRET** Render에 설정 완료 (2026-04-28)
+
+---
+
+## 인증 시스템 상세
+
+**파일**: `backend/app/auth.py`
+
+```python
+class UserContext:
+    id: str
+    email: str
+    role: str  # "super_admin" | "customer"
+    insight_operator_id: str | None  # maesil-insight operator UUID
+    display_name: str | None
+
+    @property
+    def is_super_admin(self) -> bool: return self.role == "super_admin"
+    @property
+    def operator_id(self) -> str | None: return self.insight_operator_id
+```
+
+**JWT 구조**: `{ sub: user_id, email, role, insight_operator_id, display_name, exp }`
+
+**super_admin 계정**: `support@maesil-insight.com` / `kdh801023!`
+
+---
+
+## 채팅 라우팅 로직
+
+**파일**: `backend/app/routers/chat.py`
+
+```
+1. DEV_KEYWORDS 감지 + is_super_admin → 개발 에이전트 (super_admin 전용)
+2. 승인/취소 키워드 → 개발 에이전트 pending 처리
+3. SMALL_TALK (안녕, hi 등) or len<=3 → 오케스트레이터 직접 응답 (에이전트 미실행)
+4. 나머지 → 오케스트레이터 → 비즈니스 에이전트 (sales/finance/warehouse/cs)
+```
+
+**DEV_KEYWORDS**:
+```python
+{"에러", "error", "버그", "bug", "수정", "fix", "코드", "code",
+ "배포", "deploy", "로그", "log", "traceback", "exception",
+ "pr", "커밋", "commit", "github", "깃", "고쳐", "분석",
+ "개발팀", "개발자", "개발에이전트", "개발 에이전트", "dev",
+ "[에러 알림"}
+```
+
+**SMALL_TALK**:
+```python
+{"안녕", "안녕하세요", "hello", "hi", "ㅎㅇ", "반가워", "테스트", "test",
+ "뭐해", "있어", "누구야", "누구", "잘있어"}
+```
+
+---
+
+## 이메일→채팅 연동
+
+**백엔드 엔드포인트**: `POST /api/chat/from-alert/{alert_id}`
+- alert_events 테이블에서 이벤트 조회
+- `conversation_id = f"alert-{alert_id}"` (고정 → 같은 알림은 같은 대화)
+- 에러 컨텍스트 자동 구성 → 개발 에이전트 분석
+
+**프론트엔드**: `chat/page.tsx`
+- URL 파라미터 `?alert_id=xxx` 감지
+- `GET /api/alerts/{id}` 로 알림 내용 로드
+- 에러 메시지 자동 전송
 
 ---
 
@@ -76,117 +186,63 @@ Settings 페이지(`/settings`)에서 등록:
 | `anthropic_api_key` | Claude API 키 |
 | `github_token` | GitHub PAT (repo 권한, classic) |
 | `render_api` | Render API 키 (로그 폴링용) |
-| `notify_token` | maesil-insight 이메일 게이트웨이 토큰 |
-
----
-
-## SQL 마이그레이션 실행 목록
-
-Supabase SQL Editor에서 실행한 순서:
-
-```
-001 ~ 005  — 초기 스키마 (program_registry, secrets 등)
-006_alert_system.sql     — alert_events, alert_channels 테이블
-006_conversations.sql    — conversations, messages 테이블
-007_*.sql                — (있을 경우)
-008_github_repo.sql      — program_registry에 github_repo 컬럼 추가
-```
-
-### 008_github_repo.sql 내용
-```sql
-ALTER TABLE agent_work.program_registry
-    ADD COLUMN IF NOT EXISTS github_repo text;
--- 예: 'fantasia44-netizen/maesil-total'
-```
+| `m_insight_service_role` | maesil-insight Supabase service role key |
+| `maesil-insight_operator_id` | 본인의 maesil-insight operator UUID (super_admin용) |
+| `maesil_insight_supabase_url` | maesil-insight Supabase URL |
+| `maesil_insight_url` | maesil-insight 서비스 URL |
+| `harness_api_token` | Tester 에이전트용 |
 
 ---
 
 ## 구현된 기능
 
-### A. asyncio 내부 스케쥴러 (외부 Cron 불필요)
+### A. JWT 인증 시스템
+- 이메일+비밀번호 로그인 → 30일 JWT
+- 역할 기반 접근 제어 (super_admin / customer)
+- super_admin만 개발 에이전트, 설정 페이지 접근
+- 고객 계정 생성은 설정 페이지 → 유저 관리 섹션
+
+### B. asyncio 내부 스케쥴러
 **파일**: `backend/app/main.py`
-
 ```python
-@asynccontextmanager
-async def lifespan(application: FastAPI):
-    task = asyncio.create_task(_poll_loop())
-    yield
-    task.cancel()
-
 async def _poll_loop():
+    await asyncio.sleep(10)   # 서버 기동 대기
     while True:
-        await asyncio.sleep(180)  # 3분
-        render_logs.poll_all()
-        alert_dispatcher.dispatch_pending(limit=100)
+        try:
+            render_logs.poll_all()
+            alert_dispatcher.dispatch_pending(limit=100)
+        except Exception as e:
+            logger.error(...)
+        await asyncio.sleep(180)  # 3분 후 반복
 ```
+- 배포 직후 10초 대기 후 즉시 첫 폴링 (수집전 문제 방지)
 
-- Render 유료 플랜 (always-on)이므로 내부 스케쥴러가 가장 적합
-- 3분 간격으로 Render 로그 폴링 + 미발송 알림 이메일 발송
-
-### B. Render 로그 폴링
+### C. Render 로그 폴링
 **파일**: `backend/app/services/render_logs.py`
+- `program_log_cursor` 테이블의 `last_seen_at` 커서 사용
+- 에러/크리티컬 패턴 감지 → `alert_events` INSERT (dedup_key 중복 방지)
 
-- `program_log_cursor` 테이블의 `last_seen_at`을 커서로 사용
-- 매 폴링 시 새 로그만 읽음 (하루치 전체가 아닌 3분치만)
-- 에러/크리티컬 패턴 감지 → `alert_events` INSERT (dedup_key로 중복 방지)
-
-### C. AI 에러 분석 (이메일 포함)
+### D. AI 에러 분석 (이메일)
 **파일**: `backend/app/services/dev_agent.py`
+- Claude Haiku 사용
+- error/critical 이벤트만 분석
+- 이메일에 원인추정/영향범위/수정방향/신뢰도 포함
 
-- Claude Haiku 사용 (빠르고 저렴)
-- error/critical 심각도 이벤트만 분석 (info/warning은 스킵)
-- 반환: `ErrorAnalysis(root_cause, impact, fix_suggestion, confidence, ok)`
-- 이메일에 "원인 추정 / 영향 범위 / 수정 방향 / 신뢰도" 섹션 포함
-
-### D. 개발 에이전트 채팅
+### E. 개발 에이전트 채팅
 **파일**: `backend/app/services/dev_chat_agent.py`
+1. DEV_KEYWORDS 트리거 → program_registry에서 프로그램 감지
+2. GitHub에서 파일 읽기 → Claude Sonnet 분석
+3. `[PROPOSED_FIX]...[/PROPOSED_FIX]` 파싱 → `_pending` 저장
+4. 승인 → 브랜치 생성 → 파일 커밋 → PR 생성 → URL 반환
 
-흐름:
-1. 유저가 에러/코드 관련 메시지 입력 (DEV_KEYWORDS 트리거)
-2. program_registry에서 프로그램 감지 (메시지에서 이름 추출)
-3. GitHub에서 해당 파일 코드 읽기
-4. Claude Sonnet으로 분석 + 수정안 생성
-5. `[PROPOSED_FIX]...[/PROPOSED_FIX]` 블록 파싱 → `_pending` 저장
-6. 유저가 "승인" 입력 → 브랜치 생성 → 파일 커밋 → PR 생성 → URL 반환
-
-**승인 키워드**: 승인, 실행, 확인, ok, yes, ㅇㅋ, 적용, 해줘, 실행해, 고쳐줘  
+**승인 키워드**: 승인, 실행, 확인, ok, yes, ㅇㅋ, 적용, 해줘, 실행해, 고쳐줘
 **취소 키워드**: 취소, cancel, no, 아니, ㄴ
 
-**거버넌스**: 에이전트는 제안만 함. 커밋/푸시는 유저 승인 후에만. PR만 생성 (main 직접 푸시 없음).
-
-DEV_KEYWORDS (채팅 라우팅):
-```python
-{"에러", "error", "버그", "bug", "수정", "fix", "코드", "code",
- "배포", "deploy", "로그", "log", "traceback", "exception",
- "pr", "커밋", "commit", "github", "깃", "고쳐", "분석"}
-```
-
-### E. GitHub 연동
-**파일**: `backend/app/services/github_client.py`
-
-- `get_file(repo, path, branch)` — 파일 내용 + SHA
-- `list_files(repo, path, branch)` — 파일 목록
-- `get_default_branch(repo)` — 기본 브랜치명
-- `get_recent_commits(repo, branch, n)` — 최근 커밋
-- `create_branch(repo, new_branch, from_branch)` — 브랜치 생성
-- `commit_file(repo, path, new_content, commit_message, branch, sha)` — 파일 커밋
-- `create_pr(repo, title, body, head, base)` — PR 생성
-
-인증: Supabase secrets의 `github_token` (classic PAT, repo 권한)
-
-### F. 이메일→채팅 연동 (최근 구현)
-**흐름**:
-```
-에러 발생 → 이메일 발송 → [💬 채팅에서 분석하기] 버튼
-  → /chat?alert_id=<uuid> 클릭
-  → 채팅 페이지: GET /api/alerts/{id} 로 알림 로드
-  → 에러 컨텍스트 자동 전송 → 개발 에이전트 분석 시작
-```
-
-**관련 파일**:
-- `backend/app/routers/alerts.py` — `GET /api/alerts/{event_id}` 추가
-- `backend/app/services/alert_dispatcher.py` — 이메일에 채팅 버튼 추가
-- `frontend/app/chat/page.tsx` — `useSearchParams` + 자동 전송 로직
+### F. 대화 저장/조회
+**파일**: `backend/app/services/conversations.py`
+- 모든 채팅 → DB 저장 (conversations + conversation_messages)
+- user_id 연결로 고객별 대화 분리
+- super_admin: 전체 대화 조회 / customer: 본인 것만
 
 ---
 
@@ -194,67 +250,79 @@ DEV_KEYWORDS (채팅 라우팅):
 
 ```
 maesil-agency/
-├── MEMORY.md                          ← 이 파일
+├── MEMORY.md                           ← 이 파일
 ├── backend/
 │   ├── app/
-│   │   ├── main.py                    ← lifespan 스케쥴러
-│   │   ├── config.py                  ← 환경변수 설정
-│   │   ├── auth.py                    ← Bearer 토큰 인증
+│   │   ├── main.py                     ← lifespan 스케쥴러 (10s 기동 대기)
+│   │   ├── auth.py                     ← JWT 인증, UserContext, passlib bcrypt
 │   │   ├── db/
-│   │   │   └── maesil_total_client.py ← Supabase 클라이언트 (매 요청 새 클라이언트)
+│   │   │   └── maesil_total_client.py  ← Supabase (매 요청 새 클라이언트)
 │   │   ├── routers/
-│   │   │   ├── chat.py                ← 채팅 + 오케스트레이터 라우팅
-│   │   │   ├── alerts.py              ← 알림 CRUD + GET /{id}
-│   │   │   ├── programs.py            ← 프로그램 레지스트리 CRUD
-│   │   │   └── settings.py            ← 시크릿 관리
+│   │   │   ├── auth_router.py          ← /api/auth/* (login, me, users CRUD)
+│   │   │   ├── chat.py                 ← 채팅 + 오케스트레이터 + from-alert
+│   │   │   ├── alerts.py               ← 알림 CRUD + GET /{id}
+│   │   │   ├── programs.py             ← 프로그램 레지스트리 CRUD
+│   │   │   └── secrets_router.py       ← 시크릿 관리
 │   │   ├── services/
-│   │   │   ├── dev_chat_agent.py      ← 채팅 개발 에이전트 (분석+PR)
-│   │   │   ├── dev_agent.py           ← AI 에러 분석 (이메일용 Haiku)
-│   │   │   ├── github_client.py       ← GitHub REST API 래퍼
-│   │   │   ├── alert_dispatcher.py    ← 이메일 발송 + 채팅 링크
-│   │   │   ├── render_logs.py         ← Render 로그 폴링
-│   │   │   ├── notify_client.py       ← 이메일 게이트웨이 클라이언트
-│   │   │   ├── conversations.py       ← 대화 DB 서비스
-│   │   │   └── secrets.py             ← Supabase secrets 조회
+│   │   │   ├── dev_chat_agent.py       ← 채팅 개발 에이전트 (분석+PR)
+│   │   │   ├── dev_agent.py            ← AI 에러 분석 (이메일용 Haiku)
+│   │   │   ├── github_client.py        ← GitHub REST API 래퍼
+│   │   │   ├── alert_dispatcher.py     ← 이메일 발송 + 채팅 링크
+│   │   │   ├── render_logs.py          ← Render 로그 폴링
+│   │   │   ├── notify_client.py        ← 이메일 게이트웨이 클라이언트
+│   │   │   ├── conversations.py        ← 대화 DB 서비스
+│   │   │   └── secrets.py              ← Supabase secrets 조회
 │   │   └── agents/
-│   │       └── orchestrator.py        ← 에이전트 라우팅 + 실행
+│   │       ├── orchestrator.py         ← 에이전트 라우팅 + 실행
+│   │       └── base.py                 ← 에이전트 기반 (operator_id 처리)
+│   ├── requirements.txt                ← PyJWT, passlib[bcrypt], bcrypt==3.2.2
 │   └── sql/
-│       ├── 006_alert_system.sql
-│       ├── 006_conversations.sql
-│       └── 008_github_repo.sql
+│       ├── 009_users_auth.sql          ← users 테이블 생성
+│       └── 010_insert_superadmin.sql   ← 초기 관리자 계정 INSERT
 └── frontend/
     └── app/
-        ├── chat/page.tsx              ← 채팅 UI + alert_id 자동 연동
-        ├── settings/page.tsx          ← 설정 페이지 (시크릿, 프로그램)
-        └── dashboard/page.tsx         ← 대시보드 (알림 위젯)
+        ├── login/page.tsx              ← 로그인 페이지 (JWT)
+        ├── ClientLayout.tsx            ← 인증 가드 + 역할별 네비게이션
+        ├── chat/page.tsx               ← 채팅 UI + alert_id 자동 연동
+        ├── history/page.tsx            ← 이전 대화 목록/뷰어 (모든 유저)
+        ├── settings/page.tsx           ← 설정 (시크릿, 프로그램, 유저 관리)
+        ├── page.tsx                    ← 대시보드
+        └── layout.tsx                  ← ClientLayout 위임
+    └── lib/
+        └── api.ts                      ← JWT 토큰 관리, apiFetch, login/logout
 ```
 
 ---
 
-## 프로그램 레지스트리 설정 방법
+## 해결한 주요 버그
 
-Settings 페이지에서 각 프로그램에 GitHub 레포 등록:
-- 형식: `owner/repo` (예: `fantasia44-netizen/maesil-total`)
-- PATCH `/api/programs/{name}` — `github_repo` 필드
-
-현재 등록된 프로그램 예시:
-- `maesil-total` → `fantasia44-netizen/maesil-total` (GitHub에서 돌아감, host_provider는 나중에 수정 예정)
+| 버그 | 원인 | 해결 |
+|------|------|------|
+| SupabaseException: Invalid URL | Render 환경변수 URL/Key 뒤바뀜 | Render 대시보드에서 수정 |
+| httpx.RemoteProtocolError | Supabase 클라이언트 싱글톤 HTTP/2 idle 끊김 | 매 요청마다 새 클라이언트 생성 |
+| bcrypt + passlib 호환 오류 | bcrypt 4.x에서 `__about__` 제거 | `bcrypt==3.2.2`로 다운그레이드 |
+| 대화 저장 실패 (무음) | `except Exception: pass` | `logger.warning(...)` 으로 교체 |
+| 인삿말 → 비즈니스 에이전트 호출 | 라우팅 없음 | SMALL_TALK set → 오케스트레이터 직접 응답 |
+| 스케쥴러 첫 폴링 180초 지연 | `asyncio.sleep(180)` 루프 맨 앞 | 루프 맨 뒤로 이동 + 기동 시 10초 대기 |
+| "개발팀" 키워드 미인식 | DEV_KEYWORDS 미포함 | 개발팀/개발자/dev 등 추가 |
 
 ---
 
 ## 미완료 / 향후 작업
 
-- [ ] `maesil_total_client.py`의 진단 `print()` 제거 (DB 연결 안정 확인 후)
-- [ ] `maesil-total` 프로그램의 `host_provider` 수정 (`render` → `github` or `other`) — 도메인 연결 후
-- [ ] 개발 에이전트 전체 플로우 E2E 테스트 (채팅 → 분석 → 승인 → PR 생성)
-- [ ] `_pending` 딕셔너리를 Redis/DB로 영속화 (현재 프로세스 재시작 시 초기화됨)
-- [ ] 이메일 채팅 링크 클릭 → 자동 분석 시작 E2E 테스트
+- [ ] `maesil-insight_operator_id` 시크릿 등록 (super_admin 데이터 쿼리 작동 필수)
+- [ ] maesil-insight DB 스키마 확인 (`/admin/inspect-insight` 엔드포인트로 조회 가능)
+- [ ] `/admin/inspect-insight` 임시 엔드포인트 제거 (작업 후)
+- [ ] `_pending` 딕셔너리 Redis/DB 영속화 (현재 재배포 시 초기화)
+- [ ] 개발 에이전트 E2E 테스트 (채팅 → 분석 → 승인 → PR 생성)
+- [ ] 고객 입장에서 UX 테스트 (customer 계정 생성 후 확인)
 
 ---
 
 ## 알려진 제약 사항
 
-- `_pending` (승인 대기 수정안)은 메모리 내 저장 → Render 재배포 시 초기화됨
-- Supabase free tier: DB 연결 수 제한 있음 → 매 요청마다 새 클라이언트 생성으로 회피
-- 개발 에이전트는 첫 번째 파일만 읽음 (코드 컨텍스트 크기 관리)
-- GitHub PR은 base 브랜치로만 생성 (직접 main 푸시 없음)
+- `_pending` (승인 대기 수정안)은 메모리 내 → Render 재배포 시 초기화
+- Supabase free tier: DB 연결 수 제한 → 매 요청마다 새 클라이언트로 회피
+- 개발 에이전트는 첫 번째 파일만 읽음 (컨텍스트 크기 관리)
+- GitHub PR은 base 브랜치로만 생성 (main 직접 푸시 없음)
+- `inspect_insight.py` 파일은 백엔드 루트에 존재하지만 production 코드 미포함
