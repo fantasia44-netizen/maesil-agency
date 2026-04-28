@@ -360,8 +360,8 @@ PR제목: <간단한 제목>
 
             response += (
                 f"\n\n---\n✅ **수정안 준비 완료** (action: `{action_id}`)\n"
-                f"📄 수정 파일: `{file_info['path']}` / 함수: `{fn_name or '전체'}`\n"
-                f"`승인` → PR 생성 · `취소` → 폐기"
+                f"📄 수정 파일: `{file_info['path']}` · 함수: `{fn_name or '전체'}`\n"
+                f"`미리보기` → 실제 diff 확인 · `승인` → PR 생성 · `취소` → 폐기"
             )
 
     return response
@@ -455,6 +455,56 @@ def execute_pending(conversation_id: str) -> str:
         return f"❌ PR 생성 실패: {e}"
 
 
+def preview_pending(conversation_id: str) -> str:
+    """대기 중인 수정안의 실제 diff를 출력. 커밋 전 검토용."""
+    import difflib
+
+    action = _pending.get(conversation_id)
+    if not action:
+        return "⚠️ 대기 중인 수정안이 없습니다."
+
+    patch_code = action.get("patch_code") or action.get("new_content", "")
+    original = action.get("original_content", "")
+    fn_name = action.get("fn_name")
+    final_content = _smart_patch(original, patch_code, fn_name)
+
+    if not original:
+        # 원본 없으면 최종 내용 그대로 표시
+        preview = final_content[:4000]
+        return (
+            f"📄 **수정 파일**: `{action['path']}`\n"
+            f"⚠️ 원본 파일 없음 — 전체 내용으로 커밋됩니다\n\n"
+            f"```python\n{preview}\n```"
+        )
+
+    # unified diff 생성
+    diff_lines = list(difflib.unified_diff(
+        original.splitlines(keepends=True),
+        final_content.splitlines(keepends=True),
+        fromfile=f"a/{action['path']}",
+        tofile=f"b/{action['path']}",
+        lineterm="",
+    ))
+
+    if not diff_lines:
+        return "⚠️ 변경 사항이 없습니다. 수정안이 원본과 동일합니다."
+
+    diff_text = "".join(diff_lines)
+    # 너무 길면 자르기
+    if len(diff_text) > 6000:
+        diff_text = diff_text[:6000] + "\n... (이하 생략)"
+
+    changed_lines = sum(1 for l in diff_lines if l.startswith("+") or l.startswith("-"))
+
+    return (
+        f"📄 **수정 파일**: `{action['path']}`\n"
+        f"🔧 **수정 함수**: `{fn_name or '(전체)'}`\n"
+        f"📊 변경 라인: {changed_lines}줄\n\n"
+        f"```diff\n{diff_text}\n```\n\n"
+        f"`승인` → PR 생성 · `취소` → 폐기"
+    )
+
+
 def cancel_pending(conversation_id: str) -> str:
     if conversation_id in _pending:
         del _pending[conversation_id]
@@ -467,9 +517,17 @@ def is_approve(text: str) -> bool:
     return any(k in t for k in APPROVE_KEYWORDS) and len(t) < 20
 
 
+def is_preview(text: str) -> bool:
+    t = text.strip().lower()
+    return any(k in t for k in {"미리보기", "preview", "diff", "확인", "뭐가바뀌어", "뭐바뀌"}) and len(t) < 15
+
+
 def is_cancel(text: str) -> bool:
     t = text.strip().lower()
     return any(k in t for k in {"취소", "cancel", "no", "아니", "ㄴ"}) and len(t) < 10
 
 
-__all__ = ["analyze_and_propose", "execute_pending", "cancel_pending", "is_approve", "is_cancel"]
+__all__ = [
+    "analyze_and_propose", "execute_pending", "preview_pending",
+    "cancel_pending", "is_approve", "is_preview", "is_cancel",
+]

@@ -164,10 +164,15 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
         any(k in msg_lower for k in DEV_KEYWORDS) or
         _is_dev_intent(req.message)
     )
-    is_approve = user.is_super_admin and dev_chat_agent.is_approve(req.message)
-    is_cancel  = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
+    is_approve  = user.is_super_admin and dev_chat_agent.is_approve(req.message)
+    is_preview  = user.is_super_admin and dev_chat_agent.is_preview(req.message)
+    is_cancel   = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
 
-    if is_approve and conversation_id in dev_chat_agent._pending:
+    if is_preview and conversation_id in dev_chat_agent._pending:
+        response_text = dev_chat_agent.preview_pending(conversation_id)
+        agent_type = "developer"
+
+    elif is_approve and conversation_id in dev_chat_agent._pending:
         response_text = dev_chat_agent.execute_pending(conversation_id)
         agent_type = "developer"
 
