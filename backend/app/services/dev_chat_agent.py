@@ -63,6 +63,48 @@ def _all_programs() -> list[dict]:
     return resp.data or []
 
 
+def _extract_error_function(text: str) -> str | None:
+    """로그 메시지에서 실패한 클래스/함수명 추출.
+    예: '[AgencyLog] start 예외' → 'AgencyLog.start'
+    예: 'AgencyLog.start failed' → 'AgencyLog.start'
+    """
+    # [ClassName] method 예외 패턴 (가장 흔한 패턴)
+    m = re.search(r'\[([A-Z][a-zA-Z0-9_]+)\]\s+(\w+)\s+예외', text)
+    if m:
+        return f"{m.group(1)}.{m.group(2)}"
+    # ClassName.method_name 패턴
+    m = re.search(r'\b([A-Z][a-zA-Z0-9]+)\.([a-z_]\w+)\b', text)
+    if m and m.group(1) not in {"File", "GET", "POST", "PUT", "DELETE", "HTTP"}:
+        return f"{m.group(1)}.{m.group(2)}"
+    return None
+
+
+def _extract_relevant_section(content: str, target_symbol: str, window_lines: int = 120) -> str:
+    """파일에서 target_symbol(클래스/함수)이 정의된 섹션을 추출.
+    못 찾으면 앞 3000자 반환."""
+    class_name = target_symbol.split(".")[0]
+    lines = content.split("\n")
+    for i, line in enumerate(lines):
+        if re.search(r"(?:class|def)\s+" + re.escape(class_name) + r"\b", line):
+            end = min(len(lines), i + window_lines)
+            return "\n".join(lines[i:end])
+    return content[:3000]
+
+
+def _save_github_repo_to_db(program_name: str, github_repo: str) -> None:
+    """자동 탐지된 github_repo를 DB에 저장 (이후 재탐지 불필요)."""
+    try:
+        get_maesil_total_client() \
+            .schema("agent_work") \
+            .table("program_registry") \
+            .update({"github_repo": github_repo}) \
+            .eq("name", program_name) \
+            .execute()
+        logger.info("github_repo DB 저장: %s → %s", program_name, github_repo)
+    except Exception as e:
+        logger.warning("github_repo DB 저장 실패 [%s]: %s", program_name, e)
+
+
 def _extract_file_paths(text: str) -> list[str]:
     """스택트레이스/로그에서 파일 경로 패턴 추출."""
     patterns = [
@@ -145,16 +187,24 @@ def analyze_and_propose(
             if program:
                 break
 
+    # 에러 메시지에서 실패 함수/클래스 추출 (AgencyLog.start 등)
+    # 현재 메시지 + 대화 컨텍스트 전체에서 탐색
+    full_text = user_message
+    if context_messages:
+        full_text += " ".join(m.get("content", "") for m in context_messages[-4:])
+    failing_symbol = _extract_error_function(full_text)
+
     # 코드 컨텍스트 수집
     code_context = ""
     file_info: dict | None = None
 
-    # github_repo가 없으면 PAT으로 레포 자동 탐지
+    # github_repo가 없으면 PAT으로 레포 자동 탐지 → 성공 시 DB에 저장
     if program and not program.get("github_repo"):
         detected = github_client.find_repo_by_name(program["name"])
         if detected:
             logger.info("레포 자동 탐지 성공: %s → %s", program["name"], detected)
             program = {**program, "github_repo": detected}
+            _save_github_repo_to_db(program["name"], detected)
         else:
             code_context = (
                 f"\n\n⚠️ **GitHub 레포 자동 탐지 실패** ({program['name']})\n"
@@ -165,13 +215,26 @@ def analyze_and_propose(
         repo = program["github_repo"]
         try:
             branch = github_client.get_default_branch(repo)
+            # 실패 심볼이 있으면 해당 클래스명도 파일 경로 후보로 추가
             file_paths = _extract_file_paths(user_message)
+            if failing_symbol:
+                cls_name = failing_symbol.split(".")[0].lower()
+                # 클래스명으로 파일 검색 (AgencyLog → agency_log.py 등 스네이크케이스도 시도)
+                snake = re.sub(r'(?<!^)(?=[A-Z])', '_', failing_symbol.split(".")[0]).lower()
+                for extra in [f"{cls_name}.py", f"{snake}.py"]:
+                    if extra not in file_paths:
+                        file_paths.append(extra)
 
             # 1차: 추출된 경로 후보로 직접 시도
             for fp in file_paths:
                 try:
                     f = github_client.get_file(repo, fp, branch)
-                    code_context += f"\n\n### {fp}\n```\n{f['content'][:3000]}\n```"
+                    # 실패 심볼이 있으면 해당 섹션만 추출, 없으면 앞 3000자
+                    snippet = (
+                        _extract_relevant_section(f["content"], failing_symbol)
+                        if failing_symbol else f["content"][:3000]
+                    )
+                    code_context += f"\n\n### {fp}\n```\n{snippet}\n```"
                     file_info = {"repo": repo, "path": fp, "sha": f["sha"], "branch": branch,
                                  "original": f["content"]}
                     break
@@ -180,16 +243,27 @@ def analyze_and_propose(
                 except Exception as e:
                     logger.warning("파일 읽기 실패 %s/%s: %s", repo, fp, e)
 
-            # 2차 폴백: 레포 트리 전체 검색으로 파일 찾기
-            if not file_info and file_paths:
-                logger.info("경로 후보 실패 → 레포 트리 검색: %s", file_paths)
-                for fp in file_paths:
-                    basename = fp.split("/")[-1].replace(".py", "").replace(".ts", "")
-                    found = github_client.find_file_in_repo(repo, basename, branch)
+            # 2차 폴백: 레포 트리 전체 검색 (실패 심볼 클래스명 우선)
+            if not file_info:
+                search_names = []
+                if failing_symbol:
+                    cls_name = failing_symbol.split(".")[0].lower()
+                    snake = re.sub(r'(?<!^)(?=[A-Z])', '_', failing_symbol.split(".")[0]).lower()
+                    search_names = [cls_name, snake]
+                search_names += [fp.split("/")[-1].replace(".py","").replace(".ts","")
+                                 for fp in file_paths]
+
+                logger.info("경로 후보 실패 → 레포 트리 검색: %s", search_names)
+                for name in search_names:
+                    found = github_client.find_file_in_repo(repo, name, branch)
                     for candidate in found[:3]:
                         try:
                             f = github_client.get_file(repo, candidate, branch)
-                            code_context += f"\n\n### {candidate} (트리검색)\n```\n{f['content'][:3000]}\n```"
+                            snippet = (
+                                _extract_relevant_section(f["content"], failing_symbol)
+                                if failing_symbol else f["content"][:3000]
+                            )
+                            code_context += f"\n\n### {candidate} (트리검색)\n```\n{snippet}\n```"
                             file_info = {"repo": repo, "path": candidate, "sha": f["sha"],
                                          "branch": branch, "original": f["content"]}
                             break
@@ -199,7 +273,7 @@ def analyze_and_propose(
                         break
 
             if not file_info:
-                code_context = f"\n\n(파일 읽기 시도: {file_paths} — 레포 `{repo}` 에서 파일을 찾지 못했습니다)"
+                code_context = f"\n\n(파일 읽기 시도 — 레포 `{repo}` 에서 파일을 찾지 못했습니다)"
 
         except Exception as e:
             code_context = f"\n\n(GitHub 접근 실패: {e})"
@@ -233,10 +307,13 @@ def analyze_and_propose(
 PR제목: <간단한 제목>
 [/PROPOSED_FIX]"""
 
+    failing_hint = f"\n실패 함수/클래스: `{failing_symbol}` — 이 심볼을 중심으로 분석하세요." if failing_symbol else ""
+    read_file_hint = f"\n읽은 파일: `{file_info['path']}`" if file_info else ""
+
     user_prompt = f"""요청: {user_message}
 
 프로그램: {program['name'] if program else '미특정'}
-레포: {program.get('github_repo', '미등록') if program else '미등록'}
+레포: {program.get('github_repo', '미등록') if program else '미등록'}{read_file_hint}{failing_hint}
 {history}
 {code_context}
 
@@ -281,7 +358,11 @@ PR제목: <간단한 제목>
                 "created_at": datetime.now(timezone.utc).isoformat(),
             }
 
-            response += f"\n\n---\n✅ **수정안 준비 완료** (action: `{action_id}`)\n`승인` 이라고 입력하면 PR을 생성합니다. `취소` 로 취소 가능."
+            response += (
+                f"\n\n---\n✅ **수정안 준비 완료** (action: `{action_id}`)\n"
+                f"📄 수정 파일: `{file_info['path']}` / 함수: `{fn_name or '전체'}`\n"
+                f"`승인` → PR 생성 · `취소` → 폐기"
+            )
 
     return response
 
