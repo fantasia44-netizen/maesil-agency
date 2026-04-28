@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.auth import require_bearer
-from app.db.autotool_client import get_autotool_client
+from app.db.maesil_total_client import get_maesil_total_client
 
 router = APIRouter(prefix="/api/programs", tags=["programs"], dependencies=[Depends(require_bearer)])
 
@@ -15,7 +15,7 @@ ALLOWED_PROVIDERS = {"render", "vercel", "self", "other"}
 
 
 def _table():
-    return get_autotool_client().schema("agent_work").table("program_registry")
+    return get_maesil_total_client().schema("agent_work").table("program_registry")
 
 
 class ProgramIn(BaseModel):

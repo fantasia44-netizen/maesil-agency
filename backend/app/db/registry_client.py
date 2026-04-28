@@ -6,12 +6,12 @@ from functools import lru_cache
 
 from supabase import Client, create_client
 
-from app.db.autotool_client import get_autotool_client
+from app.db.maesil_total_client import get_maesil_total_client
 
 
 def get_db_client(db_name: str) -> Client:
     """db_registry에 등록된 DB에 대한 Supabase 클라이언트 반환."""
-    autotool = get_autotool_client()
+    autotool = get_maesil_total_client()
 
     # db_registry 조회
     reg = (
@@ -56,8 +56,8 @@ def get_db_client(db_name: str) -> Client:
 
 
 def get_operator_id(db_name: str) -> str | None:
-    """secrets에서 operator_id 조회 (예: 'autotool_operator_id')."""
-    autotool = get_autotool_client()
+    """secrets에서 operator_id 조회 (예: 'maesil_total_operator_id')."""
+    autotool = get_maesil_total_client()
     name = f"{db_name}_operator_id"
     sec = (
         autotool.schema("agent_work")

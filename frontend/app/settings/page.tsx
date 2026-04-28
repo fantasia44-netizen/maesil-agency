@@ -53,7 +53,7 @@ const KEY_CARDS: KeyCard[] = [
   { name: "m_insight_service_role", kind: "supabase", label: "maesil-insight Service Role Key",
     hint: "Supabase 프로젝트 → Settings → API → service_role (CS 에이전트 / 매요AI 분석)" },
   // ── Operator ID ──
-  { name: "autotool_operator_id", kind: "config", label: "autotool Operator ID",
+  { name: "maesil_total_operator_id", kind: "config", label: "autotool Operator ID",
     hint: "autotool DB의 내 operator_id (UUID) — Sales/Finance/Warehouse 에이전트에 필수" },
   { name: "maesil-insight_operator_id", kind: "config", label: "maesil-insight Operator ID",
     hint: "maesil-insight DB의 내 operator_id (UUID) — CS 에이전트에 필수" },

@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from app.auth import require_bearer
-from app.db.autotool_client import get_autotool_client
+from app.db.maesil_total_client import get_maesil_total_client
 
 router = APIRouter(prefix="/api/alert-channels", tags=["alert-channels"], dependencies=[Depends(require_bearer)])
 
@@ -16,7 +16,7 @@ ALLOWED_SEV = {"info", "warning", "error", "critical"}
 
 
 def _table():
-    return get_autotool_client().schema("agent_work").table("alert_channels")
+    return get_maesil_total_client().schema("agent_work").table("alert_channels")
 
 
 class ChannelIn(BaseModel):

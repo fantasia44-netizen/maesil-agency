@@ -11,8 +11,8 @@ from app.config import settings
 
 
 @lru_cache(maxsize=1)
-def get_autotool_client() -> Client:
+def get_maesil_total_client() -> Client:
     return create_client(
-        settings.autotool_supabase_url,
-        settings.autotool_service_role_key,
+        settings.maesil_total_supabase_url,
+        settings.maesil_total_service_role_key,
     )

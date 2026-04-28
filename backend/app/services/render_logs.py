@@ -24,7 +24,7 @@ from typing import Iterable
 
 import httpx
 
-from app.db.autotool_client import get_autotool_client
+from app.db.maesil_total_client import get_maesil_total_client
 from app.services.secrets import get_secret
 
 logger = logging.getLogger(__name__)
@@ -131,15 +131,15 @@ def make_dedup_key(program_name: str, message: str) -> str:
 
 
 def _events_table():
-    return get_autotool_client().schema("agent_work").table("alert_events")
+    return get_maesil_total_client().schema("agent_work").table("alert_events")
 
 
 def _cursor_table():
-    return get_autotool_client().schema("agent_work").table("program_log_cursor")
+    return get_maesil_total_client().schema("agent_work").table("program_log_cursor")
 
 
 def _registry_table():
-    return get_autotool_client().schema("agent_work").table("program_registry")
+    return get_maesil_total_client().schema("agent_work").table("program_registry")
 
 
 def _list_render_programs() -> list[dict]:

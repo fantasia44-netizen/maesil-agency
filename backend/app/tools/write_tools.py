@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-from app.db.autotool_client import get_autotool_client
+from app.db.maesil_total_client import get_maesil_total_client
 
 
 def _now() -> str:
@@ -24,7 +24,7 @@ def create_finding(
 ) -> str:
     """에이전트 판단/근거 저장. finding_id 반환."""
     fid = str(uuid.uuid4())
-    get_autotool_client().schema("agent_work").table("findings").insert({
+    get_maesil_total_client().schema("agent_work").table("findings").insert({
         "id": fid,
         "run_id": run_id,
         "agent_type": agent_type,
@@ -49,7 +49,7 @@ def create_snapshot(
     sid = str(uuid.uuid4())
     from datetime import timedelta
     valid_until = (datetime.now(timezone.utc) + timedelta(seconds=valid_seconds)).isoformat()
-    get_autotool_client().schema("agent_work").table("snapshots").insert({
+    get_maesil_total_client().schema("agent_work").table("snapshots").insert({
         "id": sid,
         "agent_type": agent_type,
         "kind": kind,
@@ -70,7 +70,7 @@ def create_suggestion(
 ) -> str:
     """개선 제안 저장. suggestion_id 반환."""
     sid = str(uuid.uuid4())
-    get_autotool_client().schema("agent_work").table("suggestions").insert({
+    get_maesil_total_client().schema("agent_work").table("suggestions").insert({
         "id": sid,
         "run_id": run_id,
         "target_area": target_area,

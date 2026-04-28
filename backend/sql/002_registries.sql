@@ -7,7 +7,7 @@
 -- ---------------------------------------------------------------
 create table if not exists agent_work.db_registry (
     id              uuid primary key default gen_random_uuid(),
-    name            text not null unique,           -- 'autotool' | 'maesil-insight' | ...
+    name            text not null unique,           -- 'maesil-total' | 'maesil-insight' | ...
     display_name    text,
     supabase_url    text not null,
     api_key_ref     text,                           -- agent_work.secrets.name 참조
@@ -26,7 +26,7 @@ create table if not exists agent_work.db_registry (
 -- ---------------------------------------------------------------
 create table if not exists agent_work.program_registry (
     id                  uuid primary key default gen_random_uuid(),
-    name                text not null unique,           -- 'autotool' | 'maesil-insight' | ...
+    name                text not null unique,           -- 'maesil-total' | 'maesil-insight' | ...
     display_name        text,
     host_provider       text,                           -- 'render' | 'vercel' | 'self' | ...
     host_service_id     text,                           -- Render service id 등
@@ -82,7 +82,7 @@ create index if not exists idx_program_health_program_checked on agent_work.prog
 create table if not exists agent_work.query_templates (
     id                  uuid primary key default gen_random_uuid(),
     key                 text not null unique,       -- 'sales.today_revenue_by_channel'
-    db_name             text not null,              -- 'autotool' | 'maesil-insight'
+    db_name             text not null,              -- 'maesil-total' | 'maesil-insight'
     sql                 text not null,
     params              jsonb default '[]'::jsonb,
     allowed_agents      jsonb default '[]'::jsonb,  -- ["sales", "finance"]
@@ -95,16 +95,21 @@ create table if not exists agent_work.query_templates (
 );
 
 -- ---------------------------------------------------------------
--- 초기 시드 (autotool 자기 자신 등록)
+-- 초기 시드 — 전체 시스템 등록
 -- ---------------------------------------------------------------
 insert into agent_work.db_registry (name, display_name, supabase_url, is_active, notes)
 values
-  ('autotool', '자사 통합 운영(autotool)', 'https://pbocckpuiyzijspqpvqz.supabase.co', true, '에이전트 작업 허브 / agent_work 스키마 호스트'),
-  ('maesil-insight', '매실 인사이트', '', true, '온라인 매출/광고/CS 분석 (URL은 /settings에서 등록)')
+  ('maesil-total',   '매실 통합',      'https://pbocckpuiyzijspqpvqz.supabase.co', true, '통합 데이터 허브 / agent_work 스키마 호스트'),
+  ('maesil-insight', '매실 인사이트',  '', true, '온라인 매출/광고/CS 분석 (URL은 /settings에서 등록)'),
+  ('maesil-order',   '매실 주문',      '', true, '주문 수집 시스템 (URL은 /settings에서 등록)'),
+  ('maesil-accounting', '매실 회계',   '', true, '회계 모듈 분리 (URL은 /settings에서 등록)')
 on conflict (name) do nothing;
 
 insert into agent_work.program_registry (name, display_name, host_provider, is_active, db_registry_name, notes)
 values
-  ('autotool', 'autotool (Render)', 'render', true, 'autotool', 'Render 서비스 ID는 /settings에서 등록'),
-  ('maesil-insight', 'maesil-insight (Render)', 'render', true, 'maesil-insight', 'Render 서비스 ID는 /settings에서 등록')
+  ('maesil-total',      '매실 통합 (Render)',    'render', true, 'maesil-total',      '서비스 ID는 /settings에서 등록'),
+  ('maesil-insight',    '매실 인사이트 (Render)','render', true, 'maesil-insight',    '서비스 ID는 /settings에서 등록'),
+  ('maesil',            '매실 본체',             'render', true,  null,               '서비스 ID는 /settings에서 등록'),
+  ('maesil-order',      '매실 주문 (Render)',    'render', true, 'maesil-order',      '서비스 ID는 /settings에서 등록'),
+  ('maesil-accounting', '매실 회계 (Render)',    'render', true, 'maesil-accounting', '서비스 ID는 /settings에서 등록')
 on conflict (name) do nothing;

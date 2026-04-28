@@ -16,7 +16,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Iterable
 
-from app.db.autotool_client import get_autotool_client
+from app.db.maesil_total_client import get_maesil_total_client
 from app.services import notify_client
 
 logger = logging.getLogger(__name__)
@@ -28,11 +28,11 @@ SEV_RANK = {"info": 0, "warning": 1, "error": 2, "critical": 3}
 # DB helpers
 # ─────────────────────────────────────────────────────────────────
 def _events_table():
-    return get_autotool_client().schema("agent_work").table("alert_events")
+    return get_maesil_total_client().schema("agent_work").table("alert_events")
 
 
 def _channels_table():
-    return get_autotool_client().schema("agent_work").table("alert_channels")
+    return get_maesil_total_client().schema("agent_work").table("alert_channels")
 
 
 def _list_active_channels() -> list[dict]:

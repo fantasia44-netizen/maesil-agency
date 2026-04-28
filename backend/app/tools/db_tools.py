@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from app.agent_config.query_templates import QUERY_TEMPLATES
-from app.db.autotool_client import get_autotool_client
+from app.db.maesil_total_client import get_maesil_total_client
 from app.db.registry_client import get_db_client
 
 
@@ -58,13 +58,13 @@ def run_readonly_sql(
     rows: list[dict] = []
 
     try:
-        if db_name == "autotool":
-            client = get_autotool_client()
+        if db_name == "maesil-total":
+            client = get_maesil_total_client()
         else:
             client = get_db_client(db_name)
 
         # autotool은 agent_work 스키마에서 함수 호출, 나머지는 public
-        if db_name == "autotool":
+        if db_name == "maesil-total":
             result = client.schema("agent_work").rpc(
                 "execute_readonly_sql", {"query": sql}
             ).execute()
@@ -103,10 +103,10 @@ def _audit(
     row_count: int,
     error_message: str | None = None,
     latency_ms: int = 0,
-    db_name: str = "autotool",
+    db_name: str = "maesil-total",
 ) -> None:
     try:
-        autotool = get_autotool_client()
+        autotool = get_maesil_total_client()
         autotool.schema("agent_work").table("query_audit").insert({
             "id": str(uuid.uuid4()),
             "run_id": run_id,

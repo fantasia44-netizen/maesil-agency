@@ -12,7 +12,7 @@ from typing import Any
 
 import anthropic
 
-from app.db.autotool_client import get_autotool_client
+from app.db.maesil_total_client import get_maesil_total_client
 from app.db.registry_client import get_operator_id
 from app.services.secrets import get_secret
 from app.tools.db_tools import run_readonly_sql
@@ -58,7 +58,7 @@ class BaseAgent:
 
         try:
             client = _get_anthropic_client()
-            operator_id = get_operator_id("autotool")
+            operator_id = get_operator_id("maesil-total")
 
             system = self.get_system_prompt()
             if operator_id:
@@ -271,7 +271,7 @@ COMMON_TOOLS: list[dict] = [
 
 def _log_run_start(run_id: str, conversation_id: str, agent_type: str, model: str) -> None:
     try:
-        get_autotool_client().schema("agent_work").table("runs").insert({
+        get_maesil_total_client().schema("agent_work").table("runs").insert({
             "id": run_id,
             "conversation_id": conversation_id,
             "agent_type": agent_type,
@@ -292,7 +292,7 @@ def _log_run_end(
     error_reason: str | None = None,
 ) -> None:
     try:
-        get_autotool_client().schema("agent_work").table("runs").update({
+        get_maesil_total_client().schema("agent_work").table("runs").update({
             "status": status,
             "ended_at": datetime.now(timezone.utc).isoformat(),
             "input_tokens": input_tokens,
@@ -306,7 +306,7 @@ def _log_run_end(
 
 def _log_tool_call(run_id: str, tool_name: str, tool_input: dict) -> None:
     try:
-        get_autotool_client().schema("agent_work").table("tool_calls").insert({
+        get_maesil_total_client().schema("agent_work").table("tool_calls").insert({
             "id": str(uuid.uuid4()),
             "run_id": run_id,
             "tool_name": tool_name,

@@ -26,7 +26,7 @@ maesil-agency/
 │       ├── main.py                  FastAPI 진입
 │       ├── config.py                .env 로더
 │       ├── auth.py                  Bearer 토큰 검사
-│       ├── db/autotool_client.py    부트스트랩 Supabase 클라이언트
+│       ├── db/maesil_total_client.py    부트스트랩 Supabase 클라이언트
 │       ├── services/secrets.py      agent_work.secrets 래퍼
 │       └── routers/
 │           ├── health.py            /health
@@ -111,7 +111,7 @@ Render 로그를 3분마다 폴링하여 에러를 감지하고, 등록된 채�
    ```sql
    insert into agent_work.program_registry (name, display_name, host_provider, host_service_id, is_active)
    values
-     ('autotool',        'autotool',        'render', 'srv-XXXXXXXX', true),
+     ('maesil-total',        'maesil-total',        'render', 'srv-XXXXXXXX', true),
      ('maesil-insight',  '매실 인사이트',    'render', 'srv-YYYYYYYY', true)
    on conflict (name) do update
      set host_provider   = excluded.host_provider,

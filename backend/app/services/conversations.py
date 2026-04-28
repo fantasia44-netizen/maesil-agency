@@ -1,7 +1,7 @@
 """대화 이력 저장/조회 서비스."""
 import uuid
 from datetime import datetime, timezone
-from app.db.autotool_client import get_autotool_client
+from app.db.maesil_total_client import get_maesil_total_client
 
 
 def _now() -> str:
@@ -10,7 +10,7 @@ def _now() -> str:
 
 def ensure_conversation(conversation_id: str, first_message: str) -> str:
     """conversation_id가 없으면 생성, 있으면 updated_at 갱신."""
-    client = get_autotool_client()
+    client = get_maesil_total_client()
     title = first_message[:50] + ("…" if len(first_message) > 50 else "")
     now = _now()
     client.schema("agent_work").table("conversations").upsert({
@@ -22,7 +22,7 @@ def ensure_conversation(conversation_id: str, first_message: str) -> str:
 
 
 def save_user_message(conversation_id: str, content: str) -> None:
-    get_autotool_client().schema("agent_work").table("conversation_messages").insert({
+    get_maesil_total_client().schema("agent_work").table("conversation_messages").insert({
         "id": str(uuid.uuid4()),
         "conversation_id": conversation_id,
         "role": "user",
@@ -39,7 +39,7 @@ def save_agent_message(
     cost_usd: float = 0.0,
     run_id: str | None = None,
 ) -> None:
-    get_autotool_client().schema("agent_work").table("conversation_messages").insert({
+    get_maesil_total_client().schema("agent_work").table("conversation_messages").insert({
         "id": str(uuid.uuid4()),
         "conversation_id": conversation_id,
         "role": "agent",
@@ -54,7 +54,7 @@ def save_agent_message(
 
 def list_conversations(limit: int = 50) -> list[dict]:
     resp = (
-        get_autotool_client()
+        get_maesil_total_client()
         .schema("agent_work")
         .table("conversations")
         .select("id, title, created_at, updated_at")
@@ -67,7 +67,7 @@ def list_conversations(limit: int = 50) -> list[dict]:
 
 def get_messages(conversation_id: str) -> list[dict]:
     resp = (
-        get_autotool_client()
+        get_maesil_total_client()
         .schema("agent_work")
         .table("conversation_messages")
         .select("id, role, agent_type, agent_display, content, cost_usd, run_id, created_at")

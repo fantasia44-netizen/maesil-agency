@@ -75,11 +75,11 @@
 {
   "agent": "sales",
   "permissions": [
-    { "db": "autotool",        "schema": "public",     "table": "orders",            "actions": ["select"] },
-    { "db": "autotool",        "schema": "public",     "table": "channels",          "actions": ["select"] },
+    { "db": "maesil-total",        "schema": "public",     "table": "orders",            "actions": ["select"] },
+    { "db": "maesil-total",        "schema": "public",     "table": "channels",          "actions": ["select"] },
     { "db": "maesil-insight",  "schema": "public",     "table": "*",                 "actions": ["select"] },
-    { "db": "autotool",        "schema": "agent_work", "table": "sales_snapshots",   "actions": ["select", "insert"] },
-    { "db": "autotool",        "schema": "agent_work", "table": "findings",          "actions": ["select", "insert"] }
+    { "db": "maesil-total",        "schema": "agent_work", "table": "sales_snapshots",   "actions": ["select", "insert"] },
+    { "db": "maesil-total",        "schema": "agent_work", "table": "findings",          "actions": ["select", "insert"] }
   ]
 }
 ```
@@ -107,7 +107,7 @@ agent_work.widget_cache      -- 위젯 결과 캐시
 **테이블 (autotool.agent_work.db_registry)**
 ```
   id            uuid
-  name          text   -- 'autotool', 'maesil-insight', ...
+  name          text   -- 'maesil-total', 'maesil-insight', ...
   supabase_url  text
   api_key_ref   text   -- secret manager 참조 (실제 키 저장 금지)
   schema_hint   jsonb  -- LLM용 테이블/컬럼 요약 (승인본)

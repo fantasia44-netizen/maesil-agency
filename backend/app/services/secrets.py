@@ -5,14 +5,14 @@ Phase 1: 평문 저장. Phase 2에서 암호화 레이어 추가 예정.
 from datetime import datetime, timezone
 from typing import Optional
 
-from app.db.autotool_client import get_autotool_client
+from app.db.maesil_total_client import get_maesil_total_client
 
 TABLE = "secrets"
 SCHEMA = "agent_work"
 
 
 def _table():
-    return get_autotool_client().schema(SCHEMA).table(TABLE)
+    return get_maesil_total_client().schema(SCHEMA).table(TABLE)
 
 
 def get_secret(name: str) -> Optional[str]:

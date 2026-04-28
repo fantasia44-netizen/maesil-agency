@@ -9,8 +9,8 @@ _ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=str(_ENV_FILE), env_file_encoding="utf-8", extra="ignore")
 
-    autotool_supabase_url: str
-    autotool_service_role_key: str
+    maesil_total_supabase_url: str
+    maesil_total_service_role_key: str
 
     api_bearer_token: str = "change-me"
     cors_origins: str = "http://localhost:3000"

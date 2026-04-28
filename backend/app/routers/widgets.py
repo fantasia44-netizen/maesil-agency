@@ -5,7 +5,7 @@ Phase 1 Day 2~3: 실제 Render/Supabase API 호출해서 program_health 갱신�
 """
 from fastapi import APIRouter, Depends
 
-from app.db.autotool_client import get_autotool_client
+from app.db.maesil_total_client import get_maesil_total_client
 from app.auth import require_bearer
 
 router = APIRouter(prefix="/api/widgets", tags=["widgets"], dependencies=[Depends(require_bearer)])
@@ -22,7 +22,7 @@ AGENT_REGISTRY = [
 
 @router.get("/system-status")
 def system_status() -> dict:
-    client = get_autotool_client()
+    client = get_maesil_total_client()
 
     # 등록된 프로그램 전체
     progs = (
@@ -62,7 +62,7 @@ def system_status() -> dict:
 
 @router.get("/agent-status")
 def agent_status() -> dict:
-    client = get_autotool_client()
+    client = get_maesil_total_client()
 
     # 에이전트 타입별 마지막 실행 1건씩 조회
     runs_resp = (

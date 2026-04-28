@@ -11,14 +11,14 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from app.auth import require_bearer
-from app.db.autotool_client import get_autotool_client
+from app.db.maesil_total_client import get_maesil_total_client
 from app.services import alert_dispatcher, render_logs
 
 router = APIRouter(prefix="/api/alerts", tags=["alerts"], dependencies=[Depends(require_bearer)])
 
 
 def _events_table():
-    return get_autotool_client().schema("agent_work").table("alert_events")
+    return get_maesil_total_client().schema("agent_work").table("alert_events")
 
 
 @router.post("/poll")
