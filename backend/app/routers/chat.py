@@ -108,6 +108,30 @@ def _orchestrator_reply(message: str) -> str:
     )
 
 
+def _is_dev_intent(message: str) -> bool:
+    """LLM으로 개발/기술 관련 의도인지 판단 (super_admin 전용, 키워드 매칭 실패 시 폴백)."""
+    try:
+        from app.services.secrets import get_secret
+        import anthropic
+        api_key = get_secret("anthropic_api_key")
+        if not api_key:
+            return False
+        client = anthropic.Anthropic(api_key=api_key)
+        resp = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=10,
+            system=(
+                "다음 메시지가 소프트웨어 개발/디버깅/코드수정/에러분석/배포에 관한 질문인지 판단하세요. "
+                "오직 'yes' 또는 'no'만 답하세요."
+            ),
+            messages=[{"role": "user", "content": message}],
+        )
+        answer = resp.content[0].text.strip().lower()
+        return answer.startswith("yes")
+    except Exception:
+        return False
+
+
 @router.post("", response_model=ChatResponse)
 def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> ChatResponse:
     from app.services import dev_chat_agent
@@ -116,7 +140,9 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
     msg_lower = req.message.lower().strip()
 
     # ── 1. 개발 에이전트 라우팅 (super_admin 전용) ──────────────────
-    is_dev     = user.is_super_admin and any(k in msg_lower for k in DEV_KEYWORDS)
+    is_dev     = user.is_super_admin and (
+        any(k in msg_lower for k in DEV_KEYWORDS) or _is_dev_intent(req.message)
+    )
     is_approve = user.is_super_admin and dev_chat_agent.is_approve(req.message)
     is_cancel  = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
 
