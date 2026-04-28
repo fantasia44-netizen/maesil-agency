@@ -1,0 +1,95 @@
+"""
+program_registry CRUD — settings 페이지에서 감시 대상 프로그램 등록/수정.
+"""
+from datetime import datetime, timezone
+
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+
+from app.auth import require_bearer
+from app.db.autotool_client import get_autotool_client
+
+router = APIRouter(prefix="/api/programs", tags=["programs"], dependencies=[Depends(require_bearer)])
+
+ALLOWED_PROVIDERS = {"render", "vercel", "self", "other"}
+
+
+def _table():
+    return get_autotool_client().schema("agent_work").table("program_registry")
+
+
+class ProgramIn(BaseModel):
+    name: str
+    display_name: str | None = None
+    host_provider: str | None = None       # 'render' | 'vercel' | 'self' | 'other'
+    host_service_id: str | None = None     # Render srv-xxx 등
+    health_url: str | None = None          # /health 엔드포인트
+    notes: str | None = None
+    is_active: bool = True
+
+
+class ProgramPatch(BaseModel):
+    display_name: str | None = None
+    host_provider: str | None = None
+    host_service_id: str | None = None
+    health_url: str | None = None
+    notes: str | None = None
+    is_active: bool | None = None
+
+
+@router.get("")
+def list_programs() -> list[dict]:
+    resp = _table().select("*").order("name").execute()
+    return resp.data or []
+
+
+@router.post("")
+def create_program(body: ProgramIn) -> dict:
+    if not body.name.strip():
+        raise HTTPException(400, detail="name 필수")
+    if body.host_provider and body.host_provider not in ALLOWED_PROVIDERS:
+        raise HTTPException(400, detail=f"host_provider는 {sorted(ALLOWED_PROVIDERS)} 중 하나")
+
+    now = datetime.now(timezone.utc).isoformat()
+    payload = {
+        "name": body.name.strip(),
+        "display_name": (body.display_name or "").strip() or body.name.strip(),
+        "host_provider": body.host_provider or None,
+        "host_service_id": (body.host_service_id or "").strip() or None,
+        "health_url": (body.health_url or "").strip() or None,
+        "notes": body.notes,
+        "is_active": body.is_active,
+        "updated_at": now,
+    }
+    resp = _table().insert(payload).execute()
+    rows = resp.data or []
+    return rows[0] if rows else {"ok": True}
+
+
+@router.patch("/{name}")
+def update_program(name: str, body: ProgramPatch) -> dict:
+    update: dict = {}
+    if body.display_name is not None:
+        update["display_name"] = body.display_name.strip() or None
+    if body.host_provider is not None:
+        if body.host_provider and body.host_provider not in ALLOWED_PROVIDERS:
+            raise HTTPException(400, detail=f"host_provider는 {sorted(ALLOWED_PROVIDERS)} 중 하나")
+        update["host_provider"] = body.host_provider or None
+    if body.host_service_id is not None:
+        update["host_service_id"] = body.host_service_id.strip() or None
+    if body.health_url is not None:
+        update["health_url"] = body.health_url.strip() or None
+    if body.notes is not None:
+        update["notes"] = body.notes
+    if body.is_active is not None:
+        update["is_active"] = body.is_active
+
+    if not update:
+        return {"ok": True, "noop": True}
+
+    update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    resp = _table().update(update).eq("name", name).execute()
+    rows = resp.data or []
+    if not rows:
+        raise HTTPException(404, detail="program not found")
+    return rows[0]

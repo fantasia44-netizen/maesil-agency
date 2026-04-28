@@ -16,6 +16,16 @@ type SecretRow = {
   updated_at: string;
 };
 
+type Program = {
+  name: string;
+  display_name: string | null;
+  host_provider: string | null;
+  host_service_id: string | null;
+  health_url: string | null;
+  is_active: boolean;
+  notes: string | null;
+};
+
 type AlertChannel = {
   id: string;
   kind: "email" | "widget";
@@ -66,6 +76,11 @@ export default function SettingsPage() {
   const [testResults, setTestResults] = useState<Record<string, { ok: boolean; msg: string }>>({});
   const [err, setErr] = useState<string | null>(null);
 
+  // ── 연결 프로그램 상태 ──
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [editingProgram, setEditingProgram] = useState<Record<string, Partial<Program>>>({});
+  const [newProgram, setNewProgram] = useState({ name: "", display_name: "", host_provider: "render", host_service_id: "", health_url: "" });
+
   // ── 감시 채널 상태 ──
   const [channels, setChannels] = useState<AlertChannel[]>([]);
   const [newChannel, setNewChannel] = useState<{ kind: "email" | "widget"; target: string; label: string; severity_min: "info" | "warning" | "error" | "critical" }>({
@@ -92,19 +107,24 @@ export default function SettingsPage() {
     }
   };
 
+  const loadPrograms = async () => {
+    try {
+      const rows = await apiFetch<Program[]>("/api/programs");
+      setPrograms(rows);
+    } catch (e) { console.warn(e); }
+  };
+
   const loadChannels = async () => {
     try {
       const rows = await apiFetch<AlertChannel[]>("/api/alert-channels");
       setChannels(rows);
-    } catch (e) {
-      // 채널 로딩 실패는 비치명적
-      console.warn(e);
-    }
+    } catch (e) { console.warn(e); }
   };
 
   useEffect(() => {
     if (hasToken()) {
       loadSecrets();
+      loadPrograms();
       loadChannels();
     }
   }, []);
@@ -113,12 +133,46 @@ export default function SettingsPage() {
     if (token.trim()) {
       setToken(token.trim());
       loadSecrets();
+      loadPrograms();
       loadChannels();
     } else {
       clearToken();
       setSecrets([]);
+      setPrograms([]);
       setChannels([]);
     }
+  };
+
+  // ── 연결 프로그램 CRUD ──
+  const saveProgram = async (name: string) => {
+    const patch = editingProgram[name] || {};
+    try {
+      await apiFetch(`/api/programs/${name}`, {
+        method: "PATCH",
+        body: JSON.stringify(patch),
+      });
+      setEditingProgram({ ...editingProgram, [name]: {} });
+      loadPrograms();
+    } catch (e) { setErr((e as Error).message); }
+  };
+
+  const addProgram = async () => {
+    if (!newProgram.name.trim()) { setErr("프로그램 이름 필수"); return; }
+    try {
+      await apiFetch("/api/programs", {
+        method: "POST",
+        body: JSON.stringify({
+          name: newProgram.name.trim(),
+          display_name: newProgram.display_name.trim() || null,
+          host_provider: newProgram.host_provider || null,
+          host_service_id: newProgram.host_service_id.trim() || null,
+          health_url: newProgram.health_url.trim() || null,
+        }),
+      });
+      setNewProgram({ name: "", display_name: "", host_provider: "render", host_service_id: "", health_url: "" });
+      loadPrograms();
+      setErr(null);
+    } catch (e) { setErr((e as Error).message); }
   };
 
   // ── 감시 채널 CRUD ──
@@ -282,6 +336,94 @@ export default function SettingsPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* ── 연결 프로그램 ── */}
+      <h2 style={{ margin: "2rem 0 0.5rem 0", fontSize: "1.05rem" }}>연결 프로그램</h2>
+      <p className="muted" style={{ marginTop: 0 }}>
+        감시할 서비스를 등록합니다. Render 서비스 ID는 Render 대시보드 → 서비스 클릭 → URL의 <code>srv-xxxxxxxx</code> 부분입니다.
+      </p>
+
+      {/* 기존 프로그램 카드 */}
+      <div className="grid" style={{ marginBottom: "1rem" }}>
+        {programs.map((p) => {
+          const edit = editingProgram[p.name] || {};
+          const isDirty = Object.keys(edit).length > 0;
+          return (
+            <div key={p.name} className="card">
+              <div className="card-header">
+                <div className="card-title">{p.display_name || p.name}</div>
+                <span className={`status-badge ${p.is_active ? "up" : "unknown"}`}>
+                  {p.is_active ? "활성" : "비활성"}
+                </span>
+              </div>
+              <div className="muted" style={{ marginBottom: "0.75rem" }}>
+                이름: <code>{p.name}</code> · 호스팅: {p.host_provider || "-"}
+              </div>
+              <div className="config-field">
+                <label>Render 서비스 ID</label>
+                <input
+                  type="text"
+                  value={edit.host_service_id ?? p.host_service_id ?? ""}
+                  onChange={(e) => setEditingProgram({ ...editingProgram, [p.name]: { ...edit, host_service_id: e.target.value } })}
+                  placeholder="srv-xxxxxxxxxxxxxxxxxx"
+                />
+              </div>
+              <div className="config-field">
+                <label>헬스 URL (선택)</label>
+                <input
+                  type="text"
+                  value={edit.health_url ?? p.health_url ?? ""}
+                  onChange={(e) => setEditingProgram({ ...editingProgram, [p.name]: { ...edit, health_url: e.target.value } })}
+                  placeholder="https://example.onrender.com/health"
+                />
+              </div>
+              <button className="btn primary" disabled={!isDirty} onClick={() => saveProgram(p.name)}>저장</button>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 새 프로그램 추가 */}
+      <div className="card" style={{ marginBottom: "1rem" }}>
+        <div className="card-header"><div className="card-title">새 프로그램 추가</div></div>
+        <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.75rem" }}>
+          <div className="config-field">
+            <label>이름 (고유 key)</label>
+            <input type="text" value={newProgram.name}
+              onChange={(e) => setNewProgram({ ...newProgram, name: e.target.value })}
+              placeholder="예: maesil-net" />
+          </div>
+          <div className="config-field">
+            <label>표시명</label>
+            <input type="text" value={newProgram.display_name}
+              onChange={(e) => setNewProgram({ ...newProgram, display_name: e.target.value })}
+              placeholder="예: 매실 본체" />
+          </div>
+          <div className="config-field">
+            <label>호스팅</label>
+            <select value={newProgram.host_provider}
+              onChange={(e) => setNewProgram({ ...newProgram, host_provider: e.target.value })}>
+              <option value="render">Render</option>
+              <option value="vercel">Vercel</option>
+              <option value="self">자체 서버</option>
+              <option value="other">기타</option>
+            </select>
+          </div>
+          <div className="config-field">
+            <label>서비스 ID</label>
+            <input type="text" value={newProgram.host_service_id}
+              onChange={(e) => setNewProgram({ ...newProgram, host_service_id: e.target.value })}
+              placeholder="srv-xxxxxxxxxxxxxxxxxx" />
+          </div>
+          <div className="config-field">
+            <label>헬스 URL (선택)</label>
+            <input type="text" value={newProgram.health_url}
+              onChange={(e) => setNewProgram({ ...newProgram, health_url: e.target.value })}
+              placeholder="https://.../health" />
+          </div>
+        </div>
+        <button className="btn primary" onClick={addProgram}>프로그램 추가</button>
       </div>
 
       {/* ── 감시 채널 ── */}
