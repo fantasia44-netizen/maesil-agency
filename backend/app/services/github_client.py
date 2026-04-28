@@ -64,6 +64,49 @@ def get_default_branch(repo: str) -> str:
     return r.json().get("default_branch", "main")
 
 
+def list_user_repos() -> list[str]:
+    """인증된 PAT로 접근 가능한 모든 레포 (owner/repo 형식)."""
+    results = []
+    page = 1
+    while True:
+        r = httpx.get(
+            f"{BASE}/user/repos",
+            headers=_headers(),
+            params={"per_page": 100, "page": page, "type": "all"},
+            timeout=15,
+        )
+        r.raise_for_status()
+        batch = r.json()
+        if not batch:
+            break
+        results.extend(repo["full_name"] for repo in batch)
+        if len(batch) < 100:
+            break
+        page += 1
+    return results
+
+
+def find_repo_by_name(program_name: str) -> str | None:
+    """프로그램 이름으로 GitHub 레포 자동 감지.
+    1차: owner/maesil-insight 형태로 정확 매칭
+    2차: 이름에 program_name 포함
+    """
+    try:
+        repos = list_user_repos()
+        name_lower = program_name.lower()
+        # 정확 매칭 (끝부분)
+        for repo in repos:
+            if repo.lower().split("/")[-1] == name_lower:
+                return repo
+        # 포함 매칭
+        for repo in repos:
+            if name_lower in repo.lower():
+                return repo
+    except Exception as e:
+        logger.warning("레포 자동 감지 실패 [%s]: %s", program_name, e)
+    return None
+
+
 def get_repo_tree(repo: str, branch: str = "main") -> list[str]:
     """레포 전체 파일 경로 목록 (재귀). 파일 찾기 폴백용."""
     r = httpx.get(
@@ -183,6 +226,8 @@ def create_pr(
 
 
 __all__ = [
-    "get_file", "list_files", "get_default_branch", "get_repo_tree", "find_file_in_repo",
+    "get_file", "list_files", "get_default_branch",
+    "get_repo_tree", "find_file_in_repo",
+    "list_user_repos", "find_repo_by_name",
     "get_recent_commits", "create_branch", "commit_file", "create_pr",
 ]

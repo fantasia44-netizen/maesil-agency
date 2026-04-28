@@ -142,12 +142,19 @@ def analyze_and_propose(
     code_context = ""
     file_info: dict | None = None
 
+    # github_repo가 없으면 PAT으로 레포 자동 탐지
     if program and not program.get("github_repo"):
-        code_context = (
-            f"\n\n⚠️ **{program.get('display_name', program['name'])} GitHub 레포 미등록**\n"
-            "Settings → 프로그램 관리에서 github_repo를 등록하면 코드를 직접 읽고 수정안을 제시합니다."
-        )
-    elif program and program.get("github_repo"):
+        detected = github_client.find_repo_by_name(program["name"])
+        if detected:
+            logger.info("레포 자동 탐지 성공: %s → %s", program["name"], detected)
+            program = {**program, "github_repo": detected}
+        else:
+            code_context = (
+                f"\n\n⚠️ **GitHub 레포 자동 탐지 실패** ({program['name']})\n"
+                "Settings → 연결 프로그램에서 GitHub 레포를 직접 등록하세요."
+            )
+
+    if program and program.get("github_repo"):
         repo = program["github_repo"]
         try:
             branch = github_client.get_default_branch(repo)
