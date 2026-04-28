@@ -92,7 +92,7 @@ def _resolve_owner_id(service_id: str, api_key: str, timeout: float = 10.0) -> s
 
 
 def _fetch_logs(service_id: str, owner_id: str, api_key: str, start: datetime, end: datetime,
-                limit: int = 100, timeout: float = 15.0) -> list[dict]:
+                limit: int = 100, timeout: float = 30.0) -> list[dict]:
     """Render /v1/logs 호출. 시간순 오름차순으로 정렬해서 반환."""
     params = {
         "ownerId": owner_id,
@@ -104,6 +104,9 @@ def _fetch_logs(service_id: str, owner_id: str, api_key: str, start: datetime, e
     }
     try:
         resp = httpx.get(f"{RENDER_API_BASE}/logs", headers=_headers(api_key), params=params, timeout=timeout)
+    except httpx.ReadTimeout:
+        logger.warning("render_logs: fetch timed out (service=%s), skipping this poll cycle", service_id)
+        return []
     except Exception as e:
         logger.exception("render_logs: fetch failed")
         raise RuntimeError(f"render logs fetch failed: {e}") from e
