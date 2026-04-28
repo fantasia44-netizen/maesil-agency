@@ -46,6 +46,17 @@ type KeyCard = {
   hint: string;
 };
 
+type UserRow = {
+  id: string;
+  email: string;
+  role: string;
+  display_name: string | null;
+  insight_operator_id: string | null;
+  is_active: boolean;
+  last_login_at: string | null;
+  created_at: string;
+};
+
 const KEY_CARDS: KeyCard[] = [
   // ── 에이전트 핵심 ──
   { name: "anthropic_api_key", kind: "anthropic", label: "Anthropic API Key",
@@ -77,6 +88,13 @@ export default function SettingsPage() {
   const [inputs, setInputs] = useState<Record<string, string>>({});
   const [testResults, setTestResults] = useState<Record<string, { ok: boolean; msg: string }>>({});
   const [err, setErr] = useState<string | null>(null);
+
+  // ── 유저 관리 상태 ──
+  const [users, setUsers] = useState<UserRow[]>([]);
+  const [newUser, setNewUser] = useState({ email: "", password: "", display_name: "", insight_operator_id: "" });
+  const [userErr, setUserErr] = useState<string | null>(null);
+  const [userOk, setUserOk] = useState<string | null>(null);
+  const [editingUser, setEditingUser] = useState<Record<string, Partial<UserRow & { password: string }>>>({});
 
   // ── 연결 프로그램 상태 ──
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -118,13 +136,60 @@ export default function SettingsPage() {
     } catch (e) { console.warn(e); }
   };
 
+  const loadUsers = async () => {
+    try {
+      const rows = await apiFetch<UserRow[]>("/api/auth/users");
+      setUsers(rows);
+    } catch (e) { console.warn(e); }
+  };
+
   useEffect(() => {
     if (hasToken()) {
       loadSecrets();
       loadPrograms();
       loadChannels();
+      loadUsers();
     }
   }, []);
+
+  // ── 유저 관리 CRUD ──
+  const createUser = async () => {
+    setUserErr(null); setUserOk(null);
+    if (!newUser.email.trim() || !newUser.password.trim()) { setUserErr("이메일과 비밀번호를 입력하세요."); return; }
+    try {
+      await apiFetch("/api/auth/users", {
+        method: "POST",
+        body: JSON.stringify({
+          email: newUser.email.trim(),
+          password: newUser.password,
+          role: "customer",
+          display_name: newUser.display_name.trim() || null,
+          insight_operator_id: newUser.insight_operator_id.trim() || null,
+        }),
+      });
+      setNewUser({ email: "", password: "", display_name: "", insight_operator_id: "" });
+      setUserOk("계정 생성 완료");
+      loadUsers();
+    } catch (e) { setUserErr((e as Error).message); }
+  };
+
+  const patchUser = async (id: string) => {
+    const patch = editingUser[id] || {};
+    setUserErr(null);
+    try {
+      await apiFetch(`/api/auth/users/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          display_name: patch.display_name ?? undefined,
+          insight_operator_id: patch.insight_operator_id ?? undefined,
+          is_active: patch.is_active ?? undefined,
+          password: (patch as any).password || undefined,
+        }),
+      });
+      setEditingUser({ ...editingUser, [id]: {} });
+      loadUsers();
+    } catch (e) { setUserErr((e as Error).message); }
+  };
 
   // ── 연결 프로그램 CRUD ──
   const testProgram = async (name: string) => {
@@ -580,6 +645,107 @@ export default function SettingsPage() {
                   {tr.ok ? "성공" : "실패"} — {tr.msg}
                 </div>
               )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── 유저 관리 (super_admin 전용) ── */}
+      <h2 style={{ margin: "2rem 0 0.5rem 0", fontSize: "1.05rem" }}>유저 관리</h2>
+      <p className="muted" style={{ marginTop: 0 }}>
+        매실인사이트 고객 계정을 생성합니다. <code>insight_operator_id</code>는 해당 기업의 maesil-insight operator UUID입니다.
+      </p>
+
+      {userErr && (
+        <div className="card" style={{ borderColor: "#fecaca", background: "#fef2f2", color: "#b91c1c", marginBottom: "0.75rem" }}>{userErr}</div>
+      )}
+      {userOk && (
+        <div className="card" style={{ borderColor: "#bbf7d0", background: "#f0fdf4", color: "#15803d", marginBottom: "0.75rem" }}>{userOk}</div>
+      )}
+
+      {/* 새 계정 생성 */}
+      <div className="card" style={{ marginBottom: "1rem" }}>
+        <div className="card-header"><div className="card-title">새 고객 계정 추가</div></div>
+        <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "0.75rem" }}>
+          <div className="config-field">
+            <label>이메일</label>
+            <input type="email" value={newUser.email}
+              onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+              placeholder="customer@company.com" />
+          </div>
+          <div className="config-field">
+            <label>비밀번호</label>
+            <input type="password" value={newUser.password}
+              onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+              placeholder="8자 이상" />
+          </div>
+          <div className="config-field">
+            <label>표시명</label>
+            <input type="text" value={newUser.display_name}
+              onChange={(e) => setNewUser({ ...newUser, display_name: e.target.value })}
+              placeholder="예: 홍길동 대표" />
+          </div>
+          <div className="config-field">
+            <label>insight Operator ID (UUID)</label>
+            <input type="text" value={newUser.insight_operator_id}
+              onChange={(e) => setNewUser({ ...newUser, insight_operator_id: e.target.value })}
+              placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+          </div>
+        </div>
+        <button className="btn primary" onClick={createUser}>계정 생성</button>
+      </div>
+
+      {/* 계정 목록 */}
+      <div className="grid">
+        {users.map((u) => {
+          const edit = editingUser[u.id] || {};
+          const isDirty = Object.keys(edit).length > 0;
+          return (
+            <div key={u.id} className="card">
+              <div className="card-header">
+                <div className="card-title" style={{ fontSize: "0.88rem" }}>{u.display_name || u.email}</div>
+                <span className={`status-badge ${u.is_active ? "up" : "unknown"}`}>
+                  {u.is_active ? "활성" : "비활성"}
+                </span>
+              </div>
+              <div className="muted" style={{ marginBottom: "0.5rem", fontSize: "0.8rem" }}>
+                {u.email} · <strong>{u.role}</strong>
+                {u.last_login_at && (
+                  <> · 최근 로그인: {new Date(u.last_login_at).toLocaleString("ko-KR")}</>
+                )}
+              </div>
+              <div className="config-field">
+                <label>표시명</label>
+                <input type="text"
+                  value={(edit as any).display_name ?? u.display_name ?? ""}
+                  onChange={(e) => setEditingUser({ ...editingUser, [u.id]: { ...edit, display_name: e.target.value } })}
+                />
+              </div>
+              <div className="config-field">
+                <label>insight Operator ID</label>
+                <input type="text"
+                  value={(edit as any).insight_operator_id ?? u.insight_operator_id ?? ""}
+                  onChange={(e) => setEditingUser({ ...editingUser, [u.id]: { ...edit, insight_operator_id: e.target.value } })}
+                  placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                />
+              </div>
+              <div className="config-field">
+                <label>새 비밀번호 (변경 시만)</label>
+                <input type="password"
+                  value={(edit as any).password ?? ""}
+                  onChange={(e) => setEditingUser({ ...editingUser, [u.id]: { ...edit, password: e.target.value } })}
+                  placeholder="변경하려면 입력"
+                />
+              </div>
+              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                <button className="btn primary" disabled={!isDirty} onClick={() => patchUser(u.id)}>저장</button>
+                <button className="btn" onClick={() => {
+                  setEditingUser({ ...editingUser, [u.id]: { ...edit, is_active: !u.is_active } });
+                  patchUser(u.id);
+                }}>
+                  {u.is_active ? "비활성화" : "활성화"}
+                </button>
+              </div>
             </div>
           );
         })}
