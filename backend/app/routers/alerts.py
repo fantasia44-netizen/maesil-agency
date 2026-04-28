@@ -63,6 +63,19 @@ class AckBody(BaseModel):
     by: str | None = None
 
 
+@router.post("/ack-all")
+def acknowledge_all() -> dict:
+    """미확인 알림 전체 일괄 확인 처리."""
+    now = datetime.now(timezone.utc).isoformat()
+    resp = (
+        _events_table()
+        .update({"acknowledged_at": now})
+        .is_("acknowledged_at", "null")
+        .execute()
+    )
+    return {"acknowledged": len(resp.data or [])}
+
+
 @router.post("/{event_id}/ack")
 def acknowledge(event_id: str, body: AckBody | None = None) -> dict:
     now = datetime.now(timezone.utc).isoformat()

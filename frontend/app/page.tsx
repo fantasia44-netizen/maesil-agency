@@ -129,9 +129,21 @@ export default function Dashboard() {
       {/* 알림 위젯 (미확인 알림이 있을 때만) */}
       {alerts.length > 0 && (
         <>
-          <h2 style={{ margin: "0 0 0.5rem 0", fontSize: "1rem", fontWeight: 600 }}>
-            미확인 알림 <span className="muted">({alerts.length})</span>
-          </h2>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "0.5rem" }}>
+            <h2 style={{ margin: 0, fontSize: "1rem", fontWeight: 600 }}>
+              미확인 알림 <span className="muted">({alerts.length})</span>
+            </h2>
+            <button
+              className="btn"
+              style={{ fontSize: "0.75rem", padding: "3px 10px" }}
+              onClick={async () => {
+                try {
+                  await apiFetch("/api/alerts/ack-all", { method: "POST", body: JSON.stringify({}) });
+                  loadAlerts();
+                } catch (e) { console.warn(e); }
+              }}
+            >전체 확인</button>
+          </div>
           <div className="grid" style={{ marginBottom: "2rem" }}>
             {alerts.map((a) => (
               <div key={a.id} className="card" style={{ borderLeft: `4px solid ${a.severity === "critical" || a.severity === "error" ? "#dc2626" : a.severity === "warning" ? "#d97706" : "#2563eb"}` }}>
