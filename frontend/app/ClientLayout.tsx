@@ -41,10 +41,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <nav>
           {/* 모든 유저 */}
           <Link href="/chat">대화</Link>
+          <Link href="/history">이전 대화</Link>
 
           {/* super_admin 전용 */}
           {admin && <Link href="/">대시보드</Link>}
-          {admin && <Link href="/history">이전 대화</Link>}
           {admin && <Link href="/settings">설정</Link>}
         </nav>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.75rem" }}>

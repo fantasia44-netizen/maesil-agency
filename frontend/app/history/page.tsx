@@ -26,14 +26,16 @@ const AGENT_COLOR: Record<string, string> = {
   finance:      "#2563eb",
   warehouse:    "#b45309",
   cs:           "#7c3aed",
+  developer:    "#0891b2",
   orchestrator: "#475569",
 };
 
 const AGENT_EMOJI: Record<string, string> = {
-  sales:    "📈",
-  finance:  "💰",
-  warehouse:"📦",
-  cs:       "💬",
+  sales:        "📈",
+  finance:      "💰",
+  warehouse:    "📦",
+  cs:           "💬",
+  developer:    "👨‍💻",
   orchestrator: "🤖",
 };
 
@@ -88,7 +90,7 @@ export default function HistoryPage() {
         <div style={{ flex: 1, overflowY: "auto" }}>
           {!hasToken() && (
             <div className="muted" style={{ padding: "1rem", fontSize: "0.82rem" }}>
-              설정 페이지에서 인증 토큰을 입력하세요.
+              로그인이 필요합니다.
             </div>
           )}
           {loadingList && (

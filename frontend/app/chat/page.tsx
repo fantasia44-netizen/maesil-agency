@@ -107,7 +107,7 @@ function ChatPageInner() {
     const text = (overrideMessage ?? input).trim();
     if (!text || loading) return;
     if (!hasToken()) {
-      alert("설정 페이지에서 인증 토큰을 입력하세요.");
+      window.location.href = "/login";
       return;
     }
 

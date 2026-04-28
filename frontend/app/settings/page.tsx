@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiFetch, setToken, clearToken, hasToken } from "../../lib/api";
+import { apiFetch, hasToken, getUser } from "../../lib/api";
 
 type SecretRow = {
   id: string;
@@ -73,7 +73,6 @@ const KEY_CARDS: KeyCard[] = [
 ];
 
 export default function SettingsPage() {
-  const [token, setTokenLocal] = useState<string>("");
   const [secrets, setSecrets] = useState<SecretRow[]>([]);
   const [inputs, setInputs] = useState<Record<string, string>>({});
   const [testResults, setTestResults] = useState<Record<string, { ok: boolean; msg: string }>>({});
@@ -94,12 +93,6 @@ export default function SettingsPage() {
     severity_min: "error",
   });
   const [channelTest, setChannelTest] = useState<Record<string, { ok: boolean; msg: string }>>({});
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setTokenLocal(window.localStorage.getItem("maesil_agency_token") || "");
-    }
-  }, []);
 
   const loadSecrets = async () => {
     try {
@@ -132,20 +125,6 @@ export default function SettingsPage() {
       loadChannels();
     }
   }, []);
-
-  const saveToken = () => {
-    if (token.trim()) {
-      setToken(token.trim());
-      loadSecrets();
-      loadPrograms();
-      loadChannels();
-    } else {
-      clearToken();
-      setSecrets([]);
-      setPrograms([]);
-      setChannels([]);
-    }
-  };
 
   // ── 연결 프로그램 CRUD ──
   const testProgram = async (name: string) => {
@@ -287,31 +266,28 @@ export default function SettingsPage() {
 
   const existing = (name: string) => secrets.find((s) => s.name === name);
 
+  const currentUser = getUser();
+
   return (
     <div>
       <h1 style={{ margin: "0 0 1rem 0", fontSize: "1.3rem" }}>설정</h1>
 
-      <div className="card">
-        <div className="card-header">
-          <div className="card-title">API 인증 토큰</div>
-          <span className={`status-badge ${hasToken() ? "up" : "unknown"}`}>
-            {hasToken() ? "설정됨" : "미설정"}
-          </span>
+      {currentUser && (
+        <div className="card" style={{ marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "1rem" }}>
+          <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "1rem", flexShrink: 0 }}>
+            {currentUser.display_name ? currentUser.display_name[0].toUpperCase() : "A"}
+          </div>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: "0.9rem" }}>
+              {currentUser.display_name || currentUser.email}
+              <span style={{ marginLeft: 8, fontSize: "0.7rem", background: "#0f172a", color: "#fff", padding: "1px 7px", borderRadius: 4 }}>
+                {currentUser.role === "super_admin" ? "ADMIN" : "CUSTOMER"}
+              </span>
+            </div>
+            <div className="muted" style={{ fontSize: "0.78rem" }}>{currentUser.email}</div>
+          </div>
         </div>
-        <div className="muted" style={{ marginBottom: "0.5rem" }}>
-          백엔드 <code>API_BEARER_TOKEN</code> 값을 입력하세요. 브라우저에만 저장되고 서버로는 요청 시 Bearer로 전달됩니다.
-        </div>
-        <div className="config-field">
-          <label>Bearer Token</label>
-          <input
-            type="password"
-            value={token}
-            onChange={(e) => setTokenLocal(e.target.value)}
-            placeholder="지금은 .env의 API_BEARER_TOKEN 값"
-          />
-        </div>
-        <button className="btn primary" onClick={saveToken}>저장</button>
-      </div>
+      )}
 
       <h2 style={{ margin: "1.5rem 0 0.75rem 0", fontSize: "1.05rem" }}>시스템 키</h2>
       <p className="muted" style={{ marginTop: 0 }}>
