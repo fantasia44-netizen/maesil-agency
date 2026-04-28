@@ -106,10 +106,11 @@ def _save_github_repo_to_db(program_name: str, github_repo: str) -> None:
 
 
 def _extract_file_paths(text: str) -> list[str]:
-    """스택트레이스/로그에서 파일 경로 패턴 추출."""
+    """스택트레이스/로그 및 유저 메시지에서 파일 경로 패턴 추출."""
     patterns = [
         r'File "([^"]+\.py)"',                      # Python traceback
         r'at ([^\s]+\.py):',                         # 일반
+        r'`([a-zA-Z_][a-zA-Z0-9_/]+\.py)`',        # 백틱으로 감싼 경로 (유저 직접 입력)
         r'([a-zA-Z_][a-zA-Z0-9_/]+\.py)',           # 단순 .py 경로
         r'([a-zA-Z_/]+\.(ts|tsx|js|jsx))',          # JS/TS
         r'"module":\s*"([a-zA-Z_][a-zA-Z0-9_/]+)"', # JSON 로그: "module": "repository"
@@ -283,32 +284,28 @@ def analyze_and_propose(
                     if file_info:
                         break
 
-            # 3차 폴백: 디렉터리 직접 탐색 (code search 인덱싱/rate-limit 실패 대비)
+            # 3차 폴백: 디렉터리 내 모든 .py 파일 내용 검사 (파일명 무관, 내용 기반)
             if not file_info and failing_symbol:
                 cls_lower = failing_symbol.split(".")[0].lower()
-                snake = re.sub(r'(?<!^)(?=[A-Z])', '_', failing_symbol.split(".")[0]).lower()
                 search_dirs = [
                     "app/services", "app", "app/utils", "app/models", "app/core",
                     "src/services", "src", "utils", "core", "logs", "",
                 ]
-                logger.warning("3차 디렉터리 탐색 시작: %s / %s (repo=%s)", cls_lower, snake, repo)
+                logger.warning("3차 디렉터리 탐색 시작 (내용 기반): %s (repo=%s)", cls_lower, repo)
                 for dir_path in search_dirs:
                     try:
                         dir_files = github_client.list_files(repo, dir_path, branch)
-                        relevant = [
-                            f for f in dir_files
-                            if cls_lower in f.split("/")[-1].lower()
-                            or snake in f.split("/")[-1].lower()
-                        ]
-                        for candidate in relevant[:3]:
+                        py_files = [f for f in dir_files if f.endswith(".py")][:12]  # 최대 12개
+                        for candidate in py_files:
                             try:
                                 f = github_client.get_file(repo, candidate, branch)
+                                # 파일명 무관 — 내용에 클래스명 포함 여부로 판단
                                 if cls_lower in f["content"].lower():
                                     snippet = _extract_relevant_section(f["content"], failing_symbol)
                                     code_context += f"\n\n### {candidate}\n```\n{snippet}\n```"
                                     file_info = {"repo": repo, "path": candidate, "sha": f["sha"],
                                                  "branch": branch, "original": f["content"]}
-                                    logger.warning("3차(디렉터리) 파일 발견: %s/%s", dir_path, candidate)
+                                    logger.warning("3차(내용검색) 파일 발견: %s", candidate)
                                     break
                             except Exception:
                                 continue
@@ -399,6 +396,26 @@ PR제목: <간단한 제목>
 {code_context}
 
 위 정보를 바탕으로 응답해주세요. 구체적인 에러나 수정 요청이 있으면 분석하고, 없으면 짧게 맞이해주세요."""
+
+    # ── 파일 미확인 상태에서 코드 수정 요청 → 차단 ─────────────────────
+    # 실패 심볼을 알고 있는데 파일을 못 읽었으면 추측 분석 금지
+    if file_info is None and failing_symbol and program and program.get("github_repo"):
+        repo_tried = program.get("github_repo", "?")
+        return (
+            f"🔒 **파일 미확인 — 코드 수정 불가**\n\n"
+            f"레포 `{repo_tried}` 에서 `{failing_symbol}` 클래스/함수가 포함된 파일을 찾지 못했습니다.\n\n"
+            f"**시도한 방법:**\n"
+            f"- 직접 경로 시도: `agencylog.py`, `agency_log.py` 등\n"
+            f"- GitHub code search: `class {failing_symbol.split('.')[0]}`\n"
+            f"- 디렉터리 내용 검색: `app/services`, `app`, `src`, `utils` 등\n\n"
+            f"**가능한 원인:**\n"
+            f"1. 파일명에 클래스명이 없음 (예: `AgencyLog`가 `repository.py` 안에 있음)\n"
+            f"2. code search 인덱싱 지연 또는 rate-limit\n"
+            f"3. github_repo 설정 오류 (현재: `{repo_tried}`)\n\n"
+            f"**해결 방법:**\n"
+            f"`AgencyLog` 클래스가 어느 파일에 있는지 알려주시면 직접 읽어서 분석하겠습니다.\n"
+            f"예: '`app/services/logger.py` 파일 읽어봐'"
+        )
 
     try:
         response = _call_claude(system_prompt, user_prompt)
