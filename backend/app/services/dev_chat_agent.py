@@ -213,10 +213,14 @@ def analyze_and_propose(
 - **메시지가 짧거나 단순 호출(예: "개발팀", "안녕")이면 1~2줄로 간단히 맞이하고 무엇을 도와줄지 물어볼 것. 긴 형식 목록 금지**
 
 ## 코드 수정 제안 시 형식
+코드 수정이 필요한 경우, 변경이 필요한 함수/클래스만 출력하세요 (파일 전체 X).
+백엔드가 자동으로 원본 파일에서 해당 함수를 찾아 교체합니다.
+
 [PROPOSED_FIX]
 파일: <파일경로>
-```
-<수정된 전체 파일 내용 또는 변경 부분>
+함수명: <교체할 최상위 함수 또는 클래스 이름 (하나만)>
+```python
+<변경된 함수/클래스 전체 내용>
 ```
 커밋메시지: <fix: 간단한 설명>
 PR제목: <간단한 제목>
@@ -243,11 +247,13 @@ PR제목: <간단한 제목>
         code_match = re.search(r'```(?:\w+)?\n(.*?)```', fix_block, re.DOTALL)
         commit_match = re.search(r'커밋메시지:\s*(.+)', fix_block)
         pr_title_match = re.search(r'PR제목:\s*(.+)', fix_block)
+        fn_name_match = re.search(r'함수명:\s*(\w+)', fix_block)
 
         if code_match:
-            new_code = code_match.group(1)
+            patch_code = code_match.group(1)
             commit_msg = commit_match.group(1).strip() if commit_match else "fix: AI 자동 수정"
             pr_title = pr_title_match.group(1).strip() if pr_title_match else commit_msg
+            fn_name = fn_name_match.group(1).strip() if fn_name_match else None
 
             action_id = str(uuid.uuid4())[:8]
             branch_name = f"fix/agency-{action_id}"
@@ -258,7 +264,9 @@ PR제목: <간단한 제목>
                 "branch": branch_name,
                 "base_branch": file_info["branch"],
                 "path": file_info["path"],
-                "new_content": new_code,
+                "patch_code": patch_code,
+                "original_content": file_info.get("original", ""),
+                "fn_name": fn_name,
                 "sha": file_info["sha"],
                 "commit_msg": commit_msg,
                 "pr_title": pr_title,
@@ -275,6 +283,36 @@ PR제목: <간단한 제목>
 # 승인 처리
 # ─────────────────────────────────────────────────────────────────
 
+def _smart_patch(original: str, patch_code: str, fn_name: str | None) -> str:
+    """원본 파일에서 fn_name 함수/클래스를 patch_code로 교체.
+    fn_name이 없거나 찾지 못하면 patch_code를 그대로 반환 (full-file 모드)."""
+    if not original or not fn_name:
+        return patch_code
+
+    # def/async def/class 패턴으로 함수 시작 위치 탐색
+    start_pat = re.compile(
+        r'^([ \t]*)(?:async def |def |class )' + re.escape(fn_name) + r'[\s(:]',
+        re.MULTILINE,
+    )
+    m = start_pat.search(original)
+    if not m:
+        return patch_code  # 원본에서 못 찾으면 패치 그대로
+
+    fn_indent = m.group(1)
+    start = m.start()
+
+    # 같은 들여쓰기 레벨의 다음 def/class/decorator 위치를 함수 끝으로 간주
+    end_pat = re.compile(
+        r'\n' + re.escape(fn_indent) + r'(?:async def |def |class |@)',
+        re.MULTILINE,
+    )
+    rest = original[start + 1:]  # start 다음부터 검색
+    em = end_pat.search(rest)
+    end = start + 1 + em.start() + 1 if em else len(original)
+
+    return original[:start] + patch_code.rstrip('\n') + '\n\n\n' + original[end:]
+
+
 def execute_pending(conversation_id: str) -> str:
     """pending action 실행 → PR 생성."""
     action = _pending.get(conversation_id)
@@ -285,6 +323,12 @@ def execute_pending(conversation_id: str) -> str:
     branch = action["branch"]
     base = action["base_branch"]
 
+    # 패치 코드 → 최종 커밋 내용 결정
+    patch_code = action.get("patch_code") or action.get("new_content", "")
+    original = action.get("original_content", "")
+    fn_name = action.get("fn_name")
+    final_content = _smart_patch(original, patch_code, fn_name)
+
     try:
         # 1) 브랜치 생성
         github_client.create_branch(repo, branch, from_branch=base)
@@ -293,7 +337,7 @@ def execute_pending(conversation_id: str) -> str:
         github_client.commit_file(
             repo=repo,
             path=action["path"],
-            new_content=action["new_content"],
+            new_content=final_content,
             commit_message=action["commit_msg"],
             branch=branch,
             sha=action["sha"],
