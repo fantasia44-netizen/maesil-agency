@@ -120,6 +120,24 @@ def get_repo_tree(repo: str, branch: str = "main") -> list[str]:
     return [item["path"] for item in data.get("tree", []) if item.get("type") == "blob"]
 
 
+def search_code_in_repo(repo: str, query: str) -> list[str]:
+    """GitHub code search API로 레포 내 코드가 들어있는 파일 경로 목록 반환.
+    예: search_code_in_repo('owner/repo', 'class AgencyLog')
+    """
+    try:
+        r = httpx.get(
+            f"{BASE}/search/code",
+            headers=_headers(),
+            params={"q": f"{query} repo:{repo}"},
+            timeout=15,
+        )
+        r.raise_for_status()
+        return [item["path"] for item in r.json().get("items", [])]
+    except Exception as e:
+        logger.warning("코드 검색 실패 [%s] %r: %s", repo, query, e)
+        return []
+
+
 def find_file_in_repo(repo: str, filename: str, branch: str = "main") -> list[str]:
     """레포 트리에서 파일명이 포함된 경로 목록 반환 (대소문자 무시)."""
     try:
@@ -227,7 +245,7 @@ def create_pr(
 
 __all__ = [
     "get_file", "list_files", "get_default_branch",
-    "get_repo_tree", "find_file_in_repo",
+    "get_repo_tree", "find_file_in_repo", "search_code_in_repo",
     "list_user_repos", "find_repo_by_name",
     "get_recent_commits", "create_branch", "commit_file", "create_pr",
 ]

@@ -275,39 +275,32 @@ def analyze_and_propose(
             if not file_info:
                 code_context = f"\n\n(파일 읽기 시도 — 레포 `{repo}` 에서 파일을 찾지 못했습니다)"
 
-            # 실패 심볼이 현재 파일에 정의되지 않은 경우 → 클래스 정의 파일 별도 탐색
+            # 실패 심볼이 현재 파일에 정의되지 않은 경우 → GitHub 코드 검색으로 정의 파일 탐색
             if file_info and failing_symbol:
                 cls_name = failing_symbol.split(".")[0]
                 if not re.search(r'(?:class|def)\s+' + re.escape(cls_name) + r'\b',
                                  file_info["original"]):
-                    snake = re.sub(r'(?<!^)(?=[A-Z])', '_', cls_name).lower()
-                    cls_lower = cls_name.lower()
-                    logger.info("%s이 현재 파일에 없음 → 정의 파일 탐색: %s / %s",
-                                cls_name, cls_lower, snake)
+                    logger.info("%s이 현재 파일에 없음 → GitHub 코드 검색으로 정의 파일 탐색", cls_name)
                     original_path = file_info["path"]
-                    found_def = False
-                    for sname in [cls_lower, snake]:
-                        if found_def:
-                            break
-                        found_files = github_client.find_file_in_repo(repo, sname, branch)
-                        for candidate in found_files[:3]:
+                    # GitHub code search: 'class AgencyLog' 또는 'def AgencyLog'
+                    for search_q in [f"class {cls_name}", f"def {cls_name}"]:
+                        found_paths = github_client.search_code_in_repo(repo, search_q)
+                        for candidate in found_paths[:3]:
                             if candidate == original_path:
                                 continue
                             try:
                                 f2 = github_client.get_file(repo, candidate, branch)
-                                if re.search(r'(?:class|def)\s+' + re.escape(cls_name) + r'\b',
-                                             f2["content"]):
-                                    section = _extract_relevant_section(f2["content"], failing_symbol)
-                                    code_context += f"\n\n### {candidate} ({cls_name} 정의)\n```\n{section}\n```"
-                                    # 수정 대상 파일을 AgencyLog 정의 파일로 전환
-                                    file_info = {"repo": repo, "path": candidate,
-                                                 "sha": f2["sha"], "branch": branch,
-                                                 "original": f2["content"]}
-                                    logger.info("%s 정의 파일 발견: %s", cls_name, candidate)
-                                    found_def = True
-                                    break
+                                section = _extract_relevant_section(f2["content"], failing_symbol)
+                                code_context += f"\n\n### {candidate} ({cls_name} 정의)\n```\n{section}\n```"
+                                file_info = {"repo": repo, "path": candidate,
+                                             "sha": f2["sha"], "branch": branch,
+                                             "original": f2["content"]}
+                                logger.info("%s 정의 파일 발견(코드검색): %s", cls_name, candidate)
+                                break
                             except Exception:
                                 continue
+                        if file_info["path"] != original_path:
+                            break  # 파일 교체됨
 
         except Exception as e:
             code_context = f"\n\n(GitHub 접근 실패: {e})"
