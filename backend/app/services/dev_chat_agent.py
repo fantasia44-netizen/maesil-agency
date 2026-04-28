@@ -243,29 +243,36 @@ def analyze_and_propose(
                 except Exception as e:
                     logger.warning("파일 읽기 실패 %s/%s: %s", repo, fp, e)
 
-            # 2차 폴백: 레포 트리 전체 검색 (실패 심볼 클래스명 우선)
+            # 2차 폴백: GitHub code search (트리 검색 X — 대용량 레포 타임아웃 방지)
             if not file_info:
-                search_names = []
+                code_search_queries = []
                 if failing_symbol:
-                    cls_name = failing_symbol.split(".")[0].lower()
-                    snake = re.sub(r'(?<!^)(?=[A-Z])', '_', failing_symbol.split(".")[0]).lower()
-                    search_names = [cls_name, snake]
-                search_names += [fp.split("/")[-1].replace(".py","").replace(".ts","")
-                                 for fp in file_paths]
+                    cls_name_orig = failing_symbol.split(".")[0]
+                    # 에러 로그 문자열 직접 검색 (가장 정확)
+                    code_search_queries += [
+                        f'"[{cls_name_orig}]"',           # "[AgencyLog]"
+                        f"class {cls_name_orig}",          # class AgencyLog
+                        f"def {cls_name_orig.lower()}",    # def agencylog
+                    ]
+                # 모듈명으로도 검색
+                for fp in file_paths[:2]:
+                    base = fp.split("/")[-1].replace(".py", "")
+                    code_search_queries.append(base)
 
-                logger.info("경로 후보 실패 → 레포 트리 검색: %s", search_names)
-                for name in search_names:
-                    found = github_client.find_file_in_repo(repo, name, branch)
-                    for candidate in found[:3]:
+                logger.warning("1차 경로 실패 → code search: %s (repo=%s)", code_search_queries[:2], repo)
+                for query in code_search_queries:
+                    found_paths = github_client.search_code_in_repo(repo, query)
+                    for candidate in found_paths[:3]:
                         try:
                             f = github_client.get_file(repo, candidate, branch)
                             snippet = (
                                 _extract_relevant_section(f["content"], failing_symbol)
                                 if failing_symbol else f["content"][:3000]
                             )
-                            code_context += f"\n\n### {candidate} (트리검색)\n```\n{snippet}\n```"
+                            code_context += f"\n\n### {candidate}\n```\n{snippet}\n```"
                             file_info = {"repo": repo, "path": candidate, "sha": f["sha"],
                                          "branch": branch, "original": f["content"]}
+                            logger.warning("code search 파일 발견: %s", candidate)
                             break
                         except Exception:
                             continue
@@ -273,34 +280,39 @@ def analyze_and_propose(
                         break
 
             if not file_info:
-                code_context = f"\n\n(파일 읽기 시도 — 레포 `{repo}` 에서 파일을 찾지 못했습니다)"
+                code_context = (
+                    f"\n\n(파일 읽기 실패 — 레포 `{repo}`)\n"
+                    f"시도한 경로: {file_paths[:4]}\n"
+                    f"실패 심볼: {failing_symbol}"
+                )
 
-            # 실패 심볼이 현재 파일에 정의되지 않은 경우 → GitHub 코드 검색으로 정의 파일 탐색
+            # 파일은 찾았으나 실패 심볼 클래스가 없는 경우 → 클래스 정의 파일 추가 탐색
             if file_info and failing_symbol:
                 cls_name = failing_symbol.split(".")[0]
                 if not re.search(r'(?:class|def)\s+' + re.escape(cls_name) + r'\b',
                                  file_info["original"]):
-                    logger.info("%s이 현재 파일에 없음 → GitHub 코드 검색으로 정의 파일 탐색", cls_name)
                     original_path = file_info["path"]
-                    # GitHub code search: 'class AgencyLog' 또는 'def AgencyLog'
-                    for search_q in [f"class {cls_name}", f"def {cls_name}"]:
+                    logger.warning("%s이 %s에 없음 → 정의 파일 추가 탐색", cls_name, original_path)
+                    for search_q in [f"class {cls_name}", f'"[{cls_name}]"']:
                         found_paths = github_client.search_code_in_repo(repo, search_q)
                         for candidate in found_paths[:3]:
                             if candidate == original_path:
                                 continue
                             try:
                                 f2 = github_client.get_file(repo, candidate, branch)
-                                section = _extract_relevant_section(f2["content"], failing_symbol)
-                                code_context += f"\n\n### {candidate} ({cls_name} 정의)\n```\n{section}\n```"
-                                file_info = {"repo": repo, "path": candidate,
-                                             "sha": f2["sha"], "branch": branch,
-                                             "original": f2["content"]}
-                                logger.info("%s 정의 파일 발견(코드검색): %s", cls_name, candidate)
-                                break
+                                if re.search(r'(?:class|def)\s+' + re.escape(cls_name) + r'\b',
+                                             f2["content"]) or f'"[{cls_name}]"' in search_q:
+                                    section = _extract_relevant_section(f2["content"], failing_symbol)
+                                    code_context += f"\n\n### {candidate} ({cls_name})\n```\n{section}\n```"
+                                    file_info = {"repo": repo, "path": candidate,
+                                                 "sha": f2["sha"], "branch": branch,
+                                                 "original": f2["content"]}
+                                    logger.warning("%s 정의 파일: %s", cls_name, candidate)
+                                    break
                             except Exception:
                                 continue
                         if file_info["path"] != original_path:
-                            break  # 파일 교체됨
+                            break
 
         except Exception as e:
             code_context = f"\n\n(GitHub 접근 실패: {e})"
