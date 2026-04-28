@@ -157,12 +157,26 @@ export default function SettingsPage() {
 
   const saveProgram = async (name: string) => {
     const patch = editingProgram[name] || {};
+    // 서비스 ID를 새로 입력하면 자동 활성화
+    if (patch.host_service_id && patch.host_service_id.trim()) {
+      patch.is_active = true;
+    }
     try {
       await apiFetch(`/api/programs/${name}`, {
         method: "PATCH",
         body: JSON.stringify(patch),
       });
       setEditingProgram({ ...editingProgram, [name]: {} });
+      loadPrograms();
+    } catch (e) { setErr((e as Error).message); }
+  };
+
+  const toggleProgramActive = async (p: Program) => {
+    try {
+      await apiFetch(`/api/programs/${p.name}`, {
+        method: "PATCH",
+        body: JSON.stringify({ is_active: !p.is_active }),
+      });
       loadPrograms();
     } catch (e) { setErr((e as Error).message); }
   };
@@ -360,38 +374,58 @@ export default function SettingsPage() {
         {programs.map((p) => {
           const edit = editingProgram[p.name] || {};
           const isDirty = Object.keys(edit).length > 0;
+          const isRender = (edit.host_provider ?? p.host_provider) === "render";
+          const hasConnection = !!(p.host_service_id || p.health_url);
+          const badgeClass = !hasConnection ? "unknown" : p.is_active ? "up" : "unknown";
+          const badgeLabel = !hasConnection ? "미설정" : p.is_active ? "활성" : "비활성";
           return (
             <div key={p.name} className="card">
               <div className="card-header">
                 <div className="card-title">{p.display_name || p.name}</div>
-                <span className={`status-badge ${p.is_active ? "up" : "unknown"}`}>
-                  {p.is_active ? "활성" : "비활성"}
-                </span>
+                <span className={`status-badge ${badgeClass}`}>{badgeLabel}</span>
               </div>
               <div className="muted" style={{ marginBottom: "0.75rem" }}>
-                이름: <code>{p.name}</code> · 호스팅: {p.host_provider || "-"}
+                이름: <code>{p.name}</code> · 호스팅:&nbsp;
+                <select
+                  style={{ fontSize: "0.8rem", padding: "1px 4px" }}
+                  value={edit.host_provider ?? p.host_provider ?? "render"}
+                  onChange={(e) => setEditingProgram({ ...editingProgram, [p.name]: { ...edit, host_provider: e.target.value } })}
+                >
+                  <option value="render">Render</option>
+                  <option value="github">GitHub</option>
+                  <option value="vercel">Vercel</option>
+                  <option value="self">자체 서버</option>
+                  <option value="other">기타</option>
+                </select>
               </div>
-              <div className="config-field">
-                <label>Render 서비스 ID</label>
-                <input
-                  type="text"
-                  value={edit.host_service_id ?? p.host_service_id ?? ""}
-                  onChange={(e) => setEditingProgram({ ...editingProgram, [p.name]: { ...edit, host_service_id: e.target.value } })}
-                  placeholder="srv-xxxxxxxxxxxxxxxxxx"
-                />
-              </div>
+              {isRender && (
+                <div className="config-field">
+                  <label>Render 서비스 ID</label>
+                  <input
+                    type="text"
+                    value={edit.host_service_id ?? p.host_service_id ?? ""}
+                    onChange={(e) => setEditingProgram({ ...editingProgram, [p.name]: { ...edit, host_service_id: e.target.value } })}
+                    placeholder="srv-xxxxxxxxxxxxxxxxxx"
+                  />
+                </div>
+              )}
               <div className="config-field">
                 <label>헬스 URL (선택)</label>
                 <input
                   type="text"
                   value={edit.health_url ?? p.health_url ?? ""}
                   onChange={(e) => setEditingProgram({ ...editingProgram, [p.name]: { ...edit, health_url: e.target.value } })}
-                  placeholder="https://example.onrender.com/health"
+                  placeholder="https://example.com/health"
                 />
               </div>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
+              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                 <button className="btn primary" disabled={!isDirty} onClick={() => saveProgram(p.name)}>저장</button>
                 <button className="btn" onClick={() => testProgram(p.name)}>연결 테스트</button>
+                {hasConnection && (
+                  <button className="btn" onClick={() => toggleProgramActive(p)}>
+                    {p.is_active ? "비활성화" : "활성화"}
+                  </button>
+                )}
               </div>
               {programTestResults[p.name] && (() => {
                 const tr = programTestResults[p.name];
