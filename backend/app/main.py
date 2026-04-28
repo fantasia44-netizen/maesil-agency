@@ -14,12 +14,14 @@ async def _poll_loop():
     """배포 직후 1회 즉시 실행 후 3분 간격 반복."""
     import asyncio
     from app.services import alert_dispatcher, render_logs
+    from app.services import program_health as ph_svc
 
     # 첫 실행은 즉시 (수집전 문제 방지)
     await asyncio.sleep(10)  # 서버 완전 기동 대기
     while True:
         try:
             render_logs.poll_all()
+            ph_svc.check_all()          # 헬스 체크 → program_health 기록
             alert_dispatcher.dispatch_pending(limit=100)
             logger.info("[scheduler] poll cycle done")
         except Exception as e:
