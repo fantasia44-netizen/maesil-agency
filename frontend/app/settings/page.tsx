@@ -80,6 +80,7 @@ export default function SettingsPage() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [editingProgram, setEditingProgram] = useState<Record<string, Partial<Program>>>({});
   const [newProgram, setNewProgram] = useState({ name: "", display_name: "", host_provider: "render", host_service_id: "", health_url: "" });
+  const [programTestResults, setProgramTestResults] = useState<Record<string, { ok: boolean; checks: {kind: string; ok: boolean; status_code?: number; response_ms?: number; state?: string; service_name?: string; error?: string}[]; note?: string }>>({});
 
   // ── 감시 채널 상태 ──
   const [channels, setChannels] = useState<AlertChannel[]>([]);
@@ -144,6 +145,16 @@ export default function SettingsPage() {
   };
 
   // ── 연결 프로그램 CRUD ──
+  const testProgram = async (name: string) => {
+    try {
+      const r = await apiFetch<{ ok: boolean; checks: {kind: string; ok: boolean; status_code?: number; response_ms?: number; state?: string; service_name?: string; error?: string}[]; note?: string }>(
+        `/api/programs/${name}/test`, { method: "POST" });
+      setProgramTestResults({ ...programTestResults, [name]: r });
+    } catch (e) {
+      setProgramTestResults({ ...programTestResults, [name]: { ok: false, checks: [], note: (e as Error).message } });
+    }
+  };
+
   const saveProgram = async (name: string) => {
     const patch = editingProgram[name] || {};
     try {
@@ -378,7 +389,30 @@ export default function SettingsPage() {
                   placeholder="https://example.onrender.com/health"
                 />
               </div>
-              <button className="btn primary" disabled={!isDirty} onClick={() => saveProgram(p.name)}>저장</button>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button className="btn primary" disabled={!isDirty} onClick={() => saveProgram(p.name)}>저장</button>
+                <button className="btn" onClick={() => testProgram(p.name)}>연결 테스트</button>
+              </div>
+              {programTestResults[p.name] && (() => {
+                const tr = programTestResults[p.name];
+                return (
+                  <div style={{ marginTop: "0.5rem" }}>
+                    <div className={`test-result show ${tr.ok ? "success" : "error"}`}>
+                      {tr.ok ? "✓ 연결 정상" : "✗ 연결 실패"}{tr.note ? ` — ${tr.note}` : ""}
+                    </div>
+                    {tr.checks.map((c, i) => (
+                      <div key={i} className="muted" style={{ fontSize: "0.8rem", marginTop: "0.25rem" }}>
+                        [{c.kind}] {c.ok ? "OK" : "FAIL"}
+                        {c.status_code != null && ` · HTTP ${c.status_code}`}
+                        {c.response_ms != null && ` · ${c.response_ms}ms`}
+                        {c.service_name && ` · ${c.service_name}`}
+                        {c.state && ` · ${c.state}`}
+                        {c.error && ` · ${c.error}`}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           );
         })}

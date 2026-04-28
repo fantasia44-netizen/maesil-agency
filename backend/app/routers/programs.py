@@ -93,3 +93,83 @@ def update_program(name: str, body: ProgramPatch) -> dict:
     if not rows:
         raise HTTPException(404, detail="program not found")
     return rows[0]
+
+
+@router.post("/{name}/test")
+def test_program(name: str) -> dict:
+    """헬스 URL ping + Render API 상태 조회.
+    - health_url 있으면 → GET 요청 → 응답코드/시간 반환
+    - host_service_id 있으면 → Render API로 서비스 상태 조회
+    """
+    import time
+    import httpx
+    from app.services.secrets import get_secret
+
+    rows = _table().select("*").eq("name", name).limit(1).execute().data or []
+    if not rows:
+        raise HTTPException(404, detail="program not found")
+    prog = rows[0]
+
+    results: dict = {"name": name, "ok": True, "checks": []}
+
+    # 1) health_url ping
+    health_url = prog.get("health_url")
+    if health_url:
+        try:
+            t0 = time.monotonic()
+            r = httpx.get(health_url, timeout=10, follow_redirects=True)
+            ms = int((time.monotonic() - t0) * 1000)
+            ok = r.status_code < 400
+            results["checks"].append({
+                "kind": "health_url",
+                "url": health_url,
+                "status_code": r.status_code,
+                "response_ms": ms,
+                "ok": ok,
+            })
+            if not ok:
+                results["ok"] = False
+        except Exception as e:
+            results["checks"].append({"kind": "health_url", "url": health_url, "ok": False, "error": str(e)})
+            results["ok"] = False
+
+    # 2) Render API 서비스 상태 조회
+    service_id = prog.get("host_service_id")
+    if service_id and prog.get("host_provider") == "render":
+        api_key = get_secret("render_api")
+        if api_key:
+            try:
+                r = httpx.get(
+                    f"https://api.render.com/v1/services/{service_id}",
+                    headers={"Authorization": f"Bearer {api_key}", "Accept": "application/json"},
+                    timeout=10,
+                )
+                if r.status_code == 200:
+                    data = r.json()
+                    results["checks"].append({
+                        "kind": "render_api",
+                        "service_id": service_id,
+                        "ok": True,
+                        "service_name": data.get("name"),
+                        "state": data.get("suspended", "active"),
+                        "type": data.get("type"),
+                    })
+                else:
+                    results["checks"].append({
+                        "kind": "render_api",
+                        "service_id": service_id,
+                        "ok": False,
+                        "error": f"HTTP {r.status_code}: {r.text[:200]}",
+                    })
+                    results["ok"] = False
+            except Exception as e:
+                results["checks"].append({"kind": "render_api", "service_id": service_id, "ok": False, "error": str(e)})
+                results["ok"] = False
+        else:
+            results["checks"].append({"kind": "render_api", "ok": False, "error": "render_api 시크릿 미설정"})
+
+    if not results["checks"]:
+        results["ok"] = False
+        results["note"] = "health_url 또는 host_service_id(render) 중 하나 이상 등록 필요"
+
+    return results
