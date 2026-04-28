@@ -36,18 +36,23 @@ def get_maesil_total_client() -> Client:
         or os.environ.get("AUTOTOOL_SERVICE_ROLE_KEY", "").strip()
     )
 
+    # ── 진단 로그 (항상 출력) ──────────────────────────────────────────
+    candidates = sorted(k for k in os.environ if any(t in k for t in ("SUPABASE", "AUTOTOOL", "MAESIL")))
+    print(
+        f"[DB DIAG] url_key={url_key!r} "
+        f"url_prefix={url[:30]!r} url_len={len(url)} "
+        f"svc_key_len={len(svc_key)} "
+        f"env_keys={candidates}",
+        flush=True,
+    )
+    # ──────────────────────────────────────────────────────────────────
+
     if not url:
-        # 디버그용: 환경변수 이름 목록 (값 제외)
-        candidates = sorted(
-            k for k in os.environ
-            if any(t in k for t in ("SUPABASE", "AUTOTOOL", "MAESIL"))
-        )
         raise RuntimeError(
             f"Supabase URL 환경변수를 찾을 수 없습니다. "
             f"(MAESIL_TOTAL_SUPABASE_URL 또는 AUTOTOOL_SUPABASE_URL 필요) "
             f"현재 관련 환경변수 키: {candidates}"
         )
 
-    logger.info("[db] Supabase client init: key=%s url=%.40s…", url_key, url)
     _client = create_client(url, svc_key)
     return _client
