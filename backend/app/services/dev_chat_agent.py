@@ -66,10 +66,12 @@ def _all_programs() -> list[dict]:
 def _extract_file_paths(text: str) -> list[str]:
     """스택트레이스/로그에서 파일 경로 패턴 추출."""
     patterns = [
-        r'File "([^"]+\.py)"',           # Python traceback
-        r'at ([^\s]+\.py):',             # 일반
-        r'([a-zA-Z_/]+\.py)',            # 단순 .py 경로
-        r'([a-zA-Z_/]+\.(ts|tsx|js|jsx))',  # JS/TS
+        r'File "([^"]+\.py)"',                      # Python traceback
+        r'at ([^\s]+\.py):',                         # 일반
+        r'([a-zA-Z_][a-zA-Z0-9_/]+\.py)',           # 단순 .py 경로
+        r'([a-zA-Z_/]+\.(ts|tsx|js|jsx))',          # JS/TS
+        r'"module":\s*"([a-zA-Z_][a-zA-Z0-9_/]+)"', # JSON 로그: "module": "repository"
+        r'module["\s:=]+([a-zA-Z_][a-zA-Z0-9_/]+)', # module=xxx
     ]
     found = []
     for pat in patterns:
@@ -78,9 +80,19 @@ def _extract_file_paths(text: str) -> list[str]:
             # /opt/render/project/src/ 같은 prefix 제거
             p = re.sub(r'^.*?/src/', '', p)
             p = re.sub(r'^.*?/project/', '', p)
-            if p and p not in found and not p.startswith('/'):
-                found.append(p)
-    return found[:5]  # 최대 5개
+            # 모듈명 → 파일 경로 후보 생성
+            base = p.replace('.py', '').replace('.ts', '').replace('.tsx', '').replace('.js', '')
+            candidates = [p] if '.' in p or '/' in p else [
+                f"{base}.py",
+                f"app/{base}.py",
+                f"src/{base}.py",
+                f"app/services/{base}.py",
+                f"app/routers/{base}.py",
+            ]
+            for c in candidates:
+                if c not in found:
+                    found.append(c)
+    return found[:8]  # 최대 8개 (후보 포함)
 
 
 def _detect_program_from_text(text: str, programs: list[dict]) -> dict | None:
