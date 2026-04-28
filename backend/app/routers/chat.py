@@ -5,6 +5,7 @@
 - /api/chat/conversations  대화 목록
 - /api/chat/conversations/{id}  특정 대화 메시지
 """
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends
@@ -12,6 +13,8 @@ from pydantic import BaseModel
 
 from app.auth import UserContext, get_current_user
 from app.services import conversations as conv_svc
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
@@ -25,10 +28,19 @@ AGENT_DISPLAY = {
     "orchestrator": "오케스트레이터",
 }
 
+# 개발 에이전트 키워드 (super_admin 전용)
 DEV_KEYWORDS = {
     "에러", "error", "버그", "bug", "수정", "fix", "코드", "code",
     "배포", "deploy", "로그", "log", "traceback", "exception",
     "pr", "커밋", "commit", "github", "깃", "고쳐", "분석",
+    "개발팀", "개발자", "개발에이전트", "개발 에이전트", "dev",
+    "[에러 알림",  # 이메일 알림 → 채팅 자동 연결
+}
+
+# 인삿말/잡담 → 오케스트레이터 직접 처리 (에이전트 낭비 방지)
+SMALL_TALK = {
+    "안녕", "안녕하세요", "hello", "hi", "ㅎㅇ", "반가워", "테스트", "test",
+    "뭐해", "있어", "누구야", "누구", "잘있어",
 }
 
 
@@ -58,7 +70,7 @@ def _save_results(
     results: list[dict],
     user_id: str | None = None,
 ) -> None:
-    """대화 내용을 DB에 저장 (오류 시 무시)."""
+    """대화 내용을 DB에 저장. 오류는 로그만 남기고 응답은 계속."""
     try:
         conv_svc.ensure_conversation(conversation_id, user_message, user_id=user_id)
         conv_svc.save_user_message(conversation_id, user_message)
@@ -72,8 +84,17 @@ def _save_results(
                     cost_usd=r.get("cost_usd", 0.0),
                     run_id=r.get("run_id"),
                 )
-    except Exception:
-        pass  # 저장 실패가 응답을 깨지 않도록
+    except Exception as e:
+        logger.warning("대화 저장 실패 [conv=%s]: %s", conversation_id, e)
+
+
+def _orchestrator_reply(message: str) -> str:
+    """인삿말/단순 질문 → 오케스트레이터 직접 응답 (에이전트 미실행)."""
+    return (
+        "안녕하세요! 👋 매실 AI 어시스턴트입니다.\n\n"
+        "**매출·재무·재고·CS** 관련 질문을 입력해주세요.\n"
+        "예) '이번달 매출 현황', '재고 부족 상품', '광고비 ROAS 분석'"
+    )
 
 
 @router.post("", response_model=ChatResponse)
@@ -81,19 +102,21 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
     from app.services import dev_chat_agent
 
     conversation_id = req.conversation_id or str(uuid.uuid4())
-    msg_lower = req.message.lower()
+    msg_lower = req.message.lower().strip()
 
-    # ── customer는 개발 에이전트 사용 불가 ──
-    is_dev = user.is_super_admin and any(k in msg_lower for k in DEV_KEYWORDS)
+    # ── 1. 개발 에이전트 라우팅 (super_admin 전용) ──────────────────
+    is_dev     = user.is_super_admin and any(k in msg_lower for k in DEV_KEYWORDS)
     is_approve = user.is_super_admin and dev_chat_agent.is_approve(req.message)
-    is_cancel = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
+    is_cancel  = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
 
     if is_approve and conversation_id in dev_chat_agent._pending:
         response_text = dev_chat_agent.execute_pending(conversation_id)
         agent_type = "developer"
+
     elif is_cancel:
         response_text = dev_chat_agent.cancel_pending(conversation_id)
         agent_type = "developer"
+
     elif is_dev:
         try:
             ctx = conv_svc.get_messages(conversation_id)
@@ -101,10 +124,30 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
             ctx = []
         response_text = dev_chat_agent.analyze_and_propose(req.message, conversation_id, ctx)
         agent_type = "developer"
+
+    # ── 2. 인삿말/잡담 → 오케스트레이터 직접 응답 ────────────────────
+    elif msg_lower in SMALL_TALK or len(msg_lower) <= 3:
+        run_id = str(uuid.uuid4())
+        response_text = _orchestrator_reply(req.message)
+        result = {
+            "run_id": run_id, "agent_type": "orchestrator",
+            "message": response_text, "status": "success", "cost_usd": 0.0,
+        }
+        _save_results(conversation_id, req.message, [result], user_id=user.id)
+        return ChatResponse(
+            conversation_id=conversation_id,
+            agents=[AgentResult(
+                run_id=run_id, agent_type="orchestrator",
+                agent_display=AGENT_DISPLAY["orchestrator"],
+                message=response_text, status="success",
+            )],
+            routed_to=["orchestrator"],
+        )
+
+    # ── 3. 비즈니스 에이전트 오케스트레이션 ─────────────────────────
     else:
-        # 오케스트레이터 흐름 — operator_id는 JWT에서
         from app.agents.orchestrator import route, run_agents
-        operator_id = user.operator_id  # customer: insight_operator_id, super_admin: secrets에서
+        operator_id = user.operator_id
         agent_types = route(req.message)
         results = run_agents(req.message, conversation_id, agent_types, operator_id=operator_id)
         _save_results(conversation_id, req.message, results, user_id=user.id)
@@ -121,24 +164,19 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
         ]
         return ChatResponse(conversation_id=conversation_id, agents=agents, routed_to=agent_types)
 
-    # 개발 에이전트 결과 저장
+    # 개발 에이전트 결과 저장 + 반환
     run_id = str(uuid.uuid4())
     _save_results(conversation_id, req.message, [{
-        "run_id": run_id,
-        "agent_type": agent_type,
-        "message": response_text,
-        "status": "success",
-        "cost_usd": 0.0,
+        "run_id": run_id, "agent_type": agent_type,
+        "message": response_text, "status": "success", "cost_usd": 0.0,
     }], user_id=user.id)
 
     return ChatResponse(
         conversation_id=conversation_id,
         agents=[AgentResult(
-            run_id=run_id,
-            agent_type=agent_type,
+            run_id=run_id, agent_type=agent_type,
             agent_display=AGENT_DISPLAY["developer"],
-            message=response_text,
-            status="success",
+            message=response_text, status="success",
         )],
         routed_to=[agent_type],
     )
@@ -154,7 +192,6 @@ def morning_briefing(
     conversation_id = (req.conversation_id if req else None) or str(uuid.uuid4())
     user_message = "☀️ 아침 현황 보고"
     results = run_morning_briefing(conversation_id, operator_id=user.operator_id)
-
     _save_results(conversation_id, user_message, results, user_id=user.id)
 
     agents = [
@@ -175,12 +212,91 @@ def morning_briefing(
     )
 
 
+@router.post("/from-alert/{alert_id}", response_model=ChatResponse)
+def chat_from_alert(
+    alert_id: str,
+    req: ChatRequest | None = None,
+    user: UserContext = Depends(get_current_user),
+) -> ChatResponse:
+    """이메일 알림 링크 → 대화 자동 시작.
+    alert_id로 알림 조회 → 에러 컨텍스트 자동 전송 → 개발 에이전트 분석.
+    conversation_id를 alert_id 기반으로 고정해서 같은 알림은 같은 대화로 이어짐.
+    """
+    from app.db.maesil_total_client import get_maesil_total_client
+    from app.services import dev_chat_agent
+
+    # alert 조회
+    try:
+        resp = get_maesil_total_client().schema("agent_work").table("alert_events") \
+            .select("*").eq("id", alert_id).limit(1).execute()
+        rows = resp.data or []
+        event = rows[0] if rows else None
+    except Exception:
+        event = None
+
+    conversation_id = f"alert-{alert_id}"  # 알림 ID 기반 고정 conversation
+
+    if not event:
+        msg = "⚠️ 알림을 찾을 수 없습니다."
+        _save_results(conversation_id, f"[알림 {alert_id}]", [{
+            "run_id": str(uuid.uuid4()), "agent_type": "orchestrator",
+            "message": msg, "status": "failed", "cost_usd": 0.0,
+        }], user_id=user.id)
+        return ChatResponse(
+            conversation_id=conversation_id,
+            agents=[AgentResult(
+                run_id=str(uuid.uuid4()), agent_type="orchestrator",
+                agent_display="시스템", message=msg, status="failed",
+            )],
+            routed_to=[],
+        )
+
+    sev  = (event.get("severity") or "error").upper()
+    prog = event.get("program_name") or "(프로그램 미특정)"
+    title = event.get("title") or ""
+    body  = event.get("message") or ""
+
+    auto_msg = (
+        f"[에러 알림 자동 연결]\n"
+        f"프로그램: {prog}\n심각도: {sev}\n제목: {title}\n\n{body}\n\n"
+        f"이 에러를 분석하고 수정 방향을 알려주세요."
+    )
+
+    try:
+        ctx = conv_svc.get_messages(conversation_id)
+    except Exception:
+        ctx = []
+
+    response_text = dev_chat_agent.analyze_and_propose(auto_msg, conversation_id, ctx)
+    run_id = str(uuid.uuid4())
+
+    _save_results(conversation_id, auto_msg, [{
+        "run_id": run_id, "agent_type": "developer",
+        "message": response_text, "status": "success", "cost_usd": 0.0,
+    }], user_id=user.id)
+
+    return ChatResponse(
+        conversation_id=conversation_id,
+        agents=[AgentResult(
+            run_id=run_id, agent_type="developer",
+            agent_display=AGENT_DISPLAY["developer"],
+            message=response_text, status="success",
+        )],
+        routed_to=["developer"],
+    )
+
+
 @router.get("/conversations")
 def list_conversations(user: UserContext = Depends(get_current_user)) -> list[dict]:
-    return conv_svc.list_conversations(user_id=user.id)
+    # super_admin은 전체, customer는 본인 것만
+    uid = None if user.is_super_admin else user.id
+    return conv_svc.list_conversations(user_id=uid)
 
 
 @router.get("/conversations/{conversation_id}")
-def get_conversation(conversation_id: str, user: UserContext = Depends(get_current_user)) -> dict:
+def get_conversation(
+    conversation_id: str,
+    user: UserContext = Depends(get_current_user),
+) -> dict:
     messages = conv_svc.get_messages(conversation_id)
     return {"conversation_id": conversation_id, "messages": messages}
