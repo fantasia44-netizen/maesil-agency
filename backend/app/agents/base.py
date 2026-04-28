@@ -329,7 +329,9 @@ def _estimate_cost(model: str, input_tokens: int, output_tokens: int) -> float:
     rates = {
         "claude-haiku-4-5-20251001": (0.00025, 0.00125),   # per 1k tokens
         "claude-sonnet-4-5": (0.003, 0.015),
+        "claude-sonnet-4-6": (0.003, 0.015),               # same price as 4.5
         "claude-opus-4-5": (0.015, 0.075),
+        "claude-opus-4-6": (0.005, 0.025),
     }
     in_rate, out_rate = rates.get(model, (0.003, 0.015))
     return round((input_tokens / 1000 * in_rate) + (output_tokens / 1000 * out_rate), 6)
