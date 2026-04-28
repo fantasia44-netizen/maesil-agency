@@ -96,7 +96,16 @@ export default function HistoryPage() {
           {loadingList && (
             <div className="muted" style={{ padding: "1rem", fontSize: "0.82rem" }}>불러오는 중…</div>
           )}
-          {!loadingList && conversations.length === 0 && hasToken() && (
+          {!loadingList && error && (
+            <div style={{ padding: "0.75rem 1rem", fontSize: "0.8rem", color: "#b91c1c", background: "#fef2f2", borderBottom: "1px solid #fecaca" }}>
+              ⚠️ {error}
+              <button
+                onClick={() => { setError(null); setLoadingList(true); apiFetch<Conversation[]>("/api/chat/conversations").then(setConversations).catch((e) => setError(e.message)).finally(() => setLoadingList(false)); }}
+                style={{ marginLeft: 8, fontSize: "0.75rem", color: "#2563eb", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+              >재시도</button>
+            </div>
+          )}
+          {!loadingList && !error && conversations.length === 0 && hasToken() && (
             <div className="muted" style={{ padding: "1rem", fontSize: "0.82rem" }}>저장된 대화가 없습니다.</div>
           )}
           {conversations.map((c) => (
@@ -218,16 +227,6 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      {error && (
-        <div style={{
-          position: "fixed", bottom: 20, right: 20,
-          background: "#fef2f2", border: "1px solid #fecaca",
-          borderRadius: 8, padding: "0.6rem 1rem",
-          color: "#b91c1c", fontSize: "0.82rem",
-        }}>
-          오류: {error}
-        </div>
-      )}
     </div>
   );
 }

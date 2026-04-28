@@ -50,7 +50,8 @@ export function isSuperAdmin(): boolean {
 // ── API 호출 ─────────────────────────────────────────────────────────
 export async function apiFetch<T = unknown>(
   path: string,
-  init: RequestInit = {}
+  init: RequestInit = {},
+  timeoutMs = 15000,
 ): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
@@ -59,7 +60,20 @@ export async function apiFetch<T = unknown>(
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`${BASE}${path}`, { ...init, headers });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${path}`, { ...init, headers, signal: controller.signal });
+  } catch (e: unknown) {
+    if (e instanceof DOMException && e.name === "AbortError") {
+      throw new Error("요청 시간이 초과되었습니다. 서버 연결을 확인하세요.");
+    }
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
 
   // 401 → 로그인 페이지로
   if (res.status === 401) {

@@ -8,9 +8,12 @@ HTTP/2 idle 연결 끊김 문제로 싱글턴 불가 → 요청마다 새 클라
 import logging
 import os
 
-from supabase import Client, create_client
+from supabase import Client, ClientOptions, create_client
 
 logger = logging.getLogger(__name__)
+
+# 쿼리 타임아웃 (초) — 이 시간 내 응답 없으면 Exception 발생
+_QUERY_TIMEOUT = 10
 
 # 자격증명: 프로세스 시작 시 1회 읽기
 def _read_credentials() -> tuple[str, str]:
@@ -35,5 +38,8 @@ _SUPABASE_URL, _SUPABASE_KEY = _read_credentials()
 
 
 def get_maesil_total_client() -> Client:
-    """매 호출마다 새 클라이언트 반환 (HTTP/2 stale connection 방지)."""
-    return create_client(_SUPABASE_URL, _SUPABASE_KEY)
+    """매 호출마다 새 클라이언트 반환 (HTTP/2 stale connection 방지).
+    postgrest_client_timeout: 쿼리 10초 내 응답 없으면 타임아웃.
+    """
+    options = ClientOptions(postgrest_client_timeout=_QUERY_TIMEOUT)
+    return create_client(_SUPABASE_URL, _SUPABASE_KEY, options=options)
