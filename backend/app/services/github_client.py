@@ -50,11 +50,26 @@ def get_file(repo: str, path: str, branch: str = "main") -> dict:
 
 def list_files(repo: str, path: str = "", branch: str = "main") -> list[str]:
     """디렉터리 내 파일 경로 목록."""
-    url = f"{BASE}/repos/{repo}/contents/{path}"
+    url = f"{BASE}/repos/{repo}/contents/{path}" if path else f"{BASE}/repos/{repo}/contents"
     r = httpx.get(url, headers=_headers(), params={"ref": branch}, timeout=10)
     r.raise_for_status()
     items = r.json() if isinstance(r.json(), list) else []
     return [item["path"] for item in items if item.get("type") == "file"]
+
+
+def list_dir_entries(repo: str, path: str = "", branch: str = "main") -> list[dict]:
+    """디렉터리 항목 목록 (파일 + 하위 디렉터리 모두).
+    반환: [{"path": str, "type": "file"|"dir", "name": str}]
+    """
+    url = f"{BASE}/repos/{repo}/contents/{path}" if path else f"{BASE}/repos/{repo}/contents"
+    r = httpx.get(url, headers=_headers(), params={"ref": branch}, timeout=10)
+    r.raise_for_status()
+    items = r.json() if isinstance(r.json(), list) else []
+    return [
+        {"path": item["path"], "type": item.get("type", ""), "name": item.get("name", "")}
+        for item in items
+        if item.get("type") in ("file", "dir")
+    ]
 
 
 def get_default_branch(repo: str) -> str:
@@ -244,7 +259,7 @@ def create_pr(
 
 
 __all__ = [
-    "get_file", "list_files", "get_default_branch",
+    "get_file", "list_files", "list_dir_entries", "get_default_branch",
     "get_repo_tree", "find_file_in_repo", "search_code_in_repo",
     "list_user_repos", "find_repo_by_name",
     "get_recent_commits", "create_branch", "commit_file", "create_pr",

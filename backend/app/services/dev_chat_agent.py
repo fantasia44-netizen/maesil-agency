@@ -131,6 +131,14 @@ def _extract_file_paths(text: str) -> list[str]:
                 f"src/{base}.py",
                 f"app/services/{base}.py",
                 f"app/routers/{base}.py",
+                f"app/models/{base}.py",
+                f"app/db/{base}.py",
+                f"app/repositories/{base}.py",
+                f"db/{base}.py",
+                f"models/{base}.py",
+                f"repositories/{base}.py",
+                f"core/{base}.py",
+                f"infrastructure/{base}.py",
             ]
             for c in candidates:
                 if c not in found:
@@ -216,8 +224,8 @@ def analyze_and_propose(
         repo = program["github_repo"]
         try:
             branch = github_client.get_default_branch(repo)
-            # 실패 심볼이 있으면 해당 클래스명도 파일 경로 후보로 추가
-            file_paths = _extract_file_paths(user_message)
+            # 파일 경로: 현재 메시지 + 컨텍스트 전체에서 추출 (이전 메시지에 모듈 정보가 있을 수 있음)
+            file_paths = _extract_file_paths(full_text)
             if failing_symbol:
                 cls_name = failing_symbol.split(".")[0].lower()
                 # 클래스명으로 파일 검색 (AgencyLog → agency_log.py 등 스네이크케이스도 시도)
@@ -284,32 +292,58 @@ def analyze_and_propose(
                     if file_info:
                         break
 
-            # 3차 폴백: 디렉터리 내 모든 .py 파일 내용 검사 (파일명 무관, 내용 기반)
+            # 3차 폴백: 루트 동적 탐색 (실제 존재하는 디렉터리 파악 → 내용 기반 검색)
             if not file_info and failing_symbol:
                 cls_lower = failing_symbol.split(".")[0].lower()
-                search_dirs = [
-                    "app/services", "app", "app/utils", "app/models", "app/core",
-                    "src/services", "src", "utils", "core", "logs", "",
-                ]
-                logger.warning("3차 디렉터리 탐색 시작 (내용 기반): %s (repo=%s)", cls_lower, repo)
-                for dir_path in search_dirs:
+                logger.warning("3차 동적탐색 시작: %s (repo=%s)", cls_lower, repo)
+
+                all_py_candidates: list[str] = []
+
+                # 루트 탐색 (파일 + 디렉터리 목록)
+                root_dirs: list[str] = []
+                try:
+                    root_entries = github_client.list_dir_entries(repo, "", branch)
+                    root_dirs = [e["path"] for e in root_entries if e["type"] == "dir"][:10]
+                    all_py_candidates.extend(
+                        e["path"] for e in root_entries
+                        if e["type"] == "file" and e["path"].endswith(".py")
+                    )
+                    logger.warning("루트 디렉터리 발견: %s", root_dirs)
+                except Exception as e:
+                    logger.warning("루트 탐색 실패: %s", e)
+
+                # 각 루트 디렉터리 → 파일 목록 + 하위 디렉터리 탐색 (2레벨)
+                for d in root_dirs:
                     try:
-                        dir_files = github_client.list_files(repo, dir_path, branch)
-                        py_files = [f for f in dir_files if f.endswith(".py")][:12]  # 최대 12개
-                        for candidate in py_files:
+                        d_entries = github_client.list_dir_entries(repo, d, branch)
+                        all_py_candidates.extend(
+                            e["path"] for e in d_entries
+                            if e["type"] == "file" and e["path"].endswith(".py")
+                        )
+                        # 2레벨 하위 디렉터리
+                        for sub_d in (e["path"] for e in d_entries if e["type"] == "dir"):
                             try:
-                                f = github_client.get_file(repo, candidate, branch)
-                                # 파일명 무관 — 내용에 클래스명 포함 여부로 판단
-                                if cls_lower in f["content"].lower():
-                                    snippet = _extract_relevant_section(f["content"], failing_symbol)
-                                    code_context += f"\n\n### {candidate}\n```\n{snippet}\n```"
-                                    file_info = {"repo": repo, "path": candidate, "sha": f["sha"],
-                                                 "branch": branch, "original": f["content"]}
-                                    logger.warning("3차(내용검색) 파일 발견: %s", candidate)
-                                    break
+                                sub_files = github_client.list_files(repo, sub_d, branch)
+                                all_py_candidates.extend(f for f in sub_files if f.endswith(".py"))
                             except Exception:
-                                continue
-                        if file_info:
+                                pass
+                    except Exception:
+                        continue
+
+                # 내용 검사 (이미 시도한 경로 제외, 최대 25개)
+                tried_paths = set(file_paths)
+                for candidate in all_py_candidates[:25]:
+                    if candidate in tried_paths:
+                        continue
+                    tried_paths.add(candidate)
+                    try:
+                        f = github_client.get_file(repo, candidate, branch)
+                        if cls_lower in f["content"].lower():
+                            snippet = _extract_relevant_section(f["content"], failing_symbol)
+                            code_context += f"\n\n### {candidate}\n```\n{snippet}\n```"
+                            file_info = {"repo": repo, "path": candidate, "sha": f["sha"],
+                                         "branch": branch, "original": f["content"]}
+                            logger.warning("3차(동적) 파일 발견: %s", candidate)
                             break
                     except Exception:
                         continue
