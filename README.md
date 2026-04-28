@@ -88,5 +88,80 @@ npm run dev
 - 대시보드 위젯 자동 갱신 (5~10초 폴링 or WebSocket)
 - `GET /api/secrets/{name}/test` 의 kind별 실제 검증 구현
 
+## 감시 시스템 (Phase A)
+
+Render 로그를 3분마다 폴링하여 에러를 감지하고, 등록된 채널(이메일/위젯)로 알림을 보냅니다.
+
+### 구성
+- **SQL**: `backend/sql/006_alert_system.sql` (`alert_channels`, `alert_events`, `program_log_cursor`)
+- **백엔드 서비스**: `services/render_logs.py`, `services/alert_dispatcher.py`, `services/notify_client.py`
+- **API**: `/api/alert-channels` (CRUD), `/api/alerts/poll` (cron 트리거), `/api/alerts/recent`, `/api/alerts/{id}/ack`
+- **이메일 발송**: maesil-insight의 `/api/v1/notify/email` 게이트웨이 호출 (자체 SMTP 안 가짐)
+
+### 셋업 순서
+
+1. **SQL 실행**: Supabase(autotool 프로젝트) SQL Editor에서 `006_alert_system.sql` 붙여넣고 실행.
+
+2. **시크릿 등록** (`/settings`):
+   - `render_api` — Render Account API Token
+   - `maesil_insight_url` — 예: `https://maesil-insight.onrender.com`
+   - `harness_api_token` — maesil-insight의 `HARNESS_API_TOKEN` 환경변수와 동일
+
+3. **감시 대상 등록** — `program_registry`에 row 추가 (또는 settings UI 추후 추가):
+   ```sql
+   insert into agent_work.program_registry (name, display_name, host_provider, host_service_id, is_active)
+   values
+     ('autotool',        'autotool',        'render', 'srv-XXXXXXXX', true),
+     ('maesil-insight',  '매실 인사이트',    'render', 'srv-YYYYYYYY', true)
+   on conflict (name) do update
+     set host_provider   = excluded.host_provider,
+         host_service_id = excluded.host_service_id,
+         is_active       = excluded.is_active;
+   ```
+   `host_service_id`는 Render 대시보드 → 서비스 → URL의 `srv-...` 부분.
+
+4. **알림 채널 등록** (`/settings` → "감시 채널" 섹션):
+   - 종류: `email` / 대상: 수신 이메일 주소 / 최소 심각도: `error`
+   - 추가로 `widget` 채널 1개 등록(대시보드에 미확인 알림 카드 표시)
+   - "테스트 발송" 버튼으로 메일이 도착하는지 확인
+
+5. **Render Cron Job 등록** (3분 간격 폴링):
+   - Render 대시보드 → New → **Cron Job**
+   - Schedule: `*/3 * * * *`
+   - Command:
+     ```bash
+     curl -fsS -X POST "$AGENCY_URL/api/alerts/poll" \
+       -H "Authorization: Bearer $AGENCY_TOKEN"
+     ```
+   - 환경변수:
+     - `AGENCY_URL` = agency 백엔드 URL (예: `https://maesil-agency.onrender.com`)
+     - `AGENCY_TOKEN` = agency `.env`의 `API_BEARER_TOKEN` 과 동일
+
+   로컬 테스트:
+   ```bash
+   curl -X POST http://localhost:8000/api/alerts/poll \
+     -H "Authorization: Bearer $API_BEARER_TOKEN"
+   ```
+
+### 동작 흐름
+
+```
+[Render Cron 3분]
+      ↓ POST /api/alerts/poll
+[render_logs.poll_all] — 프로그램별 신규 로그 fetch + 패턴 매칭 → alert_events INSERT
+      ↓
+[alert_dispatcher.dispatch_pending] — 미발송 이벤트를 채널로 fan-out
+      ↓                               ↓
+   [email 채널]                    [widget 채널]
+   notify_client.send_email →       (DB 적재만 — 대시보드가 30초 폴링)
+   maesil-insight /api/v1/notify/email
+   → Resend → 메일 도착
+```
+
+### 향후 (Phase B~D)
+- Phase B: `monitor` 에이전트 — 적재된 에러를 LLM이 분류/요약/원인 추정
+- Phase C: `dev` 에이전트 — monitor가 인계한 에러의 원인 코드 분석
+- Phase D: PWA + Web Push — 폰 위젯 푸시 알림
+
 ## 아직 안 만든 것 (Future Work)
 [DESIGN.md §18](./DESIGN.md) 참조.

@@ -16,6 +16,18 @@ type SecretRow = {
   updated_at: string;
 };
 
+type AlertChannel = {
+  id: string;
+  kind: "email" | "widget";
+  target: string | null;
+  label: string | null;
+  severity_min: "info" | "warning" | "error" | "critical";
+  is_active: boolean;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 type KeyCard = {
   name: string;
   kind: string;
@@ -54,6 +66,16 @@ export default function SettingsPage() {
   const [testResults, setTestResults] = useState<Record<string, { ok: boolean; msg: string }>>({});
   const [err, setErr] = useState<string | null>(null);
 
+  // ── 감시 채널 상태 ──
+  const [channels, setChannels] = useState<AlertChannel[]>([]);
+  const [newChannel, setNewChannel] = useState<{ kind: "email" | "widget"; target: string; label: string; severity_min: "info" | "warning" | "error" | "critical" }>({
+    kind: "email",
+    target: "",
+    label: "",
+    severity_min: "error",
+  });
+  const [channelTest, setChannelTest] = useState<Record<string, { ok: boolean; msg: string }>>({});
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       setTokenLocal(window.localStorage.getItem("maesil_agency_token") || "");
@@ -70,17 +92,89 @@ export default function SettingsPage() {
     }
   };
 
+  const loadChannels = async () => {
+    try {
+      const rows = await apiFetch<AlertChannel[]>("/api/alert-channels");
+      setChannels(rows);
+    } catch (e) {
+      // 채널 로딩 실패는 비치명적
+      console.warn(e);
+    }
+  };
+
   useEffect(() => {
-    if (hasToken()) loadSecrets();
+    if (hasToken()) {
+      loadSecrets();
+      loadChannels();
+    }
   }, []);
 
   const saveToken = () => {
     if (token.trim()) {
       setToken(token.trim());
       loadSecrets();
+      loadChannels();
     } else {
       clearToken();
       setSecrets([]);
+      setChannels([]);
+    }
+  };
+
+  // ── 감시 채널 CRUD ──
+  const createChannel = async () => {
+    if (newChannel.kind === "email" && !newChannel.target.trim()) {
+      setErr("이메일 주소를 입력하세요");
+      return;
+    }
+    try {
+      await apiFetch("/api/alert-channels", {
+        method: "POST",
+        body: JSON.stringify({
+          kind: newChannel.kind,
+          target: newChannel.target.trim() || null,
+          label: newChannel.label.trim() || null,
+          severity_min: newChannel.severity_min,
+          is_active: true,
+        }),
+      });
+      setNewChannel({ kind: "email", target: "", label: "", severity_min: "error" });
+      loadChannels();
+      setErr(null);
+    } catch (e) {
+      setErr((e as Error).message);
+    }
+  };
+
+  const toggleChannel = async (ch: AlertChannel) => {
+    try {
+      await apiFetch(`/api/alert-channels/${ch.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ is_active: !ch.is_active }),
+      });
+      loadChannels();
+    } catch (e) {
+      setErr((e as Error).message);
+    }
+  };
+
+  const deleteChannel = async (id: string) => {
+    if (!confirm("이 채널을 삭제할까요?")) return;
+    try {
+      await apiFetch(`/api/alert-channels/${id}`, { method: "DELETE" });
+      loadChannels();
+    } catch (e) {
+      setErr((e as Error).message);
+    }
+  };
+
+  const testChannel = async (id: string) => {
+    try {
+      const r = await apiFetch<{ ok: boolean; detail?: { error?: string } }>(
+        `/api/alert-channels/${id}/test`, { method: "POST" });
+      setChannelTest({ ...channelTest, [id]: { ok: !!r.ok, msg: r.ok ? "발송 성공" : (r.detail?.error || "발송 실패") } });
+    } catch (e) {
+      setChannelTest({ ...channelTest, [id]: { ok: false, msg: (e as Error).message } });
     }
   };
 
@@ -183,6 +277,109 @@ export default function SettingsPage() {
               {ex && (
                 <div className="muted" style={{ marginTop: "0.5rem" }}>
                   최근 테스트: {ex.last_tested_at ? new Date(ex.last_tested_at).toLocaleString("ko-KR") : "없음"}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── 감시 채널 ── */}
+      <h2 style={{ margin: "2rem 0 0.5rem 0", fontSize: "1.05rem" }}>감시 채널</h2>
+      <p className="muted" style={{ marginTop: 0 }}>
+        Render 로그/사용자 에러 등 시스템 알림을 받을 채널을 등록하세요. 이메일은 maesil-insight 게이트웨이를 통해 발송됩니다.
+        위젯 채널은 대시보드에 알림이 떠요.
+      </p>
+
+      {/* 새 채널 추가 폼 */}
+      <div className="card" style={{ marginBottom: "1rem" }}>
+        <div className="card-header">
+          <div className="card-title">새 채널 추가</div>
+        </div>
+        <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "0.75rem" }}>
+          <div className="config-field">
+            <label>종류</label>
+            <select
+              value={newChannel.kind}
+              onChange={(e) => setNewChannel({ ...newChannel, kind: e.target.value as "email" | "widget" })}
+            >
+              <option value="email">이메일</option>
+              <option value="widget">위젯 (대시보드)</option>
+            </select>
+          </div>
+          <div className="config-field">
+            <label>{newChannel.kind === "email" ? "수신 이메일" : "대상 (선택)"}</label>
+            <input
+              type="text"
+              value={newChannel.target}
+              onChange={(e) => setNewChannel({ ...newChannel, target: e.target.value })}
+              placeholder={newChannel.kind === "email" ? "you@example.com" : "(빈칸 가능)"}
+            />
+          </div>
+          <div className="config-field">
+            <label>최소 심각도</label>
+            <select
+              value={newChannel.severity_min}
+              onChange={(e) => setNewChannel({ ...newChannel, severity_min: e.target.value as typeof newChannel.severity_min })}
+            >
+              <option value="info">info (모든 알림)</option>
+              <option value="warning">warning 이상</option>
+              <option value="error">error 이상 (권장)</option>
+              <option value="critical">critical 만</option>
+            </select>
+          </div>
+          <div className="config-field">
+            <label>라벨 (선택)</label>
+            <input
+              type="text"
+              value={newChannel.label}
+              onChange={(e) => setNewChannel({ ...newChannel, label: e.target.value })}
+              placeholder="예: 운영자 메일"
+            />
+          </div>
+        </div>
+        <button className="btn primary" onClick={createChannel}>채널 추가</button>
+      </div>
+
+      {/* 등록된 채널 목록 */}
+      <div className="grid">
+        {channels.length === 0 && (
+          <div className="card muted">아직 등록된 감시 채널이 없습니다. 위에서 추가하세요.</div>
+        )}
+        {channels.map((ch) => {
+          const tr = channelTest[ch.id];
+          return (
+            <div key={ch.id} className="card">
+              <div className="card-header">
+                <div className="card-title">
+                  {ch.label || (ch.kind === "email" ? "이메일 채널" : "위젯 채널")}
+                </div>
+                <span className={`status-badge ${ch.is_active ? "up" : "unknown"}`}>
+                  {ch.is_active ? "활성" : "비활성"}
+                </span>
+              </div>
+              <div className="muted" style={{ marginBottom: "0.5rem" }}>
+                종류: <strong>{ch.kind}</strong>
+                {ch.target && <> · 대상: <code>{ch.target}</code></>}
+                <br />
+                최소 심각도: <strong>{ch.severity_min}</strong>
+              </div>
+              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                <button className="btn" onClick={() => testChannel(ch.id)}>테스트 발송</button>
+                <button className="btn" onClick={() => toggleChannel(ch)}>
+                  {ch.is_active ? "비활성화" : "활성화"}
+                </button>
+                <button
+                  className="btn"
+                  style={{ color: "#b91c1c" }}
+                  onClick={() => deleteChannel(ch.id)}
+                >
+                  삭제
+                </button>
+              </div>
+              {tr && (
+                <div className={`test-result show ${tr.ok ? "success" : "error"}`}>
+                  {tr.ok ? "성공" : "실패"} — {tr.msg}
                 </div>
               )}
             </div>

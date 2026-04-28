@@ -36,6 +36,26 @@ type AgentCard = {
 
 type AgentStatusResp = { agents: AgentCard[] };
 
+// --- 알림 타입 ---
+type AlertEvent = {
+  id: string;
+  program_name: string | null;
+  severity: "info" | "warning" | "error" | "critical";
+  source: string | null;
+  title: string;
+  message: string | null;
+  created_at: string;
+  acknowledged_at: string | null;
+};
+
+type AlertsResp = { events: AlertEvent[] };
+
+function severityClass(sev: string): string {
+  if (sev === "critical" || sev === "error") return "down";
+  if (sev === "warning") return "degraded";
+  return "unknown";
+}
+
 // --- 상태 뱃지 헬퍼 ---
 function statusClass(status: string | null | undefined): string {
   if (!status) return "unknown";
@@ -61,7 +81,23 @@ function agentStatusLabel(status: string): string {
 export default function Dashboard() {
   const [programs, setPrograms] = useState<SystemStatusResp | null>(null);
   const [agents, setAgents] = useState<AgentStatusResp | null>(null);
+  const [alerts, setAlerts] = useState<AlertEvent[]>([]);
   const [err, setErr] = useState<string | null>(null);
+
+  const loadAlerts = () => {
+    apiFetch<AlertsResp>("/api/alerts/recent?limit=10&only_unack=true")
+      .then((r) => setAlerts(r.events || []))
+      .catch(() => {/* alerts는 비치명적 */});
+  };
+
+  const ackAlert = async (id: string) => {
+    try {
+      await apiFetch(`/api/alerts/${id}/ack`, { method: "POST", body: JSON.stringify({}) });
+      loadAlerts();
+    } catch (e) {
+      console.warn(e);
+    }
+  };
 
   useEffect(() => {
     if (!hasToken()) {
@@ -75,6 +111,11 @@ export default function Dashboard() {
     apiFetch<AgentStatusResp>("/api/widgets/agent-status")
       .then(setAgents)
       .catch((e: Error) => setErr(e.message));
+
+    loadAlerts();
+    // 30초마다 알림 갱신
+    const t = setInterval(loadAlerts, 30000);
+    return () => clearInterval(t);
   }, []);
 
   return (
@@ -83,6 +124,38 @@ export default function Dashboard() {
         <div className="card" style={{ borderColor: "#fecaca", background: "#fef2f2", color: "#b91c1c", marginBottom: "1.5rem" }}>
           {err}
         </div>
+      )}
+
+      {/* 알림 위젯 (미확인 알림이 있을 때만) */}
+      {alerts.length > 0 && (
+        <>
+          <h2 style={{ margin: "0 0 0.5rem 0", fontSize: "1rem", fontWeight: 600 }}>
+            미확인 알림 <span className="muted">({alerts.length})</span>
+          </h2>
+          <div className="grid" style={{ marginBottom: "2rem" }}>
+            {alerts.map((a) => (
+              <div key={a.id} className="card" style={{ borderLeft: `4px solid ${a.severity === "critical" || a.severity === "error" ? "#dc2626" : a.severity === "warning" ? "#d97706" : "#2563eb"}` }}>
+                <div className="card-header">
+                  <div className="card-title" style={{ fontSize: "0.95rem" }}>{a.title}</div>
+                  <span className={`status-badge ${severityClass(a.severity)}`}>{a.severity}</span>
+                </div>
+                <div className="muted" style={{ marginBottom: "0.5rem" }}>
+                  {a.program_name || "(프로그램 없음)"} · {a.source || "-"}<br />
+                  {new Date(a.created_at).toLocaleString("ko-KR")}
+                </div>
+                {a.message && (
+                  <pre style={{
+                    background: "#0f172a", color: "#e2e8f0", padding: "0.5rem",
+                    fontSize: "0.75rem", borderRadius: "4px", overflow: "auto",
+                    maxHeight: "120px", whiteSpace: "pre-wrap", wordBreak: "break-all",
+                    marginBottom: "0.5rem"
+                  }}>{a.message}</pre>
+                )}
+                <button className="btn" onClick={() => ackAlert(a.id)}>확인 처리</button>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* 에이전트 섹션 */}
