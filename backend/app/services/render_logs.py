@@ -31,6 +31,15 @@ logger = logging.getLogger(__name__)
 
 RENDER_API_BASE = "https://api.render.com/v1"
 
+# 제외 패턴 — 알려진 정상 경고 (alert 생성 안 함)
+EXCLUDE_PATTERNS: list[re.Pattern[str]] = [
+    re.compile(r"데이터없음", re.I),
+    re.compile(r"데이터 없음", re.I),
+    re.compile(r"no data", re.I),
+    re.compile(r"(trapped).*bcrypt", re.I),   # passlib bcrypt 버전 경고
+    re.compile(r"error reading bcrypt", re.I),
+]
+
 # 에러 패턴 → severity 매핑 (위에서부터 우선)
 SEVERITY_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("critical", re.compile(r"\b(FATAL|CRITICAL|OOMKilled|out of memory|killed \(signal|segmentation fault|panic:)\b", re.I)),
@@ -117,6 +126,10 @@ def classify(message: str) -> str | None:
     """에러 패턴 매칭 → severity. 매칭 안되면 None (스킵)."""
     if not message:
         return None
+    # 제외 패턴 먼저 확인 — 정상 경고는 alert 생성 안 함
+    for pat in EXCLUDE_PATTERNS:
+        if pat.search(message):
+            return None
     for sev, pat in SEVERITY_PATTERNS:
         if pat.search(message):
             return sev

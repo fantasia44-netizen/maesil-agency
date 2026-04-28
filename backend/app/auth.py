@@ -16,6 +16,15 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 from fastapi import Depends, HTTPException, Request
+
+# passlib 1.7.4 + bcrypt 4.x 호환 패치 (bcrypt.__about__ 제거됨)
+try:
+    import bcrypt as _bcrypt_mod
+    if not hasattr(_bcrypt_mod, "__about__"):
+        _bcrypt_mod.__about__ = type("_about", (), {"__version__": _bcrypt_mod.__version__})()
+except Exception:
+    pass
+
 from passlib.context import CryptContext
 
 from app.db.maesil_total_client import get_maesil_total_client
