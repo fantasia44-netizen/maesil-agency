@@ -98,6 +98,41 @@ def update_program(name: str, body: ProgramPatch) -> dict:
     return rows[0]
 
 
+@router.get("/{name}/test-github")
+def test_github_access(name: str) -> dict:
+    """GitHub 레포 접근 진단: 브랜치 조회 + 루트 디렉터리 목록 반환.
+    dev agent 파일 탐색 실패 원인 파악용."""
+    from app.services import github_client
+
+    rows = _table().select("name, github_repo").eq("name", name).limit(1).execute().data or []
+    if not rows:
+        raise HTTPException(404, detail="program not found")
+    repo = rows[0].get("github_repo")
+    if not repo:
+        return {"ok": False, "error": "github_repo 미설정", "name": name}
+
+    result: dict = {"name": name, "repo": repo, "ok": True}
+    try:
+        branch = github_client.get_default_branch(repo)
+        result["branch"] = branch
+    except Exception as e:
+        result["ok"] = False
+        result["error"] = f"get_default_branch 실패: {e}"
+        return result
+
+    try:
+        entries = github_client.list_dir_entries(repo, "", branch)
+        result["root_dirs"] = [e["path"] for e in entries if e["type"] == "dir"]
+        result["root_py_files"] = [e["path"] for e in entries if e["type"] == "file" and e["path"].endswith(".py")]
+        result["root_total_files"] = len([e for e in entries if e["type"] == "file"])
+    except Exception as e:
+        result["ok"] = False
+        result["error"] = f"list_dir_entries 실패: {e}"
+        return result
+
+    return result
+
+
 @router.post("/{name}/test")
 def test_program(name: str) -> dict:
     """헬스 URL ping + Render API 상태 조회.

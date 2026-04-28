@@ -388,7 +388,9 @@ def analyze_and_propose(
                             break
 
         except Exception as e:
+            logger.warning("GitHub 접근 실패 [%s]: %s", repo, e)
             code_context = f"\n\n(GitHub 접근 실패: {e})"
+            file_info = None  # 명시적 표시
 
     # 이전 대화 컨텍스트
     history = ""
@@ -435,20 +437,23 @@ PR제목: <간단한 제목>
     # 실패 심볼을 알고 있는데 파일을 못 읽었으면 추측 분석 금지
     if file_info is None and failing_symbol and program and program.get("github_repo"):
         repo_tried = program.get("github_repo", "?")
+        # GitHub 접근 에러가 code_context에 있으면 포함
+        github_err = ""
+        if "(GitHub 접근 실패:" in code_context:
+            github_err = f"\n⚠️ **GitHub 오류**: `{code_context.strip()}`\n"
+        tried_paths_str = ", ".join(f"`{p}`" for p in (file_paths or [])[:5]) or "`agencylog.py` 등"
+        cls_name_s = failing_symbol.split('.')[0]
         return (
-            f"🔒 **파일 미확인 — 코드 수정 불가**\n\n"
-            f"레포 `{repo_tried}` 에서 `{failing_symbol}` 클래스/함수가 포함된 파일을 찾지 못했습니다.\n\n"
-            f"**시도한 방법:**\n"
-            f"- 직접 경로 시도: `agencylog.py`, `agency_log.py` 등\n"
-            f"- GitHub code search: `class {failing_symbol.split('.')[0]}`\n"
-            f"- 디렉터리 내용 검색: `app/services`, `app`, `src`, `utils` 등\n\n"
-            f"**가능한 원인:**\n"
-            f"1. 파일명에 클래스명이 없음 (예: `AgencyLog`가 `repository.py` 안에 있음)\n"
-            f"2. code search 인덱싱 지연 또는 rate-limit\n"
-            f"3. github_repo 설정 오류 (현재: `{repo_tried}`)\n\n"
-            f"**해결 방법:**\n"
-            f"`AgencyLog` 클래스가 어느 파일에 있는지 알려주시면 직접 읽어서 분석하겠습니다.\n"
-            f"예: '`app/services/logger.py` 파일 읽어봐'"
+            f"🔒 **파일 미확인 — 코드 수정 불가**\n"
+            f"{github_err}\n"
+            f"레포 `{repo_tried}` 에서 `{failing_symbol}` 관련 파일을 찾지 못했습니다.\n\n"
+            f"**시도한 경로 ({len(file_paths or [])}개):** {tried_paths_str}\n"
+            f"**code search 쿼리:** `class {cls_name_s}`, `{cls_name_s}`\n"
+            f"**루트 동적 탐색:** 실제 레포 디렉터리 2레벨까지 Python 파일 내용 검사\n\n"
+            f"**직접 경로를 알려주시면 바로 읽겠습니다:**\n"
+            f"- `repository.py 파일 분석해줘`\n"
+            f"- `app/repository.py 파일 읽어봐`\n"
+            f"- `{cls_name_s}는 어느 파일에 있어? 경로 알려줘` (본인이 직접 입력)"
         )
 
     try:
