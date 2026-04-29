@@ -367,6 +367,7 @@ def _extract_error_function(text: str) -> str | None:
     예: '[AgencyLog] start 예외' → 'AgencyLog.start'
     예: '[Scheduler] auto_recovery 실패' → 'Scheduler.auto_recovery'
     예: 'AgencyLog.start failed' → 'AgencyLog.start'
+    예: '"POST /app/api/competitor/register-group" 500' → 'competitor.register_group'
     """
     # [ClassName] method 예외|실패|오류|에러|error|failed 패턴 (가장 흔한 패턴)
     m = re.search(
@@ -379,6 +380,19 @@ def _extract_error_function(text: str) -> str | None:
     m = re.search(r'\b([A-Z][a-zA-Z0-9]+)\.([a-z_]\w+)\b', text)
     if m and m.group(1) not in {"File", "GET", "POST", "PUT", "DELETE", "HTTP"}:
         return f"{m.group(1)}.{m.group(2)}"
+    # HTTP access log 5xx — URL 마지막 2 세그먼트를 심볼로
+    # "POST /app/api/competitor/register-group HTTP/1.1" 500
+    m = re.search(
+        r'"(?:POST|GET|PUT|DELETE|PATCH)\s+(/[^\s"]*)\s+HTTP/[\d.]+"\s+5\d\d\b',
+        text, re.I
+    )
+    if m:
+        _SKIP = {"app", "api", "v1", "v2", "v3", ""}
+        parts = [p for p in m.group(1).split("/") if p not in _SKIP]
+        if len(parts) >= 2:
+            return f"{parts[-2]}.{parts[-1].replace('-', '_')}"
+        elif parts:
+            return parts[-1].replace("-", "_")
     return None
 
 
