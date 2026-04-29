@@ -76,6 +76,68 @@ def root() -> dict:
     return {"service": "maesil-agency", "version": app.version}
 
 
+@app.get("/admin/dev-agent-debug")
+def admin_dev_agent_debug(token: str = "", program_name: str = "maesil-sync-worker-1",
+                          table_name: str = "naver_ad_sync_log") -> dict:
+    """introspector 단독 진단 — 어느 단계에서 막히는지 추적."""
+    from app.config import settings
+    if token != settings.api_bearer_token:
+        from fastapi import HTTPException
+        raise HTTPException(403, "forbidden")
+
+    from app.services import db_introspector
+
+    out: dict = {"program_name": program_name, "table_name": table_name}
+
+    # Step 1: DB 매핑
+    try:
+        db_name = db_introspector.get_program_db_name(program_name)
+        out["step1_db_name"] = db_name
+    except Exception as e:
+        out["step1_error"] = str(e)
+        return out
+
+    if not db_name:
+        out["error"] = "DB 매핑 실패 (program_registry.db_registry_name 없고 fallback도 매칭 안 됨)"
+        return out
+
+    # Step 2: 테이블 스키마 조회
+    try:
+        schema = db_introspector.get_table_schema(db_name, table_name)
+        out["step2_schema_raw"] = schema
+    except Exception as e:
+        out["step2_error"] = str(e)
+        return out
+
+    # Step 3: 마크다운 포맷
+    try:
+        md = db_introspector.format_schema_markdown(schema) if schema else "(no schema)"
+        out["step3_markdown_preview"] = md[:1500]
+    except Exception as e:
+        out["step3_error"] = str(e)
+        return out
+
+    # Step 4: 실제 코드(샘플)에서 테이블 추출
+    sample_code = (
+        "url, key = _supabase_config()\n"
+        "sess.post(f'{url}/rest/v1/naver_ad_sync_log', ...)"
+    )
+    try:
+        out["step4_extracted_tables"] = db_introspector.extract_referenced_tables(sample_code)
+    except Exception as e:
+        out["step4_error"] = str(e)
+
+    # Step 5: 통합 함수 호출
+    try:
+        out["step5_full_markdown"] = db_introspector.introspect_for_program(
+            program_name, sample_code
+        )[:2000]
+    except Exception as e:
+        out["step5_error"] = str(e)
+
+    return out
+
+
 @app.post("/admin/repo-mirror/sync")
 def admin_repo_mirror_sync(token: str = "", repo: str = "", force: bool = False) -> dict:
     """레포 미러 수동 동기화 (배포 직후 1회 또는 단일 레포 강제 갱신).
