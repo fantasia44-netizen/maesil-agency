@@ -229,33 +229,60 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
     # dev로 라우팅이 결정되면 메모리 플래그 등록 → 이후 모든 메시지는 자동으로 dev
     if is_dev:
         _dev_mode_conversations.add(conversation_id)
-    is_approve  = user.is_super_admin and dev_chat_agent.is_approve(req.message)
-    is_preview  = user.is_super_admin and dev_chat_agent.is_preview(req.message)
-    is_cancel   = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
-    is_merge_cmd = user.is_super_admin and dev_chat_agent.is_merge(req.message)
+    # 액션 결정 — LLM 의도 분류 우선, 실패 시 키워드 fallback.
+    has_pending = conversation_id in dev_chat_agent._pending
+    has_recent_pr = conversation_id in dev_chat_agent._recent_pr
 
-    if is_preview and conversation_id in dev_chat_agent._pending:
+    intent = None
+    if user.is_super_admin and is_dev:
+        intent = dev_chat_agent.classify_action(
+            req.message, has_pending=has_pending, has_recent_pr=has_recent_pr
+        )
+
+    # 키워드 빠른 패스 (LLM 응답 늦거나 실패할 때 fallback)
+    is_approve_kw  = user.is_super_admin and dev_chat_agent.is_approve(req.message)
+    is_preview_kw  = user.is_super_admin and dev_chat_agent.is_preview(req.message)
+    is_cancel_kw   = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
+    is_merge_kw    = user.is_super_admin and dev_chat_agent.is_merge(req.message)
+
+    # 액션 우선순위: LLM (high/medium confidence) > 키워드 fallback
+    action = None
+    if intent and intent["confidence"] in ("high", "medium"):
+        action = intent["action"]
+    elif is_preview_kw and has_pending:
+        action = "preview"
+    elif is_approve_kw and has_pending:
+        action = "approve"
+    elif is_merge_kw:
+        action = "merge"
+    elif is_cancel_kw:
+        action = "cancel"
+
+    if action == "preview" and has_pending:
         response_text = dev_chat_agent.preview_pending(conversation_id)
         agent_type = "developer"
 
-    elif is_approve and conversation_id in dev_chat_agent._pending:
+    elif action == "approve" and has_pending:
         response_text = dev_chat_agent.execute_pending(conversation_id)
         agent_type = "developer"
 
-    elif is_merge_cmd:
-        # 메시지/컨텍스트에서 PR 참조 추출 또는 _recent_pr fallback
+    elif action == "merge":
         try:
             ctx_for_merge = conv_svc.get_messages(conversation_id)
         except Exception:
             ctx_for_merge = []
+        # LLM이 PR 번호 직접 추출했으면 메시지에 prepend (기존 추출 로직 활용)
+        msg_for_merge = req.message
+        if intent and intent.get("pr_number"):
+            msg_for_merge = f"PR #{intent['pr_number']} {req.message}"
         response_text = dev_chat_agent.merge_pending_pr(
             conversation_id,
-            user_message=req.message,
+            user_message=msg_for_merge,
             context_messages=ctx_for_merge,
         )
         agent_type = "developer"
 
-    elif is_cancel:
+    elif action == "cancel":
         response_text = dev_chat_agent.cancel_pending(conversation_id)
         agent_type = "developer"
 

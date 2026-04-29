@@ -1277,24 +1277,105 @@ def is_cancel(text: str) -> bool:
 
 
 def is_merge(text: str) -> bool:
-    """짧은 머지 명령 감지.
-    1) '머지' / 'merge' 키워드 (가장 강한 신호 — analyze_kws 무시)
-    2) 또는 'PR #N' / '#N' 만 있는 짧은 메시지 (사용자가 'PR #1' 만 입력)
-       단 분석 키워드 같이 있으면 머지 아님 (예: 'PR #1 분석해줘')
+    """짧은 머지 명령 감지 (빠른 패스 — LLM 분류 보조).
+    1) '머지' / 'merge' 키워드 (가장 강한 신호)
+    2) 'PR #N' / '#N' 만 있는 짧은 메시지 + 분석 키워드 부재
     """
     t = text.strip()
     t_lower = t.lower()
-    # case 1: 명시적 머지 키워드 — 다른 키워드 무관, 무조건 머지 의도
     if len(t_lower) < 30 and any(
         k in t_lower for k in {"머지", "merge", "머지해", "머지하자", "merge it"}
     ):
         return True
-    # case 2: 짧은 메시지 + PR 번호 + 분석 키워드 부재
     if len(t) <= 25 and _PR_HASH_PAT.search(t):
         analyze_kws = {"분석", "원인", "왜", "체크", "보여", "내용"}
         if not any(k in t_lower for k in analyze_kws):
             return True
     return False
+
+
+# ─────────────────────────────────────────────────────────────────
+# LLM 기반 의도 분류 (키워드 매칭의 brittle 함 보완)
+# ─────────────────────────────────────────────────────────────────
+def classify_action(
+    message: str,
+    has_pending: bool = False,
+    has_recent_pr: bool = False,
+) -> dict | None:
+    """LLM 으로 사용자 메시지를 dev-agent 액션 카테고리로 분류.
+
+    반환:
+      {
+        "action": "preview" | "approve" | "merge" | "cancel" | "analyze" | "chat",
+        "pr_number": int | None,   # 머지일 때만 의미 있음
+        "confidence": "high" | "medium" | "low",
+      }
+    실패시 None — 호출 측은 keyword 폴백 사용.
+    """
+    import anthropic
+    from app.services.secrets import get_secret
+    api_key = get_secret("anthropic_api_key")
+    if not api_key:
+        return None
+
+    state_lines = []
+    if has_pending:
+        state_lines.append("- 진행 중인 수정안 있음 (preview/approve/cancel 가능)")
+    if has_recent_pr:
+        state_lines.append("- 최근 생성된 PR 있음 (merge 가능)")
+    state_block = "\n".join(state_lines) or "- 진행 중인 수정안 / 최근 PR 없음"
+
+    system = f"""사용자가 dev-agent에 보낸 메시지의 의도를 분류하라.
+
+**현재 상태:**
+{state_block}
+
+**가능한 액션:**
+- preview: 수정안 diff 미리보기 ("미리보기", "diff 보여줘", "뭐가 바뀌어")
+- approve: 수정안 승인 → PR 생성 ("승인", "ok", "좋아", "진행해", "만들어")
+- merge: PR 머지 ("머지", "합쳐", "PR #N 머지", "#N", "PR #1만 입력해도 머지 의도")
+- cancel: 진행 취소 ("취소", "no", "아니야", "그만")
+- analyze: 새 에러/이슈/코드 질문 분석 (에러 로그 / 알림 / 질문 / 명령)
+- chat: 인사·잡담·시스템 질문 ("안녕", "고마워", "ai야 너는?")
+
+**규칙:**
+- 메시지가 짧고 PR 번호만 있으면 (예: "PR #1", "#2") → merge
+- 새 알림이나 에러 메시지 / 코드 질문이면 → analyze
+- 진행 중인 수정안 없는데 preview/approve/cancel 분류하지 말 것
+- 최근 PR 없는데 merge 분류 가능 (메시지의 #N 또는 URL 로 식별)
+
+**PR 번호 추출:** 메시지에 #N, PR N, /pull/N 같은 패턴 있으면 정수로.
+
+**응답 형식 (JSON 만, 다른 텍스트 금지):**
+{{"action": "...", "pr_number": null 또는 정수, "confidence": "high|medium|low"}}
+"""
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        resp = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=80,
+            system=system,
+            messages=[{"role": "user", "content": message[:500]}],
+        )
+        text = resp.content[0].text.strip()
+        # JSON 추출 (코드블록 제거 등 robust 하게)
+        import json
+        # ```json ... ``` 형식이면 본문만
+        m = re.search(r'\{[^{}]*\}', text)
+        if not m:
+            return None
+        data = json.loads(m.group(0))
+        action = (data.get("action") or "").lower()
+        if action not in {"preview", "approve", "merge", "cancel", "analyze", "chat"}:
+            return None
+        return {
+            "action": action,
+            "pr_number": data.get("pr_number") if isinstance(data.get("pr_number"), int) else None,
+            "confidence": data.get("confidence") or "medium",
+        }
+    except Exception as e:
+        logger.warning("classify_action 실패: %s", e)
+        return None
 
 
 __all__ = [
