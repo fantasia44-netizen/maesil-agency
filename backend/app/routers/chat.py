@@ -425,9 +425,35 @@ def chat_from_alert(
     title = event.get("title") or ""
     body  = event.get("message") or ""
 
+    # 이메일 발송 알림 피드백 루프 처리 — 중첩된 실제 에러 추출
+    import json as _json, re as _re
+    _email_wrap = _re.search(r'"msg":\s*"이메일 발송 성공[^"]*maesil-agency[^"]*({.+})"', body or title)
+    if not _email_wrap:
+        # 이메일 발송 성공 패턴이 title에 있는 경우 (body가 truncated일 때)
+        _email_wrap2 = _re.search(r'이메일 발송 성공.*?(\{[^}]+level.*?\})', body or title, _re.DOTALL)
+    else:
+        _email_wrap2 = None
+    _inner_error = ""
+    for _m in [_email_wrap, _email_wrap2]:
+        if _m:
+            try:
+                _inner = _json.loads(_m.group(1))
+                _inner_error = (
+                    f"\n\n[실제 에러 (이메일 알림 내부 추출)]\n"
+                    f"module: {_inner.get('module', '?')}\n"
+                    f"msg: {_inner.get('msg', '?')}\n"
+                    f"level: {_inner.get('level', '?')}\n"
+                    f"ts: {_inner.get('ts', '?')}"
+                )
+                logger.info("이메일 래퍼 알림: 내부 에러 추출 성공 — module=%s", _inner.get('module'))
+            except Exception:
+                pass
+            break
+
     auto_msg = (
         f"[에러 알림 자동 연결]\n"
-        f"프로그램: {prog}\n심각도: {sev}\n제목: {title}\n\n{body}\n\n"
+        f"프로그램: {prog}\n심각도: {sev}\n제목: {title}\n\n{body}"
+        f"{_inner_error}\n\n"
         f"이 에러를 분석하고 수정 방향을 알려주세요."
     )
 

@@ -47,9 +47,15 @@ EXCLUDE_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"^\s*Using cached\b", re.I),
     re.compile(r"^\s*Collecting\b.*deprecated", re.I),
     re.compile(r"^\s*Downloading\b.*\.whl", re.I),
-    # 에러 알림 메일 발송 로그가 다시 잡히는 피드백 루프 차단
-    re.compile(r"이메일\s*발송\s*(성공|완료)", re.I),
+    # 에러 알림 메일 발송 로그 피드백 루프 차단
+    # — "이메일 발송 성공/완료" 는 알림이 정상 발송됐다는 INFO 로그
+    # — module이 email 이고 이메일 발송 관련 메시지면 무조건 제외
+    re.compile(r"이메일\s*발송\s*(성공|완료|실패|시도)", re.I),
     re.compile(r'"msg":\s*"이메일\s*발송', re.I),
+    re.compile(r'"module":\s*"email".*"msg":\s*"이메일', re.I),
+    # maesil-agency 자체 알림 에이전트 동작 로그 (INFO여도 ERROR 키워드 포함)
+    re.compile(r"\[maesil-agency\s*·\s*(ERROR|WARNING|INFO)\]", re.I),
+    re.compile(r'"path":\s*"/api/v1/notify/', re.I),  # notify 엔드포인트 호출 로그
 ]
 
 # 에러 패턴 → severity 매핑 (위에서부터 우선)
@@ -137,6 +143,28 @@ def _fetch_logs(service_id: str, owner_id: str, api_key: str, start: datetime, e
 # ─────────────────────────────────────────────────────────────────
 # 분류 + 적재
 # ─────────────────────────────────────────────────────────────────
+def _extract_title(msg: str, program_name: str) -> str:
+    """로그 메시지에서 의미 있는 알림 제목 추출.
+    JSON 구조화 로그이면 'msg' 필드 우선, 아니면 첫 줄."""
+    if not msg:
+        return f"{program_name} 로그 이상"
+    stripped = msg.strip()
+    # JSON 구조화 로그 시도
+    if stripped.startswith("{"):
+        import json as _json
+        try:
+            obj = _json.loads(stripped)
+            inner_msg = obj.get("msg") or obj.get("message") or ""
+            level = obj.get("level") or ""
+            module = obj.get("module") or ""
+            if inner_msg:
+                prefix = f"[{module}] " if module else ""
+                return f"{prefix}{inner_msg}"[:200]
+        except Exception:
+            pass
+    return stripped.splitlines()[0][:200]
+
+
 def classify(message: str) -> str | None:
     """에러 패턴 매칭 → severity. 매칭 안되면 None (스킵)."""
     if not message:
@@ -283,7 +311,7 @@ def poll_all() -> dict:
             sev = classify(msg)
             if not sev:
                 continue
-            title = msg.splitlines()[0][:200] if msg else f"{name} 로그 이상"
+            title = _extract_title(msg, name)
             if _insert_event(name, sev, title, msg, entry):
                 new_events += 1
 
