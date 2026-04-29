@@ -193,7 +193,7 @@ def cs_chat_stream(
 ) -> StreamingResponse:
     import json as _json
     from app.services.maeyo_engine import (
-        _call_haiku, _check_out_of_scope, _match_l2,
+        _check_out_of_scope, _match_l2,
         _build_system_prompt,
     )
 
@@ -256,6 +256,7 @@ def cs_chat_stream(
 
     def _l3_gen():
         full = []
+        final_emotion = "satisfaction"
         try:
             import anthropic
             client = anthropic.Anthropic(api_key=api_key)
@@ -268,18 +269,19 @@ def cs_chat_stream(
                 for text in stream.text_stream:
                     full.append(text)
                     yield f"data: {_json.dumps({'token': text})}\n\n"
-            yield f"data: {_json.dumps({'done': True, 'emotion': 'satisfaction', 'conversation_id': conv_id})}\n\n"
+            yield f"data: {_json.dumps({'done': True, 'emotion': final_emotion, 'action': None, 'hint': None, 'conversation_id': conv_id})}\n\n"
         except Exception as e:
+            final_emotion = "tired"
             msg = "일시적인 오류가 발생했어요. 잠시 후 다시 시도해 주세요."
             full = list(msg)
             for ch in msg:
                 yield f"data: {_json.dumps({'token': ch})}\n\n"
-            yield f"data: {_json.dumps({'done': True, 'emotion': 'tired', 'conversation_id': conv_id})}\n\n"
+            yield f"data: {_json.dumps({'done': True, 'emotion': final_emotion, 'action': None, 'hint': None, 'conversation_id': conv_id})}\n\n"
         finally:
             if full:
                 try:
                     _save_message(conv_id, "assistant", "".join(full),
-                                  emotion="satisfaction", layer="l3")
+                                  emotion=final_emotion, action=None, hint=None, layer="l3")
                 except Exception:
                     pass
 

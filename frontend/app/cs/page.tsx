@@ -37,6 +37,7 @@ type L2Script = {
   message: string;
   action: { label: string; url: string } | null;
   hint: string | null;
+  tts_key: string | null;
   is_active: boolean;
   sort_order: number;
   updated_at: string;
@@ -159,11 +160,14 @@ export default function CSPage() {
   /* L2 저장 */
   async function saveL2Script() {
     if (!editScript) return;
-    const method = editScript.id.startsWith("NEW_") ? "POST" : "PUT";
-    const url = method === "POST"
+    const isNew = editScript.id.startsWith("NEW_");
+    const method = isNew ? "POST" : "PUT";
+    const url = isNew
       ? "/api/cs/l2-scripts"
       : `/api/cs/l2-scripts/${editScript.id}`;
-    await apiFetch(url, { method, body: JSON.stringify(editScript) });
+    // 새 대본: id를 null로 전송 → 백엔드가 CUSTOM_... ID 생성
+    const body = isNew ? { ...editScript, id: null } : editScript;
+    await apiFetch(url, { method, body: JSON.stringify(body) });
     setEditOpen(false);
     loadL2();
   }
@@ -438,7 +442,7 @@ export default function CSPage() {
                 setEditScript({
                   id: `NEW_${Date.now()}`, program: "maesil-insight",
                   triggers: [], keywords: [], emotion: "thinking",
-                  message: "", action: null, hint: null,
+                  message: "", action: null, hint: null, tts_key: null,
                   is_active: true, sort_order: l2Scripts.length, updated_at: "",
                 });
                 setEditOpen(true);

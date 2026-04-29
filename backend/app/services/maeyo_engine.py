@@ -66,19 +66,19 @@ FALLBACK_REPLY: dict = {
 }
 
 # ─────────────────────────────────────────────────────────────────
-# L2 스크립트 — DB 로드 (60초 캐시)
+# L2 스크립트 — DB 로드 (60초 캐시, 프로그램별 분리)
 # ─────────────────────────────────────────────────────────────────
-_l2_cache: list[dict] = []
-_l2_cache_ts: float = 0.0
+_l2_cache: dict[str, list[dict]] = {}   # program → scripts
+_l2_cache_ts: dict[str, float] = {}     # program → last load time
 _L2_CACHE_TTL = 60.0  # seconds
 
 
 def _load_l2_scripts(program: str = "maesil-insight") -> list[dict]:
-    """DB에서 L2 스크립트 로드 (TTL 캐시). 실패 시 기존 캐시 유지."""
+    """DB에서 L2 스크립트 로드 (TTL 캐시, 프로그램별). 실패 시 기존 캐시 유지."""
     global _l2_cache, _l2_cache_ts
     now = time.time()
-    if now - _l2_cache_ts < _L2_CACHE_TTL and _l2_cache:
-        return _l2_cache
+    if now - _l2_cache_ts.get(program, 0.0) < _L2_CACHE_TTL and _l2_cache.get(program):
+        return _l2_cache[program]
     try:
         from app.db.maesil_total_client import get_maesil_total_client
         resp = (
@@ -104,18 +104,18 @@ def _load_l2_scripts(program: str = "maesil-insight") -> list[dict]:
                 "hint":     r.get("hint"),
                 "tts_key":  r.get("tts_key"),
             })
-        _l2_cache = scripts
-        _l2_cache_ts = now
-        logger.debug("[maeyo] L2 scripts loaded from DB: %d", len(scripts))
+        _l2_cache[program] = scripts
+        _l2_cache_ts[program] = now
+        logger.debug("[maeyo] L2 scripts loaded from DB for '%s': %d", program, len(scripts))
     except Exception as e:
-        logger.warning("[maeyo] L2 DB 로드 실패 (캐시 유지): %s", e)
-    return _l2_cache
+        logger.warning("[maeyo] L2 DB 로드 실패 (캐시 유지) program=%s: %s", program, e)
+    return _l2_cache.get(program, [])
 
 
 def invalidate_l2_cache() -> None:
     """L2 스크립트 캐시 강제 무효화 (스크립트 편집 후 호출)."""
     global _l2_cache_ts
-    _l2_cache_ts = 0.0
+    _l2_cache_ts.clear()
 
 
 # ─────────────────────────────────────────────────────────────────
