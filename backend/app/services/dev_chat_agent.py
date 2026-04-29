@@ -592,6 +592,29 @@ def analyze_and_propose(
 - 메서드도 못 찾으면 그때서야 "관련 함수 식별 실패" 답변.
 - ❌ "SyncLog 클래스가 없어서 분석 불가" 같이 표면적 판단으로 멈추지 말 것.
 
+## PostgREST / Supabase REST 호출 패턴 (자주 발생하는 함정)
+코드가 `f'{url}/rest/v1/<table>'` 또는 Supabase 클라이언트로 호출하는 부분을 수정할 때:
+
+1. **SQL 함수를 JSON 문자열로 못 보냄**:
+   - ❌ `{'finished_at': 'now()'}` — PostgREST 가 문자열 `"now()"` 그대로 cast 시도 → 깨짐
+   - ✅ `{'finished_at': datetime.now(timezone.utc).isoformat()}` — ISO 8601 문자열 → timestamptz cast 성공
+   - ✅ DB 측에서 `DEFAULT now()` 또는 트리거로 처리 (이때만 클라이언트가 안 보내도 됨)
+
+2. **컬럼 default · 트리거 모르면 임의 제거 금지**:
+   - 클라이언트가 보내던 필드를 제거할 때, DB 가 자동으로 채워주지 않으면 NULL/누락으로 회귀
+   - 모르면 "필드 제거" 대신 "올바른 형식으로 변환" 선택
+
+3. **재시도/타임아웃 일관성**:
+   - 같은 파일에 `_request_with_retry` 같은 헬퍼가 이미 있고 다른 함수들이 사용 중이면, 새 호출도 동일 헬퍼 경유
+   - keep-alive 끊김(`RemoteDisconnected`, `Connection aborted`)은 retry 로 해결
+
+4. **응답 객체 호환**:
+   - 헬퍼가 반환하는 객체가 `requests.Response` 호환인지 확인 — 호출 측에서 `resp.ok`, `resp.json()`, `resp.status_code` 같은 접근 패턴 그대로 유지
+
+5. **동일 패턴 다중 발생**:
+   - 한 함수에서 발견한 안티패턴은 같은 파일/모듈 내 다른 함수에도 있을 가능성 높음
+   - 수정안 만들 때 "다른 함수에도 같은 문제 있는지" 한 번 짚고, PROPOSED_FIX 여러 개 출력 가능
+
 ## 코드 수정 제안 시 형식
 코드 수정이 필요한 경우, 변경이 필요한 함수/클래스만 출력하세요 (파일 전체 X).
 백엔드가 자동으로 원본 파일에서 해당 함수를 찾아 교체합니다.
