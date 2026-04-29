@@ -242,8 +242,17 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
         response_text = dev_chat_agent.execute_pending(conversation_id)
         agent_type = "developer"
 
-    elif is_merge_cmd and conversation_id in dev_chat_agent._recent_pr:
-        response_text = dev_chat_agent.merge_pending_pr(conversation_id)
+    elif is_merge_cmd:
+        # 메시지/컨텍스트에서 PR 참조 추출 또는 _recent_pr fallback
+        try:
+            ctx_for_merge = conv_svc.get_messages(conversation_id)
+        except Exception:
+            ctx_for_merge = []
+        response_text = dev_chat_agent.merge_pending_pr(
+            conversation_id,
+            user_message=req.message,
+            context_messages=ctx_for_merge,
+        )
         agent_type = "developer"
 
     elif is_cancel:

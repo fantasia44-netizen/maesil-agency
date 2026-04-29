@@ -860,41 +860,108 @@ def execute_pending(conversation_id: str) -> str:
         return f"❌ PR 생성 실패: {e}"
 
 
-def merge_pending_pr(conversation_id: str) -> str:
-    """대화에서 가장 최근 생성된 PR 머지. 안전 가드 포함."""
-    info = _recent_pr.get(conversation_id)
-    if not info:
-        return (
-            "⚠️ 머지할 PR 이 없습니다. 이 대화에서 PR 을 먼저 생성해주세요.\n"
-            "(`승인` 으로 PR 생성 후 → `머지` 입력)"
-        )
+_PR_URL_PAT = re.compile(
+    r"https?://github\.com/([\w.-]+/[\w.-]+)/pull/(\d+)"
+)
+_PR_HASH_PAT = re.compile(r"(?:^|[\s\(])#(\d+)\b")
 
-    repo = info["repo"]
-    pr_number = info["pr_number"]
+
+def _extract_pr_reference(
+    message: str,
+    context_messages: list[dict] | None,
+) -> tuple[str, int] | None:
+    """메시지/컨텍스트에서 PR 참조 추출.
+
+    1) https://github.com/owner/repo/pull/N → (repo, N) 직접 사용
+    2) #N → repo 는 프로그램 매칭으로 추론
+    """
+    texts = [message or ""]
+    if context_messages:
+        texts += [m.get("content", "") for m in context_messages[-15:]]
+    full = "\n".join(texts)
+
+    # 1순위: PR URL
+    m = _PR_URL_PAT.search(full)
+    if m:
+        return (m.group(1), int(m.group(2)))
+
+    # 2순위: #N — 컨텍스트에서 program 매칭으로 repo 추론
+    h = _PR_HASH_PAT.search(full)
+    if not h:
+        return None
+    pr_num = int(h.group(1))
+    try:
+        programs = _all_programs()
+        prog = _detect_program_from_text(full, programs)
+        if prog and prog.get("github_repo"):
+            return (prog["github_repo"], pr_num)
+    except Exception:
+        pass
+    return None
+
+
+def merge_pending_pr(
+    conversation_id: str,
+    user_message: str = "",
+    context_messages: list[dict] | None = None,
+) -> str:
+    """대화에서 머지 요청 처리. 안전 가드 포함.
+
+    탐색 순서:
+      1) 메시지/컨텍스트에 PR URL 있으면 그것 머지
+      2) #N + program 매칭으로 추론
+      3) _recent_pr[conversation_id] (이 대화에서 방금 만든 PR)
+    """
+    repo: str | None = None
+    pr_number: int | None = None
+
+    # 1) 메시지/컨텍스트에서 PR 참조 추출
+    ref = _extract_pr_reference(user_message, context_messages)
+    if ref:
+        repo, pr_number = ref
+
+    # 2) 없으면 _recent_pr fallback
+    if not repo:
+        info = _recent_pr.get(conversation_id)
+        if not info:
+            return (
+                "⚠️ 머지할 PR 정보를 찾지 못했습니다.\n"
+                "다음 중 한 가지 형식으로 다시 요청해 주세요:\n"
+                "- `https://github.com/owner/repo/pull/N 머지`\n"
+                "- `PR #N 머지` (이전 메시지에 프로그램 이름이 언급된 경우)\n"
+                "- 같은 대화에서 `승인` 으로 PR 만든 직후 `머지`"
+            )
+        repo = info["repo"]
+        pr_number = info["pr_number"]
+
+    # PR URL — _recent_pr 에서 알 수도 있고, 모를 수도 있으니 fallback URL 생성
+    info_local = _recent_pr.get(conversation_id) or {}
+    pr_url = info_local.get("pr_url") or f"https://github.com/{repo}/pull/{pr_number}"
+    pr_title = info_local.get("pr_title")
 
     try:
         result = github_client.merge_pull_request(
             repo=repo,
             pr_number=pr_number,
             method="squash",
-            commit_title=info["pr_title"],
+            commit_title=pr_title,
         )
         if result.get("merged"):
-            # 머지 성공 — 더 이상 머지할 게 없으니 추적 해제
+            # 머지 성공 — 추적 해제 (있었다면)
             _recent_pr.pop(conversation_id, None)
             return (
-                f"✅ **PR #{pr_number} 머지 완료**\n\n"
-                f"🔗 {info['pr_url']}\n"
-                f"sha: `{result.get('sha', '?')[:8]}`\n\n"
+                f"✅ **PR #{pr_number} 머지 완료** (`{repo}`)\n\n"
+                f"🔗 {pr_url}\n"
+                f"sha: `{result.get('sha', '?')[:8] if result.get('sha') else '?'}`\n\n"
                 f"Render 가 자동으로 재배포를 시작합니다 (~2~3분)."
             )
         return f"⚠️ 머지 응답 이상: {result}"
     except Exception as e:
         logger.warning("merge_pending_pr 실패: %s", e)
         return (
-            f"❌ PR #{pr_number} 머지 실패\n\n"
+            f"❌ PR #{pr_number} (`{repo}`) 머지 실패\n\n"
             f"사유: `{str(e)[:300]}`\n\n"
-            f"GitHub UI 에서 직접 머지: {info['pr_url']}"
+            f"GitHub UI 에서 직접 머지: {pr_url}"
         )
 
 
