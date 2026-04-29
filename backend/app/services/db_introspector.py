@@ -139,9 +139,13 @@ def get_table_schema(db_name: str, table_name: str) -> dict | None:
 
 
 def format_schema_markdown(schema: dict) -> str:
-    """LLM 컨텍스트용 마크다운 포맷."""
+    """LLM 컨텍스트용 마크다운 포맷.
+    exists=False (컬럼 조회 실패) 이면 빈 문자열 반환 — "없음" 단언 금지.
+    에이전트는 정보 부재를 "테이블 없음"으로 해석하면 안 됨."""
     if not schema or not schema.get("exists"):
-        return f"### DB 테이블 `{schema.get('table', '?')}`\n⚠️ 테이블이 존재하지 않거나 접근 권한 없음\n"
+        # 정보 부재 ≠ 테이블 없음. 아무것도 반환하지 않음으로써
+        # 에이전트가 "스키마 정보 없음 → 추론만" 경로를 탐
+        return ""
 
     lines: list[str] = []
     lines.append(f"### DB 테이블 `public.{schema['table']}`")
@@ -186,18 +190,31 @@ def introspect_for_program(program_name: str, code_content: str) -> str:
         logger.info("program → db 매핑 없음: %s", program_name)
         return ""
 
-    blocks: list[str] = []
-    blocks.append(f"## 🗄️ DB 스키마 컨텍스트 (`{db_name}` DB)")
-    blocks.append("이 정보는 maesil-agency 가 자동으로 information_schema 에서 조회한 실제 DB 상태입니다.")
-    blocks.append("이 외의 'DB 에 접속해보니' 같은 추론은 거짓 진술 — 절대 하지 말 것.\n")
+    table_blocks: list[str] = []
 
     for tname in tables:
         schema = get_table_schema(db_name, tname)
         if schema is None:
-            blocks.append(f"### DB 테이블 `{tname}`\n⚠️ 조회 실패 (권한/연결 오류)\n")
-            continue
-        blocks.append(format_schema_markdown(schema))
-        blocks.append("")  # 구분 빈 줄
+            # 클라이언트 생성 자체 실패 — 이 DB 는 접근 불가, 다음 테이블도 의미 없음
+            logger.warning("DB 클라이언트 없음 — 스키마 컨텍스트 생략 [%s/%s]", db_name, tname)
+            break
+        md = format_schema_markdown(schema)
+        if md:
+            table_blocks.append(md)
+            table_blocks.append("")  # 구분 빈 줄
+        else:
+            logger.info("DB 테이블 '%s' 스키마 조회 결과 없음 (정보 부재 — 단언 금지)", tname)
+
+    if not table_blocks:
+        # 조회 성공한 테이블이 하나도 없으면 헤더도 보내지 않음
+        # → 에이전트는 "DB 스키마 컨텍스트 없음 → 코드 기반 추론만" 경로 진입
+        return ""
+
+    blocks: list[str] = []
+    blocks.append(f"## 🗄️ DB 스키마 컨텍스트 (`{db_name}` DB)")
+    blocks.append("이 정보는 maesil-agency 가 자동으로 information_schema 에서 조회한 실제 DB 상태입니다.")
+    blocks.append("이 외의 'DB 에 접속해보니' 같은 추론은 거짓 진술 — 절대 하지 말 것.\n")
+    blocks.extend(table_blocks)
 
     return "\n".join(blocks)
 

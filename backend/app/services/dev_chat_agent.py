@@ -111,29 +111,75 @@ def _mark_pr_merged(repo: str, pr_number: int, pr_url: str | None = None,
         logger.exception("dev_pr_history merged 마킹 실패: %s", e)
 
 
-def _find_overlapping_prs(repo: str, file_path: str | None, fn_name: str | None) -> list[dict]:
+def _find_overlapping_prs(
+    repo: str,
+    file_path: str | None,
+    fn_name: str | None,
+    failing_symbol: str | None = None,
+) -> list[dict]:
     """같은 파일/함수에 대해 이미 만들어진 PR (open/merged) 목록.
-    중복 fix 생성 방지에 사용. 최근 30일 이내."""
-    if not file_path:
-        return []
+    중복 fix 생성 방지에 사용. 최근 30일 이내.
+
+    매칭 전략 (우선순위순):
+    1) file_path 직접 매칭
+    2) 파일 basename이 PR 제목에 포함 (백필 PR 등 file_path 미등록 케이스)
+    3) failing_symbol 이 PR 제목에 포함 (예: 'SyncLog.start' → PR #1 타이틀 매칭)
+    """
     try:
         from datetime import timedelta
         client = get_maesil_total_client()
         cutoff = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
-        q = (
+        all_rows = (
             client.schema("agent_work").table("dev_pr_history")
-            .select("pr_number, pr_url, pr_title, status, fn_name, created_at, merged_at")
+            .select("pr_number, pr_url, pr_title, status, fn_name, file_path, created_at, merged_at")
             .eq("repo", repo)
-            .eq("file_path", file_path)
             .gte("created_at", cutoff)
             .order("created_at", desc=True)
-            .limit(10)
-        )
-        rows = (q.execute().data) or []
+            .limit(30)
+            .execute().data
+        ) or []
+
+        matched: list[dict] = []
+        seen_nums: set[int] = set()
+
+        def _add(row: dict) -> None:
+            n = row.get("pr_number")
+            if n not in seen_nums:
+                seen_nums.add(n)
+                matched.append(row)
+
+        # 1) file_path 직접 매칭
+        if file_path:
+            for r in all_rows:
+                if r.get("file_path") == file_path:
+                    _add(r)
+
+        # 2) 파일 basename → PR 제목 검색
+        if file_path:
+            basename = file_path.rsplit("/", 1)[-1].replace(".py", "").lower()
+            if basename:
+                for r in all_rows:
+                    title = (r.get("pr_title") or "").lower()
+                    if basename in title:
+                        _add(r)
+
+        # 3) failing_symbol → PR 제목 검색 (예: "SyncLog.start", "log_sync_start")
+        if failing_symbol:
+            hints = [failing_symbol.lower()]
+            # "SyncLog.start" → "synclog", "start" 도 개별 추가 (짧은 단어 제외)
+            for part in failing_symbol.replace(".", "_").split("_"):
+                if len(part) >= 5:
+                    hints.append(part.lower())
+            for r in all_rows:
+                title = (r.get("pr_title") or "").lower()
+                if any(h in title for h in hints):
+                    _add(r)
+
+        # fn_name 필터 — 명시된 경우만 (None 이면 모두 통과)
         if fn_name:
-            # 같은 함수만 또는 fn_name 미상 (백필) 만 남기기
-            rows = [r for r in rows if not r.get("fn_name") or r["fn_name"] == fn_name]
-        return rows
+            matched = [r for r in matched if not r.get("fn_name") or r["fn_name"] == fn_name]
+
+        return matched[:10]
     except Exception as e:
         logger.warning("_find_overlapping_prs 실패 [%s/%s]: %s", repo, file_path, e)
         return []
@@ -753,7 +799,8 @@ def analyze_and_propose(
     if file_info:
         try:
             overlaps = _find_overlapping_prs(
-                file_info["repo"], file_info["path"], None
+                file_info["repo"], file_info["path"], None,
+                failing_symbol=failing_symbol,
             )
             if overlaps:
                 lines = ["## 📋 같은 파일의 기존 PR (중복 fix 방지)"]
