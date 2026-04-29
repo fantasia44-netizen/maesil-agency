@@ -163,7 +163,19 @@ export default function Dashboard() {
                     marginBottom: "0.5rem"
                   }}>{a.message}</pre>
                 )}
-                <button className="btn" onClick={() => ackAlert(a.id)}>확인 처리</button>
+                <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+                  <button
+                    className="btn"
+                    style={{ background: "#0891b2", color: "white", borderColor: "#0891b2" }}
+                    onClick={() => {
+                      // 채팅 페이지로 이동 — alert_id 파라미터로 자동 분석 시작
+                      window.location.href = `/chat?alert_id=${encodeURIComponent(a.id)}`;
+                    }}
+                  >
+                    🔧 분석 요청
+                  </button>
+                  <button className="btn" onClick={() => ackAlert(a.id)}>확인 처리</button>
+                </div>
               </div>
             ))}
           </div>
