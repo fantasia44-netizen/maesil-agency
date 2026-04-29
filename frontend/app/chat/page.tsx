@@ -100,7 +100,7 @@ function ChatPageInner() {
 
         const resp = await apiFetch<ChatResp>(`/api/chat/from-alert/${alertId}`, {
           method: "POST",
-          body: JSON.stringify({ conversation_id: fixedConvId }),
+          body: JSON.stringify({ conversation_id: fixedConvId, message: "" }),
         });
         const sessionCost = resp.agents.reduce((s, a) => s + (a.cost_usd ?? 0), 0);
         setTotalCost((prev) => prev + sessionCost);

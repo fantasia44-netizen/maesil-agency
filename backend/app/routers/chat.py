@@ -58,7 +58,7 @@ SMALL_TALK = {
 
 
 class ChatRequest(BaseModel):
-    message: str
+    message: str = ""
     conversation_id: str | None = None
 
 
