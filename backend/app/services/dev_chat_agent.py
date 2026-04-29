@@ -854,24 +854,45 @@ def analyze_and_propose(
             branch = github_client.get_default_branch(repo)
             # 파일 경로: 현재 메시지 + 컨텍스트 전체에서 추출 (이전 메시지에 모듈 정보가 있을 수 있음)
             file_paths = _extract_file_paths(full_text)
+            cls_check = failing_symbol.split(".")[0] if failing_symbol else ""
+            symbol_is_tag = _is_logger_tag_symbol(full_text, failing_symbol) if failing_symbol else False
+            # URL 기반 심볼 감지 — HTTP access log에서 추출된 경우 (lowercase class part)
+            # 예: competitor.register_group (URL 세그먼트) vs AgencyLog.start (Python 클래스)
+            is_url_symbol = (
+                bool(failing_symbol) and not symbol_is_tag
+                and bool(cls_check) and cls_check[0].islower()
+            )
+
             if failing_symbol:
                 cls_name = failing_symbol.split(".")[0].lower()
-                # 클래스명으로 파일 검색 (AgencyLog → agency_log.py 등 스네이크케이스도 시도)
+                method_name_sym = failing_symbol.split(".")[1] if "." in failing_symbol else ""
                 snake = re.sub(r'(?<!^)(?=[A-Z])', '_', failing_symbol.split(".")[0]).lower()
-                for extra in [f"{cls_name}.py", f"{snake}.py"]:
-                    if extra not in file_paths:
-                        file_paths.append(extra)
+
+                if is_url_symbol:
+                    # HTTP 라우트 파일 — 공통 경로 접두사 우선 시도
+                    for prefix in ["routes", "blueprints", "app/routes", "app/blueprints", "api", "views"]:
+                        for name in [cls_name, snake]:
+                            fp = f"{prefix}/{name}.py"
+                            if fp not in file_paths:
+                                file_paths.append(fp)
+                else:
+                    for extra in [f"{cls_name}.py", f"{snake}.py"]:
+                        if extra not in file_paths:
+                            file_paths.append(extra)
 
             # 1차: 추출된 경로 후보로 직접 시도
             # IMPORTANT: failing_symbol 이 있으면 그 심볼의 **정의(class/def)** 가
             # 실제로 파일에 있어야 채택. 단순 언급(로그 태그/문자열 리터럴)은 거부.
             # 단, [ClassName] 형식의 로거 태그에서 추출된 심볼은 클래스 정의가
             # 파일에 없어도 정상 — 경로 매칭 우선 (Scheduler, SyncLog 등 대부분 이 케이스).
-            cls_check = failing_symbol.split(".")[0] if failing_symbol else ""
-            symbol_is_tag = _is_logger_tag_symbol(full_text, failing_symbol) if failing_symbol else False
-            cls_def_pat = re.compile(
-                r'(?:class|def)\s+' + re.escape(cls_check) + r'\b'
-            ) if (cls_check and not symbol_is_tag) else None
+            if is_url_symbol and method_name_sym:
+                # URL 라우트: class 정의 대신 method(=실제 핸들러 함수명)로 검증
+                cls_def_pat = re.compile(r'def\s+' + re.escape(method_name_sym) + r'\b')
+                logger.info("URL 심볼 [%s] — cls_def_pat → def %s 검증", cls_check, method_name_sym)
+            elif cls_check and not symbol_is_tag:
+                cls_def_pat = re.compile(r'(?:class|def)\s+' + re.escape(cls_check) + r'\b')
+            else:
+                cls_def_pat = None
             if symbol_is_tag:
                 logger.info("로거 태그 심볼 [%s] — cls_def_pat 체크 면제, 경로 매칭 우선", cls_check)
             for fp in file_paths:
@@ -903,7 +924,17 @@ def analyze_and_propose(
                 if failing_symbol:
                     cls_name_orig = failing_symbol.split(".")[0]
                     method_name_orig = failing_symbol.split(".")[1] if "." in failing_symbol else ""
-                    if symbol_is_tag:
+                    if is_url_symbol:
+                        # URL 기반: 실제 핸들러 함수명 + URL 하이픈 표기 검색
+                        url_seg = method_name_orig.replace("_", "-") if method_name_orig else ""
+                        if method_name_orig:
+                            code_search_queries += [
+                                f"def {method_name_orig}",       # def register_group
+                                f'"{url_seg}"',                  # "register-group" (Flask route 데코레이터)
+                                method_name_orig,                # register_group 단독
+                            ]
+                        code_search_queries += [cls_name_orig]  # competitor (파일명 매칭 폴백)
+                    elif symbol_is_tag:
                         # 로거 태그인 경우: 클래스 정의 대신 메서드명으로 검색
                         # (예: auto_recovery, start 등 실제 함수명이 더 정확)
                         if method_name_orig:
