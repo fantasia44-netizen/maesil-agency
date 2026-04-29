@@ -79,16 +79,41 @@ def _extract_error_function(text: str) -> str | None:
     return None
 
 
-def _extract_relevant_section(content: str, target_symbol: str, window_lines: int = 120) -> str:
+def _extract_relevant_section(content: str, target_symbol: str, window_lines: int = 200) -> str:
     """파일에서 target_symbol(클래스/함수)이 정의된 섹션을 추출.
-    못 찾으면 앞 3000자 반환."""
-    class_name = target_symbol.split(".")[0]
+
+    탐색 순서:
+      1) class/def <ClassPart> 정의 (예: 'class SyncLog')
+      2) def <MethodPart> (예: 'def start') — 클래스가 로그태그라 정의 없을 때
+      3) 파일 길이가 6000자 이하면 전체 반환, 아니면 앞 6000자
+
+    못 찾으면 잘라도 잘리지 않게 충분한 윈도우 + 전체 보존 우선.
+    """
+    parts = target_symbol.split(".")
+    class_part = parts[0] if parts else ""
+    method_part = parts[1] if len(parts) > 1 else ""
     lines = content.split("\n")
-    for i, line in enumerate(lines):
-        if re.search(r"(?:class|def)\s+" + re.escape(class_name) + r"\b", line):
-            end = min(len(lines), i + window_lines)
-            return "\n".join(lines[i:end])
-    return content[:3000]
+
+    # 1) class/def <ClassPart>
+    if class_part:
+        for i, line in enumerate(lines):
+            if re.search(r"(?:class|def)\s+" + re.escape(class_part) + r"\b", line):
+                end = min(len(lines), i + window_lines)
+                return "\n".join(lines[i:end])
+
+    # 2) def <MethodPart> — [LogTag] method 패턴에서 진짜 메서드
+    if method_part:
+        for i, line in enumerate(lines):
+            if re.search(r"\bdef\s+" + re.escape(method_part) + r"\s*\(", line):
+                # 메서드 위로 클래스 라인 한 줄도 포함시켜 컨텍스트 제공
+                start = max(0, i - 2)
+                end = min(len(lines), i + window_lines)
+                return "\n".join(lines[start:end])
+
+    # 3) 파일 짧으면 전체, 길면 앞 6000자
+    if len(content) <= 6000:
+        return content
+    return content[:6000]
 
 
 def _save_github_repo_to_db(program_name: str, github_repo: str) -> None:
@@ -470,12 +495,21 @@ def analyze_and_propose(
 ## 절대 금지
 - ❌ 사용자에게 "파일을 공유해 주세요" / "코드를 올려주세요" / "보여주세요" 요청 금지
 - ❌ 깃 레포 접근 권한이 시스템에 등록되어 있고, 백엔드가 알아서 파일을 찾아 제공함
-- 제공된 코드(### 헤더로 표시)가 잘못된 파일이라고 판단되면, 사용자에게 묻지 말고
-  "분석할 진짜 파일을 찾지 못했습니다 — 시스템 검색이 더 필요합니다" 라고만 응답
+- ❌ 스택트레이스나 추가 정보 요청 금지 — 이미 시스템이 자동으로 추출함
 
-## 제공된 코드가 진짜 대상 파일인지 검증
-- 시스템이 헤더 `### 파일경로` 로 코드를 제공했더라도, **실패 심볼**이 그 파일에 정의되어 있지 않으면 잘못된 파일임
-- 잘못된 파일에 대한 추측성 수정안 절대 만들지 말 것 (PROPOSED_FIX 출력 금지)
+## 심볼 식별 가이드 (중요)
+- 에러 로그의 `[XXX] method 예외` 형식에서 `XXX` 는 보통 **로거 태그(prefix)** 임 — 클래스명이 아닐 수 있음
+- 예) `services.naver_ad.repository: [SyncLog] start 예외` →
+   - 파일: `services/naver_ad/repository.py` (모듈 경로 그대로)
+   - 클래스: 그 파일의 메인 클래스 (예: `NaverAdRepository`)
+   - 실패 메서드: `start` (또는 `start` 가 호출하는 메서드 체인)
+   - `class SyncLog` 는 존재하지 않을 수 있음 — 정상
+
+## 분석 진행 원칙
+- 제공된 파일이 **에러 로그의 모듈 경로와 일치** 하면 (예: `services.naver_ad.repository` ↔ `services/naver_ad/repository.py`) → **올바른 파일**. 분석 진행.
+- 그 파일에서 `start` 같은 **메서드명을 검색** 해서 어느 클래스/함수에서 정의됐는지 찾고, 그 함수를 분석 대상으로.
+- 메서드도 못 찾으면 그때서야 "관련 함수 식별 실패" 답변.
+- ❌ "SyncLog 클래스가 없어서 분석 불가" 같이 표면적 판단으로 멈추지 말 것.
 
 ## 코드 수정 제안 시 형식
 코드 수정이 필요한 경우, 변경이 필요한 함수/클래스만 출력하세요 (파일 전체 X).
