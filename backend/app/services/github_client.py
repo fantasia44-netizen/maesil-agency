@@ -4,13 +4,18 @@ github_client — GitHub REST API 래퍼.
 용도:
   - 코드 파일 읽기 (분석 컨텍스트)
   - 브랜치 생성 / 파일 커밋 / PR 생성 (승인 후 실행)
+  - 레포 tarball 일괄 다운로드 (in-memory 검색용)
 
 인증: agent_work.secrets.github_token (classic PAT, repo 권한)
 """
 from __future__ import annotations
 
 import base64
+import io
 import logging
+import tarfile
+import time
+from typing import Optional
 
 import httpx
 
@@ -19,6 +24,10 @@ from app.services.secrets import get_secret
 logger = logging.getLogger(__name__)
 
 BASE = "https://api.github.com"
+
+# Tarball 캐시: (repo, branch) → (timestamp, {path: content})
+_tarball_cache: dict[tuple[str, str], tuple[float, dict[str, str]]] = {}
+_TARBALL_TTL = 300.0  # 5분
 
 
 def _headers() -> dict[str, str]:
@@ -154,6 +163,82 @@ def find_repo_by_name(program_name: str) -> str | None:
     except Exception as e:
         logger.warning("레포 자동 감지 실패 [%s]: %s", program_name, e)
     return None
+
+
+def download_repo_files(
+    repo: str,
+    branch: str = "main",
+    extensions: tuple[str, ...] = (".py", ".ts", ".tsx", ".js", ".jsx"),
+    skip_dirs: tuple[str, ...] = (
+        "node_modules/", "__pycache__/", ".git/", ".github/",
+        "dist/", "build/", "static/", "assets/", "images/",
+        "public/", ".next/", ".cache/", "coverage/",
+    ),
+    max_file_bytes: int = 512 * 1024,  # 파일당 512KB 상한 (대용량 자동생성 파일 차단)
+    timeout: float = 30.0,
+) -> dict[str, str]:
+    """레포 전체를 tarball로 1번에 받아서 메모리에 펼침. {path: content} 반환.
+
+    캐싱: 5분 TTL — 같은 (repo, branch) 재호출시 네트워크 안 탐.
+    개별 get_file 호출 N번 대비 5~10배 빠름 (HTTP 1번).
+    """
+    cache_key = (repo, branch)
+    now = time.monotonic()
+    cached = _tarball_cache.get(cache_key)
+    if cached and now - cached[0] < _TARBALL_TTL:
+        logger.info("tarball 캐시 HIT: %s@%s (%d files)", repo, branch, len(cached[1]))
+        return cached[1]
+
+    url = f"{BASE}/repos/{repo}/tarball/{branch}"
+    t0 = time.monotonic()
+    # tarball은 redirect (codeload.github.com) 으로 가므로 follow_redirects 필수
+    with httpx.Client(follow_redirects=True, timeout=timeout) as client:
+        r = client.get(url, headers=_headers())
+        r.raise_for_status()
+        data = r.content
+    download_secs = time.monotonic() - t0
+    logger.info("tarball 다운로드 %s@%s: %.1fMB / %.1fs",
+                repo, branch, len(data) / (1024 * 1024), download_secs)
+
+    files: dict[str, str] = {}
+    t1 = time.monotonic()
+    with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as tar:
+        for member in tar:
+            if not member.isfile():
+                continue
+            name = member.name
+            # tarball 최상단 디렉터리 제거 (예: "owner-repo-sha/app/foo.py" → "app/foo.py")
+            if "/" in name:
+                name = name.split("/", 1)[1]
+            if not name.endswith(extensions):
+                continue
+            if any(tok in name for tok in skip_dirs):
+                continue
+            if member.size > max_file_bytes:
+                continue
+            try:
+                f = tar.extractfile(member)
+                if f is None:
+                    continue
+                files[name] = f.read().decode("utf-8", errors="replace")
+            except Exception:
+                continue
+    extract_secs = time.monotonic() - t1
+    logger.info("tarball 추출 %s@%s: %d files / %.2fs (다운=%.1fs)",
+                repo, branch, len(files), extract_secs, download_secs)
+
+    _tarball_cache[cache_key] = (now, files)
+    return files
+
+
+def invalidate_tarball_cache(repo: Optional[str] = None) -> None:
+    """커밋 후 캐시 무효화 (선택). repo=None이면 전체."""
+    if repo is None:
+        _tarball_cache.clear()
+        return
+    keys = [k for k in _tarball_cache if k[0] == repo]
+    for k in keys:
+        _tarball_cache.pop(k, None)
 
 
 def get_repo_tree(repo: str, branch: str = "main") -> list[str]:

@@ -318,36 +318,27 @@ def analyze_and_propose(
                     if file_info:
                         break
 
-            # 3차 폴백: 레포 전체 tree (recursive=1)에서 모든 .py 파일 병렬 스캔
-            # 캡 없음 — 발견할 때까지 다 뒤짐 (병렬 fetch로 속도 보전)
+            # 3차 폴백: tarball 1회 다운로드 → 메모리 내 전체 .py 검색 (캡 없음)
             if not file_info and failing_symbol:
-                from concurrent.futures import ThreadPoolExecutor, as_completed
                 import time as _time
-
                 cls_orig = failing_symbol.split(".")[0]
                 cls_lower = cls_orig.lower()
                 cls_snake = re.sub(r'(?<!^)(?=[A-Z])', '_', cls_orig).lower()
+                content_pat = re.compile(r'(?:class|def)\s+' + re.escape(cls_orig) + r'\b')
 
-                SKIP_DIR_TOKENS = (
-                    'node_modules/', '__pycache__/', '.git/', '.github/',
-                    'dist/', 'build/', 'static/', 'assets/', 'images/',
-                    'public/', 'doc/', 'docs/', 'logo/',
-                )
-
+                _t0 = _time.monotonic()
                 try:
-                    all_paths = github_client.get_repo_tree(repo, branch)
+                    repo_files = github_client.download_repo_files(repo, branch)
                 except Exception as e:
-                    logger.warning("get_repo_tree 실패: %s", e)
-                    all_paths = []
+                    logger.warning("tarball 다운로드 실패 [%s]: %s", repo, e)
+                    repo_files = {}
 
-                py_paths = [
-                    p for p in all_paths
-                    if p.endswith(".py") and not any(tok in p for tok in SKIP_DIR_TOKENS)
-                ]
-                logger.warning("3차: tree 전체 .py %d개 (전체 %d경로)", len(py_paths), len(all_paths))
+                # .py만 — 다른 확장자는 검색에서 제외 (이미 download에서 필터됐지만 안전망)
+                py_files = {p: c for p, c in repo_files.items() if p.endswith(".py")}
+                logger.warning("3차(tarball): %d files / %.1fs",
+                               len(py_files), _time.monotonic() - _t0)
 
-                # 추출된 후보 basename + 클래스명 → 우선순위 정렬 (검사 순서만 결정,
-                # 캡은 없음 — 다 뒤짐. 시간 단축 목적)
+                # 우선순위 정렬 (검사 순서만 결정, 캡 없음)
                 candidate_basenames = {
                     p.rsplit("/", 1)[-1].lower()
                     for p in (file_paths or []) if p.endswith(".py")
@@ -365,58 +356,30 @@ def analyze_and_propose(
                     return 2
 
                 tried_paths = set(file_paths)
-                py_paths = [p for p in py_paths if p not in tried_paths]
-                py_paths.sort(key=_path_priority)
-                logger.warning("3차 정렬 후 검사 대상: %d개 (basename hint=%s)",
-                               len(py_paths), candidate_basenames)
-
-                # 병렬 fetch (최대 8 worker), 매칭되는 첫 파일에서 종료.
-                # 시간 상한: 60초 (아주 큰 레포 보호용 안전망)
-                MAX_SECS = 60
-                _t0 = _time.monotonic()
-                content_pat = re.compile(
-                    r'(?:class|def)\s+' + re.escape(cls_orig) + r'\b'
+                ordered = sorted(
+                    [(p, c) for p, c in py_files.items() if p not in tried_paths],
+                    key=lambda kv: _path_priority(kv[0]),
                 )
 
-                def _fetch_one(path: str):
-                    try:
-                        f = github_client.get_file(repo, path, branch)
-                        return path, f
-                    except Exception:
-                        return path, None
-
-                # 우선순위 0/1을 먼저 일괄 처리 (몇 개 안 됨)
-                # 그 다음 priority 2를 청크로 (한 청크에 8개씩 병렬)
-                CHUNK = 16  # 한 번에 16개씩 fetch (8 worker로 처리)
                 found_any = False
-                with ThreadPoolExecutor(max_workers=8) as pool:
-                    for chunk_start in range(0, len(py_paths), CHUNK):
-                        if _time.monotonic() - _t0 > MAX_SECS:
-                            logger.warning("3차: 시간 상한 %ds 도달", MAX_SECS)
-                            break
-                        chunk = py_paths[chunk_start:chunk_start + CHUNK]
-                        futures = [pool.submit(_fetch_one, p) for p in chunk]
-                        for fut in as_completed(futures):
-                            path, f = fut.result()
-                            if f is None:
-                                continue
-                            content = f.get("content", "")
-                            # 정의(class/def)가 있거나, 심볼 문자열이 본문에 등장
-                            if content_pat.search(content) or cls_lower in content.lower():
-                                snippet = _extract_relevant_section(content, failing_symbol)
-                                code_context += f"\n\n### {path}\n```\n{snippet}\n```"
-                                file_info = {"repo": repo, "path": path, "sha": f["sha"],
-                                             "branch": branch, "original": content}
-                                logger.warning("3차(병렬) 파일 발견: %s (검사=%d, %.1fs)",
-                                               path, chunk_start + len(chunk),
-                                               _time.monotonic() - _t0)
-                                found_any = True
-                                break
-                        if found_any:
-                            break
-                logger.warning("3차 완료: 검사 %d/%d, 소요 %.1fs, 발견=%s",
-                               min(len(py_paths), chunk_start + CHUNK if py_paths else 0),
-                               len(py_paths), _time.monotonic() - _t0, found_any)
+                for path, content in ordered:
+                    if content_pat.search(content) or cls_lower in content.lower():
+                        snippet = _extract_relevant_section(content, failing_symbol)
+                        code_context += f"\n\n### {path}\n```\n{snippet}\n```"
+                        # tarball엔 sha가 없으므로 contents API로 sha만 받아옴 (1회 추가 호출)
+                        try:
+                            f = github_client.get_file(repo, path, branch)
+                            sha = f["sha"]
+                        except Exception:
+                            sha = ""
+                        file_info = {"repo": repo, "path": path, "sha": sha,
+                                     "branch": branch, "original": content}
+                        logger.warning("3차(tarball) 파일 발견: %s (총 %.1fs)",
+                                       path, _time.monotonic() - _t0)
+                        found_any = True
+                        break
+                logger.warning("3차 완료: 검사 %d, 소요 %.1fs, 발견=%s",
+                               len(ordered), _time.monotonic() - _t0, found_any)
 
             if not file_info:
                 tried_dirs = ["app/services", "app", "app/utils", "src", "utils", "core", "logs"]
