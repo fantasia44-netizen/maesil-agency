@@ -111,6 +111,60 @@ def _mark_pr_merged(repo: str, pr_number: int, pr_url: str | None = None,
         logger.exception("dev_pr_history merged 마킹 실패: %s", e)
 
 
+def _find_overlapping_prs(repo: str, file_path: str | None, fn_name: str | None) -> list[dict]:
+    """같은 파일/함수에 대해 이미 만들어진 PR (open/merged) 목록.
+    중복 fix 생성 방지에 사용. 최근 30일 이내."""
+    if not file_path:
+        return []
+    try:
+        from datetime import timedelta
+        client = get_maesil_total_client()
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+        q = (
+            client.schema("agent_work").table("dev_pr_history")
+            .select("pr_number, pr_url, pr_title, status, fn_name, created_at, merged_at")
+            .eq("repo", repo)
+            .eq("file_path", file_path)
+            .gte("created_at", cutoff)
+            .order("created_at", desc=True)
+            .limit(10)
+        )
+        rows = (q.execute().data) or []
+        if fn_name:
+            # 같은 함수만 또는 fn_name 미상 (백필) 만 남기기
+            rows = [r for r in rows if not r.get("fn_name") or r["fn_name"] == fn_name]
+        return rows
+    except Exception as e:
+        logger.warning("_find_overlapping_prs 실패 [%s/%s]: %s", repo, file_path, e)
+        return []
+
+
+def _trigger_mirror_refresh_if_stale(repo: str, max_age_seconds: int = 300) -> None:
+    """미러가 max_age 초 이상 stale 이면 동기화 트리거 (인라인, 빠르면 0.5s)."""
+    try:
+        from app.services import repo_mirror
+        client = get_maesil_total_client()
+        r = (
+            client.schema("agent_work").table("repo_sync_state")
+            .select("last_synced_at").eq("repo", repo).limit(1).execute()
+        )
+        rows = r.data or []
+        if not rows:
+            repo_mirror.sync_repo(repo)
+            return
+        last = rows[0].get("last_synced_at")
+        if not last:
+            repo_mirror.sync_repo(repo)
+            return
+        last_dt = datetime.fromisoformat(last.replace("Z", "+00:00"))
+        age = (datetime.now(timezone.utc) - last_dt).total_seconds()
+        if age > max_age_seconds:
+            logger.info("미러 stale (%.0fs) — 강제 동기화: %s", age, repo)
+            repo_mirror.sync_repo(repo)
+    except Exception as e:
+        logger.warning("미러 freshness 체크 실패: %s", e)
+
+
 def _lookup_pr_in_history(pr_number: int, conversation_id: str | None = None) -> dict | None:
     """dev_pr_history 에서 PR 번호로 조회.
     같은 대화 우선 → 못 찾으면 최근 생성 순."""
@@ -500,6 +554,9 @@ def analyze_and_propose(
 
     if program and program.get("github_repo"):
         repo = program["github_repo"]
+        # 분석 전 미러 freshness 체크 — stale 이면 강제 sync (이미 머지된 fix 가
+        # 미러에 반영 안 된 채로 분석돼서 같은 fix 또 만들어지는 사고 방지)
+        _trigger_mirror_refresh_if_stale(repo)
         try:
             branch = github_client.get_default_branch(repo)
             # 파일 경로: 현재 메시지 + 컨텍스트 전체에서 추출 (이전 메시지에 모듈 정보가 있을 수 있음)
@@ -682,6 +739,36 @@ def analyze_and_propose(
                             program["name"], len(schema_md))
         except Exception as e:
             logger.warning("DB introspector 실패: %s", e)
+
+    # ── 중복 PR 감지 ───────────────────────────────────────────────
+    # 같은 파일에 이미 만들어진 PR (open/merged) 이 있으면 LLM 컨텍스트로 알려줌
+    # → '이미 수정 PR 있음' 인지하고 중복 fix 생성 방지
+    overlap_md = ""
+    if file_info:
+        try:
+            overlaps = _find_overlapping_prs(
+                file_info["repo"], file_info["path"], None
+            )
+            if overlaps:
+                lines = ["## 📋 같은 파일의 기존 PR (중복 fix 방지)"]
+                for o in overlaps[:5]:
+                    status = o.get("status", "?")
+                    badge = "✅ merged" if status == "merged" else f"⏳ {status}"
+                    lines.append(
+                        f"- {badge} [PR #{o['pr_number']}]({o['pr_url']}) — "
+                        f"{o.get('pr_title', '?')} (fn: {o.get('fn_name') or '?'})"
+                    )
+                lines.append(
+                    "\n**중요**: 위 PR 중 'merged' 상태의 fix 가 현재 파일 코드에 "
+                    "이미 반영돼 있을 수 있음. 또 다른 fix 만들기 전에 중복 여부 확인. "
+                    "'open' PR 이 같은 함수면 새로 만들지 말고 그 PR 안내."
+                )
+                overlap_md = "\n".join(lines)
+                code_context += "\n\n" + overlap_md
+                logger.info("기존 PR %d개 발견 [%s/%s]",
+                            len(overlaps), file_info["repo"], file_info["path"])
+        except Exception as e:
+            logger.warning("overlap PR 조회 실패: %s", e)
 
     # 이전 대화 컨텍스트
     history = ""
