@@ -62,16 +62,53 @@ def _save_pr_history(
         logger.warning("dev_pr_history 저장 실패: %s", e)
 
 
-def _mark_pr_merged(repo: str, pr_number: int) -> None:
+def _mark_pr_merged(repo: str, pr_number: int, pr_url: str | None = None,
+                    pr_title: str | None = None) -> None:
+    """PR 머지 완료를 DB 에 마킹.
+    UPDATE 가 0행 매칭일 수 있으므로 (행 자체가 없는 경우) UPSERT 로 처리.
+    응답 로그까지 남겨서 디버깅 가능."""
+    payload = {
+        "repo": repo,
+        "pr_number": pr_number,
+        "status": "merged",
+        "merged_at": datetime.now(timezone.utc).isoformat(),
+    }
+    if pr_url:
+        payload["pr_url"] = pr_url
+    if pr_title:
+        payload["pr_title"] = pr_title
+
     try:
-        get_maesil_total_client().schema("agent_work").table("dev_pr_history").update(
-            {
-                "status": "merged",
-                "merged_at": datetime.now(timezone.utc).isoformat(),
-            }
-        ).eq("repo", repo).eq("pr_number", pr_number).execute()
+        # 1) UPDATE 우선 — 행이 있으면 status/merged_at 만 갱신
+        upd = (
+            get_maesil_total_client()
+            .schema("agent_work")
+            .table("dev_pr_history")
+            .update({"status": "merged", "merged_at": payload["merged_at"]})
+            .eq("repo", repo)
+            .eq("pr_number", pr_number)
+            .execute()
+        )
+        updated_rows = len(upd.data or [])
+        logger.info("_mark_pr_merged UPDATE %s#%d → %d rows: %s",
+                    repo, pr_number, updated_rows, upd.data)
+
+        # 2) UPDATE 가 0행이면 (ex: 백필 안 된 PR) UPSERT 로 INSERT
+        if updated_rows == 0:
+            # conversation_id 는 머지 시점엔 알 수 없으니 'merged-only' 로 표시
+            payload.setdefault("conversation_id", "merged-only")
+            payload.setdefault("pr_url", pr_url or f"https://github.com/{repo}/pull/{pr_number}")
+            ins = (
+                get_maesil_total_client()
+                .schema("agent_work")
+                .table("dev_pr_history")
+                .upsert(payload, on_conflict="repo,pr_number")
+                .execute()
+            )
+            logger.info("_mark_pr_merged UPSERT fallback %s#%d: %s",
+                        repo, pr_number, ins.data)
     except Exception as e:
-        logger.warning("dev_pr_history merged 마킹 실패: %s", e)
+        logger.exception("dev_pr_history merged 마킹 실패: %s", e)
 
 
 def _lookup_pr_in_history(pr_number: int, conversation_id: str | None = None) -> dict | None:
@@ -1060,7 +1097,7 @@ def merge_pending_pr(
         if result.get("merged"):
             # 머지 성공 — 추적 해제 (있었다면) + DB history 도 업데이트
             _recent_pr.pop(conversation_id, None)
-            _mark_pr_merged(repo, pr_number)
+            _mark_pr_merged(repo, pr_number, pr_url=pr_url, pr_title=pr_title)
             return (
                 f"✅ **PR #{pr_number} 머지 완료** (`{repo}`)\n\n"
                 f"🔗 {pr_url}\n"
