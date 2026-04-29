@@ -558,6 +558,22 @@ def analyze_and_propose(
             code_context = f"\n\n(GitHub 접근 실패: {e})"
             file_info = None  # 명시적 표시
 
+    # ── DB 스키마 인트로스펙션 ──────────────────────────────
+    # 파일을 찾았으면 그 코드에서 참조되는 DB 테이블의 실제 스키마 자동 첨부
+    # (LLM 의 거짓 진술 방지 — 진짜 정보만 컨텍스트로)
+    if file_info and program:
+        try:
+            from app.services import db_introspector
+            schema_md = db_introspector.introspect_for_program(
+                program["name"], file_info["original"]
+            )
+            if schema_md:
+                code_context += "\n\n" + schema_md
+                logger.info("DB 스키마 컨텍스트 첨부 [program=%s]: %d chars",
+                            program["name"], len(schema_md))
+        except Exception as e:
+            logger.warning("DB introspector 실패: %s", e)
+
     # 이전 대화 컨텍스트
     history = ""
     if context_messages:
@@ -591,6 +607,14 @@ def analyze_and_propose(
 - 그 파일에서 `start` 같은 **메서드명을 검색** 해서 어느 클래스/함수에서 정의됐는지 찾고, 그 함수를 분석 대상으로.
 - 메서드도 못 찾으면 그때서야 "관련 함수 식별 실패" 답변.
 - ❌ "SyncLog 클래스가 없어서 분석 불가" 같이 표면적 판단으로 멈추지 말 것.
+
+## ⚠️ 거짓 진술 금지 — 핵심 규칙
+- ❌ "DB 에 접속해보니" / "테이블을 조회해보니" / "쿼리해보니" / "스키마를 확인했더니" 같은 표현 절대 사용 금지
+- 너의 도구는 **코드 정독 + 시스템이 자동 첨부한 DB 스키마(있을 때만)** 뿐
+- 자동 첨부되는 컨텍스트:
+  * `### 파일경로` 헤더로 시작하는 코드 섹션 (이건 봤다고 말해도 됨)
+  * `## 🗄️ DB 스키마 컨텍스트` 헤더로 시작하는 information_schema 결과 (이것도 봤다고 가능)
+- 이 두 가지에 없는 정보는 **추론 또는 일반론** 으로 명시 — "코드 패턴상..." / "PostgREST 동작 일반론으로는..."
 
 ## PostgREST / Supabase REST 호출 패턴 (자주 발생하는 함정)
 코드가 `f'{url}/rest/v1/<table>'` 또는 Supabase 클라이언트로 호출하는 부분을 수정할 때:
