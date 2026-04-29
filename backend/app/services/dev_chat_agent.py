@@ -180,6 +180,7 @@ def _lookup_pr_in_history(pr_number: int, conversation_id: str | None = None) ->
             )
             rows = r.data or []
             if rows:
+                logger.info("_lookup_pr_in_history same-conv hit: #%d conv=%s", pr_number, conversation_id)
                 return rows[0]
         # 전역에서 가장 최근
         r = (
@@ -190,9 +191,14 @@ def _lookup_pr_in_history(pr_number: int, conversation_id: str | None = None) ->
             .limit(1).execute()
         )
         rows = r.data or []
-        return rows[0] if rows else None
+        if rows:
+            logger.info("_lookup_pr_in_history global hit: #%d → %s (status=%s)",
+                        pr_number, rows[0].get("repo"), rows[0].get("status"))
+            return rows[0]
+        logger.warning("_lookup_pr_in_history: #%d — DB에 행 없음 (백필 미적용?)", pr_number)
+        return None
     except Exception as e:
-        logger.warning("dev_pr_history 조회 실패: %s", e)
+        logger.warning("dev_pr_history 조회 실패 [pr=%d]: %s", pr_number, e)
         return None
 
 
@@ -1073,6 +1079,24 @@ _PR_URL_PAT = re.compile(
 _PR_HASH_PAT = re.compile(r"(?<!\d)#(\d+)(?!\d)")
 
 
+def _latest_open_pr() -> dict | None:
+    """dev_pr_history 에서 가장 최근 open PR 반환 (PR 번호 미지정 머지 명령 fallback)."""
+    try:
+        client = get_maesil_total_client()
+        r = (
+            client.schema("agent_work").table("dev_pr_history")
+            .select("repo, pr_number, pr_url, pr_title, status")
+            .eq("status", "open")
+            .order("created_at", desc=True)
+            .limit(1).execute()
+        )
+        rows = r.data or []
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning("_latest_open_pr 조회 실패: %s", e)
+        return None
+
+
 def _extract_pr_reference(
     message: str,
     context_messages: list[dict] | None,
@@ -1081,7 +1105,9 @@ def _extract_pr_reference(
 
     1) 현재 메시지·컨텍스트에 https://github.com/owner/repo/pull/N → 직접 사용
     2) #N → 현재 컨텍스트의 program 매칭으로 repo 추론
-    3) #N → DB의 최근 dev 메시지 전체에서 같은 PR 번호 언급한 URL 검색 (cross-conversation)
+    3) #N → dev_pr_history DB 조회 (새 대화에서도 유효, 가장 신뢰)
+    4) #N → 일반 conversation_messages cross-conversation 검색
+    5) #N 없음 → dev_pr_history 최근 open PR fallback (번호 없이 "머지해줘" 케이스)
     """
     texts = [message or ""]
     if context_messages:
@@ -1093,47 +1119,65 @@ def _extract_pr_reference(
     if m:
         return (m.group(1), int(m.group(2)))
 
-    # 2순위: #N + 컨텍스트의 program 매칭
+    # PR 번호 추출 — 없으면 5순위(최근 open PR fallback)로 바로 이동
     h = _PR_HASH_PAT.search(full)
-    if not h:
-        return None
-    pr_num = int(h.group(1))
-    try:
-        programs = _all_programs()
-        prog = _detect_program_from_text(full, programs)
-        if prog and prog.get("github_repo"):
-            return (prog["github_repo"], pr_num)
-    except Exception:
-        pass
+    if h:
+        pr_num = int(h.group(1))
 
-    # 3순위: dev_pr_history 에서 직접 조회 (가장 신뢰)
-    hist = _lookup_pr_in_history(pr_num)
-    if hist:
-        logger.info("dev_pr_history 매칭: #%d → %s", pr_num, hist["repo"])
-        return (hist["repo"], pr_num)
+        # 2순위: #N + 컨텍스트의 program 매칭
+        try:
+            programs = _all_programs()
+            prog = _detect_program_from_text(full, programs)
+            if prog and prog.get("github_repo"):
+                logger.info("_extract_pr_reference 2순위 (program): #%d → %s",
+                            pr_num, prog["github_repo"])
+                return (prog["github_repo"], pr_num)
+        except Exception:
+            pass
 
-    # 4순위: 일반 conversation_messages 에서 cross-conversation 검색 (보조 fallback)
-    try:
-        client = get_maesil_total_client()
-        for pat in [f"%/pull/{pr_num}%", f"%#{pr_num}%"]:
-            resp = (
-                client.schema("agent_work")
-                .table("conversation_messages")
-                .select("content")
-                .eq("agent_type", "developer")
-                .ilike("content", pat)
-                .order("created_at", desc=True)
-                .limit(20)
-                .execute()
-            )
-            for row in (resp.data or []):
-                content = row.get("content") or ""
-                u = _PR_URL_PAT.search(content)
-                if u and int(u.group(2)) == pr_num:
-                    logger.info("conversation_messages 매칭: #%d → %s", pr_num, u.group(1))
-                    return (u.group(1), pr_num)
-    except Exception as e:
-        logger.warning("conversation_messages PR 검색 실패: %s", e)
+        # 3순위: dev_pr_history 에서 직접 조회 (가장 신뢰 — 새 대화에서도 유효)
+        hist = _lookup_pr_in_history(pr_num)
+        if hist:
+            logger.info("_extract_pr_reference 3순위 (dev_pr_history): #%d → %s",
+                        pr_num, hist["repo"])
+            return (hist["repo"], pr_num)
+        else:
+            logger.warning("_extract_pr_reference 3순위 실패: pr_number=%d DB 조회 결과 없음 "
+                           "(dev_pr_history 백필 확인 필요)", pr_num)
+
+        # 4순위: 일반 conversation_messages 에서 cross-conversation 검색
+        try:
+            client = get_maesil_total_client()
+            for pat in [f"%/pull/{pr_num}%", f"%#{pr_num}%"]:
+                resp = (
+                    client.schema("agent_work")
+                    .table("conversation_messages")
+                    .select("content")
+                    .eq("agent_type", "developer")
+                    .ilike("content", pat)
+                    .order("created_at", desc=True)
+                    .limit(20)
+                    .execute()
+                )
+                for row in (resp.data or []):
+                    content = row.get("content") or ""
+                    u = _PR_URL_PAT.search(content)
+                    if u and int(u.group(2)) == pr_num:
+                        logger.info("_extract_pr_reference 4순위 (conv_msgs): #%d → %s",
+                                    pr_num, u.group(1))
+                        return (u.group(1), pr_num)
+        except Exception as e:
+            logger.warning("conversation_messages PR 검색 실패: %s", e)
+
+        return None  # 번호는 있지만 repo를 못 찾음
+
+    # 5순위: PR 번호 자체가 없는 경우 → 최근 open PR fallback
+    # ("머지해줘" / "그거 머지" 같이 번호 생략한 케이스)
+    latest = _latest_open_pr()
+    if latest:
+        logger.info("_extract_pr_reference 5순위 (latest open): #%d → %s",
+                    latest["pr_number"], latest["repo"])
+        return (latest["repo"], latest["pr_number"])
 
     return None
 
@@ -1161,21 +1205,37 @@ def merge_pending_pr(
     # 2) 없으면 _recent_pr fallback
     if not repo:
         info = _recent_pr.get(conversation_id)
-        if not info:
-            return (
-                "⚠️ 머지할 PR 정보를 찾지 못했습니다.\n"
-                "다음 중 한 가지 형식으로 다시 요청해 주세요:\n"
-                "- `https://github.com/owner/repo/pull/N 머지`\n"
-                "- `PR #N 머지` (이전 메시지에 프로그램 이름이 언급된 경우)\n"
-                "- 같은 대화에서 `승인` 으로 PR 만든 직후 `머지`"
-            )
-        repo = info["repo"]
-        pr_number = info["pr_number"]
+        if info:
+            repo = info["repo"]
+            pr_number = info["pr_number"]
+        else:
+            # 3) 마지막 수단 — dev_pr_history 최근 open PR
+            latest = _latest_open_pr()
+            if latest:
+                repo = latest["repo"]
+                pr_number = latest["pr_number"]
+                logger.info("merge_pending_pr: PR 번호 미지정 → dev_pr_history 최근 open PR #%d (%s) 사용",
+                            pr_number, repo)
+            else:
+                return (
+                    "⚠️ 머지할 PR 정보를 찾지 못했습니다.\n"
+                    "다음 중 한 가지 형식으로 다시 요청해 주세요:\n"
+                    "- `https://github.com/owner/repo/pull/N 머지`\n"
+                    "- `PR #N 머지` (이전 메시지에 프로그램 이름이 언급된 경우)\n"
+                    "- 같은 대화에서 `승인` 으로 PR 만든 직후 `머지`"
+                )
 
-    # PR URL — _recent_pr 에서 알 수도 있고, 모를 수도 있으니 fallback URL 생성
+    # PR URL — _recent_pr 또는 dev_pr_history 에서 조회
     info_local = _recent_pr.get(conversation_id) or {}
-    pr_url = info_local.get("pr_url") or f"https://github.com/{repo}/pull/{pr_number}"
+    pr_url = info_local.get("pr_url")
     pr_title = info_local.get("pr_title")
+    if not pr_url:
+        # dev_pr_history 에서 URL/title 보완
+        hist2 = _lookup_pr_in_history(pr_number)
+        if hist2:
+            pr_url = hist2.get("pr_url")
+            pr_title = pr_title or hist2.get("pr_title")
+    pr_url = pr_url or f"https://github.com/{repo}/pull/{pr_number}"
 
     try:
         result = github_client.merge_pull_request(
