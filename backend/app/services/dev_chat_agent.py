@@ -665,8 +665,8 @@ _HALLUCINATION_PATTERNS: list[tuple[re.Pattern, str | None]] = [
     # ── 사용자에게 정보 요청 (가장 빈번한 위반) ─────────────────────────
     # "알려주세요", "보내주세요", "공유해주세요", "첨부해주세요"
     (re.compile(r"(알려|보내|공유|첨부)\s*주\s*(세요|시겠어요|시면|시기\s*바랍)", re.I), None),
-    # "붙여주시면", "붙여주세요"
-    (re.compile(r"붙여\s*주\s*(세요|시면|시겠)", re.I), None),
+    # "붙여주시면", "붙여주세요", "붙여넣어 주시면" (넣어 삽입 케이스 포함)
+    (re.compile(r"붙여\s*(넣어\s*)?주\s*(세요|시면|시겠)", re.I), None),
     # "확인해주세요", "확인해주시면"
     (re.compile(r"확인\s*(해|하여|하고)\s*주\s*(세요|시면|시겠)", re.I), None),
     (re.compile(r"확인\s*(결과|후)\s*(알려|보내)\s*주", re.I), None),
@@ -1203,16 +1203,13 @@ PR제목: <간단한 제목>
         tried_paths_str = ", ".join(f"`{p}`" for p in (file_paths or [])[:5]) or "`agencylog.py` 등"
         cls_name_s = failing_symbol.split('.')[0]
         return (
-            f"🔒 **파일 미확인 — 코드 수정 불가**\n"
+            f"🔒 **파일 탐색 실패 — GitHub 트리 기반 재시도 필요**\n"
             f"{github_err}\n"
-            f"레포 `{repo_tried}` 에서 `{failing_symbol}` 관련 파일을 찾지 못했습니다.\n\n"
+            f"레포 `{repo_tried}` 에서 `{failing_symbol}` 관련 파일을 자동으로 찾지 못했습니다.\n\n"
             f"**시도한 경로 ({len(file_paths or [])}개):** {tried_paths_str}\n"
-            f"**code search 쿼리:** `class {cls_name_s}`, `{cls_name_s}`\n"
-            f"**전체 tree 재귀 탐색:** 레포 모든 .py 파일에서 클래스명/심볼 매칭 시도\n\n"
-            f"**직접 경로를 알려주시면 바로 읽겠습니다:**\n"
-            f"- `repository.py 파일 분석해줘`\n"
-            f"- `app/repository.py 파일 읽어봐`\n"
-            f"- `{cls_name_s}는 어느 파일에 있어? 경로 알려줘` (본인이 직접 입력)"
+            f"**code search 쿼리:** `class {cls_name_s}`, `{cls_name_s}`\n\n"
+            f"파일 경로를 메시지에 포함하면 바로 분석할 수 있습니다.\n"
+            f"예) `app/services/{cls_name_s.lower()}.py 분석해줘`"
         )
 
     try:

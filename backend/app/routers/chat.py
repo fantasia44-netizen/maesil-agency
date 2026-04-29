@@ -454,10 +454,25 @@ def chat_from_alert(
 
     # 이메일 래퍼이고 내부 모듈을 알 수 있으면 — 이미 수정된 이슈인지 먼저 확인
     if not _inner_module:
-        # 잘린 경우에도 앞 부분으로 추출 시도 ("reposito" → "repository" 등)
-        _mod_partial = _re.search(r'"module":\s*"([a-z_A-Z0-9.]+)', body or title)
-        if _mod_partial:
-            _inner_module = _mod_partial.group(1)
+        _raw_txt = body or title or ""
+        # 전략 1: "이메일 발송 성공" 이후 내부 JSON에서 module 추출
+        # 내부 JSON은 이스케이프된 따옴표 사용: \"module\": \"repository\" (잘릴 수 있음)
+        _email_pos = _raw_txt.find("이메일 발송 성공")
+        if _email_pos >= 0:
+            _after_email = _raw_txt[_email_pos:]
+            # 닫는 따옴표 없이 캡처 (truncate 처리)
+            _inner_mod_m = _re.search(
+                r'(?:\\?"module\\?")\s*:\s*\\?"([a-zA-Z0-9_.]+)',
+                _after_email,
+            )
+            if _inner_mod_m:
+                _inner_module = _inner_mod_m.group(1)
+        # 전략 2: 바디 전체에서 "email" 아닌 module 값 (이스케이프 없는 버전)
+        if not _inner_module:
+            _all_mods = _re.findall(r'"module":\s*"([a-zA-Z0-9_.]+)"', _raw_txt)
+            _non_email = [m for m in _all_mods if m.lower() not in ("email", "")]
+            if _non_email:
+                _inner_module = _non_email[0]
 
     if _inner_module and prog and prog != "(프로그램 미특정)":
         # dev_pr_history에서 내부 모듈 관련 머지된 PR 조회
