@@ -47,6 +47,13 @@ EXCLUDE_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"^\s*Using cached\b", re.I),
     re.compile(r"^\s*Collecting\b.*deprecated", re.I),
     re.compile(r"^\s*Downloading\b.*\.whl", re.I),
+    # Render 배포 진행 로그 (정상 동작 — 에러 아님)
+    re.compile(r"^\s*==>\s+", re.I),                          # ==> Running / ==> Build
+    re.compile(r"gunicorn.*--bind", re.I),                     # gunicorn 기동 명령
+    re.compile(r"^\s*\[INFO\]\s+Listening at:", re.I),         # gunicorn 리스닝 시작
+    re.compile(r"Booting worker with pid", re.I),              # gunicorn 워커 부트
+    re.compile(r"Worker\s+(booting|exiting|timeout)", re.I),   # gunicorn 워커 상태
+    re.compile(r"^\s*\[\d+\]\s+\[\d+\]", re.I),               # gunicorn pid 로그
     # 에러 알림 메일 발송 로그 피드백 루프 차단
     # — "이메일 발송 성공/완료" 는 알림이 정상 발송됐다는 INFO 로그
     # — module이 email 이고 이메일 발송 관련 메시지면 무조건 제외
@@ -145,10 +152,10 @@ def _fetch_logs(service_id: str, owner_id: str, api_key: str, start: datetime, e
 # ─────────────────────────────────────────────────────────────────
 def _extract_title(msg: str, program_name: str) -> str:
     """로그 메시지에서 의미 있는 알림 제목 추출.
-    JSON 구조화 로그이면 'msg' 필드 우선, 아니면 첫 줄."""
+    ANSI 코드 제거 → JSON 구조화 로그이면 'msg' 필드 우선, 아니면 첫 줄."""
     if not msg:
         return f"{program_name} 로그 이상"
-    stripped = msg.strip()
+    stripped = _strip_ansi(msg).strip()
     # JSON 구조화 로그 시도
     if stripped.startswith("{"):
         import json as _json
@@ -165,16 +172,27 @@ def _extract_title(msg: str, program_name: str) -> str:
     return stripped.splitlines()[0][:200]
 
 
+# ANSI 이스케이프 코드 제거 패턴 (Render 컬러 로그)
+_ANSI_ESC = re.compile(r'\x1b\[[0-9;]*[mBCDHJKSTfhlmnpsu]|\(B')
+
+
+def _strip_ansi(text: str) -> str:
+    """ANSI 이스케이프 시퀀스 제거."""
+    return _ANSI_ESC.sub("", text)
+
+
 def classify(message: str) -> str | None:
     """에러 패턴 매칭 → severity. 매칭 안되면 None (스킵)."""
     if not message:
         return None
+    # ANSI 코드 제거 후 분류 (Render 컬러 로그 오탐 방지)
+    clean = _strip_ansi(message)
     # 제외 패턴 먼저 확인 — 정상 경고는 alert 생성 안 함
     for pat in EXCLUDE_PATTERNS:
-        if pat.search(message):
+        if pat.search(clean):
             return None
     for sev, pat in SEVERITY_PATTERNS:
-        if pat.search(message):
+        if pat.search(clean):
             return sev
     return None
 
