@@ -318,68 +318,40 @@ def analyze_and_propose(
                     if file_info:
                         break
 
-            # 3차 폴백: tarball 1회 다운로드 → 메모리 내 전체 .py 검색 (캡 없음)
+            # 3차 폴백: DB 미러(repo_mirror)에서 심볼 검색 — 1~5ms, GitHub 호출 0
             if not file_info and failing_symbol:
                 import time as _time
+                from app.services import repo_mirror
+
                 cls_orig = failing_symbol.split(".")[0]
-                cls_lower = cls_orig.lower()
-                cls_snake = re.sub(r'(?<!^)(?=[A-Z])', '_', cls_orig).lower()
-                content_pat = re.compile(r'(?:class|def)\s+' + re.escape(cls_orig) + r'\b')
+                # 추출된 file_paths의 basename을 우선순위 힌트로 전달
+                hint_basenames = list({
+                    p.rsplit("/", 1)[-1]
+                    for p in (file_paths or []) if p.endswith(".py")
+                })
 
                 _t0 = _time.monotonic()
-                try:
-                    repo_files = github_client.download_repo_files(repo, branch)
-                except Exception as e:
-                    logger.warning("tarball 다운로드 실패 [%s]: %s", repo, e)
-                    repo_files = {}
+                hit = repo_mirror.search_symbol(repo, cls_orig, hint_basenames)
+                elapsed = _time.monotonic() - _t0
 
-                # .py만 — 다른 확장자는 검색에서 제외 (이미 download에서 필터됐지만 안전망)
-                py_files = {p: c for p, c in repo_files.items() if p.endswith(".py")}
-                logger.warning("3차(tarball): %d files / %.1fs",
-                               len(py_files), _time.monotonic() - _t0)
-
-                # 우선순위 정렬 (검사 순서만 결정, 캡 없음)
-                candidate_basenames = {
-                    p.rsplit("/", 1)[-1].lower()
-                    for p in (file_paths or []) if p.endswith(".py")
-                }
-
-                def _path_priority(p: str) -> int:
-                    fname = p.rsplit("/", 1)[-1].lower()
-                    if fname in candidate_basenames:
-                        return 0
-                    stem = fname[:-3]
-                    if stem == cls_snake or stem == cls_lower:
-                        return 0
-                    if cls_snake in stem or cls_lower in stem:
-                        return 1
-                    return 2
-
-                tried_paths = set(file_paths)
-                ordered = sorted(
-                    [(p, c) for p, c in py_files.items() if p not in tried_paths],
-                    key=lambda kv: _path_priority(kv[0]),
-                )
-
-                found_any = False
-                for path, content in ordered:
-                    if content_pat.search(content) or cls_lower in content.lower():
-                        snippet = _extract_relevant_section(content, failing_symbol)
-                        code_context += f"\n\n### {path}\n```\n{snippet}\n```"
-                        # tarball엔 sha가 없으므로 contents API로 sha만 받아옴 (1회 추가 호출)
-                        try:
-                            f = github_client.get_file(repo, path, branch)
-                            sha = f["sha"]
-                        except Exception:
-                            sha = ""
-                        file_info = {"repo": repo, "path": path, "sha": sha,
-                                     "branch": branch, "original": content}
-                        logger.warning("3차(tarball) 파일 발견: %s (총 %.1fs)",
-                                       path, _time.monotonic() - _t0)
-                        found_any = True
-                        break
-                logger.warning("3차 완료: 검사 %d, 소요 %.1fs, 발견=%s",
-                               len(ordered), _time.monotonic() - _t0, found_any)
+                if hit:
+                    path = hit["path"]
+                    content = hit["content"]
+                    # 미러에 저장된 sha는 commit sha. 커밋용 blob sha는 별도 호출.
+                    try:
+                        f = github_client.get_file(repo, path, branch)
+                        sha = f["sha"]
+                    except Exception:
+                        sha = ""
+                    snippet = _extract_relevant_section(content, failing_symbol)
+                    code_context += f"\n\n### {path}\n```\n{snippet}\n```"
+                    file_info = {"repo": repo, "path": path, "sha": sha,
+                                 "branch": branch, "original": content}
+                    logger.warning("3차(DB미러) 파일 발견: %s (score=%s, %.1fms)",
+                                   path, hit.get("score"), elapsed * 1000)
+                else:
+                    logger.warning("3차(DB미러) 파일 미발견 [repo=%s, symbol=%s, hints=%s] %.1fms",
+                                   repo, cls_orig, hint_basenames, elapsed * 1000)
 
             if not file_info:
                 tried_dirs = ["app/services", "app", "app/utils", "src", "utils", "core", "logs"]
