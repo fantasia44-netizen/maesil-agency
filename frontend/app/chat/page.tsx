@@ -102,6 +102,8 @@ function ChatPageInner() {
           method: "POST",
           body: JSON.stringify({ conversation_id: fixedConvId, message: "" }),
         });
+        // 백엔드가 반환한 실제 conversation_id로 업데이트 (UUID 형식)
+        setConversationId(resp.conversation_id);
         const sessionCost = resp.agents.reduce((s, a) => s + (a.cost_usd ?? 0), 0);
         setTotalCost((prev) => prev + sessionCost);
         setMessages((prev) => [

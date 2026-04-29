@@ -403,7 +403,9 @@ def chat_from_alert(
     except Exception:
         event = None
 
-    conversation_id = f"alert-{alert_id}"  # 알림 ID 기반 고정 conversation
+    # alert_id 기반 결정론적 UUID — Supabase UUID 타입 제약 통과 + 같은 알림은 같은 대화
+    import uuid as _uuid_mod
+    conversation_id = str(_uuid_mod.uuid5(_uuid_mod.NAMESPACE_URL, f"alert:{alert_id}"))
 
     if not event:
         msg = "⚠️ 알림을 찾을 수 없습니다."
@@ -447,7 +449,8 @@ def chat_from_alert(
             logger.info("이메일 피드백 루프 알림 자동 ack: alert_id=%s", alert_id)
         except Exception as _e:
             logger.warning("이메일 루프 알림 ack 실패: %s", _e)
-        _save_results(conversation_id, f"[알림 {alert_id}]", [{
+        _alert_title = f"[알림] {prog} · {sev} — {title[:40]}"
+        _save_results(conversation_id, _alert_title, [{
             "run_id": _run_id, "agent_type": "developer",
             "message": _resp, "status": "success", "cost_usd": 0.0,
         }], user_id=user.id)
@@ -475,7 +478,8 @@ def chat_from_alert(
     response_text = dev_chat_agent.analyze_and_propose(auto_msg, conversation_id, ctx)
     run_id = str(uuid.uuid4())
 
-    _save_results(conversation_id, auto_msg, [{
+    _alert_title = f"[알림] {prog} · {sev} — {title[:40]}"
+    _save_results(conversation_id, _alert_title, [{
         "run_id": run_id, "agent_type": "developer",
         "message": response_text, "status": "success", "cost_usd": 0.0,
     }], user_id=user.id)
