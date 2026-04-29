@@ -48,12 +48,14 @@ EXCLUDE_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"^\s*Collecting\b.*deprecated", re.I),
     re.compile(r"^\s*Downloading\b.*\.whl", re.I),
     # Render 배포 진행 로그 (정상 동작 — 에러 아님)
-    re.compile(r"^\s*==>\s+", re.I),                          # ==> Running / ==> Build
-    re.compile(r"gunicorn.*--bind", re.I),                     # gunicorn 기동 명령
-    re.compile(r"^\s*\[INFO\]\s+Listening at:", re.I),         # gunicorn 리스닝 시작
+    re.compile(r"==>\s+\S", re.I),                             # ==> Running / ==> Build (위치 무관)
+    re.compile(r"\bgunicorn\b.*\b(--bind|--workers|--timeout|--worker-class|app:app)\b", re.I),  # gunicorn 기동 명령
+    re.compile(r"\[INFO\]\s+Listening at:", re.I),             # gunicorn 리스닝 시작
     re.compile(r"Booting worker with pid", re.I),              # gunicorn 워커 부트
     re.compile(r"Worker\s+(booting|exiting|timeout)", re.I),   # gunicorn 워커 상태
-    re.compile(r"^\s*\[\d+\]\s+\[\d+\]", re.I),               # gunicorn pid 로그
+    re.compile(r"\[\d+\]\s+\[\d+\]", re.I),                   # gunicorn pid 로그
+    re.compile(r"Arbiter booting", re.I),                      # gunicorn arbiter 시작
+    re.compile(r"Arbiter pid", re.I),                          # gunicorn arbiter pid
     # 에러 알림 메일 발송 로그 피드백 루프 차단
     # — "이메일 발송 성공/완료" 는 알림이 정상 발송됐다는 INFO 로그
     # — module이 email 이고 이메일 발송 관련 메시지면 무조건 제외
