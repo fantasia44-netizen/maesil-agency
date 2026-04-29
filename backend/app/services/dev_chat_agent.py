@@ -33,7 +33,76 @@ APPROVE_KEYWORDS = {"승인", "실행", "확인", "ok", "yes", "ㅇㅋ", "적용
 _pending: dict[str, dict[str, Any]] = {}
 # 최근 생성된 PR — 같은 대화에서 '머지' 명령으로 바로 머지 가능
 # { conversation_id: {repo, pr_number, pr_url, pr_title, created_at} }
+# 영속 저장은 agent_work.dev_pr_history (사이트 재시작·새 대화에서도 조회)
 _recent_pr: dict[str, dict[str, Any]] = {}
+
+
+def _save_pr_history(
+    conversation_id: str, repo: str, pr_number: int, pr_url: str,
+    pr_title: str | None, base_branch: str | None, head_branch: str | None,
+    file_path: str | None, fn_name: str | None,
+) -> None:
+    try:
+        get_maesil_total_client().schema("agent_work").table("dev_pr_history").upsert(
+            {
+                "conversation_id": conversation_id,
+                "repo": repo,
+                "pr_number": pr_number,
+                "pr_url": pr_url,
+                "pr_title": pr_title,
+                "base_branch": base_branch,
+                "head_branch": head_branch,
+                "file_path": file_path,
+                "fn_name": fn_name,
+                "status": "open",
+            },
+            on_conflict="repo,pr_number",
+        ).execute()
+    except Exception as e:
+        logger.warning("dev_pr_history 저장 실패: %s", e)
+
+
+def _mark_pr_merged(repo: str, pr_number: int) -> None:
+    try:
+        get_maesil_total_client().schema("agent_work").table("dev_pr_history").update(
+            {
+                "status": "merged",
+                "merged_at": datetime.now(timezone.utc).isoformat(),
+            }
+        ).eq("repo", repo).eq("pr_number", pr_number).execute()
+    except Exception as e:
+        logger.warning("dev_pr_history merged 마킹 실패: %s", e)
+
+
+def _lookup_pr_in_history(pr_number: int, conversation_id: str | None = None) -> dict | None:
+    """dev_pr_history 에서 PR 번호로 조회.
+    같은 대화 우선 → 못 찾으면 최근 생성 순."""
+    try:
+        client = get_maesil_total_client()
+        if conversation_id:
+            r = (
+                client.schema("agent_work").table("dev_pr_history")
+                .select("repo, pr_number, pr_url, pr_title, status")
+                .eq("conversation_id", conversation_id)
+                .eq("pr_number", pr_number)
+                .limit(1).execute()
+            )
+            rows = r.data or []
+            if rows:
+                return rows[0]
+        # 전역에서 가장 최근
+        r = (
+            client.schema("agent_work").table("dev_pr_history")
+            .select("repo, pr_number, pr_url, pr_title, status")
+            .eq("pr_number", pr_number)
+            .order("created_at", desc=True)
+            .limit(1).execute()
+        )
+        rows = r.data or []
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning("dev_pr_history 조회 실패: %s", e)
+        return None
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -837,7 +906,7 @@ def execute_pending(conversation_id: str) -> str:
             base=base,
         )
 
-        # 완료 후 삭제 + 머지용 정보 보관
+        # 완료 후 삭제 + 머지용 정보 보관 (in-memory + DB 영속)
         del _pending[conversation_id]
         _recent_pr[conversation_id] = {
             "repo": repo,
@@ -846,6 +915,17 @@ def execute_pending(conversation_id: str) -> str:
             "pr_title": action["pr_title"],
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
+        _save_pr_history(
+            conversation_id=conversation_id,
+            repo=repo,
+            pr_number=pr["number"],
+            pr_url=pr["html_url"],
+            pr_title=action["pr_title"],
+            base_branch=action.get("base_branch"),
+            head_branch=action.get("branch"),
+            file_path=action.get("path"),
+            fn_name=action.get("fn_name"),
+        )
 
         return (
             f"✅ **PR 생성 완료**\n\n"
@@ -870,22 +950,23 @@ def _extract_pr_reference(
     message: str,
     context_messages: list[dict] | None,
 ) -> tuple[str, int] | None:
-    """메시지/컨텍스트에서 PR 참조 추출.
+    """메시지/컨텍스트/전체 대화 DB 에서 PR 참조 추출.
 
-    1) https://github.com/owner/repo/pull/N → (repo, N) 직접 사용
-    2) #N → repo 는 프로그램 매칭으로 추론
+    1) 현재 메시지·컨텍스트에 https://github.com/owner/repo/pull/N → 직접 사용
+    2) #N → 현재 컨텍스트의 program 매칭으로 repo 추론
+    3) #N → DB의 최근 dev 메시지 전체에서 같은 PR 번호 언급한 URL 검색 (cross-conversation)
     """
     texts = [message or ""]
     if context_messages:
         texts += [m.get("content", "") for m in context_messages[-15:]]
     full = "\n".join(texts)
 
-    # 1순위: PR URL
+    # 1순위: PR URL (현재 컨텍스트)
     m = _PR_URL_PAT.search(full)
     if m:
         return (m.group(1), int(m.group(2)))
 
-    # 2순위: #N — 컨텍스트에서 program 매칭으로 repo 추론
+    # 2순위: #N + 컨텍스트의 program 매칭
     h = _PR_HASH_PAT.search(full)
     if not h:
         return None
@@ -897,6 +978,36 @@ def _extract_pr_reference(
             return (prog["github_repo"], pr_num)
     except Exception:
         pass
+
+    # 3순위: dev_pr_history 에서 직접 조회 (가장 신뢰)
+    hist = _lookup_pr_in_history(pr_num)
+    if hist:
+        logger.info("dev_pr_history 매칭: #%d → %s", pr_num, hist["repo"])
+        return (hist["repo"], pr_num)
+
+    # 4순위: 일반 conversation_messages 에서 cross-conversation 검색 (보조 fallback)
+    try:
+        client = get_maesil_total_client()
+        for pat in [f"%/pull/{pr_num}%", f"%#{pr_num}%"]:
+            resp = (
+                client.schema("agent_work")
+                .table("conversation_messages")
+                .select("content")
+                .eq("agent_type", "developer")
+                .ilike("content", pat)
+                .order("created_at", desc=True)
+                .limit(20)
+                .execute()
+            )
+            for row in (resp.data or []):
+                content = row.get("content") or ""
+                u = _PR_URL_PAT.search(content)
+                if u and int(u.group(2)) == pr_num:
+                    logger.info("conversation_messages 매칭: #%d → %s", pr_num, u.group(1))
+                    return (u.group(1), pr_num)
+    except Exception as e:
+        logger.warning("conversation_messages PR 검색 실패: %s", e)
+
     return None
 
 
@@ -947,8 +1058,9 @@ def merge_pending_pr(
             commit_title=pr_title,
         )
         if result.get("merged"):
-            # 머지 성공 — 추적 해제 (있었다면)
+            # 머지 성공 — 추적 해제 (있었다면) + DB history 도 업데이트
             _recent_pr.pop(conversation_id, None)
+            _mark_pr_merged(repo, pr_number)
             return (
                 f"✅ **PR #{pr_number} 머지 완료** (`{repo}`)\n\n"
                 f"🔗 {pr_url}\n"
