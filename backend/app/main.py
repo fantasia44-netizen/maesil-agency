@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import alert_channels, alerts, auth_router, chat, health, programs, secrets_router, widgets
+from app.routers import alert_channels, alerts, auth_router, chat, cs, health, programs, secrets_router, widgets
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +69,7 @@ app.include_router(chat.router)
 app.include_router(programs.router)
 app.include_router(alert_channels.router)
 app.include_router(alerts.router)
+app.include_router(cs.router)
 
 
 @app.get("/")
