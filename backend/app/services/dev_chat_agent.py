@@ -62,11 +62,75 @@ def _save_pr_history(
         logger.warning("dev_pr_history 저장 실패: %s", e)
 
 
+def _auto_ack_alerts_for_pr(repo: str, pr_number: int, pr_title: str | None,
+                             file_path: str | None) -> int:
+    """PR 머지 시 관련 미확인 알림 자동 확인 처리.
+    같은 프로그램(repo 기준)의 미확인 alert_events 중 file_path/module 관련된 것 ack.
+    반환: ack 처리한 알림 수."""
+    try:
+        client = get_maesil_total_client()
+        # repo → program_name 매핑 (program_registry)
+        prog_resp = (
+            client.schema("agent_work").table("program_registry")
+            .select("name")
+            .eq("github_repo", repo)
+            .execute()
+        )
+        program_names = [r["name"] for r in (prog_resp.data or [])]
+        if not program_names:
+            return 0
+
+        now = datetime.now(timezone.utc).isoformat()
+        ack_count = 0
+
+        # 모듈명 힌트 (file_path에서 추출)
+        module_hints: list[str] = []
+        if file_path:
+            # services/naver_ad/repository.py → ['naver_ad', 'repository']
+            parts = file_path.replace(".py", "").replace("/", ".").split(".")
+            module_hints = [p for p in parts if len(p) > 3]
+
+        for prog_name in program_names:
+            # 미확인 알림 조회
+            alerts_resp = (
+                client.schema("agent_work").table("alert_events")
+                .select("id, title, message")
+                .eq("program_name", prog_name)
+                .is_("acknowledged_at", "null")
+                .order("created_at", desc=True)
+                .limit(50)
+                .execute()
+            )
+            for alert in (alerts_resp.data or []):
+                content = f"{alert.get('title', '')} {alert.get('message', '')}".lower()
+                # 관련 알림인지 판단: 모듈 힌트 or PR 제목 키워드
+                is_related = any(h.lower() in content for h in module_hints)
+                if not is_related and pr_title:
+                    # PR 제목의 주요 키워드 매칭
+                    title_words = [w for w in re.split(r'\W+', pr_title) if len(w) > 4]
+                    is_related = any(w.lower() in content for w in title_words[:5])
+                if is_related:
+                    try:
+                        client.schema("agent_work").table("alert_events").update(
+                            {"acknowledged_at": now,
+                             "acknowledged_note": f"PR #{pr_number} 머지로 자동 확인 처리"}
+                        ).eq("id", alert["id"]).execute()
+                        ack_count += 1
+                        logger.info("alert 자동 ack [%s]: alert_id=%s (PR #%d)",
+                                    prog_name, alert["id"], pr_number)
+                    except Exception as e:
+                        logger.warning("alert ack 실패 [%s]: %s", alert["id"], e)
+
+        return ack_count
+    except Exception as e:
+        logger.warning("_auto_ack_alerts_for_pr 실패: %s", e)
+        return 0
+
+
 def _mark_pr_merged(repo: str, pr_number: int, pr_url: str | None = None,
                     pr_title: str | None = None) -> None:
-    """PR 머지 완료를 DB 에 마킹.
-    UPDATE 가 0행 매칭일 수 있으므로 (행 자체가 없는 경우) UPSERT 로 처리.
-    응답 로그까지 남겨서 디버깅 가능."""
+    """PR 머지 완료를 DB 에 마킹 + 관련 미확인 알림 자동 확인 처리.
+    UPDATE 가 0행 매칭일 수 있으므로 (행 자체가 없는 경우) UPSERT 로 처리."""
     payload = {
         "repo": repo,
         "pr_number": pr_number,
@@ -95,7 +159,6 @@ def _mark_pr_merged(repo: str, pr_number: int, pr_url: str | None = None,
 
         # 2) UPDATE 가 0행이면 (ex: 백필 안 된 PR) UPSERT 로 INSERT
         if updated_rows == 0:
-            # conversation_id 는 머지 시점엔 알 수 없으니 'merged-only' 로 표시
             payload.setdefault("conversation_id", "merged-only")
             payload.setdefault("pr_url", pr_url or f"https://github.com/{repo}/pull/{pr_number}")
             ins = (
@@ -107,6 +170,27 @@ def _mark_pr_merged(repo: str, pr_number: int, pr_url: str | None = None,
             )
             logger.info("_mark_pr_merged UPSERT fallback %s#%d: %s",
                         repo, pr_number, ins.data)
+
+        # 3) 관련 미확인 알림 자동 ack
+        # file_path 는 dev_pr_history 에서 조회
+        file_path: str | None = None
+        try:
+            hist = (
+                get_maesil_total_client()
+                .schema("agent_work").table("dev_pr_history")
+                .select("file_path").eq("repo", repo).eq("pr_number", pr_number)
+                .limit(1).execute()
+            )
+            rows = hist.data or []
+            if rows:
+                file_path = rows[0].get("file_path")
+        except Exception:
+            pass
+
+        acked = _auto_ack_alerts_for_pr(repo, pr_number, pr_title, file_path)
+        if acked:
+            logger.info("PR #%d 머지 → 관련 알림 %d개 자동 확인 처리", pr_number, acked)
+
     except Exception as e:
         logger.exception("dev_pr_history merged 마킹 실패: %s", e)
 
