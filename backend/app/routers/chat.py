@@ -154,12 +154,24 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
     msg_lower = req.message.lower().strip()
 
     # ── 1. 개발 에이전트 라우팅 (super_admin 전용) ──────────────────
-    # 이전 대화 맥락 확인: 마지막 에이전트가 developer면 계속 developer로
+    # 우선순위:
+    #   (a) 진행 중인 pending 액션 있음 → 무조건 dev (가장 강한 신호)
+    #   (b) 직전 에이전트가 developer → 대화 맥락 유지
+    #   (c) 메시지에 dev 키워드 또는 LLM 판단 yes
+    has_pending_dev_action = (
+        user.is_super_admin and conversation_id in dev_chat_agent._pending
+    )
+    # 알림에서 시작된 대화(alert-{alert_id})는 항상 dev 컨텍스트
+    is_alert_conversation = (
+        user.is_super_admin and conversation_id.startswith("alert-")
+    )
     is_dev_context = (
         user.is_super_admin and
         _last_agent_in_conversation(conversation_id) == "developer"
     )
     is_dev = user.is_super_admin and (
+        has_pending_dev_action or
+        is_alert_conversation or
         is_dev_context or
         any(k in msg_lower for k in DEV_KEYWORDS) or
         _is_dev_intent(req.message)
