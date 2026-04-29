@@ -106,23 +106,49 @@ def _save_github_repo_to_db(program_name: str, github_repo: str) -> None:
 
 
 def _extract_file_paths(text: str) -> list[str]:
-    """스택트레이스/로그 및 유저 메시지에서 파일 경로 패턴 추출."""
+    """스택트레이스/로그 및 유저 메시지에서 파일 경로 패턴 추출.
+
+    지원 형식:
+    - Python traceback: File "..."
+    - 직접 경로: app/foo/bar.py
+    - JSON 로그: "module": "..."
+    - Python logger 점 표기: services.naver_ad.repository (→ services/naver_ad/repository.py)
+    """
     patterns = [
-        r'File "([^"]+\.py)"',                      # Python traceback
-        r'at ([^\s]+\.py):',                         # 일반
-        r'`([a-zA-Z_][a-zA-Z0-9_/]+\.py)`',        # 백틱으로 감싼 경로 (유저 직접 입력)
-        r'([a-zA-Z_][a-zA-Z0-9_/]+\.py)',           # 단순 .py 경로
-        r'([a-zA-Z_/]+\.(ts|tsx|js|jsx))',          # JS/TS
-        r'"module":\s*"([a-zA-Z_][a-zA-Z0-9_/]+)"', # JSON 로그: "module": "repository"
-        r'module["\s:=]+([a-zA-Z_][a-zA-Z0-9_/]+)', # module=xxx
+        r'File "([^"]+\.py)"',                          # Python traceback
+        r'at ([^\s]+\.py):',                             # 일반
+        r'`([a-zA-Z_][a-zA-Z0-9_/]+\.py)`',            # 백틱
+        r'([a-zA-Z_][a-zA-Z0-9_/]+\.py)',               # 단순 .py
+        r'([a-zA-Z_/]+\.(ts|tsx|js|jsx))',              # JS/TS
+        r'"module":\s*"([a-zA-Z_][a-zA-Z0-9_/.]+)"',   # JSON 로그
+        r'module["\s:=]+([a-zA-Z_][a-zA-Z0-9_/.]+)',   # module=xxx
+        # Python logger 점 표기: 'services.naver_ad.repository:' or 'app.foo.bar -'
+        r'(?:^|[\s\[])([a-z_][a-z0-9_]*(?:\.[a-z_][a-z0-9_]+){1,5})(?=\s*[:\-])',
     ]
     found = []
     for pat in patterns:
-        for m in re.finditer(pat, text):
+        for m in re.finditer(pat, text, re.MULTILINE):
             p = m.group(1)
             # /opt/render/project/src/ 같은 prefix 제거
             p = re.sub(r'^.*?/src/', '', p)
             p = re.sub(r'^.*?/project/', '', p)
+
+            # Python 점 표기(파일 확장자 없음, 점 포함) → 슬래시 변환
+            if '.py' not in p and '.' in p and '/' not in p:
+                slashed = p.replace('.', '/') + '.py'
+                # 점 표기는 패키지 루트가 app/ 또는 src/ 일 수도 있으므로 후보 다양화
+                dot_candidates = [
+                    slashed,
+                    f"app/{slashed}",
+                    f"src/{slashed}",
+                    f"backend/{slashed}",
+                    f"backend/app/{slashed}",
+                ]
+                for c in dot_candidates:
+                    if c not in found:
+                        found.append(c)
+                continue
+
             # 모듈명 → 파일 경로 후보 생성
             base = p.replace('.py', '').replace('.ts', '').replace('.tsx', '').replace('.js', '')
             candidates = [p] if '.' in p or '/' in p else [
@@ -143,7 +169,7 @@ def _extract_file_paths(text: str) -> list[str]:
             for c in candidates:
                 if c not in found:
                     found.append(c)
-    return found[:8]  # 최대 8개 (후보 포함)
+    return found[:12]  # 최대 12개 (점 표기 후보 포함)
 
 
 def _detect_program_from_text(text: str, programs: list[dict]) -> dict | None:
@@ -455,7 +481,7 @@ PR제목: <간단한 제목>
             f"레포 `{repo_tried}` 에서 `{failing_symbol}` 관련 파일을 찾지 못했습니다.\n\n"
             f"**시도한 경로 ({len(file_paths or [])}개):** {tried_paths_str}\n"
             f"**code search 쿼리:** `class {cls_name_s}`, `{cls_name_s}`\n"
-            f"**루트 동적 탐색:** 실제 레포 디렉터리 2레벨까지 Python 파일 내용 검사\n\n"
+            f"**전체 tree 재귀 탐색:** 레포 모든 .py 파일에서 클래스명/심볼 매칭 시도\n\n"
             f"**직접 경로를 알려주시면 바로 읽겠습니다:**\n"
             f"- `repository.py 파일 분석해줘`\n"
             f"- `app/repository.py 파일 읽어봐`\n"
