@@ -292,94 +292,64 @@ def analyze_and_propose(
                     if file_info:
                         break
 
-            # 3차 폴백: 루트 동적 탐색 (비코드 디렉터리 스킵 + 시간 제한)
+            # 3차 폴백: 레포 전체 tree (recursive=1)에서 깊이 무관 탐색
             if not file_info and failing_symbol:
-                import time as _time
-                cls_lower = failing_symbol.split(".")[0].lower()
-                _t0 = _time.monotonic()
-                MAX_SECS = 18  # 전체 3차 탐색 제한 시간
+                cls_orig = failing_symbol.split(".")[0]
+                cls_lower = cls_orig.lower()
+                cls_snake = re.sub(r'(?<!^)(?=[A-Z])', '_', cls_orig).lower()
 
-                # 건너뛸 비코드 디렉터리
-                SKIP_DIRS = {
-                    '.claude', '.git', '.github', 'doc', 'docs', 'logo', 'data',
-                    'node_modules', '__pycache__', 'static', 'assets', 'images',
-                    'public', 'dist', 'build', 'test', 'tests', 'spec',
-                }
-                # 높은 우선순위 키워드 (Python 패키지일 가능성 높음)
-                HIGH_PRI = {'app', 'src', 'lib', 'core', 'service', 'model',
-                            'blueprint', 'api', 'backend', 'module', 'pkg'}
+                SKIP_DIR_TOKENS = (
+                    'node_modules/', '__pycache__/', '.git/', '.github/',
+                    'dist/', 'build/', 'static/', 'assets/', 'images/',
+                    'public/', 'doc/', 'docs/', 'logo/',
+                )
 
-                all_py_candidates: list[str] = []
-
-                # 루트 탐색
-                root_dirs: list[str] = []
                 try:
-                    root_entries = github_client.list_dir_entries(repo, "", branch)
-                    root_dirs_raw = [e["path"] for e in root_entries if e["type"] == "dir"]
-                    all_py_candidates.extend(
-                        e["path"] for e in root_entries
-                        if e["type"] == "file" and e["path"].endswith(".py")
-                    )
-                    # 비코드 디렉터리 제외 + 우선순위 정렬
-                    def _dir_priority(d: str) -> int:
-                        n = d.lower()
-                        if n in SKIP_DIRS or n.startswith('.'):
-                            return 999
-                        if any(kw in n for kw in HIGH_PRI):
-                            return 0
-                        return 50
-                    root_dirs = sorted(
-                        [d for d in root_dirs_raw if d.lower() not in SKIP_DIRS
-                         and not d.startswith('.')],
-                        key=_dir_priority,
-                    )[:8]  # 최대 8개
-                    logger.warning("루트 디렉터리 발견: %s", root_dirs_raw)
-                    logger.warning("탐색 순서: %s", root_dirs)
+                    all_paths = github_client.get_repo_tree(repo, branch)
                 except Exception as e:
-                    logger.warning("루트 탐색 실패: %s", e)
+                    logger.warning("get_repo_tree 실패: %s", e)
+                    all_paths = []
 
-                # 각 루트 디렉터리 → 1레벨만 (서브디렉터리 재귀 없음)
-                for d in root_dirs:
-                    if _time.monotonic() - _t0 > MAX_SECS:
-                        logger.warning("3차: 시간 초과 (%ds)", MAX_SECS)
-                        break
-                    try:
-                        d_entries = github_client.list_dir_entries(repo, d, branch)
-                        # 이 디렉터리의 .py 파일
-                        all_py_candidates.extend(
-                            e["path"] for e in d_entries
-                            if e["type"] == "file" and e["path"].endswith(".py")
-                        )
-                        # 서브디렉터리도 1단계만 (최대 3개, 시간 초과 주의)
-                        sub_dirs_here = [e["path"] for e in d_entries if e["type"] == "dir"][:3]
-                        for sub_d in sub_dirs_here:
-                            if _time.monotonic() - _t0 > MAX_SECS:
-                                break
-                            try:
-                                sub_files = github_client.list_files(repo, sub_d, branch)
-                                all_py_candidates.extend(f for f in sub_files if f.endswith(".py"))
-                            except Exception:
-                                pass
-                    except Exception:
-                        continue
+                # .py만, 비코드 디렉터리 제외
+                py_paths = [
+                    p for p in all_paths
+                    if p.endswith(".py") and not any(tok in p for tok in SKIP_DIR_TOKENS)
+                ]
+                logger.warning("3차: tree 전체 .py %d개 (전체 %d경로)", len(py_paths), len(all_paths))
 
-                # 내용 검사 (이미 시도한 경로 제외, 최대 20개)
+                # 우선순위: 파일명이 클래스명(snake/lower)과 일치 > 부분 포함 > 나머지
+                def _path_priority(p: str) -> int:
+                    fname = p.rsplit("/", 1)[-1].lower()
+                    stem = fname[:-3]
+                    if stem == cls_snake or stem == cls_lower:
+                        return 0
+                    if cls_snake in stem or cls_lower in stem:
+                        return 1
+                    return 2
+                py_paths.sort(key=_path_priority)
+
                 tried_paths = set(file_paths)
-                for candidate in all_py_candidates[:20]:
-                    if _time.monotonic() - _t0 > MAX_SECS:
-                        logger.warning("3차: 파일 읽기 시간 초과")
-                        break
+                # 우선순위 0/1은 모두, 2는 최대 15개까지 내용 검사
+                checked = 0
+                for candidate in py_paths:
                     if candidate in tried_paths:
                         continue
                     tried_paths.add(candidate)
+                    pri = _path_priority(candidate)
+                    if pri == 2 and checked >= 15:
+                        break
+                    checked += 1
                     try:
                         f = github_client.get_file(repo, candidate, branch)
-                        if cls_lower in f["content"].lower():
-                            snippet = _extract_relevant_section(f["content"], failing_symbol)
+                        content = f["content"]
+                        # 클래스/함수 정의 또는 단순 포함 확인
+                        if (re.search(r'(?:class|def)\s+' + re.escape(cls_orig) + r'\b', content)
+                                or cls_lower in content.lower()):
+                            snippet = _extract_relevant_section(content, failing_symbol)
                             code_context += f"\n\n### {candidate}\n```\n{snippet}\n```"
                             file_info = {"repo": repo, "path": candidate, "sha": f["sha"],
-                                         "branch": branch, "original": f["content"]}
-                            logger.warning("3차(동적) 파일 발견: %s", candidate)
+                                         "branch": branch, "original": content}
+                            logger.warning("3차(tree) 파일 발견: %s (priority=%d)", candidate, pri)
                             break
                     except Exception:
                         continue
