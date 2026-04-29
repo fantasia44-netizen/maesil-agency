@@ -1067,7 +1067,9 @@ def execute_pending(conversation_id: str) -> str:
 _PR_URL_PAT = re.compile(
     r"https?://github\.com/([\w.-]+/[\w.-]+)/pull/(\d+)"
 )
-_PR_HASH_PAT = re.compile(r"(?:^|[\s\(])#(\d+)\b")
+# 우측 경계는 \b 가 한글에선 작동 안 함 (한글이 \w 에 포함) →
+# negative lookahead 로 '뒤에 또 다른 숫자만 아니면 OK' 정의
+_PR_HASH_PAT = re.compile(r"(?:^|[\s\(\[])#(\d+)(?!\d)")
 
 
 def _extract_pr_reference(
