@@ -771,6 +771,41 @@ def analyze_and_propose(
         full_text += " ".join(m.get("content", "") for m in context_messages[-4:])
     failing_symbol = _extract_error_function(full_text)
 
+    # ── 1순위: 이력 우선 조회 ─────────────────────────────────────────
+    # 같은 심볼/프로그램에 대해 이미 머지된 PR이 있으면 분석 시작 전에 바로 반환.
+    # "이미 수정됐는데 또 분석하는" 낭비 차단.
+    if failing_symbol and program and program.get("github_repo"):
+        repo_for_check = program["github_repo"]
+        already_fixed = _find_overlapping_prs(
+            repo_for_check, None, None, failing_symbol=failing_symbol
+        )
+        merged_prs = [p for p in already_fixed if p.get("status") == "merged"]
+        if merged_prs:
+            latest = merged_prs[0]
+            pr_num = latest.get("pr_number", "?")
+            pr_url = latest.get("pr_url", "")
+            pr_title = latest.get("pr_title", "")
+            merged_at = latest.get("merged_at") or latest.get("created_at") or ""
+            merged_at_str = ""
+            if merged_at:
+                try:
+                    dt = datetime.fromisoformat(merged_at.replace("Z", "+00:00"))
+                    merged_at_str = dt.strftime("%m/%d %H:%M")
+                except Exception:
+                    merged_at_str = merged_at[:16]
+            logger.info("이미 수정된 이슈 — 분석 스킵: %s → PR #%s (%s)",
+                        failing_symbol, pr_num, repo_for_check)
+            return (
+                f"## ✅ 이미 수정된 이슈입니다\n\n"
+                f"**`{failing_symbol}`** 관련 수정이 이미 머지됐습니다.\n\n"
+                f"- **PR #{pr_num}**: {pr_title}\n"
+                f"- 🔗 {pr_url}\n"
+                f"- 머지 시각: {merged_at_str}\n\n"
+                f"이 알림은 PR 머지 **이전**에 발생한 에러입니다.\n"
+                f"현재 코드에는 수정이 반영된 상태이므로 추가 조치가 필요 없습니다.\n\n"
+                f"> 동일 에러가 머지 이후에도 계속 발생한다면 다시 알려주세요."
+            )
+
     # 코드 컨텍스트 수집
     code_context = ""
     file_info: dict | None = None
