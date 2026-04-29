@@ -38,6 +38,18 @@ EXCLUDE_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"no data", re.I),
     re.compile(r"(trapped).*bcrypt", re.I),   # passlib bcrypt 버전 경고
     re.compile(r"error reading bcrypt", re.I),
+    # graceful shutdown (배포 시 정상)
+    re.compile(r"SHUTDOWN_EVENT\s+set", re.I),
+    re.compile(r"신호\s*15\s*수신", re.I),
+    re.compile(r"graceful shutdown", re.I),
+    re.compile(r"\bSIGTERM\b"),
+    # pip install 로그 (deprecated 키워드 잡혀서 들어옴)
+    re.compile(r"^\s*Using cached\b", re.I),
+    re.compile(r"^\s*Collecting\b.*deprecated", re.I),
+    re.compile(r"^\s*Downloading\b.*\.whl", re.I),
+    # 에러 알림 메일 발송 로그가 다시 잡히는 피드백 루프 차단
+    re.compile(r"이메일\s*발송\s*(성공|완료)", re.I),
+    re.compile(r'"msg":\s*"이메일\s*발송', re.I),
 ]
 
 # 에러 패턴 → severity 매핑 (위에서부터 우선)
