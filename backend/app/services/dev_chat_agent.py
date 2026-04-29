@@ -365,10 +365,14 @@ def _all_programs() -> list[dict]:
 def _extract_error_function(text: str) -> str | None:
     """로그 메시지에서 실패한 클래스/함수명 추출.
     예: '[AgencyLog] start 예외' → 'AgencyLog.start'
+    예: '[Scheduler] auto_recovery 실패' → 'Scheduler.auto_recovery'
     예: 'AgencyLog.start failed' → 'AgencyLog.start'
     """
-    # [ClassName] method 예외 패턴 (가장 흔한 패턴)
-    m = re.search(r'\[([A-Z][a-zA-Z0-9_]+)\]\s+(\w+)\s+예외', text)
+    # [ClassName] method 예외|실패|오류|에러|error|failed 패턴 (가장 흔한 패턴)
+    m = re.search(
+        r'\[([A-Z][a-zA-Z0-9_]+)\]\s+(\w+)\s+(예외|실패|오류|에러|error|failed)',
+        text, re.I
+    )
     if m:
         return f"{m.group(1)}.{m.group(2)}"
     # ClassName.method_name 패턴
