@@ -31,6 +31,9 @@ APPROVE_KEYWORDS = {"승인", "실행", "확인", "ok", "yes", "ㅇㅋ", "적용
 # 메모리 내 pending actions (프로세스 수명 동안 유지)
 # { conversation_id: { action_id, repo, branch, path, new_content, sha, pr_title, pr_body, commit_msg } }
 _pending: dict[str, dict[str, Any]] = {}
+# 최근 생성된 PR — 같은 대화에서 '머지' 명령으로 바로 머지 가능
+# { conversation_id: {repo, pr_number, pr_url, pr_title, created_at} }
+_recent_pr: dict[str, dict[str, Any]] = {}
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -828,19 +831,65 @@ def execute_pending(conversation_id: str) -> str:
             base=base,
         )
 
-        # 완료 후 삭제
+        # 완료 후 삭제 + 머지용 정보 보관
         del _pending[conversation_id]
+        _recent_pr[conversation_id] = {
+            "repo": repo,
+            "pr_number": pr["number"],
+            "pr_url": pr["html_url"],
+            "pr_title": action["pr_title"],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
 
         return (
             f"✅ **PR 생성 완료**\n\n"
             f"**{action['pr_title']}**\n"
             f"🔗 {pr['html_url']}\n\n"
-            f"PR을 검토 후 머지하면 Render가 자동 재배포합니다."
+            f"검토 후 `머지` 입력하면 자동으로 머지 + Render 재배포 시작됩니다.\n"
+            f"또는 GitHub UI 에서 직접 `Merge pull request` 클릭."
         )
 
     except Exception as e:
         logger.exception("execute_pending 실패")
         return f"❌ PR 생성 실패: {e}"
+
+
+def merge_pending_pr(conversation_id: str) -> str:
+    """대화에서 가장 최근 생성된 PR 머지. 안전 가드 포함."""
+    info = _recent_pr.get(conversation_id)
+    if not info:
+        return (
+            "⚠️ 머지할 PR 이 없습니다. 이 대화에서 PR 을 먼저 생성해주세요.\n"
+            "(`승인` 으로 PR 생성 후 → `머지` 입력)"
+        )
+
+    repo = info["repo"]
+    pr_number = info["pr_number"]
+
+    try:
+        result = github_client.merge_pull_request(
+            repo=repo,
+            pr_number=pr_number,
+            method="squash",
+            commit_title=info["pr_title"],
+        )
+        if result.get("merged"):
+            # 머지 성공 — 더 이상 머지할 게 없으니 추적 해제
+            _recent_pr.pop(conversation_id, None)
+            return (
+                f"✅ **PR #{pr_number} 머지 완료**\n\n"
+                f"🔗 {info['pr_url']}\n"
+                f"sha: `{result.get('sha', '?')[:8]}`\n\n"
+                f"Render 가 자동으로 재배포를 시작합니다 (~2~3분)."
+            )
+        return f"⚠️ 머지 응답 이상: {result}"
+    except Exception as e:
+        logger.warning("merge_pending_pr 실패: %s", e)
+        return (
+            f"❌ PR #{pr_number} 머지 실패\n\n"
+            f"사유: `{str(e)[:300]}`\n\n"
+            f"GitHub UI 에서 직접 머지: {info['pr_url']}"
+        )
 
 
 def preview_pending(conversation_id: str) -> str:
@@ -915,7 +964,14 @@ def is_cancel(text: str) -> bool:
     return any(k in t for k in {"취소", "cancel", "no", "아니", "ㄴ"}) and len(t) < 10
 
 
+def is_merge(text: str) -> bool:
+    """짧은 머지 명령 감지 (생성된 PR이 있을 때만 라우터에서 처리)."""
+    t = text.strip().lower()
+    return any(k in t for k in {"머지", "merge", "머지해", "머지하자", "merge it"}) and len(t) < 20
+
+
 __all__ = [
     "analyze_and_propose", "execute_pending", "preview_pending",
-    "cancel_pending", "is_approve", "is_preview", "is_cancel",
+    "cancel_pending", "merge_pending_pr",
+    "is_approve", "is_preview", "is_cancel", "is_merge",
 ]

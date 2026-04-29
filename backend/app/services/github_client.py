@@ -377,9 +377,91 @@ def create_pr(
     return {"number": data["number"], "html_url": data["html_url"]}
 
 
+def get_pr_status(repo: str, pr_number: int) -> dict:
+    """PR 상태/머지 가능성 조회.
+    Returns: { state, mergeable, mergeable_state, merged, head_sha, html_url, base_branch }
+    - state: 'open' | 'closed'
+    - mergeable: True/False/None (None = GitHub 가 계산 중)
+    - mergeable_state: 'clean' | 'dirty' | 'blocked' | 'unstable' | 'behind' | 'unknown'
+    """
+    r = httpx.get(
+        f"{BASE}/repos/{repo}/pulls/{pr_number}",
+        headers=_headers(),
+        timeout=15,
+    )
+    r.raise_for_status()
+    d = r.json()
+    return {
+        "state": d.get("state"),
+        "mergeable": d.get("mergeable"),
+        "mergeable_state": d.get("mergeable_state"),
+        "merged": d.get("merged", False),
+        "head_sha": d.get("head", {}).get("sha"),
+        "html_url": d.get("html_url"),
+        "base_branch": d.get("base", {}).get("ref"),
+        "title": d.get("title"),
+    }
+
+
+def merge_pull_request(
+    repo: str,
+    pr_number: int,
+    method: str = "squash",   # 'merge' | 'squash' | 'rebase'
+    commit_title: str | None = None,
+    commit_message: str | None = None,
+) -> dict:
+    """PR 머지. 안전 가드 포함:
+    - 이미 머지됐으면 idempotent (같은 결과 반환)
+    - mergeable = False / state != 'open' 이면 RuntimeError
+    Returns: { merged, sha, message, html_url }
+    """
+    # 1) 사전 상태 체크
+    status = get_pr_status(repo, pr_number)
+    if status["merged"]:
+        return {
+            "merged": True, "sha": status["head_sha"],
+            "message": f"PR #{pr_number} 는 이미 머지됨",
+            "html_url": status["html_url"],
+        }
+    if status["state"] != "open":
+        raise RuntimeError(f"PR #{pr_number} 는 open 상태가 아님 (state={status['state']})")
+    if status["mergeable"] is False:
+        raise RuntimeError(
+            f"PR #{pr_number} 머지 불가 (mergeable_state={status['mergeable_state']}). "
+            "충돌 해결 또는 CI 통과 필요."
+        )
+    # mergeable is None — GitHub 가 계산 중. 한 번 더 시도해볼 만함
+
+    # 2) 머지 호출
+    payload: dict = {"merge_method": method}
+    if commit_title:
+        payload["commit_title"] = commit_title
+    if commit_message:
+        payload["commit_message"] = commit_message
+
+    r = httpx.put(
+        f"{BASE}/repos/{repo}/pulls/{pr_number}/merge",
+        headers=_headers(),
+        json=payload,
+        timeout=20,
+    )
+    if r.status_code == 200:
+        d = r.json()
+        return {
+            "merged": True, "sha": d.get("sha"),
+            "message": d.get("message", "merged"),
+            "html_url": status["html_url"],
+        }
+    # 405/409 등은 명확한 사유 함께 반환
+    raise RuntimeError(
+        f"PR #{pr_number} 머지 실패: HTTP {r.status_code} — {r.text[:300]}"
+    )
+
+
 __all__ = [
     "get_file", "list_files", "list_dir_entries", "get_default_branch",
     "get_repo_tree", "find_file_in_repo", "search_code_in_repo",
     "list_user_repos", "find_repo_by_name",
     "get_recent_commits", "create_branch", "commit_file", "create_pr",
+    "get_pr_status", "merge_pull_request",
 ]

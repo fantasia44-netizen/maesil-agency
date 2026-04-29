@@ -232,6 +232,7 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
     is_approve  = user.is_super_admin and dev_chat_agent.is_approve(req.message)
     is_preview  = user.is_super_admin and dev_chat_agent.is_preview(req.message)
     is_cancel   = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
+    is_merge_cmd = user.is_super_admin and dev_chat_agent.is_merge(req.message)
 
     if is_preview and conversation_id in dev_chat_agent._pending:
         response_text = dev_chat_agent.preview_pending(conversation_id)
@@ -239,6 +240,10 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
 
     elif is_approve and conversation_id in dev_chat_agent._pending:
         response_text = dev_chat_agent.execute_pending(conversation_id)
+        agent_type = "developer"
+
+    elif is_merge_cmd and conversation_id in dev_chat_agent._recent_pr:
+        response_text = dev_chat_agent.merge_pending_pr(conversation_id)
         agent_type = "developer"
 
     elif is_cancel:
