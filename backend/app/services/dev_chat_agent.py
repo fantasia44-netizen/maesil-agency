@@ -79,41 +79,122 @@ def _extract_error_function(text: str) -> str | None:
     return None
 
 
-def _extract_relevant_section(content: str, target_symbol: str, window_lines: int = 200) -> str:
-    """파일에서 target_symbol(클래스/함수)이 정의된 섹션을 추출.
+# 코드 컨텍스트 크기 정책
+# Claude Sonnet 4.6 context = 200k tokens (~600k chars). 충분히 여유 있음.
+# - 작은/중간 파일은 전체 (~30k자) → 함수 호출 그래프·imports 모두 포함
+# - 큰 파일은 메서드를 포함한 클래스 전체 추출 → 그래도 한도 초과면 앞부분 잘라서 송신
+_FULL_FILE_THRESHOLD = 30_000   # 이 이하면 전체 파일 송신
+_MAX_SECTION_CHARS  = 50_000   # 추출 섹션의 절대 상한
 
-    탐색 순서:
-      1) class/def <ClassPart> 정의 (예: 'class SyncLog')
-      2) def <MethodPart> (예: 'def start') — 클래스가 로그태그라 정의 없을 때
-      3) 파일 길이가 6000자 이하면 전체 반환, 아니면 앞 6000자
 
-    못 찾으면 잘라도 잘리지 않게 충분한 윈도우 + 전체 보존 우선.
+def _find_enclosing_class_block(lines: list[str], method_line_idx: int) -> tuple[int, int] | None:
+    """method 라인 위쪽으로 올라가며 'class X:' 라인 찾고, 다음 class/def(0-indent)까지 범위 반환."""
+    # 메서드의 들여쓰기 깊이 — 클래스 안의 메서드면 보통 4
+    method_line = lines[method_line_idx]
+    method_indent = len(method_line) - len(method_line.lstrip())
+
+    if method_indent == 0:
+        return None  # top-level 함수 — 클래스 없음
+
+    # 위로 올라가며 같은/낮은 들여쓰기의 'class ' 찾기
+    class_idx = None
+    for i in range(method_line_idx - 1, -1, -1):
+        line = lines[i]
+        stripped = line.lstrip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        line_indent = len(line) - len(stripped)
+        if stripped.startswith("class ") and line_indent < method_indent:
+            class_idx = i
+            break
+
+    if class_idx is None:
+        return None
+
+    # 클래스 끝 — 같거나 낮은 들여쓰기의 다음 'class '/'def ' (0-indent 기준)
+    cls_indent = len(lines[class_idx]) - len(lines[class_idx].lstrip())
+    end_idx = len(lines)
+    for j in range(class_idx + 1, len(lines)):
+        line = lines[j]
+        stripped = line.lstrip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        line_indent = len(line) - len(stripped)
+        if line_indent <= cls_indent and (stripped.startswith("class ") or stripped.startswith("def ")):
+            end_idx = j
+            break
+    return (class_idx, end_idx)
+
+
+def _extract_relevant_section(content: str, target_symbol: str) -> str:
+    """파일에서 target_symbol 분석에 필요한 섹션 추출.
+
+    정책:
+      - 30k자 이하: 파일 전체 (호출 그래프·imports 모두 포함)
+      - 30k자 초과: imports + 메서드를 포함한 클래스 전체 (없으면 메서드 함수)
+      - 50k자 초과: 위 추출분 50k 절단
+      - 못 찾으면 앞 50k자
     """
+    if len(content) <= _FULL_FILE_THRESHOLD:
+        return content  # 전체 송신 — 가장 정확
+
     parts = target_symbol.split(".")
     class_part = parts[0] if parts else ""
     method_part = parts[1] if len(parts) > 1 else ""
     lines = content.split("\n")
 
-    # 1) class/def <ClassPart>
+    # 큰 파일에서는 imports 머리를 같이 보내야 분석이 정확함
+    # 처음 ~60줄 (typical import block) 추출
+    header_end = 0
+    for i, line in enumerate(lines[:120]):
+        stripped = line.lstrip()
+        if (stripped.startswith("import ") or stripped.startswith("from ")
+                or stripped.startswith("#") or not stripped
+                or stripped.startswith('"""') or stripped.startswith("'''")
+                or stripped.startswith(")")):
+            header_end = i + 1
+        elif stripped.startswith("class ") or stripped.startswith("def "):
+            break
+    header = "\n".join(lines[:header_end])
+
+    # 1) 'class <ClassPart>:' 정의가 있으면 그 전체 클래스
     if class_part:
         for i, line in enumerate(lines):
-            if re.search(r"(?:class|def)\s+" + re.escape(class_part) + r"\b", line):
-                end = min(len(lines), i + window_lines)
-                return "\n".join(lines[i:end])
+            stripped = line.lstrip()
+            if (stripped.startswith(f"class {class_part}")
+                    or stripped.startswith(f"class {class_part}(")
+                    or stripped.startswith(f"class {class_part}:")):
+                # 다음 0-indent class/def 까지
+                end_idx = len(lines)
+                for j in range(i + 1, len(lines)):
+                    s2 = lines[j].lstrip()
+                    if not s2 or s2.startswith("#"):
+                        continue
+                    l_indent = len(lines[j]) - len(s2)
+                    if l_indent == 0 and (s2.startswith("class ") or s2.startswith("def ")):
+                        end_idx = j
+                        break
+                section = "\n".join(lines[i:end_idx])
+                merged = header + "\n\n# ─── 관련 클래스 ───\n" + section
+                return merged[:_MAX_SECTION_CHARS]
 
-    # 2) def <MethodPart> — [LogTag] method 패턴에서 진짜 메서드
+    # 2) 'def <MethodPart>(' — 그 메서드를 둘러싼 클래스 전체
     if method_part:
         for i, line in enumerate(lines):
             if re.search(r"\bdef\s+" + re.escape(method_part) + r"\s*\(", line):
-                # 메서드 위로 클래스 라인 한 줄도 포함시켜 컨텍스트 제공
-                start = max(0, i - 2)
-                end = min(len(lines), i + window_lines)
-                return "\n".join(lines[start:end])
+                rng = _find_enclosing_class_block(lines, i)
+                if rng:
+                    section = "\n".join(lines[rng[0]:rng[1]])
+                    merged = header + "\n\n# ─── 관련 클래스 ───\n" + section
+                    return merged[:_MAX_SECTION_CHARS]
+                # top-level 함수
+                end_idx = min(len(lines), i + 300)
+                section = "\n".join(lines[max(0, i - 2):end_idx])
+                merged = header + "\n\n# ─── 관련 함수 ───\n" + section
+                return merged[:_MAX_SECTION_CHARS]
 
-    # 3) 파일 짧으면 전체, 길면 앞 6000자
-    if len(content) <= 6000:
-        return content
-    return content[:6000]
+    # 3) 못 찾음 → 앞 50k자
+    return content[:_MAX_SECTION_CHARS]
 
 
 def _save_github_repo_to_db(program_name: str, github_repo: str) -> None:
