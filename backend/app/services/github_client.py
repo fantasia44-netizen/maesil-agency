@@ -103,20 +103,54 @@ def list_user_repos() -> list[str]:
 
 def find_repo_by_name(program_name: str) -> str | None:
     """프로그램 이름으로 GitHub 레포 자동 감지.
-    1차: owner/maesil-insight 형태로 정확 매칭
-    2차: 이름에 program_name 포함
+    1차: 정확 매칭 (끝부분)
+    2차: 인스턴스 번호 제거 후 정확 매칭 (예: maesil-sync-worker-1 → maesil-sync-worker)
+    3차: 포함 매칭
+    4차: 토큰 다수 일치 점수 매칭 (fuzzy)
     """
+    import re as _re
     try:
         repos = list_user_repos()
         name_lower = program_name.lower()
-        # 정확 매칭 (끝부분)
+
+        # 1차: 정확 매칭
         for repo in repos:
             if repo.lower().split("/")[-1] == name_lower:
                 return repo
-        # 포함 매칭
+
+        # 2차: 뒤쪽 -숫자 (인스턴스 번호) 제거 후 정확 매칭
+        stripped = _re.sub(r'-\d+$', '', name_lower)
+        if stripped != name_lower:
+            for repo in repos:
+                if repo.lower().split("/")[-1] == stripped:
+                    logger.info("레포 인스턴스 번호 제거 매칭: %s → %s", program_name, repo)
+                    return repo
+
+        # 3차: 포함 매칭 (양방향)
         for repo in repos:
-            if name_lower in repo.lower():
+            rname = repo.lower().split("/")[-1]
+            if name_lower in rname or rname in name_lower:
                 return repo
+        if stripped != name_lower:
+            for repo in repos:
+                rname = repo.lower().split("/")[-1]
+                if stripped in rname or rname in stripped:
+                    return repo
+
+        # 4차: 토큰 다수 일치 점수 (- 와 _ 를 토큰 구분자로)
+        tokens = {t for t in _re.split(r'[-_]', stripped) if len(t) >= 3}
+        if tokens:
+            best_repo, best_score = None, 0
+            for repo in repos:
+                rname = repo.lower().split("/")[-1]
+                rtokens = {t for t in _re.split(r'[-_]', rname) if len(t) >= 3}
+                score = len(tokens & rtokens)
+                if score > best_score:
+                    best_repo, best_score = repo, score
+            # 토큰 2개 이상 겹치거나 (전체 토큰 대비 절반 이상이면 채택)
+            if best_repo and (best_score >= 2 or best_score >= len(tokens) / 2):
+                logger.info("레포 토큰 매칭: %s → %s (score=%d)", program_name, best_repo, best_score)
+                return best_repo
     except Exception as e:
         logger.warning("레포 자동 감지 실패 [%s]: %s", program_name, e)
     return None
