@@ -261,17 +261,26 @@ def analyze_and_propose(
                         file_paths.append(extra)
 
             # 1차: 추출된 경로 후보로 직접 시도
+            # IMPORTANT: failing_symbol 이 있으면 그 심볼이 실제로 파일에 들어있는지 검증.
+            # 없으면 잘못된 후보(예: email.py에 SyncLog 없음)이므로 다음 후보로 진행.
+            cls_check = failing_symbol.split(".")[0] if failing_symbol else ""
+            cls_check_lower = cls_check.lower()
             for fp in file_paths:
                 try:
                     f = github_client.get_file(repo, fp, branch)
-                    # 실패 심볼이 있으면 해당 섹션만 추출, 없으면 앞 3000자
+                    content = f["content"]
+                    # 심볼이 명시된 경우, 본문에 포함됐는지 확인
+                    if cls_check and cls_check_lower not in content.lower():
+                        logger.info("1차 후보 %s — '%s' 미포함, skip", fp, cls_check)
+                        continue
                     snippet = (
-                        _extract_relevant_section(f["content"], failing_symbol)
-                        if failing_symbol else f["content"][:3000]
+                        _extract_relevant_section(content, failing_symbol)
+                        if failing_symbol else content[:3000]
                     )
                     code_context += f"\n\n### {fp}\n```\n{snippet}\n```"
                     file_info = {"repo": repo, "path": fp, "sha": f["sha"], "branch": branch,
-                                 "original": f["content"]}
+                                 "original": content}
+                    logger.info("1차 hit: %s (%s 포함)", fp, cls_check or "no-symbol")
                     break
                 except FileNotFoundError:
                     continue
@@ -304,13 +313,19 @@ def analyze_and_propose(
                     for candidate in found_paths[:3]:
                         try:
                             f = github_client.get_file(repo, candidate, branch)
+                            content = f["content"]
+                            # 심볼 검증 — 검색결과여도 잘못된 파일 거를 수 있음
+                            if cls_check and cls_check_lower not in content.lower():
+                                logger.info("2차 후보 %s — '%s' 미포함, skip",
+                                            candidate, cls_check)
+                                continue
                             snippet = (
-                                _extract_relevant_section(f["content"], failing_symbol)
-                                if failing_symbol else f["content"][:3000]
+                                _extract_relevant_section(content, failing_symbol)
+                                if failing_symbol else content[:3000]
                             )
                             code_context += f"\n\n### {candidate}\n```\n{snippet}\n```"
                             file_info = {"repo": repo, "path": candidate, "sha": f["sha"],
-                                         "branch": branch, "original": f["content"]}
+                                         "branch": branch, "original": content}
                             logger.warning("code search 파일 발견: %s", candidate)
                             break
                         except Exception:
