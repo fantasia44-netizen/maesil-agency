@@ -173,12 +173,49 @@ def _extract_file_paths(text: str) -> list[str]:
 
 
 def _detect_program_from_text(text: str, programs: list[dict]) -> dict | None:
-    """메시지에서 프로그램 이름 감지."""
+    """메시지에서 프로그램 이름 감지.
+
+    중요: 'maesil' 같은 짧은 이름이 'maesil-insight' 같은 긴 이름의 prefix가
+    되는 경우가 있으므로:
+      1) 이름 길이 내림차순 — 가장 구체적인 매칭부터
+      2) 단어 경계 검사 — 'maesil' 이 'maesil-insight' 의 prefix로 잘못 잡히지 않게
+         (단어 경계 = 알파벳·숫자가 아닌 문자 또는 문자열 끝)
+    """
     text_lower = text.lower()
-    for p in programs:
+
+    def _word_boundary_contains(needle: str, haystack: str) -> bool:
+        if not needle or needle not in haystack:
+            return False
+        # \b 는 일부 케이스에서 hyphen 처리가 미묘 — 직접 체크
+        idx = 0
+        nlen = len(needle)
+        while True:
+            i = haystack.find(needle, idx)
+            if i < 0:
+                return False
+            left = haystack[i - 1] if i > 0 else ""
+            right = haystack[i + nlen] if i + nlen < len(haystack) else ""
+            # 좌우가 단어 문자(알파벳/숫자/_) 가 아니면 단어 경계로 인정
+            # ('-' 도 경계로 인정 → 'maesil-insight' 의 'maesil' 은 매칭 거부)
+            def _is_word_char(c: str) -> bool:
+                return c.isalnum() or c == '_'
+            if not _is_word_char(left) and not _is_word_char(right):
+                return True
+            idx = i + 1
+
+    # 길이 내림차순 — 'maesil-sync-worker-1' 이 'maesil' 보다 먼저 검사됨
+    sorted_programs = sorted(
+        programs,
+        key=lambda p: max(len(p["name"]), len(p.get("display_name") or "")),
+        reverse=True,
+    )
+
+    for p in sorted_programs:
         name = p["name"].lower()
         display = (p.get("display_name") or "").lower()
-        if name in text_lower or (display and display in text_lower):
+        if _word_boundary_contains(name, text_lower):
+            return p
+        if display and _word_boundary_contains(display, text_lower):
             return p
     return None
 
