@@ -294,6 +294,15 @@ def _extract_error_function(text: str) -> str | None:
     return None
 
 
+def _is_logger_tag_symbol(text: str, symbol: str) -> bool:
+    """symbol이 '[ClassName] method 예외' 패턴에서 추출된 로거 태그인지 확인.
+    로거 태그이면 class 정의 검증을 건너뜀 (Scheduler, SyncLog 등은 클래스가 아님)."""
+    if not symbol:
+        return False
+    cls_part = symbol.split(".")[0]
+    return bool(re.search(r'\[' + re.escape(cls_part) + r'\]', text))
+
+
 # 코드 컨텍스트 크기 정책
 # Claude Sonnet 4.6 context = 200k tokens (~600k chars). 충분히 여유 있음.
 # - 작은/중간 파일은 전체 (~30k자) → 함수 호출 그래프·imports 모두 포함
@@ -624,16 +633,21 @@ def analyze_and_propose(
             # 1차: 추출된 경로 후보로 직접 시도
             # IMPORTANT: failing_symbol 이 있으면 그 심볼의 **정의(class/def)** 가
             # 실제로 파일에 있어야 채택. 단순 언급(로그 태그/문자열 리터럴)은 거부.
-            # 정의 없는 경우 skip → 3차 DB 미러가 basename 힌트로 정확히 찾음.
+            # 단, [ClassName] 형식의 로거 태그에서 추출된 심볼은 클래스 정의가
+            # 파일에 없어도 정상 — 경로 매칭 우선 (Scheduler, SyncLog 등 대부분 이 케이스).
             cls_check = failing_symbol.split(".")[0] if failing_symbol else ""
+            symbol_is_tag = _is_logger_tag_symbol(full_text, failing_symbol) if failing_symbol else False
             cls_def_pat = re.compile(
                 r'(?:class|def)\s+' + re.escape(cls_check) + r'\b'
-            ) if cls_check else None
+            ) if (cls_check and not symbol_is_tag) else None
+            if symbol_is_tag:
+                logger.info("로거 태그 심볼 [%s] — cls_def_pat 체크 면제, 경로 매칭 우선", cls_check)
             for fp in file_paths:
                 try:
                     f = github_client.get_file(repo, fp, branch)
                     content = f["content"]
                     # 심볼 정의 검증 — 단순 substring 매칭은 로그 문자열 등에서 오탐
+                    # (로거 태그에서 추출된 경우 이 검증 면제)
                     if cls_def_pat and not cls_def_pat.search(content):
                         logger.info("1차 후보 %s — '%s' 정의 없음, skip", fp, cls_check)
                         continue
@@ -656,11 +670,21 @@ def analyze_and_propose(
                 code_search_queries = []
                 if failing_symbol:
                     cls_name_orig = failing_symbol.split(".")[0]
-                    # 괄호 없이 클래스명 단독 검색 (대괄호는 GitHub search 특수문자)
-                    code_search_queries += [
-                        f"class {cls_name_orig}",          # class AgencyLog
-                        cls_name_orig,                     # AgencyLog (단독)
-                    ]
+                    method_name_orig = failing_symbol.split(".")[1] if "." in failing_symbol else ""
+                    if symbol_is_tag:
+                        # 로거 태그인 경우: 클래스 정의 대신 메서드명으로 검색
+                        # (예: auto_recovery, start 등 실제 함수명이 더 정확)
+                        if method_name_orig:
+                            code_search_queries += [
+                                f"def {method_name_orig}",     # def auto_recovery
+                                method_name_orig,              # auto_recovery 단독
+                            ]
+                    else:
+                        # 괄호 없이 클래스명 단독 검색 (대괄호는 GitHub search 특수문자)
+                        code_search_queries += [
+                            f"class {cls_name_orig}",          # class AgencyLog
+                            cls_name_orig,                     # AgencyLog (단독)
+                        ]
                 # 모듈명으로도 검색
                 for fp in file_paths[:2]:
                     base = fp.split("/")[-1].replace(".py", "")
