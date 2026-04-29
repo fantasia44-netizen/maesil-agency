@@ -676,8 +676,12 @@ _HALLUCINATION_PATTERNS: list[tuple[re.Pattern, str | None]] = [
     (re.compile(r"(디렉터리|폴더|경로)\s*(구조|정보|내용)[를을]?\s*(알려|보내|공유|확인)", re.I), None),
     # "스택트레이스를 보내주세요", "전체 로그를 보내주세요"
     (re.compile(r"(스택트레이스|스택\s*트레이스|전체\s*로그|full\s*log)[를을]?\s*(보내|공유|첨부|알려)", re.I), None),
-    # "import된 함수인지 ... 알고 계신가요?"
+    # "알고 계신가요?", "요청드리고 싶은 것", 간접 요청 패턴
     (re.compile(r"알고\s*(계신가요|계세요|있으신가요|있으세요)\s*[?？]?", re.I), None),
+    (re.compile(r"요청드리고\s*싶", re.I), None),
+    (re.compile(r"(전달|제공|확인)\s*된다면\s*.{0,20}(분석|확인|파악)\s*(가능|드릴)", re.I), None),
+    (re.compile(r"(완전히\s*)?전달된다면", re.I), None),
+    (re.compile(r"다음\s*(알림|로그|에러)[에서]?\s*(완전히|전체|full)", re.I), None),
 ]
 
 

@@ -429,26 +429,94 @@ def chat_from_alert(
     import json as _json, re as _re
     _email_wrap = _re.search(r'"msg":\s*"이메일 발송 성공[^"]*maesil-agency[^"]*({.+})"', body or title)
     if not _email_wrap:
-        # 이메일 발송 성공 패턴이 title에 있는 경우 (body가 truncated일 때)
         _email_wrap2 = _re.search(r'이메일 발송 성공.*?(\{[^}]+level.*?\})', body or title, _re.DOTALL)
     else:
         _email_wrap2 = None
+
     _inner_error = ""
+    _inner_module = ""
     for _m in [_email_wrap, _email_wrap2]:
         if _m:
             try:
                 _inner = _json.loads(_m.group(1))
+                _inner_module = _inner.get('module', '')
                 _inner_error = (
                     f"\n\n[실제 에러 (이메일 알림 내부 추출)]\n"
-                    f"module: {_inner.get('module', '?')}\n"
+                    f"module: {_inner_module or '?'}\n"
                     f"msg: {_inner.get('msg', '?')}\n"
                     f"level: {_inner.get('level', '?')}\n"
                     f"ts: {_inner.get('ts', '?')}"
                 )
-                logger.info("이메일 래퍼 알림: 내부 에러 추출 성공 — module=%s", _inner.get('module'))
+                logger.info("이메일 래퍼 알림: 내부 에러 추출 성공 — module=%s", _inner_module)
             except Exception:
                 pass
             break
+
+    # 이메일 래퍼이고 내부 모듈을 알 수 있으면 — 이미 수정된 이슈인지 먼저 확인
+    if not _inner_module:
+        # 잘린 경우에도 앞 부분으로 추출 시도 ("reposito" → "repository" 등)
+        _mod_partial = _re.search(r'"module":\s*"([a-z_A-Z0-9.]+)', body or title)
+        if _mod_partial:
+            _inner_module = _mod_partial.group(1)
+
+    if _inner_module and prog and prog != "(프로그램 미특정)":
+        # dev_pr_history에서 내부 모듈 관련 머지된 PR 조회
+        try:
+            _already = dev_chat_agent._find_overlapping_prs(
+                repo="",  # repo 모름 — program_name으로 검색
+                file_path=None,
+                fn_name=None,
+                failing_symbol=_inner_module,
+            )
+            # repo가 없을 때를 위해 program→repo 매핑 후 재시도
+            from app.db.maesil_total_client import get_maesil_total_client as _gtc
+            _preg = _gtc().schema("agent_work").table("program_registry") \
+                .select("github_repo").eq("name", prog).limit(1).execute()
+            _prog_repo = ((_preg.data or [{}])[0] or {}).get("github_repo", "")
+            if _prog_repo:
+                _already = dev_chat_agent._find_overlapping_prs(
+                    repo=_prog_repo, file_path=None, fn_name=None,
+                    failing_symbol=_inner_module,
+                )
+            _merged = [p for p in _already if p.get("status") == "merged"]
+            if _merged:
+                _pr = _merged[0]
+                _resp = (
+                    f"## ✅ 이미 수정된 이슈 (이메일 피드백 루프 알림)\n\n"
+                    f"이 알림은 피드백 루프입니다 — 이메일 발송 성공 로그가 알림으로 잡힌 것이며,\n"
+                    f"내부 실제 에러(`module: {_inner_module}`)는 **이미 PR #{_pr['pr_number']}로 수정됐습니다.**\n\n"
+                    f"- PR #{_pr['pr_number']}: {_pr.get('pr_title', '')}\n"
+                    f"- 🔗 {_pr.get('pr_url', '')}\n\n"
+                    f"이 알림은 PR 머지 이전에 발생한 에러입니다. **확인 처리하세요.**"
+                )
+                run_id = str(uuid.uuid4())
+                # 알림 자동 ack
+                try:
+                    from app.db.maesil_total_client import get_maesil_total_client as _gtc2
+                    from datetime import datetime, timezone
+                    _gtc2().schema("agent_work").table("alert_events").update({
+                        "acknowledged_at": datetime.now(timezone.utc).isoformat(),
+                        "acknowledged_note": f"PR #{_pr['pr_number']} 머지로 자동 확인 처리 (이메일 래퍼)"
+                    }).eq("id", alert_id).execute()
+                    logger.info("이메일 래퍼 알림 자동 ack: alert_id=%s, PR #%d",
+                                alert_id, _pr['pr_number'])
+                except Exception as _e:
+                    logger.warning("알림 자동 ack 실패: %s", _e)
+                _save_results(conversation_id, f"[알림 {alert_id}]", [{
+                    "run_id": run_id, "agent_type": "developer",
+                    "message": _resp, "status": "success", "cost_usd": 0.0,
+                }], user_id=user.id)
+                return ChatResponse(
+                    conversation_id=conversation_id,
+                    agents=[AgentResult(
+                        run_id=run_id, agent_type="developer",
+                        agent_display=AGENT_DISPLAY["developer"],
+                        message=_resp, status="success",
+                    )],
+                    routed_to=["developer"],
+                )
+        except Exception as _e:
+            logger.warning("이메일 래퍼 PR 이력 조회 실패: %s", _e)
 
     auto_msg = (
         f"[에러 알림 자동 연결]\n"
