@@ -1067,9 +1067,10 @@ def execute_pending(conversation_id: str) -> str:
 _PR_URL_PAT = re.compile(
     r"https?://github\.com/([\w.-]+/[\w.-]+)/pull/(\d+)"
 )
-# 우측 경계는 \b 가 한글에선 작동 안 함 (한글이 \w 에 포함) →
-# negative lookahead 로 '뒤에 또 다른 숫자만 아니면 OK' 정의
-_PR_HASH_PAT = re.compile(r"(?:^|[\s\(\[])#(\d+)(?!\d)")
+# #N 매칭. 좌·우 경계 모두 negative lookbehind/ahead 으로 '숫자만 아니면 OK'.
+# 이렇게 하면 'PR#1머지', '머지#1확인', '[#1]', '(#1)', 시작 위치, 어디든 매칭.
+# (버전번호 'v1.2#3' 같은 경우 '2' 가 숫자라 lookbehind 로 차단)
+_PR_HASH_PAT = re.compile(r"(?<!\d)#(\d+)(?!\d)")
 
 
 def _extract_pr_reference(
@@ -1276,9 +1277,24 @@ def is_cancel(text: str) -> bool:
 
 
 def is_merge(text: str) -> bool:
-    """짧은 머지 명령 감지 (생성된 PR이 있을 때만 라우터에서 처리)."""
-    t = text.strip().lower()
-    return any(k in t for k in {"머지", "merge", "머지해", "머지하자", "merge it"}) and len(t) < 20
+    """짧은 머지 명령 감지.
+    1) '머지' / 'merge' 키워드 (가장 강한 신호 — analyze_kws 무시)
+    2) 또는 'PR #N' / '#N' 만 있는 짧은 메시지 (사용자가 'PR #1' 만 입력)
+       단 분석 키워드 같이 있으면 머지 아님 (예: 'PR #1 분석해줘')
+    """
+    t = text.strip()
+    t_lower = t.lower()
+    # case 1: 명시적 머지 키워드 — 다른 키워드 무관, 무조건 머지 의도
+    if len(t_lower) < 30 and any(
+        k in t_lower for k in {"머지", "merge", "머지해", "머지하자", "merge it"}
+    ):
+        return True
+    # case 2: 짧은 메시지 + PR 번호 + 분석 키워드 부재
+    if len(t) <= 25 and _PR_HASH_PAT.search(t):
+        analyze_kws = {"분석", "원인", "왜", "체크", "보여", "내용"}
+        if not any(k in t_lower for k in analyze_kws):
+            return True
+    return False
 
 
 __all__ = [
