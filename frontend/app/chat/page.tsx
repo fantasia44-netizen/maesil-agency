@@ -79,23 +79,39 @@ function ChatPageInner() {
     async function loadAlert() {
       if (!hasToken()) return;
       try {
+        // 알림 배너용 기본 정보만 먼저 가져오기
         const event = await apiFetch<AlertEvent>(`/api/alerts/${alertId}`);
         const sev = (event.severity || "error").toUpperCase();
         const prog = event.program_name || "(프로그램 미특정)";
         setAlertBanner(`📨 알림에서 연결됨 · ${sev} · ${prog} — ${event.title}`);
 
-        const autoMsg =
-          `[에러 알림 자동 연결]\n` +
-          `프로그램: ${prog}\n` +
-          `심각도: ${sev}\n` +
-          `제목: ${event.title}\n\n` +
-          `${event.message}\n\n` +
-          `이 에러를 분석하고 수정 방향을 알려주세요.`;
+        // 일반 /api/chat 대신 from-alert 전용 엔드포인트 사용
+        // — 이력 우선 조회, 이메일 래퍼 처리, 자동 ack 등 백엔드 로직 활용
+        const fixedConvId = `alert-${alertId}`;
+        setConversationId(fixedConvId);
 
-        // sendMsg는 동기적으로 읽는 state 없이 override 사용
-        await sendMsg(autoMsg);
+        setLoading(true);
+        const userMsg: Message = {
+          id: crypto.randomUUID(), role: "user",
+          text: `[에러 알림 자동 연결] ${prog} · ${sev}`,
+          ts: new Date(),
+        };
+        setMessages((prev) => [...prev, userMsg]);
+
+        const resp = await apiFetch<ChatResp>(`/api/chat/from-alert/${alertId}`, {
+          method: "POST",
+          body: JSON.stringify({ conversation_id: fixedConvId }),
+        });
+        const sessionCost = resp.agents.reduce((s, a) => s + (a.cost_usd ?? 0), 0);
+        setTotalCost((prev) => prev + sessionCost);
+        setMessages((prev) => [
+          ...prev,
+          { id: resp.conversation_id + Date.now(), role: "agents", agents: resp.agents, ts: new Date() },
+        ]);
       } catch {
         // 알림 로드 실패 시 무시 (일반 채팅 계속 사용 가능)
+      } finally {
+        setLoading(false);
       }
     }
 
