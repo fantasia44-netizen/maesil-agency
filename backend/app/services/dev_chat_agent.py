@@ -298,17 +298,20 @@ def analyze_and_propose(
                         file_paths.append(extra)
 
             # 1차: 추출된 경로 후보로 직접 시도
-            # IMPORTANT: failing_symbol 이 있으면 그 심볼이 실제로 파일에 들어있는지 검증.
-            # 없으면 잘못된 후보(예: email.py에 SyncLog 없음)이므로 다음 후보로 진행.
+            # IMPORTANT: failing_symbol 이 있으면 그 심볼의 **정의(class/def)** 가
+            # 실제로 파일에 있어야 채택. 단순 언급(로그 태그/문자열 리터럴)은 거부.
+            # 정의 없는 경우 skip → 3차 DB 미러가 basename 힌트로 정확히 찾음.
             cls_check = failing_symbol.split(".")[0] if failing_symbol else ""
-            cls_check_lower = cls_check.lower()
+            cls_def_pat = re.compile(
+                r'(?:class|def)\s+' + re.escape(cls_check) + r'\b'
+            ) if cls_check else None
             for fp in file_paths:
                 try:
                     f = github_client.get_file(repo, fp, branch)
                     content = f["content"]
-                    # 심볼이 명시된 경우, 본문에 포함됐는지 확인
-                    if cls_check and cls_check_lower not in content.lower():
-                        logger.info("1차 후보 %s — '%s' 미포함, skip", fp, cls_check)
+                    # 심볼 정의 검증 — 단순 substring 매칭은 로그 문자열 등에서 오탐
+                    if cls_def_pat and not cls_def_pat.search(content):
+                        logger.info("1차 후보 %s — '%s' 정의 없음, skip", fp, cls_check)
                         continue
                     snippet = (
                         _extract_relevant_section(content, failing_symbol)
@@ -317,7 +320,7 @@ def analyze_and_propose(
                     code_context += f"\n\n### {fp}\n```\n{snippet}\n```"
                     file_info = {"repo": repo, "path": fp, "sha": f["sha"], "branch": branch,
                                  "original": content}
-                    logger.info("1차 hit: %s (%s 포함)", fp, cls_check or "no-symbol")
+                    logger.info("1차 hit: %s (%s 정의 발견)", fp, cls_check or "no-symbol")
                     break
                 except FileNotFoundError:
                     continue
@@ -351,9 +354,9 @@ def analyze_and_propose(
                         try:
                             f = github_client.get_file(repo, candidate, branch)
                             content = f["content"]
-                            # 심볼 검증 — 검색결과여도 잘못된 파일 거를 수 있음
-                            if cls_check and cls_check_lower not in content.lower():
-                                logger.info("2차 후보 %s — '%s' 미포함, skip",
+                            # 2차도 정의 기반 검증 (1차와 동일 정책)
+                            if cls_def_pat and not cls_def_pat.search(content):
+                                logger.info("2차 후보 %s — '%s' 정의 없음, skip",
                                             candidate, cls_check)
                                 continue
                             snippet = (
@@ -463,6 +466,16 @@ def analyze_and_propose(
 - 응답은 항상 한국어로 작성
 - 에러/코드 관련 구체적 요청이 있으면 분석 후 수정안 제시
 - **메시지가 짧거나 단순 호출(예: "개발팀", "안녕")이면 1~2줄로 간단히 맞이하고 무엇을 도와줄지 물어볼 것. 긴 형식 목록 금지**
+
+## 절대 금지
+- ❌ 사용자에게 "파일을 공유해 주세요" / "코드를 올려주세요" / "보여주세요" 요청 금지
+- ❌ 깃 레포 접근 권한이 시스템에 등록되어 있고, 백엔드가 알아서 파일을 찾아 제공함
+- 제공된 코드(### 헤더로 표시)가 잘못된 파일이라고 판단되면, 사용자에게 묻지 말고
+  "분석할 진짜 파일을 찾지 못했습니다 — 시스템 검색이 더 필요합니다" 라고만 응답
+
+## 제공된 코드가 진짜 대상 파일인지 검증
+- 시스템이 헤더 `### 파일경로` 로 코드를 제공했더라도, **실패 심볼**이 그 파일에 정의되어 있지 않으면 잘못된 파일임
+- 잘못된 파일에 대한 추측성 수정안 절대 만들지 말 것 (PROPOSED_FIX 출력 금지)
 
 ## 코드 수정 제안 시 형식
 코드 수정이 필요한 경우, 변경이 필요한 함수/클래스만 출력하세요 (파일 전체 X).

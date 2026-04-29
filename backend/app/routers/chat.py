@@ -146,6 +146,35 @@ def _last_agent_in_conversation(conversation_id: str) -> str | None:
     return None
 
 
+def _has_recent_dev_message(conversation_id: str, last_n: int = 5) -> bool:
+    """최근 N턴 내에 developer 에이전트 메시지가 있으면 True (sticky 라우팅용).
+    last_agent가 다른 에이전트로 잠시 빠져도 dev 컨텍스트 유지."""
+    try:
+        msgs = conv_svc.get_messages(conversation_id)
+        for m in list(reversed(msgs))[:last_n * 2]:  # user/assistant 합쳐서 N*2
+            if m.get("agent_type") == "developer":
+                return True
+    except Exception:
+        pass
+    return False
+
+
+# 한 번 dev 모드 들어간 대화 — 명시적 해제 전까진 무조건 dev로
+# DB 조회 실패해도 견고하게 유지됨 (in-memory)
+_dev_mode_conversations: set[str] = set()
+
+# 명시적으로 다른 에이전트로 빠지는 키워드 — 이게 있으면 dev sticky 해제
+EXPLICIT_OTHER_AGENT_KEYWORDS = {
+    "@매출", "@재고", "@재무", "@cs", "@고객",
+    "매출 에이전트", "재고 에이전트", "재무 에이전트", "cs 에이전트",
+    "dev 끄기", "개발 끄기", "개발모드 종료", "개발 종료",
+}
+
+
+def _user_explicitly_invokes_other_agent(msg_lower: str) -> bool:
+    return any(k.lower() in msg_lower for k in EXPLICIT_OTHER_AGENT_KEYWORDS)
+
+
 @router.post("", response_model=ChatResponse)
 def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> ChatResponse:
     from app.services import dev_chat_agent
@@ -169,13 +198,37 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
         user.is_super_admin and
         _last_agent_in_conversation(conversation_id) == "developer"
     )
-    is_dev = user.is_super_admin and (
-        has_pending_dev_action or
-        is_alert_conversation or
-        is_dev_context or
-        any(k in msg_lower for k in DEV_KEYWORDS) or
-        _is_dev_intent(req.message)
+    # sticky: 최근 5턴 내 dev 메시지 있으면 일시적으로 다른 에이전트 끼어들어도 dev 유지
+    is_dev_sticky = (
+        user.is_super_admin and
+        _has_recent_dev_message(conversation_id, last_n=5)
     )
+    # in-memory dev 모드 플래그 (DB 실패해도 견고)
+    is_dev_mode_locked = (
+        user.is_super_admin and conversation_id in _dev_mode_conversations
+    )
+    # 명시적으로 다른 에이전트 호출 키워드 → dev 해제 (단, 키워드 매칭 시점에만)
+    explicit_other = _user_explicitly_invokes_other_agent(msg_lower)
+    if explicit_other:
+        _dev_mode_conversations.discard(conversation_id)
+
+    is_dev = (
+        not explicit_other and
+        user.is_super_admin and
+        (
+            has_pending_dev_action or
+            is_alert_conversation or
+            is_dev_context or
+            is_dev_sticky or
+            is_dev_mode_locked or
+            any(k in msg_lower for k in DEV_KEYWORDS) or
+            _is_dev_intent(req.message)
+        )
+    )
+
+    # dev로 라우팅이 결정되면 메모리 플래그 등록 → 이후 모든 메시지는 자동으로 dev
+    if is_dev:
+        _dev_mode_conversations.add(conversation_id)
     is_approve  = user.is_super_admin and dev_chat_agent.is_approve(req.message)
     is_preview  = user.is_super_admin and dev_chat_agent.is_preview(req.message)
     is_cancel   = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
