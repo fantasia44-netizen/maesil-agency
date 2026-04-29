@@ -1058,6 +1058,44 @@ def analyze_and_propose(
                         if file_info["path"] != original_path:
                             break
 
+            # ── URL 심볼 추가 파일 수집 ─────────────────────────────────────
+            # HTTP access log 기반 심볼은 라우트 핸들러 + 레포 파일 2개가 필요.
+            # 현재 파일(db_utils 등)의 import에서 레포 경로 추출 + 라우트 파일 직접 시도.
+            if is_url_symbol and file_info:
+                _url_cls = failing_symbol.split(".")[0] if failing_symbol else ""
+                _url_method = (failing_symbol.split(".")[1]
+                               if failing_symbol and "." in failing_symbol else "")
+                _extra_to_read: list[str] = []
+
+                # 1) 현재 파일 import에서 "{cls_name}" 포함 모듈 경로 추출
+                #    예: from repositories.competitor_repo import CompetitorRepo
+                for _imp in re.finditer(
+                    r'from\s+([\w.]*' + re.escape(_url_cls) + r'[\w.]*)\s+import',
+                    file_info.get("original", ""), re.I
+                ):
+                    _mod = _imp.group(1).replace(".", "/") + ".py"
+                    if _mod != file_info["path"] and _mod not in _extra_to_read:
+                        _extra_to_read.append(_mod)
+
+                # 2) URL 기반 라우트 파일 후보
+                for _pfx in ["routes", "blueprints", "app/routes", "app/blueprints", "views"]:
+                    _c = f"{_pfx}/{_url_cls}.py"
+                    if _c != file_info["path"] and _c not in _extra_to_read:
+                        _extra_to_read.append(_c)
+
+                # 3) 최대 2개 추가 수집
+                for _xfp in _extra_to_read[:6]:
+                    if sum(1 for h in ["### " + _xfp] if h in code_context) > 0:
+                        continue
+                    try:
+                        _xf = github_client.get_file(repo, _xfp, branch)
+                        _xs = _extract_relevant_section(_xf["content"], failing_symbol)
+                        code_context += f"\n\n### {_xfp}\n```\n{_xs}\n```"
+                        logger.info("URL 심볼 추가 파일: %s", _xfp)
+                        break  # 라우트 OR 레포 중 첫 번째 성공분만
+                    except (FileNotFoundError, Exception):
+                        continue
+
         except Exception as e:
             logger.warning("GitHub 접근 실패 [%s]: %s", repo, e)
             code_context = f"\n\n(GitHub 접근 실패: {e})"
