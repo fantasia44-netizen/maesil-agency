@@ -343,9 +343,23 @@ def analyze_and_propose(
                 ]
                 logger.warning("3차: tree 전체 .py %d개 (전체 %d경로)", len(py_paths), len(all_paths))
 
-                # 우선순위: 파일명이 클래스명(snake/lower)과 일치 > 부분 포함 > 나머지
+                # 추출된 후보 파일들의 basename을 최우선 시그널로 사용
+                # (점 표기 모듈에서 변환된 'repository.py' 등 — 1차/2차 경로는 못맞췄지만
+                #  같은 basename이 다른 깊이에 존재할 수 있음)
+                candidate_basenames = {
+                    p.rsplit("/", 1)[-1].lower()
+                    for p in (file_paths or []) if p.endswith(".py")
+                }
+                logger.warning("3차 우선 basename: %s", candidate_basenames)
+
+                # 우선순위:
+                #   0 = 추출된 모듈 basename 일치 OR 파일명이 클래스명(snake/lower)과 일치
+                #   1 = 클래스명 부분 포함
+                #   2 = 나머지
                 def _path_priority(p: str) -> int:
                     fname = p.rsplit("/", 1)[-1].lower()
+                    if fname in candidate_basenames:
+                        return 0
                     stem = fname[:-3]
                     if stem == cls_snake or stem == cls_lower:
                         return 0
@@ -355,14 +369,14 @@ def analyze_and_propose(
                 py_paths.sort(key=_path_priority)
 
                 tried_paths = set(file_paths)
-                # 우선순위 0/1은 모두, 2는 최대 15개까지 내용 검사
+                # 우선순위 0/1은 모두, 2는 최대 25개까지 내용 검사
                 checked = 0
                 for candidate in py_paths:
                     if candidate in tried_paths:
                         continue
                     tried_paths.add(candidate)
                     pri = _path_priority(candidate)
-                    if pri == 2 and checked >= 15:
+                    if pri == 2 and checked >= 25:
                         break
                     checked += 1
                     try:
