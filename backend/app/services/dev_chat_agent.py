@@ -1059,42 +1059,57 @@ def analyze_and_propose(
                             break
 
             # ── URL 심볼 추가 파일 수집 ─────────────────────────────────────
-            # HTTP access log 기반 심볼은 라우트 핸들러 + 레포 파일 2개가 필요.
-            # 현재 파일(db_utils 등)의 import에서 레포 경로 추출 + 라우트 파일 직접 시도.
+            # HTTP access log 기반 심볼: 라우트 핸들러 + 레포 파일 2개 수집.
             if is_url_symbol and file_info:
                 _url_cls = failing_symbol.split(".")[0] if failing_symbol else ""
-                _url_method = (failing_symbol.split(".")[1]
-                               if failing_symbol and "." in failing_symbol else "")
-                _extra_to_read: list[str] = []
+                _repo_candidates: list[str] = []   # 레포 파일 후보
+                _route_candidates: list[str] = []  # 라우트 파일 후보
+                _orig_txt = file_info.get("original", "")
 
-                # 1) 현재 파일 import에서 "{cls_name}" 포함 모듈 경로 추출
-                #    예: from repositories.competitor_repo import CompetitorRepo
+                # 1) import 구문에서 레포 경로 추출
+                #    from repositories.competitor_repo import CompetitorRepo
                 for _imp in re.finditer(
                     r'from\s+([\w.]*' + re.escape(_url_cls) + r'[\w.]*)\s+import',
-                    file_info.get("original", ""), re.I
+                    _orig_txt, re.I
                 ):
                     _mod = _imp.group(1).replace(".", "/") + ".py"
-                    if _mod != file_info["path"] and _mod not in _extra_to_read:
-                        _extra_to_read.append(_mod)
+                    if _mod != file_info["path"]:
+                        _repo_candidates.append(_mod)
 
-                # 2) URL 기반 라우트 파일 후보
+                # 2) 문자열 리터럴에서 모듈 경로 추출
+                #    'repositories.competitor_repo.CompetitorRepo'
+                for _lit in re.finditer(
+                    r"""['"]([a-z_][a-z0-9_.]*\.""" + re.escape(_url_cls) + r"""[a-z0-9_.]*)['"]\s*[,:\}]""",
+                    _orig_txt, re.I
+                ):
+                    _parts = _lit.group(1).rsplit(".", 1)[0]  # 클래스명 제거
+                    _mod = _parts.replace(".", "/") + ".py"
+                    if _mod != file_info["path"] and _mod not in _repo_candidates:
+                        _repo_candidates.append(_mod)
+
+                # 3) 라우트 파일 후보
                 for _pfx in ["routes", "blueprints", "app/routes", "app/blueprints", "views"]:
-                    _c = f"{_pfx}/{_url_cls}.py"
-                    if _c != file_info["path"] and _c not in _extra_to_read:
-                        _extra_to_read.append(_c)
+                    _route_candidates.append(f"{_pfx}/{_url_cls}.py")
 
-                # 3) 최대 2개 추가 수집
-                for _xfp in _extra_to_read[:6]:
-                    if sum(1 for h in ["### " + _xfp] if h in code_context) > 0:
-                        continue
-                    try:
-                        _xf = github_client.get_file(repo, _xfp, branch)
-                        _xs = _extract_relevant_section(_xf["content"], failing_symbol)
-                        code_context += f"\n\n### {_xfp}\n```\n{_xs}\n```"
-                        logger.info("URL 심볼 추가 파일: %s", _xfp)
-                        break  # 라우트 OR 레포 중 첫 번째 성공분만
-                    except (FileNotFoundError, Exception):
-                        continue
+                # 4) 레포 파일 1개 + 라우트 파일 1개 각각 수집
+                def _try_read(candidates: list[str]) -> bool:
+                    for _fp in candidates[:4]:
+                        if f"### {_fp}" in code_context:
+                            continue
+                        try:
+                            _xf = github_client.get_file(repo, _fp, branch)
+                            _xs = _extract_relevant_section(_xf["content"], failing_symbol)
+                            code_context_ref.append(f"\n\n### {_fp}\n```\n{_xs}\n```")
+                            logger.info("URL 심볼 추가 파일: %s", _fp)
+                            return True
+                        except (FileNotFoundError, Exception):
+                            continue
+                    return False
+
+                code_context_ref: list[str] = []
+                _try_read(_repo_candidates)
+                _try_read(_route_candidates)
+                code_context += "".join(code_context_ref)
 
         except Exception as e:
             logger.warning("GitHub 접근 실패 [%s]: %s", repo, e)
