@@ -550,6 +550,86 @@ def _detect_program_from_text(text: str, programs: list[dict]) -> dict | None:
     return None
 
 
+# ─────────────────────────────────────────────────────────────────
+# 거짓 진술 감지 + 자동 정정 레이어
+# LLM 이 컨텍스트에 없는 정보를 "확인했다"고 주장하는 패턴을 차단
+# ─────────────────────────────────────────────────────────────────
+
+# (패턴, 대체 메시지) 목록
+# 대체 메시지가 None 이면 해당 문장 전체 삭제
+_HALLUCINATION_PATTERNS: list[tuple[re.Pattern, str | None]] = [
+    # DB 직접 접근 주장
+    (re.compile(r"DB\s*[에을]\s*(접속|조회|쿼리|확인)해\s*보[니면]", re.I),
+     "[정정] DB에 직접 접근하지 않았습니다 — 코드 기반 추론입니다"),
+    (re.compile(r"테이블\s*[을를]\s*(조회|확인|쿼리)해\s*보[니면]", re.I),
+     "[정정] 테이블을 직접 조회하지 않았습니다"),
+    # 테이블 없음 단언 (DB 스키마 컨텍스트 없을 때)
+    (re.compile(r"테이블이\s*(존재하지\s*않|없[거어]|미존재)", re.I),
+     "[정정] DB 스키마 정보가 없어 테이블 존재 여부를 확인할 수 없습니다"),
+    (re.compile(r"접근\s*권한\s*(이\s*없|없[거어])", re.I),
+     "[정정] 접근 권한 여부를 코드에서 확인할 수 없습니다"),
+    # 로그/서버 직접 확인 주장
+    (re.compile(r"(Render|서버)\s*(로그|상태)[를을]\s*(확인|조회)해\s*보[니면]", re.I),
+     "[정정] 서버 로그를 직접 조회하지 않았습니다 — 제공된 에러 메시지 기반입니다"),
+    (re.compile(r"GitHub\s*(API|레포)[를을]\s*(직접\s*)?(확인|조회)했[더으]니", re.I),
+     "[정정] GitHub API를 직접 호출해 확인하지 않았습니다"),
+    # 배포/재시작 완료 주장
+    (re.compile(r"배포\s*(시작|완료|됐|되었)\s*[습니다됩]", re.I),
+     "[정정] 배포는 Render가 머지 후 자동 처리합니다 — 직접 트리거하지 않았습니다"),
+    (re.compile(r"서버\s*(재시작|재배포)\s*(했|완료|됐)", re.I),
+     "[정정] 서버 재시작은 직접 실행할 수 없습니다"),
+    # 사용자에게 정보 요청 (가장 빈번한 위반)
+    (re.compile(r"(알려|보내|공유|첨부)\s*주\s*(세요|시겠어요|시면)", re.I),
+     None),  # 해당 문장 삭제
+    (re.compile(r"확인\s*(결과|후)\s*(알려|보내)\s*주", re.I),
+     None),
+]
+
+
+def _sanitize_response(response: str, has_db_schema: bool = False) -> str:
+    """LLM 응답에서 거짓 진술 패턴을 감지하고 정정/삭제.
+
+    - DB 직접 접근 주장 → 정정 문구로 교체
+    - 테이블 없음 단언 (스키마 컨텍스트 없을 때) → 정정
+    - 사용자에게 추가 정보 요청 → 해당 문장 삭제
+    - 배포/재시작 완료 주장 → 정정
+    """
+    lines = response.split("\n")
+    cleaned: list[str] = []
+    corrections: list[str] = []
+
+    for line in lines:
+        replaced = False
+        for pat, replacement in _HALLUCINATION_PATTERNS:
+            # DB 스키마가 컨텍스트에 있으면 "테이블 없음" 패턴은 체크 안 함
+            # (실제 스키마를 보고 내린 판단일 수 있으므로)
+            if has_db_schema and pat.pattern in (
+                r"테이블이\s*(존재하지\s*않|없[거어]|미존재)",
+                r"접근\s*권한\s*(이\s*없|없[거어])",
+            ):
+                continue
+            if pat.search(line):
+                if replacement is None:
+                    # 줄 통째로 삭제 (사용자 요청 금지 등)
+                    logger.warning("거짓 진술 차단 — 문장 삭제: %s", line[:80])
+                    replaced = True
+                    break
+                else:
+                    # 정정 문구로 교체
+                    corrected = f"> ⚠️ {replacement}"
+                    cleaned.append(corrected)
+                    corrections.append(pat.pattern[:40])
+                    logger.warning("거짓 진술 감지 → 정정: pat=%s | line=%s",
+                                   pat.pattern[:40], line[:80])
+                    replaced = True
+                    break
+        if not replaced:
+            cleaned.append(line)
+
+    result = "\n".join(cleaned)
+    return result
+
+
 def _call_claude(system: str, user: str, max_tokens: int = 2000) -> str:
     from app.services.secrets import get_secret
     import anthropic
@@ -998,6 +1078,9 @@ PR제목: <간단한 제목>
         response = _call_claude(system_prompt, user_prompt)
     except Exception as e:
         return f"⚠️ AI 분석 실패: {e}"
+
+    # ── 거짓 진술 검출 + 차단 ─────────────────────────────────────────
+    response = _sanitize_response(response, has_db_schema="🗄️ DB 스키마 컨텍스트" in code_context)
 
     # PROPOSED_FIX 파싱 → pending action 저장
     fix_match = re.search(r'\[PROPOSED_FIX\](.*?)\[/PROPOSED_FIX\]', response, re.DOTALL)
