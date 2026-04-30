@@ -314,21 +314,38 @@ def _call_haiku(
 # ─────────────────────────────────────────────────────────────────
 # 메인 처리 함수
 # ─────────────────────────────────────────────────────────────────
+_MAX_TURNS = 12  # 유저 발화 기준 최대 대화 턴
+
+
 def process_message(
     message: str,
     history: list[dict] | None = None,
     user_context: dict | None = None,
     program: str = "maesil-insight",
+    conversation_id: str | None = None,
 ) -> dict:
     """
     메시지 처리 메인 함수.
 
     Returns:
         {emotion, message, action, hint, layer, script_id}
-        layer: 'l2' | 'l3' | 'fallback'
+        layer: 'l2' | 'l2.5' | 'l3' | 'fallback'
     """
     user_context = user_context or {}
     history = history or []
+
+    # 대화 턴 제한 — 무한 대화 토큰 낭비 방지
+    user_turns = sum(1 for m in history if m.get("role") == "user")
+    if user_turns >= _MAX_TURNS:
+        return {
+            "emotion": "relief",
+            "message": (
+                "대화가 많이 길어졌네요. 더 정확한 답변을 위해 새 대화를 시작해 주세요.\n"
+                "새 대화에서 이어서 질문하시면 더 빠르게 도와드릴게요."
+            ),
+            "action": None, "hint": None,
+            "layer": "limit", "script_id": None,
+        }
 
     # 범위 밖 거절
     oos = _check_out_of_scope(message)
@@ -350,9 +367,37 @@ def process_message(
             "script_id": script.get("id"),
         }
 
+    # L2.5 — feature_docs 키워드 매칭 (dev 에이전트가 생성한 기능 설명)
+    try:
+        from app.services.feature_kb import lookup as _kb_lookup
+        kb_hit = _kb_lookup(message, program)
+        if kb_hit:
+            return {
+                "emotion":   kb_hit.get("emotion", "thinking"),
+                "message":   kb_hit["answer"],
+                "action":    None, "hint": None,
+                "layer":     "l2.5", "script_id": None,
+            }
+    except Exception as e:
+        logger.warning("[maeyo] feature_kb lookup 실패: %s", e)
+
     # L3 Haiku — verified 스크립트를 few-shot 예시로 전달
     verified = [s for s in scripts if s.get("is_verified")]
     result = _call_haiku(message, history, user_context, program, verified_examples=verified)
     result["layer"] = "l3"
     result["script_id"] = None
+
+    # L3 응답 이후 사이드이펙트 (비동기 처리 불필요 — 단순 DB INSERT)
+    try:
+        from app.services.feature_kb import log_unanswered as _log_unanswered
+        _log_unanswered(program, message, result.get("message", ""), conversation_id)
+    except Exception as e:
+        logger.warning("[maeyo] unanswered_log 적재 실패: %s", e)
+
+    try:
+        from app.services.feature_kb import detect_and_report_bug as _detect_bug
+        _detect_bug(program, message, result.get("message", ""), conversation_id)
+    except Exception as e:
+        logger.warning("[maeyo] 버그 감지 실패: %s", e)
+
     return result

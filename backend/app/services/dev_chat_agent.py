@@ -1951,8 +1951,75 @@ def classify_action(
         return None
 
 
+# ─────────────────────────────────────────────────────────────────
+# 기능 설명 모드 (CS ↔ Dev 연동 — feature_kb 생성용)
+# ─────────────────────────────────────────────────────────────────
+
+def explain_feature(question: str, program: str) -> dict | None:
+    """CS 에이전트가 모르는 기능 질문을 분석해 feature_docs 항목 생성.
+
+    Returns:
+        {keywords: [...], answer: "...", code_refs: [...]} 또는 None
+    """
+    programs = _all_programs()
+    prog = next((p for p in programs if p["name"] == program), None)
+    if not prog or not prog.get("github_repo"):
+        logger.warning("explain_feature: 프로그램 레지스트리 미등록 [%s]", program)
+        return None
+
+    repo = prog["github_repo"]
+
+    code_context = ""
+    code_refs: list[str] = []
+    try:
+        from app.services import repo_mirror
+        kw_tokens = re.findall(r'[가-힣a-zA-Z_]{2,}', question)
+        for kw in kw_tokens[:5]:
+            hit = repo_mirror.search_symbol(repo, kw, [])
+            if hit:
+                path = hit["path"]
+                content = hit["content"]
+                code_context += f"\n\n### {path}\n```\n{content[:3000]}\n```"
+                code_refs.append(path)
+                break
+    except Exception as e:
+        logger.warning("explain_feature 코드 검색 실패: %s", e)
+
+    system_prompt = """당신은 maesil SaaS의 기능 설명 전문가입니다.
+고객 질문과 관련 코드를 분석해서 CS 에이전트가 사용할 수 있는 기능 설명을 생성하세요.
+
+응답 형식 (JSON만, 다른 텍스트 금지):
+{"keywords": ["키워드1", "키워드2"], "answer": "설명", "code_refs": ["파일경로"]}
+
+규칙:
+- answer: 기술 용어 없이 쉬운 말로, 2~3문장, 마크다운·이모지 금지
+- keywords: 이 질문을 재매칭할 2~5개 핵심 키워드"""
+
+    user_prompt = (
+        f"프로그램: {program}\n고객 질문: {question}\n"
+        + (code_context if code_context else "(관련 코드 없음 — 일반 SaaS 기능 기준으로 설명)")
+    )
+
+    try:
+        response = _call_claude(system_prompt, user_prompt, max_tokens=500)
+        m = re.search(r'\{.*\}', response, re.DOTALL)
+        if not m:
+            return None
+        import json as _json
+        data = _json.loads(m.group(0))
+        return {
+            "keywords": data.get("keywords") or [],
+            "answer": data.get("answer") or "",
+            "code_refs": data.get("code_refs") or code_refs,
+        }
+    except Exception as e:
+        logger.warning("explain_feature LLM 실패: %s", e)
+        return None
+
+
 __all__ = [
     "analyze_and_propose", "execute_pending", "preview_pending",
     "cancel_pending", "merge_pending_pr",
     "is_approve", "is_preview", "is_cancel", "is_merge",
+    "explain_feature",
 ]

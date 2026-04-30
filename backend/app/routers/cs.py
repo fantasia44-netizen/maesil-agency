@@ -155,6 +155,7 @@ def cs_chat(
         history=req.history,
         user_context=req.user_context,
         program=req.program,
+        conversation_id=req.conversation_id,
     )
 
     reply     = result.get("message", "")
