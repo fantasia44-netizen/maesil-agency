@@ -65,6 +65,9 @@ EXCLUDE_PATTERNS: list[re.Pattern[str]] = [
     # maesil-agency 자체 알림 에이전트 동작 로그 (INFO여도 ERROR 키워드 포함)
     re.compile(r"\[maesil-agency\s*·\s*(ERROR|WARNING|INFO)\]", re.I),
     re.compile(r'"path":\s*"/api/v1/notify/', re.I),  # notify 엔드포인트 호출 로그
+    # 네이버 광고 API — 지표 준비중(code=20007)은 정상 비즈니스 응답
+    re.compile(r'"code"\s*:\s*20007', re.I),
+    re.compile(r'지표\s*준비중', re.I),
 ]
 
 # 에러 패턴 → severity 매핑 (위에서부터 우선)
