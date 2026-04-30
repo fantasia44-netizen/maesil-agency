@@ -25,6 +25,16 @@ async def _poll_loop():
             ph_svc.check_all()          # 헬스 체크 → program_health 기록
             alert_dispatcher.dispatch_pending(limit=100)
 
+            # CS 미답변 큐 처리 → feature_docs 자동 생성 (L2.5 축적)
+            try:
+                from app.services.feature_kb import process_queue as _fkb_queue
+                fkb_result = _fkb_queue(limit=5)
+                if fkb_result.get("processed"):
+                    logger.info("[scheduler] feature_kb queue processed=%d",
+                                fkb_result["processed"])
+            except Exception as e:
+                logger.warning("[scheduler] feature_kb process_queue 실패: %s", e)
+
             # 레포 미러 동기화 — 매 사이클 실행하되 commit_sha 변동 없으면 1콜만 (스킵)
             try:
                 mirror_result = repo_mirror.sync_all_active()
