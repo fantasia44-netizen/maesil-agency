@@ -532,6 +532,29 @@ def _extract_relevant_section(content: str, target_symbol: str) -> str:
                         break
                 section = "\n".join(lines[i:end_idx])
                 merged = header + "\n\n# ─── 관련 클래스 ───\n" + section
+                if len(merged) <= _MAX_SECTION_CHARS:
+                    return merged
+                # 클래스가 너무 크고 메서드명을 알면 → 해당 메서드 집중 추출
+                if method_part:
+                    class_lines = lines[i:end_idx]
+                    for mi, cl in enumerate(class_lines):
+                        if re.search(r"\bdef\s+" + re.escape(method_part) + r"\s*\(", cl):
+                            m_end = len(class_lines)
+                            for mk in range(mi + 1, len(class_lines)):
+                                s = class_lines[mk]
+                                stripped_mk = s.lstrip()
+                                if stripped_mk and stripped_mk.startswith("def ") and (len(s) - len(stripped_mk)) <= 4:
+                                    m_end = mk
+                                    break
+                            class_head = "\n".join(class_lines[:30])
+                            method_body = "\n".join(class_lines[mi:m_end])
+                            targeted = (
+                                header
+                                + "\n\n# ─── 관련 클래스 (상단) ───\n" + class_head
+                                + "\n    # ... (중략) ...\n"
+                                + f"\n# ─── {method_part} 메서드 ───\n" + method_body
+                            )
+                            return targeted[:_MAX_SECTION_CHARS]
                 return merged[:_MAX_SECTION_CHARS]
 
     # 2) 'def <MethodPart>(' — 그 메서드를 둘러싼 클래스 전체
