@@ -533,7 +533,7 @@ def sync_l2_from_insight(
 
     try:
         resp = httpx.get(
-            f"{base_url}/api/maeyo/l2-scripts",
+            f"{base_url}/api/v1/maeyo/l2-scripts",
             headers={"Authorization": f"Bearer {token}"},
             timeout=20,
         )
