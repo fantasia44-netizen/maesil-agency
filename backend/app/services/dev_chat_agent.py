@@ -370,6 +370,16 @@ def _extract_error_function(text: str) -> str | None:
     예: '"POST /app/api/competitor/register-group" 500' → 'competitor.register_group'
     예: '[naver_ad_api_client] [NaverAd] POST /stat-reports → 400:' → 'NaverAd.stat_reports'
     """
+    # Python logger 포맷: module.path: [ClassName] /endpoint 메시지
+    # 예: services.marketplace.naver_ad_api_client: [NaverAd] /stat-reports 지표 준비중
+    m = re.search(
+        r'[a-z_][a-z0-9_.]+:\s+\[([A-Z][a-zA-Z0-9_]+)\]\s+(?:(?:POST|GET|PUT|DELETE|PATCH)\s+)?(/[^\s\n,]+)',
+        text, re.I
+    )
+    if m:
+        path_last = m.group(2).strip('/').split('/')[-1].replace('-', '_')
+        return f"{m.group(1)}.{path_last}"
+
     # [module] [ClassName] HTTP_METHOD /path → 숫자 패턴 (API 클라이언트 로그)
     # 예: [naver_ad_api_client] [NaverAd] POST /stat-reports → 400:
     m = re.search(
@@ -1032,40 +1042,54 @@ def analyze_and_propose(
                     if file_info:
                         break
 
-            # 3차 폴백: DB 미러(repo_mirror)에서 심볼 검색 — 1~5ms, GitHub 호출 0
-            if not file_info and failing_symbol:
+            # 3차 폴백: DB 미러(repo_mirror) — 심볼 검색 or 경로 직접 조회 (1~5ms, GitHub 호출 0)
+            if not file_info:
                 import time as _time
                 from app.services import repo_mirror
 
-                cls_orig = failing_symbol.split(".")[0]
-                # 추출된 file_paths의 basename을 우선순위 힌트로 전달
                 hint_basenames = list({
                     p.rsplit("/", 1)[-1]
                     for p in (file_paths or []) if p.endswith(".py")
                 })
-
                 _t0 = _time.monotonic()
-                hit = repo_mirror.search_symbol(repo, cls_orig, hint_basenames)
-                elapsed = _time.monotonic() - _t0
+                hit = None
+
+                if failing_symbol:
+                    # 심볼 기반 검색 (기존 로직)
+                    cls_orig = failing_symbol.split(".")[0]
+                    hit = repo_mirror.search_symbol(repo, cls_orig, hint_basenames)
+                    if not hit:
+                        logger.warning("3차(DB미러) 심볼 미발견 [repo=%s, symbol=%s] %.1fms",
+                                       repo, cls_orig, (_time.monotonic() - _t0) * 1000)
+
+                if not hit and file_paths:
+                    # 경로 기반 직접 조회 — failing_symbol 없어도 동작
+                    for _fp in file_paths[:8]:
+                        _h = repo_mirror.get_file_by_path(repo, _fp)
+                        if _h:
+                            hit = _h
+                            logger.warning("3차(DB미러 경로) 파일 발견: %s (%.1fms)",
+                                           _fp, (_time.monotonic() - _t0) * 1000)
+                            break
 
                 if hit:
                     path = hit["path"]
                     content = hit["content"]
-                    # 미러에 저장된 sha는 commit sha. 커밋용 blob sha는 별도 호출.
                     try:
                         f = github_client.get_file(repo, path, branch)
                         sha = f["sha"]
                     except Exception:
-                        sha = ""
-                    snippet = _extract_relevant_section(content, failing_symbol)
+                        sha = hit.get("sha", "")
+                    snippet = (
+                        _extract_relevant_section(content, failing_symbol)
+                        if failing_symbol else content[:_MAX_SECTION_CHARS]
+                    )
                     code_context += f"\n\n### {path}\n```\n{snippet}\n```"
                     file_info = {"repo": repo, "path": path, "sha": sha,
                                  "branch": branch, "original": content}
-                    logger.warning("3차(DB미러) 파일 발견: %s (score=%s, %.1fms)",
-                                   path, hit.get("score"), elapsed * 1000)
                 else:
-                    logger.warning("3차(DB미러) 파일 미발견 [repo=%s, symbol=%s, hints=%s] %.1fms",
-                                   repo, cls_orig, hint_basenames, elapsed * 1000)
+                    logger.warning("3차(DB미러) 전체 미발견 [repo=%s, paths=%s] %.1fms",
+                                   repo, file_paths[:3], (_time.monotonic() - _t0) * 1000)
 
             if not file_info:
                 tried_dirs = ["app/services", "app", "app/utils", "src", "utils", "core", "logs"]

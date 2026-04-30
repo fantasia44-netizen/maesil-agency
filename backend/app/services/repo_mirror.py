@@ -239,4 +239,23 @@ def search_symbol(
         return None
 
 
-__all__ = ["sync_repo", "sync_all_active", "search_symbol"]
+def get_file_by_path(repo: str, path: str) -> dict | None:
+    """DB 미러에서 경로로 직접 파일 조회. search_symbol 의 경로 기반 폴백용."""
+    try:
+        client = get_maesil_total_client()
+        resp = (
+            client.schema("agent_work").table("repo_files")
+            .select("path, content, sha")
+            .eq("repo", repo)
+            .eq("path", path)
+            .limit(1)
+            .execute()
+        )
+        rows = resp.data or []
+        return rows[0] if rows else None
+    except Exception as e:
+        logger.warning("repo_mirror get_file_by_path 실패 [%s/%s]: %s", repo, path, e)
+        return None
+
+
+__all__ = ["sync_repo", "sync_all_active", "search_symbol", "get_file_by_path"]
