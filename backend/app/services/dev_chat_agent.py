@@ -867,6 +867,14 @@ def analyze_and_propose(
                     merged_at_str = merged_at[:16]
             logger.info("이미 수정된 이슈 — 분석 스킵: %s → PR #%s (%s)",
                         failing_symbol, pr_num, repo_for_check)
+
+            # 머지된 PR의 실제 diff 가져오기
+            diff_section = ""
+            if isinstance(pr_num, int):
+                diff = github_client.get_pr_diff(repo_for_check, pr_num)
+                if diff:
+                    diff_section = f"\n\n## 📝 수정 내용 (PR #{pr_num} diff)\n\n{diff}"
+
             return (
                 f"## ✅ 이미 수정된 이슈입니다\n\n"
                 f"**`{failing_symbol}`** 관련 수정이 이미 머지됐습니다.\n\n"
@@ -876,6 +884,7 @@ def analyze_and_propose(
                 f"이 알림은 PR 머지 **이전**에 발생한 에러입니다.\n"
                 f"현재 코드에는 수정이 반영된 상태이므로 추가 조치가 필요 없습니다.\n\n"
                 f"> 동일 에러가 머지 이후에도 계속 발생한다면 다시 알려주세요."
+                f"{diff_section}"
             )
 
     # 코드 컨텍스트 수집

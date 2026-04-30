@@ -377,6 +377,32 @@ def create_pr(
     return {"number": data["number"], "html_url": data["html_url"]}
 
 
+def get_pr_diff(repo: str, pr_number: int, max_chars: int = 8000) -> str:
+    """PR의 unified diff 반환. 너무 크면 max_chars로 절단."""
+    try:
+        r = httpx.get(
+            f"{BASE}/repos/{repo}/pulls/{pr_number}/files",
+            headers=_headers(),
+            timeout=15,
+        )
+        r.raise_for_status()
+        files = r.json() or []
+        parts: list[str] = []
+        for f in files:
+            filename = f.get("filename", "")
+            patch = f.get("patch", "")
+            status = f.get("status", "")  # added / modified / removed
+            if patch:
+                parts.append(f"### {filename} ({status})\n```diff\n{patch}\n```")
+            else:
+                parts.append(f"### {filename} ({status}) — 바이너리 또는 diff 없음")
+        result = "\n\n".join(parts)
+        return result[:max_chars] + ("\n...(생략)" if len(result) > max_chars else "")
+    except Exception as e:
+        logger.warning("get_pr_diff 실패 [%s#%d]: %s", repo, pr_number, e)
+        return ""
+
+
 def get_pr_status(repo: str, pr_number: int) -> dict:
     """PR 상태/머지 가능성 조회.
     Returns: { state, mergeable, mergeable_state, merged, head_sha, html_url, base_branch }
