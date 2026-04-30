@@ -3,8 +3,8 @@
 
 L1/L2/L3 레이어:
   L1: 호출 측(프로그램)이 user_context 구성해서 전달
-  L2: DB(maeyo_l2_scripts) 또는 fallback 대본 매칭 (비용 0)
-  L3: Claude Haiku fallback (미매칭 자유 질문)
+  L2: DB(maeyo_l2_scripts) 매칭 — is_verified 우선, 트리거 길이순 (비용 0)
+  L3: Claude Haiku fallback — verified 예시 few-shot 주입
 
 DB에 L2 스크립트가 없으면 빈 리스트로 동작 (L3 전용 모드).
 """
@@ -14,7 +14,6 @@ import json
 import logging
 import re
 import time
-from functools import lru_cache
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -66,15 +65,20 @@ FALLBACK_REPLY: dict = {
 }
 
 # ─────────────────────────────────────────────────────────────────
-# L2 스크립트 — DB 로드 (60초 캐시, 프로그램별 분리)
+# L2 스크립트 — DB 로드 (60초 캐시, 프로그램별)
 # ─────────────────────────────────────────────────────────────────
-_l2_cache: dict[str, list[dict]] = {}   # program → scripts
-_l2_cache_ts: dict[str, float] = {}     # program → last load time
-_L2_CACHE_TTL = 60.0  # seconds
+_l2_cache: dict[str, list[dict]] = {}
+_l2_cache_ts: dict[str, float] = {}
+_L2_CACHE_TTL = 60.0
 
 
 def _load_l2_scripts(program: str = "maesil-insight") -> list[dict]:
-    """DB에서 L2 스크립트 로드 (TTL 캐시, 프로그램별). 실패 시 기존 캐시 유지."""
+    """DB에서 L2 스크립트 로드 (TTL 캐시, 프로그램별).
+
+    정렬 우선순위:
+      1) is_verified=True 스크립트 먼저 (오답 방지)
+      2) 각 스크립트 내 트리거: 길이 내림차순 (구체적인 것 우선 매칭)
+    """
     global _l2_cache, _l2_cache_ts
     now = time.time()
     if now - _l2_cache_ts.get(program, 0.0) < _L2_CACHE_TTL and _l2_cache.get(program):
@@ -85,35 +89,47 @@ def _load_l2_scripts(program: str = "maesil-insight") -> list[dict]:
             get_maesil_total_client()
             .schema("agent_work")
             .table("maeyo_l2_scripts")
-            .select("id,triggers,keywords,emotion,message,action,hint,tts_key")
+            .select("id,triggers,keywords,emotion,message,action,hint,tts_key,is_verified")
             .eq("is_active", True)
             .in_("program", [program, "common"])
             .order("sort_order")
             .execute()
         )
         rows = resp.data or []
-        scripts = []
+        scripts: list[dict] = []
         for r in rows:
+            triggers = r.get("triggers") or []
+            # 트리거를 길이 내림차순 정렬 → 더 구체적인 트리거가 먼저 매칭
+            triggers_sorted = sorted(triggers, key=lambda t: len(str(t)), reverse=True)
             scripts.append({
-                "id":       r["id"],
-                "triggers": r.get("triggers") or [],
-                "keywords": r.get("keywords") or [],
-                "emotion":  r.get("emotion", "thinking"),
-                "message":  r.get("message", ""),
-                "action":   r.get("action"),
-                "hint":     r.get("hint"),
-                "tts_key":  r.get("tts_key"),
+                "id":          r["id"],
+                "triggers":    triggers_sorted,
+                "keywords":    r.get("keywords") or [],
+                "emotion":     r.get("emotion", "thinking"),
+                "message":     r.get("message", ""),
+                "action":      r.get("action"),
+                "hint":        r.get("hint"),
+                "tts_key":     r.get("tts_key"),
+                "is_verified": bool(r.get("is_verified", False)),
             })
+        # verified 스크립트를 앞에 배치 (동일 트리거 충돌 시 검증된 것 우선)
+        verified   = [s for s in scripts if s["is_verified"]]
+        unverified = [s for s in scripts if not s["is_verified"]]
+        scripts = verified + unverified
+
         _l2_cache[program] = scripts
         _l2_cache_ts[program] = now
-        logger.debug("[maeyo] L2 scripts loaded from DB for '%s': %d", program, len(scripts))
+        logger.debug(
+            "[maeyo] L2 loaded '%s': total=%d verified=%d",
+            program, len(scripts), len(verified),
+        )
     except Exception as e:
         logger.warning("[maeyo] L2 DB 로드 실패 (캐시 유지) program=%s: %s", program, e)
     return _l2_cache.get(program, [])
 
 
 def invalidate_l2_cache() -> None:
-    """L2 스크립트 캐시 강제 무효화 (스크립트 편집 후 호출)."""
+    """L2 스크립트 캐시 강제 무효화 (스크립트 편집/동기화 후 호출)."""
     global _l2_cache_ts
     _l2_cache_ts.clear()
 
@@ -132,8 +148,11 @@ def _check_out_of_scope(message: str) -> dict | None:
     return None
 
 
-def _match_l2(message: str, program: str = "maesil-insight") -> dict | None:
-    scripts = _load_l2_scripts(program)
+def _match_l2(message: str, scripts: list[dict]) -> dict | None:
+    """스크립트 리스트에서 메시지와 매칭되는 첫 번째 스크립트 반환.
+
+    트리거는 이미 길이 내림차순, verified 스크립트가 앞에 배치됨.
+    """
     norm_msg = _normalize(message)
     for script in scripts:
         for trigger in (script.get("triggers") or []):
@@ -149,7 +168,11 @@ def _match_l2(message: str, program: str = "maesil-insight") -> dict | None:
 # ─────────────────────────────────────────────────────────────────
 # L3 Claude Haiku 호출
 # ─────────────────────────────────────────────────────────────────
-def _build_system_prompt(user_context: dict, program: str) -> str:
+def _build_system_prompt(
+    user_context: dict,
+    program: str,
+    verified_examples: list[dict] | None = None,
+) -> str:
     plan    = user_context.get("plan_type", "free")
     company = user_context.get("company_name", "")
     program_display = {
@@ -161,7 +184,6 @@ def _build_system_prompt(user_context: dict, program: str) -> str:
     has_coupang_ad = bool(user_context.get("has_coupang_ad"))
     has_naver_ad   = bool(user_context.get("has_naver_ad"))
 
-    # 채널 상태 블록
     if channels:
         ch_status = "연동된 채널: " + ", ".join(channels)
     else:
@@ -179,10 +201,8 @@ def _build_system_prompt(user_context: dict, program: str) -> str:
             ad_lines.append("쿠팡 광고: 데이터 있음 (파일 업로드됨)")
         else:
             ad_lines.append("쿠팡 광고: 데이터 없음 (Wing 엑셀 다운로드 후 업로드 필요)")
-
     ad_status = "\n".join(ad_lines) if ad_lines else ""
 
-    # 안내 규칙
     if not channels:
         guidance = "【안내 규칙】\n- 채널을 연동하지 않았다. 채널 연결하기를 최우선으로 안내해라."
     else:
@@ -192,6 +212,22 @@ def _build_system_prompt(user_context: dict, program: str) -> str:
         if has_naver and not has_naver_ad:
             rules.append("- 네이버 광고 API가 미연동. ads.naver.com → SA API 사용 관리에서 신청 필요.")
         guidance = "\n".join(rules)
+
+    # 검증된 L2 대본에서 few-shot 예시 (최대 6개)
+    example_block = ""
+    if verified_examples:
+        lines = ["【검증된 답변 스타일 (이 톤·형식으로 답해라)】"]
+        for ex in verified_examples[:6]:
+            triggers = ex.get("triggers") or []
+            if not triggers:
+                continue
+            q = triggers[0]
+            a = ex.get("message", "").replace("\n", " ")
+            emotion = ex.get("emotion", "thinking")
+            lines.append(f'Q: "{q}"')
+            lines.append(f'A: {{"emotion":"{emotion}","message":"{a}","action":null,"hint":null}}')
+        if len(lines) > 1:
+            example_block = "\n".join(lines) + "\n\n"
 
     return f"""\
 너는 {program_display}의 AI 도우미 '매요'야.
@@ -214,7 +250,7 @@ def _build_system_prompt(user_context: dict, program: str) -> str:
 - 세금 신고, 법률, 투자 조언
 - 경쟁 서비스 추천
 
-【응답 규칙】
+{example_block}【응답 규칙】
 - 반드시 아래 JSON만 반환 (다른 텍스트 금지)
 - message: 2~3문장, 마크다운 기호(*#`~) 사용 금지, 이모지 금지
 - emotion: love/welcome/thinking/doubt/warning/relief/exploration/wink/failure/satisfaction/data_control 중 하나
@@ -224,11 +260,16 @@ action과 hint가 없으면 null로.
 """
 
 
-def _call_haiku(message: str, history: list[dict], user_context: dict, program: str) -> dict:
+def _call_haiku(
+    message: str,
+    history: list[dict],
+    user_context: dict,
+    program: str,
+    verified_examples: list[dict] | None = None,
+) -> dict:
     import os
     api_key = os.environ.get("ANTHROPIC_API_KEY", "")
     if not api_key:
-        # secrets에서 조회
         try:
             from app.services.secrets import get_secret
             api_key = get_secret("anthropic_api_key") or ""
@@ -240,18 +281,19 @@ def _call_haiku(message: str, history: list[dict], user_context: dict, program: 
     try:
         import anthropic
         client = anthropic.Anthropic(api_key=api_key)
-        system_prompt = _build_system_prompt(user_context, program)
-        messages = list(history or [])
+        system_prompt = _build_system_prompt(user_context, program, verified_examples)
+
+        # 최근 6개 메시지만 전달 (비용 절감 + 응답 속도)
+        messages = list((history or [])[-6:])
         messages.append({"role": "user", "content": message})
 
         resp = client.messages.create(
             model=_HAIKU_MODEL,
-            max_tokens=300,
+            max_tokens=400,
             system=system_prompt,
             messages=messages,
         )
         text = resp.content[0].text.strip()
-        # 마크다운 코드블록 제거
         text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.MULTILINE)
         text = re.sub(r"```\s*$", "", text, flags=re.MULTILINE).strip()
         try:
@@ -293,8 +335,11 @@ def process_message(
     if oos:
         return {**oos, "layer": "l2", "script_id": None}
 
+    # L2 스크립트 로드 (캐시) — verified 우선 정렬 포함
+    scripts = _load_l2_scripts(program)
+
     # L2 FAQ 매칭
-    script = _match_l2(message, program)
+    script = _match_l2(message, scripts)
     if script:
         return {
             "emotion":   script.get("emotion", "thinking"),
@@ -305,8 +350,9 @@ def process_message(
             "script_id": script.get("id"),
         }
 
-    # L3 Haiku
-    result = _call_haiku(message, history, user_context, program)
+    # L3 Haiku — verified 스크립트를 few-shot 예시로 전달
+    verified = [s for s in scripts if s.get("is_verified")]
+    result = _call_haiku(message, history, user_context, program, verified_examples=verified)
     result["layer"] = "l3"
     result["script_id"] = None
     return result
