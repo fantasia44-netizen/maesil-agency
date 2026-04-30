@@ -1112,7 +1112,8 @@ def analyze_and_propose(
                 )
 
             # 파일은 찾았으나 실패 심볼 클래스가 없는 경우 → 클래스 정의 파일 추가 탐색
-            if file_info and failing_symbol:
+            # symbol_is_tag=True 면 [NaverAd] 같은 로거 태그 — 클래스 정의 파일 탐색 불필요
+            if file_info and failing_symbol and not symbol_is_tag:
                 cls_name = failing_symbol.split(".")[0]
                 if not re.search(r'(?:class|def)\s+' + re.escape(cls_name) + r'\b',
                                  file_info["original"]):

@@ -82,10 +82,12 @@ def _save_results(
     user_message: str,
     results: list[dict],
     user_id: str | None = None,
+    title: str | None = None,
 ) -> None:
-    """대화 내용을 DB에 저장. 오류는 로그만 남기고 응답은 계속."""
+    """대화 내용을 DB에 저장. 오류는 로그만 남기고 응답은 계속.
+    title이 있으면 사이드바 표시용 제목으로 사용, user_message는 전체 내용으로 저장."""
     try:
-        conv_svc.ensure_conversation(conversation_id, user_message, user_id=user_id)
+        conv_svc.ensure_conversation(conversation_id, title or user_message, user_id=user_id)
         conv_svc.save_user_message(conversation_id, user_message)
         for r in results:
             if r.get("message"):
@@ -479,10 +481,10 @@ def chat_from_alert(
     run_id = str(uuid.uuid4())
 
     _alert_title = f"[알림] {prog} · {sev} — {title[:40]}"
-    _save_results(conversation_id, _alert_title, [{
+    _save_results(conversation_id, auto_msg, [{
         "run_id": run_id, "agent_type": "developer",
         "message": response_text, "status": "success", "cost_usd": 0.0,
-    }], user_id=user.id)
+    }], user_id=user.id, title=_alert_title)
 
     return ChatResponse(
         conversation_id=conversation_id,

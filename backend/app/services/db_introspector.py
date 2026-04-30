@@ -92,7 +92,7 @@ def get_table_schema(db_name: str, table_name: str) -> dict | None:
 
     def _exec(sql: str):
         try:
-            r = client.rpc("execute_readonly_sql", {"query": sql}).execute()
+            r = client.rpc("execute_readonly_sql", {"query": sql.strip()}).execute()
             return r.data or []
         except Exception as e:
             logger.warning("execute_readonly_sql 실패 [%s/%s]: %s", db_name, table_name, e)
