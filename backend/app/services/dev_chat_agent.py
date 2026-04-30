@@ -1499,6 +1499,14 @@ def _smart_patch(original: str, patch_code: str, fn_name: str | None) -> str:
     em = end_pat.search(rest)
     end = start + 1 + em.start() + 1 if em else len(original)
 
+    # LLM이 0-indent로 작성한 patch_code를 원본 함수의 들여쓰기 수준으로 맞춤
+    if fn_indent and not patch_code.startswith(fn_indent):
+        indented_lines = [
+            fn_indent + line if line.strip() else line
+            for line in patch_code.rstrip('\n').split('\n')
+        ]
+        patch_code = '\n'.join(indented_lines)
+
     return original[:start] + patch_code.rstrip('\n') + '\n\n\n' + original[end:]
 
 
