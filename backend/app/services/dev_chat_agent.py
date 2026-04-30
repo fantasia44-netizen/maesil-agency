@@ -517,9 +517,7 @@ def _extract_relevant_section(content: str, target_symbol: str) -> str:
     if class_part:
         for i, line in enumerate(lines):
             stripped = line.lstrip()
-            if (stripped.startswith(f"class {class_part}")
-                    or stripped.startswith(f"class {class_part}(")
-                    or stripped.startswith(f"class {class_part}:")):
+            if re.match(r'class\s+' + re.escape(class_part) + r'[\s(:]', stripped):
                 # 다음 0-indent class/def 까지
                 end_idx = len(lines)
                 for j in range(i + 1, len(lines)):
