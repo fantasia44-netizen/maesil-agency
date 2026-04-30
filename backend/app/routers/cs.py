@@ -203,7 +203,7 @@ def cs_chat_stream(
     )
 
     # L2 먼저 확인
-    oos = _check_out_of_scope(req.message)
+    oos = _check_out_of_scope(req.message, req.program)
     l2  = oos or (lambda s: {
         "emotion": s.get("emotion", "thinking"),
         "message": s.get("message", ""),

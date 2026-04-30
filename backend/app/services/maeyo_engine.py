@@ -21,19 +21,41 @@ logger = logging.getLogger(__name__)
 _HAIKU_MODEL = "claude-haiku-4-5-20251001"
 
 # ─────────────────────────────────────────────────────────────────
-# 범위 밖 거절 패턴 (공통)
+# 범위 밖 거절 패턴 — 공통 + 프로그램별 분기
 # ─────────────────────────────────────────────────────────────────
-_OUT_OF_SCOPE: list[tuple[str, str]] = [
+
+# 모든 프로그램에 공통 적용
+_OUT_OF_SCOPE_COMMON: list[tuple[str, str]] = [
     (r"경쟁 서비스|다른 서비스 추천|장사왕|셀러노트", "거절"),
     (r"광고 대신 운영|대신 운영해", "거절"),
     (r"세금 신고|세무사", "세무사"),
     (r"주식 투자|투자해도", "거절"),
     (r"다른 사람 매출|타인 매출", "거절_개인정보"),
     (r"채용|직원 채용", "거절"),
+]
+
+# maesil-insight 전용 — 이커머스 서비스, 유튜브 등 콘텐츠 플랫폼은 범위 밖
+_OUT_OF_SCOPE_INSIGHT: list[tuple[str, str]] = [
     (r"유튜브|youtube|인스타|instagram|틱톡|tiktok|블로그|blog|카카오스토어|11번가|지마켓|옥션|위메프|티몬|올리브영|무신사", "타플랫폼"),
     (r"영상 편집|콘텐츠 제작|SNS 마케팅|팔로워|구독자|조회수|숏폼", "타플랫폼"),
     (r"카페24|고도몰|메이크샵|아임웹|쇼피파이|shopify", "타플랫폼"),
 ]
+
+# maesil-studio 전용 — 유튜브/콘텐츠 질문은 유효, 이커머스는 범위 밖
+_OUT_OF_SCOPE_STUDIO: list[tuple[str, str]] = [
+    (r"스마트스토어|쿠팡|네이버쇼핑|지마켓|옥션|11번가|위메프|티몬|올리브영|무신사", "타플랫폼"),
+    (r"카페24|고도몰|메이크샵|아임웹|쇼피파이|shopify", "타플랫폼"),
+    (r"광고비|ROAS|키워드 광고|CPC|CPM", "타플랫폼"),
+]
+
+# 하위 호환 — 기존 코드에서 직접 참조하는 곳 있으면 공통+인사이트 합본 노출
+_OUT_OF_SCOPE = _OUT_OF_SCOPE_COMMON + _OUT_OF_SCOPE_INSIGHT
+
+
+def _get_out_of_scope_rules(program: str) -> list[tuple[str, str]]:
+    if program == "maesil-studio":
+        return _OUT_OF_SCOPE_COMMON + _OUT_OF_SCOPE_STUDIO
+    return _OUT_OF_SCOPE_COMMON + _OUT_OF_SCOPE_INSIGHT
 
 _OUT_OF_SCOPE_REPLIES: dict[str, dict] = {
     "거절": {
@@ -141,8 +163,8 @@ def _normalize(text: str) -> str:
     return re.sub(r"[^\w가-힣]", "", text).lower()
 
 
-def _check_out_of_scope(message: str) -> dict | None:
-    for pattern, reply_key in _OUT_OF_SCOPE:
+def _check_out_of_scope(message: str, program: str = "maesil-insight") -> dict | None:
+    for pattern, reply_key in _get_out_of_scope_rules(program):
         if re.search(pattern, message, re.I):
             return _OUT_OF_SCOPE_REPLIES.get(reply_key, _OUT_OF_SCOPE_REPLIES["거절"])
     return None
@@ -180,40 +202,87 @@ def _build_system_prompt(
         "maesil-studio":  "매실 스튜디오(Maesil Studio)",
     }.get(program, program)
 
-    channels = user_context.get("connected_channels") or []
-    has_coupang_ad = bool(user_context.get("has_coupang_ad"))
-    has_naver_ad   = bool(user_context.get("has_naver_ad"))
+    is_studio = (program == "maesil-studio")
 
-    if channels:
-        ch_status = "연동된 채널: " + ", ".join(channels)
-    else:
-        ch_status = "연동된 채널: 없음 (아직 채널 연동 전)"
+    # ── 프로그램별 상태 블록 ──────────────────────────────────────
+    if is_studio:
+        channels = user_context.get("connected_channels") or []
+        yt_channels = [c for c in channels if "유튜브" in c or "youtube" in c.lower()]
 
-    ad_lines = []
-    has_naver   = any("스마트스토어" in c or ("네이버" in c and "광고" not in c) for c in channels)
-    has_coupang = any("쿠팡" in c and "광고" not in c for c in channels)
-    if has_naver_ad:
-        ad_lines.append("네이버 광고: API 연동됨")
-    elif has_naver:
-        ad_lines.append("네이버 광고: 미연동 (광고센터 SA API 별도 신청 필요)")
-    if has_coupang:
-        if has_coupang_ad:
-            ad_lines.append("쿠팡 광고: 데이터 있음 (파일 업로드됨)")
+        if yt_channels:
+            ch_status = "연동된 유튜브 채널: " + ", ".join(yt_channels)
+        elif channels:
+            ch_status = "연동된 채널: " + ", ".join(channels)
         else:
-            ad_lines.append("쿠팡 광고: 데이터 없음 (Wing 엑셀 다운로드 후 업로드 필요)")
-    ad_status = "\n".join(ad_lines) if ad_lines else ""
+            ch_status = "연동된 채널: 없음 (아직 유튜브 채널 연동 전)"
 
-    if not channels:
-        guidance = "【안내 규칙】\n- 채널을 연동하지 않았다. 채널 연결하기를 최우선으로 안내해라."
+        ad_status = ""
+
+        if not channels:
+            guidance = "【안내 규칙】\n- 유튜브 채널을 연동하지 않았다. 채널 연결하기를 최우선으로 안내해라."
+        else:
+            guidance = "【안내 규칙】\n- 이미 채널이 연동되어 있으므로 '채널을 연결하세요'라고 안내하지 마라."
+
+        role_block = f"""\
+【역할】
+- {program_display} 서비스 사용법, 기능 안내
+- 유튜브 채널 API 연결 방법 안내
+- 채널 수익·조회수·구독자 분석 관련 질문 답변
+- 서비스 오류·에러 해결 안내
+
+【절대 금지】
+- 이커머스(쇼핑몰, 스마트스토어, 쿠팡) 관련 안내
+- 세금 신고, 법률, 투자 조언
+- 경쟁 서비스 추천"""
+
     else:
-        rules = ["【안내 규칙】", "- 이미 채널이 연동되어 있으므로 '채널을 연결하세요'라고 안내하지 마라."]
-        if has_coupang and not has_coupang_ad:
-            rules.append("- 쿠팡 광고 데이터가 없다. Wing → 광고관리 → 데이터 다운로드 → 파일 업로드 방법을 안내해라.")
-        if has_naver and not has_naver_ad:
-            rules.append("- 네이버 광고 API가 미연동. ads.naver.com → SA API 사용 관리에서 신청 필요.")
-        guidance = "\n".join(rules)
+        # maesil-insight (기본)
+        channels = user_context.get("connected_channels") or []
+        has_coupang_ad = bool(user_context.get("has_coupang_ad"))
+        has_naver_ad   = bool(user_context.get("has_naver_ad"))
 
-    # 검증된 L2 대본에서 few-shot 예시 (최대 6개)
+        if channels:
+            ch_status = "연동된 채널: " + ", ".join(channels)
+        else:
+            ch_status = "연동된 채널: 없음 (아직 채널 연동 전)"
+
+        ad_lines = []
+        has_naver   = any("스마트스토어" in c or ("네이버" in c and "광고" not in c) for c in channels)
+        has_coupang = any("쿠팡" in c and "광고" not in c for c in channels)
+        if has_naver_ad:
+            ad_lines.append("네이버 광고: API 연동됨")
+        elif has_naver:
+            ad_lines.append("네이버 광고: 미연동 (광고센터 SA API 별도 신청 필요)")
+        if has_coupang:
+            if has_coupang_ad:
+                ad_lines.append("쿠팡 광고: 데이터 있음 (파일 업로드됨)")
+            else:
+                ad_lines.append("쿠팡 광고: 데이터 없음 (Wing 엑셀 다운로드 후 업로드 필요)")
+        ad_status = "\n".join(ad_lines) if ad_lines else ""
+
+        if not channels:
+            guidance = "【안내 규칙】\n- 채널을 연동하지 않았다. 채널 연결하기를 최우선으로 안내해라."
+        else:
+            rules = ["【안내 규칙】", "- 이미 채널이 연동되어 있으므로 '채널을 연결하세요'라고 안내하지 마라."]
+            if has_coupang and not has_coupang_ad:
+                rules.append("- 쿠팡 광고 데이터가 없다. Wing → 광고관리 → 데이터 다운로드 → 파일 업로드 방법을 안내해라.")
+            if has_naver and not has_naver_ad:
+                rules.append("- 네이버 광고 API가 미연동. ads.naver.com → SA API 사용 관리에서 신청 필요.")
+            guidance = "\n".join(rules)
+
+        role_block = f"""\
+【역할】
+- {program_display} 서비스 사용법, 기능 안내
+- 채널 API 연결 방법 안내
+- 매출·수익 분석 관련 질문 답변
+- 서비스 오류·에러 해결 안내
+
+【절대 금지】
+- 다른 플랫폼 안내 (유튜브, 인스타, 타 SaaS 등)
+- 세금 신고, 법률, 투자 조언
+- 경쟁 서비스 추천"""
+
+    # ── 검증된 L2 대본 few-shot 예시 (최대 6개) ──────────────────
     example_block = ""
     if verified_examples:
         lines = ["【검증된 답변 스타일 (이 톤·형식으로 답해라)】"]
@@ -239,16 +308,7 @@ def _build_system_prompt(
 
 {guidance}
 
-【역할】
-- {program_display} 서비스 사용법, 기능 안내
-- 채널 API 연결 방법 안내
-- 매출·수익 분석 관련 질문 답변
-- 서비스 오류·에러 해결 안내
-
-【절대 금지】
-- 다른 플랫폼 안내 (유튜브, 인스타, 타 SaaS 등)
-- 세금 신고, 법률, 투자 조언
-- 경쟁 서비스 추천
+{role_block}
 
 {example_block}【응답 규칙】
 - 반드시 아래 JSON만 반환 (다른 텍스트 금지)
@@ -347,8 +407,8 @@ def process_message(
             "layer": "limit", "script_id": None,
         }
 
-    # 범위 밖 거절
-    oos = _check_out_of_scope(message)
+    # 범위 밖 거절 (program별 규칙 적용)
+    oos = _check_out_of_scope(message, program)
     if oos:
         return {**oos, "layer": "l2", "script_id": None}
 
