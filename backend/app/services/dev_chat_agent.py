@@ -368,7 +368,27 @@ def _extract_error_function(text: str) -> str | None:
     예: '[Scheduler] auto_recovery 실패' → 'Scheduler.auto_recovery'
     예: 'AgencyLog.start failed' → 'AgencyLog.start'
     예: '"POST /app/api/competitor/register-group" 500' → 'competitor.register_group'
+    예: '[naver_ad_api_client] [NaverAd] POST /stat-reports → 400:' → 'NaverAd.stat_reports'
     """
+    # [module] [ClassName] HTTP_METHOD /path → 숫자 패턴 (API 클라이언트 로그)
+    # 예: [naver_ad_api_client] [NaverAd] POST /stat-reports → 400:
+    m = re.search(
+        r'\[[a-z_][a-z0-9_]+\]\s+\[([A-Z][a-zA-Z0-9_]+)\]\s+(?:POST|GET|PUT|DELETE|PATCH)\s+(/[^\s→\n]+)',
+        text, re.I
+    )
+    if m:
+        path_last = m.group(2).strip('/').split('/')[-1].replace('-', '_')
+        return f"{m.group(1)}.{path_last}"
+
+    # [ClassName] HTTP_METHOD /path → 숫자 (모듈 없는 버전)
+    m = re.search(
+        r'\[([A-Z][a-zA-Z0-9_]+)\]\s+(?:POST|GET|PUT|DELETE|PATCH)\s+(/[^\s→\n]+)\s*→\s*\d',
+        text, re.I
+    )
+    if m:
+        path_last = m.group(2).strip('/').split('/')[-1].replace('-', '_')
+        return f"{m.group(1)}.{path_last}"
+
     # [ClassName] method 예외|실패|오류|에러|error|failed 패턴 (가장 흔한 패턴)
     m = re.search(
         r'\[([A-Z][a-zA-Z0-9_]+)\]\s+(\w+)\s+(예외|실패|오류|에러|error|failed)',
@@ -545,6 +565,7 @@ def _extract_file_paths(text: str) -> list[str]:
     - 직접 경로: app/foo/bar.py
     - JSON 로그: "module": "..."
     - Python logger 점 표기: services.naver_ad.repository (→ services/naver_ad/repository.py)
+    - 로거 브라켓 모듈명: [naver_ad_api_client] → services/marketplace/naver_ad_api_client.py 등
     """
     patterns = [
         r'File "([^"]+\.py)"',                          # Python traceback
@@ -592,6 +613,9 @@ def _extract_file_paths(text: str) -> list[str]:
                 f"app/models/{base}.py",
                 f"app/db/{base}.py",
                 f"app/repositories/{base}.py",
+                f"services/{base}.py",
+                f"services/marketplace/{base}.py",
+                f"services/naver_ad/{base}.py",
                 f"db/{base}.py",
                 f"models/{base}.py",
                 f"repositories/{base}.py",
@@ -601,7 +625,23 @@ def _extract_file_paths(text: str) -> list[str]:
             for c in candidates:
                 if c not in found:
                     found.append(c)
-    return found[:12]  # 최대 12개 (점 표기 후보 포함)
+
+    # 로거 브라켓 모듈명 추출: [naver_ad_api_client] [NaverAd] ...
+    # 첫 번째 소문자 브라켓 태그 = 실제 Python 모듈명
+    for m in re.finditer(r'^\[([a-z][a-z0-9_]+)\]', text, re.MULTILINE):
+        mod = m.group(1)
+        for prefix in [
+            "services/marketplace",
+            "services/naver_ad",
+            "services",
+            "app/services",
+            "",
+        ]:
+            fp = f"{prefix}/{mod}.py" if prefix else f"{mod}.py"
+            if fp not in found:
+                found.append(fp)
+
+    return found[:16]  # 최대 16개
 
 
 def _detect_program_from_text(text: str, programs: list[dict]) -> dict | None:
@@ -953,6 +993,14 @@ def analyze_and_propose(
                     base = fp.split("/")[-1].replace(".py", "")
                     if base not in code_search_queries:
                         code_search_queries.append(base)
+
+                # 브라켓 모듈명 폴백: [naver_ad_api_client] → naver_ad_api_client
+                if not code_search_queries:
+                    for bm in re.finditer(r'^\[([a-z][a-z0-9_]+)\]', full_text, re.MULTILINE):
+                        q = bm.group(1)
+                        if q not in code_search_queries:
+                            code_search_queries.append(q)
+                            break
 
                 logger.warning("1차 경로 실패 → code search: %s (repo=%s)", code_search_queries[:2], repo)
                 for query in code_search_queries:
