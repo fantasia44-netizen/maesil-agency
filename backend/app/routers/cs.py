@@ -13,8 +13,11 @@ CS / 매요 엔드포인트
   GET  /api/cs/l2-scripts                — L2 대본 목록
   POST /api/cs/l2-scripts                — L2 대본 추가
   PUT  /api/cs/l2-scripts/{id}           — L2 대본 수정
+  PATCH /api/cs/l2-scripts/{id}/verify   — 검증 상태 토글
   DELETE /api/cs/l2-scripts/{id}         — L2 대본 비활성화
-  POST /api/cs/l2-scripts/import         — maesil-insight l2_scripts.py 일괄 가져오기
+  POST /api/cs/l2-scripts/import         — JSON 배열 일괄 가져오기
+  POST /api/cs/l2-scripts/sync-from-insight — maesil-insight API에서 자동 동기화
+  GET  /api/cs/gap-analysis              — L3 질문 목록 (대본 미매칭)
 """
 from __future__ import annotations
 
@@ -92,6 +95,7 @@ class L2ScriptModel(BaseModel):
     hint: str | None = None
     tts_key: str | None = None
     is_active: bool = True
+    is_verified: bool = False
     sort_order: int = 0
 
 
@@ -418,7 +422,8 @@ def update_l2_script(
         "keywords": script.keywords, "emotion": script.emotion,
         "message": script.message, "action": script.action,
         "hint": script.hint, "tts_key": script.tts_key,
-        "is_active": script.is_active, "sort_order": script.sort_order,
+        "is_active": script.is_active, "is_verified": script.is_verified,
+        "sort_order": script.sort_order,
         "updated_at": _now(),
     }).eq("id", script_id).execute()
     from app.services.maeyo_engine import invalidate_l2_cache
@@ -485,3 +490,145 @@ def import_l2_scripts(
     from app.services.maeyo_engine import invalidate_l2_cache
     invalidate_l2_cache()
     return {"ok": True, "imported": imported}
+
+
+@router.patch("/l2-scripts/{script_id}/verify")
+def verify_l2_script(
+    script_id: str,
+    user: UserContext = Depends(get_current_user),
+) -> dict:
+    """is_verified 토글 (정답 확인 ↔ 미검증)."""
+    if not user.is_super_admin:
+        raise HTTPException(403, "관리자 전용")
+    row = _db().table("maeyo_l2_scripts").select("is_verified") \
+        .eq("id", script_id).limit(1).execute().data
+    if not row:
+        raise HTTPException(404, "스크립트를 찾을 수 없습니다")
+    new_val = not row[0].get("is_verified", False)
+    _db().table("maeyo_l2_scripts").update({
+        "is_verified": new_val, "updated_at": _now(),
+    }).eq("id", script_id).execute()
+    return {"ok": True, "is_verified": new_val}
+
+
+@router.post("/l2-scripts/sync-from-insight")
+def sync_l2_from_insight(
+    user: UserContext = Depends(get_current_user),
+) -> dict:
+    """maesil-insight /api/maeyo/l2-scripts 에서 스크립트를 가져와 upsert.
+    Secrets 필요: maesil_insight_url, harness_api_token
+    """
+    if not user.is_super_admin:
+        raise HTTPException(403, "관리자 전용")
+
+    from app.services.secrets import get_secret
+    import httpx
+
+    base_url = (get_secret("maesil_insight_url") or "").rstrip("/")
+    token    = get_secret("harness_api_token") or ""
+    if not base_url:
+        raise HTTPException(400, "maesil_insight_url 시크릿이 없습니다 (/settings에서 등록)")
+    if not token:
+        raise HTTPException(400, "harness_api_token 시크릿이 없습니다 (/settings에서 등록)")
+
+    try:
+        resp = httpx.get(
+            f"{base_url}/api/maeyo/l2-scripts",
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=20,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception as e:
+        raise HTTPException(502, f"maesil-insight 호출 실패: {e}")
+
+    scripts = data.get("scripts") or []
+    if not scripts:
+        return {"ok": True, "imported": 0, "note": "스크립트가 없거나 응답이 비어있음"}
+
+    now = _now()
+    rows = []
+    for i, s in enumerate(scripts):
+        rows.append({
+            "id":         s.get("id") or f"IMP_{i:04d}",
+            "program":    "maesil-insight",
+            "triggers":   s.get("triggers") or [],
+            "keywords":   s.get("keywords") or [],
+            "emotion":    s.get("emotion", "thinking"),
+            "message":    s.get("message", ""),
+            "action":     s.get("action"),
+            "hint":       s.get("hint"),
+            "tts_key":    s.get("tts_key"),
+            "is_active":  True,
+            "sort_order": i,
+            "updated_at": now,
+        })
+
+    imported = 0
+    for i in range(0, len(rows), 100):
+        chunk = rows[i:i + 100]
+        _db().table("maeyo_l2_scripts").upsert(chunk, on_conflict="id").execute()
+        imported += len(chunk)
+
+    from app.services.maeyo_engine import invalidate_l2_cache
+    invalidate_l2_cache()
+    return {"ok": True, "imported": imported}
+
+
+@router.get("/gap-analysis")
+def gap_analysis(
+    program: str = "maesil-insight",
+    limit: int = 200,
+    user: UserContext = Depends(get_current_user),
+) -> dict:
+    """L3로 처리된 질문 목록 (L2 대본 미매칭 = 갭).
+    대본 없이 AI가 답변한 실제 사용자 질문을 반환.
+    """
+    if not user.is_super_admin:
+        raise HTTPException(403, "관리자 전용")
+
+    # layer는 assistant 메시지에 저장됨 → l3 assistant 메시지의 conversation_id 수집
+    l3_convs_r = _db().table("maeyo_messages") \
+        .select("conversation_id,created_at") \
+        .eq("role", "assistant") \
+        .eq("layer", "l3") \
+        .order("created_at", desc=True) \
+        .limit(limit) \
+        .execute()
+    l3_rows = l3_convs_r.data or []
+
+    conv_ids = list(dict.fromkeys(r["conversation_id"] for r in l3_rows if r.get("conversation_id")))
+    if not conv_ids:
+        return {"questions": [], "total": 0}
+
+    # 프로그램 필터
+    convs = _db().table("maeyo_conversations") \
+        .select("id,program") \
+        .in_("id", conv_ids[:100]) \
+        .execute().data or []
+    conv_map = {c["id"]: c["program"] for c in convs}
+
+    if program:
+        conv_ids = [cid for cid in conv_ids if conv_map.get(cid) == program]
+    if not conv_ids:
+        return {"questions": [], "total": 0}
+
+    # 해당 대화의 user 메시지 조회
+    user_msgs = _db().table("maeyo_messages") \
+        .select("id,content,created_at,conversation_id") \
+        .eq("role", "user") \
+        .in_("conversation_id", conv_ids[:100]) \
+        .order("created_at", desc=True) \
+        .execute().data or []
+
+    result = [
+        {
+            "id":              m["id"],
+            "content":         m["content"],
+            "created_at":      m["created_at"],
+            "conversation_id": m["conversation_id"],
+            "program":         conv_map.get(m["conversation_id"], "unknown"),
+        }
+        for m in user_msgs
+    ]
+    return {"questions": result, "total": len(result)}
