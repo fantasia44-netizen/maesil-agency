@@ -14,6 +14,7 @@ dev_chat_agent — 대화형 개발 에이전트.
 """
 from __future__ import annotations
 
+import ast
 import json
 import logging
 import re
@@ -1375,11 +1376,17 @@ PR 생성 후 안내 문구는 시스템이 자동으로 "`머지` 입력하면 
 코드 수정이 필요한 경우, 변경이 필요한 함수/클래스만 출력하세요 (파일 전체 X).
 백엔드가 자동으로 원본 파일에서 해당 함수를 찾아 교체합니다.
 
+⚠️ **클래스 메서드 수정 시 반드시 지켜야 할 규칙**:
+- `함수명`에는 **클래스 이름**을 적으세요 (메서드 이름 X).
+- 코드 블록에는 **클래스 전체**를 출력하세요 (메서드만 X).
+- 예) `NaverAdClient`의 `create_stat_report` 수정 → 함수명: `NaverAdClient`, 코드: `class NaverAdClient:` 전체.
+- 모듈 레벨 함수(클래스 밖)만 함수 이름을 그대로 써도 됩니다.
+
 [PROPOSED_FIX]
 파일: <파일경로>
-함수명: <교체할 최상위 함수 또는 클래스 이름 (하나만)>
+함수명: <클래스 메서드이면 클래스 이름 / 모듈 레벨 함수이면 함수 이름 (하나만)>
 ```python
-<변경된 함수/클래스 전체 내용>
+<클래스 메서드이면 class 전체 / 모듈 레벨 함수이면 함수 전체>
 ```
 커밋메시지: <fix: 간단한 설명>
 PR제목: <간단한 제목>
@@ -1472,6 +1479,41 @@ PR제목: <간단한 제목>
 # 승인 처리
 # ─────────────────────────────────────────────────────────────────
 
+def _verify_class_methods(original: str, final: str) -> str | None:
+    """원본에 있던 클래스 메서드가 final 에서 모듈 레벨로 이탈했으면 오류 문자열 반환.
+    정상이면 None 반환."""
+    try:
+        orig_tree = ast.parse(original)
+        final_tree = ast.parse(final)
+    except SyntaxError as e:
+        return f"SyntaxError in patched file: {e}"
+
+    def class_methods(tree: ast.AST) -> dict[str, str]:
+        """메서드명 → 소속 클래스명 매핑."""
+        result: dict[str, str] = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                for child in node.body:
+                    if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        result[child.name] = node.name
+        return result
+
+    orig_cm = class_methods(orig_tree)
+    final_cm = class_methods(final_tree)
+
+    escaped: list[str] = []
+    for method, cls in orig_cm.items():
+        if method not in final_cm:
+            escaped.append(f"`{cls}.{method}`")
+
+    if escaped:
+        return (
+            f"클래스 메서드가 모듈 레벨로 이탈했습니다: {', '.join(escaped)}. "
+            "커밋을 중단합니다 — LLM 출력을 확인하세요."
+        )
+    return None
+
+
 def _smart_patch(original: str, patch_code: str, fn_name: str | None) -> str:
     """원본 파일에서 fn_name 함수/클래스를 patch_code로 교체.
     fn_name이 없거나 찾지 못하면 patch_code를 그대로 반환 (full-file 모드)."""
@@ -1525,6 +1567,13 @@ def execute_pending(conversation_id: str) -> str:
     original = action.get("original_content", "")
     fn_name = action.get("fn_name")
     final_content = _smart_patch(original, patch_code, fn_name)
+
+    # ── AST 클래스 멤버십 검증 (원본에 있던 클래스 메서드가 모듈 레벨로 이탈 방지) ──
+    if original:
+        verify_err = _verify_class_methods(original, final_content)
+        if verify_err:
+            logger.error("execute_pending: AST 검증 실패 — %s", verify_err)
+            return f"❌ **코드 구조 오류 감지 — 커밋 중단**\n\n{verify_err}\n\n수정안을 다시 요청해 주세요."
 
     try:
         # 1) 브랜치 생성
