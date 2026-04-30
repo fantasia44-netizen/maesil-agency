@@ -41,11 +41,13 @@ _OUT_OF_SCOPE_INSIGHT: list[tuple[str, str]] = [
     (r"카페24|고도몰|메이크샵|아임웹|쇼피파이|shopify", "타플랫폼"),
 ]
 
-# maesil-studio 전용 — 유튜브/콘텐츠 질문은 유효, 이커머스는 범위 밖
+# maesil-studio 전용 — 콘텐츠 생성 SaaS (블로그·인스타·이미지·상품 상세)
+# 이커머스 플랫폼 운영, 광고 최적화 질문은 범위 밖
 _OUT_OF_SCOPE_STUDIO: list[tuple[str, str]] = [
-    (r"스마트스토어|쿠팡|네이버쇼핑|지마켓|옥션|11번가|위메프|티몬|올리브영|무신사", "타플랫폼"),
+    (r"스마트스토어 운영|쿠팡 판매|네이버 쇼핑 등록|지마켓|옥션|11번가 입점", "타플랫폼"),
     (r"카페24|고도몰|메이크샵|아임웹|쇼피파이|shopify", "타플랫폼"),
-    (r"광고비|ROAS|키워드 광고|CPC|CPM", "타플랫폼"),
+    (r"ROAS|키워드 광고|광고비 최적화|CPC 입찰|CPM 설정", "타플랫폼"),
+    (r"유튜브 채널 분석|유튜브 수익|유튜브 알고리즘|유튜브 구독자 늘리기", "타플랫폼"),
 ]
 
 # 하위 호환 — 기존 코드에서 직접 참조하는 곳 있으면 공통+인사이트 합본 노출
@@ -207,31 +209,42 @@ def _build_system_prompt(
     # ── 프로그램별 상태 블록 ──────────────────────────────────────
     if is_studio:
         channels = user_context.get("connected_channels") or []
-        yt_channels = [c for c in channels if "유튜브" in c or "youtube" in c.lower()]
+        has_insight = bool(user_context.get("has_insight_connection")) or any(
+            "인사이트" in c for c in channels
+        )
 
-        if yt_channels:
-            ch_status = "연동된 유튜브 채널: " + ", ".join(yt_channels)
-        elif channels:
-            ch_status = "연동된 채널: " + ", ".join(channels)
+        if has_insight:
+            ch_status = "매실 인사이트 연동: 완료 (상품 데이터 가져오기 가능)"
         else:
-            ch_status = "연동된 채널: 없음 (아직 유튜브 채널 연동 전)"
+            ch_status = "매실 인사이트 연동: 없음"
 
         ad_status = ""
 
-        if not channels:
-            guidance = "【안내 규칙】\n- 유튜브 채널을 연동하지 않았다. 채널 연결하기를 최우선으로 안내해라."
+        if not has_insight:
+            guidance = (
+                "【안내 규칙】\n"
+                "- 매실 인사이트가 연동되지 않았다. 필요하면 연동 방법을 안내하되, 강요하지 마라.\n"
+                "- 콘텐츠 생성은 인사이트 연동 없이도 가능하다."
+            )
         else:
-            guidance = "【안내 규칙】\n- 이미 채널이 연동되어 있으므로 '채널을 연결하세요'라고 안내하지 마라."
+            guidance = (
+                "【안내 규칙】\n"
+                "- 매실 인사이트가 연동되어 있다. '연동하세요'라고 안내하지 마라.\n"
+                "- 상품 데이터를 가져와서 콘텐츠를 바로 생성할 수 있다고 안내해도 좋다."
+            )
 
         role_block = f"""\
 【역할】
-- {program_display} 서비스 사용법, 기능 안내
-- 유튜브 채널 API 연결 방법 안내
-- 채널 수익·조회수·구독자 분석 관련 질문 답변
+- {program_display} 서비스 사용법·기능 안내
+- 블로그·인스타그램·상품 상세·광고 문구·보도자료 등 콘텐츠 생성 방법 안내
+- 이미지 생성(FLUX, Ideogram), 배경 제거·교체 기능 안내
+- 브랜드 프로필·브랜드 패키지 사용법 안내
+- 포인트 사용·요금제별 기능 안내
+- 매실 인사이트 연동 및 상품 가져오기 안내
 - 서비스 오류·에러 해결 안내
 
 【절대 금지】
-- 이커머스(쇼핑몰, 스마트스토어, 쿠팡) 관련 안내
+- 이커머스 플랫폼 운영 방법 안내 (스마트스토어 광고비, 쿠팡 판매 전략 등)
 - 세금 신고, 법률, 투자 조언
 - 경쟁 서비스 추천"""
 
