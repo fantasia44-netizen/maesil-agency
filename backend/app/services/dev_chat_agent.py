@@ -373,10 +373,11 @@ def _extract_error_function(text: str) -> str | None:
     예: "AttributeError: 'NaverAdClient' object has no attribute 'create_stat_report'"
         → 'NaverAdClient.create_stat_report'
     """
-    # ── 최우선: AttributeError 'ClassName' has no attribute 'method' ──
-    # 이 패턴이 가장 명확하므로 다른 패턴보다 먼저 체크
+    # ── 최우선: 'ClassName' object has no attribute 'method' ──
+    # AttributeError: 접두사가 있든 없든 (로거 태그 뒤에 붙는 경우 포함) 잡아냄.
+    # 예: "[Collector] AD 예외: 'NaverAdClient' object has no attribute 'create_stat_report'"
     m = re.search(
-        r"AttributeError[:\s]+['\"]?([A-Za-z][A-Za-z0-9_]+)['\"]?\s+object\s+has\s+no\s+attribute\s+['\"]([a-z_]\w+)['\"]",
+        r"['\"]([A-Za-z][A-Za-z0-9_]+)['\"]?\s+object\s+has\s+no\s+attribute\s+['\"]([a-z_]\w+)['\"]",
         text, re.I,
     )
     if m:
