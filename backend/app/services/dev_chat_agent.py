@@ -370,7 +370,18 @@ def _extract_error_function(text: str) -> str | None:
     예: 'AgencyLog.start failed' → 'AgencyLog.start'
     예: '"POST /app/api/competitor/register-group" 500' → 'competitor.register_group'
     예: '[naver_ad_api_client] [NaverAd] POST /stat-reports → 400:' → 'NaverAd.stat_reports'
+    예: "AttributeError: 'NaverAdClient' object has no attribute 'create_stat_report'"
+        → 'NaverAdClient.create_stat_report'
     """
+    # ── 최우선: AttributeError 'ClassName' has no attribute 'method' ──
+    # 이 패턴이 가장 명확하므로 다른 패턴보다 먼저 체크
+    m = re.search(
+        r"AttributeError[:\s]+['\"]?([A-Za-z][A-Za-z0-9_]+)['\"]?\s+object\s+has\s+no\s+attribute\s+['\"]([a-z_]\w+)['\"]",
+        text, re.I,
+    )
+    if m:
+        return f"{m.group(1)}.{m.group(2)}"
+
     # Python logger 포맷: module.path: [ClassName] /endpoint 메시지
     # 예: services.marketplace.naver_ad_api_client: [NaverAd] /stat-reports 지표 준비중
     m = re.search(
@@ -1235,6 +1246,28 @@ def analyze_and_propose(
                             program["name"], len(schema_md))
         except Exception as e:
             logger.warning("DB introspector 실패: %s", e)
+
+    # ── AttributeError 유형 "이미 수정됨" 코드 기반 감지 ─────────────
+    # dev_pr_history에 없는 외부 커밋으로 수정된 경우도 잡아냄.
+    # "has no attribute 'method'" 에러인데 현재 코드에 메서드가 존재하면 → 수정 완료.
+    if file_info and failing_symbol and re.search(r"has no attribute", user_message, re.I):
+        _attr_cls    = failing_symbol.split(".")[0]
+        _attr_method = failing_symbol.split(".")[-1]
+        _src = file_info.get("original", "")
+        _method_in_code = bool(re.search(r'\bdef\s+' + re.escape(_attr_method) + r'\s*\(', _src))
+        _cls_in_code    = bool(re.search(r'\bclass\s+' + re.escape(_attr_cls) + r'[\s(:]', _src))
+        if _method_in_code and _cls_in_code:
+            logger.info("AttributeError 이미 수정됨 감지: %s.%s 현재 코드에 존재 [%s]",
+                        _attr_cls, _attr_method, file_info["path"])
+            return (
+                f"## ✅ 이미 수정된 에러입니다\n\n"
+                f"현재 `{file_info['path']}`에서 "
+                f"`{_attr_cls}.{_attr_method}`가 정상적으로 존재합니다.\n\n"
+                f"이 `AttributeError`는 메서드가 **클래스 밖으로 밀려났을 때** 발생한 에러이며, "
+                f"현재 코드에는 이미 수정이 반영된 상태입니다.\n\n"
+                f"알림 발생 시각의 에러이므로 추가 조치가 필요 없습니다.\n"
+                f"> 동일 에러가 지금도 계속 발생한다면 다시 알려주세요."
+            )
 
     # ── 중복 PR 감지 ───────────────────────────────────────────────
     # 같은 파일에 이미 만들어진 PR (open/merged) 이 있으면 LLM 컨텍스트로 알려줌
