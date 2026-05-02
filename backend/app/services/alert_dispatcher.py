@@ -41,9 +41,12 @@ def _list_active_channels() -> list[dict]:
 
 
 def _list_undispatched_events(scan_limit: int = 200) -> list[dict]:
-    """sent_channels 가 비어있는 이벤트.
+    """아직 발송 안 된(또는 일부 채널 실패) 이벤트 반환.
+
+    sent_channels 가 비어있으면 → 완전 미발송
+    sent_channels 에 ok=False 항목이 있으면 → 부분 실패 (재시도 대상)
     최근 N건을 desc로 가져와 Python에서 필터 후 chronological 순으로 반환.
-    분당 수 건 수준 운영 부하라 200건 스캔이면 백로그 충분히 커버."""
+    """
     resp = (
         _events_table()
         .select("*")
@@ -52,14 +55,36 @@ def _list_undispatched_events(scan_limit: int = 200) -> list[dict]:
         .execute()
     )
     rows = resp.data or []
-    pending = [r for r in rows if not (r.get("sent_channels") or [])]
+    pending = []
+    for r in rows:
+        sent = r.get("sent_channels") or []
+        if not sent:
+            # 완전 미발송
+            pending.append(r)
+        elif any(not e.get("ok") for e in sent):
+            # 일부 채널 실패 → 재시도 대상으로 포함, 실패 채널 ID만 별도 표시
+            r["_retry_channel_ids"] = {e["channel_id"] for e in sent if not e.get("ok")}
+            r["_already_sent_channel_ids"] = {e["channel_id"] for e in sent if e.get("ok")}
+            pending.append(r)
     # 처리는 오래된 순으로
     pending.reverse()
     return pending
 
 
 def _mark_sent(event_id: str, sent_entries: list[dict]) -> None:
-    _events_table().update({"sent_channels": sent_entries}).eq("id", event_id).execute()
+    """성공 항목을 sent_channels에 append (기존 성공분 보존)."""
+    # 기존 sent_channels 조회 후 성공 항목만 누적 (중복 channel_id 덮어쓰기)
+    resp = _events_table().select("sent_channels").eq("id", event_id).limit(1).execute()
+    existing: list[dict] = []
+    if resp.data:
+        existing = resp.data[0].get("sent_channels") or []
+
+    # channel_id 기준으로 merge (새 항목이 우선)
+    merged: dict[str, dict] = {e["channel_id"]: e for e in existing}
+    for e in sent_entries:
+        merged[e["channel_id"]] = e
+
+    _events_table().update({"sent_channels": list(merged.values())}).eq("id", event_id).execute()
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -207,6 +232,10 @@ def _send_to_channel(event: dict, channel: dict) -> dict:
 def dispatch_pending(limit: int = 50) -> dict:
     """미발송 이벤트를 모든 활성 채널로 fan-out.
 
+    성공한 채널만 sent_channels에 기록 → 실패 채널은 다음 사이클에 재시도.
+    단, severity 미충족으로 스킵된 채널은 '처리 대상 아님'이므로 전체 채널이
+    severity 미충족이면 이벤트 자체를 건드리지 않음.
+
     Returns: { events_processed, total_sends, ok_sends, errors: [...] }
     """
     channels = _list_active_channels()
@@ -219,21 +248,29 @@ def dispatch_pending(limit: int = 50) -> dict:
     errors: list[dict] = []
 
     for ev in events:
-        sent_entries: list[dict] = []
+        ok_entries: list[dict] = []   # 성공한 채널만 마킹 (실패는 제외 → 재시도 대상)
+        # 재시도 이벤트: 이전에 이미 성공한 채널은 건너뜀 (중복 발송 방지)
+        already_sent_ids: set = ev.get("_already_sent_channel_ids") or set()
+
         for ch in channels:
+            if ch["id"] in already_sent_ids:
+                continue  # 이전 사이클에서 이미 성공 → 스킵
             if not _meets_severity(ch.get("severity_min", "error"), ev.get("severity", "error")):
                 continue
             entry = _send_to_channel(ev, ch)
-            sent_entries.append(entry)
             total_sends += 1
             if entry.get("ok"):
                 ok_sends += 1
+                ok_entries.append(entry)
             else:
                 errors.append({"event_id": ev["id"], "channel_id": ch["id"], "error": entry.get("error")})
+                logger.warning("dispatcher: 채널 발송 실패 [event=%s channel=%s]: %s",
+                               ev.get("id"), ch.get("id"), entry.get("error"))
 
-        if sent_entries:
+        # 성공한 채널이 1개 이상 있을 때만 마킹 (실패 채널은 다음 사이클 재시도)
+        if ok_entries:
             try:
-                _mark_sent(ev["id"], sent_entries)
+                _mark_sent(ev["id"], ok_entries)
             except Exception as e:
                 logger.warning("dispatcher: mark_sent failed for %s — %s", ev.get("id"), e)
 
