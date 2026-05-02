@@ -1250,7 +1250,7 @@ def analyze_and_propose(
     # ── AttributeError 유형 "이미 수정됨" 코드 기반 감지 ─────────────
     # dev_pr_history에 없는 외부 커밋으로 수정된 경우도 잡아냄.
     # "has no attribute 'method'" 에러인데 현재 코드에 메서드가 존재하면 → 수정 완료.
-    if file_info and failing_symbol and re.search(r"has no attribute", user_message, re.I):
+    if file_info and failing_symbol and re.search(r"has no attribute", full_text, re.I):
         _attr_cls    = failing_symbol.split(".")[0]
         _attr_method = failing_symbol.split(".")[-1]
         _src = file_info.get("original", "")
@@ -1259,6 +1259,20 @@ def analyze_and_propose(
         if _method_in_code and _cls_in_code:
             logger.info("AttributeError 이미 수정됨 감지: %s.%s 현재 코드에 존재 [%s]",
                         _attr_cls, _attr_method, file_info["path"])
+            # 파일 최근 커밋 이력으로 어떤 커밋이 수정했는지 보여줌
+            commits_md = ""
+            try:
+                recent = github_client.get_file_commits(
+                    file_info["repo"], file_info["path"],
+                    file_info.get("branch", "main"), n=5,
+                )
+                if recent:
+                    lines = ["**최근 커밋 (이 파일)**"]
+                    for c in recent:
+                        lines.append(f"- `{c['sha']}` {c['date'][:10]} — {c['message']}")
+                    commits_md = "\n\n" + "\n".join(lines)
+            except Exception:
+                pass
             return (
                 f"## ✅ 이미 수정된 에러입니다\n\n"
                 f"현재 `{file_info['path']}`에서 "
@@ -1267,6 +1281,7 @@ def analyze_and_propose(
                 f"현재 코드에는 이미 수정이 반영된 상태입니다.\n\n"
                 f"알림 발생 시각의 에러이므로 추가 조치가 필요 없습니다.\n"
                 f"> 동일 에러가 지금도 계속 발생한다면 다시 알려주세요."
+                f"{commits_md}"
             )
 
     # ── 중복 PR 감지 ───────────────────────────────────────────────

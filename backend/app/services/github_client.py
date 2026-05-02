@@ -303,6 +303,29 @@ def get_recent_commits(repo: str, branch: str = "main", n: int = 5) -> list[dict
     ]
 
 
+def get_file_commits(repo: str, file_path: str, branch: str = "main", n: int = 5) -> list[dict]:
+    """특정 파일의 최근 커밋 n건. [{sha, message, author, date}]"""
+    try:
+        r = httpx.get(
+            f"{BASE}/repos/{repo}/commits",
+            headers=_headers(),
+            params={"sha": branch, "path": file_path, "per_page": n},
+            timeout=10,
+        )
+        r.raise_for_status()
+        return [
+            {
+                "sha": c["sha"][:8],
+                "message": (c["commit"]["message"] or "").splitlines()[0][:120],
+                "author": c["commit"]["author"]["name"],
+                "date": c["commit"]["author"]["date"],
+            }
+            for c in r.json()
+        ]
+    except Exception:
+        return []
+
+
 # ─────────────────────────────────────────────────────────────────
 # 쓰기 (승인 후 실행)
 # ─────────────────────────────────────────────────────────────────
@@ -488,6 +511,6 @@ __all__ = [
     "get_file", "list_files", "list_dir_entries", "get_default_branch",
     "get_repo_tree", "find_file_in_repo", "search_code_in_repo",
     "list_user_repos", "find_repo_by_name",
-    "get_recent_commits", "create_branch", "commit_file", "create_pr",
+    "get_recent_commits", "get_file_commits", "create_branch", "commit_file", "create_pr",
     "get_pr_status", "merge_pull_request",
 ]
