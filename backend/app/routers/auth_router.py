@@ -1,16 +1,20 @@
 """
 인증 라우터.
 
-POST /api/auth/login    — 이메일+비밀번호 → JWT
-GET  /api/auth/me       — 현재 로그인 유저 정보
-POST /api/auth/setup    — 최초 super_admin 계정 생성 (users 테이블이 빈 경우만)
-POST /api/auth/users    — super_admin이 customer 계정 생성
-PATCH /api/auth/users/{id} — super_admin이 계정 수정 (operator_id 연결 등)
-GET  /api/auth/users    — super_admin이 전체 유저 목록 조회
+POST /api/auth/login              — 이메일+비밀번호 → JWT
+GET  /api/auth/me                 — 현재 로그인 유저 정보
+POST /api/auth/setup              — 최초 super_admin 계정 생성 (users 테이블이 빈 경우만)
+POST /api/auth/users              — super_admin이 customer 계정 생성
+PATCH /api/auth/users/{id}        — super_admin이 계정 수정 (operator_id 연결 등)
+GET  /api/auth/users              — super_admin이 전체 유저 목록 조회
+POST /api/auth/invites            — super_admin이 초대 링크 토큰 생성 (7일 유효)
+GET  /api/auth/invites/check/{t}  — 토큰 유효성 검증 (공개)
+POST /api/auth/join               — 초대 토큰으로 계정 생성 (공개)
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+import secrets
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -31,6 +35,120 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 def _users_table():
     return get_maesil_total_client().schema("agent_work").table("users")
+
+
+def _snapshots_table():
+    return get_maesil_total_client().schema("agent_work").table("snapshots")
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+# ─────────────────────────────────────────────────────────────────
+# 초대 링크 (invite token)
+# ─────────────────────────────────────────────────────────────────
+
+def _find_invite(token: str) -> dict | None:
+    """유효한 invite 토큰 row 반환. 없거나 만료시 None."""
+    now_iso = _now()
+    resp = _snapshots_table().select("*").eq("kind", "invite").gt("valid_until", now_iso).execute()
+    for row in (resp.data or []):
+        payload = row.get("payload") or {}
+        if payload.get("token") == token:
+            return row
+    return None
+
+
+class InviteCreateRequest(BaseModel):
+    role: str = "super_admin"  # 초대할 역할 (기본 팀원 = super_admin)
+
+
+class JoinRequest(BaseModel):
+    token: str
+    email: str
+    password: str
+    display_name: str | None = None
+
+
+@router.post("/invites")
+def create_invite(body: InviteCreateRequest, admin: UserContext = Depends(require_admin)) -> dict:
+    """초대 링크 토큰 생성 (7일 유효). super_admin 전용."""
+    if body.role not in ("super_admin", "customer"):
+        raise HTTPException(400, "role은 'super_admin' 또는 'customer'")
+
+    token = secrets.token_urlsafe(24)
+    valid_until = (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
+
+    _snapshots_table().insert({
+        "agent_type": "system",
+        "kind": "invite",
+        "payload": {
+            "token": token,
+            "role": body.role,
+            "created_by": admin.email,
+        },
+        "valid_until": valid_until,
+        "created_at": _now(),
+    }).execute()
+
+    return {"token": token, "role": body.role, "valid_until": valid_until}
+
+
+@router.get("/invites/check/{token}")
+def check_invite(token: str) -> dict:
+    """토큰 유효성 검증 — 공개 엔드포인트."""
+    row = _find_invite(token)
+    if not row:
+        raise HTTPException(404, "유효하지 않거나 만료된 초대 링크입니다.")
+    payload = row.get("payload") or {}
+    return {"valid": True, "role": payload.get("role", "super_admin")}
+
+
+@router.post("/join")
+def join(body: JoinRequest) -> dict:
+    """초대 토큰으로 계정 생성 — 공개 엔드포인트."""
+    row = _find_invite(body.token)
+    if not row:
+        raise HTTPException(404, "유효하지 않거나 만료된 초대 링크입니다.")
+
+    if not body.email.strip():
+        raise HTTPException(400, "이메일을 입력하세요.")
+    if len(body.password) < 8:
+        raise HTTPException(400, "비밀번호는 8자 이상이어야 합니다.")
+    if get_user_by_email(body.email):
+        raise HTTPException(409, "이미 사용 중인 이메일입니다.")
+
+    payload = row.get("payload") or {}
+    role = payload.get("role", "super_admin")
+    now = _now()
+    new_row = {
+        "email":         body.email.lower().strip(),
+        "password_hash": hash_password(body.password),
+        "role":          role,
+        "display_name":  body.display_name or None,
+        "is_active":     True,
+        "created_at":    now,
+        "updated_at":    now,
+    }
+    resp = _users_table().insert(new_row).execute()
+    rows = resp.data or []
+    if not rows:
+        raise HTTPException(500, "계정 생성 실패")
+
+    # 초대 토큰 무효화 (valid_until을 과거로 설정)
+    past = datetime(2000, 1, 1, tzinfo=timezone.utc).isoformat()
+    _snapshots_table().update({"valid_until": past}).eq("id", row["id"]).execute()
+
+    user = rows[0]
+    token_jwt = create_token(user)
+    return {
+        "ok": True,
+        "token": token_jwt,
+        "email": user["email"],
+        "role": user["role"],
+        "display_name": user.get("display_name"),
+    }
 
 
 # ─────────────────────────────────────────────────────────────────

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getToken, getUser, isSuperAdmin, logout, type StoredUser } from "../lib/api";
 
-const PUBLIC_PATHS = ["/login"];
+const PUBLIC_PATHS = ["/login", "/join"];
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

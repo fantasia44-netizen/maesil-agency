@@ -96,6 +96,12 @@ export default function SettingsPage() {
   const [userOk, setUserOk] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<Record<string, Partial<UserRow & { password: string }>>>({});
 
+  // ── 팀원 초대 상태 ──
+  const [inviteRole, setInviteRole]   = useState<"super_admin" | "customer">("super_admin");
+  const [inviteLink, setInviteLink]   = useState<string | null>(null);
+  const [inviteErr, setInviteErr]     = useState<string | null>(null);
+  const [inviteCopied, setInviteCopied] = useState(false);
+
   // ── 연결 프로그램 상태 ──
   const [programs, setPrograms] = useState<Program[]>([]);
   const [editingProgram, setEditingProgram] = useState<Record<string, Partial<Program>>>({});
@@ -151,6 +157,27 @@ export default function SettingsPage() {
       loadUsers();
     }
   }, []);
+
+  // ── 팀원 초대 ──
+  const createInvite = async () => {
+    setInviteErr(null); setInviteLink(null); setInviteCopied(false);
+    try {
+      const res = await apiFetch<{ token: string; role: string; valid_until: string }>(
+        "/api/auth/invites",
+        { method: "POST", body: JSON.stringify({ role: inviteRole }) },
+      );
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      setInviteLink(`${origin}/join?token=${res.token}`);
+    } catch (e) { setInviteErr((e as Error).message); }
+  };
+
+  const copyInviteLink = () => {
+    if (!inviteLink) return;
+    navigator.clipboard.writeText(inviteLink).then(() => {
+      setInviteCopied(true);
+      setTimeout(() => setInviteCopied(false), 2000);
+    });
+  };
 
   // ── 유저 관리 CRUD ──
   const createUser = async () => {
@@ -648,6 +675,52 @@ export default function SettingsPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* ── 팀원 초대 ── */}
+      <h2 style={{ margin: "2rem 0 0.5rem 0", fontSize: "1.05rem" }}>팀원 초대</h2>
+      <p className="muted" style={{ marginTop: 0 }}>
+        초대 링크를 생성해 팀원에게 공유하세요. 링크는 7일간 유효하며 한 번만 사용 가능합니다.
+      </p>
+
+      <div className="card" style={{ marginBottom: "1rem" }}>
+        <div className="card-header"><div className="card-title">초대 링크 생성</div></div>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap", marginBottom: "0.75rem" }}>
+          <div className="config-field" style={{ margin: 0, flex: "0 0 auto" }}>
+            <label>역할</label>
+            <select
+              value={inviteRole}
+              onChange={(e) => { setInviteRole(e.target.value as "super_admin" | "customer"); setInviteLink(null); }}
+            >
+              <option value="super_admin">관리자 (Admin) — 동일 권한</option>
+              <option value="customer">고객 (Customer)</option>
+            </select>
+          </div>
+          <button className="btn primary" onClick={createInvite} style={{ alignSelf: "flex-end" }}>
+            초대 링크 생성
+          </button>
+        </div>
+
+        {inviteErr && (
+          <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#b91c1c", borderRadius: 8, padding: "0.5rem 0.75rem", fontSize: "0.85rem", marginBottom: "0.5rem" }}>
+            {inviteErr}
+          </div>
+        )}
+
+        {inviteLink && (
+          <div style={{ marginTop: "0.5rem" }}>
+            <div style={{
+              background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 8,
+              padding: "0.6rem 0.9rem", fontFamily: "monospace", fontSize: "0.78rem",
+              wordBreak: "break-all", marginBottom: "0.5rem", color: "#0f172a",
+            }}>
+              {inviteLink}
+            </div>
+            <button className="btn primary" onClick={copyInviteLink}>
+              {inviteCopied ? "✓ 복사됨" : "링크 복사"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── 유저 관리 (super_admin 전용) ── */}

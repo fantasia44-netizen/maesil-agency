@@ -116,6 +116,16 @@ export async function login(email: string, password: string): Promise<StoredUser
   return user;
 }
 
+export function storeAuth(token: string, user: Partial<StoredUser>) {
+  setToken(token);
+  setUser({
+    email: user.email || "",
+    role: (user.role as StoredUser["role"]) || "super_admin",
+    display_name: user.display_name ?? null,
+    insight_operator_id: user.insight_operator_id ?? null,
+  });
+}
+
 export function logout() {
   clearToken();
   if (typeof window !== "undefined") {
