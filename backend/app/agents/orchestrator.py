@@ -24,6 +24,11 @@ ROUTING_RULES: list[tuple[list[str], list[str]]] = [
      ["cs"]),
     (["테스트", "하네스", "test", "harness", "회귀", "검증"],
      ["tester"]),
+    # 영업 아웃리치: 타겟 발굴 / 제안서 / 셀러 찾기
+    (["타겟", "영업", "제안서", "셀러 찾", "아웃리치", "outreach",
+      "발굴", "리스트 뽑", "홍보 대상", "잠재 고객", "잠재고객",
+      "스토어 찾", "쇼핑몰 찾"],
+     ["outreach"]),
     (["현황", "브리핑", "보고", "오늘", "아침", "요약", "전체"],
      ["sales", "finance"]),  # 현황 보고 → sales + finance 기본
 ]
@@ -47,13 +52,14 @@ def llm_route(message: str) -> list[str]:
             max_tokens=128,
             system="""당신은 운영 AI 비서팀의 라우터입니다.
 사용자 메시지를 분석해 적절한 에이전트를 선택하세요.
-가능한 에이전트: sales, finance, warehouse, cs
+가능한 에이전트: sales, finance, warehouse, cs, outreach
+- outreach: 외부 타겟 발굴, 제안서 작성, 셀러 찾기, 영업 리스트
 여러 에이전트가 필요하면 쉼표로 구분해 반환하세요.
 에이전트 이름만 반환하세요. 예: sales,finance""",
             messages=[{"role": "user", "content": f"메시지: {message}"}],
         )
         text = resp.content[0].text.strip().lower()
-        valid = {"sales", "finance", "warehouse", "cs"}
+        valid = {"sales", "finance", "warehouse", "cs", "outreach"}
         agents = [a.strip() for a in text.split(",") if a.strip() in valid]
         return agents if agents else ["sales"]
     except Exception:
@@ -82,13 +88,15 @@ def run_agents(
     from app.agents.warehouse import WarehouseAgent
     from app.agents.cs import CSAgent
     from app.agents.tester import TesterAgent
+    from app.agents.outreach import OutreachAgent
 
     AGENT_MAP = {
-        "sales": SalesAgent,
-        "finance": FinanceAgent,
+        "sales":    SalesAgent,
+        "finance":  FinanceAgent,
         "warehouse": WarehouseAgent,
-        "cs": CSAgent,
-        "tester": TesterAgent,
+        "cs":       CSAgent,
+        "tester":   TesterAgent,
+        "outreach": OutreachAgent,
     }
 
     results = []

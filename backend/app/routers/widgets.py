@@ -12,11 +12,12 @@ router = APIRouter(prefix="/api/widgets", tags=["widgets"], dependencies=[Depend
 
 # 에이전트 정의 (코드에서 관리, Phase별 확장)
 AGENT_REGISTRY = [
-    {"agent_type": "orchestrator", "display_name": "오케스트레이터", "phase": 1},
-    {"agent_type": "sales",        "display_name": "세일즈 에이전트",  "phase": 2},
-    {"agent_type": "finance",      "display_name": "파이낸스 에이전트","phase": 2},
+    {"agent_type": "orchestrator", "display_name": "오케스트레이터",     "phase": 1},
+    {"agent_type": "sales",        "display_name": "세일즈 에이전트",    "phase": 2},
+    {"agent_type": "finance",      "display_name": "파이낸스 에이전트",  "phase": 2},
     {"agent_type": "warehouse",    "display_name": "웨어하우스 에이전트","phase": 3},
-    {"agent_type": "cs",           "display_name": "CS 에이전트",      "phase": 3},
+    {"agent_type": "cs",           "display_name": "CS 에이전트",        "phase": 3},
+    {"agent_type": "outreach",     "display_name": "영업 에이전트",      "phase": 3},
 ]
 
 
