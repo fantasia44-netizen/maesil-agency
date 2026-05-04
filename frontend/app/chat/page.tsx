@@ -18,6 +18,8 @@ type ChatResp = {
   conversation_id: string;
   agents: AgentResult[];
   routed_to: string[];
+  status?: "done" | "pending" | "error";
+  run_id?: string;
 };
 
 type Message = {
@@ -457,9 +459,11 @@ function ChatPageInner() {
   const [messages,       setMessages]       = useState<Message[]>([]);
   const [input,          setInput]          = useState("");
   const [loading,        setLoading]        = useState(false);
+  const [loadingLabel,   setLoadingLabel]   = useState("처리 중…");
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [totalCost,      setTotalCost]      = useState(0);
   const [alertBanner,    setAlertBanner]    = useState<string | null>(null);
+  const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   /* 사이드바 */
   const [sidebarOpen,   setSidebarOpen]   = useState(true);
@@ -482,6 +486,13 @@ function ChatPageInner() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  /* 언마운트 시 폴링 정리 */
+  useEffect(() => {
+    return () => {
+      if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+    };
+  }, []);
 
   /* 대화 목록 불러오기 */
   function refreshConvList() {
@@ -582,21 +593,76 @@ function ChatPageInner() {
     }
   }
 
+  /* 백그라운드 잡 폴링 */
+  function startPolling(runId: string, convId: string, routedTo: string[]) {
+    if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+    let polls = 0;
+    const MAX_POLLS = 90; // 최대 3분 (2초 × 90)
+
+    pollTimerRef.current = setInterval(async () => {
+      polls++;
+      if (polls > MAX_POLLS) {
+        clearInterval(pollTimerRef.current!);
+        pollTimerRef.current = null;
+        setLoading(false);
+        setMessages((p) => [...p, {
+          id: crypto.randomUUID(), role: "agents",
+          agents: [{ run_id: runId, agent_type: "orchestrator", agent_display: "시스템",
+            message: "처리 시간이 초과되었습니다. 잠시 후 결과를 확인해주세요.", status: "failed", cost_usd: 0 }],
+          ts: new Date(),
+        }]);
+        return;
+      }
+
+      try {
+        const result = await apiFetch<ChatResp>(`/api/chat/runs/${runId}`);
+        if (result.status === "pending") return; // 계속 폴링
+
+        clearInterval(pollTimerRef.current!);
+        pollTimerRef.current = null;
+
+        if (result.status === "error") {
+          setMessages((p) => [...p, {
+            id: crypto.randomUUID(), role: "agents",
+            agents: [{ run_id: runId, agent_type: "orchestrator", agent_display: "시스템",
+              message: `오류: ${(result as any).error || "알 수 없는 오류"}`, status: "failed", cost_usd: 0 }],
+            ts: new Date(),
+          }]);
+        } else {
+          if (!conversationId) setConversationId(convId);
+          const agents = result.agents ?? [];
+          setTotalCost((p) => p + agents.reduce((s, a) => s + (a.cost_usd ?? 0), 0));
+          setMessages((p) => [...p, {
+            id: convId + Date.now(), role: "agents", agents, ts: new Date(),
+          }]);
+          refreshConvList();
+          if (routedTo.includes("outreach") || forcedAgent === "outreach") loadSnapshots();
+        }
+        setLoading(false);
+      } catch {
+        // 네트워크 오류는 무시하고 계속 폴링
+      }
+    }, 2000);
+  }
+
   /* 메시지 전송 */
   async function sendMsg(overrideMessage?: string) {
     const text = (overrideMessage ?? input).trim();
     if (!text || loading) return;
     if (!hasToken()) { window.location.href = "/login"; return; }
 
+    // 이전 폴링 정리
+    if (pollTimerRef.current) { clearInterval(pollTimerRef.current); pollTimerRef.current = null; }
+
     const userMsg: Message = { id: crypto.randomUUID(), role: "user", text, ts: new Date() };
     setMessages((p) => [...p, userMsg]);
     if (!overrideMessage) setInput("");
     setLoading(true);
+    setLoadingLabel("처리 중…");
 
     const isBriefing = text.includes("브리핑") || text.includes("현황 보고") || text === "__briefing__";
     const endpoint   = isBriefing ? "/api/chat/briefing" : "/api/chat";
 
-    // force_agent: 1:1 에이전트 채팅 모드일 때 오케스트레이터 bypass
     const body: Record<string, unknown> = { message: text, conversation_id: conversationId };
     if (forcedAgent && !isBriefing) body.force_agent = forcedAgent;
 
@@ -605,30 +671,35 @@ function ChatPageInner() {
         method: "POST",
         body: JSON.stringify(body),
       });
+
+      // 백그라운드 처리 중 → 폴링 시작
+      if (resp.status === "pending" && resp.run_id) {
+        setLoadingLabel("백그라운드 처리 중… (자동 갱신)");
+        if (!conversationId) setConversationId(resp.conversation_id);
+        startPolling(resp.run_id, resp.conversation_id, resp.routed_to ?? []);
+        return; // loading은 폴링 완료 시 해제
+      }
+
+      // 동기 처리 완료
       if (!conversationId) setConversationId(resp.conversation_id);
-      setTotalCost((p) => p + resp.agents.reduce((s, a) => s + (a.cost_usd ?? 0), 0));
+      setTotalCost((p) => p + (resp.agents ?? []).reduce((s, a) => s + (a.cost_usd ?? 0), 0));
       setMessages((p) => [
         ...p,
-        { id: resp.conversation_id + Date.now(), role: "agents", agents: resp.agents, ts: new Date() },
+        { id: resp.conversation_id + Date.now(), role: "agents", agents: resp.agents ?? [], ts: new Date() },
       ]);
-      refreshConvList(); // 대화 목록 갱신
-      // 영업 에이전트 응답이 왔거나 outreach 모드면 스냅샷 갱신
-      if (forcedAgent === "outreach" || resp.routed_to?.includes("outreach")) {
-        loadSnapshots();
-      }
+      refreshConvList();
+      if (forcedAgent === "outreach" || resp.routed_to?.includes("outreach")) loadSnapshots();
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      setMessages((p) => [
-        ...p,
-        {
-          id: crypto.randomUUID(), role: "agents",
-          agents: [{ run_id: "err", agent_type: "orchestrator", agent_display: "시스템",
-            message: `오류: ${msg}`, status: "failed", cost_usd: 0 }],
-          ts: new Date(),
-        },
-      ]);
+      setMessages((p) => [...p, {
+        id: crypto.randomUUID(), role: "agents",
+        agents: [{ run_id: "err", agent_type: "orchestrator", agent_display: "시스템",
+          message: `오류: ${msg}`, status: "failed", cost_usd: 0 }],
+        ts: new Date(),
+      }]);
     } finally {
-      setLoading(false);
+      // pending이 아니면 여기서 해제, pending이면 폴링에서 해제
+      if (!pollTimerRef.current) setLoading(false);
     }
   }
 
@@ -1085,9 +1156,11 @@ function ChatPageInner() {
                 {forcedAgent ? (AGENT_EMOJI[forcedAgent] ?? "🤖") : "🤖"}
               </div>
               <div style={{ padding: "0.6rem 0.9rem", background: "#fff", border: "1px solid #e2e8f0", borderRadius: "14px 14px 14px 4px", color: "#94a3b8", fontSize: "0.85rem" }}>
-                {forcedAgent
-                  ? `${AGENT_DISPLAY_NAME[forcedAgent] ?? forcedAgent} 응답 중…`
-                  : "에이전트 실행 중…"}
+                {loadingLabel !== "처리 중…"
+                  ? loadingLabel
+                  : forcedAgent
+                    ? `${AGENT_DISPLAY_NAME[forcedAgent] ?? forcedAgent} 응답 중…`
+                    : "에이전트 실행 중…"}
               </div>
             </div>
           )}

@@ -8,11 +8,12 @@
 import logging
 import uuid
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.auth import UserContext, get_current_user
 from app.services import conversations as conv_svc
+from app.services import job_store
 
 logger = logging.getLogger(__name__)
 
@@ -78,8 +79,10 @@ class AgentResult(BaseModel):
 
 class ChatResponse(BaseModel):
     conversation_id: str
-    agents: list[AgentResult]
-    routed_to: list[str]
+    agents: list[AgentResult] = []
+    routed_to: list[str] = []
+    status: str = "done"   # "done" | "pending"
+    run_id: str | None = None  # pending 시 폴링용
 
 
 def _save_results(
@@ -210,8 +213,96 @@ def _user_explicitly_invokes_other_agent(msg_lower: str) -> bool:
     return any(k.lower() in msg_lower for k in EXPLICIT_OTHER_AGENT_KEYWORDS)
 
 
+# 항상 백그라운드로 처리할 에이전트 (느리거나 타임아웃 위험)
+_BG_AGENTS: set[str] = {"outreach"}
+
+
+def _bg_run_agents(
+    job_run_id: str,
+    message: str,
+    conversation_id: str,
+    agent_types: list[str],
+    operator_id: str | None,
+    ctx_msgs: list[dict],
+    user_id: str | None,
+    title: str,
+) -> None:
+    """BackgroundTasks에서 실행 — 완료 후 job_store에 결과 저장."""
+    try:
+        from app.agents.orchestrator import run_agents
+        results = run_agents(message, conversation_id, agent_types,
+                             operator_id=operator_id, context_messages=ctx_msgs)
+        _save_results(conversation_id, message, results, user_id=user_id, title=title)
+        agents = [
+            AgentResult(
+                run_id=r["run_id"],
+                agent_type=r["agent_type"],
+                agent_display=AGENT_DISPLAY.get(r["agent_type"], r["agent_type"]),
+                message=r["message"],
+                status=r.get("status", "unknown"),
+                cost_usd=r.get("cost_usd", 0.0),
+            )
+            for r in results
+        ]
+        job_store.complete(job_run_id, {
+            "conversation_id": conversation_id,
+            "agents": [a.model_dump() for a in agents],
+            "routed_to": agent_types,
+            "status": "done",
+        })
+    except Exception as e:
+        job_store.fail(job_run_id, str(e))
+
+
+def _bg_briefing(
+    job_run_id: str,
+    conversation_id: str,
+    user_message: str,
+    operator_id: str | None,
+    user_id: str | None,
+) -> None:
+    """브리핑 백그라운드 실행."""
+    try:
+        from app.agents.orchestrator import run_morning_briefing
+        results = run_morning_briefing(conversation_id, operator_id=operator_id)
+        _save_results(conversation_id, user_message, results, user_id=user_id)
+        agents = [
+            AgentResult(
+                run_id=r["run_id"],
+                agent_type=r["agent_type"],
+                agent_display=AGENT_DISPLAY.get(r["agent_type"], r["agent_type"]),
+                message=r["message"],
+                status=r.get("status", "unknown"),
+                cost_usd=r.get("cost_usd", 0.0),
+            )
+            for r in results
+        ]
+        job_store.complete(job_run_id, {
+            "conversation_id": conversation_id,
+            "agents": [a.model_dump() for a in agents],
+            "routed_to": ["sales", "finance", "warehouse", "cs"],
+            "status": "done",
+        })
+    except Exception as e:
+        job_store.fail(job_run_id, str(e))
+
+
+@router.get("/runs/{run_id}")
+def poll_run(run_id: str, user: UserContext = Depends(get_current_user)) -> dict:
+    """백그라운드 잡 상태 폴링. pending이면 계속 폴링, done이면 결과 반환."""
+    job_store.evict_expired()
+    job = job_store.get(run_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="작업을 찾을 수 없습니다.")
+    if job["status"] == "pending":
+        return {"status": "pending", "run_id": run_id}
+    if job["status"] == "error":
+        return {"status": "error", "run_id": run_id, "error": job["result"].get("error", "오류")}
+    return job["result"]  # done → ChatResponse 호환 dict
+
+
 @router.post("", response_model=ChatResponse)
-def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> ChatResponse:
+def chat(req: ChatRequest, bg: BackgroundTasks, user: UserContext = Depends(get_current_user)) -> ChatResponse:
     from app.services import dev_chat_agent
 
     conversation_id = req.conversation_id or str(uuid.uuid4())
@@ -262,6 +353,20 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
             ctx_msgs = conv_svc.get_messages(conversation_id)
         except Exception:
             ctx_msgs = []
+
+        # 느린 에이전트 → 백그라운드 처리
+        if fa in _BG_AGENTS:
+            job_run_id = str(uuid.uuid4())
+            job_store.create(job_run_id)
+            bg.add_task(_bg_run_agents, job_run_id, req.message, conversation_id,
+                        [fa], user.operator_id, ctx_msgs, user.id, title)
+            return ChatResponse(
+                conversation_id=conversation_id,
+                status="pending",
+                run_id=job_run_id,
+                routed_to=[fa],
+            )
+
         from app.agents.orchestrator import run_agents
         results = run_agents(
             req.message, conversation_id, [fa],
@@ -468,29 +573,20 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
 @router.post("/briefing", response_model=ChatResponse)
 def morning_briefing(
     req: ChatRequest | None = None,
+    bg: BackgroundTasks = BackgroundTasks(),
     user: UserContext = Depends(get_current_user),
 ) -> ChatResponse:
-    from app.agents.orchestrator import run_morning_briefing
-
     conversation_id = (req.conversation_id if req else None) or str(uuid.uuid4())
     user_message = "☀️ 아침 현황 보고"
-    results = run_morning_briefing(conversation_id, operator_id=user.operator_id)
-    _save_results(conversation_id, user_message, results, user_id=user.id)
 
-    agents = [
-        AgentResult(
-            run_id=r["run_id"],
-            agent_type=r["agent_type"],
-            agent_display=AGENT_DISPLAY.get(r["agent_type"], r["agent_type"]),
-            message=r["message"],
-            status=r.get("status", "unknown"),
-            cost_usd=r.get("cost_usd", 0.0),
-        )
-        for r in results
-    ]
+    job_run_id = str(uuid.uuid4())
+    job_store.create(job_run_id)
+    bg.add_task(_bg_briefing, job_run_id, conversation_id, user_message, user.operator_id, user.id)
+
     return ChatResponse(
         conversation_id=conversation_id,
-        agents=agents,
+        status="pending",
+        run_id=job_run_id,
         routed_to=["sales", "finance", "warehouse", "cs"],
     )
 

@@ -1,10 +1,11 @@
 """
 오케스트레이터 — 하이브리드 라우팅 (규칙 1차 + LLM 2차).
-멀티 에이전트 조합 지원.
+멀티 에이전트 조합 지원. 복수 에이전트는 ThreadPoolExecutor로 병렬 실행.
 """
 from __future__ import annotations
 
 import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from typing import Any
 
@@ -76,17 +77,15 @@ def route(message: str) -> list[str]:
 
 # ─── 멀티 에이전트 실행 ─────────────────────────────────────────────
 
-def run_agents(
+def _run_single_agent(
+    atype: str,
     message: str,
     conversation_id: str,
-    agent_types: list[str],
-    operator_id: str | None = None,
-    context_messages: list[dict] | None = None,
-) -> list[dict[str, Any]]:
-    """여러 에이전트를 순차 실행하고 결과 목록 반환.
-
-    context_messages: 이전 대화 히스토리. 전달 시 각 에이전트가 멀티턴 컨텍스트 유지.
-    """
+    run_id: str,
+    operator_id: str | None,
+    context_messages: list[dict] | None,
+) -> dict[str, Any]:
+    """단일 에이전트 실행 — ThreadPoolExecutor 내부에서 호출."""
     from app.agents.sales import SalesAgent
     from app.agents.finance import FinanceAgent
     from app.agents.warehouse import WarehouseAgent
@@ -95,37 +94,68 @@ def run_agents(
     from app.agents.outreach import OutreachAgent
 
     AGENT_MAP = {
-        "sales":    SalesAgent,
-        "finance":  FinanceAgent,
+        "sales":     SalesAgent,
+        "finance":   FinanceAgent,
         "warehouse": WarehouseAgent,
-        "cs":       CSAgent,
-        "tester":   TesterAgent,
-        "outreach": OutreachAgent,
+        "cs":        CSAgent,
+        "tester":    TesterAgent,
+        "outreach":  OutreachAgent,
     }
+    cls = AGENT_MAP.get(atype)
+    if not cls:
+        return {"run_id": run_id, "agent_type": atype,
+                "message": f"[알 수 없는 에이전트: {atype}]", "status": "failed", "cost_usd": 0}
+    try:
+        agent = cls()
+        return agent.run(message, conversation_id, run_id,
+                         operator_id=operator_id, context_messages=context_messages)
+    except Exception as e:
+        return {"run_id": run_id, "agent_type": atype,
+                "message": f"[에이전트 실행 오류] {e}", "status": "failed", "cost_usd": 0}
 
-    results = []
-    for atype in agent_types:
-        cls = AGENT_MAP.get(atype)
-        if not cls:
-            continue
-        run_id = str(uuid.uuid4())
-        try:
-            agent = cls()
-            result = agent.run(
-                message, conversation_id, run_id,
-                operator_id=operator_id,
-                context_messages=context_messages,
-            )
-            results.append(result)
-        except Exception as e:
-            results.append({
-                "run_id": run_id,
-                "agent_type": atype,
-                "message": f"[에이전트 실행 오류] {e}",
-                "status": "failed",
-                "cost_usd": 0,
-            })
-    return results
+
+def run_agents(
+    message: str,
+    conversation_id: str,
+    agent_types: list[str],
+    operator_id: str | None = None,
+    context_messages: list[dict] | None = None,
+) -> list[dict[str, Any]]:
+    """에이전트 실행 — 단일은 직접, 복수는 ThreadPoolExecutor 병렬 실행.
+
+    context_messages: 이전 대화 히스토리.
+    """
+    if not agent_types:
+        return []
+
+    jobs = [(atype, str(uuid.uuid4())) for atype in agent_types]
+
+    if len(jobs) == 1:
+        atype, run_id = jobs[0]
+        return [_run_single_agent(atype, message, conversation_id, run_id,
+                                  operator_id, context_messages)]
+
+    # 복수 에이전트 → 병렬
+    results_map: dict[str, dict] = {}
+    with ThreadPoolExecutor(max_workers=min(len(jobs), 4)) as exe:
+        future_to_atype = {
+            exe.submit(_run_single_agent, atype, message, conversation_id,
+                       run_id, operator_id, context_messages): atype
+            for atype, run_id in jobs
+        }
+        run_id_map = {atype: run_id for atype, run_id in jobs}
+        for future in as_completed(future_to_atype):
+            atype = future_to_atype[future]
+            try:
+                results_map[atype] = future.result()
+            except Exception as e:
+                results_map[atype] = {
+                    "run_id": run_id_map[atype], "agent_type": atype,
+                    "message": f"[병렬 실행 오류] {e}", "status": "failed", "cost_usd": 0,
+                }
+
+    # 원래 순서 복원
+    return [results_map[atype] for atype, _ in jobs if atype in results_map]
 
 
 BRIEFING_MESSAGES = {
@@ -156,33 +186,26 @@ def run_morning_briefing(
     conversation_id: str,
     operator_id: str | None = None,
 ) -> list[dict[str, Any]]:
-    """아침 현황 보고 — 각 에이전트에 맞는 메시지로 개별 실행."""
-    from app.agents.sales import SalesAgent
-    from app.agents.finance import FinanceAgent
-    from app.agents.warehouse import WarehouseAgent
-    from app.agents.cs import CSAgent
+    """아침 현황 보고 — 4개 에이전트 병렬 실행."""
+    briefing_agents = list(BRIEFING_MESSAGES.keys())  # sales, finance, warehouse, cs
+    jobs = [(atype, str(uuid.uuid4())) for atype in briefing_agents]
 
-    AGENT_MAP = {
-        "sales": SalesAgent,
-        "finance": FinanceAgent,
-        "warehouse": WarehouseAgent,
-        "cs": CSAgent,
-    }
+    results_map: dict[str, dict] = {}
+    with ThreadPoolExecutor(max_workers=4) as exe:
+        future_to_atype = {
+            exe.submit(_run_single_agent, atype, BRIEFING_MESSAGES[atype],
+                       conversation_id, run_id, operator_id, None): atype
+            for atype, run_id in jobs
+        }
+        run_id_map = {atype: run_id for atype, run_id in jobs}
+        for future in as_completed(future_to_atype):
+            atype = future_to_atype[future]
+            try:
+                results_map[atype] = future.result()
+            except Exception as e:
+                results_map[atype] = {
+                    "run_id": run_id_map[atype], "agent_type": atype,
+                    "message": f"[에이전트 실행 오류] {e}", "status": "failed", "cost_usd": 0,
+                }
 
-    results = []
-    for atype, cls in AGENT_MAP.items():
-        run_id = str(uuid.uuid4())
-        message = BRIEFING_MESSAGES[atype]
-        try:
-            agent = cls()
-            result = agent.run(message, conversation_id, run_id, operator_id=operator_id)
-            results.append(result)
-        except Exception as e:
-            results.append({
-                "run_id": run_id,
-                "agent_type": atype,
-                "message": f"[에이전트 실행 오류] {e}",
-                "status": "failed",
-                "cost_usd": 0,
-            })
-    return results
+    return [results_map[atype] for atype, _ in jobs if atype in results_map]
