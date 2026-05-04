@@ -1966,20 +1966,27 @@ def cancel_pending(conversation_id: str) -> str:
 
 def is_approve(text: str) -> bool:
     """승인 의도 감지.
-    - 단독 키워드 (len < 10): '승인', 'ㄱ', 'ok' 등
-    - 짧은 문장 (len < 30): '진행해줘', '실행해주세요', '그냥 해줘' 등
-    - 거절 키워드 포함 시 False ('아니', '취소', 'no' 등)
+    - 거절 키워드 포함 시 즉시 False
+    - 1~2자 짧은 키워드('해','가','ㄱ' 등): 공백 분리 토큰 단위 완전 매칭만 허용
+      → '검토해보고' 같은 단어 내 부분 매칭 방지
+    - 3자 이상 키워드: len < 30 문장 내 부분 포함 허용
     """
     t = text.strip().lower()
     DENY_KW = {"아니", "취소", "cancel", "no", "ㄴ", "싫", "말아", "하지마"}
     if any(k in t for k in DENY_KW):
         return False
-    # 단독 짧은 키워드 (완전 일치 또는 len < 10)
-    if len(t) < 10 and any(k in t for k in APPROVE_KEYWORDS):
-        return True
-    # 문장 형태 (len < 30) — '진행해줘', '실행해주세요' 등
-    if len(t) < 30 and any(k in t for k in APPROVE_KEYWORDS):
-        return True
+
+    tokens = set(t.split())  # 공백 분리 토큰 (한국어 조사 미분리지만 충분)
+
+    for k in APPROVE_KEYWORDS:
+        if len(k) <= 2:
+            # '해', '가', 'ㄱ', 'ㅇ' 등 — 전체 문자열 또는 독립 토큰일 때만 승인
+            if t == k or k in tokens:
+                return True
+        else:
+            # '진행해줘', 'ok', 'yep' 등 — 30자 이하 문장 내 포함이면 승인
+            if k in t and len(t) < 30:
+                return True
     return False
 
 
