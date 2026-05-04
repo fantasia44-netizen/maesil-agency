@@ -89,7 +89,7 @@ const AGENT_EMOJI: Record<string, string> = {
 };
 
 // 오케스트레이터 bypass 지원 에이전트 (직접 채팅 가능)
-const DIRECT_CHAT_AGENTS = new Set(["sales", "finance", "warehouse", "cs", "outreach"]);
+const DIRECT_CHAT_AGENTS = new Set(["sales", "finance", "warehouse", "cs", "outreach", "developer"]);
 
 export default function Dashboard() {
   const [programs, setPrograms] = useState<SystemStatusResp | null>(null);

@@ -30,7 +30,7 @@ AGENT_DISPLAY = {
 }
 
 # force_agent 허용 목록 (오케스트레이터 bypass 가능한 에이전트)
-DIRECT_AGENTS = {"sales", "finance", "warehouse", "cs", "outreach"}
+DIRECT_AGENTS = {"sales", "finance", "warehouse", "cs", "outreach", "developer"}
 
 # 개발 에이전트 키워드 (super_admin 전용)
 DEV_KEYWORDS = {
@@ -192,15 +192,44 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
     # ── 0. force_agent: 오케스트레이터 완전 bypass ──────────────────
     # 대시보드 에이전트 카드 클릭 → 해당 에이전트와 1:1 채팅 시작
     if req.force_agent and req.force_agent in DIRECT_AGENTS:
+        from app.services import dev_chat_agent
+
+        display_name = AGENT_DISPLAY.get(req.force_agent, req.force_agent)
+        title = f"[{display_name}] {req.message[:30]}"
+
+        # developer는 dev_chat_agent 서비스 직접 사용 (AGENT_MAP에 없음)
+        if req.force_agent == "developer":
+            _dev_mode_conversations.add(conversation_id)
+            try:
+                ctx = conv_svc.get_messages(conversation_id)
+            except Exception:
+                ctx = []
+            response_text = dev_chat_agent.analyze_and_propose(req.message, conversation_id, ctx)
+            run_id = str(uuid.uuid4())
+            _save_results(
+                conversation_id, req.message,
+                [{"run_id": run_id, "agent_type": "developer",
+                  "message": response_text, "status": "success", "cost_usd": 0.0}],
+                user_id=user.id, title=title,
+            )
+            return ChatResponse(
+                conversation_id=conversation_id,
+                agents=[AgentResult(
+                    run_id=run_id, agent_type="developer",
+                    agent_display=display_name,
+                    message=response_text, status="success",
+                )],
+                routed_to=["developer"],
+            )
+
+        # 비즈니스 에이전트 (sales / finance / warehouse / cs / outreach)
         from app.agents.orchestrator import run_agents
         results = run_agents(
             req.message, conversation_id, [req.force_agent],
             operator_id=user.operator_id,
         )
-        display_name = AGENT_DISPLAY.get(req.force_agent, req.force_agent)
         _save_results(
-            conversation_id, req.message, results, user_id=user.id,
-            title=f"[{display_name}] {req.message[:30]}",
+            conversation_id, req.message, results, user_id=user.id, title=title,
         )
         agents = [
             AgentResult(

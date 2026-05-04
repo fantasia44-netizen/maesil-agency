@@ -131,10 +131,11 @@ const AGENT_PLACEHOLDER: Record<string, string> = {
   warehouse: "재고 현황, 입출고, 품절 위험 상품 등을 물어보세요…",
   cs:        "고객 문의, 리뷰, CS 현황 등을 물어보세요…",
   outreach:  "신규 파트너, 영업 기회, 광고 성과 등을 물어보세요…",
+  developer: "에러, 버그, 코드 수정, 배포, 로그 분석 등을 질문하세요…",
 };
 
 // force_agent 허용 목록 (백엔드 DIRECT_AGENTS와 동일하게 유지)
-const VALID_FORCE_AGENTS = new Set(["sales", "finance", "warehouse", "cs", "outreach"]);
+const VALID_FORCE_AGENTS = new Set(["sales", "finance", "warehouse", "cs", "outreach", "developer"]);
 
 /* ── 메인 컴포넌트 ─────────────────────────────────────── */
 function ChatPageInner() {
