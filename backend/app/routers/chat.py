@@ -170,6 +170,34 @@ def _has_recent_dev_message(conversation_id: str, last_n: int = 5) -> bool:
 # DB 조회 실패해도 견고하게 유지됨 (in-memory)
 _dev_mode_conversations: set[str] = set()
 
+# 1:1 에이전트 고정 대화 — conversation_id → agent_type
+# force_agent가 한 번이라도 사용된 대화는 이후 메시지에도 자동 적용
+_locked_agent_conversations: dict[str, str] = {}
+
+
+def _detect_locked_agent(conversation_id: str) -> str | None:
+    """대화 히스토리에서 1:1 에이전트 고정 여부를 판단.
+
+    이미 in-memory에 등록된 경우 즉시 반환.
+    없으면 DB 조회: 모든 에이전트 응답이 같은 타입이면 해당 타입 반환 (orchestrator 제외).
+    """
+    if conversation_id in _locked_agent_conversations:
+        return _locked_agent_conversations[conversation_id]
+    try:
+        msgs = conv_svc.get_messages(conversation_id)
+        agent_msgs = [m for m in msgs if m.get("role") == "agent"]
+        if not agent_msgs:
+            return None
+        types = {m.get("agent_type") for m in agent_msgs if m.get("agent_type")}
+        if len(types) == 1:
+            atype = next(iter(types))
+            if atype in DIRECT_AGENTS:
+                _locked_agent_conversations[conversation_id] = atype
+                return atype
+    except Exception:
+        pass
+    return None
+
 # 명시적으로 다른 에이전트로 빠지는 키워드 — 이게 있으면 dev sticky 해제
 EXPLICIT_OTHER_AGENT_KEYWORDS = {
     "@매출", "@재고", "@재무", "@cs", "@고객",
@@ -191,14 +219,21 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
 
     # ── 0. force_agent: 오케스트레이터 완전 bypass ──────────────────
     # 대시보드 에이전트 카드 클릭 → 해당 에이전트와 1:1 채팅 시작
-    if req.force_agent and req.force_agent in DIRECT_AGENTS:
+    # req.force_agent가 없어도, 대화 히스토리에서 고정 에이전트를 자동 감지해 적용
+    fa = req.force_agent or (
+        _detect_locked_agent(conversation_id) if req.conversation_id else None
+    )
+    if fa and fa in DIRECT_AGENTS:
         from app.services import dev_chat_agent
 
-        display_name = AGENT_DISPLAY.get(req.force_agent, req.force_agent)
+        # 이 대화를 해당 에이전트로 고정 (이후 메시지에서 force_agent 없어도 자동 유지)
+        _locked_agent_conversations[conversation_id] = fa
+
+        display_name = AGENT_DISPLAY.get(fa, fa)
         title = f"[{display_name}] {req.message[:30]}"
 
         # developer는 dev_chat_agent 서비스 직접 사용 (AGENT_MAP에 없음)
-        if req.force_agent == "developer":
+        if fa == "developer":
             _dev_mode_conversations.add(conversation_id)
             try:
                 ctx = conv_svc.get_messages(conversation_id)
@@ -229,7 +264,7 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
             ctx_msgs = []
         from app.agents.orchestrator import run_agents
         results = run_agents(
-            req.message, conversation_id, [req.force_agent],
+            req.message, conversation_id, [fa],
             operator_id=user.operator_id,
             context_messages=ctx_msgs,
         )
@@ -250,7 +285,7 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
         return ChatResponse(
             conversation_id=conversation_id,
             agents=agents,
-            routed_to=[req.force_agent],
+            routed_to=[fa],
         )
 
     # ── 1. 개발 에이전트 라우팅 (super_admin 전용) ──────────────────
