@@ -204,3 +204,82 @@ def inspect_insight(token: str = "") -> dict:
         }
     except Exception as e:
         return {"error": str(e)}
+
+
+@app.get("/admin/inspect-insight-performance")
+def inspect_insight_performance(token: str = "") -> dict:
+    """maesil-insight 성과/광고 관련 테이블 전체 컬럼 목록 조회.
+    insight_benchmark.py 쿼리 수정 전 실제 스키마 파악용.
+    """
+    from app.config import settings
+    if token != settings.api_bearer_token:
+        from fastapi import HTTPException
+        raise HTTPException(403, "forbidden")
+    try:
+        from app.db.registry_client import get_db_client
+        client = get_db_client("maesil-insight")
+
+        # 성과/광고/매출/분석 관련 테이블 + 전체 컬럼
+        cols_r = client.rpc("execute_readonly_sql", {
+            "query": """
+                SELECT
+                    c.table_name,
+                    c.column_name,
+                    c.data_type,
+                    c.ordinal_position
+                FROM information_schema.columns c
+                JOIN information_schema.tables t
+                  ON t.table_name = c.table_name
+                 AND t.table_schema = c.table_schema
+                WHERE c.table_schema = 'public'
+                  AND t.table_type = 'BASE TABLE'
+                  AND (
+                    c.table_name ILIKE ANY(ARRAY[
+                      '%ad%','%roas%','%revenue%','%sales%','%profit%',
+                      '%performance%','%report%','%stat%','%analytics%',
+                      '%naver%','%coupang%','%kakao%','%channel%',
+                      '%cost%','%spend%','%margin%','%income%','%sync%'
+                    ])
+                    OR c.column_name ILIKE ANY(ARRAY[
+                      '%roas%','%revenue%','%sales%','%profit%','%margin%',
+                      '%ad_cost%','%ad_spend%','%spend%','%cost%',
+                      '%impressions%','%clicks%','%orders%','%conversion%'
+                    ])
+                  )
+                ORDER BY c.table_name, c.ordinal_position
+            """
+        }).execute()
+
+        # 테이블별 row count (규모 파악용)
+        tables = list({r["table_name"] for r in (cols_r.data or [])})
+        counts: dict = {}
+        for tbl in tables[:15]:  # 최대 15개
+            try:
+                cnt_r = client.rpc("execute_readonly_sql", {
+                    "query": f"SELECT COUNT(*) AS n FROM {tbl}"
+                }).execute()
+                counts[tbl] = (cnt_r.data or [{}])[0].get("n", "?")
+            except Exception:
+                counts[tbl] = "error"
+
+        # 컬럼을 테이블별로 그룹핑
+        by_table: dict = {}
+        for row in (cols_r.data or []):
+            tbl = row["table_name"]
+            by_table.setdefault(tbl, []).append({
+                "col": row["column_name"],
+                "type": row["data_type"],
+            })
+
+        return {
+            "tables_with_perf_columns": [
+                {
+                    "table": tbl,
+                    "row_count": counts.get(tbl, "?"),
+                    "columns": cols,
+                }
+                for tbl, cols in sorted(by_table.items())
+            ]
+        }
+    except Exception as e:
+        return {"error": str(e)}
