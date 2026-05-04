@@ -56,6 +56,57 @@ type DbMessage = {
   created_at: string;
 };
 
+/* ── 영업 에이전트 스냅샷 타입 ──────────────────────────── */
+type OutreachTarget = {
+  mall_name: string;
+  store_url: string;
+  best_rank?: number;
+  product_count?: number;
+  price_range?: string;
+  priority_score: number;
+  proposal_point: string;
+};
+
+type OutreachSnapshot = {
+  id: string;
+  kind: "outreach_targets" | "proposal_draft";
+  payload: {
+    keyword?: string;
+    targets?: OutreachTarget[];
+    mall_name?: string;
+    store_url?: string;
+    product_area?: string;
+    proposal?: string;
+    created_at?: string;
+  };
+  created_at: string;
+};
+
+/* ── CSV 다운로드 헬퍼 ───────────────────────────────────── */
+function downloadTargetCSV(keyword: string, targets: OutreachTarget[]) {
+  const BOM = "﻿";
+  const header = ["셀러명", "스토어URL", "최고순위", "상품수", "우선도(1-10)", "제안포인트"].join(",");
+  const rows = targets.map((t) =>
+    [
+      `"${t.mall_name}"`,
+      `"${t.store_url}"`,
+      t.best_rank ?? "",
+      t.product_count ?? "",
+      t.priority_score,
+      `"${t.proposal_point.replace(/"/g, '""')}"`,
+    ].join(",")
+  );
+  const csv = BOM + [header, ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  const date = new Date().toLocaleDateString("ko-KR").replace(/\./g, "").replace(/ /g, "");
+  a.download = `영업타겟_${keyword}_${date}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 /* ── 상수 ──────────────────────────────────────────────── */
 const AGENT_COLOR: Record<string, string> = {
   sales:        "#16a34a",
@@ -157,6 +208,12 @@ function ChatPageInner() {
   const [convLoading,   setConvLoading]   = useState(false);
   const [histLoading,   setHistLoading]   = useState(false); // 이전 대화 로드 중
 
+  /* 영업 에이전트 스냅샷 패널 */
+  const [snapshots,       setSnapshots]       = useState<OutreachSnapshot[]>([]);
+  const [snapshotOpen,    setSnapshotOpen]    = useState(false);
+  const [snapshotLoading, setSnapshotLoading] = useState(false);
+  const [proposalModal,   setProposalModal]   = useState<OutreachSnapshot | null>(null);
+
   const bottomRef    = useRef<HTMLDivElement>(null);
   const alertSentRef = useRef(false);
 
@@ -175,6 +232,20 @@ function ChatPageInner() {
       .finally(() => setConvLoading(false));
   }
   useEffect(() => { refreshConvList(); }, []);
+
+  /* 영업 에이전트 스냅샷 로드 */
+  function loadSnapshots() {
+    if (!hasToken() || forcedAgent !== "outreach") return;
+    setSnapshotLoading(true);
+    apiFetch<OutreachSnapshot[]>("/api/outreach/snapshots")
+      .then(setSnapshots)
+      .catch(() => {})
+      .finally(() => setSnapshotLoading(false));
+  }
+  useEffect(() => {
+    if (forcedAgent === "outreach") loadSnapshots();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [forcedAgent]);
 
   /* alert_id URL 파라미터 — 알림 자동 연결 */
   useEffect(() => {
@@ -274,6 +345,7 @@ function ChatPageInner() {
         { id: resp.conversation_id + Date.now(), role: "agents", agents: resp.agents, ts: new Date() },
       ]);
       refreshConvList(); // 대화 목록 갱신
+      if (forcedAgent === "outreach") loadSnapshots(); // 영업 스냅샷 갱신
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       setMessages((p) => [
@@ -395,6 +467,153 @@ function ChatPageInner() {
             >
               ← 대시보드
             </button>
+          </div>
+        )}
+
+        {/* ── 영업 에이전트 저장 자료 패널 ── */}
+        {forcedAgent === "outreach" && (
+          <div style={{ marginBottom: "0.75rem" }}>
+            <button
+              onClick={() => { setSnapshotOpen((v) => !v); if (!snapshotOpen) loadSnapshots(); }}
+              style={{
+                width: "100%", textAlign: "left",
+                padding: "6px 12px", fontSize: "0.82rem",
+                background: "#fef9ec", border: "1px solid #fed7aa",
+                borderRadius: snapshotOpen ? "8px 8px 0 0" : "8px",
+                cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
+              }}
+            >
+              <span>📥</span>
+              <span style={{ flex: 1, fontWeight: 600, color: "#92400e" }}>저장된 영업 자료</span>
+              <span className="muted" style={{ fontSize: "0.75rem" }}>
+                {snapshotLoading ? "로딩…" : `타겟 ${snapshots.filter(s => s.kind === "outreach_targets").length}개 · 제안서 ${snapshots.filter(s => s.kind === "proposal_draft").length}개`}
+              </span>
+              <span style={{ color: "#94a3b8" }}>{snapshotOpen ? "▲" : "▼"}</span>
+            </button>
+
+            {snapshotOpen && (
+              <div style={{
+                border: "1px solid #fed7aa", borderTop: "none",
+                borderRadius: "0 0 8px 8px", background: "#fffbf5",
+                maxHeight: 260, overflowY: "auto", padding: "0.5rem 0",
+              }}>
+                {snapshots.length === 0 && !snapshotLoading && (
+                  <div className="muted" style={{ padding: "0.75rem 1rem", fontSize: "0.8rem" }}>
+                    저장된 자료가 없습니다. 영업 에이전트에게 타겟을 찾아달라고 요청하세요.
+                  </div>
+                )}
+
+                {/* 타겟 리스트 */}
+                {snapshots.filter(s => s.kind === "outreach_targets").map((s) => (
+                  <div key={s.id} style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "6px 12px", borderBottom: "1px solid #fde68a",
+                  }}>
+                    <span style={{ fontSize: "0.8rem", flex: 1, color: "#78350f" }}>
+                      📋 <strong>{s.payload.keyword || "키워드 없음"}</strong> 타겟 리스트
+                      <span className="muted"> ({s.payload.targets?.length ?? 0}개)</span>
+                      <span className="muted" style={{ fontSize: "0.72rem", marginLeft: 6 }}>
+                        {new Date(s.created_at).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                      </span>
+                    </span>
+                    <button
+                      className="btn"
+                      style={{ fontSize: "0.72rem", padding: "2px 8px", background: "#ea580c", color: "#fff", borderColor: "#ea580c" }}
+                      onClick={() => {
+                        if (s.payload.targets && s.payload.keyword) {
+                          downloadTargetCSV(s.payload.keyword, s.payload.targets);
+                        }
+                      }}
+                    >
+                      CSV ↓
+                    </button>
+                  </div>
+                ))}
+
+                {/* 제안서 */}
+                {snapshots.filter(s => s.kind === "proposal_draft").map((s) => (
+                  <div key={s.id} style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "6px 12px", borderBottom: "1px solid #fde68a",
+                  }}>
+                    <span style={{ fontSize: "0.8rem", flex: 1, color: "#78350f" }}>
+                      📝 <strong>{s.payload.mall_name || "셀러 없음"}</strong> 제안서
+                      {s.payload.product_area && <span className="muted"> · {s.payload.product_area}</span>}
+                      <span className="muted" style={{ fontSize: "0.72rem", marginLeft: 6 }}>
+                        {new Date(s.created_at).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                      </span>
+                    </span>
+                    <button
+                      className="btn"
+                      style={{ fontSize: "0.72rem", padding: "2px 8px" }}
+                      onClick={() => setProposalModal(s)}
+                    >
+                      보기
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── 제안서 모달 ── */}
+        {proposalModal && (
+          <div
+            onClick={() => setProposalModal(null)}
+            style={{
+              position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000,
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: "#fff", borderRadius: 12, padding: "1.5rem",
+                width: "min(680px, 90vw)", maxHeight: "80vh",
+                display: "flex", flexDirection: "column", gap: "0.75rem",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: "1rem" }}>
+                    📝 {proposalModal.payload.mall_name} 제안서
+                  </div>
+                  {proposalModal.payload.store_url && (
+                    <a href={proposalModal.payload.store_url} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: "0.78rem", color: "#2563eb" }}>
+                      {proposalModal.payload.store_url}
+                    </a>
+                  )}
+                </div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <button
+                    className="btn"
+                    style={{ fontSize: "0.75rem" }}
+                    onClick={() => {
+                      navigator.clipboard.writeText(proposalModal.payload.proposal || "");
+                    }}
+                  >
+                    📋 복사
+                  </button>
+                  <button onClick={() => setProposalModal(null)}
+                    style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.4rem", color: "#94a3b8" }}>
+                    ×
+                  </button>
+                </div>
+              </div>
+              <div style={{ flex: 1, overflowY: "auto" }}>
+                <pre style={{
+                  whiteSpace: "pre-wrap", wordBreak: "break-word",
+                  fontSize: "0.88rem", lineHeight: 1.7,
+                  background: "#f8fafc", border: "1px solid #e2e8f0",
+                  borderRadius: 8, padding: "1rem", margin: 0,
+                }}>
+                  {proposalModal.payload.proposal || "(내용 없음)"}
+                </pre>
+              </div>
+            </div>
           </div>
         )}
 
