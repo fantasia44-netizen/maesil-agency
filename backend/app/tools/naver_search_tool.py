@@ -63,7 +63,7 @@ def search_naver_shopping(
             headers={"Authorization": f"Bearer {token}"},
             params={
                 "keyword": keyword,
-                "display": min(max(display, 1), 100),
+                "display": min(max(display, 1), 30),  # 30개 상한 (타임아웃 방지)
                 "sort":    sort,
             },
             timeout=20,

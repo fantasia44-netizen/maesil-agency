@@ -41,13 +41,13 @@ OUTREACH_TOOLS: list[dict] = [
         "name": "search_naver_shopping",
         "description": (
             "키워드로 네이버쇼핑을 검색해 판매처(스마트스토어 셀러) 목록을 가져옵니다. "
-            "display는 최대 100. sort는 sim(정확도)/date/asc/dsc 중 하나."
+            "display는 최대 30. sort는 sim(정확도)/asc/dsc 중 하나."
         ),
         "input_schema": {
             "type": "object",
             "properties": {
                 "keyword": {"type": "string", "description": "검색 키워드 (예: 스킨케어, 주방용품)"},
-                "display": {"type": "integer", "description": "조회할 상품 수 (기본 100, 최대 100)", "default": 100},
+                "display": {"type": "integer", "description": "조회할 상품 수 (기본 30, 최대 30)", "default": 30},
                 "sort": {"type": "string", "description": "정렬 방식 (sim=정확도, asc=가격낮은순)", "default": "sim"},
             },
             "required": ["keyword"],
@@ -187,17 +187,18 @@ class OutreachAgent(BaseAgent):
 4. 부드럽고 친근한 톤, 수신거부 언급 불필요
 
 ## 워크플로우
-1. `search_naver_shopping`으로 셀러 목록 조회
+1. `search_naver_shopping`으로 셀러 목록 조회 (display=30 고정)
 2. 결과 분석 → 우선순위 스코어 + 제안 포인트 도출
 3. `save_target_list`로 타겟 리스트 저장
-4. 제안서 작성 시 `create_proposal_draft`에 sections 채워서 저장
-   (get_industry_benchmark 호출 불필요 — 수치보다 문제 해결 중심으로)
-5. 시장 인사이트는 `create_finding`으로 저장
+4. **우선순위 1위 셀러 1명**만 `create_proposal_draft` 호출 (제안서는 1개만)
+   - 나머지 셀러 제안서는 사용자가 개별 요청 시 작성
+5. `create_finding`은 특별한 인사이트가 있을 때만 (선택)
 
 ## 제약
 - 연락처(전화번호, 이메일) 수집·저장 금지
 - 실제 발송 행위 금지 (리스트 준비까지만)
 - 허위 정보 포함 금지
+- **한 번 실행에 제안서 1개만** — 여러 개 동시 작성 금지 (응답 지연 방지)
 """
 
     def get_tools(self) -> list[dict]:
@@ -226,7 +227,7 @@ class OutreachAgent(BaseAgent):
             for _round in range(MAX_TOOL_ROUNDS):
                 resp = client.messages.create(
                     model=self.model,
-                    max_tokens=4096,
+                    max_tokens=2048,
                     system=system,
                     tools=tools,
                     messages=messages,
