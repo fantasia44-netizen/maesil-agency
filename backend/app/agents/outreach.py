@@ -23,6 +23,7 @@ import anthropic
 from app.agents.base import (
     BaseAgent,
     MAX_TOOL_ROUNDS,
+    _build_messages,
     _estimate_cost,
     _get_anthropic_client,
     _log_run_end,
@@ -173,6 +174,7 @@ class OutreachAgent(BaseAgent):
         conversation_id: str,
         run_id: str | None = None,
         operator_id: str | None = None,
+        context_messages: list[dict] | None = None,
     ) -> dict[str, Any]:
         run_id = run_id or str(uuid.uuid4())
         _log_run_start(run_id, conversation_id, self.agent_type, self.model)
@@ -180,7 +182,7 @@ class OutreachAgent(BaseAgent):
         try:
             client = _get_anthropic_client()
             system = self.get_system_prompt()
-            messages = [{"role": "user", "content": message}]
+            messages = _build_messages(context_messages, message)
             tools = self.get_tools()
 
             input_tokens = output_tokens = 0

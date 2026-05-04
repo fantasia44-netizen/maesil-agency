@@ -223,10 +223,15 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
             )
 
         # 비즈니스 에이전트 (sales / finance / warehouse / cs / outreach)
+        try:
+            ctx_msgs = conv_svc.get_messages(conversation_id)
+        except Exception:
+            ctx_msgs = []
         from app.agents.orchestrator import run_agents
         results = run_agents(
             req.message, conversation_id, [req.force_agent],
             operator_id=user.operator_id,
+            context_messages=ctx_msgs,
         )
         _save_results(
             conversation_id, req.message, results, user_id=user.id, title=title,
@@ -384,7 +389,15 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
         from app.agents.orchestrator import route, run_agents
         operator_id = user.operator_id
         agent_types = route(req.message)
-        results = run_agents(req.message, conversation_id, agent_types, operator_id=operator_id)
+        try:
+            ctx_msgs = conv_svc.get_messages(conversation_id)
+        except Exception:
+            ctx_msgs = []
+        results = run_agents(
+            req.message, conversation_id, agent_types,
+            operator_id=operator_id,
+            context_messages=ctx_msgs,
+        )
         _save_results(conversation_id, req.message, results, user_id=user.id)
         agents = [
             AgentResult(

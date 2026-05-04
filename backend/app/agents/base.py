@@ -23,6 +23,36 @@ MAX_TOKENS = 2048
 MAX_TOOL_ROUNDS = 8
 
 
+def _build_messages(
+    context_messages: list[dict] | None,
+    current_message: str,
+    max_turns: int = 8,
+) -> list[dict]:
+    """대화 히스토리 + 현재 메시지를 Anthropic messages 형식으로 변환.
+
+    규칙:
+    - 최근 max_turns 턴(user+assistant 쌍)만 포함 (컨텍스트 길이 관리)
+    - 연속된 같은 role은 합치기 (Anthropic API 요구사항: user↔assistant 교대)
+    - 현재 메시지는 항상 마지막 user 메시지로 추가
+    """
+    msgs: list[dict] = []
+    if context_messages:
+        # 최근 max_turns 턴만 포함 (메시지 쌍이므로 ×2)
+        recent = context_messages[-(max_turns * 2):]
+        for m in recent:
+            role = "user" if m.get("role") == "user" else "assistant"
+            content = str(m.get("content") or "").strip()
+            if not content:
+                continue
+            if msgs and msgs[-1]["role"] == role:
+                # 연속 같은 role → 합치기
+                msgs[-1]["content"] += "\n\n" + content
+            else:
+                msgs.append({"role": role, "content": content})
+    msgs.append({"role": "user", "content": current_message})
+    return msgs
+
+
 def _get_anthropic_client() -> anthropic.Anthropic:
     api_key = get_secret("anthropic_api_key") or get_secret("anthropic_api")
     if not api_key:
@@ -51,11 +81,14 @@ class BaseAgent:
         conversation_id: str,
         run_id: str | None = None,
         operator_id: str | None = None,
+        context_messages: list[dict] | None = None,
     ) -> dict[str, Any]:
         """메시지를 받아 에이전트를 실행하고 결과 반환.
 
         operator_id: JWT에서 주입 (customer의 insight_operator_id).
                      None이면 secrets 테이블의 기본값을 폴백으로 사용.
+        context_messages: 이전 대화 히스토리 (conv_svc.get_messages() 반환값).
+                          전달 시 멀티턴 컨텍스트 유지.
         """
         run_id = run_id or str(uuid.uuid4())
         started_at = datetime.now(timezone.utc).isoformat()
@@ -71,7 +104,7 @@ class BaseAgent:
             if operator_id:
                 system += f"\n\n[운영자 operator_id: {operator_id}]"
 
-            messages = [{"role": "user", "content": message}]
+            messages = _build_messages(context_messages, message)
             tools = self.get_tools()
 
             input_tokens = 0

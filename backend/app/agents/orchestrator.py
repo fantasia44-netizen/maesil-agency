@@ -81,8 +81,12 @@ def run_agents(
     conversation_id: str,
     agent_types: list[str],
     operator_id: str | None = None,
+    context_messages: list[dict] | None = None,
 ) -> list[dict[str, Any]]:
-    """여러 에이전트를 순차 실행하고 결과 목록 반환."""
+    """여러 에이전트를 순차 실행하고 결과 목록 반환.
+
+    context_messages: 이전 대화 히스토리. 전달 시 각 에이전트가 멀티턴 컨텍스트 유지.
+    """
     from app.agents.sales import SalesAgent
     from app.agents.finance import FinanceAgent
     from app.agents.warehouse import WarehouseAgent
@@ -107,7 +111,11 @@ def run_agents(
         run_id = str(uuid.uuid4())
         try:
             agent = cls()
-            result = agent.run(message, conversation_id, run_id, operator_id=operator_id)
+            result = agent.run(
+                message, conversation_id, run_id,
+                operator_id=operator_id,
+                context_messages=context_messages,
+            )
             results.append(result)
         except Exception as e:
             results.append({
