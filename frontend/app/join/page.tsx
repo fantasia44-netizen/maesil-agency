@@ -56,7 +56,7 @@ export default function JoinPage() {
           display_name: displayName.trim() || null,
         }),
       });
-      storeAuth(res.token, { email: res.email, role: res.role, display_name: res.display_name });
+      storeAuth(res.token, { email: res.email, role: res.role as "super_admin" | "customer", display_name: res.display_name });
       router.replace("/chat");
     } catch (e) {
       setErr((e as Error).message);
