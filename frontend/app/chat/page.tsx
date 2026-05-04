@@ -498,25 +498,32 @@ function ChatPageInner() {
     };
   }, []);
 
-  /* 대화 목록 불러오기 */
-  function refreshConvList() {
+  /* 대화 목록 불러오기 — 완료 후 outreach 스냅샷을 순차 로딩 (DB 경합 방지) */
+  function refreshConvList(thenLoadSnapshots = false) {
     if (!hasToken()) return;
     setConvLoading(true);
     apiFetch<Conversation[]>("/api/chat/conversations")
-      .then(setConvList)
+      .then((data) => {
+        setConvList(data);
+        if (thenLoadSnapshots) loadSnapshots();
+      })
       .catch(() => {})
       .finally(() => setConvLoading(false));
   }
-  useEffect(() => { refreshConvList(); }, []);
+  useEffect(() => {
+    const isOutreach = forcedAgent === "outreach" || window.location.hash === "#snapshots";
+    // outreach 페이지: 대화 목록 로딩 완료 후 스냅샷 순차 로딩
+    refreshConvList(isOutreach);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  /* 영업 에이전트 스냅샷 로드 — forcedAgent 무관하게 항상 시도 */
+  /* 영업 에이전트 스냅샷 로드 */
   function loadSnapshots() {
     if (!hasToken()) return;
     setSnapshotLoading(true);
     apiFetch<OutreachSnapshot[]>("/api/outreach/snapshots")
       .then((data) => {
         setSnapshots(data);
-        // #snapshots anchor로 왔거나 outreach 모드면 패널 자동 열기
         if (data.length > 0 && (forcedAgent === "outreach" || window.location.hash === "#snapshots")) {
           setSnapshotOpen(true);
         }
@@ -524,10 +531,6 @@ function ChatPageInner() {
       .catch(() => {})
       .finally(() => setSnapshotLoading(false));
   }
-  useEffect(() => {
-    loadSnapshots();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   /* alert_id URL 파라미터 — 알림 자동 연결 */
   useEffect(() => {
