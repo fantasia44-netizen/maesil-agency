@@ -75,15 +75,6 @@ type ProposalSections = {
   cta?: string;
 };
 
-type ProposalBenchmark = {
-  category?: string;
-  avg_roas?: number;
-  avg_margin_pct?: number;
-  top_channel?: string;
-  sample_size?: number;
-  source?: string;
-};
-
 type OutreachSnapshot = {
   id: string;
   kind: "outreach_targets" | "proposal_draft";
@@ -95,7 +86,6 @@ type OutreachSnapshot = {
     product_area?: string;
     proposal?: string;
     sections?: ProposalSections;
-    benchmark?: ProposalBenchmark;
     created_at?: string;
   };
   created_at: string;
@@ -109,7 +99,6 @@ function openProposalHTML(s: OutreachSnapshot) {
   const productArea= p.product_area || "";
   const proposal   = p.proposal     || "";
   const sections: ProposalSections  = p.sections  ?? {};
-  const bm: ProposalBenchmark       = p.benchmark ?? {};
 
   /* 날짜 */
   const dateStr = (() => {
@@ -118,47 +107,6 @@ function openProposalHTML(s: OutreachSnapshot) {
       return d.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
     } catch { return ""; }
   })();
-
-  /* 벤치마크 블록 */
-  const avgRoas    = Number(bm.avg_roas        ?? 0);
-  const avgMargin  = Number(bm.avg_margin_pct  ?? 0);
-  const sampleSize = Number(bm.sample_size     ?? 0);
-  const category   = String(bm.category        ?? "");
-  const topChannel = String(bm.top_channel     ?? "");
-  const roasW      = Math.min(Math.round(avgRoas   / 6  * 100), 100);
-  const marginW    = Math.min(Math.round(avgMargin / 40 * 100), 100);
-
-  // fallback / 기타 카테고리는 제안서 PDF에서도 숨김
-  const showBm = avgRoas > 0 && category !== "기타" && String(bm.source ?? "").startsWith("maesil-insight:");
-  const bmHtml = showBm ? `
-  <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:1.4rem;margin:1.8rem 0">
-    <div style="font-size:.83rem;font-weight:700;color:#166534;margin-bottom:1rem">
-      📊 ${category} 카테고리 평균 성과 &nbsp;·&nbsp; ${sampleSize}개 스토어 기준
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem">
-      <div>
-        <div style="font-size:.7rem;color:#6b7280">평균 ROAS</div>
-        <div style="font-size:1.6rem;font-weight:700;color:#15803d">${avgRoas.toFixed(1)}<span style="font-size:1rem">x</span></div>
-        <div style="height:7px;background:#dcfce7;border-radius:4px;overflow:hidden;margin:.3rem 0">
-          <div style="width:${roasW}%;height:100%;background:#22c55e;border-radius:4px"></div>
-        </div>
-        <div style="font-size:.7rem;color:#6b7280">광고비 1원 → ${avgRoas.toFixed(1)}원 매출</div>
-      </div>
-      <div>
-        <div style="font-size:.7rem;color:#6b7280">평균 실수익률</div>
-        <div style="font-size:1.6rem;font-weight:700;color:#15803d">${avgMargin.toFixed(0)}<span style="font-size:1rem">%</span></div>
-        <div style="height:7px;background:#dcfce7;border-radius:4px;overflow:hidden;margin:.3rem 0">
-          <div style="width:${marginW}%;height:100%;background:#22c55e;border-radius:4px"></div>
-        </div>
-        <div style="font-size:.7rem;color:#6b7280">광고비·수수료 차감 후 순이익</div>
-      </div>
-      <div>
-        <div style="font-size:.7rem;color:#6b7280">주요 매출 채널</div>
-        <div style="font-size:1.1rem;font-weight:700;color:#15803d;margin:.3rem 0">${topChannel}</div>
-        <div style="font-size:.7rem;color:#6b7280">매출 비중 1위</div>
-      </div>
-    </div>
-  </div>` : "";  // showBm이 false면 빈 문자열
 
   /* 본문 */
   const sectionKeys: [keyof ProposalSections, string][] = [
@@ -207,7 +155,6 @@ function openProposalHTML(s: OutreachSnapshot) {
   </div>
   ${storeUrl ? `<div style="padding:.9rem 2.8rem;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:.82rem;color:#475569">스토어 · <a href="${storeUrl}" target="_blank" style="color:#2563eb;text-decoration:none">${storeUrl}</a></div>` : ""}
   <div style="padding:2.2rem 2.8rem">
-    ${bmHtml}
     ${bodyHtml}
   </div>
   <div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:1.1rem 2.8rem;display:flex;justify-content:space-between;align-items:center">
@@ -350,15 +297,7 @@ const SECTION_LABELS: [keyof ProposalSections, string][] = [
 
 function ProposalModal({ snapshot, onClose }: { snapshot: OutreachSnapshot; onClose: () => void }) {
   const p                            = snapshot.payload;
-  const bm: ProposalBenchmark        = p.benchmark ?? {};
   const sections: ProposalSections   = p.sections  ?? {};
-  const avgRoas    = Number(bm.avg_roas        ?? 0);
-  const avgMargin  = Number(bm.avg_margin_pct  ?? 0);
-  const sampleSize = Number(bm.sample_size     ?? 0);
-  // fallback 데이터("기타" 카테고리 또는 source==="benchmark")는 카드 숨김
-  const hasBm      = avgRoas > 0
-                     && bm.category !== "기타"
-                     && bm.source?.startsWith("maesil-insight:");
   const hasSections= SECTION_LABELS.some(([k]) => !!sections[k]);
 
   const [studioStatus, setStudioStatus] = useState<null | "loading" | "ok" | "pending" | "error">(null);
@@ -473,50 +412,6 @@ function ProposalModal({ snapshot, onClose }: { snapshot: OutreachSnapshot; onCl
 
         {/* 스크롤 본문 */}
         <div style={{ flex: 1, overflowY: "auto", padding: "1.25rem 1.5rem" }}>
-
-          {/* 벤치마크 카드 */}
-          {hasBm && (
-            <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0",
-                          borderRadius: 10, padding: "1rem 1.2rem", marginBottom: "1.25rem" }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#166534", marginBottom: "0.8rem" }}>
-                📊 {bm.category} 카테고리 평균 성과 &nbsp;·&nbsp; {sampleSize}개 스토어
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "0.8rem" }}>
-                {/* ROAS */}
-                <div>
-                  <div style={{ fontSize: "0.68rem", color: "#6b7280" }}>평균 ROAS</div>
-                  <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#15803d" }}>
-                    {avgRoas.toFixed(1)}<span style={{ fontSize: "0.9rem" }}>x</span>
-                  </div>
-                  <div style={{ height: 6, background: "#dcfce7", borderRadius: 3, overflow: "hidden", margin: "0.25rem 0" }}>
-                    <div style={{ width: `${Math.min(Math.round(avgRoas/6*100),100)}%`,
-                                  height: "100%", background: "#22c55e", borderRadius: 3 }} />
-                  </div>
-                  <div style={{ fontSize: "0.68rem", color: "#6b7280" }}>광고비 1원 → {avgRoas.toFixed(1)}원 매출</div>
-                </div>
-                {/* 실수익률 */}
-                <div>
-                  <div style={{ fontSize: "0.68rem", color: "#6b7280" }}>평균 실수익률</div>
-                  <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#15803d" }}>
-                    {avgMargin.toFixed(0)}<span style={{ fontSize: "0.9rem" }}>%</span>
-                  </div>
-                  <div style={{ height: 6, background: "#dcfce7", borderRadius: 3, overflow: "hidden", margin: "0.25rem 0" }}>
-                    <div style={{ width: `${Math.min(Math.round(avgMargin/40*100),100)}%`,
-                                  height: "100%", background: "#22c55e", borderRadius: 3 }} />
-                  </div>
-                  <div style={{ fontSize: "0.68rem", color: "#6b7280" }}>광고비·수수료 차감 후</div>
-                </div>
-                {/* 주요 채널 */}
-                <div>
-                  <div style={{ fontSize: "0.68rem", color: "#6b7280" }}>주요 채널</div>
-                  <div style={{ fontSize: "1rem", fontWeight: 700, color: "#15803d", margin: "0.3rem 0" }}>
-                    {bm.top_channel}
-                  </div>
-                  <div style={{ fontSize: "0.68rem", color: "#6b7280" }}>매출 비중 1위</div>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* 제안서 본문 — 섹션 구조 or 평문 */}
           {hasSections ? (

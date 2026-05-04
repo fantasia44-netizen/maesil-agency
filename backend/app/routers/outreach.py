@@ -86,19 +86,7 @@ def get_proposal_html(
     return HTMLResponse(content=html, media_type="text/html; charset=utf-8")
 
 
-# ── 벤치마크 조회 (프론트에서 직접 호출 가능) ────────────────────
-
-@router.get("/benchmark")
-def get_benchmark_api(
-    keyword: str,
-    user: UserContext = Depends(get_current_user),
-) -> dict:
-    """카테고리 키워드로 업계 벤치마크 조회."""
-    from app.services.insight_benchmark import get_benchmark
-    return get_benchmark(keyword)
-
-
-# ── C: maesil-studio 제안서 전송 ────────────────────────────────
+# ── maesil-studio 제안서 전송 ────────────────────────────────
 
 @router.post("/snapshots/{snapshot_id}/send-to-studio")
 def send_to_studio(

@@ -38,23 +38,6 @@ MODEL = "claude-haiku-4-5-20251001"  # Render 60초 타임아웃 내 처리
 
 OUTREACH_TOOLS: list[dict] = [
     {
-        "name": "get_industry_benchmark",
-        "description": (
-            "카테고리/키워드로 업계 평균 ROAS·실수익률·주요 채널을 조회합니다. "
-            "제안서 작성 전에 반드시 호출해 실제 데이터를 근거로 삼으세요."
-        ),
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "keyword_or_area": {
-                    "type": "string",
-                    "description": "검색 키워드 또는 셀러 카테고리 (예: 스킨케어, 주방용품, 반려동물)",
-                },
-            },
-            "required": ["keyword_or_area"],
-        },
-    },
-    {
         "name": "search_naver_shopping",
         "description": (
             "키워드로 네이버쇼핑을 검색해 판매처(스마트스토어 셀러) 목록을 가져옵니다. "
@@ -104,11 +87,7 @@ OUTREACH_TOOLS: list[dict] = [
     },
     {
         "name": "create_proposal_draft",
-        "description": (
-            "특정 셀러를 위한 맞춤 제안서 초안을 저장합니다. "
-            "get_industry_benchmark로 얻은 benchmark 데이터를 함께 전달하면 "
-            "PDF에 ROAS·실수익률 차트가 자동 삽입됩니다."
-        ),
+        "description": "특정 셀러를 위한 맞춤 제안서 초안을 저장합니다. sections 5개를 채워서 저장하세요.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -125,18 +104,6 @@ OUTREACH_TOOLS: list[dict] = [
                         "value_proposition": {"type": "string", "description": "매실 솔루션 가치 제안 — 구체적으로"},
                         "social_proof":      {"type": "string", "description": "도입 효과 — 벤치마크 숫자 활용"},
                         "cta":               {"type": "string", "description": "다음 단계 안내 (무료 체험 등)"},
-                    },
-                },
-                "benchmark": {
-                    "type": "object",
-                    "description": "get_industry_benchmark 결과 — PDF 차트에 사용됨",
-                    "properties": {
-                        "category":       {"type": "string"},
-                        "avg_roas":       {"type": "number"},
-                        "avg_margin_pct": {"type": "number"},
-                        "top_channel":    {"type": "string"},
-                        "sample_size":    {"type": "integer"},
-                        "source":         {"type": "string"},
                     },
                 },
             },
@@ -315,11 +282,7 @@ class OutreachAgent(BaseAgent):
     ) -> Any:
         _log_tool_call(run_id, tool_name, tool_input)
 
-        if tool_name == "get_industry_benchmark":
-            from app.services.insight_benchmark import get_benchmark
-            return get_benchmark(tool_input.get("keyword_or_area", ""))
-
-        elif tool_name == "search_naver_shopping":
+        if tool_name == "search_naver_shopping":
             return search_naver_shopping(
                 keyword=tool_input["keyword"],
                 display=tool_input.get("display", 100),
@@ -351,8 +314,6 @@ class OutreachAgent(BaseAgent):
             }
             if tool_input.get("sections"):
                 payload["sections"] = tool_input["sections"]
-            if tool_input.get("benchmark"):
-                payload["benchmark"] = tool_input["benchmark"]
 
             sid = create_snapshot(
                 run_id=run_id,

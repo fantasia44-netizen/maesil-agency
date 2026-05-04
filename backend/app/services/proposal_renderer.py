@@ -31,50 +31,6 @@ def _date_str(iso: str) -> str:
         return ""
 
 
-def _benchmark_html(bm: dict) -> str:
-    if not bm:
-        return ""
-
-    avg_roas      = float(bm.get("avg_roas", 0))
-    avg_margin    = float(bm.get("avg_margin_pct", 0))
-    sample_size   = int(bm.get("sample_size", 0))
-    category      = _esc(bm.get("category", ""))
-    top_channel   = _esc(bm.get("top_channel", ""))
-    source        = bm.get("source", "benchmark")
-    source_label  = "매실 실측 데이터" if source.startswith("maesil-insight:") else "업계 평균 기준"
-
-    roas_width    = min(int(avg_roas / 6 * 100), 100)
-    margin_width  = min(int(avg_margin / 40 * 100), 100)
-
-    return f"""
-<div class="bm-card">
-  <div class="bm-header">
-    <span class="bm-icon">📊</span>
-    <span class="bm-title">{category} 카테고리 평균 성과</span>
-    <span class="bm-meta">{sample_size}개 스토어 · {source_label}</span>
-  </div>
-  <div class="bm-grid">
-    <div class="bm-item">
-      <div class="bm-label">평균 ROAS</div>
-      <div class="bm-value">{avg_roas:.1f}<span class="bm-unit">x</span></div>
-      <div class="bm-bar-wrap"><div class="bm-bar" style="width:{roas_width}%"></div></div>
-      <div class="bm-sub">광고비 1원 → {avg_roas:.1f}원 매출</div>
-    </div>
-    <div class="bm-item">
-      <div class="bm-label">평균 실수익률</div>
-      <div class="bm-value">{avg_margin:.0f}<span class="bm-unit">%</span></div>
-      <div class="bm-bar-wrap"><div class="bm-bar" style="width:{margin_width}%"></div></div>
-      <div class="bm-sub">광고비·수수료 차감 후 순이익</div>
-    </div>
-    <div class="bm-item">
-      <div class="bm-label">주요 매출 채널</div>
-      <div class="bm-value ch">{top_channel}</div>
-      <div class="bm-sub">매출 비중 1위</div>
-    </div>
-  </div>
-</div>
-"""
-
 
 def _body_html(payload: dict) -> str:
     sections = payload.get("sections") or {}
@@ -111,7 +67,6 @@ def render_proposal_html(snapshot: dict) -> str:
     mall_name    = _esc(payload.get("mall_name", "스토어"))
     store_url    = payload.get("store_url", "")
     product_area = _esc(payload.get("product_area", ""))
-    benchmark    = payload.get("benchmark") or {}
     created_at   = payload.get("created_at", snapshot.get("created_at", ""))
     date_s       = _date_str(created_at)
 
@@ -120,7 +75,6 @@ def render_proposal_html(snapshot: dict) -> str:
         if store_url else ""
     )
 
-    bm_html   = _benchmark_html(benchmark)
     body_html = _body_html(payload)
 
     return f"""<!DOCTYPE html>
@@ -155,21 +109,6 @@ p{{margin-bottom:1.1rem;font-size:.95rem;color:#1e293b}}
 .sec{{margin-bottom:1.6rem}}
 .sec-label{{font-size:.7rem;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.45rem}}
 .sec-body{{font-size:.95rem;color:#1e293b}}
-
-/* 벤치마크 */
-.bm-card{{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:1.4rem;margin:1.8rem 0}}
-.bm-header{{display:flex;align-items:center;gap:.6rem;margin-bottom:1.2rem}}
-.bm-icon{{font-size:1.1rem}}
-.bm-title{{font-size:.88rem;font-weight:700;color:#166534}}
-.bm-meta{{font-size:.72rem;color:#6b7280;margin-left:auto}}
-.bm-grid{{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}}
-.bm-label{{font-size:.7rem;color:#6b7280;margin-bottom:.2rem}}
-.bm-value{{font-size:1.6rem;font-weight:700;color:#15803d;margin-bottom:.35rem;line-height:1}}
-.bm-unit{{font-size:1rem;font-weight:600}}
-.bm-value.ch{{font-size:1.1rem}}
-.bm-bar-wrap{{height:7px;background:#dcfce7;border-radius:4px;overflow:hidden;margin-bottom:.35rem}}
-.bm-bar{{height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:4px}}
-.bm-sub{{font-size:.7rem;color:#6b7280}}
 
 /* 푸터 */
 .ft{{background:#f8fafc;border-top:1px solid #e2e8f0;padding:1.1rem 2.8rem;display:flex;justify-content:space-between;align-items:center}}
@@ -208,7 +147,6 @@ p{{margin-bottom:1.1rem;font-size:.95rem;color:#1e293b}}
   {f'<div class="store-row">스토어 · {store_link}</div>' if store_link else ''}
 
   <div class="body">
-    {bm_html}
     {body_html}
   </div>
 
