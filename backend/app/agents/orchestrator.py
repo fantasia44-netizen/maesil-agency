@@ -135,27 +135,28 @@ def run_agents(
         return [_run_single_agent(atype, message, conversation_id, run_id,
                                   operator_id, context_messages)]
 
-    # 복수 에이전트 → 병렬
-    results_map: dict[str, dict] = {}
+    # 복수 에이전트 → 병렬 (run_id를 키로 써서 중복 atype도 안전)
+    results_map: dict[str, dict] = {}  # run_id → result
     with ThreadPoolExecutor(max_workers=min(len(jobs), 4)) as exe:
-        future_to_atype = {
+        future_to_run_id = {
             exe.submit(_run_single_agent, atype, message, conversation_id,
-                       run_id, operator_id, context_messages): atype
+                       run_id, operator_id, context_messages): run_id
             for atype, run_id in jobs
         }
-        run_id_map = {atype: run_id for atype, run_id in jobs}
-        for future in as_completed(future_to_atype):
-            atype = future_to_atype[future]
+        fallback_map = {run_id: (atype, run_id) for atype, run_id in jobs}
+        for future in as_completed(future_to_run_id):
+            run_id = future_to_run_id[future]
+            atype  = fallback_map[run_id][0]
             try:
-                results_map[atype] = future.result()
+                results_map[run_id] = future.result()
             except Exception as e:
-                results_map[atype] = {
-                    "run_id": run_id_map[atype], "agent_type": atype,
+                results_map[run_id] = {
+                    "run_id": run_id, "agent_type": atype,
                     "message": f"[병렬 실행 오류] {e}", "status": "failed", "cost_usd": 0,
                 }
 
     # 원래 순서 복원
-    return [results_map[atype] for atype, _ in jobs if atype in results_map]
+    return [results_map[run_id] for _, run_id in jobs if run_id in results_map]
 
 
 BRIEFING_MESSAGES = {

@@ -572,8 +572,8 @@ def chat(req: ChatRequest, bg: BackgroundTasks, user: UserContext = Depends(get_
 
 @router.post("/briefing", response_model=ChatResponse)
 def morning_briefing(
+    bg: BackgroundTasks,
     req: ChatRequest | None = None,
-    bg: BackgroundTasks = BackgroundTasks(),
     user: UserContext = Depends(get_current_user),
 ) -> ChatResponse:
     conversation_id = (req.conversation_id if req else None) or str(uuid.uuid4())

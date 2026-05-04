@@ -20,6 +20,7 @@ type ChatResp = {
   routed_to: string[];
   status?: "done" | "pending" | "error";
   run_id?: string;
+  error?: string;
 };
 
 type Message = {
@@ -463,7 +464,8 @@ function ChatPageInner() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [totalCost,      setTotalCost]      = useState(0);
   const [alertBanner,    setAlertBanner]    = useState<string | null>(null);
-  const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollTimerRef  = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isMountedRef  = useRef(true);
 
   /* 사이드바 */
   const [sidebarOpen,   setSidebarOpen]   = useState(true);
@@ -487,9 +489,11 @@ function ChatPageInner() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  /* 언마운트 시 폴링 정리 */
+  /* 언마운트 시 폴링 정리 + 이후 setState 차단 */
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
+      isMountedRef.current = false;
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
     };
   }, []);
@@ -600,10 +604,12 @@ function ChatPageInner() {
     const MAX_POLLS = 90; // 최대 3분 (2초 × 90)
 
     pollTimerRef.current = setInterval(async () => {
+      if (!isMountedRef.current) { clearInterval(pollTimerRef.current!); return; }
       polls++;
       if (polls > MAX_POLLS) {
         clearInterval(pollTimerRef.current!);
         pollTimerRef.current = null;
+        if (!isMountedRef.current) return;
         setLoading(false);
         setMessages((p) => [...p, {
           id: crypto.randomUUID(), role: "agents",
@@ -620,16 +626,18 @@ function ChatPageInner() {
 
         clearInterval(pollTimerRef.current!);
         pollTimerRef.current = null;
+        if (!isMountedRef.current) return; // 언마운트 후 setState 차단
 
         if (result.status === "error") {
           setMessages((p) => [...p, {
             id: crypto.randomUUID(), role: "agents",
             agents: [{ run_id: runId, agent_type: "orchestrator", agent_display: "시스템",
-              message: `오류: ${(result as any).error || "알 수 없는 오류"}`, status: "failed", cost_usd: 0 }],
+              message: `오류: ${result.error || "알 수 없는 오류"}`, status: "failed", cost_usd: 0 }],
             ts: new Date(),
           }]);
         } else {
-          if (!conversationId) setConversationId(convId);
+          // stale closure 방지: convId를 함수형 업데이트로 설정
+          setConversationId((prev) => prev ?? convId);
           const agents = result.agents ?? [];
           setTotalCost((p) => p + agents.reduce((s, a) => s + (a.cost_usd ?? 0), 0));
           setMessages((p) => [...p, {
