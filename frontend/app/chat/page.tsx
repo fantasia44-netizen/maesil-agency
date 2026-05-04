@@ -62,6 +62,7 @@ const AGENT_COLOR: Record<string, string> = {
   finance:      "#2563eb",
   warehouse:    "#b45309",
   cs:           "#7c3aed",
+  outreach:     "#ea580c",
   developer:    "#0891b2",
   orchestrator: "#475569",
 };
@@ -71,8 +72,18 @@ const AGENT_EMOJI: Record<string, string> = {
   finance:      "💰",
   warehouse:    "📦",
   cs:           "💬",
+  outreach:     "🎯",
   developer:    "👨‍💻",
   orchestrator: "🤖",
+};
+
+const AGENT_DISPLAY_NAME: Record<string, string> = {
+  sales:     "세일즈 에이전트",
+  finance:   "파이낸스 에이전트",
+  warehouse: "웨어하우스 에이전트",
+  cs:        "CS 에이전트",
+  outreach:  "영업 에이전트",
+  developer: "개발 에이전트",
 };
 
 /* ── 헬퍼: DB 메시지 → 화면 메시지 변환 ─────────────────── */
@@ -113,9 +124,19 @@ function fmtTime(iso: string) {
   });
 }
 
+/* ── 에이전트별 플레이스홀더 ────────────────────────────── */
+const AGENT_PLACEHOLDER: Record<string, string> = {
+  sales:     "매출, 판매 현황, 베스트셀러, 채널별 실적 등을 물어보세요…",
+  finance:   "정산, 수익률, 비용, 재무 현황 등을 물어보세요…",
+  warehouse: "재고 현황, 입출고, 품절 위험 상품 등을 물어보세요…",
+  cs:        "고객 문의, 리뷰, CS 현황 등을 물어보세요…",
+  outreach:  "신규 파트너, 영업 기회, 광고 성과 등을 물어보세요…",
+};
+
 /* ── 메인 컴포넌트 ─────────────────────────────────────── */
 function ChatPageInner() {
   const searchParams = useSearchParams();
+  const forcedAgent  = searchParams.get("agent") || null; // ?agent=sales 등
 
   const [messages,       setMessages]       = useState<Message[]>([]);
   const [input,          setInput]          = useState("");
@@ -231,10 +252,14 @@ function ChatPageInner() {
     const isBriefing = text.includes("브리핑") || text.includes("현황 보고") || text === "__briefing__";
     const endpoint   = isBriefing ? "/api/chat/briefing" : "/api/chat";
 
+    // force_agent: 1:1 에이전트 채팅 모드일 때 오케스트레이터 bypass
+    const body: Record<string, unknown> = { message: text, conversation_id: conversationId };
+    if (forcedAgent && !isBriefing) body.force_agent = forcedAgent;
+
     try {
       const resp = await apiFetch<ChatResp>(endpoint, {
         method: "POST",
-        body: JSON.stringify({ message: text, conversation_id: conversationId }),
+        body: JSON.stringify(body),
       });
       if (!conversationId) setConversationId(resp.conversation_id);
       setTotalCost((p) => p + resp.agents.reduce((s, a) => s + (a.cost_usd ?? 0), 0));
@@ -344,6 +369,29 @@ function ChatPageInner() {
       {/* ── 메인 채팅 영역 ── */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
 
+        {/* 1:1 에이전트 모드 배너 */}
+        {forcedAgent && (
+          <div style={{
+            background: `${AGENT_COLOR[forcedAgent] ?? "#475569"}18`,
+            border: `1px solid ${AGENT_COLOR[forcedAgent] ?? "#475569"}44`,
+            borderRadius: 8,
+            padding: "8px 14px", marginBottom: "0.75rem",
+            display: "flex", alignItems: "center", gap: 10,
+            fontSize: "0.82rem",
+          }}>
+            <span style={{ fontSize: "1.1rem" }}>{AGENT_EMOJI[forcedAgent] ?? "🤖"}</span>
+            <span style={{ flex: 1, color: AGENT_COLOR[forcedAgent] ?? "#475569", fontWeight: 600 }}>
+              {AGENT_DISPLAY_NAME[forcedAgent] ?? forcedAgent}와 1:1 채팅 중
+            </span>
+            <button
+              onClick={() => { window.location.href = "/"; }}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", fontSize: "0.78rem" }}
+            >
+              ← 대시보드
+            </button>
+          </div>
+        )}
+
         {/* 알림 배너 */}
         {alertBanner && (
           <div style={{
@@ -375,11 +423,17 @@ function ChatPageInner() {
               {sidebarOpen ? "◀" : "▶"}
             </button>
             <div>
-              <h2 style={{ margin: 0, fontSize: "1rem", fontWeight: 600 }}>대화</h2>
+              <h2 style={{ margin: 0, fontSize: "1rem", fontWeight: 600 }}>
+                {forcedAgent
+                  ? `${AGENT_EMOJI[forcedAgent] ?? "🤖"} ${AGENT_DISPLAY_NAME[forcedAgent] ?? forcedAgent}`
+                  : "대화"}
+              </h2>
               <p className="muted" style={{ margin: "0.1rem 0 0 0", fontSize: "0.78rem" }}>
                 {conversationId
                   ? `대화 진행 중 · ${histLoading ? "불러오는 중…" : "이어서 입력하세요"}`
-                  : "오케스트레이터가 질문을 분석해 적절한 에이전트로 라우팅합니다."}
+                  : forcedAgent
+                    ? `${AGENT_DISPLAY_NAME[forcedAgent] ?? forcedAgent}에게 직접 질문하세요.`
+                    : "오케스트레이터가 질문을 분석해 적절한 에이전트로 라우팅합니다."}
               </p>
             </div>
           </div>
@@ -389,14 +443,16 @@ function ChatPageInner() {
                 누적 비용: ${totalCost.toFixed(4)}
               </span>
             )}
-            <button
-              className="btn"
-              style={{ fontSize: "0.78rem" }}
-              onClick={() => sendMsg("__briefing__")}
-              disabled={loading}
-            >
-              ☀️ 아침 브리핑
-            </button>
+            {!forcedAgent && (
+              <button
+                className="btn"
+                style={{ fontSize: "0.78rem" }}
+                onClick={() => sendMsg("__briefing__")}
+                disabled={loading}
+              >
+                ☀️ 아침 브리핑
+              </button>
+            )}
             <button className="btn" onClick={reset} style={{ fontSize: "0.78rem" }}>새 대화</button>
           </div>
         </div>
@@ -415,9 +471,25 @@ function ChatPageInner() {
         <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "1rem", padding: "0.5rem 0" }}>
           {messages.length === 0 && !loading && !histLoading && (
             <div style={{ textAlign: "center", color: "#94a3b8", marginTop: "4rem", fontSize: "0.9rem", lineHeight: 2 }}>
-              매출·재무·재고·CS 관련 질문을 입력하거나<br />
-              <strong>☀️ 아침 브리핑</strong> 버튼으로 전체 현황 보고를 받으세요.<br />
-              <span style={{ fontSize: "0.8rem" }}>← 왼쪽에서 이전 대화를 이어서 할 수 있습니다.</span>
+              {forcedAgent ? (
+                <>
+                  <div style={{ fontSize: "2.5rem", marginBottom: "0.5rem" }}>
+                    {AGENT_EMOJI[forcedAgent] ?? "🤖"}
+                  </div>
+                  <strong style={{ color: AGENT_COLOR[forcedAgent] ?? "#475569" }}>
+                    {AGENT_DISPLAY_NAME[forcedAgent] ?? forcedAgent}
+                  </strong>와 1:1 채팅을 시작하세요.<br />
+                  <span style={{ fontSize: "0.8rem" }}>
+                    {AGENT_PLACEHOLDER[forcedAgent] ?? "질문을 입력하세요…"}
+                  </span>
+                </>
+              ) : (
+                <>
+                  매출·재무·재고·CS 관련 질문을 입력하거나<br />
+                  <strong>☀️ 아침 브리핑</strong> 버튼으로 전체 현황 보고를 받으세요.<br />
+                  <span style={{ fontSize: "0.8rem" }}>← 왼쪽에서 이전 대화를 이어서 할 수 있습니다.</span>
+                </>
+              )}
             </div>
           )}
 
@@ -486,9 +558,17 @@ function ChatPageInner() {
 
           {loading && (
             <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-              <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#e2e8f0", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem" }}>🤖</div>
+              <div style={{
+                width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
+                background: forcedAgent ? (AGENT_COLOR[forcedAgent] ?? "#e2e8f0") : "#e2e8f0",
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem",
+              }}>
+                {forcedAgent ? (AGENT_EMOJI[forcedAgent] ?? "🤖") : "🤖"}
+              </div>
               <div style={{ padding: "0.6rem 0.9rem", background: "#fff", border: "1px solid #e2e8f0", borderRadius: "14px 14px 14px 4px", color: "#94a3b8", fontSize: "0.85rem" }}>
-                에이전트 실행 중…
+                {forcedAgent
+                  ? `${AGENT_DISPLAY_NAME[forcedAgent] ?? forcedAgent} 응답 중…`
+                  : "에이전트 실행 중…"}
               </div>
             </div>
           )}
@@ -501,7 +581,9 @@ function ChatPageInner() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={onKey}
-            placeholder="질문 입력… (Enter 전송, Shift+Enter 줄바꿈)"
+            placeholder={forcedAgent
+              ? (AGENT_PLACEHOLDER[forcedAgent] ?? "질문 입력… (Enter 전송, Shift+Enter 줄바꿈)")
+              : "질문 입력… (Enter 전송, Shift+Enter 줄바꿈)"}
             rows={2}
             style={{
               flex: 1, padding: "0.55rem 0.75rem", fontSize: "0.88rem",

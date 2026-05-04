@@ -25,8 +25,12 @@ AGENT_DISPLAY = {
     "cs":           "CS 에이전트",
     "tester":       "테스터 에이전트",
     "developer":    "개발 에이전트",
+    "outreach":     "영업 에이전트",
     "orchestrator": "오케스트레이터",
 }
+
+# force_agent 허용 목록 (오케스트레이터 bypass 가능한 에이전트)
+DIRECT_AGENTS = {"sales", "finance", "warehouse", "cs", "outreach"}
 
 # 개발 에이전트 키워드 (super_admin 전용)
 DEV_KEYWORDS = {
@@ -60,6 +64,7 @@ SMALL_TALK = {
 class ChatRequest(BaseModel):
     message: str = ""
     conversation_id: str | None = None
+    force_agent: str | None = None  # 오케스트레이터 bypass — 특정 에이전트 직접 호출
 
 
 class AgentResult(BaseModel):
@@ -183,6 +188,36 @@ def chat(req: ChatRequest, user: UserContext = Depends(get_current_user)) -> Cha
 
     conversation_id = req.conversation_id or str(uuid.uuid4())
     msg_lower = req.message.lower().strip()
+
+    # ── 0. force_agent: 오케스트레이터 완전 bypass ──────────────────
+    # 대시보드 에이전트 카드 클릭 → 해당 에이전트와 1:1 채팅 시작
+    if req.force_agent and req.force_agent in DIRECT_AGENTS:
+        from app.agents.orchestrator import run_agents
+        results = run_agents(
+            req.message, conversation_id, [req.force_agent],
+            operator_id=user.operator_id,
+        )
+        display_name = AGENT_DISPLAY.get(req.force_agent, req.force_agent)
+        _save_results(
+            conversation_id, req.message, results, user_id=user.id,
+            title=f"[{display_name}] {req.message[:30]}",
+        )
+        agents = [
+            AgentResult(
+                run_id=r["run_id"],
+                agent_type=r["agent_type"],
+                agent_display=AGENT_DISPLAY.get(r["agent_type"], r["agent_type"]),
+                message=r["message"],
+                status=r.get("status", "unknown"),
+                cost_usd=r.get("cost_usd", 0.0),
+            )
+            for r in results
+        ]
+        return ChatResponse(
+            conversation_id=conversation_id,
+            agents=agents,
+            routed_to=[req.force_agent],
+        )
 
     # ── 1. 개발 에이전트 라우팅 (super_admin 전용) ──────────────────
     # 우선순위:

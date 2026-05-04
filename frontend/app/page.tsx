@@ -78,6 +78,19 @@ function agentStatusLabel(status: string): string {
   return map[status] ?? status;
 }
 
+const AGENT_EMOJI: Record<string, string> = {
+  sales:     "📈",
+  finance:   "💰",
+  warehouse: "📦",
+  cs:        "💬",
+  outreach:  "🎯",
+  developer: "👨‍💻",
+  tester:    "🧪",
+};
+
+// 오케스트레이터 bypass 지원 에이전트 (직접 채팅 가능)
+const DIRECT_CHAT_AGENTS = new Set(["sales", "finance", "warehouse", "cs", "outreach"]);
+
 export default function Dashboard() {
   const [programs, setPrograms] = useState<SystemStatusResp | null>(null);
   const [agents, setAgents] = useState<AgentStatusResp | null>(null);
@@ -185,26 +198,66 @@ export default function Dashboard() {
       {/* 에이전트 섹션 */}
       <h2 style={{ margin: "0 0 0.5rem 0", fontSize: "1rem", fontWeight: 600 }}>에이전트</h2>
       <p className="muted" style={{ marginTop: 0, marginBottom: "1rem" }}>
-        각 에이전트의 마지막 실행 상태
+        에이전트 카드를 클릭하면 1:1 채팅을 시작합니다
       </p>
       {agents && (
         <div className="grid" style={{ marginBottom: "2rem" }}>
-          {agents.agents.map((a) => (
-            <div key={a.agent_type} className="card">
-              <div className="card-header">
-                <div className="card-title">{a.display_name}</div>
-                <span className={`status-badge ${statusClass(a.status)}`}>
-                  {agentStatusLabel(a.status)}
-                </span>
+          {agents.agents.map((a) => {
+            const canChat = DIRECT_CHAT_AGENTS.has(a.agent_type);
+            return (
+              <div
+                key={a.agent_type}
+                className="card"
+                onClick={() => {
+                  if (canChat) window.location.href = `/chat?agent=${a.agent_type}`;
+                }}
+                style={{
+                  cursor: canChat ? "pointer" : "default",
+                  transition: "box-shadow 0.15s, transform 0.1s",
+                  ...(canChat ? { } : {}),
+                }}
+                onMouseEnter={(e) => {
+                  if (canChat) {
+                    (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 12px rgba(0,0,0,0.12)";
+                    (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.boxShadow = "";
+                  (e.currentTarget as HTMLElement).style.transform = "";
+                }}
+              >
+                <div className="card-header">
+                  <div className="card-title" style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                    <span>{AGENT_EMOJI[a.agent_type] ?? "🤖"}</span>
+                    <span>{a.display_name}</span>
+                  </div>
+                  <span className={`status-badge ${statusClass(a.status)}`}>
+                    {agentStatusLabel(a.status)}
+                  </span>
+                </div>
+                <div className="muted">
+                  Phase {a.phase}<br />
+                  마지막 실행: {a.last_run_at ? new Date(a.last_run_at).toLocaleString("ko-KR") : "-"}<br />
+                  비용: {a.cost_usd != null ? `$${Number(a.cost_usd).toFixed(4)}` : "-"}<br />
+                  {a.error_reason && <span style={{ color: "#b91c1c" }}>오류: {a.error_reason}</span>}
+                </div>
+                {canChat && (
+                  <div style={{ marginTop: "0.75rem" }}>
+                    <span style={{
+                      display: "inline-block",
+                      fontSize: "0.75rem", fontWeight: 600,
+                      color: "#0f172a", background: "#f1f5f9",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: 6, padding: "3px 10px",
+                    }}>
+                      💬 채팅 시작
+                    </span>
+                  </div>
+                )}
               </div>
-              <div className="muted">
-                Phase {a.phase}<br />
-                마지막 실행: {a.last_run_at ? new Date(a.last_run_at).toLocaleString("ko-KR") : "-"}<br />
-                비용: {a.cost_usd != null ? `$${Number(a.cost_usd).toFixed(4)}` : "-"}<br />
-                {a.error_reason && <span style={{ color: "#b91c1c" }}>오류: {a.error_reason}</span>}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
