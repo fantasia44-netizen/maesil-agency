@@ -577,6 +577,8 @@ function ChatPageInner() {
   const [snapshotOpen,    setSnapshotOpen]    = useState(false);
   const [snapshotLoading, setSnapshotLoading] = useState(false);
   const [proposalModal,   setProposalModal]   = useState<OutreachSnapshot | null>(null);
+  const [snapshotTab,     setSnapshotTab]     = useState<"targets" | "proposals">("targets");
+  const [snapshotSearch,  setSnapshotSearch]  = useState("");
 
   const bottomRef    = useRef<HTMLDivElement>(null);
   const alertSentRef = useRef(false);
@@ -843,92 +845,168 @@ function ChatPageInner() {
           </div>
         )}
 
-        {/* ── 영업 에이전트 저장 자료 패널 — outreach 모드이거나 저장된 자료가 있을 때 ── */}
-        {(forcedAgent === "outreach" || snapshots.length > 0) && (
-          <div style={{ marginBottom: "0.75rem" }}>
-            <button
-              onClick={() => { setSnapshotOpen((v) => !v); if (!snapshotOpen) loadSnapshots(); }}
-              style={{
-                width: "100%", textAlign: "left",
-                padding: "6px 12px", fontSize: "0.82rem",
-                background: "#fef9ec", border: "1px solid #fed7aa",
-                borderRadius: snapshotOpen ? "8px 8px 0 0" : "8px",
-                cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
-              }}
-            >
-              <span>📥</span>
-              <span style={{ flex: 1, fontWeight: 600, color: "#92400e" }}>저장된 영업 자료</span>
-              <span className="muted" style={{ fontSize: "0.75rem" }}>
-                {snapshotLoading ? "로딩…" : `타겟 ${snapshots.filter(s => s.kind === "outreach_targets").length}개 · 제안서 ${snapshots.filter(s => s.kind === "proposal_draft").length}개`}
-              </span>
-              <span style={{ color: "#94a3b8" }}>{snapshotOpen ? "▲" : "▼"}</span>
-            </button>
+        {/* ── 영업 에이전트 저장 자료 패널 ── */}
+        {(forcedAgent === "outreach" || snapshots.length > 0) && (() => {
+          const targets   = snapshots.filter(s => s.kind === "outreach_targets");
+          const proposals = snapshots.filter(s => s.kind === "proposal_draft");
+          const q         = snapshotSearch.toLowerCase();
 
-            {snapshotOpen && (
-              <div style={{
-                border: "1px solid #fed7aa", borderTop: "none",
-                borderRadius: "0 0 8px 8px", background: "#fffbf5",
-                maxHeight: 260, overflowY: "auto", padding: "0.5rem 0",
-              }}>
-                {snapshots.length === 0 && !snapshotLoading && (
-                  <div className="muted" style={{ padding: "0.75rem 1rem", fontSize: "0.8rem" }}>
-                    저장된 자료가 없습니다. 영업 에이전트에게 타겟을 찾아달라고 요청하세요.
-                  </div>
-                )}
+          // 타겟: 키워드별 그룹핑 (최신순)
+          const targetGroups = Object.values(
+            targets.reduce<Record<string, OutreachSnapshot[]>>((acc, s) => {
+              const kw = s.payload.keyword || "기타";
+              (acc[kw] = acc[kw] || []).push(s);
+              return acc;
+            }, {})
+          ).map(g => ({ keyword: g[0].payload.keyword || "기타", items: g, latest: g[0] }))
+           .filter(g => !q || g.keyword.includes(q))
+           .sort((a, b) => b.latest.created_at.localeCompare(a.latest.created_at));
 
-                {/* 타겟 리스트 */}
-                {snapshots.filter(s => s.kind === "outreach_targets").map((s) => (
-                  <div key={s.id} style={{
-                    display: "flex", alignItems: "center", gap: 8,
-                    padding: "6px 12px", borderBottom: "1px solid #fde68a",
+          // 제안서: 검색 필터 + 최신순
+          const filteredProposals = proposals
+            .filter(s => !q || (s.payload.mall_name || "").toLowerCase().includes(q)
+                              || (s.payload.product_area || "").toLowerCase().includes(q))
+            .sort((a, b) => b.created_at.localeCompare(a.created_at));
+
+          return (
+            <div style={{ marginBottom: "0.75rem" }}>
+              {/* 헤더 토글 버튼 */}
+              <button
+                onClick={() => { setSnapshotOpen(v => !v); if (!snapshotOpen) loadSnapshots(); }}
+                style={{
+                  width: "100%", textAlign: "left", padding: "6px 12px",
+                  fontSize: "0.82rem", background: "#fef9ec",
+                  border: "1px solid #fed7aa",
+                  borderRadius: snapshotOpen ? "8px 8px 0 0" : "8px",
+                  cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
+                }}
+              >
+                <span>📥</span>
+                <span style={{ flex: 1, fontWeight: 600, color: "#92400e" }}>저장된 영업 자료</span>
+                <span className="muted" style={{ fontSize: "0.75rem" }}>
+                  {snapshotLoading ? "로딩…" : `타겟 ${targets.length}건 · 제안서 ${proposals.length}건`}
+                </span>
+                <span style={{ color: "#94a3b8" }}>{snapshotOpen ? "▲" : "▼"}</span>
+              </button>
+
+              {snapshotOpen && (
+                <div style={{
+                  border: "1px solid #fed7aa", borderTop: "none",
+                  borderRadius: "0 0 8px 8px", background: "#fffbf5",
+                }}>
+                  {/* 탭 + 검색 */}
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 0,
+                    borderBottom: "1px solid #fde68a", padding: "0 8px",
                   }}>
-                    <span style={{ fontSize: "0.8rem", flex: 1, color: "#78350f" }}>
-                      📋 <strong>{s.payload.keyword || "키워드 없음"}</strong> 타겟 리스트
-                      <span className="muted"> ({s.payload.targets?.length ?? 0}개)</span>
-                      <span className="muted" style={{ fontSize: "0.72rem", marginLeft: 6 }}>
-                        {new Date(s.created_at).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                    </span>
-                    <button
-                      className="btn"
-                      style={{ fontSize: "0.72rem", padding: "2px 8px", background: "#ea580c", color: "#fff", borderColor: "#ea580c" }}
-                      onClick={() => {
-                        if (s.payload.targets && s.payload.keyword) {
-                          downloadTargetCSV(s.payload.keyword, s.payload.targets);
-                        }
+                    {(["targets", "proposals"] as const).map(tab => (
+                      <button
+                        key={tab}
+                        onClick={() => setSnapshotTab(tab)}
+                        style={{
+                          padding: "6px 12px", fontSize: "0.75rem", fontWeight: 600,
+                          background: "none", border: "none", cursor: "pointer",
+                          borderBottom: snapshotTab === tab ? "2px solid #ea580c" : "2px solid transparent",
+                          color: snapshotTab === tab ? "#ea580c" : "#94a3b8",
+                          marginBottom: -1,
+                        }}
+                      >
+                        {tab === "targets" ? `📋 타겟 (${targetGroups.length}그룹)` : `📝 제안서 (${proposals.length}건)`}
+                      </button>
+                    ))}
+                    <input
+                      value={snapshotSearch}
+                      onChange={e => setSnapshotSearch(e.target.value)}
+                      placeholder="검색…"
+                      style={{
+                        marginLeft: "auto", width: 110, fontSize: "0.73rem",
+                        padding: "3px 8px", border: "1px solid #fde68a",
+                        borderRadius: 5, outline: "none", background: "#fff",
                       }}
-                    >
-                      CSV ↓
-                    </button>
+                    />
                   </div>
-                ))}
 
-                {/* 제안서 */}
-                {snapshots.filter(s => s.kind === "proposal_draft").map((s) => (
-                  <div key={s.id} style={{
-                    display: "flex", alignItems: "center", gap: 8,
-                    padding: "6px 12px", borderBottom: "1px solid #fde68a",
-                  }}>
-                    <span style={{ fontSize: "0.8rem", flex: 1, color: "#78350f" }}>
-                      📝 <strong>{s.payload.mall_name || "셀러 없음"}</strong> 제안서
-                      {s.payload.product_area && <span className="muted"> · {s.payload.product_area}</span>}
-                      <span className="muted" style={{ fontSize: "0.72rem", marginLeft: 6 }}>
-                        {new Date(s.created_at).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                    </span>
-                    <button
-                      className="btn"
-                      style={{ fontSize: "0.72rem", padding: "2px 8px" }}
-                      onClick={() => setProposalModal(s)}
-                    >
-                      보기
-                    </button>
+                  {/* 콘텐츠 */}
+                  <div style={{ maxHeight: 240, overflowY: "auto" }}>
+                    {snapshots.length === 0 && !snapshotLoading && (
+                      <div className="muted" style={{ padding: "0.75rem 1rem", fontSize: "0.8rem" }}>
+                        저장된 자료가 없습니다. 영업 에이전트에게 타겟을 찾아달라고 요청하세요.
+                      </div>
+                    )}
+
+                    {/* 타겟 탭 — 키워드별 그룹 */}
+                    {snapshotTab === "targets" && targetGroups.map(g => (
+                      <div key={g.keyword} style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        padding: "6px 12px", borderBottom: "1px solid #fef3c7",
+                      }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#78350f",
+                                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {g.keyword}
+                          </div>
+                          <div className="muted" style={{ fontSize: "0.7rem" }}>
+                            {g.items.length > 1 ? `${g.items.length}회 검색 · ` : ""}
+                            최신 {g.latest.payload.targets?.length ?? 0}개 셀러 ·{" "}
+                            {new Date(g.latest.created_at).toLocaleDateString("ko-KR", { month: "short", day: "numeric" })}
+                          </div>
+                        </div>
+                        <button
+                          className="btn"
+                          style={{ fontSize: "0.7rem", padding: "2px 8px", flexShrink: 0,
+                                   background: "#ea580c", color: "#fff", borderColor: "#ea580c" }}
+                          onClick={() => {
+                            const t = g.latest.payload.targets;
+                            const kw = g.latest.payload.keyword;
+                            if (t && kw) downloadTargetCSV(kw, t);
+                          }}
+                        >
+                          CSV ↓
+                        </button>
+                      </div>
+                    ))}
+                    {snapshotTab === "targets" && targetGroups.length === 0 && !snapshotLoading && (
+                      <div className="muted" style={{ padding: "0.65rem 1rem", fontSize: "0.78rem" }}>
+                        {q ? "검색 결과 없음" : "저장된 타겟 리스트가 없습니다."}
+                      </div>
+                    )}
+
+                    {/* 제안서 탭 */}
+                    {snapshotTab === "proposals" && filteredProposals.map(s => (
+                      <div key={s.id} style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        padding: "6px 12px", borderBottom: "1px solid #fef3c7",
+                      }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: "0.8rem", fontWeight: 600, color: "#78350f",
+                                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {s.payload.mall_name || "셀러 없음"}
+                          </div>
+                          <div className="muted" style={{ fontSize: "0.7rem" }}>
+                            {s.payload.product_area && `${s.payload.product_area} · `}
+                            {new Date(s.created_at).toLocaleDateString("ko-KR", { month: "short", day: "numeric" })}
+                          </div>
+                        </div>
+                        <button
+                          className="btn"
+                          style={{ fontSize: "0.7rem", padding: "2px 8px", flexShrink: 0 }}
+                          onClick={() => setProposalModal(s)}
+                        >
+                          보기
+                        </button>
+                      </div>
+                    ))}
+                    {snapshotTab === "proposals" && filteredProposals.length === 0 && !snapshotLoading && (
+                      <div className="muted" style={{ padding: "0.65rem 1rem", fontSize: "0.78rem" }}>
+                        {q ? "검색 결과 없음" : "저장된 제안서가 없습니다."}
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* ── 제안서 모달 ── */}
         {proposalModal && (
