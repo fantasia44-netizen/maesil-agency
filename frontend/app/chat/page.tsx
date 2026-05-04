@@ -128,7 +128,9 @@ function openProposalHTML(s: OutreachSnapshot) {
   const roasW      = Math.min(Math.round(avgRoas   / 6  * 100), 100);
   const marginW    = Math.min(Math.round(avgMargin / 40 * 100), 100);
 
-  const bmHtml = avgRoas > 0 ? `
+  // fallback / 기타 카테고리는 제안서 PDF에서도 숨김
+  const showBm = avgRoas > 0 && category !== "기타" && String(bm.source ?? "").startsWith("maesil-insight:");
+  const bmHtml = showBm ? `
   <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:1.4rem;margin:1.8rem 0">
     <div style="font-size:.83rem;font-weight:700;color:#166534;margin-bottom:1rem">
       📊 ${category} 카테고리 평균 성과 &nbsp;·&nbsp; ${sampleSize}개 스토어 기준
@@ -156,7 +158,7 @@ function openProposalHTML(s: OutreachSnapshot) {
         <div style="font-size:.7rem;color:#6b7280">매출 비중 1위</div>
       </div>
     </div>
-  </div>` : "";
+  </div>` : "";  // showBm이 false면 빈 문자열
 
   /* 본문 */
   const sectionKeys: [keyof ProposalSections, string][] = [
@@ -353,7 +355,10 @@ function ProposalModal({ snapshot, onClose }: { snapshot: OutreachSnapshot; onCl
   const avgRoas    = Number(bm.avg_roas        ?? 0);
   const avgMargin  = Number(bm.avg_margin_pct  ?? 0);
   const sampleSize = Number(bm.sample_size     ?? 0);
-  const hasBm      = avgRoas > 0;
+  // fallback 데이터("기타" 카테고리 또는 source==="benchmark")는 카드 숨김
+  const hasBm      = avgRoas > 0
+                     && bm.category !== "기타"
+                     && bm.source?.startsWith("maesil-insight:");
   const hasSections= SECTION_LABELS.some(([k]) => !!sections[k]);
 
   const [studioStatus, setStudioStatus] = useState<null | "loading" | "ok" | "pending" | "error">(null);
