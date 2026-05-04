@@ -126,7 +126,15 @@ def send_to_studio(
         raise HTTPException(status_code=404, detail="제안서 스냅샷을 찾을 수 없습니다.")
 
     snapshot = rows[0]
-    payload  = snapshot["payload"]
+    raw_payload = snapshot.get("payload") or {}
+    # Supabase가 JSONB를 문자열로 반환하는 경우 대비
+    if isinstance(raw_payload, str):
+        import json as _json
+        try:
+            raw_payload = _json.loads(raw_payload)
+        except Exception:
+            raw_payload = {}
+    payload: dict = raw_payload
 
     # studio-ready 패키지 구성
     studio_payload = {

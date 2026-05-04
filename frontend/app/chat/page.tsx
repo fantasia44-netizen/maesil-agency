@@ -215,7 +215,20 @@ function openProposalHTML(s: OutreachSnapshot) {
 </div></body></html>`;
 
   const win = window.open("about:blank", "_blank");
-  if (win) { win.document.write(html); win.document.close(); }
+  if (win) {
+    win.document.write(html);
+    win.document.close();
+  } else {
+    // 팝업 차단된 경우 — Blob URL fallback
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.target   = "_blank";
+    a.rel      = "noopener noreferrer";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
 }
 
 /* ── CSV 다운로드 헬퍼 ───────────────────────────────────── */

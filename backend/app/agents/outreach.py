@@ -306,18 +306,19 @@ class OutreachAgent(BaseAgent):
             )
 
         elif tool_name == "save_target_list":
+            targets = tool_input.get("targets") or []   # KeyError 방지
             sid = create_snapshot(
                 run_id=run_id,
                 agent_type=self.agent_type,
                 kind="outreach_targets",
                 payload={
-                    "keyword":    tool_input["keyword"],
-                    "targets":    tool_input["targets"],
+                    "keyword":    tool_input.get("keyword", ""),
+                    "targets":    targets,
                     "created_at": datetime.now(timezone.utc).isoformat(),
                 },
                 valid_seconds=86400 * 30,  # 30일 보관
             )
-            return {"snapshot_id": sid, "count": len(tool_input["targets"]), "status": "saved"}
+            return {"snapshot_id": sid, "count": len(targets), "status": "saved"}
 
         elif tool_name == "create_proposal_draft":
             payload: dict[str, Any] = {
