@@ -32,7 +32,7 @@ from app.agents.base import (
 from app.tools.naver_search_tool import search_naver_shopping
 from app.tools.write_tools import create_finding, create_snapshot
 
-MODEL = "claude-sonnet-4-6"  # 분석·제안서 품질이 중요 → Sonnet
+MODEL = "claude-haiku-4-5-20251001"  # Render 60초 타임아웃 내 처리
 
 
 OUTREACH_TOOLS: list[dict] = [

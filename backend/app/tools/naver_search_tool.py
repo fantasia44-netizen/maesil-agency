@@ -66,7 +66,7 @@ def search_naver_shopping(
                 "display": min(max(display, 1), 100),
                 "sort":    sort,
             },
-            timeout=15,
+            timeout=20,
         )
         r.raise_for_status()
         data  = r.json()
