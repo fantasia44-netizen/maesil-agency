@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch, storeAuth } from "../../lib/api";
 
-export default function JoinPage() {
+function JoinForm() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const token        = searchParams.get("token") || "";
@@ -193,3 +193,17 @@ const errStyle: React.CSSProperties = {
   fontSize: "0.85rem",
   marginBottom: "0.5rem",
 };
+
+export default function JoinPage() {
+  return (
+    <Suspense fallback={
+      <div style={pageStyle}>
+        <div style={boxStyle}>
+          <p style={{ color: "#64748b", textAlign: "center" }}>로딩 중…</p>
+        </div>
+      </div>
+    }>
+      <JoinForm />
+    </Suspense>
+  );
+}
