@@ -243,7 +243,7 @@ export default function Dashboard() {
                   {a.error_reason && <span style={{ color: "#b91c1c" }}>오류: {a.error_reason}</span>}
                 </div>
                 {canChat && (
-                  <div style={{ marginTop: "0.75rem" }}>
+                  <div style={{ marginTop: "0.75rem", display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
                     <span style={{
                       display: "inline-block",
                       fontSize: "0.75rem", fontWeight: 600,
@@ -253,6 +253,25 @@ export default function Dashboard() {
                     }}>
                       💬 채팅 시작
                     </span>
+                    {/* 영업 에이전트만 저장 자료 바로가기 추가 */}
+                    {a.agent_type === "outreach" && (
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = "/chat?agent=outreach#snapshots";
+                        }}
+                        style={{
+                          display: "inline-block",
+                          fontSize: "0.75rem", fontWeight: 600,
+                          color: "#92400e", background: "#fef9ec",
+                          border: "1px solid #fed7aa",
+                          borderRadius: 6, padding: "3px 10px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        📥 저장된 자료
+                      </span>
+                    )}
                   </div>
                 )}
               </div>

@@ -233,19 +233,25 @@ function ChatPageInner() {
   }
   useEffect(() => { refreshConvList(); }, []);
 
-  /* 영업 에이전트 스냅샷 로드 */
+  /* 영업 에이전트 스냅샷 로드 — forcedAgent 무관하게 항상 시도 */
   function loadSnapshots() {
-    if (!hasToken() || forcedAgent !== "outreach") return;
+    if (!hasToken()) return;
     setSnapshotLoading(true);
     apiFetch<OutreachSnapshot[]>("/api/outreach/snapshots")
-      .then(setSnapshots)
+      .then((data) => {
+        setSnapshots(data);
+        // #snapshots anchor로 왔거나 outreach 모드면 패널 자동 열기
+        if (data.length > 0 && (forcedAgent === "outreach" || window.location.hash === "#snapshots")) {
+          setSnapshotOpen(true);
+        }
+      })
       .catch(() => {})
       .finally(() => setSnapshotLoading(false));
   }
   useEffect(() => {
-    if (forcedAgent === "outreach") loadSnapshots();
+    loadSnapshots();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [forcedAgent]);
+  }, []);
 
   /* alert_id URL 파라미터 — 알림 자동 연결 */
   useEffect(() => {
@@ -345,7 +351,10 @@ function ChatPageInner() {
         { id: resp.conversation_id + Date.now(), role: "agents", agents: resp.agents, ts: new Date() },
       ]);
       refreshConvList(); // 대화 목록 갱신
-      if (forcedAgent === "outreach") loadSnapshots(); // 영업 스냅샷 갱신
+      // 영업 에이전트 응답이 왔거나 outreach 모드면 스냅샷 갱신
+      if (forcedAgent === "outreach" || resp.routed_to?.includes("outreach")) {
+        loadSnapshots();
+      }
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       setMessages((p) => [
@@ -470,8 +479,8 @@ function ChatPageInner() {
           </div>
         )}
 
-        {/* ── 영업 에이전트 저장 자료 패널 ── */}
-        {forcedAgent === "outreach" && (
+        {/* ── 영업 에이전트 저장 자료 패널 — outreach 모드이거나 저장된 자료가 있을 때 ── */}
+        {(forcedAgent === "outreach" || snapshots.length > 0) && (
           <div style={{ marginBottom: "0.75rem" }}>
             <button
               onClick={() => { setSnapshotOpen((v) => !v); if (!snapshotOpen) loadSnapshots(); }}
