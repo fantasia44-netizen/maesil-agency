@@ -38,6 +38,23 @@ MODEL = "claude-haiku-4-5-20251001"  # Render 60초 타임아웃 내 처리
 
 OUTREACH_TOOLS: list[dict] = [
     {
+        "name": "get_industry_benchmark",
+        "description": (
+            "카테고리/키워드로 업계 평균 ROAS·실수익률·주요 채널을 조회합니다. "
+            "제안서 작성 전에 반드시 호출해 실제 데이터를 근거로 삼으세요."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "keyword_or_area": {
+                    "type": "string",
+                    "description": "검색 키워드 또는 셀러 카테고리 (예: 스킨케어, 주방용품, 반려동물)",
+                },
+            },
+            "required": ["keyword_or_area"],
+        },
+    },
+    {
         "name": "search_naver_shopping",
         "description": (
             "키워드로 네이버쇼핑을 검색해 판매처(스마트스토어 셀러) 목록을 가져옵니다. "
@@ -87,16 +104,43 @@ OUTREACH_TOOLS: list[dict] = [
     },
     {
         "name": "create_proposal_draft",
-        "description": "특정 셀러를 위한 맞춤 제안서 초안을 저장합니다.",
+        "description": (
+            "특정 셀러를 위한 맞춤 제안서 초안을 저장합니다. "
+            "get_industry_benchmark로 얻은 benchmark 데이터를 함께 전달하면 "
+            "PDF에 ROAS·실수익률 차트가 자동 삽입됩니다."
+        ),
         "input_schema": {
             "type": "object",
             "properties": {
-                "mall_name":    {"type": "string", "description": "셀러/스토어명"},
+                "mall_name":    {"type": "string",  "description": "셀러/스토어명"},
                 "store_url":    {"type": "string"},
-                "product_area": {"type": "string", "description": "주요 판매 카테고리"},
-                "proposal":     {"type": "string", "description": "제안서 본문 (2~4단락)"},
+                "product_area": {"type": "string",  "description": "주요 판매 카테고리"},
+                "proposal":     {"type": "string",  "description": "제안서 전체 본문 (sections 없을 때 사용)"},
+                "sections": {
+                    "type": "object",
+                    "description": "구조화 섹션 (있으면 proposal 보다 우선 렌더링)",
+                    "properties": {
+                        "greeting":          {"type": "string", "description": "인사말 (1~2문장)"},
+                        "insight":           {"type": "string", "description": "셀러 현황 파악 — 카테고리/규모/상황"},
+                        "value_proposition": {"type": "string", "description": "매실 솔루션 가치 제안 — 구체적으로"},
+                        "social_proof":      {"type": "string", "description": "도입 효과 — 벤치마크 숫자 활용"},
+                        "cta":               {"type": "string", "description": "다음 단계 안내 (무료 체험 등)"},
+                    },
+                },
+                "benchmark": {
+                    "type": "object",
+                    "description": "get_industry_benchmark 결과 — PDF 차트에 사용됨",
+                    "properties": {
+                        "category":       {"type": "string"},
+                        "avg_roas":       {"type": "number"},
+                        "avg_margin_pct": {"type": "number"},
+                        "top_channel":    {"type": "string"},
+                        "sample_size":    {"type": "integer"},
+                        "source":         {"type": "string"},
+                    },
+                },
             },
-            "required": ["mall_name", "store_url", "proposal"],
+            "required": ["mall_name", "store_url"],
         },
     },
     {
@@ -147,16 +191,19 @@ class OutreachAgent(BaseAgent):
 - 순위 50위 이하 → 소규모, 점수 낮춤
 
 ## 제안서 작성 원칙
-1. 셀러 카테고리/상품에 맞게 구체적으로 작성 (일반적 문구 금지)
-2. "매실인사이트를 쓰면 이런 걸 볼 수 있어요" 형태로 가치 제안
-3. 2~4단락, 부드럽고 친근한 톤
-4. 수신거부/opt-in 언급 불필요 (발송은 사람이 직접)
+1. **반드시 `get_industry_benchmark`를 먼저 호출**해 실제 ROAS·실수익률 데이터를 확인
+2. 셀러 카테고리/상품에 맞게 구체적으로 작성 (일반적 문구 금지)
+3. 벤치마크 숫자를 social_proof 섹션에 직접 인용 ("동일 카테고리 평균 ROAS X.Xx" 형식)
+4. sections 필드를 반드시 채울 것 (greeting/insight/value_proposition/social_proof/cta)
+5. 부드럽고 친근한 톤, 수신거부 언급 불필요
 
 ## 워크플로우
 1. `search_naver_shopping`으로 셀러 목록 조회
 2. 결과 분석 → 우선순위 스코어 + 제안 포인트 도출
 3. `save_target_list`로 타겟 리스트 저장
-4. 요청 시 개별 셀러 `create_proposal_draft`로 제안서 초안 작성
+4. 제안서 작성 시:
+   a. `get_industry_benchmark`로 카테고리 데이터 조회
+   b. `create_proposal_draft`에 sections + benchmark 함께 저장
 5. 시장 인사이트는 `create_finding`으로 저장
 
 ## 제약
@@ -247,7 +294,11 @@ class OutreachAgent(BaseAgent):
     ) -> Any:
         _log_tool_call(run_id, tool_name, tool_input)
 
-        if tool_name == "search_naver_shopping":
+        if tool_name == "get_industry_benchmark":
+            from app.services.insight_benchmark import get_benchmark
+            return get_benchmark(tool_input.get("keyword_or_area", ""))
+
+        elif tool_name == "search_naver_shopping":
             return search_naver_shopping(
                 keyword=tool_input["keyword"],
                 display=tool_input.get("display", 100),
@@ -269,17 +320,23 @@ class OutreachAgent(BaseAgent):
             return {"snapshot_id": sid, "count": len(tool_input["targets"]), "status": "saved"}
 
         elif tool_name == "create_proposal_draft":
+            payload: dict[str, Any] = {
+                "mall_name":    tool_input["mall_name"],
+                "store_url":    tool_input.get("store_url", ""),
+                "product_area": tool_input.get("product_area", ""),
+                "proposal":     tool_input.get("proposal", ""),
+                "created_at":   datetime.now(timezone.utc).isoformat(),
+            }
+            if tool_input.get("sections"):
+                payload["sections"] = tool_input["sections"]
+            if tool_input.get("benchmark"):
+                payload["benchmark"] = tool_input["benchmark"]
+
             sid = create_snapshot(
                 run_id=run_id,
                 agent_type=self.agent_type,
                 kind="proposal_draft",
-                payload={
-                    "mall_name":    tool_input["mall_name"],
-                    "store_url":    tool_input["store_url"],
-                    "product_area": tool_input.get("product_area", ""),
-                    "proposal":     tool_input["proposal"],
-                    "created_at":   datetime.now(timezone.utc).isoformat(),
-                },
+                payload=payload,
                 valid_seconds=86400 * 30,
             )
             return {"snapshot_id": sid, "status": "saved"}

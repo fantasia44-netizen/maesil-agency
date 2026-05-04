@@ -67,6 +67,23 @@ type OutreachTarget = {
   proposal_point: string;
 };
 
+type ProposalSections = {
+  greeting?: string;
+  insight?: string;
+  value_proposition?: string;
+  social_proof?: string;
+  cta?: string;
+};
+
+type ProposalBenchmark = {
+  category?: string;
+  avg_roas?: number;
+  avg_margin_pct?: number;
+  top_channel?: string;
+  sample_size?: number;
+  source?: string;
+};
+
 type OutreachSnapshot = {
   id: string;
   kind: "outreach_targets" | "proposal_draft";
@@ -77,10 +94,129 @@ type OutreachSnapshot = {
     store_url?: string;
     product_area?: string;
     proposal?: string;
+    sections?: ProposalSections;
+    benchmark?: ProposalBenchmark;
     created_at?: string;
   };
   created_at: string;
 };
+
+/* ── 제안서 HTML 생성 (새 탭 열기 → 브라우저 인쇄 → PDF 저장) ── */
+function openProposalHTML(s: OutreachSnapshot) {
+  const p = s.payload;
+  const mallName   = p.mall_name    || "스토어";
+  const storeUrl   = p.store_url    || "";
+  const productArea= p.product_area || "";
+  const proposal   = p.proposal     || "";
+  const sections: ProposalSections  = p.sections  ?? {};
+  const bm: ProposalBenchmark       = p.benchmark ?? {};
+
+  /* 날짜 */
+  const dateStr = (() => {
+    try {
+      const d = new Date(p.created_at || s.created_at);
+      return d.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
+    } catch { return ""; }
+  })();
+
+  /* 벤치마크 블록 */
+  const avgRoas    = Number(bm.avg_roas        ?? 0);
+  const avgMargin  = Number(bm.avg_margin_pct  ?? 0);
+  const sampleSize = Number(bm.sample_size     ?? 0);
+  const category   = String(bm.category        ?? "");
+  const topChannel = String(bm.top_channel     ?? "");
+  const roasW      = Math.min(Math.round(avgRoas   / 6  * 100), 100);
+  const marginW    = Math.min(Math.round(avgMargin / 40 * 100), 100);
+
+  const bmHtml = avgRoas > 0 ? `
+  <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:1.4rem;margin:1.8rem 0">
+    <div style="font-size:.83rem;font-weight:700;color:#166534;margin-bottom:1rem">
+      📊 ${category} 카테고리 평균 성과 &nbsp;·&nbsp; ${sampleSize}개 스토어 기준
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem">
+      <div>
+        <div style="font-size:.7rem;color:#6b7280">평균 ROAS</div>
+        <div style="font-size:1.6rem;font-weight:700;color:#15803d">${avgRoas.toFixed(1)}<span style="font-size:1rem">x</span></div>
+        <div style="height:7px;background:#dcfce7;border-radius:4px;overflow:hidden;margin:.3rem 0">
+          <div style="width:${roasW}%;height:100%;background:#22c55e;border-radius:4px"></div>
+        </div>
+        <div style="font-size:.7rem;color:#6b7280">광고비 1원 → ${avgRoas.toFixed(1)}원 매출</div>
+      </div>
+      <div>
+        <div style="font-size:.7rem;color:#6b7280">평균 실수익률</div>
+        <div style="font-size:1.6rem;font-weight:700;color:#15803d">${avgMargin.toFixed(0)}<span style="font-size:1rem">%</span></div>
+        <div style="height:7px;background:#dcfce7;border-radius:4px;overflow:hidden;margin:.3rem 0">
+          <div style="width:${marginW}%;height:100%;background:#22c55e;border-radius:4px"></div>
+        </div>
+        <div style="font-size:.7rem;color:#6b7280">광고비·수수료 차감 후 순이익</div>
+      </div>
+      <div>
+        <div style="font-size:.7rem;color:#6b7280">주요 매출 채널</div>
+        <div style="font-size:1.1rem;font-weight:700;color:#15803d;margin:.3rem 0">${topChannel}</div>
+        <div style="font-size:.7rem;color:#6b7280">매출 비중 1위</div>
+      </div>
+    </div>
+  </div>` : "";
+
+  /* 본문 */
+  const sectionKeys: [keyof ProposalSections, string][] = [
+    ["greeting","인사말"],["insight","현황 파악"],["value_proposition","제안 내용"],
+    ["social_proof","도입 효과"],["cta","다음 단계"],
+  ];
+  let bodyHtml = "";
+  const hasSections = sectionKeys.some(([k]) => !!sections[k]);
+  if (hasSections) {
+    bodyHtml = sectionKeys.map(([k, label]) => {
+      const content = sections[k];
+      if (!content) return "";
+      return `<div style="margin-bottom:1.5rem">
+        <div style="font-size:.7rem;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">${label}</div>
+        <div style="font-size:.95rem;color:#1e293b;line-height:1.75">${content.replace(/\n/g, "<br>")}</div>
+      </div>`;
+    }).join("");
+  } else {
+    bodyHtml = proposal.split("\n\n").filter(Boolean)
+      .map(p2 => `<p style="margin-bottom:1.1rem;font-size:.95rem">${p2.replace(/\n/g, "<br>")}</p>`)
+      .join("");
+  }
+
+  const html = `<!DOCTYPE html><html lang="ko"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>매실 제안서 — ${mallName}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:#f1f5f9;color:#0f172a;line-height:1.75}
+  .page{max-width:760px;margin:2rem auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.1)}
+  .ctrl{position:fixed;top:1rem;right:1rem;display:flex;gap:.5rem;z-index:200}
+  .btn-p{background:#0f172a;color:#fff;border:none;border-radius:7px;padding:8px 18px;font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit}
+  .btn-p:hover{background:#1e293b}
+  .btn-c{background:#e2e8f0;color:#475569;border:none;border-radius:7px;padding:8px 12px;font-size:.82rem;cursor:pointer;font-family:inherit}
+  @media print{body{background:#fff}.ctrl{display:none!important}.page{margin:0;border-radius:0;box-shadow:none;max-width:100%}}
+  @page{margin:1.5cm 1.8cm}
+</style></head><body>
+<div class="ctrl"><button class="btn-p" onclick="window.print()">🖨️ PDF 저장 / 인쇄</button><button class="btn-c" onclick="window.close()">✕</button></div>
+<div class="page">
+  <div style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);color:#fff;padding:2.2rem 2.8rem;position:relative">
+    <div style="font-size:.78rem;font-weight:700;color:#4ade80;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.1rem">🌿 Maesil · 영업 제안서</div>
+    <h1 style="font-size:1.8rem;font-weight:700;margin-bottom:.3rem">${mallName} 귀중</h1>
+    ${productArea ? `<div style="font-size:.88rem;color:#94a3b8">${productArea}</div>` : ""}
+    ${dateStr ? `<div style="position:absolute;top:2.2rem;right:2.8rem;font-size:.76rem;color:#64748b">${dateStr}</div>` : ""}
+  </div>
+  ${storeUrl ? `<div style="padding:.9rem 2.8rem;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:.82rem;color:#475569">스토어 · <a href="${storeUrl}" target="_blank" style="color:#2563eb;text-decoration:none">${storeUrl}</a></div>` : ""}
+  <div style="padding:2.2rem 2.8rem">
+    ${bmHtml}
+    ${bodyHtml}
+  </div>
+  <div style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:1.1rem 2.8rem;display:flex;justify-content:space-between;align-items:center">
+    <div style="font-weight:700;color:#22c55e;font-size:.88rem">매실 (Maesil)</div>
+    <div style="font-size:.73rem;color:#94a3b8">본 제안서는 영업 참고용입니다.</div>
+  </div>
+</div></body></html>`;
+
+  const win = window.open("about:blank", "_blank");
+  if (win) { win.document.write(html); win.document.close(); }
+}
 
 /* ── CSV 다운로드 헬퍼 ───────────────────────────────────── */
 function downloadTargetCSV(keyword: string, targets: OutreachTarget[]) {
@@ -187,6 +323,216 @@ const AGENT_PLACEHOLDER: Record<string, string> = {
 
 // force_agent 허용 목록 (백엔드 DIRECT_AGENTS와 동일하게 유지)
 const VALID_FORCE_AGENTS = new Set(["sales", "finance", "warehouse", "cs", "outreach", "developer"]);
+
+/* ── 제안서 모달 컴포넌트 ───────────────────────────────── */
+const SECTION_LABELS: [keyof ProposalSections, string][] = [
+  ["greeting",          "인사말"],
+  ["insight",           "현황 파악"],
+  ["value_proposition", "제안 내용"],
+  ["social_proof",      "도입 효과"],
+  ["cta",               "다음 단계"],
+];
+
+function ProposalModal({ snapshot, onClose }: { snapshot: OutreachSnapshot; onClose: () => void }) {
+  const p                            = snapshot.payload;
+  const bm: ProposalBenchmark        = p.benchmark ?? {};
+  const sections: ProposalSections   = p.sections  ?? {};
+  const avgRoas    = Number(bm.avg_roas        ?? 0);
+  const avgMargin  = Number(bm.avg_margin_pct  ?? 0);
+  const sampleSize = Number(bm.sample_size     ?? 0);
+  const hasBm      = avgRoas > 0;
+  const hasSections= SECTION_LABELS.some(([k]) => !!sections[k]);
+
+  const [studioStatus, setStudioStatus] = useState<null | "loading" | "ok" | "pending" | "error">(null);
+  const [studioMsg,    setStudioMsg]    = useState("");
+
+  async function sendToStudio() {
+    setStudioStatus("loading");
+    try {
+      const r = await apiFetch<{ status: string; message?: string }>(
+        `/api/outreach/snapshots/${snapshot.id}/send-to-studio`,
+        { method: "POST" }
+      );
+      if (r.status === "sent") {
+        setStudioStatus("ok");
+        setStudioMsg("스튜디오로 전송되었습니다.");
+      } else {
+        setStudioStatus("pending");
+        setStudioMsg(r.message || "스튜디오 연동 준비 중입니다.");
+      }
+    } catch (e) {
+      setStudioStatus("error");
+      setStudioMsg(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000,
+               display: "flex", alignItems: "center", justifyContent: "center" }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{ background: "#fff", borderRadius: 14, width: "min(740px, 94vw)",
+                 maxHeight: "88vh", display: "flex", flexDirection: "column",
+                 boxShadow: "0 24px 80px rgba(0,0,0,0.22)", overflow: "hidden" }}
+      >
+        {/* 모달 헤더 */}
+        <div style={{ background: "linear-gradient(135deg,#0f172a,#1e3a5f)", color: "#fff",
+                      padding: "1.2rem 1.5rem", display: "flex", alignItems: "flex-start", gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#4ade80",
+                          textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "0.35rem" }}>
+              🌿 Maesil 제안서
+            </div>
+            <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>{p.mall_name}</div>
+            {p.store_url && (
+              <a href={p.store_url} target="_blank" rel="noopener noreferrer"
+                 style={{ fontSize: "0.76rem", color: "#93c5fd", textDecoration: "none" }}>
+                {p.store_url}
+              </a>
+            )}
+            {p.product_area && (
+              <div style={{ fontSize: "0.75rem", color: "#94a3b8", marginTop: "0.15rem" }}>{p.product_area}</div>
+            )}
+          </div>
+          {/* 액션 버튼 */}
+          <div style={{ display: "flex", gap: 6, flexShrink: 0, alignItems: "center" }}>
+            <button
+              className="btn"
+              style={{ fontSize: "0.73rem", padding: "5px 10px", background: "#1e293b",
+                       color: "#fff", borderColor: "#334155" }}
+              onClick={() => openProposalHTML(snapshot)}
+            >
+              🖨️ PDF 저장
+            </button>
+            <button
+              className="btn"
+              style={{ fontSize: "0.73rem", padding: "5px 10px", background: "#1e293b",
+                       color: "#fff", borderColor: "#334155" }}
+              onClick={() => {
+                const full = hasSections
+                  ? SECTION_LABELS.map(([k, l]) => sections[k] ? `[${l}]\n${sections[k]}` : "").filter(Boolean).join("\n\n")
+                  : (p.proposal || "");
+                navigator.clipboard.writeText(full);
+              }}
+            >
+              📋 복사
+            </button>
+            <button
+              className="btn"
+              style={{ fontSize: "0.73rem", padding: "5px 10px",
+                       background: studioStatus === "ok" ? "#166534" : "#7c3aed",
+                       color: "#fff", borderColor: studioStatus === "ok" ? "#166534" : "#7c3aed",
+                       opacity: studioStatus === "loading" ? 0.6 : 1 }}
+              disabled={studioStatus === "loading"}
+              onClick={sendToStudio}
+            >
+              {studioStatus === "loading" ? "전송 중…"
+               : studioStatus === "ok"     ? "✓ 전송됨"
+               : "🎨 스튜디오"}
+            </button>
+            <button onClick={onClose}
+              style={{ background: "none", border: "none", cursor: "pointer",
+                       fontSize: "1.5rem", color: "#64748b", lineHeight: 1 }}>
+              ×
+            </button>
+          </div>
+        </div>
+
+        {/* 스튜디오 상태 메시지 */}
+        {studioStatus && studioStatus !== "loading" && (
+          <div style={{
+            padding: "0.55rem 1.5rem", fontSize: "0.78rem",
+            background: studioStatus === "ok" ? "#f0fdf4" : studioStatus === "error" ? "#fef2f2" : "#fffbeb",
+            borderBottom: "1px solid #e2e8f0",
+            color: studioStatus === "ok" ? "#166534" : studioStatus === "error" ? "#b91c1c" : "#92400e",
+          }}>
+            {studioStatus === "ok" ? "✅" : studioStatus === "error" ? "❌" : "ℹ️"} {studioMsg}
+          </div>
+        )}
+
+        {/* 스크롤 본문 */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "1.25rem 1.5rem" }}>
+
+          {/* 벤치마크 카드 */}
+          {hasBm && (
+            <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0",
+                          borderRadius: 10, padding: "1rem 1.2rem", marginBottom: "1.25rem" }}>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#166534", marginBottom: "0.8rem" }}>
+                📊 {bm.category} 카테고리 평균 성과 &nbsp;·&nbsp; {sampleSize}개 스토어
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "0.8rem" }}>
+                {/* ROAS */}
+                <div>
+                  <div style={{ fontSize: "0.68rem", color: "#6b7280" }}>평균 ROAS</div>
+                  <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#15803d" }}>
+                    {avgRoas.toFixed(1)}<span style={{ fontSize: "0.9rem" }}>x</span>
+                  </div>
+                  <div style={{ height: 6, background: "#dcfce7", borderRadius: 3, overflow: "hidden", margin: "0.25rem 0" }}>
+                    <div style={{ width: `${Math.min(Math.round(avgRoas/6*100),100)}%`,
+                                  height: "100%", background: "#22c55e", borderRadius: 3 }} />
+                  </div>
+                  <div style={{ fontSize: "0.68rem", color: "#6b7280" }}>광고비 1원 → {avgRoas.toFixed(1)}원 매출</div>
+                </div>
+                {/* 실수익률 */}
+                <div>
+                  <div style={{ fontSize: "0.68rem", color: "#6b7280" }}>평균 실수익률</div>
+                  <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#15803d" }}>
+                    {avgMargin.toFixed(0)}<span style={{ fontSize: "0.9rem" }}>%</span>
+                  </div>
+                  <div style={{ height: 6, background: "#dcfce7", borderRadius: 3, overflow: "hidden", margin: "0.25rem 0" }}>
+                    <div style={{ width: `${Math.min(Math.round(avgMargin/40*100),100)}%`,
+                                  height: "100%", background: "#22c55e", borderRadius: 3 }} />
+                  </div>
+                  <div style={{ fontSize: "0.68rem", color: "#6b7280" }}>광고비·수수료 차감 후</div>
+                </div>
+                {/* 주요 채널 */}
+                <div>
+                  <div style={{ fontSize: "0.68rem", color: "#6b7280" }}>주요 채널</div>
+                  <div style={{ fontSize: "1rem", fontWeight: 700, color: "#15803d", margin: "0.3rem 0" }}>
+                    {bm.top_channel}
+                  </div>
+                  <div style={{ fontSize: "0.68rem", color: "#6b7280" }}>매출 비중 1위</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 제안서 본문 — 섹션 구조 or 평문 */}
+          {hasSections ? (
+            SECTION_LABELS.map(([key, label]) => {
+              const content = sections[key];
+              if (!content) return null;
+              return (
+                <div key={key} style={{ marginBottom: "1.2rem" }}>
+                  <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "#22c55e",
+                                textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.35rem" }}>
+                    {label}
+                  </div>
+                  <div style={{ fontSize: "0.92rem", lineHeight: 1.75, color: "#1e293b",
+                                whiteSpace: "pre-wrap" }}>
+                    {content}
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <pre style={{
+              whiteSpace: "pre-wrap", wordBreak: "break-word",
+              fontSize: "0.88rem", lineHeight: 1.7,
+              background: "#f8fafc", border: "1px solid #e2e8f0",
+              borderRadius: 8, padding: "1rem", margin: 0,
+            }}>
+              {p.proposal || "(내용 없음)"}
+            </pre>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ── 메인 컴포넌트 ─────────────────────────────────────── */
 function ChatPageInner() {
@@ -568,62 +914,10 @@ function ChatPageInner() {
 
         {/* ── 제안서 모달 ── */}
         {proposalModal && (
-          <div
-            onClick={() => setProposalModal(null)}
-            style={{
-              position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000,
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}
-          >
-            <div
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                background: "#fff", borderRadius: 12, padding: "1.5rem",
-                width: "min(680px, 90vw)", maxHeight: "80vh",
-                display: "flex", flexDirection: "column", gap: "0.75rem",
-                boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: "1rem" }}>
-                    📝 {proposalModal.payload.mall_name} 제안서
-                  </div>
-                  {proposalModal.payload.store_url && (
-                    <a href={proposalModal.payload.store_url} target="_blank" rel="noopener noreferrer"
-                      style={{ fontSize: "0.78rem", color: "#2563eb" }}>
-                      {proposalModal.payload.store_url}
-                    </a>
-                  )}
-                </div>
-                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <button
-                    className="btn"
-                    style={{ fontSize: "0.75rem" }}
-                    onClick={() => {
-                      navigator.clipboard.writeText(proposalModal.payload.proposal || "");
-                    }}
-                  >
-                    📋 복사
-                  </button>
-                  <button onClick={() => setProposalModal(null)}
-                    style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.4rem", color: "#94a3b8" }}>
-                    ×
-                  </button>
-                </div>
-              </div>
-              <div style={{ flex: 1, overflowY: "auto" }}>
-                <pre style={{
-                  whiteSpace: "pre-wrap", wordBreak: "break-word",
-                  fontSize: "0.88rem", lineHeight: 1.7,
-                  background: "#f8fafc", border: "1px solid #e2e8f0",
-                  borderRadius: 8, padding: "1rem", margin: 0,
-                }}>
-                  {proposalModal.payload.proposal || "(내용 없음)"}
-                </pre>
-              </div>
-            </div>
-          </div>
+          <ProposalModal
+            snapshot={proposalModal}
+            onClose={() => setProposalModal(null)}
+          />
         )}
 
         {/* 알림 배너 */}
