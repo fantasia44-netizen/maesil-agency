@@ -27,7 +27,17 @@ from app.services import github_client
 
 logger = logging.getLogger(__name__)
 
-APPROVE_KEYWORDS = {"승인", "실행", "확인", "ok", "yes", "ㅇㅋ", "적용", "해줘", "실행해", "고쳐줘"}
+APPROVE_KEYWORDS = {
+    # 명시적 승인
+    "승인", "실행", "확인", "적용", "진행",
+    # 구어체
+    "해줘", "실행해", "고쳐줘", "해", "가", "ㄱ", "고고", "가자", "그래", "좋아",
+    "진행해", "진행해줘", "해주세요", "실행해주세요", "적용해줘", "적용해",
+    # 영어
+    "ok", "yes", "go", "do it", "apply", "run", "execute",
+    # 축약
+    "ㅇㅋ", "ㅇ", "넹", "넵", "yep", "yup",
+}
 
 # 메모리 내 pending actions (프로세스 수명 동안 유지)
 # { conversation_id: { action_id, repo, branch, path, new_content, sha, pr_title, pr_body, commit_msg } }
@@ -1434,6 +1444,7 @@ PR 생성 후 안내 문구는 시스템이 자동으로 "`머지` 입력하면 
 [PROPOSED_FIX]
 파일: <파일경로>
 함수명: <클래스 메서드이면 클래스 이름 / 모듈 레벨 함수이면 함수 이름 (하나만)>
+신뢰도: <high|medium|low — 원인이 명확하고 수정이 단순하면 high, 불확실하면 low>
 ```python
 <클래스 메서드이면 class 전체 / 모듈 레벨 함수이면 함수 전체>
 ```
@@ -1496,6 +1507,10 @@ PR제목: <간단한 제목>
             pr_title = pr_title_match.group(1).strip() if pr_title_match else commit_msg
             fn_name = fn_name_match.group(1).strip() if fn_name_match else None
 
+            # 신뢰도 파싱
+            conf_match = re.search(r'신뢰도:\s*(high|medium|low)', fix_block, re.I)
+            fix_confidence = (conf_match.group(1).lower() if conf_match else "medium")
+
             action_id = str(uuid.uuid4())[:8]
             branch_name = f"fix/agency-{action_id}"
 
@@ -1512,13 +1527,30 @@ PR제목: <간단한 제목>
                 "commit_msg": commit_msg,
                 "pr_title": pr_title,
                 "pr_body": f"## AI 자동 수정\n\n{response[:1000]}\n\n---\n*maesil-agency 자동 생성*",
+                "confidence": fix_confidence,
                 "created_at": datetime.now(timezone.utc).isoformat(),
             }
+
+            # 신뢰도별 안내 메시지
+            if fix_confidence == "high":
+                action_hint = (
+                    f"⚡ **신뢰도 HIGH** — 원인이 명확합니다.\n"
+                    f"`승인` 입력 시 즉시 PR 생성 · `미리보기` → diff 확인 · `취소` → 폐기"
+                )
+            elif fix_confidence == "low":
+                action_hint = (
+                    f"⚠️ **신뢰도 LOW** — 원인이 불확실합니다. 반드시 미리보기로 검토하세요.\n"
+                    f"`미리보기` → diff 확인 (권장) · `승인` → PR 생성 · `취소` → 폐기"
+                )
+            else:
+                action_hint = (
+                    f"`미리보기` → diff 확인 · `승인` → PR 생성 · `취소` → 폐기"
+                )
 
             response += (
                 f"\n\n---\n✅ **수정안 준비 완료** (action: `{action_id}`)\n"
                 f"📄 수정 파일: `{file_info['path']}` · 함수: `{fn_name or '전체'}`\n"
-                f"`미리보기` → 실제 diff 확인 · `승인` → PR 생성 · `취소` → 폐기"
+                f"{action_hint}"
             )
 
     return response
@@ -1933,8 +1965,22 @@ def cancel_pending(conversation_id: str) -> str:
 
 
 def is_approve(text: str) -> bool:
+    """승인 의도 감지.
+    - 단독 키워드 (len < 10): '승인', 'ㄱ', 'ok' 등
+    - 짧은 문장 (len < 30): '진행해줘', '실행해주세요', '그냥 해줘' 등
+    - 거절 키워드 포함 시 False ('아니', '취소', 'no' 등)
+    """
     t = text.strip().lower()
-    return any(k in t for k in APPROVE_KEYWORDS) and len(t) < 20
+    DENY_KW = {"아니", "취소", "cancel", "no", "ㄴ", "싫", "말아", "하지마"}
+    if any(k in t for k in DENY_KW):
+        return False
+    # 단독 짧은 키워드 (완전 일치 또는 len < 10)
+    if len(t) < 10 and any(k in t for k in APPROVE_KEYWORDS):
+        return True
+    # 문장 형태 (len < 30) — '진행해줘', '실행해주세요' 등
+    if len(t) < 30 and any(k in t for k in APPROVE_KEYWORDS):
+        return True
+    return False
 
 
 def is_preview(text: str) -> bool:

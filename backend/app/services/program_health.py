@@ -98,6 +98,83 @@ def _count_errors_1h(program_name: str) -> int:
 # 메인
 # ─────────────────────────────────────────────────────────────────
 
+_ESCALATE_CONSECUTIVE = 3      # N 사이클 연속 down → critical 에스컬레이션
+_ESCALATE_COOLDOWN_MIN = 30    # 동일 프로그램 재에스컬레이션 최소 간격 (분)
+
+
+def _recent_health(program_name: str, n: int = 4) -> list[str]:
+    """최근 n건의 server_status 목록 (최신→구)."""
+    try:
+        rows = (
+            _client().schema("agent_work").table("program_health")
+            .select("server_status")
+            .eq("program_name", program_name)
+            .order("checked_at", desc=True)
+            .limit(n)
+            .execute()
+        ).data or []
+        return [r["server_status"] for r in rows]
+    except Exception:
+        return []
+
+
+def _escalate_if_needed(program_name: str, current_status: str) -> bool:
+    """연속 N사이클 down 감지 시 critical alert_events 생성. 에스컬레이션 여부 반환."""
+    if current_status not in ("down", "degraded"):
+        return False
+
+    # 최근 N건 확인 (현재 포함 N-1건 이전)
+    recent = _recent_health(program_name, _ESCALATE_CONSECUTIVE)
+    # 이전 기록이 부족하면 스킵
+    if len(recent) < _ESCALATE_CONSECUTIVE - 1:
+        return False
+    # 현재 + 이전 N-1건 모두 down/degraded이어야 에스컬레이션
+    combined = [current_status] + recent[:_ESCALATE_CONSECUTIVE - 1]
+    if not all(s in ("down", "degraded") for s in combined):
+        return False
+
+    # 쿨다운 확인 — 최근 N분 내 동일 프로그램 critical 이미 발행했으면 스킵
+    cooldown_since = (
+        datetime.now(timezone.utc) - timedelta(minutes=_ESCALATE_COOLDOWN_MIN)
+    ).isoformat()
+    try:
+        existing = (
+            _client().schema("agent_work").table("alert_events")
+            .select("id")
+            .eq("program_name", program_name)
+            .eq("severity", "critical")
+            .gte("created_at", cooldown_since)
+            .limit(1)
+            .execute()
+        ).data or []
+        if existing:
+            return False
+    except Exception:
+        return False
+
+    # critical alert 생성 → alert_dispatcher가 다음 사이클에 이메일 발송
+    try:
+        _client().schema("agent_work").table("alert_events").insert({
+            "program_name": program_name,
+            "severity":     "critical",
+            "source":       "program_health",
+            "title":        f"{program_name} 서비스 {_ESCALATE_CONSECUTIVE}사이클 연속 다운",
+            "message":      (
+                f"{program_name}의 헬스체크가 {_ESCALATE_CONSECUTIVE}사이클 연속 "
+                f"{'down' if current_status == 'down' else 'degraded'} 상태입니다.\n"
+                f"최근 상태 이력: {combined}\n"
+                f"Render 대시보드 또는 로그를 확인하세요."
+            ),
+            "created_at":   datetime.now(timezone.utc).isoformat(),
+        }).execute()
+        logger.warning("[health] 에스컬레이션 발행 [%s] 연속%d사이클 %s",
+                       program_name, _ESCALATE_CONSECUTIVE, current_status)
+        return True
+    except Exception as e:
+        logger.warning("[health] 에스컬레이션 alert 생성 실패 [%s]: %s", program_name, e)
+        return False
+
+
 def check_all() -> dict:
     """모든 active 프로그램 헬스 체크 후 program_health에 기록."""
     api_key = get_secret("render_api")
@@ -153,8 +230,14 @@ def check_all() -> dict:
                 "error_count_1h":  error_count,
                 "checked_at":      now.isoformat(),
             }).execute()
-            results.append({"name": name, "status": server_status, "error_count_1h": error_count})
-            logger.debug("program_health [%s] → %s (%sms, err1h=%s)", name, server_status, response_time_ms, error_count)
+            escalated = _escalate_if_needed(name, server_status)
+            results.append({
+                "name": name, "status": server_status,
+                "error_count_1h": error_count,
+                "escalated": escalated,
+            })
+            logger.debug("program_health [%s] → %s (%sms, err1h=%s, escalated=%s)",
+                         name, server_status, response_time_ms, error_count, escalated)
         except Exception as e:
             logger.warning("program_health insert error [%s]: %s", name, e)
             results.append({"name": name, "error": str(e)})
