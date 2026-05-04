@@ -133,10 +133,15 @@ const AGENT_PLACEHOLDER: Record<string, string> = {
   outreach:  "신규 파트너, 영업 기회, 광고 성과 등을 물어보세요…",
 };
 
+// force_agent 허용 목록 (백엔드 DIRECT_AGENTS와 동일하게 유지)
+const VALID_FORCE_AGENTS = new Set(["sales", "finance", "warehouse", "cs", "outreach"]);
+
 /* ── 메인 컴포넌트 ─────────────────────────────────────── */
 function ChatPageInner() {
   const searchParams = useSearchParams();
-  const forcedAgent  = searchParams.get("agent") || null; // ?agent=sales 등
+  // ?agent= 파라미터가 허용 목록에 없으면 null로 처리 (URL 직접 입력 방어)
+  const rawAgent    = searchParams.get("agent");
+  const forcedAgent = (rawAgent && VALID_FORCE_AGENTS.has(rawAgent)) ? rawAgent : null;
 
   const [messages,       setMessages]       = useState<Message[]>([]);
   const [input,          setInput]          = useState("");
