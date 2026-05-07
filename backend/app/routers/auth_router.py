@@ -50,12 +50,20 @@ def _now() -> str:
 # ─────────────────────────────────────────────────────────────────
 
 def _find_invite(token: str) -> dict | None:
-    """유효한 invite 토큰 row 반환. 없거나 만료시 None."""
+    """유효한 invite 토큰 row 반환. 만료/사용됨/없음이면 None."""
+    import hmac
+    if not token or len(token) < 16:
+        return None
     now_iso = _now()
     resp = _snapshots_table().select("*").eq("kind", "invite").gt("valid_until", now_iso).execute()
     for row in (resp.data or []):
         payload = row.get("payload") or {}
-        if payload.get("token") == token:
+        stored = payload.get("token") or ""
+        if not stored:
+            continue
+        if payload.get("used_at"):
+            continue
+        if hmac.compare_digest(str(stored), str(token)):
             return row
     return None
 
@@ -107,7 +115,11 @@ def check_invite(token: str) -> dict:
 
 @router.post("/join")
 def join(body: JoinRequest) -> dict:
-    """초대 토큰으로 계정 생성 — 공개 엔드포인트."""
+    """초대 토큰으로 계정 생성 — 공개 엔드포인트.
+
+    동시 join race를 막기 위해 user 생성 전에 invite를 먼저 used_at으로 마킹하고,
+    그 결과 row의 used_at가 본인이 찍은 것이 맞을 때만 진행한다.
+    """
     row = _find_invite(body.token)
     if not row:
         raise HTTPException(404, "유효하지 않거나 만료된 초대 링크입니다.")
@@ -116,12 +128,41 @@ def join(body: JoinRequest) -> dict:
         raise HTTPException(400, "이메일을 입력하세요.")
     if len(body.password) < 8:
         raise HTTPException(400, "비밀번호는 8자 이상이어야 합니다.")
+
+    payload = dict(row.get("payload") or {})
+    if payload.get("used_at"):
+        raise HTTPException(409, "이미 사용된 초대 링크입니다.")
+
+    # ── 1) invite 선점: payload.used_at 마킹 + valid_until 과거화
+    claim_id = secrets.token_urlsafe(16)
+    now = _now()
+    past = datetime(2000, 1, 1, tzinfo=timezone.utc).isoformat()
+    payload["used_at"] = now
+    payload["claim_id"] = claim_id
+    claim_resp = (
+        _snapshots_table()
+        .update({"payload": payload, "valid_until": past})
+        .eq("id", row["id"])
+        .is_("payload->>used_at", "null")  # 다른 동시 요청이 먼저 마킹했으면 0 row 갱신
+        .execute()
+    )
+    claimed_rows = claim_resp.data or []
+    if not claimed_rows:
+        raise HTTPException(409, "이미 사용된 초대 링크입니다.")
+    claimed = claimed_rows[0]
+    claimed_payload = claimed.get("payload") or {}
+    if claimed_payload.get("claim_id") != claim_id:
+        # 동시성: 누군가 한 ms 차이로 먼저 선점함
+        raise HTTPException(409, "이미 사용된 초대 링크입니다.")
+
+    # ── 2) 이메일 중복 체크 (선점 후)
     if get_user_by_email(body.email):
         raise HTTPException(409, "이미 사용 중인 이메일입니다.")
 
-    payload = row.get("payload") or {}
-    role = payload.get("role", "super_admin")
-    now = _now()
+    role = claimed_payload.get("role", "super_admin")
+    if role not in ("super_admin", "customer"):
+        raise HTTPException(500, "초대 link role 설정 오류")
+
     new_row = {
         "email":         body.email.lower().strip(),
         "password_hash": hash_password(body.password),
@@ -135,10 +176,6 @@ def join(body: JoinRequest) -> dict:
     rows = resp.data or []
     if not rows:
         raise HTTPException(500, "계정 생성 실패")
-
-    # 초대 토큰 무효화 (valid_until을 과거로 설정)
-    past = datetime(2000, 1, 1, tzinfo=timezone.utc).isoformat()
-    _snapshots_table().update({"valid_until": past}).eq("id", row["id"]).execute()
 
     user = rows[0]
     token_jwt = create_token(user)

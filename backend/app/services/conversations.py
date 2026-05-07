@@ -86,3 +86,20 @@ def get_messages(conversation_id: str) -> list[dict]:
         .execute()
     )
     return resp.data or []
+
+
+def get_conversation_owner(conversation_id: str) -> str | None:
+    """conversation의 user_id 반환. 없으면 None (legacy/system 대화)."""
+    resp = (
+        get_maesil_total_client()
+        .schema("agent_work")
+        .table("conversations")
+        .select("user_id")
+        .eq("id", conversation_id)
+        .limit(1)
+        .execute()
+    )
+    rows = resp.data or []
+    if not rows:
+        return None
+    return rows[0].get("user_id")

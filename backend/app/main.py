@@ -251,12 +251,17 @@ def inspect_insight_performance(token: str = "") -> dict:
         }).execute()
 
         # 테이블별 row count (규모 파악용)
+        import re as _re
         tables = list({r["table_name"] for r in (cols_r.data or [])})
         counts: dict = {}
         for tbl in tables[:15]:  # 최대 15개
+            # information_schema에서 가져온 값이지만 방어적으로 식별자 검증
+            if not _re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", tbl or ""):
+                counts[tbl] = "skipped:invalid_ident"
+                continue
             try:
                 cnt_r = client.rpc("execute_readonly_sql", {
-                    "query": f"SELECT COUNT(*) AS n FROM {tbl}"
+                    "query": f'SELECT COUNT(*) AS n FROM "{tbl}"'
                 }).execute()
                 counts[tbl] = (cnt_r.data or [{}])[0].get("n", "?")
             except Exception:

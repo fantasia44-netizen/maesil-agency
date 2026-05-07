@@ -1,7 +1,27 @@
 # maesil-agency 작업 메모리
 
 > 이 파일은 Claude와의 작업 내용을 다른 컴퓨터/세션에서도 이어받기 위한 기술 문서입니다.
-> 최종 업데이트: 2026-04-28
+> 최종 업데이트: 2026-05-07
+
+---
+
+## 회귀 검증 (코드 변경 후 반드시 실행)
+
+**한 줄 명령**:
+```
+PYTHONIOENCODING=utf-8 PYTHONUTF8=1 python backend/run_checks.py
+```
+
+- `backend/app` 전체 syntax compileall
+- `backend/test_*.py` 자동 발견 후 전부 실행
+- 현재 baseline: **164/164 PASS** (test_simulation 55 + test_outreach_simulation 67 + test_security_simulation 42)
+- 어느 하나라도 FAIL이면 exit 1 → dev_chat_agent가 PR 만들기 전 게이트로 사용 가능
+- 새 보안/로직 변경 시 `backend/test_security_simulation.py`에 케이스 추가하는 것이 컨벤션
+
+**필수 환경변수** (없으면 부팅 fail-fast):
+- `JWT_SECRET` (32자 이상), `API_BEARER_TOKEN` (16자 이상, "change-me" 등 거부)
+- `MAEYO_INTERNAL_TOKEN` (운영에서 미설정시 `/api/cs/*` 503)
+- `CORS_ORIGINS` (와일드카드 `*` 거부)
 
 ---
 
@@ -14,7 +34,7 @@
 - **DB**: Supabase (`maesil-total` 프로젝트, `agent_work` 스키마)
 - **AI**: Anthropic Claude (Haiku for 빠른 분석, Sonnet for 코드 수정)
 - **이메일 게이트웨이**: maesil-insight 서비스 경유
-- **인증**: JWT (PyJWT + passlib bcrypt), 30일 만료
+- **인증**: JWT (PyJWT + passlib bcrypt), **7일 만료** (2026-05-07 30일→7일 단축)
 
 ---
 
