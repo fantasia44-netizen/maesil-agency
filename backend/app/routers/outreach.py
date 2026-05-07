@@ -7,7 +7,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 
-from app.auth import UserContext, get_current_user
+from app.auth import UserContext, require_admin
 from app.db.maesil_total_client import get_maesil_total_client
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/outreach", tags=["outreach"])
 
 @router.get("/snapshots")
 def list_snapshots(
-    user: UserContext = Depends(get_current_user),
+    user: UserContext = Depends(require_admin),
 ) -> list[dict]:
     """영업 에이전트가 저장한 타겟 리스트 & 제안서 목록 (최근 50건)."""
     resp = (
@@ -37,7 +37,7 @@ def list_snapshots(
 @router.get("/snapshots/{snapshot_id}")
 def get_snapshot(
     snapshot_id: str,
-    user: UserContext = Depends(get_current_user),
+    user: UserContext = Depends(require_admin),
 ) -> dict:
     """특정 스냅샷 상세 조회."""
     resp = (
@@ -61,7 +61,7 @@ def get_snapshot(
 @router.get("/snapshots/{snapshot_id}/html", response_class=HTMLResponse)
 def get_proposal_html(
     snapshot_id: str,
-    user: UserContext = Depends(get_current_user),
+    user: UserContext = Depends(require_admin),
 ) -> HTMLResponse:
     """
     제안서 스냅샷을 인쇄 가능한 HTML 페이지로 반환.
@@ -91,7 +91,7 @@ def get_proposal_html(
 @router.post("/snapshots/{snapshot_id}/send-to-studio")
 def send_to_studio(
     snapshot_id: str,
-    user: UserContext = Depends(get_current_user),
+    user: UserContext = Depends(require_admin),
 ) -> dict:
     """
     제안서 데이터를 maesil-studio 제안서 생성 API로 전송.

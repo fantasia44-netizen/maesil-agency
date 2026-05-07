@@ -30,9 +30,14 @@ from passlib.context import CryptContext
 from app.db.maesil_total_client import get_maesil_total_client
 
 # ── 설정 ────────────────────────────────────────────────────────────
-JWT_SECRET    = os.environ.get("JWT_SECRET", "maesil-agency-jwt-secret-change-in-prod")
+JWT_SECRET = os.environ.get("JWT_SECRET", "").strip()
+if not JWT_SECRET or len(JWT_SECRET) < 32:
+    raise RuntimeError(
+        "JWT_SECRET 환경변수가 비어 있거나 너무 짧습니다(32자 이상 필요). "
+        "Render 환경변수에 강력한 시크릿을 설정하세요."
+    )
 JWT_ALGORITHM = "HS256"
-JWT_EXPIRE_DAYS = 30
+JWT_EXPIRE_DAYS = 7
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

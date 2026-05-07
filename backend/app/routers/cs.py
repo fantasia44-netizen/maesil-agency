@@ -37,7 +37,8 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/cs", tags=["cs"])
 
-_CS_TOKEN = os.environ.get("MAEYO_INTERNAL_TOKEN", "")
+_CS_TOKEN = os.environ.get("MAEYO_INTERNAL_TOKEN", "").strip()
+_ALLOW_UNAUTH_CS = os.environ.get("CS_ALLOW_UNAUTH", "").lower() in ("1", "true", "yes")
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -46,10 +47,17 @@ _CS_TOKEN = os.environ.get("MAEYO_INTERNAL_TOKEN", "")
 def _verify_cs_token(x_cs_token: str | None = Header(default=None, alias="X-CS-Token"),
                      x_maeyo_token: str | None = Header(default=None, alias="X-Maeyo-Token")) -> None:
     """X-CS-Token 또는 X-Maeyo-Token 헤더로 인증."""
-    token = x_cs_token or x_maeyo_token
     if not _CS_TOKEN:
-        return  # 토큰 미설정 = 개발 환경, 검증 skip
-    if token != _CS_TOKEN:
+        if _ALLOW_UNAUTH_CS:
+            return  # 명시적 dev override
+        raise HTTPException(
+            status_code=503,
+            detail="MAEYO_INTERNAL_TOKEN 미설정. 운영 환경에서는 반드시 설정 필요.",
+        )
+    token = (x_cs_token or x_maeyo_token or "").strip()
+    # 타이밍 공격 방어
+    import hmac
+    if not token or not hmac.compare_digest(token, _CS_TOKEN):
         raise HTTPException(status_code=401, detail="Invalid CS token")
 
 

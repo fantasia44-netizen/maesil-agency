@@ -717,5 +717,9 @@ def get_conversation(
     conversation_id: str,
     user: UserContext = Depends(get_current_user),
 ) -> dict:
+    if not user.is_super_admin:
+        owner = conv_svc.get_conversation_owner(conversation_id)
+        if owner is None or str(owner) != str(user.id):
+            raise HTTPException(status_code=404, detail="대화를 찾을 수 없습니다.")
     messages = conv_svc.get_messages(conversation_id)
     return {"conversation_id": conversation_id, "messages": messages}
