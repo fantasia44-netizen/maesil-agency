@@ -286,6 +286,75 @@ def _insert_event(program_name: str, severity: str, title: str, message: str, ra
 
 
 # ─────────────────────────────────────────────────────────────────
+# 트레이스백 줄 묶기
+# ─────────────────────────────────────────────────────────────────
+
+# 새 로그 항목 시작을 나타내는 패턴 (timestamp 앞에 [ 또는 숫자)
+_NEW_ENTRY_RE = re.compile(
+    r"^(\[\d{4}-\d{2}-\d{2}|"   # [2026-05-08 ...
+    r"\d{4}-\d{2}-\d{2}T|"      # 2026-05-08T...
+    r"\{)",                      # JSON 구조화 로그
+)
+
+# 트레이스백 이어지는 줄 패턴
+_TB_CONTINUATION_RE = re.compile(
+    r"^(\s|Traceback \(most recent|File \"|  File |    |During handling)"
+)
+
+# 트레이스백 종료: ExceptionClass: message 형태
+_EXCEPTION_CLASS_RE = re.compile(
+    r"^[A-Za-z][\w.]*(?:Error|Exception|Warning|Fault|Interrupt|Stop)[^\n]*$"
+)
+
+
+def _group_tracebacks(logs: list[dict]) -> list[dict]:
+    """연속된 트레이스백 줄들을 하나의 log entry로 묶어서 반환.
+
+    Render 로그는 Python 트레이스백이 줄별로 분리된 채 들어온다.
+    에러 감지 줄 이후 트레이스백 이어지는 줄을 최대 30줄까지 합쳐서
+    exception 클래스 줄(ExceptionType: message)을 message에 포함시킨다.
+    """
+    if not logs:
+        return logs
+
+    result: list[dict] = []
+    i = 0
+    while i < len(logs):
+        entry = logs[i]
+        msg = entry.get("message") or ""
+
+        # 에러 감지 줄인지 확인
+        sev = classify(msg)
+        if sev and sev in ("error", "critical"):
+            # 이어지는 트레이스백 줄 수집
+            combined_lines = [msg]
+            j = i + 1
+            while j < len(logs) and (j - i) <= 30:
+                next_msg = logs[j].get("message") or ""
+                # 새 독립 로그 항목이면 중단
+                if _NEW_ENTRY_RE.match(next_msg.lstrip()) and not _TB_CONTINUATION_RE.match(next_msg):
+                    break
+                combined_lines.append(next_msg)
+                # 예외 클래스 줄에서 종료
+                if _EXCEPTION_CLASS_RE.match(next_msg.strip()):
+                    j += 1
+                    break
+                j += 1
+
+            if len(combined_lines) > 1:
+                merged_entry = dict(entry)
+                merged_entry["message"] = "\n".join(combined_lines)
+                result.append(merged_entry)
+                i = j
+                continue
+
+        result.append(entry)
+        i += 1
+
+    return result
+
+
+# ─────────────────────────────────────────────────────────────────
 # 메인 폴러
 # ─────────────────────────────────────────────────────────────────
 def poll_all() -> dict:
@@ -317,6 +386,9 @@ def poll_all() -> dict:
             results.append({"name": name, "error": str(e)[:300], "fetched": 0, "new_events": 0})
             _upsert_cursor(name, start, error=str(e)[:300])
             continue
+
+        # 트레이스백 줄 묶기: 연속된 줄을 하나의 entry로 합침
+        logs = _group_tracebacks(logs)
 
         new_events = 0
         latest_ts = start
