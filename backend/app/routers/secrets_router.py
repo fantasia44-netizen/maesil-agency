@@ -53,13 +53,87 @@ def upsert_secret(body: SecretUpsert) -> dict:
 
 @router.post("/{name}/test")
 def test_secret(name: str) -> dict:
-    """
-    Phase 1 스텁: 실제 연결 테스트는 Phase 2에서 kind별로 구현.
-    (render: services list 호출 / supabase: from("_health").select 등)
-    """
     value = secrets_svc.get_secret(name)
     if value is None:
         raise HTTPException(status_code=404, detail="secret not found")
-    # TODO(Phase 2): kind별 실제 테스트
+
+    if name == "github_token":
+        return _test_github_token(name, value)
+
+    if name in ("maesil_insight_supabase_url", "maesil_total_supabase_url"):
+        return _test_supabase_url(name, value)
+
+    if name in ("m_insight_service_role", "MAESIL_TOTAL_SERVICE_ROLE_KEY"):
+        return _test_supabase_key(name, value)
+
+    if name == "anthropic_api_key":
+        return _test_anthropic_key(name, value)
+
+    # 나머지 — 저장 여부만 확인
     secrets_svc.mark_tested(name, ok=True, error=None)
-    return {"ok": True, "note": "stub — 실제 검증은 Phase 2에서 구현"}
+    return {"ok": True, "note": "값 저장 확인 (연결 테스트 미지원 항목)"}
+
+
+def _test_github_token(name: str, token: str) -> dict:
+    import httpx
+    try:
+        r = httpx.get(
+            "https://api.github.com/user",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+            timeout=10,
+        )
+        if r.status_code == 200:
+            login = r.json().get("login", "?")
+            secrets_svc.mark_tested(name, ok=True, error=None)
+            return {"ok": True, "note": f"GitHub 연결 성공 — @{login}"}
+        secrets_svc.mark_tested(name, ok=False, error=f"HTTP {r.status_code}")
+        raise HTTPException(status_code=400, detail=f"GitHub API 오류: HTTP {r.status_code}")
+    except HTTPException:
+        raise
+    except Exception as e:
+        secrets_svc.mark_tested(name, ok=False, error=str(e)[:200])
+        raise HTTPException(status_code=400, detail=f"GitHub 연결 실패: {e}")
+
+
+def _test_supabase_url(name: str, url: str) -> dict:
+    import httpx
+    try:
+        r = httpx.get(f"{url.rstrip('/')}/rest/v1/", timeout=8)
+        ok = r.status_code in (200, 400, 401)  # 인증 없어도 엔드포인트가 살아있으면 OK
+        if ok:
+            secrets_svc.mark_tested(name, ok=True, error=None)
+            return {"ok": True, "note": "Supabase URL 응답 확인"}
+        secrets_svc.mark_tested(name, ok=False, error=f"HTTP {r.status_code}")
+        raise HTTPException(status_code=400, detail=f"Supabase URL 응답 오류: HTTP {r.status_code}")
+    except HTTPException:
+        raise
+    except Exception as e:
+        secrets_svc.mark_tested(name, ok=False, error=str(e)[:200])
+        raise HTTPException(status_code=400, detail=f"Supabase URL 연결 실패: {e}")
+
+
+def _test_supabase_key(name: str, key: str) -> dict:
+    """서비스 롤 키는 URL 없이 단독 검증 불가 — 저장 여부만 확인."""
+    secrets_svc.mark_tested(name, ok=True, error=None)
+    return {"ok": True, "note": "키 저장 확인 (URL과 함께 사용 시 실제 연결 검증됨)"}
+
+
+def _test_anthropic_key(name: str, key: str) -> dict:
+    try:
+        import anthropic
+        client = anthropic.Anthropic(api_key=key)
+        client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=1,
+            messages=[{"role": "user", "content": "ping"}],
+        )
+        secrets_svc.mark_tested(name, ok=True, error=None)
+        return {"ok": True, "note": "Anthropic API 연결 성공"}
+    except Exception as e:
+        err = str(e)[:200]
+        secrets_svc.mark_tested(name, ok=False, error=err)
+        raise HTTPException(status_code=400, detail=f"Anthropic API 오류: {err}")
