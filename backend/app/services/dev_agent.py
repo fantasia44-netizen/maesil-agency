@@ -118,9 +118,17 @@ def _extract_keywords(title: str, message: str) -> list[str]:
 def _fetch_relevant_files(repo: str, keywords: list[str], max_files: int = 3) -> list[dict]:
     """repo_files DB 미러에서 키워드 관련 파일 검색. 최대 max_files개 반환."""
     from app.services import repo_mirror
+    from app.db.maesil_total_client import get_maesil_total_client
 
     found: list[dict] = []
     seen_paths: set[str] = set()
+
+    def _add(row: dict) -> bool:
+        if row.get("path") and row["path"] not in seen_paths:
+            seen_paths.add(row["path"])
+            found.append(row)
+            return True
+        return False
 
     for kw in keywords:
         if len(found) >= max_files:
@@ -128,16 +136,13 @@ def _fetch_relevant_files(repo: str, keywords: list[str], max_files: int = 3) ->
         try:
             # 1) 심볼 검색 (RPC find_file_with_symbol)
             result = repo_mirror.search_symbol(repo, kw)
-            if result and result.get("path") not in seen_paths:
-                seen_paths.add(result["path"])
-                found.append(result)
+            if result and _add(result):
                 continue
         except Exception:
             pass
 
         try:
-            # 2) 파일명 직접 조회 (경로에 키워드 포함)
-            from app.db.maesil_total_client import get_maesil_total_client
+            # 2) 파일 경로에 키워드 포함
             resp = (
                 get_maesil_total_client()
                 .schema("agent_work")
@@ -149,9 +154,27 @@ def _fetch_relevant_files(repo: str, keywords: list[str], max_files: int = 3) ->
                 .execute()
             )
             rows = resp.data or []
-            if rows and rows[0]["path"] not in seen_paths:
-                seen_paths.add(rows[0]["path"])
-                found.append(rows[0])
+            if rows and _add(rows[0]):
+                continue
+        except Exception:
+            pass
+
+        try:
+            # 3) 파일 내용에 키워드 포함 (경로 검색 실패 시 콘텐츠 전문 검색)
+            resp = (
+                get_maesil_total_client()
+                .schema("agent_work")
+                .table("repo_files")
+                .select("path, content, sha")
+                .eq("repo", repo)
+                .ilike("content", f"%{kw}%")
+                .not_.ilike("path", "%.min.%")   # 번들 파일 제외
+                .limit(1)
+                .execute()
+            )
+            rows = resp.data or []
+            if rows:
+                _add(rows[0])
         except Exception:
             pass
 
