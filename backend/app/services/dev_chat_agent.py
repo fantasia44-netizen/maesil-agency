@@ -383,8 +383,14 @@ def _extract_error_function(text: str) -> str | None:
     예: "AttributeError: 'NaverAdClient' object has no attribute 'create_stat_report'"
         → 'NaverAdClient.create_stat_report'
     """
-    # ── 최우선: 'ClassName' object has no attribute 'method' ──
-    # AttributeError: 접두사가 있든 없든 (로거 태그 뒤에 붙는 경우 포함) 잡아냄.
+    # ── 최우선: NameError — name 'X' is not defined ──
+    # 예: "name '_draw_text_stroke' is not defined"
+    m = re.search(r"name\s+['\"]([a-zA-Z_]\w+)['\"]\s+is\s+not\s+defined", text, re.I)
+    if m:
+        return m.group(1)
+
+    # ── AttributeError: 'ClassName' object has no attribute 'method' ──
+    # 접두사가 있든 없든 (로거 태그 뒤에 붙는 경우 포함) 잡아냄.
     # 예: "[Collector] AD 예외: 'NaverAdClient' object has no attribute 'create_stat_report'"
     m = re.search(
         r"['\"]([A-Za-z][A-Za-z0-9_]+)['\"]?\s+object\s+has\s+no\s+attribute\s+['\"]([a-z_]\w+)['\"]",
