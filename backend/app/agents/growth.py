@@ -39,7 +39,7 @@ from app.tools.write_tools import create_finding, create_snapshot, create_sugges
 
 logger = logging.getLogger(__name__)
 
-MODEL = "claude-sonnet-4-5-20251001"   # 복합 분석 품질을 위해 Sonnet 사용
+MODEL = "claude-haiku-4-5-20251001"   # Haiku: 전 에이전트 통일 모델 (Sonnet-4-5는 미제공)
 
 
 # ─────────────────────────────────────────────────────────────────
