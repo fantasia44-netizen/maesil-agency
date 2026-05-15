@@ -164,13 +164,30 @@ _BASE_SYSTEM = """당신은 매실인사이트 운영팀의 **그로스 인텔�
 - `query_db`로 매출·채널·상품·광고비 데이터 분석
 - 채널별 매출 현황, ROAS, 공헌이익률, 이상 탐지
 - 비교 기간(어제·전주·전월)과 대비 분석
+- 사용 가능한 템플릿: `sales.today_revenue_by_channel`, `sales.date_range_revenue`,
+  `sales.monthly_summary`, `sales.top_products`, `finance.ad_spend_by_channel`
 
-### 2. 영업 & 타겟 발굴
-- `search_naver_shopping`으로 잠재 셀러 발굴
-- 우선순위 스코어링 + 제안 포인트 도출
+### 2. 영업 & 타겟 발굴 (구 OutreachAgent 통합)
+- `search_naver_shopping`으로 잠재 셀러 발굴 (display=30 고정)
+- 우선순위 스코어링 (1~10): 순위 10~30위 + 상품 여럿 → 높은 점수 / 1~5위 → 낮은 점수
 - `save_target_list` + `create_proposal_draft`로 자료 저장
-- **제안서 핵심 소구**: "광고비 쓰는데 진짜 남는 돈 모른다" → 워터폴/POAS/공헌이익으로 해결
-- ROAS 숫자 언급 금지. 근거 없는 수치 금지.
+- **한 번 실행에 제안서 1개만** — 우선순위 1위 셀러만 작성
+
+#### 핵심 제품 이해 — 매실인사이트
+셀러들의 실제 고통:
+1. 통장 문제: 마켓 매출은 크지만 수수료·차감 후 실제 입금액이 왜 이렇게 작지?
+2. 광고 불확실성: ROAS는 높은데 왜 이익이 없을까?
+3. 상품 이익 모름: 잘 팔리는 상품인데 원가·수수료 빼면 공헌이익이 0에 가깝다.
+4. 손해 반복: 적자 키워드에 계속 광고비가 나간다.
+
+매실인사이트 해결책: 워터폴 비용 분해 / POAS (Profit on Ad Spend) / 공헌이익률 / 광고 낭비 경고
+
+#### 제안서 작성 원칙
+- **소구포인트 = 셀러의 고통**: "광고비 쓰는데 실제 남는 돈을 모르는" 상황을 구체적으로 묘사
+- **ROAS 숫자 금지**: 대신 "원가 반영 시 적자인 키워드", "통장에 돈이 안 남는 이유"로 접근
+- **근거 없는 수치 금지** (fallback 숫자 사용 금지)
+- **sections 5개 필수**: greeting / insight / value_proposition / social_proof / cta
+- 부드럽고 친근한 톤
 
 ### 3. CS 인텔리전스
 - `analyze_cs_data(cs_patterns)` → 자주 묻는 질문 TOP, 감정 분포, L3 갭 비율
@@ -227,24 +244,69 @@ class GrowthAgent(BaseAgent):
         operator_id: str | None = None,
         context_messages: list[dict] | None = None,
     ) -> dict[str, Any]:
-        """학습 루프: 이전 분석 주입 → LLM 실행 → 결과 저장."""
+        """학습 루프: 캐시 체크 → 이전 분석 주입 → LLM 실행 → 결과 저장."""
         from app.services.growth_intelligence import (
             load_recent_analyses, build_analysis_context,
             save_growth_analysis,
         )
+        from app.services.sales_knowledge import (
+            load_insights, build_context as build_sales_context,
+            get_cached_insight, save_insight, extract_insight_type,
+        )
 
-        # 1) 이전 분석 결과를 시스템 프롬프트에 주입
+        # 0) TTL 캐시 체크 (30분) — 매출 분석 요청이고 강제 갱신 키워드 없으면 스킵
+        _FORCE_REFRESH = {"새로", "갱신", "refresh", "다시", "최신", "업데이트", "update"}
+        force_refresh = any(k in message for k in _FORCE_REFRESH)
+
+        if operator_id and not force_refresh:
+            try:
+                itype_hint = extract_insight_type(message)
+                cached = get_cached_insight(operator_id, itype_hint)
+                if cached:
+                    logger.info("GrowthAgent 캐시 히트 [%s/%s] — LLM 스킵", operator_id, itype_hint)
+                    return {
+                        "run_id": run_id or "cache",
+                        "agent_type": self.agent_type,
+                        "message": (
+                            f"📊 **{cached.get('period_label', '최근')} 분석 (캐시)**\n\n"
+                            f"{cached['summary']}\n\n"
+                            f"_30분 이내 동일 분석이 있어 캐시를 반환했습니다. "
+                            f"최신 데이터가 필요하면 '새로 분석해줘'라고 입력하세요._"
+                        ),
+                        "status": "success",
+                        "cost_usd": 0.0,
+                        "cached": True,
+                    }
+            except Exception as e:
+                logger.warning("GrowthAgent 캐시 체크 실패 (계속 진행): %s", e)
+
+        # 1) 이전 분석 결과 + sales 인사이트를 시스템 프롬프트에 주입
         _original_get_prompt = self.get_system_prompt
+        context_sections: list[str] = []
+
         if operator_id:
+            # growth_intelligence 이전 분석
             try:
                 past = load_recent_analyses(operator_id, _detect_program(message))
                 if past:
-                    ctx = build_analysis_context(past)
-                    def _patched_prompt():
-                        return _original_get_prompt() + "\n\n" + ctx
-                    self.get_system_prompt = _patched_prompt  # type: ignore[method-assign]
+                    context_sections.append(build_analysis_context(past))
             except Exception as e:
                 logger.warning("GrowthAgent 이전 분석 주입 실패: %s", e)
+
+            # sales_knowledge 과거 인사이트
+            try:
+                past_sales = load_insights(operator_id)
+                if past_sales:
+                    context_sections.append(build_sales_context(past_sales))
+                    logger.info("GrowthAgent sales 인사이트 주입 [%s] %d건", operator_id, len(past_sales))
+            except Exception as e:
+                logger.warning("GrowthAgent sales 인사이트 주입 실패: %s", e)
+
+        if context_sections:
+            _combined_ctx = "\n\n".join(context_sections)
+            def _patched_prompt():
+                return _original_get_prompt() + "\n\n" + _combined_ctx
+            self.get_system_prompt = _patched_prompt  # type: ignore[method-assign]
 
         # 2) 에이전트 실행
         run_id = run_id or str(uuid.uuid4())
@@ -309,19 +371,30 @@ class GrowthAgent(BaseAgent):
 
             # 3) 분석 결과 저장 (다음 실행 시 컨텍스트로 활용)
             if operator_id and len(final_text) > 50:
+                lines = [s.strip() for s in final_text.split("\n") if s.strip()]
+
+                # growth_analysis_results 저장
                 try:
                     atype = _detect_analysis_type(message)
                     program = _detect_program(message)
-                    lines = [s.strip() for s in final_text.split("\n") if s.strip()]
-                    summary = " ".join(lines[:3])[:500]
+                    summary_ga = " ".join(lines[:3])[:500]
                     save_growth_analysis(
                         operator_id=operator_id,
                         program=program,
                         analysis_type=atype,
-                        summary=summary,
+                        summary=summary_ga,
                     )
                 except Exception as e:
-                    logger.warning("GrowthAgent 분석 저장 실패: %s", e)
+                    logger.warning("GrowthAgent growth_analysis 저장 실패: %s", e)
+
+                # sales_insights 저장 (매출 분석 결과이면)
+                try:
+                    from app.services.sales_knowledge import save_insight, extract_insight_type
+                    itype = extract_insight_type(final_text)
+                    summary_si = " ".join(lines[:2])[:300]
+                    save_insight(operator_id, summary_si, insight_type=itype)
+                except Exception as e:
+                    logger.warning("GrowthAgent sales_insight 저장 실패: %s", e)
 
             return result
 

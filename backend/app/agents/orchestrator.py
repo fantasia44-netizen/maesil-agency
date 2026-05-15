@@ -63,11 +63,16 @@ def llm_route(message: str) -> list[str]:
             messages=[{"role": "user", "content": f"메시지: {message}"}],
         )
         text = resp.content[0].text.strip().lower()
-        valid = {"growth", "sales", "finance", "warehouse", "cs", "outreach"}
-        agents = [a.strip() for a in text.split(",") if a.strip() in valid]
+        valid = {"growth", "finance", "warehouse", "cs"}
+        # legacy alias: sales/outreach → growth
+        _ALIAS = {"sales": "growth", "outreach": "growth"}
+        raw = [a.strip() for a in text.split(",")]
+        agents = list(dict.fromkeys(  # 중복 제거, 순서 유지
+            _ALIAS.get(a, a) for a in raw if _ALIAS.get(a, a) in valid
+        ))
         return agents if agents else ["growth"]
     except Exception:
-        return ["sales"]
+        return ["growth"]
 
 
 def route(message: str) -> list[str]:
@@ -98,13 +103,14 @@ def _run_single_agent(
     from app.agents.outreach import OutreachAgent
 
     AGENT_MAP = {
-        "growth":    GrowthAgent,    # 통합 그로스 에이전트
-        "sales":     SalesAgent,     # legacy (하위 호환)
+        "growth":    GrowthAgent,
         "finance":   FinanceAgent,
         "warehouse": WarehouseAgent,
         "cs":        CSAgent,
         "tester":    TesterAgent,
-        "outreach":  OutreachAgent,  # legacy (하위 호환)
+        # legacy alias → GrowthAgent로 위임
+        "sales":     GrowthAgent,
+        "outreach":  GrowthAgent,
     }
     cls = AGENT_MAP.get(atype)
     if not cls:
@@ -165,7 +171,7 @@ def run_agents(
 
 
 BRIEFING_MESSAGES = {
-    "sales": (
+    "growth": (
         "오늘 아침 매출 현황 보고를 작성해주세요. "
         "오늘 채널별 주문수와 매출을 조회하고, 어제와 비교해서 간결하게 정리해주세요. "
         "template: sales.today_revenue_by_channel"
