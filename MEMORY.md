@@ -87,10 +87,16 @@ Supabase SQL Editor에서 실행한 순서:
 001 ~ 005  — 초기 스키마 (program_registry, secrets 등)
 006_alert_system.sql     — alert_events, alert_channels 테이블
 006_conversations.sql    — conversations, conversation_messages 테이블
-007_*.sql                — (있을 경우)
 008_github_repo.sql      — program_registry에 github_repo 컬럼 추가
 009_users_auth.sql       — users 테이블, conversations/alert_channels에 user_id 추가
 010_insert_superadmin.sql — super_admin 초기 계정 생성 (1회 실행 후 삭제 권장)
+011~015  — 레지스트리, repo_files, dev_pr_history, alert_ack 등
+016_maeyo_cs_tables.sql  — maeyo_conversations, maeyo_messages, maeyo_l2_scripts
+017~019  — l2_verified, fix_insight_url, maeyo_feature_docs + unanswered_log
+020_maesil_studio_registry.sql
+021_maesil_insight_github_repo.sql — maesil-insight github_repo 등록
+022_dev_lessons_learned.sql — ⭐ dev 에이전시 학습 DB (PR 머지 → 레슨 자동 축적)
+023_sales_insights.sql      — ⭐ 영업 에이전시 학습 DB (operator별 인사이트 축적)
 ```
 
 ### 009_users_auth.sql 내용
@@ -263,6 +269,32 @@ async def _poll_loop():
 - 모든 채팅 → DB 저장 (conversations + conversation_messages)
 - user_id 연결로 고객별 대화 분리
 - super_admin: 전체 대화 조회 / customer: 본인 것만
+
+### G. 멀티 에이전시 학습 시스템 (2026-05-15)
+
+#### G1. Dev Agency Learning — `dev_lessons_learned`
+- PR 머지 완료 시 `_save_lesson()` 자동 호출 (`_mark_pr_merged` 내부)
+- `_load_lessons(repo, failing_symbol)` → 유사 과거 레슨 조회 (error_type 또는 error_pattern ilike 검색)
+- `analyze_and_propose` + `dev_agent.analyze_error` 모두에서 레슨 컨텍스트 주입
+- 효과: 동일 에러 재발 시 과거 fix 즉시 참고 → 분석 시간 단축 + 중복 실수 방지
+
+#### G2. Sales Agency Learning — `sales_insights`
+**파일**: `backend/app/services/sales_knowledge.py`
+- `SalesAgent.run()` 오버라이드 (Monkey-patch 방식 시스템 프롬프트 확장)
+  - 실행 전: `load_insights(operator_id)` → `build_context()` → 시스템 프롬프트 주입
+  - 실행 후: 분석 결과 2문장 요약 → `save_insight()` → UPSERT (operator/type/기간 키)
+- `extract_insight_type()`: 텍스트 분석 → channel_trend/top_product/growth_pattern/ad_performance/general
+
+#### G3. CS → Dev 실시간 에스컬레이션
+**엔드포인트**: `POST /api/cs/dev-escalate` (JWT 인증, super_admin 전용)
+- CS가 답 못한 질문 → `explain_feature()` 즉시 동기 호출 → `maeyo_feature_docs` 생성
+- 다음 CS 쿼리에서 L2.5로 즉시 활용 가능
+- 기존 비동기 경로(3분 폴러)도 병행 유지
+
+#### G4. 기존 CS → Dev 비동기 루프 (스케줄러 내 동작 중)
+- L3 응답 후 `log_unanswered()` → `maeyo_unanswered_log`
+- 3분마다 `feature_kb.process_queue()` → `explain_feature()` → `maeyo_feature_docs`
+- 다음 L2.5 매칭에서 자동 활용
 
 ---
 
