@@ -386,14 +386,17 @@ def _auto_promote_correction(
     corrected_answer: str,
     corrected_by: str,
 ) -> str | None:
-    """관리자 correction → maeyo_l2_scripts 자동 등록 (is_verified=True).
+    """관리자 correction → maeyo_l2_scripts draft 자동 등록.
+
+    P1 보강: correction이 곧바로 is_verified=True가 되던 오염 리스크 제거.
+    이제 status='draft'로 등록 → 관리자가 PATCH /l2-scripts/{id}/approve 로 승인해야 활성화.
 
     흐름:
       1. 수정된 메시지 조회 → conversation_id, emotion, created_at
       2. 대화 조회 → program
       3. 이 응답 직전 유저 질문 조회 → trigger
-      4. L2 script UPSERT (LEARN_ prefix, is_verified=True)
-      5. L2 캐시 무효화
+      4. L2 script UPSERT (LEARN_ prefix, status='draft', is_verified=False)
+      5. L2 캐시는 무효화 안 함 (draft는 매칭 안 되므로 불필요)
     """
     try:
         db = _db()
@@ -466,19 +469,17 @@ def _auto_promote_correction(
                 "action": None,
                 "hint": None,
                 "is_active": True,
-                "is_verified": True,   # 관리자 검증 완료
-                "sort_order": 0,        # 최우선 매칭
+                "is_verified": False,  # 관리자 승인 전까지 미검증
+                "status": "draft",     # draft → 검토 대기 (L2 매칭 제외)
+                "sort_order": 0,
                 "updated_at": now,
             },
             on_conflict="id",
         ).execute()
 
-        # 6) L2 캐시 무효화 → 다음 CS 쿼리에서 즉시 반영
-        from app.services.maeyo_engine import invalidate_l2_cache
-        invalidate_l2_cache()
-
+        # draft는 L2 매칭에 포함되지 않으므로 캐시 무효화 불필요
         logger.info(
-            "correction → L2 auto-promoted [%s] id=%s trigger='%s...'",
+            "correction → L2 draft 등록 [%s] id=%s trigger='%s...' (승인 대기)",
             program, script_id, user_question[:40],
         )
         return script_id
@@ -630,6 +631,80 @@ def verify_l2_script(
         "is_verified": new_val, "updated_at": _now(),
     }).eq("id", script_id).execute()
     return {"ok": True, "is_verified": new_val}
+
+
+# ─────────────────────────────────────────────────────────────────
+# P1 보강: L2 draft 승인 워크플로우
+# correction → draft 자동 등록 → 관리자 검토 → approve / reject
+# ─────────────────────────────────────────────────────────────────
+
+@router.get("/l2-scripts/drafts")
+def list_draft_l2_scripts(
+    program: str | None = None,
+    user: UserContext = Depends(get_current_user),
+) -> list[dict]:
+    """검토 대기 중인 draft L2 스크립트 목록.
+    관리자가 approve 또는 reject 하기 전까지 L2 매칭에서 제외된 상태.
+    """
+    if not user.is_super_admin:
+        raise HTTPException(403, "관리자 전용")
+    q = _db().table("maeyo_l2_scripts") \
+        .select("id,program,triggers,keywords,emotion,message,is_active,updated_at") \
+        .eq("status", "draft") \
+        .eq("is_active", True) \
+        .order("updated_at", desc=True) \
+        .limit(100)
+    if program:
+        q = q.in_("program", [program, "common"])
+    return q.execute().data or []
+
+
+@router.patch("/l2-scripts/{script_id}/approve")
+def approve_draft_l2_script(
+    script_id: str,
+    user: UserContext = Depends(get_current_user),
+) -> dict:
+    """draft L2 스크립트를 승인 → status='active', is_verified=True.
+    승인 후 즉시 L2 매칭에 포함.
+    """
+    if not user.is_super_admin:
+        raise HTTPException(403, "관리자 전용")
+    rows = _db().table("maeyo_l2_scripts") \
+        .select("id, status").eq("id", script_id).limit(1).execute().data or []
+    if not rows:
+        raise HTTPException(404, "스크립트를 찾을 수 없습니다")
+    _db().table("maeyo_l2_scripts").update({
+        "status": "active",
+        "is_verified": True,
+        "sort_order": 0,
+        "updated_at": _now(),
+    }).eq("id", script_id).execute()
+    from app.services.maeyo_engine import invalidate_l2_cache
+    invalidate_l2_cache()
+    logger.info("L2 script 승인 [id=%s] by %s", script_id, user.id)
+    return {"ok": True, "script_id": script_id, "status": "active"}
+
+
+@router.patch("/l2-scripts/{script_id}/reject")
+def reject_draft_l2_script(
+    script_id: str,
+    user: UserContext = Depends(get_current_user),
+) -> dict:
+    """draft L2 스크립트를 거부 → is_active=False (비활성화).
+    잘못된 correction이 FAQ가 되는 오염 방지.
+    """
+    if not user.is_super_admin:
+        raise HTTPException(403, "관리자 전용")
+    rows = _db().table("maeyo_l2_scripts") \
+        .select("id, status").eq("id", script_id).limit(1).execute().data or []
+    if not rows:
+        raise HTTPException(404, "스크립트를 찾을 수 없습니다")
+    _db().table("maeyo_l2_scripts").update({
+        "is_active": False,
+        "updated_at": _now(),
+    }).eq("id", script_id).execute()
+    logger.info("L2 script 거부 [id=%s] by %s", script_id, user.id)
+    return {"ok": True, "script_id": script_id, "status": "rejected"}
 
 
 @router.post("/l2-scripts/sync-from-insight")

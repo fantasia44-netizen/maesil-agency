@@ -39,13 +39,130 @@ APPROVE_KEYWORDS = {
     "ㅇㅋ", "ㅇ", "넹", "넵", "yep", "yup",
 }
 
-# 메모리 내 pending actions (프로세스 수명 동안 유지)
-# { conversation_id: { action_id, repo, branch, path, new_content, sha, pr_title, pr_body, commit_msg } }
-_pending: dict[str, dict[str, Any]] = {}
-# 최근 생성된 PR — 같은 대화에서 '머지' 명령으로 바로 머지 가능
-# { conversation_id: {repo, pr_number, pr_url, pr_title, created_at} }
-# 영속 저장은 agent_work.dev_pr_history (사이트 재시작·새 대화에서도 조회)
-_recent_pr: dict[str, dict[str, Any]] = {}
+# ─────────────────────────────────────────────────────────────────
+# pending / recent_pr — DB 영속 + 메모리 fallback
+#
+# P1 보강: _pending, _recent_pr 을 process memory 에만 두면
+# Render 재시작 시 승인 대기 PR 흐름이 유실 (SPOF).
+# → pending_tasks 테이블에 먼저 저장, DB 실패 시 메모리로 fallback.
+# ─────────────────────────────────────────────────────────────────
+
+# 비상 메모리 fallback (024_pending_tasks.sql 미실행 시 사용)
+_pending_mem: dict[str, dict[str, Any]] = {}
+_recent_pr_mem: dict[str, dict[str, Any]] = {}
+
+_PENDING_EXPIRE_H = 24   # pending action 만료 (시간)
+_RECENT_PR_EXPIRE_H = 72  # recent PR 정보 보관 (시간)
+
+
+def _set_pending(conversation_id: str, action: dict) -> None:
+    """pending action을 DB에 저장 (Render 재시작 안전)."""
+    from datetime import timedelta
+    expires_at = (datetime.now(timezone.utc) + timedelta(hours=_PENDING_EXPIRE_H)).isoformat()
+    try:
+        get_maesil_total_client().schema("agent_work").table("pending_tasks").upsert(
+            {
+                "task_id": f"pr:{conversation_id}",
+                "task_type": "pr_approval",
+                "payload": action,
+                "status": "pending",
+                "conversation_id": conversation_id,
+                "expires_at": expires_at,
+            },
+            on_conflict="task_id",
+        ).execute()
+        logger.debug("_set_pending DB 저장 [%s]", conversation_id[:8])
+    except Exception as e:
+        logger.warning("_set_pending DB 저장 실패 (메모리 fallback): %s", e)
+        _pending_mem[conversation_id] = action
+
+
+def _get_pending(conversation_id: str) -> dict | None:
+    """DB에서 pending action 조회 (만료 체크 포함). 없으면 None."""
+    # 메모리 fallback 먼저 (DB save 실패한 경우)
+    if conversation_id in _pending_mem:
+        return _pending_mem[conversation_id]
+    try:
+        now = datetime.now(timezone.utc).isoformat()
+        rows = (
+            get_maesil_total_client().schema("agent_work").table("pending_tasks")
+            .select("payload")
+            .eq("task_id", f"pr:{conversation_id}")
+            .eq("status", "pending")
+            .gte("expires_at", now)
+            .limit(1)
+            .execute()
+            .data or []
+        )
+        return rows[0]["payload"] if rows else None
+    except Exception as e:
+        logger.warning("_get_pending DB 조회 실패: %s", e)
+        return None
+
+
+def _del_pending(conversation_id: str) -> None:
+    """pending 완료 처리 (승인·취소 후)."""
+    _pending_mem.pop(conversation_id, None)
+    try:
+        get_maesil_total_client().schema("agent_work").table("pending_tasks").update(
+            {"status": "done"}
+        ).eq("task_id", f"pr:{conversation_id}").execute()
+    except Exception as e:
+        logger.warning("_del_pending DB 갱신 실패: %s", e)
+
+
+def _set_recent_pr(conversation_id: str, pr_data: dict) -> None:
+    """최근 PR 정보를 DB에 저장 (재시작 안전)."""
+    from datetime import timedelta
+    expires_at = (datetime.now(timezone.utc) + timedelta(hours=_RECENT_PR_EXPIRE_H)).isoformat()
+    try:
+        get_maesil_total_client().schema("agent_work").table("pending_tasks").upsert(
+            {
+                "task_id": f"recent_pr:{conversation_id}",
+                "task_type": "recent_pr",
+                "payload": pr_data,
+                "status": "pending",
+                "conversation_id": conversation_id,
+                "expires_at": expires_at,
+            },
+            on_conflict="task_id",
+        ).execute()
+    except Exception as e:
+        logger.warning("_set_recent_pr DB 저장 실패 (메모리 fallback): %s", e)
+        _recent_pr_mem[conversation_id] = pr_data
+
+
+def _get_recent_pr(conversation_id: str) -> dict | None:
+    """DB에서 최근 PR 정보 조회."""
+    if conversation_id in _recent_pr_mem:
+        return _recent_pr_mem[conversation_id]
+    try:
+        now = datetime.now(timezone.utc).isoformat()
+        rows = (
+            get_maesil_total_client().schema("agent_work").table("pending_tasks")
+            .select("payload")
+            .eq("task_id", f"recent_pr:{conversation_id}")
+            .eq("status", "pending")
+            .gte("expires_at", now)
+            .limit(1)
+            .execute()
+            .data or []
+        )
+        return rows[0]["payload"] if rows else None
+    except Exception as e:
+        logger.warning("_get_recent_pr DB 조회 실패: %s", e)
+        return None
+
+
+def _del_recent_pr(conversation_id: str) -> None:
+    """최근 PR 추적 해제."""
+    _recent_pr_mem.pop(conversation_id, None)
+    try:
+        get_maesil_total_client().schema("agent_work").table("pending_tasks").update(
+            {"status": "done"}
+        ).eq("task_id", f"recent_pr:{conversation_id}").execute()
+    except Exception as e:
+        logger.warning("_del_recent_pr DB 갱신 실패: %s", e)
 
 
 def _save_pr_history(
@@ -77,28 +194,64 @@ def _save_pr_history(
 # dev_lessons_learned — dev 에이전시 학습 루프
 # ─────────────────────────────────────────────────────────────────
 
+def _extract_root_cause_from_body(pr_body: str | None) -> str | None:
+    """PR body에서 원인 요약 추출. '## AI 자동 수정' 섹션 첫 의미 있는 문단."""
+    if not pr_body:
+        return None
+    # 코드블록 제거
+    body = re.sub(r"```[\s\S]*?```", "", pr_body)
+    # 마크다운 헤더/구분선 이후 첫 단락 추출
+    lines = [ln.strip() for ln in body.split("\n") if ln.strip()]
+    skip_prefixes = ("##", "#", "---", "*maesil-agency", "PR제목", "커밋메시지", "함수명", "신뢰도")
+    for ln in lines:
+        if not any(ln.startswith(p) for p in skip_prefixes) and len(ln) > 15:
+            return ln[:200]
+    return None
+
+
 def _save_lesson(
     repo: str,
     pr_title: str | None,
     pr_url: str | None,
     file_path: str | None,
     fn_name: str | None,
+    pr_body: str | None = None,
+    commit_msg: str | None = None,
+    test_result: str | None = None,
+    lesson_quality: str = "ok",
 ) -> None:
-    """PR 머지 완료 시 레슨 저장. 에러 패턴 + 수정 이력을 dev_lessons_learned에 축적."""
+    """PR 머지 완료 시 레슨 저장.
+    에러 패턴 + 실제 수정 내용 + 원인 + 품질을 dev_lessons_learned에 축적.
+
+    필드:
+      error_pattern  — PR 제목 (검색 키워드)
+      root_cause     — PR body에서 추출한 원인 요약
+      fix_summary    — PR 제목 기반 요약 (후방 호환)
+      actual_fix     — commit_msg (더 정확한 수정 설명)
+      test_result    — run_checks.py 결과 (PASS/FAIL/unknown)
+      lesson_quality — good | ok | bad
+    """
     if not pr_title:
         return
     try:
         files_changed = [file_path] if file_path else []
+        root_cause = _extract_root_cause_from_body(pr_body)
+        actual_fix = (commit_msg or pr_title)[:300]
         get_maesil_total_client().schema("agent_work").table("dev_lessons_learned").insert({
             "repo": repo,
             "error_type": fn_name,
             "error_pattern": pr_title,
+            "root_cause": root_cause,
             "fix_summary": pr_title,
+            "actual_fix": actual_fix,
             "files_changed": files_changed,
             "pr_url": pr_url,
             "pr_title": pr_title,
+            "test_result": test_result or "unknown",
+            "lesson_quality": lesson_quality,
         }).execute()
-        logger.info("dev_lesson 저장 [%s] fn=%s: %s", repo, fn_name, pr_title[:60])
+        logger.info("dev_lesson 저장 [%s] fn=%s quality=%s: %s",
+                    repo, fn_name, lesson_quality, pr_title[:60])
     except Exception as e:
         logger.warning("dev_lesson 저장 실패 [%s]: %s", repo, e)
 
@@ -109,8 +262,10 @@ def _load_lessons(repo: str, failing_symbol: str | None, limit: int = 3) -> list
         client = get_maesil_total_client()
         q = (
             client.schema("agent_work").table("dev_lessons_learned")
-            .select("error_type, error_pattern, fix_summary, files_changed, pr_url, pr_title, created_at")
+            .select("error_type, error_pattern, root_cause, fix_summary, actual_fix, "
+                    "files_changed, pr_url, pr_title, test_result, lesson_quality, created_at")
             .eq("repo", repo)
+            .neq("lesson_quality", "bad")   # 실패 레슨은 별도로만 조회
             .order("created_at", desc=True)
         )
         if failing_symbol:
@@ -138,21 +293,35 @@ def _load_lessons(repo: str, failing_symbol: str | None, limit: int = 3) -> list
 
 
 def _build_lessons_context(lessons: list[dict]) -> str:
-    """레슨 목록을 프롬프트 삽입용 텍스트로 변환."""
+    """레슨 목록을 프롬프트 삽입용 텍스트로 변환.
+
+    lesson_quality:
+      good → ✅ (신뢰할 수 있는 레슨, 적극 참고)
+      ok   → (일반 레슨)
+      bad  → ⚠️ (실패한 시도 — 반면교사)
+    """
     if not lessons:
         return ""
     lines = ["## 📚 과거 유사 수정 이력 (참고)"]
     for i, l in enumerate(lessons, 1):
         pr_ref = f"[PR]({l.get('pr_url')})" if l.get("pr_url") else ""
         created = (l.get("created_at") or "")[:10]
-        files = ", ".join(l.get("files_changed") or [])
-        lines.append(
-            f"{i}. **{l.get('error_pattern', '?')}** {pr_ref}\n"
-            f"   수정: {l.get('fix_summary', '?')} | 파일: {files or '?'} | {created}"
-        )
+        files = ", ".join((l.get("files_changed") or [])[:3])  # 최대 3개 파일만
+        quality = l.get("lesson_quality") or "ok"
+        badge = "✅" if quality == "good" else ("⚠️ [실패 시도]" if quality == "bad" else "")
+        root_cause = l.get("root_cause") or ""
+        actual_fix = l.get("actual_fix") or l.get("fix_summary") or "?"
+
+        entry = f"{i}. {badge}**{l.get('error_pattern', '?')}** {pr_ref} ({created})"
+        if root_cause:
+            entry += f"\n   원인: {root_cause[:120]}"
+        entry += f"\n   수정: {actual_fix[:120]} | 파일: {files or '?'}"
+        lines.append(entry)
+
     lines.append(
         "\n**활용 원칙**: 동일/유사 패턴이면 과거 fix를 참고해 빠르게 수정안 생성. "
-        "단, 현재 코드를 반드시 먼저 확인하고 이미 반영됐다면 '이미 수정됨'으로 처리."
+        "단, 현재 코드를 반드시 먼저 확인하고 이미 반영됐다면 '이미 수정됨'으로 처리. "
+        "⚠️[실패 시도] 는 이 방법이 효과가 없었다는 의미이므로 같은 방법을 쓰지 마세요."
     )
     return "\n".join(lines)
 
@@ -222,8 +391,14 @@ def _auto_ack_alerts_for_pr(repo: str, pr_number: int, pr_title: str | None,
         return 0
 
 
-def _mark_pr_merged(repo: str, pr_number: int, pr_url: str | None = None,
-                    pr_title: str | None = None) -> None:
+def _mark_pr_merged(
+    repo: str,
+    pr_number: int,
+    pr_url: str | None = None,
+    pr_title: str | None = None,
+    pr_body: str | None = None,
+    commit_msg: str | None = None,
+) -> None:
     """PR 머지 완료를 DB 에 마킹 + 관련 미확인 알림 자동 확인 처리.
     UPDATE 가 0행 매칭일 수 있으므로 (행 자체가 없는 경우) UPSERT 로 처리."""
     payload = {
@@ -289,7 +464,11 @@ def _mark_pr_merged(repo: str, pr_number: int, pr_url: str | None = None,
             logger.info("PR #%d 머지 → 관련 알림 %d개 자동 확인 처리", pr_number, acked)
 
         # 4) 레슨 저장 — 다음 유사 에러 분석 시 컨텍스트로 활용
-        _save_lesson(repo, pr_title, pr_url, file_path, fn_name)
+        _save_lesson(
+            repo, pr_title, pr_url, file_path, fn_name,
+            pr_body=pr_body, commit_msg=commit_msg,
+            test_result="unknown", lesson_quality="ok",
+        )
 
     except Exception as e:
         logger.exception("dev_pr_history merged 마킹 실패: %s", e)
@@ -1618,7 +1797,7 @@ PR제목: <간단한 제목>
             action_id = str(uuid.uuid4())[:8]
             branch_name = f"fix/agency-{action_id}"
 
-            _pending[conversation_id] = {
+            _set_pending(conversation_id, {
                 "action_id": action_id,
                 "repo": file_info["repo"],
                 "branch": branch_name,
@@ -1633,7 +1812,7 @@ PR제목: <간단한 제목>
                 "pr_body": f"## AI 자동 수정\n\n{response[:1000]}\n\n---\n*maesil-agency 자동 생성*",
                 "confidence": fix_confidence,
                 "created_at": datetime.now(timezone.utc).isoformat(),
-            }
+            })
 
             # 신뢰도별 안내 메시지
             if fix_confidence == "high":
@@ -1739,7 +1918,7 @@ def _smart_patch(original: str, patch_code: str, fn_name: str | None) -> str:
 
 def execute_pending(conversation_id: str) -> str:
     """pending action 실행 → PR 생성."""
-    action = _pending.get(conversation_id)
+    action = _get_pending(conversation_id)
     if not action:
         return "⚠️ 대기 중인 수정안이 없습니다. 먼저 수정 요청을 해주세요."
 
@@ -1783,15 +1962,17 @@ def execute_pending(conversation_id: str) -> str:
             base=base,
         )
 
-        # 완료 후 삭제 + 머지용 정보 보관 (in-memory + DB 영속)
-        del _pending[conversation_id]
-        _recent_pr[conversation_id] = {
+        # 완료 후 삭제 + 머지용 정보 보관 (DB 영속)
+        _del_pending(conversation_id)
+        _set_recent_pr(conversation_id, {
             "repo": repo,
             "pr_number": pr["number"],
             "pr_url": pr["html_url"],
             "pr_title": action["pr_title"],
+            "pr_body": action.get("pr_body", ""),    # 머지 시 레슨 저장에 활용
+            "commit_msg": action.get("commit_msg"),  # actual_fix 필드에 저장
             "created_at": datetime.now(timezone.utc).isoformat(),
-        }
+        })
         _save_pr_history(
             conversation_id=conversation_id,
             repo=repo,
@@ -1949,9 +2130,9 @@ def merge_pending_pr(
     if ref:
         repo, pr_number = ref
 
-    # 2) 없으면 _recent_pr fallback
+    # 2) 없으면 _recent_pr fallback (DB 조회)
     if not repo:
-        info = _recent_pr.get(conversation_id)
+        info = _get_recent_pr(conversation_id)
         if info:
             repo = info["repo"]
             pr_number = info["pr_number"]
@@ -1972,8 +2153,8 @@ def merge_pending_pr(
                     "- 같은 대화에서 `승인` 으로 PR 만든 직후 `머지`"
                 )
 
-    # PR URL — _recent_pr 또는 dev_pr_history 에서 조회
-    info_local = _recent_pr.get(conversation_id) or {}
+    # PR URL — recent_pr DB 또는 dev_pr_history 에서 조회
+    info_local = _get_recent_pr(conversation_id) or {}
     pr_url = info_local.get("pr_url")
     pr_title = info_local.get("pr_title")
     if not pr_url:
@@ -1992,9 +2173,13 @@ def merge_pending_pr(
             commit_title=pr_title,
         )
         if result.get("merged"):
-            # 머지 성공 — 추적 해제 (있었다면) + DB history 도 업데이트
-            _recent_pr.pop(conversation_id, None)
-            _mark_pr_merged(repo, pr_number, pr_url=pr_url, pr_title=pr_title)
+            # 머지 성공 — 추적 해제 + DB history 업데이트 + 레슨 저장
+            _del_recent_pr(conversation_id)
+            _mark_pr_merged(
+                repo, pr_number, pr_url=pr_url, pr_title=pr_title,
+                pr_body=info_local.get("pr_body"),
+                commit_msg=info_local.get("commit_msg"),
+            )
             return (
                 f"✅ **PR #{pr_number} 머지 완료** (`{repo}`)\n\n"
                 f"🔗 {pr_url}\n"
@@ -2015,7 +2200,7 @@ def preview_pending(conversation_id: str) -> str:
     """대기 중인 수정안의 실제 diff를 출력. 커밋 전 검토용."""
     import difflib
 
-    action = _pending.get(conversation_id)
+    action = _get_pending(conversation_id)
     if not action:
         return "⚠️ 대기 중인 수정안이 없습니다."
 
@@ -2062,8 +2247,8 @@ def preview_pending(conversation_id: str) -> str:
 
 
 def cancel_pending(conversation_id: str) -> str:
-    if conversation_id in _pending:
-        del _pending[conversation_id]
+    if _get_pending(conversation_id):
+        _del_pending(conversation_id)
         return "🚫 수정안을 취소했습니다."
     return "취소할 대기 중인 수정안이 없습니다."
 

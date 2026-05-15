@@ -113,8 +113,11 @@ def _load_l2_scripts(program: str = "maesil-insight") -> list[dict]:
             get_maesil_total_client()
             .schema("agent_work")
             .table("maeyo_l2_scripts")
-            .select("id,triggers,keywords,emotion,message,action,hint,tts_key,is_verified")
+            .select("id,triggers,keywords,emotion,message,action,hint,tts_key,is_verified,status")
             .eq("is_active", True)
+            # P1 보강: status='active'만 로딩 (draft는 관리자 검토 전 — L2 매칭 제외)
+            # 하위 호환: status 컬럼 없는 구 레코드는 NULL → neq('draft')로 포함
+            .or_("status.eq.active,status.is.null")
             .in_("program", [program, "common"])
             .order("sort_order")
             .execute()
