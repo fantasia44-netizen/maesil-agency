@@ -79,5 +79,5 @@ if failures:
     for f in failures:
         print(f"  - {f}")
     sys.exit(1)
-print("ALL CLEAR — 배포 가능 상태")
+print("ALL CLEAR - 배포 가능 상태")
 sys.exit(0)
