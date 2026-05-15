@@ -215,6 +215,7 @@ def analyze_error(
 
     # ── 코드 컨텍스트 붙이기 ──────────────────────────────────────
     code_section = ""
+    github_repo: str | None = None
     try:
         github_repo = _get_github_repo(program_name)
         if github_repo:
@@ -231,6 +232,22 @@ def analyze_error(
     except Exception as e:
         logger.warning("dev_agent: 코드 컨텍스트 수집 실패 [%s]: %s", program_name, e)
 
+    # ── 과거 레슨 컨텍스트 (학습 루프) ──────────────────────────────
+    lessons_section = ""
+    if github_repo:
+        try:
+            from app.services.dev_chat_agent import _load_lessons, _build_lessons_context
+            # 에러 타이틀에서 심볼 추출 시도 (NameError, fn명 등)
+            _sym_m = re.search(r"name\s+['\"]([a-zA-Z_]\w+)['\"]\s+is\s+not\s+defined", title + " " + message, re.I)
+            _sym_m = _sym_m or re.search(r"'([A-Za-z_]\w+(?:\.[A-Za-z_]\w+)?)'\s+(?:object|method|attribute)", title + " " + message, re.I)
+            _failing_sym = _sym_m.group(1) if _sym_m else None
+            _lessons = _load_lessons(github_repo, _failing_sym)
+            if _lessons:
+                lessons_section = "\n\n" + _build_lessons_context(_lessons)
+                logger.info("dev_agent: 레슨 컨텍스트 주입 [%s] %d건", github_repo, len(_lessons))
+        except Exception as e:
+            logger.warning("dev_agent: 레슨 컨텍스트 수집 실패: %s", e)
+
     try:
         import anthropic
 
@@ -241,7 +258,7 @@ def analyze_error(
             title=title[:200],
             source=source,
             message=(message or "")[:3000],
-            code_section=code_section,
+            code_section=code_section + lessons_section,
         )
 
         resp = client.messages.create(

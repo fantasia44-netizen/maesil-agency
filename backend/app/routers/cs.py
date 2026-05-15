@@ -641,3 +641,80 @@ def gap_analysis(
         for m in user_msgs
     ]
     return {"questions": result, "total": len(result)}
+
+
+# ─────────────────────────────────────────────────────────────────
+# CS → Dev 에스컬레이션 (에이전시 간 실시간 연결)
+# ─────────────────────────────────────────────────────────────────
+
+class EscalateRequest(BaseModel):
+    program: str
+    question: str
+    conversation_id: str | None = None
+
+
+@router.post("/dev-escalate")
+def cs_dev_escalate(
+    body: EscalateRequest,
+    user: UserContext = Depends(get_current_user),
+) -> dict:
+    """CS 에이전트가 답할 수 없는 질문을 개발 에이전트에 즉시 전달.
+
+    - maeyo_unanswered_log에 큐 적재 (비동기 폴러 경로)
+    - explain_feature를 즉시 호출해 feature_docs 생성 후 반환
+    - 성공 시 다음 CS 쿼리에서 L2.5로 즉시 활용 가능
+    """
+    if not user.is_super_admin:
+        raise HTTPException(403, "관리자 전용")
+
+    from app.services.feature_kb import _generate_feature_doc, _log_table
+    from app.services.feature_kb import log_unanswered
+
+    # 1) unanswered_log 적재 (비동기 폴러 백업 경로)
+    log_unanswered(body.program, body.question, "", body.conversation_id)
+
+    # 2) 즉시 explain_feature 호출 (동기 처리 — 약 2~5초)
+    try:
+        doc_id = _generate_feature_doc(
+            program=body.program,
+            question=body.question,
+            l3_hint="",
+        )
+        if doc_id:
+            # unanswered_log processed_at 업데이트
+            try:
+                _log_table().update({
+                    "processed_at": datetime.now(timezone.utc).isoformat(),
+                    "feature_doc_id": doc_id,
+                }).eq("program", body.program).eq("message", body.question[:500]).is_(
+                    "processed_at", "null"
+                ).execute()
+            except Exception:
+                pass
+
+            # feature_docs 조회
+            doc = (
+                get_maesil_total_client()
+                .schema("agent_work")
+                .table("maeyo_feature_docs")
+                .select("keywords, answer, code_refs")
+                .eq("id", doc_id)
+                .limit(1)
+                .execute()
+                .data or []
+            )
+            doc_data = doc[0] if doc else {}
+            return {
+                "status": "answered",
+                "doc_id": doc_id,
+                "answer": doc_data.get("answer", ""),
+                "keywords": doc_data.get("keywords", []),
+                "code_refs": doc_data.get("code_refs", []),
+            }
+        else:
+            return {"status": "queued", "doc_id": None,
+                    "message": "즉시 답변 생성 실패 — 큐에 적재됨 (3분 내 처리)"}
+    except Exception as e:
+        logger.warning("cs_dev_escalate explain_feature 실패: %s", e)
+        return {"status": "queued", "doc_id": None,
+                "message": f"에러로 큐 적재 완료 — {str(e)[:100]}"}

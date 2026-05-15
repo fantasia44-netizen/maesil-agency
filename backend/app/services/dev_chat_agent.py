@@ -73,6 +73,90 @@ def _save_pr_history(
         logger.warning("dev_pr_history 저장 실패: %s", e)
 
 
+# ─────────────────────────────────────────────────────────────────
+# dev_lessons_learned — dev 에이전시 학습 루프
+# ─────────────────────────────────────────────────────────────────
+
+def _save_lesson(
+    repo: str,
+    pr_title: str | None,
+    pr_url: str | None,
+    file_path: str | None,
+    fn_name: str | None,
+) -> None:
+    """PR 머지 완료 시 레슨 저장. 에러 패턴 + 수정 이력을 dev_lessons_learned에 축적."""
+    if not pr_title:
+        return
+    try:
+        files_changed = [file_path] if file_path else []
+        get_maesil_total_client().schema("agent_work").table("dev_lessons_learned").insert({
+            "repo": repo,
+            "error_type": fn_name,
+            "error_pattern": pr_title,
+            "fix_summary": pr_title,
+            "files_changed": files_changed,
+            "pr_url": pr_url,
+            "pr_title": pr_title,
+        }).execute()
+        logger.info("dev_lesson 저장 [%s] fn=%s: %s", repo, fn_name, pr_title[:60])
+    except Exception as e:
+        logger.warning("dev_lesson 저장 실패 [%s]: %s", repo, e)
+
+
+def _load_lessons(repo: str, failing_symbol: str | None, limit: int = 3) -> list[dict]:
+    """과거 레슨 조회. repo + error_type(심볼) 기반. 최근 순 최대 limit개."""
+    try:
+        client = get_maesil_total_client()
+        q = (
+            client.schema("agent_work").table("dev_lessons_learned")
+            .select("error_type, error_pattern, fix_summary, files_changed, pr_url, pr_title, created_at")
+            .eq("repo", repo)
+            .order("created_at", desc=True)
+        )
+        if failing_symbol:
+            # error_type 직접 매칭 or error_pattern에 심볼 포함
+            resp_exact = q.eq("error_type", failing_symbol).limit(limit).execute()
+            rows = resp_exact.data or []
+            if not rows:
+                # 패턴 검색 fallback
+                resp_fuzzy = (
+                    client.schema("agent_work").table("dev_lessons_learned")
+                    .select("error_type, error_pattern, fix_summary, files_changed, pr_url, pr_title, created_at")
+                    .eq("repo", repo)
+                    .ilike("error_pattern", f"%{failing_symbol[:40]}%")
+                    .order("created_at", desc=True)
+                    .limit(limit)
+                    .execute()
+                )
+                rows = resp_fuzzy.data or []
+        else:
+            rows = q.limit(limit).execute().data or []
+        return rows
+    except Exception as e:
+        logger.warning("dev_lessons_learned 조회 실패 [%s]: %s", repo, e)
+        return []
+
+
+def _build_lessons_context(lessons: list[dict]) -> str:
+    """레슨 목록을 프롬프트 삽입용 텍스트로 변환."""
+    if not lessons:
+        return ""
+    lines = ["## 📚 과거 유사 수정 이력 (참고)"]
+    for i, l in enumerate(lessons, 1):
+        pr_ref = f"[PR]({l.get('pr_url')})" if l.get("pr_url") else ""
+        created = (l.get("created_at") or "")[:10]
+        files = ", ".join(l.get("files_changed") or [])
+        lines.append(
+            f"{i}. **{l.get('error_pattern', '?')}** {pr_ref}\n"
+            f"   수정: {l.get('fix_summary', '?')} | 파일: {files or '?'} | {created}"
+        )
+    lines.append(
+        "\n**활용 원칙**: 동일/유사 패턴이면 과거 fix를 참고해 빠르게 수정안 생성. "
+        "단, 현재 코드를 반드시 먼저 확인하고 이미 반영됐다면 '이미 수정됨'으로 처리."
+    )
+    return "\n".join(lines)
+
+
 def _auto_ack_alerts_for_pr(repo: str, pr_number: int, pr_title: str | None,
                              file_path: str | None) -> int:
     """PR 머지 시 관련 미확인 알림 자동 확인 처리.
@@ -182,25 +266,30 @@ def _mark_pr_merged(repo: str, pr_number: int, pr_url: str | None = None,
             logger.info("_mark_pr_merged UPSERT fallback %s#%d: %s",
                         repo, pr_number, ins.data)
 
-        # 3) 관련 미확인 알림 자동 ack
-        # file_path 는 dev_pr_history 에서 조회
+        # 3) 관련 미확인 알림 자동 ack + 레슨 저장
+        # file_path, fn_name 는 dev_pr_history 에서 조회
         file_path: str | None = None
+        fn_name: str | None = None
         try:
             hist = (
                 get_maesil_total_client()
                 .schema("agent_work").table("dev_pr_history")
-                .select("file_path").eq("repo", repo).eq("pr_number", pr_number)
+                .select("file_path, fn_name").eq("repo", repo).eq("pr_number", pr_number)
                 .limit(1).execute()
             )
             rows = hist.data or []
             if rows:
                 file_path = rows[0].get("file_path")
+                fn_name = rows[0].get("fn_name")
         except Exception:
             pass
 
         acked = _auto_ack_alerts_for_pr(repo, pr_number, pr_title, file_path)
         if acked:
             logger.info("PR #%d 머지 → 관련 알림 %d개 자동 확인 처리", pr_number, acked)
+
+        # 4) 레슨 저장 — 다음 유사 에러 분석 시 컨텍스트로 활용
+        _save_lesson(repo, pr_title, pr_url, file_path, fn_name)
 
     except Exception as e:
         logger.exception("dev_pr_history merged 마킹 실패: %s", e)
@@ -1461,12 +1550,21 @@ PR제목: <간단한 제목>
     failing_hint = f"\n실패 함수/클래스: `{failing_symbol}` — 이 심볼을 중심으로 분석하세요." if failing_symbol else ""
     read_file_hint = f"\n읽은 파일: `{file_info['path']}`" if file_info else ""
 
+    # ── 과거 레슨 컨텍스트 (학습 루프) ──────────────────────────────
+    lessons_context = ""
+    if program and program.get("github_repo") and (failing_symbol or file_info):
+        _repo_for_lessons = program["github_repo"]
+        _lessons = _load_lessons(_repo_for_lessons, failing_symbol)
+        if _lessons:
+            lessons_context = "\n\n" + _build_lessons_context(_lessons)
+            logger.info("dev_lesson 컨텍스트 주입 [%s] %d건", _repo_for_lessons, len(_lessons))
+
     user_prompt = f"""요청: {user_message}
 
 프로그램: {program['name'] if program else '미특정'}
 레포: {program.get('github_repo', '미등록') if program else '미등록'}{read_file_hint}{failing_hint}
 {history}
-{code_context}
+{code_context}{lessons_context}
 
 위 정보를 바탕으로 응답해주세요. 구체적인 에러나 수정 요청이 있으면 분석하고, 없으면 짧게 맞이해주세요."""
 
