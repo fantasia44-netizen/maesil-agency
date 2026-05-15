@@ -3,18 +3,26 @@ sales_knowledge — 영업/매출 에이전시 학습 DB (sales_insights)
 
 흐름:
   1. SalesAgent 실행 전: load_insights()로 과거 인사이트 조회 → 시스템 프롬프트 주입
-  2. SalesAgent 분석 완료 후: save_insight()로 핵심 인사이트 저장
+  2. SalesAgent 실행 전: get_cached_insight()로 당일 캐시 히트 확인 → LLM 호출 스킵
+  3. SalesAgent 분석 완료 후: save_insight()로 핵심 인사이트 저장
      → 다음 동일 운영자 분석 시 과거 패턴 컨텍스트로 활용
+
+캐시 정책:
+  - general/channel_trend 등 일반 분석: 당일 동일 operator+type 이면 캐시 반환 (30분 TTL)
+  - 갱신이 필요한 경우: force_refresh=True 로 강제 재실행
 """
 from __future__ import annotations
 
 import logging
 import re
-from datetime import date
+from datetime import date, datetime, timezone, timedelta
 
 from app.db.maesil_total_client import get_maesil_total_client
 
 logger = logging.getLogger(__name__)
+
+# 캐시 TTL (초) — 같은 operator+type 분석을 이 시간 내 재실행하지 않음
+_CACHE_TTL_SECONDS = 1800  # 30분
 
 
 def _table():
@@ -36,6 +44,45 @@ def load_insights(operator_id: str, limit: int = 5) -> list[dict]:
     except Exception as e:
         logger.warning("sales_insights 조회 실패 [%s]: %s", operator_id, e)
         return []
+
+
+def get_cached_insight(
+    operator_id: str,
+    insight_type: str = "general",
+    ttl_seconds: int = _CACHE_TTL_SECONDS,
+) -> dict | None:
+    """TTL 이내 동일 operator+type 인사이트가 있으면 반환 (캐시 히트).
+
+    반환값이 None이 아니면 → LLM 호출 스킵, 캐시 사용.
+    반환값이 None이면 → 캐시 미스, 새로 분석 필요.
+    """
+    try:
+        cutoff = (datetime.now(timezone.utc) - timedelta(seconds=ttl_seconds)).isoformat()
+        rows = (
+            _table()
+            .select("summary, data_snapshot, updated_at, period_label")
+            .eq("operator_id", operator_id)
+            .eq("insight_type", insight_type)
+            .gte("updated_at", cutoff)
+            .order("updated_at", desc=True)
+            .limit(1)
+            .execute()
+            .data or []
+        )
+        if rows:
+            hit = rows[0]
+            age_s = (
+                datetime.now(timezone.utc)
+                - datetime.fromisoformat(hit["updated_at"].replace("Z", "+00:00"))
+            ).total_seconds()
+            logger.info(
+                "sales_insights 캐시 히트 [%s/%s] age=%.0fs",
+                operator_id, insight_type, age_s,
+            )
+            return hit
+    except Exception as e:
+        logger.warning("get_cached_insight 실패 [%s]: %s", operator_id, e)
+    return None
 
 
 def build_context(insights: list[dict]) -> str:

@@ -373,7 +373,119 @@ def message_correction(
         "corrected_at": _now(),
         "feedback": "bad",  # 수정됐다는 건 기존 답변이 틀렸다는 의미
     }).eq("id", message_id).execute()
-    return {"ok": True, "message_id": message_id}
+
+    # ── Self-evolving loop: correction → L2 script 자동 등록 ──
+    script_id = _auto_promote_correction(message_id, req.correction, user.id)
+
+    return {"ok": True, "message_id": message_id,
+            "auto_l2_script_id": script_id}  # None이면 등록 실패(무시)
+
+
+def _auto_promote_correction(
+    message_id: str,
+    corrected_answer: str,
+    corrected_by: str,
+) -> str | None:
+    """관리자 correction → maeyo_l2_scripts 자동 등록 (is_verified=True).
+
+    흐름:
+      1. 수정된 메시지 조회 → conversation_id, emotion, created_at
+      2. 대화 조회 → program
+      3. 이 응답 직전 유저 질문 조회 → trigger
+      4. L2 script UPSERT (LEARN_ prefix, is_verified=True)
+      5. L2 캐시 무효화
+    """
+    try:
+        db = _db()
+
+        # 1) 수정 대상 메시지 정보
+        msg_rows = (
+            db.table("maeyo_messages")
+            .select("conversation_id, emotion, created_at")
+            .eq("id", message_id)
+            .limit(1)
+            .execute()
+            .data or []
+        )
+        if not msg_rows:
+            return None
+        msg = msg_rows[0]
+        conv_id = msg["conversation_id"]
+        emotion = msg.get("emotion") or "thinking"
+        msg_created = msg.get("created_at") or ""
+
+        # 2) 대화에서 program 조회
+        conv_rows = (
+            db.table("maeyo_conversations")
+            .select("program")
+            .eq("id", conv_id)
+            .limit(1)
+            .execute()
+            .data or []
+        )
+        program = (conv_rows[0].get("program") if conv_rows else None) or "maesil-insight"
+
+        # 3) 이 응답 바로 직전 유저 메시지 → trigger
+        user_rows = (
+            db.table("maeyo_messages")
+            .select("content")
+            .eq("conversation_id", conv_id)
+            .eq("role", "user")
+            .lt("created_at", msg_created)
+            .order("created_at", desc=True)
+            .limit(1)
+            .execute()
+            .data or []
+        )
+        if not user_rows:
+            return None
+        user_question = user_rows[0].get("content", "")[:200].strip()
+        if not user_question:
+            return None
+
+        # 4) 자동 키워드 추출 (명사/동사 2~4개)
+        import re as _re
+        raw_tokens = _re.findall(r"[가-힣a-zA-Z]{2,}", user_question)
+        _STOPWORDS = {"어떻게", "무엇", "어디서", "왜요", "있나요", "이유", "방법", "어디"}
+        keywords = [t for t in raw_tokens if t not in _STOPWORDS][:4]
+
+        # 5) L2 script ID — 동일 질문 재등록 방지 (hash 기반)
+        import hashlib as _hl
+        key_src = f"{program}:{user_question[:80]}"
+        script_id = "LEARN_" + _hl.sha256(key_src.encode()).hexdigest()[:8].upper()
+
+        now = _now()
+        _db().table("maeyo_l2_scripts").upsert(
+            {
+                "id": script_id,
+                "program": program,
+                "triggers": [user_question],
+                "keywords": keywords,
+                "emotion": emotion,
+                "message": corrected_answer,
+                "action": None,
+                "hint": None,
+                "is_active": True,
+                "is_verified": True,   # 관리자 검증 완료
+                "sort_order": 0,        # 최우선 매칭
+                "updated_at": now,
+            },
+            on_conflict="id",
+        ).execute()
+
+        # 6) L2 캐시 무효화 → 다음 CS 쿼리에서 즉시 반영
+        from app.services.maeyo_engine import invalidate_l2_cache
+        invalidate_l2_cache()
+
+        logger.info(
+            "correction → L2 auto-promoted [%s] id=%s trigger='%s...'",
+            program, script_id, user_question[:40],
+        )
+        return script_id
+
+    except Exception as e:
+        logger.warning("_auto_promote_correction 실패 [msg=%s]: %s", message_id, e)
+        return None
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -653,6 +765,84 @@ class EscalateRequest(BaseModel):
     conversation_id: str | None = None
 
 
+def _build_handoff_context(
+    program: str,
+    question: str,
+    conversation_id: str | None,
+) -> str:
+    """Intelligent Handoff: 대화 맥락 + 감정 신호를 담은 풍부한 컨텍스트 생성.
+
+    dev_agent에게 넘길 때 단순 질문 대신 3-layer 컨텍스트를 전달:
+      - 고객이 실제로 물어본 것 (raw question)
+      - 대화 흐름 요약 (이전 시도들, CS 답변 품질)
+      - 감정 신호 (반복 질문 여부, 부정 키워드 감지)
+    """
+    context_lines = [f"[고객 질문]\n{question}"]
+
+    if not conversation_id:
+        return question  # 대화 컨텍스트 없으면 원본 그대로
+
+    try:
+        # 최근 8개 메시지 (유저+어시스턴트) 로드
+        msgs = (
+            _db().table("maeyo_messages")
+            .select("role, content, emotion, layer, created_at")
+            .eq("conversation_id", conversation_id)
+            .order("created_at", desc=True)
+            .limit(8)
+            .execute()
+            .data or []
+        )
+        msgs = list(reversed(msgs))  # 시간순 정렬
+
+        if not msgs:
+            return question
+
+        # ── 대화 흐름 요약 ──────────────────────────────────────────
+        flow_lines = []
+        for m in msgs:
+            role_label = "유저" if m["role"] == "user" else f"매요({m.get('emotion','?')}·{m.get('layer','?')})"
+            content = (m.get("content") or "")[:120]
+            flow_lines.append(f"  {role_label}: {content}")
+        context_lines.append("\n[대화 흐름]\n" + "\n".join(flow_lines))
+
+        # ── 감정 신호 분석 ──────────────────────────────────────────
+        import re as _re
+        _NEG = _re.compile(r"안\s*돼|안\s*되|이상해|모르겠|왜|또|다시|계속|해결|안\s*나와")
+        user_msgs = [m for m in msgs if m["role"] == "user"]
+        neg_count = sum(1 for m in user_msgs if _NEG.search(m.get("content", "")))
+        repeat_count = sum(1 for m in user_msgs)
+
+        signals = []
+        if repeat_count >= 3:
+            signals.append(f"동일 주제 {repeat_count}회 반복 질문 (이탈 위험)")
+        if neg_count >= 1:
+            signals.append("부정적 표현 감지 (불만족 신호)")
+
+        # L3 응답이 많으면 → CS가 계속 모른다는 신호
+        l3_count = sum(1 for m in msgs if m.get("layer") == "l3")
+        if l3_count >= 2:
+            signals.append(f"L3 응답 {l3_count}회 → L2 스크립트 없는 영역")
+
+        if signals:
+            context_lines.append("\n[감정/품질 신호]\n" + "\n".join(f"  • {s}" for s in signals))
+
+        # ── 에스컬레이션 지시 ───────────────────────────────────────
+        context_lines.append(
+            f"\n[개발팀 요청]\n"
+            f"  프로그램: {program}\n"
+            f"  위 고객 질문에 대해 {program} 코드/기능을 분석하여 "
+            f"CS 에이전트가 바로 쓸 수 있는 정확한 답변을 만들어주세요.\n"
+            f"  기술 용어 없이 2~3문장, 마크다운·이모지 금지."
+        )
+
+        return "\n".join(context_lines)
+
+    except Exception as e:
+        logger.warning("_build_handoff_context 실패: %s", e)
+        return question  # 에러 시 원본 질문 fallback
+
+
 @router.post("/dev-escalate")
 def cs_dev_escalate(
     body: EscalateRequest,
@@ -660,9 +850,11 @@ def cs_dev_escalate(
 ) -> dict:
     """CS 에이전트가 답할 수 없는 질문을 개발 에이전트에 즉시 전달.
 
-    - maeyo_unanswered_log에 큐 적재 (비동기 폴러 경로)
-    - explain_feature를 즉시 호출해 feature_docs 생성 후 반환
-    - 성공 시 다음 CS 쿼리에서 L2.5로 즉시 활용 가능
+    Intelligent Handoff:
+    - 단순 질문이 아닌 대화 맥락 + 감정 신호 포함 컨텍스트 전달
+    - maeyo_unanswered_log에 큐 적재 (비동기 폴러 백업)
+    - explain_feature 즉시 호출 → feature_docs 생성 후 반환
+    - 성공 시 다음 CS 쿼리에서 L2.5로 즉시 활용
     """
     if not user.is_super_admin:
         raise HTTPException(403, "관리자 전용")
@@ -670,14 +862,23 @@ def cs_dev_escalate(
     from app.services.feature_kb import _generate_feature_doc, _log_table
     from app.services.feature_kb import log_unanswered
 
-    # 1) unanswered_log 적재 (비동기 폴러 백업 경로)
+    # ── Intelligent Handoff 컨텍스트 구성 ─────────────────────────
+    enriched_question = _build_handoff_context(
+        body.program, body.question, body.conversation_id
+    )
+    logger.info(
+        "cs_dev_escalate: handoff context %d chars (raw %d) conv=%s",
+        len(enriched_question), len(body.question), body.conversation_id,
+    )
+
+    # 1) unanswered_log 적재 (비동기 폴러 백업 경로) — 원본 질문 저장
     log_unanswered(body.program, body.question, "", body.conversation_id)
 
-    # 2) 즉시 explain_feature 호출 (동기 처리 — 약 2~5초)
+    # 2) 즉시 explain_feature 호출 — 풍부한 컨텍스트 전달 (동기, ~2~5초)
     try:
         doc_id = _generate_feature_doc(
             program=body.program,
-            question=body.question,
+            question=enriched_question,   # 풍부한 컨텍스트 전달
             l3_hint="",
         )
         if doc_id:
@@ -710,6 +911,7 @@ def cs_dev_escalate(
                 "answer": doc_data.get("answer", ""),
                 "keywords": doc_data.get("keywords", []),
                 "code_refs": doc_data.get("code_refs", []),
+                "context_chars": len(enriched_question),  # handoff 컨텍스트 크기
             }
         else:
             return {"status": "queued", "doc_id": None,

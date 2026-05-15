@@ -55,15 +55,48 @@ class SalesAgent(BaseAgent):
         operator_id: str | None = None,
         context_messages: list[dict] | None = None,
     ) -> dict[str, Any]:
-        """베이스 run 확장 — 과거 인사이트 주입 + 결과 저장."""
+        """베이스 run 확장 — 캐시 체크 + 과거 인사이트 주입 + 결과 저장."""
+        from app.services.sales_knowledge import (
+            load_insights, build_context,
+            get_cached_insight, save_insight, extract_insight_type,
+        )
+
+        # 0) 캐시 체크 — TTL(30분) 이내 동일 분석이 있으면 LLM 스킵
+        # "새로", "갱신", "refresh", "다시", "최신" 키워드 → 강제 재실행
+        _FORCE_REFRESH = {"새로", "갱신", "refresh", "다시", "최신", "업데이트", "update"}
+        force_refresh = any(k in message for k in _FORCE_REFRESH)
+
+        if operator_id and not force_refresh:
+            try:
+                itype_hint = extract_insight_type(message)
+                cached = get_cached_insight(operator_id, itype_hint)
+                if cached:
+                    logger.info(
+                        "SalesAgent 캐시 히트 [%s/%s] — LLM 스킵",
+                        operator_id, itype_hint,
+                    )
+                    return {
+                        "run_id": run_id or "cache",
+                        "agent_type": self.agent_type,
+                        "message": (
+                            f"📊 **{cached.get('period_label', '최근')} 분석 (캐시)**\n\n"
+                            f"{cached['summary']}\n\n"
+                            f"_30분 이내 동일 분석이 있어 캐시를 반환했습니다. "
+                            f"최신 데이터가 필요하면 '새로 분석해줘'라고 입력하세요._"
+                        ),
+                        "status": "success",
+                        "cost_usd": 0.0,
+                        "cached": True,
+                    }
+            except Exception as e:
+                logger.warning("SalesAgent 캐시 체크 실패 (계속 진행): %s", e)
+
         # 1) 과거 인사이트 로드 → 시스템 프롬프트에 주입
         if operator_id:
             try:
-                from app.services.sales_knowledge import load_insights, build_context
                 past = load_insights(operator_id)
                 if past:
                     ctx = build_context(past)
-                    # get_system_prompt를 monkey-patch 방식으로 확장
                     _original = self.get_system_prompt
 
                     def _patched_prompt():
