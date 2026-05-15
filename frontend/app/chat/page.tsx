@@ -210,31 +210,34 @@ function downloadTargetCSV(keyword: string, targets: OutreachTarget[]) {
 
 /* ── 상수 ──────────────────────────────────────────────── */
 const AGENT_COLOR: Record<string, string> = {
-  sales:        "#16a34a",
+  growth:       "#16a34a",   // 통합 그로스 에이전트 (매출+영업+CS분석)
+  sales:        "#16a34a",   // legacy alias → growth
   finance:      "#2563eb",
   warehouse:    "#b45309",
   cs:           "#7c3aed",
-  outreach:     "#ea580c",
+  outreach:     "#ea580c",   // legacy alias → growth
   developer:    "#0891b2",
   orchestrator: "#475569",
 };
 
 const AGENT_EMOJI: Record<string, string> = {
-  sales:        "📈",
+  growth:       "📊",        // 통합 그로스 에이전트
+  sales:        "📈",        // legacy alias
   finance:      "💰",
   warehouse:    "📦",
   cs:           "💬",
-  outreach:     "🎯",
+  outreach:     "🎯",        // legacy alias
   developer:    "👨‍💻",
   orchestrator: "🤖",
 };
 
 const AGENT_DISPLAY_NAME: Record<string, string> = {
-  sales:     "세일즈 에이전트",
+  growth:    "그로스 에이전트",  // 통합: 매출·영업·CS인텔리전스·개선제안
+  sales:     "세일즈 에이전트",  // legacy alias
   finance:   "파이낸스 에이전트",
   warehouse: "웨어하우스 에이전트",
   cs:        "CS 에이전트",
-  outreach:  "영업 에이전트",
+  outreach:  "영업 에이전트",    // legacy alias
   developer: "개발 에이전트",
 };
 
@@ -278,16 +281,17 @@ function fmtTime(iso: string) {
 
 /* ── 에이전트별 플레이스홀더 ────────────────────────────── */
 const AGENT_PLACEHOLDER: Record<string, string> = {
-  sales:     "매출, 판매 현황, 베스트셀러, 채널별 실적 등을 물어보세요…",
+  growth:    "매출·채널 분석, 영업 타겟 발굴, CS 패턴 분석, 개선 제안 등을 물어보세요…",
+  sales:     "매출, 판매 현황, 베스트셀러, 채널별 실적 등을 물어보세요…",  // legacy alias
   finance:   "정산, 수익률, 비용, 재무 현황 등을 물어보세요…",
   warehouse: "재고 현황, 입출고, 품절 위험 상품 등을 물어보세요…",
   cs:        "고객 문의, 리뷰, CS 현황 등을 물어보세요…",
-  outreach:  "신규 파트너, 영업 기회, 광고 성과 등을 물어보세요…",
+  outreach:  "신규 파트너, 영업 기회, 광고 성과 등을 물어보세요…",  // legacy alias
   developer: "에러, 버그, 코드 수정, 배포, 로그 분석 등을 질문하세요…",
 };
 
 // force_agent 허용 목록 (백엔드 DIRECT_AGENTS와 동일하게 유지)
-const VALID_FORCE_AGENTS = new Set(["sales", "finance", "warehouse", "cs", "outreach", "developer"]);
+const VALID_FORCE_AGENTS = new Set(["growth", "sales", "finance", "warehouse", "cs", "outreach", "developer"]);
 
 /* ── 제안서 모달 컴포넌트 ───────────────────────────────── */
 const SECTION_LABELS: [keyof ProposalSections, string][] = [
@@ -511,7 +515,7 @@ function ChatPageInner() {
       .finally(() => setConvLoading(false));
   }
   useEffect(() => {
-    const isOutreach = forcedAgent === "outreach" || window.location.hash === "#snapshots";
+    const isOutreach = forcedAgent === "outreach" || forcedAgent === "growth" || window.location.hash === "#snapshots";
     // outreach 페이지: 대화 목록 로딩 완료 후 스냅샷 순차 로딩
     refreshConvList(isOutreach);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -647,7 +651,7 @@ function ChatPageInner() {
             id: convId + Date.now(), role: "agents", agents, ts: new Date(),
           }]);
           refreshConvList();
-          if (routedTo.includes("outreach") || forcedAgent === "outreach") loadSnapshots();
+          if (routedTo.includes("outreach") || routedTo.includes("growth") || forcedAgent === "outreach" || forcedAgent === "growth") loadSnapshots();
         }
         setLoading(false);
       } catch {
@@ -699,7 +703,7 @@ function ChatPageInner() {
         { id: resp.conversation_id + Date.now(), role: "agents", agents: resp.agents ?? [], ts: new Date() },
       ]);
       refreshConvList();
-      if (forcedAgent === "outreach" || resp.routed_to?.includes("outreach")) loadSnapshots();
+      if (forcedAgent === "outreach" || forcedAgent === "growth" || resp.routed_to?.includes("outreach") || resp.routed_to?.includes("growth")) loadSnapshots();
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       setMessages((p) => [...p, {
@@ -823,7 +827,7 @@ function ChatPageInner() {
         )}
 
         {/* ── 영업 에이전트 저장 자료 패널 ── */}
-        {(forcedAgent === "outreach" || snapshots.length > 0) && (() => {
+        {(forcedAgent === "outreach" || forcedAgent === "growth" || snapshots.length > 0) && (() => {
           const targets   = snapshots.filter(s => s.kind === "outreach_targets");
           const proposals = snapshots.filter(s => s.kind === "proposal_draft");
           const q         = snapshotSearch.toLowerCase();
