@@ -253,7 +253,8 @@ class GrowthAgent(BaseAgent):
         try:
             client = _get_anthropic_client()
             system  = self.get_system_prompt()
-            msgs    = _build_messages(context_messages, message)
+            # Growth 에이전트: 분석 컨텍스트가 무거우므로 max_turns=6으로 제한
+            msgs    = _build_messages(context_messages, message, max_turns=6)
             tools   = self.get_tools()
 
             input_tokens = output_tokens = 0

@@ -359,8 +359,17 @@ def _call_haiku(
         client = anthropic.Anthropic(api_key=api_key)
         system_prompt = _build_system_prompt(user_context, program, verified_examples)
 
-        # 최근 6개 메시지만 전달 (비용 절감 + 응답 속도)
-        messages = list((history or [])[-6:])
+        # 최근 _MAX_HISTORY_MSGS 개 메시지만 전달 (비용 절감 + 토큰 보호)
+        # 각 메시지 내용도 _MAX_HIST_MSG_CHARS 이내로 잘라냄
+        raw_history = list((history or [])[-_MAX_HISTORY_MSGS:])
+        messages = [
+            {
+                "role": m.get("role", "user"),
+                "content": _truncate_msg(str(m.get("content") or "").strip()),
+            }
+            for m in raw_history
+            if str(m.get("content") or "").strip()
+        ]
         messages.append({"role": "user", "content": message})
 
         resp = client.messages.create(
@@ -390,7 +399,17 @@ def _call_haiku(
 # ─────────────────────────────────────────────────────────────────
 # 메인 처리 함수
 # ─────────────────────────────────────────────────────────────────
-_MAX_TURNS = 12  # 유저 발화 기준 최대 대화 턴
+_MAX_TURNS = 12        # 유저 발화 기준 최대 대화 턴 (초과 시 새 대화 유도)
+_MAX_HISTORY_MSGS = 6  # L3 Haiku에 전달하는 최대 히스토리 메시지 수
+_MAX_HIST_MSG_CHARS = 1_000   # 히스토리 메시지 1개당 최대 글자 수
+_TRUNCATE_SUFFIX = "…[생략]"  # 잘린 메시지 접미사
+
+
+def _truncate_msg(text: str, max_chars: int = _MAX_HIST_MSG_CHARS) -> str:
+    """메시지 내용을 max_chars 이내로 자른다."""
+    if len(text) <= max_chars:
+        return text
+    return text[: max_chars - len(_TRUNCATE_SUFFIX)] + _TRUNCATE_SUFFIX
 
 
 def process_message(

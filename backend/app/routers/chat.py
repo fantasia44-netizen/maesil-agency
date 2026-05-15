@@ -112,6 +112,16 @@ def _save_results(
         logger.warning("대화 저장 실패 [conv=%s]: %s", conversation_id, e)
 
 
+def _trigger_partition(conversation_id: str) -> None:
+    """대화 파티션(요약) 트리거 — BackgroundTasks에서 호출.
+    active 메시지 수가 임계치 이상이면 Haiku 요약 후 파티션 저장."""
+    try:
+        from app.services.conv_summarizer import maybe_summarize
+        maybe_summarize(conversation_id)
+    except Exception as e:
+        logger.warning("파티션 트리거 실패 [conv=%s]: %s", conversation_id, e)
+
+
 def _orchestrator_reply(message: str) -> str:
     """인삿말/단순 질문 → 오케스트레이터 직접 응답 (에이전트 미실행)."""
     return (
@@ -234,6 +244,7 @@ def _bg_run_agents(
         results = run_agents(message, conversation_id, agent_types,
                              operator_id=operator_id, context_messages=ctx_msgs)
         _save_results(conversation_id, message, results, user_id=user_id, title=title)
+        _trigger_partition(conversation_id)   # 파티션 트리거 (이미 백그라운드)
         agents = [
             AgentResult(
                 run_id=r["run_id"],
@@ -267,6 +278,7 @@ def _bg_briefing(
         from app.agents.orchestrator import run_morning_briefing
         results = run_morning_briefing(conversation_id, operator_id=operator_id)
         _save_results(conversation_id, user_message, results, user_id=user_id)
+        _trigger_partition(conversation_id)   # 파티션 트리거 (이미 백그라운드)
         agents = [
             AgentResult(
                 run_id=r["run_id"],
@@ -377,6 +389,7 @@ def chat(req: ChatRequest, bg: BackgroundTasks, user: UserContext = Depends(get_
         _save_results(
             conversation_id, req.message, results, user_id=user.id, title=title,
         )
+        bg.add_task(_trigger_partition, conversation_id)
         agents = [
             AgentResult(
                 run_id=r["run_id"],
@@ -540,6 +553,7 @@ def chat(req: ChatRequest, bg: BackgroundTasks, user: UserContext = Depends(get_
             context_messages=ctx_msgs,
         )
         _save_results(conversation_id, req.message, results, user_id=user.id)
+        bg.add_task(_trigger_partition, conversation_id)
         agents = [
             AgentResult(
                 run_id=r["run_id"],
@@ -716,11 +730,21 @@ def list_conversations(user: UserContext = Depends(get_current_user)) -> list[di
 @router.get("/conversations/{conversation_id}")
 def get_conversation(
     conversation_id: str,
+    history: bool = False,   # True = archived 포함 전체 히스토리 (UI 상세 뷰)
     user: UserContext = Depends(get_current_user),
 ) -> dict:
+    """대화 메시지 조회.
+
+    history=False (기본): 에이전트 컨텍스트와 동일 — 최신 summary + active 메시지만.
+    history=True: archived 포함 전체 히스토리 (히스토리 뷰 / 감사 로그용).
+    """
     if not user.is_super_admin:
         owner = conv_svc.get_conversation_owner(conversation_id)
         if owner is None or str(owner) != str(user.id):
             raise HTTPException(status_code=404, detail="대화를 찾을 수 없습니다.")
-    messages = conv_svc.get_messages(conversation_id)
-    return {"conversation_id": conversation_id, "messages": messages}
+    messages = conv_svc.get_messages(conversation_id, include_archived=history)
+    return {
+        "conversation_id": conversation_id,
+        "messages": messages,
+        "has_archived": any(m.get("is_archived") for m in messages) if not history else None,
+    }

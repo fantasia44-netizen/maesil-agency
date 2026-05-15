@@ -470,6 +470,16 @@ def _mark_pr_merged(
             test_result="unknown", lesson_quality="ok",
         )
 
+        # 5) Dev→CS 역피드백 — 새 기능/수정 내용을 feature_kb에 자동 반영
+        #    CS 에이전트가 새 배포 내용을 즉시 답변할 수 있도록
+        _push_feature_kb_from_pr(
+            repo=repo,
+            pr_title=pr_title,
+            pr_body=pr_body,
+            commit_msg=commit_msg,
+            file_path=file_path,
+        )
+
     except Exception as e:
         logger.exception("dev_pr_history merged 마킹 실패: %s", e)
 
@@ -2457,9 +2467,82 @@ def explain_feature(question: str, program: str) -> dict | None:
         return None
 
 
+# ─────────────────────────────────────────────────────────────────
+# Dev→CS 역피드백 — PR 머지 후 feature_kb 자동 갱신
+# ─────────────────────────────────────────────────────────────────
+
+# PR 제목/파일 경로로 어느 program에 해당하는지 추론
+_PROGRAM_HINTS: list[tuple[list[str], str]] = [
+    (["studio", "스튜디오", "content", "콘텐츠", "image", "이미지", "blog", "블로그"], "maesil-studio"),
+    (["insight", "인사이트", "sales", "매출", "channel", "채널", "roas", "warehouse", "재고",
+      "finance", "재무", "cs", "maeyo", "매요"], "maesil-insight"),
+]
+
+_SKIP_KEYWORDS = ["infra", "ci", "cd", "deploy", "docker", "migration", "sql", "test", "lint", "chore"]
+
+
+def _infer_program(pr_title: str | None, file_path: str | None) -> str | None:
+    """PR 제목 + 파일 경로에서 영향받는 program 추론."""
+    text = " ".join(filter(None, [pr_title, file_path])).lower()
+    for keywords, program in _PROGRAM_HINTS:
+        if any(k in text for k in keywords):
+            return program
+    return None
+
+
+def _is_feature_worthy(pr_title: str | None, commit_msg: str | None) -> bool:
+    """인프라/테스트/CI 변경은 feature_kb 생성 불필요."""
+    text = " ".join(filter(None, [pr_title, commit_msg])).lower()
+    return not any(k in text for k in _SKIP_KEYWORDS)
+
+
+def _push_feature_kb_from_pr(
+    repo: str,
+    pr_title: str | None,
+    pr_body: str | None,
+    commit_msg: str | None,
+    file_path: str | None,
+) -> None:
+    """PR 머지 후 CS feature_kb 자동 갱신.
+
+    - PR 내용에서 program 추론
+    - feature_kb._generate_feature_doc() 호출 → CS L2.5에서 즉시 활용 가능
+    """
+    if not _is_feature_worthy(pr_title, commit_msg):
+        logger.debug("_push_feature_kb_from_pr: 인프라/테스트 PR, 스킵")
+        return
+
+    program = _infer_program(pr_title, file_path)
+    if not program:
+        logger.debug("_push_feature_kb_from_pr: program 추론 실패, 스킵")
+        return
+
+    # PR 내용에서 "무엇이 바뀌었는지" 질문 형태로 변환
+    change_summary = pr_title or ""
+    if commit_msg:
+        change_summary += f" — {commit_msg[:200]}"
+
+    question = f"최근 업데이트: {change_summary}"
+    l3_hint = (pr_body or "")[:500]
+
+    try:
+        from app.services.feature_kb import _generate_feature_doc
+        doc_id = _generate_feature_doc(program=program, question=question, l3_hint=l3_hint)
+        if doc_id:
+            logger.info(
+                "[Dev→CS] feature_kb 자동 갱신 [%s] PR '%s' → doc_id=%s",
+                program, pr_title, doc_id,
+            )
+        else:
+            logger.debug("[Dev→CS] feature_doc 생성 결과 없음 (PR: %s)", pr_title)
+    except Exception as e:
+        logger.warning("[Dev→CS] feature_kb 갱신 실패 [%s]: %s", program, e)
+
+
 __all__ = [
     "analyze_and_propose", "execute_pending", "preview_pending",
     "cancel_pending", "merge_pending_pr",
     "is_approve", "is_preview", "is_cancel", "is_merge",
     "explain_feature",
+    "_push_feature_kb_from_pr",   # Dev→CS 역피드백 (테스트/내부 사용)
 ]

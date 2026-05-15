@@ -22,6 +22,24 @@ DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 MAX_TOKENS = 2048
 MAX_TOOL_ROUNDS = 8
 
+# ─── 컨텍스트 토큰 보호 설정 ────────────────────────────────────────
+# 메시지 1개당 최대 글자 수 (초과 시 말미 잘라냄 + 안내 표시)
+_MAX_MSG_CHARS: int = 2_000
+# 히스토리 전체 합산 최대 글자 수 (초과 시 오래된 메시지부터 제외)
+_MAX_CONTEXT_CHARS: int = 40_000
+# 현재 메시지(질문)는 더 넉넉하게 허용 (파일 붙여넣기 등)
+_MAX_CURRENT_MSG_CHARS: int = 8_000
+# 잘린 메시지에 붙이는 접미사
+_TRUNCATE_SUFFIX: str = "…[내용 일부 생략]"
+
+
+def _truncate(text: str, max_chars: int, suffix: str = _TRUNCATE_SUFFIX) -> str:
+    """텍스트를 max_chars 이내로 자르고, 잘린 경우 suffix를 붙인다."""
+    if len(text) <= max_chars:
+        return text
+    cut = max_chars - len(suffix)
+    return text[:cut] + suffix
+
 
 def _build_messages(
     context_messages: list[dict] | None,
@@ -30,26 +48,72 @@ def _build_messages(
 ) -> list[dict]:
     """대화 히스토리 + 현재 메시지를 Anthropic messages 형식으로 변환.
 
-    규칙:
-    - 최근 max_turns 턴(user+assistant 쌍)만 포함 (컨텍스트 길이 관리)
+    보호 규칙 (토큰 오버플로우 방지):
+    1. max_turns: 최근 N턴 슬라이딩 윈도우 (user+assistant 쌍 기준)
+    2. _MAX_MSG_CHARS: 히스토리 메시지 1개당 글자 수 상한 (긴 답변 잘라냄)
+    3. _MAX_CONTEXT_CHARS: 히스토리 전체 글자 합산 상한 (초과 시 오래된 것 제외)
+    4. _MAX_CURRENT_MSG_CHARS: 현재 질문 글자 수 상한
+    기타:
     - 연속된 같은 role은 합치기 (Anthropic API 요구사항: user↔assistant 교대)
     - 현재 메시지는 항상 마지막 user 메시지로 추가
     """
     msgs: list[dict] = []
+    summary_header: str | None = None
+
     if context_messages:
-        # 최근 max_turns 턴만 포함 (메시지 쌍이므로 ×2)
-        recent = context_messages[-(max_turns * 2):]
+        # ① summary 파티션 분리 — role='summary' 메시지는 컨텍스트 헤더로 따로 처리
+        normal_msgs = []
+        for m in context_messages:
+            if m.get("message_type") == "summary" or m.get("role") == "summary":
+                # 가장 마지막 summary만 사용 (최신 파티션)
+                summary_header = str(m.get("content") or "").strip()
+            else:
+                normal_msgs.append(m)
+
+        # ② 최근 max_turns 턴만 추출 (메시지 쌍이므로 ×2)
+        recent = normal_msgs[-(max_turns * 2):]
+
+        # ③ 각 메시지 내용 글자 수 제한
         for m in recent:
             role = "user" if m.get("role") == "user" else "assistant"
-            content = str(m.get("content") or "").strip()
-            if not content:
+            raw_content = str(m.get("content") or "").strip()
+            if not raw_content:
                 continue
+            content = _truncate(raw_content, _MAX_MSG_CHARS)
+
             if msgs and msgs[-1]["role"] == role:
-                # 연속 같은 role → 합치기
-                msgs[-1]["content"] += "\n\n" + content
+                # 연속 같은 role → 합치기 (합친 후에도 상한 재적용)
+                combined = msgs[-1]["content"] + "\n\n" + content
+                msgs[-1]["content"] = _truncate(combined, _MAX_MSG_CHARS)
             else:
                 msgs.append({"role": role, "content": content})
-    msgs.append({"role": "user", "content": current_message})
+
+        # ④ 전체 히스토리 글자 합산 제한 — 오래된 메시지부터 제거
+        total_chars = sum(len(m["content"]) for m in msgs)
+        while msgs and total_chars > _MAX_CONTEXT_CHARS:
+            removed = msgs.pop(0)
+            total_chars -= len(removed["content"])
+        # 제거 후 첫 메시지가 assistant면 대화 흐름 깨짐 → 추가 제거
+        while msgs and msgs[0]["role"] == "assistant":
+            removed = msgs.pop(0)
+            total_chars -= len(removed["content"])
+
+    # ⑤ summary 헤더가 있으면 가장 앞에 user 메시지로 삽입
+    #    에이전트는 "이전 대화 요약을 전달받은 것"으로 인식
+    if summary_header:
+        truncated_summary = _truncate(summary_header, 1_500)
+        msgs.insert(0, {"role": "user", "content": truncated_summary})
+        # summary 다음에 assistant의 확인 메시지를 끼워 넣어 user→assistant 교대 유지
+        msgs.insert(1, {"role": "assistant", "content": "이전 대화 요약을 확인했습니다. 계속 진행하겠습니다."})
+
+    # ⑥ 현재 질문도 상한 적용
+    #    마지막 메시지가 이미 user면 합쳐서 API user↔assistant 교대 규칙 유지
+    safe_current = _truncate(current_message, _MAX_CURRENT_MSG_CHARS)
+    if msgs and msgs[-1]["role"] == "user":
+        combined = msgs[-1]["content"] + "\n\n" + safe_current
+        msgs[-1]["content"] = _truncate(combined, _MAX_CURRENT_MSG_CHARS)
+    else:
+        msgs.append({"role": "user", "content": safe_current})
     return msgs
 
 

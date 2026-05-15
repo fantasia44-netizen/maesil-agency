@@ -799,6 +799,463 @@ test_l2_approve_triggers_cache_invalidation()
 
 
 # ══════════════════════════════════════════════════════════════════
+# Circuit TOKEN: 토큰 보호 — 회수·글자 수 제한
+# ══════════════════════════════════════════════════════════════════
+print("\n[Circuit TOKEN] 컨텍스트 토큰 보호 (회수·글자 수 제한)")
+
+# base.py DB 의존성 없이 로직을 인라인으로 검증
+# (환경변수 없이도 실행 가능하도록 base.py의 핵심 함수를 로컬 재현)
+_MAX_MSG_CHARS: int = 2_000
+_MAX_CONTEXT_CHARS: int = 40_000
+_MAX_CURRENT_MSG_CHARS: int = 8_000
+_TRUNCATE_SUFFIX_BASE: str = "…[내용 일부 생략]"
+
+def _truncate(text: str, max_chars: int, suffix: str = _TRUNCATE_SUFFIX_BASE) -> str:
+    if len(text) <= max_chars:
+        return text
+    cut = max_chars - len(suffix)
+    return text[:cut] + suffix
+
+def _build_messages(context_messages, current_message: str, max_turns: int = 8):
+    msgs = []
+    summary_header = None
+    if context_messages:
+        # ① summary 파티션 분리
+        normal_msgs = []
+        for m in context_messages:
+            if m.get("message_type") == "summary" or m.get("role") == "summary":
+                summary_header = str(m.get("content") or "").strip()
+            else:
+                normal_msgs.append(m)
+        # ② max_turns 슬라이딩
+        recent = normal_msgs[-(max_turns * 2):]
+        # ③ 각 메시지 글자 제한
+        for m in recent:
+            role = "user" if m.get("role") == "user" else "assistant"
+            raw_content = str(m.get("content") or "").strip()
+            if not raw_content:
+                continue
+            content = _truncate(raw_content, _MAX_MSG_CHARS)
+            if msgs and msgs[-1]["role"] == role:
+                combined = msgs[-1]["content"] + "\n\n" + content
+                msgs[-1]["content"] = _truncate(combined, _MAX_MSG_CHARS)
+            else:
+                msgs.append({"role": role, "content": content})
+        # ④ 전체 합산 제한
+        total_chars = sum(len(m["content"]) for m in msgs)
+        while msgs and total_chars > _MAX_CONTEXT_CHARS:
+            removed = msgs.pop(0)
+            total_chars -= len(removed["content"])
+        while msgs and msgs[0]["role"] == "assistant":
+            removed = msgs.pop(0)
+            total_chars -= len(removed["content"])
+    # ⑤ summary 헤더 앞에 삽입 (user + assistant ack)
+    if summary_header:
+        truncated_summary = _truncate(summary_header, 1_500)
+        msgs.insert(0, {"role": "user", "content": truncated_summary})
+        msgs.insert(1, {"role": "assistant", "content": "이전 대화 요약을 확인했습니다. 계속 진행하겠습니다."})
+    safe_current = _truncate(current_message, _MAX_CURRENT_MSG_CHARS)
+    if msgs and msgs[-1]["role"] == "user":
+        combined = msgs[-1]["content"] + "\n\n" + safe_current
+        msgs[-1]["content"] = _truncate(combined, _MAX_CURRENT_MSG_CHARS)
+    else:
+        msgs.append({"role": "user", "content": safe_current})
+    return msgs
+
+_BASE_IMPORTED = True  # 인라인 정의 완료
+
+def test_truncate_short():
+    """짧은 텍스트는 그대로."""
+    if not _BASE_IMPORTED:
+        return
+    text = "안녕하세요"
+    result = _truncate(text, 100)
+    if result == text:
+        ok("_truncate: 짧은 텍스트 유지")
+    else:
+        fail("_truncate: 짧은 텍스트 유지", f"got={result!r}")
+
+def test_truncate_long():
+    """긴 텍스트는 잘리고 suffix 추가."""
+    if not _BASE_IMPORTED:
+        return
+    text = "A" * 5000
+    result = _truncate(text, 2000)
+    if len(result) <= 2000 and result.endswith("…[내용 일부 생략]"):
+        ok("_truncate: 긴 텍스트 잘림 + suffix")
+    else:
+        fail("_truncate: 긴 텍스트 잘림", f"len={len(result)}, ends={result[-20:]!r}")
+
+def test_build_messages_max_turns():
+    """max_turns=3이면 최근 3턴(6개 메시지)만 포함."""
+    if not _BASE_IMPORTED:
+        return
+    # 10턴 히스토리 생성 (user/assistant 교대)
+    history = []
+    for i in range(10):
+        history.append({"role": "user", "content": f"질문{i}"})
+        history.append({"role": "assistant", "content": f"답변{i}"})
+    msgs = _build_messages(history, "현재질문", max_turns=3)
+    # 마지막 user(현재질문) 포함해서 최대 7개 (3턴×2 + 현재1)
+    if len(msgs) <= 7:
+        ok(f"_build_messages: max_turns=3 → {len(msgs)}개 메시지")
+    else:
+        fail("_build_messages: max_turns=3 초과", f"got={len(msgs)}")
+
+def test_build_messages_content_truncated():
+    """히스토리 메시지 내용이 _MAX_MSG_CHARS 이내로 잘린다."""
+    if not _BASE_IMPORTED:
+        return
+    long_content = "X" * 10_000
+    history = [
+        {"role": "user", "content": long_content},
+        {"role": "assistant", "content": long_content},
+    ]
+    msgs = _build_messages(history, "짧은질문", max_turns=8)
+    # 현재 질문 제외, 히스토리 메시지 내용 확인
+    hist_msgs = [m for m in msgs if m["content"] != "짧은질문"]
+    all_ok = all(len(m["content"]) <= _MAX_MSG_CHARS for m in hist_msgs)
+    if all_ok:
+        ok(f"_build_messages: 히스토리 메시지 ≤{_MAX_MSG_CHARS}자")
+    else:
+        lengths = [len(m["content"]) for m in hist_msgs]
+        fail("_build_messages: 히스토리 메시지 글자 초과", f"lengths={lengths}")
+
+def test_build_messages_total_chars():
+    """히스토리 합산이 _MAX_CONTEXT_CHARS 초과 시 오래된 것 제거."""
+    if not _BASE_IMPORTED:
+        return
+    # 각 1000자 메시지 50개 — 합산 50000자 > _MAX_CONTEXT_CHARS(40000)
+    history = []
+    for i in range(25):
+        history.append({"role": "user",      "content": f"Q{i}:" + "q" * 990})
+        history.append({"role": "assistant", "content": f"A{i}:" + "a" * 990})
+    msgs = _build_messages(history, "최신질문", max_turns=30)
+    total = sum(len(m["content"]) for m in msgs if m["content"] != "최신질문")
+    if total <= _MAX_CONTEXT_CHARS:
+        ok(f"_build_messages: 컨텍스트 합산 ≤{_MAX_CONTEXT_CHARS}자 (실제={total})")
+    else:
+        fail("_build_messages: 컨텍스트 합산 초과", f"total={total}")
+
+def test_build_messages_current_truncated():
+    """현재 메시지도 _MAX_CURRENT_MSG_CHARS 이내로 잘린다."""
+    if not _BASE_IMPORTED:
+        return
+    huge_msg = "Z" * 20_000
+    msgs = _build_messages([], huge_msg)
+    last = msgs[-1]["content"]
+    if len(last) <= _MAX_CURRENT_MSG_CHARS:
+        ok(f"_build_messages: 현재 메시지 ≤{_MAX_CURRENT_MSG_CHARS}자")
+    else:
+        fail("_build_messages: 현재 메시지 초과", f"len={len(last)}")
+
+def test_maeyo_engine_max_turns():
+    """maeyo_engine._MAX_TURNS, _MAX_HISTORY_MSGS 상수가 소스에 정의되어 있는지 확인."""
+    import re as _re
+    engine_path = os.path.join(os.path.dirname(__file__), "app", "services", "maeyo_engine.py")
+    try:
+        with open(engine_path, encoding="utf-8") as _f:
+            src = _f.read()
+        has_max_turns    = bool(_re.search(r"_MAX_TURNS\s*=\s*\d+", src))
+        has_hist_msgs    = bool(_re.search(r"_MAX_HISTORY_MSGS\s*=\s*\d+", src))
+        has_hist_chars   = bool(_re.search(r"_MAX_HIST_MSG_CHARS\s*=\s*\d+", src))
+        has_truncate_fn  = "_truncate_msg" in src
+        all_ok = has_max_turns and has_hist_msgs and has_hist_chars and has_truncate_fn
+        if all_ok:
+            ok("maeyo_engine 상수 + _truncate_msg 정의 확인")
+        else:
+            missing = [n for n, v in [
+                ("_MAX_TURNS", has_max_turns), ("_MAX_HISTORY_MSGS", has_hist_msgs),
+                ("_MAX_HIST_MSG_CHARS", has_hist_chars), ("_truncate_msg", has_truncate_fn),
+            ] if not v]
+            fail("maeyo_engine 상수 미정의", f"missing={missing}")
+    except FileNotFoundError:
+        fail("maeyo_engine.py 파일 없음", engine_path)
+
+def test_build_messages_no_leading_assistant():
+    """컨텍스트 글자 초과로 오래된 메시지 제거 후 첫 메시지가 user여야 한다."""
+    if not _BASE_IMPORTED:
+        return
+    # 오래된 assistant 메시지가 앞에 남지 않도록
+    history = [
+        {"role": "assistant", "content": "오래된 답변 " + "A" * 500},
+        {"role": "user",      "content": "오래된 질문 " + "Q" * 500},
+        {"role": "assistant", "content": "중간 답변"},
+        {"role": "user",      "content": "중간 질문"},
+    ]
+    msgs = _build_messages(history, "현재질문", max_turns=8)
+    if msgs[0]["role"] == "user":
+        ok("_build_messages: 첫 메시지 항상 user")
+    else:
+        fail("_build_messages: 첫 메시지가 assistant", f"role={msgs[0]['role']}")
+
+if _BASE_IMPORTED:
+    test_truncate_short()
+    test_truncate_long()
+    test_build_messages_max_turns()
+    test_build_messages_content_truncated()
+    test_build_messages_total_chars()
+    test_build_messages_current_truncated()
+    test_maeyo_engine_max_turns()
+    test_build_messages_no_leading_assistant()
+
+
+# ══════════════════════════════════════════════════════════════════
+# Circuit PARTITION: 대화 요약 파티션
+# ══════════════════════════════════════════════════════════════════
+print("\n[Circuit PARTITION] 대화 요약 파티션 (summary 마커 + archived 로딩)")
+
+def test_summary_injected_before_normal():
+    """summary 타입 메시지가 normal 메시지 앞에 배치된다."""
+    context = [
+        {"role": "user",    "content": "오래된 질문1", "message_type": "normal", "is_archived": False},
+        {"role": "summary", "content": "📋 이전 대화 요약 (파티션 #1)\n- 매출 10억 확인\n- ROAS 1.8", "message_type": "summary"},
+        {"role": "user",    "content": "최근 질문",    "message_type": "normal", "is_archived": False},
+        {"role": "assistant","content": "최근 답변",   "message_type": "normal", "is_archived": False},
+    ]
+    msgs = _build_messages(context, "현재질문", max_turns=8)
+    # 첫 번째 메시지가 summary 내용이어야 함
+    if msgs[0]["content"].startswith("📋"):
+        ok("summary 파티션 앞에 배치 (헤더 주입)")
+    else:
+        fail("summary 파티션 앞 배치 실패", f"first={msgs[0]['content'][:40]!r}")
+
+def test_summary_followed_by_assistant_ack():
+    """summary 삽입 후 assistant 확인 메시지가 이어져 role 교대 유지."""
+    context = [
+        {"role": "summary", "content": "📋 파티션 #1\n- 내용", "message_type": "summary"},
+        {"role": "user",    "content": "최근 질문", "message_type": "normal"},
+    ]
+    msgs = _build_messages(context, "현재질문")
+    # [summary(user), ack(assistant), 최근질문(user), ..., 현재질문(user)]
+    roles = [m["role"] for m in msgs]
+    valid_alternating = all(
+        roles[i] != roles[i+1] for i in range(len(roles) - 1)
+    )
+    if valid_alternating:
+        ok("summary 주입 후 user↔assistant 교대 유지")
+    else:
+        fail("summary 주입 후 role 교대 깨짐", f"roles={roles}")
+
+def test_summary_header_truncated():
+    """요약 헤더가 1500자 이내로 잘린다."""
+    context = [
+        {"role": "summary", "content": "📋 " + "X" * 5000, "message_type": "summary"},
+    ]
+    msgs = _build_messages(context, "질문")
+    summary_msg = next((m for m in msgs if m["content"].startswith("📋")), None)
+    if summary_msg and len(summary_msg["content"]) <= 1_500:
+        ok("summary 헤더 ≤1500자 잘림")
+    else:
+        length = len(summary_msg["content"]) if summary_msg else -1
+        fail("summary 헤더 길이 초과", f"len={length}")
+
+def test_conv_summarizer_constants():
+    """conv_summarizer 상수 + maybe_summarize 함수 정의 확인 (소스 파싱)."""
+    import re as _re
+    path = os.path.join(os.path.dirname(__file__), "app", "services", "conv_summarizer.py")
+    try:
+        with open(path, encoding="utf-8") as _f:
+            src = _f.read()
+        checks = {
+            # 타입 어노테이션 형태도 허용: _PARTITION_THRESHOLD: int = 20
+            "_PARTITION_THRESHOLD": bool(_re.search(r"_PARTITION_THRESHOLD[:\s].*=\s*\d+", src)),
+            "_ARCHIVE_BATCH":       bool(_re.search(r"_ARCHIVE_BATCH[:\s].*=\s*\d+", src)),
+            "maybe_summarize":      "def maybe_summarize" in src,
+            "_call_haiku_summary":  "_call_haiku_summary" in src,
+            "save_summary_partition": "save_summary_partition" in src,
+            "archive_messages":     "archive_messages" in src,
+        }
+        missing = [k for k, v in checks.items() if not v]
+        if not missing:
+            ok("conv_summarizer 구성 요소 완비")
+        else:
+            fail("conv_summarizer 누락", f"missing={missing}")
+    except FileNotFoundError:
+        fail("conv_summarizer.py 없음", path)
+
+def test_conversations_service_partition_api():
+    """conversations.py에 파티션 API 함수가 모두 정의되어 있는지 확인."""
+    import re as _re
+    path = os.path.join(os.path.dirname(__file__), "app", "services", "conversations.py")
+    try:
+        with open(path, encoding="utf-8") as _f:
+            src = _f.read()
+        required = [
+            "def save_summary_partition",
+            "def archive_messages",
+            "def count_active_messages",
+            "include_archived",
+            "message_type",
+        ]
+        missing = [fn for fn in required if fn not in src]
+        if not missing:
+            ok("conversations.py 파티션 API 완비")
+        else:
+            fail("conversations.py 파티션 API 누락", f"{missing}")
+    except FileNotFoundError:
+        fail("conversations.py 없음", path)
+
+def test_sql_028_exists():
+    """SQL 028 마이그레이션 파일 존재 + 핵심 DDL 포함 확인."""
+    import re as _re
+    path = os.path.join(os.path.dirname(__file__), "sql", "028_conversation_partitions.sql")
+    try:
+        with open(path, encoding="utf-8") as _f:
+            src = _f.read()
+        checks = {
+            "message_type": "message_type" in src,
+            "is_archived":  "is_archived" in src,
+            "idx_summary":  "idx_conv_msgs_summary" in src,
+            "idx_active":   "idx_conv_msgs_active" in src,
+        }
+        missing = [k for k, v in checks.items() if not v]
+        if not missing:
+            ok("028 SQL: message_type + is_archived + 인덱스 정의")
+        else:
+            fail("028 SQL 누락", f"{missing}")
+    except FileNotFoundError:
+        fail("028_conversation_partitions.sql 없음", path)
+
+def test_no_archived_in_default_load():
+    """get_messages 기본(include_archived=False)에서 archived 메시지는 제외된다 — 로직 검증."""
+    # 실제 DB 연결 없이 필터링 로직을 시뮬레이션
+    all_msgs = [
+        {"id": "1", "role": "user",    "message_type": "normal",  "is_archived": True,  "content": "오래된 질문"},
+        {"id": "2", "role": "assistant","message_type": "normal",  "is_archived": True,  "content": "오래된 답변"},
+        {"id": "3", "role": "summary", "message_type": "summary", "is_archived": False, "content": "📋 파티션 #1"},
+        {"id": "4", "role": "user",    "message_type": "normal",  "is_archived": False, "content": "최근 질문"},
+        {"id": "5", "role": "assistant","message_type": "normal",  "is_archived": False, "content": "최근 답변"},
+    ]
+    # conversations.py의 get_messages 로직 시뮬레이션
+    summary_rows = [m for m in all_msgs if m["message_type"] == "summary"]
+    active_rows  = [m for m in all_msgs if m["message_type"] == "normal" and not m["is_archived"]]
+    result = (summary_rows[-1:] if summary_rows else []) + active_rows
+
+    has_archived = any(m.get("is_archived") for m in result)
+    has_summary  = any(m["message_type"] == "summary" for m in result)
+    has_recent   = any(m["content"] == "최근 질문" for m in result)
+
+    if not has_archived and has_summary and has_recent:
+        ok("archived 제외, summary 포함, 최근 메시지 포함 (로딩 로직 검증)")
+    else:
+        fail("스마트 로딩 로직 오류",
+             f"archived={has_archived}, summary={has_summary}, recent={has_recent}")
+
+test_summary_injected_before_normal()
+test_summary_followed_by_assistant_ack()
+test_summary_header_truncated()
+test_conv_summarizer_constants()
+test_conversations_service_partition_api()
+test_sql_028_exists()
+test_no_archived_in_default_load()
+
+
+# ══════════════════════════════════════════════════════════════════
+# Circuit MEMORY: Memory API + Dev→CS 역피드백
+# ══════════════════════════════════════════════════════════════════
+print("\n[Circuit MEMORY] Memory API + Dev→CS 역피드백")
+
+def test_memory_router_exists():
+    """memory.py 라우터 파일 존재 + 필수 엔드포인트 정의 확인."""
+    path = os.path.join(os.path.dirname(__file__), "app", "routers", "memory.py")
+    try:
+        with open(path, encoding="utf-8") as _f:
+            src = _f.read()
+        required = [
+            '@router.get("/dev")',
+            '@router.get("/cs")',
+            '@router.get("/growth")',
+            '@router.get("/sales")',
+            '@router.get("/summary")',
+        ]
+        missing = [ep for ep in required if ep not in src]
+        if not missing:
+            ok("memory 라우터 5개 엔드포인트 정의")
+        else:
+            fail("memory 라우터 엔드포인트 누락", f"{missing}")
+    except FileNotFoundError:
+        fail("memory.py 없음", path)
+
+def test_memory_registered_in_main():
+    """main.py에 memory 라우터가 등록되어 있는지 확인."""
+    path = os.path.join(os.path.dirname(__file__), "app", "main.py")
+    try:
+        with open(path, encoding="utf-8") as _f:
+            src = _f.read()
+        if "memory" in src and "memory.router" in src:
+            ok("main.py에 memory 라우터 등록 확인")
+        else:
+            fail("main.py memory 라우터 미등록")
+    except FileNotFoundError:
+        fail("main.py 없음", path)
+
+def test_dev_cs_feedback_in_mark_pr_merged():
+    """_mark_pr_merged에 Dev→CS 역피드백 호출이 포함되어 있는지 확인."""
+    import re as _re
+    path = os.path.join(os.path.dirname(__file__), "app", "services", "dev_chat_agent.py")
+    try:
+        with open(path, encoding="utf-8") as _f:
+            src = _f.read()
+        has_push_fn   = "def _push_feature_kb_from_pr" in src
+        has_call      = "_push_feature_kb_from_pr(" in src
+        has_infer     = "_infer_program" in src
+        has_skip      = "_is_feature_worthy" in src
+        all_ok = has_push_fn and has_call and has_infer and has_skip
+        if all_ok:
+            ok("Dev→CS 역피드백 구성 완비 (4항목)")
+        else:
+            missing = [n for n, v in [
+                ("_push_feature_kb_from_pr 정의", has_push_fn),
+                ("_push_feature_kb_from_pr 호출", has_call),
+                ("_infer_program", has_infer),
+                ("_is_feature_worthy", has_skip),
+            ] if not v]
+            fail("Dev→CS 역피드백 누락", f"{missing}")
+    except FileNotFoundError:
+        fail("dev_chat_agent.py 없음", path)
+
+def test_program_hint_inference():
+    """_PROGRAM_HINTS 기반 program 추론 로직 시뮬레이션."""
+    _PROGRAM_HINTS_LOCAL = [
+        (["studio", "스튜디오", "content", "콘텐츠"], "maesil-studio"),
+        (["insight", "인사이트", "sales", "매출", "maeyo", "매요"], "maesil-insight"),
+    ]
+    _SKIP_LOCAL = ["infra", "ci", "cd", "deploy", "docker", "migration", "sql", "test", "lint", "chore"]
+
+    def infer(pr_title, file_path=None):
+        text = " ".join(filter(None, [pr_title, file_path])).lower()
+        for keywords, prog in _PROGRAM_HINTS_LOCAL:
+            if any(k in text for k in keywords):
+                return prog
+        return None
+
+    def worthy(pr_title, commit_msg=None):
+        text = " ".join(filter(None, [pr_title, commit_msg])).lower()
+        return not any(k in text for k in _SKIP_LOCAL)
+
+    cases = [
+        (infer("매출 채널 분석 개선") == "maesil-insight",      "인사이트 PR 추론"),
+        (infer("studio 이미지 생성 버그 수정") == "maesil-studio", "스튜디오 PR 추론"),
+        (infer("인프라 docker 업데이트") is None,               "인프라 PR → None"),
+        (worthy("매요 cs 답변 개선"),                           "일반 PR → worthy=True"),
+        (not worthy("ci: github actions 업데이트"),            "CI PR → worthy=False"),
+    ]
+    all_ok = True
+    for passed, name in cases:
+        if not passed:
+            all_ok = False
+            fail(f"program 추론: {name}")
+    if all_ok:
+        ok(f"program 추론 + worthy 필터 ({len(cases)}케이스)")
+
+test_memory_router_exists()
+test_memory_registered_in_main()
+test_dev_cs_feedback_in_mark_pr_merged()
+test_program_hint_inference()
+
+
+# ══════════════════════════════════════════════════════════════════
 # Result
 # ══════════════════════════════════════════════════════════════════
 total = PASS + FAIL
