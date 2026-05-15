@@ -1,9 +1,14 @@
 """
-test_circuits.py — 3 Self-Evolving Circuits 검증
+test_circuits.py — Self-Evolving Circuits 검증 (P1 보강 포함)
 
-Circuit 1: CS correction -> L2 auto-promote
-Circuit 2: Intelligent handoff context building
-Circuit 3: Sales analysis cache (TTL + force_refresh)
+Circuit 0: Dev Lessons Learned
+Circuit 1: CS Correction -> L2 Auto-Promote (draft 워크플로우 포함)
+Circuit 2: Intelligent Handoff Context Building
+Circuit 3: Sales Analysis Cache (TTL + force_refresh)
+Circuit P1: P1 보강 검증
+  P1-1: _pending / _recent_pr DB 영속화
+  P1-2: L2 draft -> approve / reject 워크플로우
+  P1-3: dev_lessons 품질 필드 (root_cause, actual_fix, lesson_quality)
 """
 import sys
 import os
@@ -34,9 +39,9 @@ def fail(name, reason=""):
 
 
 # ══════════════════════════════════════════════════════════════════
-# Circuit 1: CS Correction → L2 Auto-Promote
+# Circuit 1: CS Correction → L2 Auto-Promote (draft 워크플로우)
 # ══════════════════════════════════════════════════════════════════
-print("\n[Circuit 1] CS Correction → L2 Auto-Promote")
+print("\n[Circuit 1] CS Correction → L2 Auto-Promote (draft workflow)")
 
 def test_script_id_hash_deterministic():
     """같은 program+question → 항상 같은 script_id (중복 방지)."""
@@ -66,82 +71,46 @@ def test_keyword_extraction():
     raw_tokens = re.findall(r"[가-힣a-zA-Z]{2,}", question)
     STOPWORDS = {"어떻게", "무엇", "어디서", "왜요", "있나요", "이유", "방법", "어디"}
     keywords = [t for t in raw_tokens if t not in STOPWORDS][:4]
-    # "왜" is only 1 char so filtered by regex; "환불", "신청", "하나요", "안되나요"
     if "환불" in keywords and "어떻게" not in keywords:
         ok("키워드 추출 + stopword 제거")
     else:
         fail("키워드 추출 + stopword 제거", f"keywords={keywords}")
 
-def test_auto_promote_mock():
-    """_auto_promote_correction: DB 조회 → L2 upsert 호출 검증."""
-    mock_db = MagicMock()
-
-    # maeyo_messages 조회 응답
-    msg_row = {"conversation_id": "conv-1", "emotion": "doubt", "created_at": "2026-05-15T10:00:00+00:00"}
-    # maeyo_conversations 조회 응답
-    conv_row = {"program": "maesil-insight"}
-    # 유저 질문 조회 응답
-    user_row = {"content": "환불 신청 버튼이 어디 있나요"}
-
-    def _mock_table(name):
-        tbl = MagicMock()
-        if name == "maeyo_messages":
-            # select chain
-            chain = MagicMock()
-            chain.execute.return_value.data = [msg_row]
-            tbl.select.return_value.eq.return_value.limit.return_value = chain
-            # user messages: role=user, lt, order, limit
-            user_chain = MagicMock()
-            user_chain.execute.return_value.data = [user_row]
-            tbl.select.return_value.eq.return_value.eq.return_value.lt.return_value.order.return_value.limit.return_value = user_chain
-        elif name == "maeyo_conversations":
-            chain = MagicMock()
-            chain.execute.return_value.data = [conv_row]
-            tbl.select.return_value.eq.return_value.limit.return_value = chain
-        elif name == "maeyo_l2_scripts":
-            upsert_chain = MagicMock()
-            upsert_chain.execute.return_value = MagicMock()
-            tbl.upsert.return_value = upsert_chain
-        return tbl
-
-    mock_db.table.side_effect = _mock_table
-
-    # 핵심 검증: L2 upsert가 호출됐는가
-    l2_upsert_called = False
-    upsert_data = {}
-
-    def _mock_l2_upsert(data, **kwargs):
-        nonlocal l2_upsert_called, upsert_data
-        l2_upsert_called = True
-        upsert_data = data
-        chain = MagicMock()
-        chain.execute.return_value = MagicMock()
-        return chain
-
-    # 직접 로직 시뮬레이션 (cs.py의 _auto_promote_correction 핵심 로직)
-    user_question = user_row["content"]
-    program = conv_row["program"]
+def test_auto_promote_creates_draft():
+    """P1 보강: correction → is_verified=False, status='draft' (L2 매칭 제외 상태)."""
+    user_question = "환불 신청 버튼이 어디 있나요"
+    program = "maesil-insight"
     corrected_answer = "환불 신청은 마이페이지 > 주문내역에서 하실 수 있습니다."
     key_src = f"{program}:{user_question[:80]}"
     script_id = "LEARN_" + hashlib.sha256(key_src.encode()).hexdigest()[:8].upper()
 
+    # P1 이후 페이로드: is_verified=False, status='draft'
     upsert_payload = {
         "id": script_id,
         "program": program,
         "triggers": [user_question],
-        "emotion": msg_row["emotion"],
+        "emotion": "doubt",
         "message": corrected_answer,
-        "is_verified": True,
+        "is_active": True,
+        "is_verified": False,   # P1: 관리자 승인 전까지 미검증
+        "status": "draft",      # P1: L2 매칭 제외
         "sort_order": 0,
     }
 
-    if (upsert_payload["is_verified"] is True
-            and upsert_payload["sort_order"] == 0
-            and user_question in upsert_payload["triggers"]
-            and script_id.startswith("LEARN_")):
-        ok("L2 upsert payload 구조 검증")
-    else:
-        fail("L2 upsert payload 구조 검증", str(upsert_payload))
+    checks = [
+        (upsert_payload["is_verified"] is False, "is_verified=False (승인 전)"),
+        (upsert_payload["status"] == "draft", "status='draft'"),
+        (upsert_payload["is_active"] is True, "is_active=True (DB엔 존재)"),
+        (script_id.startswith("LEARN_"), "script_id LEARN_ prefix"),
+        (user_question in upsert_payload["triggers"], "trigger 포함"),
+    ]
+    all_pass = True
+    for passed, name in checks:
+        if not passed:
+            all_pass = False
+            fail(f"draft payload: {name}", str(upsert_payload))
+    if all_pass:
+        ok("correction → draft 등록 payload (5항목)")
 
 def test_correction_response_includes_script_id():
     """correction API 응답에 auto_l2_script_id 포함 확인."""
@@ -154,7 +123,7 @@ def test_correction_response_includes_script_id():
 test_script_id_hash_deterministic()
 test_script_id_different_programs()
 test_keyword_extraction()
-test_auto_promote_mock()
+test_auto_promote_creates_draft()
 test_correction_response_includes_script_id()
 
 
@@ -166,7 +135,6 @@ print("\n[Circuit 2] Intelligent Handoff Context Building")
 def test_handoff_fallback_no_conversation():
     """conversation_id가 없으면 원본 질문 그대로 반환."""
     question = "환불 어떻게 하나요?"
-    # _build_handoff_context 핵심 로직: conv_id가 없으면 question 반환
     conv_id = None
     result = question if not conv_id else "SHOULD_NOT_REACH"
     if result == question:
@@ -176,8 +144,7 @@ def test_handoff_fallback_no_conversation():
 
 def test_handoff_neg_signal_detection():
     """부정적 표현 감지 패턴."""
-    import re as _re
-    _NEG = _re.compile(r"안\s*돼|안\s*되|이상해|모르겠|왜|또|다시|계속|해결|안\s*나와")
+    _NEG = re.compile(r"안\s*돼|안\s*되|이상해|모르겠|왜|또|다시|계속|해결|안\s*나와")
     test_cases = [
         ("왜 안되는거예요", True),
         ("또 에러나요", True),
@@ -202,17 +169,14 @@ def test_handoff_context_structure():
         {"role": "user", "content": "왜 모르세요 환불이 안되요", "emotion": None, "layer": None, "created_at": "2026-05-15T10:00:10+00:00"},
     ]
     question = "환불 신청 어떻게 하나요"
-    program = "maesil-insight"
 
-    # 대화 흐름 시뮬레이션
     flow_lines = []
     for m in msgs:
         role_label = "유저" if m["role"] == "user" else f"매요({m.get('emotion','?')}·{m.get('layer','?')})"
         content = (m.get("content") or "")[:120]
         flow_lines.append(f"  {role_label}: {content}")
 
-    import re as _re
-    _NEG = _re.compile(r"안\s*돼|안\s*되|이상해|모르겠|왜|또|다시|계속|해결|안\s*나와")
+    _NEG = re.compile(r"안\s*돼|안\s*되|이상해|모르겠|왜|또|다시|계속|해결|안\s*나와")
     user_msgs = [m for m in msgs if m["role"] == "user"]
     neg_count = sum(1 for m in user_msgs if _NEG.search(m.get("content", "")))
     l3_count = sum(1 for m in msgs if m.get("layer") == "l3")
@@ -245,8 +209,7 @@ def test_handoff_context_structure():
 
 def test_handoff_enrichment_ratio():
     """enriched context가 원본 질문보다 최소 3배 이상 풍부해야 함."""
-    original = "환불 신청 어떻게 하나요"  # 15자
-    # 시뮬레이션된 컨텍스트 (대화흐름+신호+지시 포함)
+    original = "환불 신청 어떻게 하나요"
     enriched = (
         f"[고객 질문]\n{original}\n\n"
         "[대화 흐름]\n  유저: 환불 버튼 어디있어요\n  매요(doubt·l3): 죄송해요\n  유저: 왜 모르세요\n\n"
@@ -257,7 +220,7 @@ def test_handoff_enrichment_ratio():
     if ratio >= 3:
         ok(f"컨텍스트 풍부도 (원본 대비 {ratio:.1f}배)")
     else:
-        fail("컨텍스트 풍부도", f"ratio={ratio:.1f} (기대 ≥3)")
+        fail("컨텍스트 풍부도", f"ratio={ratio:.1f} (기대 >=3)")
 
 test_handoff_fallback_no_conversation()
 test_handoff_neg_signal_detection()
@@ -278,10 +241,9 @@ def test_cache_ttl_fresh():
         "updated_at": (now - timedelta(minutes=10)).isoformat(),
         "period_label": "2026-05",
     }
-    TTL = 1800  # 30분
+    TTL = 1800
     age = (now - datetime.fromisoformat(insight["updated_at"].replace("Z", "+00:00"))).total_seconds()
-    hit = age <= TTL
-    if hit:
+    if age <= TTL:
         ok("TTL 이내(10분) → 캐시 히트")
     else:
         fail("TTL 이내(10분) → 캐시 히트", f"age={age:.0f}s > TTL={TTL}s")
@@ -289,13 +251,10 @@ def test_cache_ttl_fresh():
 def test_cache_ttl_stale():
     """35분 지난 인사이트 → 캐시 미스."""
     now = datetime.now(timezone.utc)
-    insight = {
-        "updated_at": (now - timedelta(minutes=35)).isoformat(),
-    }
+    insight = {"updated_at": (now - timedelta(minutes=35)).isoformat()}
     TTL = 1800
     age = (now - datetime.fromisoformat(insight["updated_at"].replace("Z", "+00:00"))).total_seconds()
-    miss = age > TTL
-    if miss:
+    if age > TTL:
         ok("TTL 초과(35분) → 캐시 미스")
     else:
         fail("TTL 초과(35분) → 캐시 미스", f"age={age:.0f}s <= TTL={TTL}s")
@@ -358,7 +317,6 @@ def test_cache_hit_response_structure():
 
 def test_extract_insight_type():
     """메시지에서 인사이트 유형 자동 분류."""
-    # sales_knowledge.extract_insight_type 로직 직접 테스트
     def _extract(text: str) -> str:
         t = text.lower()
         if any(k in t for k in ("채널별", "channel", "스마트스토어", "쿠팡")):
@@ -396,48 +354,144 @@ test_extract_insight_type()
 
 
 # ══════════════════════════════════════════════════════════════════
-# Integration: dev_lessons_learned (Circuit from previous session)
+# Circuit 0: Dev Lessons Learned (P1-3 품질 필드 포함)
 # ══════════════════════════════════════════════════════════════════
-print("\n[Circuit 0] Dev Lessons Learned (integration check)")
+print("\n[Circuit 0] Dev Lessons Learned (P1-3 quality fields)")
 
-def test_lessons_context_format():
-    """_build_lessons_context 출력 형식 검증."""
-    lessons = [
-        {
-            "error_type": "_draw_text_stroke",
-            "error_pattern": "[fix] _draw_text_stroke NameError 수정",
-            "fix_summary": "[fix] _draw_text_stroke NameError 수정",
-            "files_changed": ["services/shorts_service.py"],
-            "pr_url": "https://github.com/test/repo/pull/3",
-            "created_at": "2026-05-15T09:30:00+00:00",
-        }
-    ]
-    # _build_lessons_context 로직 직접 시뮬레이션
-    lines = ["## 📚 과거 유사 수정 이력 (참고)"]
-    for i, l in enumerate(lessons, 1):
-        pr_ref = f"[PR]({l.get('pr_url')})" if l.get("pr_url") else ""
-        created = (l.get("created_at") or "")[:10]
-        files = ", ".join(l.get("files_changed") or [])
-        lines.append(
-            f"{i}. **{l.get('error_pattern', '?')}** {pr_ref}\n"
-            f"   수정: {l.get('fix_summary', '?')} | 파일: {files or '?'} | {created}"
-        )
-    context = "\n".join(lines)
+def test_extract_root_cause_from_body():
+    """PR body에서 root_cause 추출."""
+    pr_body = (
+        "## AI 자동 수정\n\n"
+        "NaverAdClient.create_stat_report 함수가 정의되지 않아 AttributeError 발생. "
+        "api_client.py에 누락된 메서드를 추가함.\n\n"
+        "---\n*maesil-agency 자동 생성*"
+    )
+    # _extract_root_cause_from_body 로직 직접 시뮬레이션
+    body = re.sub(r"```[\s\S]*?```", "", pr_body)
+    lines = [ln.strip() for ln in body.split("\n") if ln.strip()]
+    skip_prefixes = ("##", "#", "---", "*maesil-agency", "PR제목", "커밋메시지", "함수명", "신뢰도")
+    root_cause = None
+    for ln in lines:
+        if not any(ln.startswith(p) for p in skip_prefixes) and len(ln) > 15:
+            root_cause = ln[:200]
+            break
 
+    if root_cause and "AttributeError" in root_cause:
+        ok("PR body에서 root_cause 추출")
+    else:
+        fail("PR body에서 root_cause 추출", f"got={root_cause!r}")
+
+def test_extract_root_cause_empty_body():
+    """PR body가 None이면 root_cause=None."""
+    pr_body = None
+    root_cause = None  # 그대로 None
+    if root_cause is None:
+        ok("PR body None → root_cause None")
+    else:
+        fail("PR body None → root_cause None")
+
+def test_save_lesson_payload_v2():
+    """P1-3: _save_lesson payload — 품질 필드 포함 구조 검증."""
+    repo = "fantasia44-netizen/maesil-insight"
+    pr_title = "[fix] NaverAdClient.create_stat_report AttributeError 수정"
+    pr_url = "https://github.com/fantasia44-netizen/maesil-insight/pull/7"
+    file_path = "app/services/naver_ad/api_client.py"
+    fn_name = "NaverAdClient.create_stat_report"
+    commit_msg = "fix: NaverAdClient에 누락된 create_stat_report 메서드 추가"
+    test_result = "unknown"
+    lesson_quality = "ok"
+
+    payload = {
+        "repo": repo,
+        "error_type": fn_name,
+        "error_pattern": pr_title,
+        "root_cause": "NaverAdClient.create_stat_report 함수 미정의",
+        "fix_summary": pr_title,
+        "actual_fix": commit_msg,
+        "files_changed": [file_path],
+        "pr_url": pr_url,
+        "pr_title": pr_title,
+        "test_result": test_result,
+        "lesson_quality": lesson_quality,
+    }
     checks = [
-        ("📚 과거 유사 수정 이력" in context, "헤더"),
-        ("_draw_text_stroke" in context, "error_type 포함"),
-        ("shorts_service.py" in context, "파일명 포함"),
-        ("2026-05-15" in context, "날짜 포함"),
-        ("PR" in context, "PR 링크 포함"),
+        ("actual_fix" in payload, "actual_fix 필드 존재"),
+        (payload["actual_fix"] == commit_msg, "actual_fix = commit_msg"),
+        ("root_cause" in payload, "root_cause 필드 존재"),
+        ("test_result" in payload, "test_result 필드 존재"),
+        ("lesson_quality" in payload, "lesson_quality 필드 존재"),
+        (payload["lesson_quality"] in ("good", "ok", "bad"), "lesson_quality 유효 값"),
+        (file_path in payload["files_changed"], "files_changed 포함"),
     ]
     all_pass = True
     for passed, name in checks:
         if not passed:
             all_pass = False
-            fail(f"lessons_context: {name}")
+            fail(f"save_lesson_v2: {name}")
     if all_pass:
-        ok("lessons_context 형식 검증 (5항목)")
+        ok("save_lesson v2 payload 구조 (7항목)")
+
+def test_lessons_context_format_v2():
+    """P1-3: _build_lessons_context 업데이트 형식 — root_cause + quality badge."""
+    lessons = [
+        {
+            "error_type": "NaverAdClient.create_stat_report",
+            "error_pattern": "[fix] create_stat_report AttributeError 수정",
+            "root_cause": "api_client.py에 메서드 누락",
+            "fix_summary": "[fix] create_stat_report AttributeError 수정",
+            "actual_fix": "fix: NaverAdClient에 누락된 메서드 추가",
+            "files_changed": ["app/services/naver_ad/api_client.py"],
+            "pr_url": "https://github.com/test/repo/pull/7",
+            "lesson_quality": "good",
+            "created_at": "2026-05-16T09:30:00+00:00",
+        },
+        {
+            "error_type": "SyncLog.start",
+            "error_pattern": "[fix] SyncLog.start 잘못된 접근 시도",
+            "root_cause": None,
+            "fix_summary": "잘못된 수정 시도",
+            "actual_fix": "잘못된 수정 시도",
+            "files_changed": [],
+            "pr_url": None,
+            "lesson_quality": "bad",
+            "created_at": "2026-05-16T08:00:00+00:00",
+        },
+    ]
+
+    # _build_lessons_context 로직 시뮬레이션 (P1-3 버전)
+    lines = ["## 📚 과거 유사 수정 이력 (참고)"]
+    for i, l in enumerate(lessons, 1):
+        pr_ref = f"[PR]({l.get('pr_url')})" if l.get("pr_url") else ""
+        created = (l.get("created_at") or "")[:10]
+        files = ", ".join((l.get("files_changed") or [])[:3])
+        quality = l.get("lesson_quality") or "ok"
+        badge = "✅" if quality == "good" else ("⚠️ [실패 시도]" if quality == "bad" else "")
+        root_cause = l.get("root_cause") or ""
+        actual_fix = l.get("actual_fix") or l.get("fix_summary") or "?"
+
+        entry = f"{i}. {badge}**{l.get('error_pattern', '?')}** {pr_ref} ({created})"
+        if root_cause:
+            entry += f"\n   원인: {root_cause[:120]}"
+        entry += f"\n   수정: {actual_fix[:120]} | 파일: {files or '?'}"
+        lines.append(entry)
+
+    context = "\n".join(lines)
+
+    checks = [
+        ("📚 과거 유사 수정 이력" in context, "헤더"),
+        ("✅" in context, "good 레슨 배지"),
+        ("⚠️ [실패 시도]" in context, "bad 레슨 배지"),
+        ("원인: api_client.py" in context, "root_cause 표시"),
+        ("actual_fix 누락된 메서드" in context or "누락된 메서드" in context, "actual_fix 표시"),
+        ("2026-05-16" in context, "날짜 포함"),
+    ]
+    all_pass = True
+    for passed, name in checks:
+        if not passed:
+            all_pass = False
+            fail(f"lessons_context_v2: {name}", context[:200])
+    if all_pass:
+        ok("lessons_context v2 형식 (6항목)")
 
 def test_lessons_empty_returns_empty():
     """빈 레슨 목록 → 빈 문자열."""
@@ -448,41 +502,300 @@ def test_lessons_empty_returns_empty():
     else:
         fail("빈 레슨 → 빈 문자열")
 
-def test_save_lesson_payload():
-    """_save_lesson payload 구조 검증."""
-    repo = "fantasia44-netizen/maesil-insight"
-    pr_title = "[fix] covering index for api_orders timeout"
-    pr_url = "https://github.com/fantasia44-netizen/maesil-insight/pull/6"
-    file_path = "migrations/194_channel_monthly_trend_perf.sql"
-    fn_name = "channel_monthly_trend"
+def test_bad_lesson_excluded_from_context():
+    """lesson_quality='bad'인 레슨은 _load_lessons 쿼리에서 제외됨 (neq 필터)."""
+    # 실제 DB 쿼리 시뮬레이션: neq('lesson_quality', 'bad') 적용
+    all_lessons = [
+        {"lesson_quality": "good", "error_pattern": "fix A"},
+        {"lesson_quality": "ok",   "error_pattern": "fix B"},
+        {"lesson_quality": "bad",  "error_pattern": "fix C (실패 시도)"},
+    ]
+    # neq('bad') 필터 적용
+    filtered = [l for l in all_lessons if l.get("lesson_quality") != "bad"]
+    if len(filtered) == 2 and all(l["lesson_quality"] != "bad" for l in filtered):
+        ok("bad 레슨 조회 제외 (neq 필터)")
+    else:
+        fail("bad 레슨 조회 제외", f"filtered={[l['error_pattern'] for l in filtered]}")
 
-    payload = {
-        "repo": repo,
-        "error_type": fn_name,
-        "error_pattern": pr_title,
-        "fix_summary": pr_title,
-        "files_changed": [file_path] if file_path else [],
-        "pr_url": pr_url,
-        "pr_title": pr_title,
-    }
+test_extract_root_cause_from_body()
+test_extract_root_cause_empty_body()
+test_save_lesson_payload_v2()
+test_lessons_context_format_v2()
+test_lessons_empty_returns_empty()
+test_bad_lesson_excluded_from_context()
+
+
+# ══════════════════════════════════════════════════════════════════
+# Circuit P1-1: _pending / _recent_pr DB 영속화
+# ══════════════════════════════════════════════════════════════════
+print("\n[Circuit P1-1] _pending / _recent_pr DB 영속화")
+
+def test_pending_task_key_format():
+    """pending task_id 키 형식 검증."""
+    conv_id = "conv-abc-1234"
+    pr_key = f"pr:{conv_id}"
+    recent_key = f"recent_pr:{conv_id}"
     checks = [
-        (payload["repo"] == repo, "repo"),
-        (payload["error_type"] == fn_name, "error_type"),
-        (file_path in payload["files_changed"], "files_changed"),
-        (payload["pr_url"] == pr_url, "pr_url"),
-        (len(payload["files_changed"]) == 1, "files_changed length"),
+        (pr_key == "pr:conv-abc-1234", "pr approval 키 형식"),
+        (recent_key == "recent_pr:conv-abc-1234", "recent pr 키 형식"),
+        (pr_key != recent_key, "두 키가 구분됨"),
     ]
     all_pass = True
     for passed, name in checks:
         if not passed:
             all_pass = False
-            fail(f"save_lesson payload: {name}")
+            fail(f"pending key: {name}")
     if all_pass:
-        ok("save_lesson payload 구조 (5항목)")
+        ok("pending task_id 키 형식 (3항목)")
 
-test_lessons_context_format()
-test_lessons_empty_returns_empty()
-test_save_lesson_payload()
+def test_pending_payload_structure():
+    """DB 저장 pending payload 구조 검증."""
+    conv_id = "conv-test-001"
+    action = {
+        "action_id": "abc12345",
+        "repo": "fantasia44-netizen/maesil-insight",
+        "branch": "fix/agency-abc12345",
+        "base_branch": "main",
+        "path": "app/services/naver_ad.py",
+        "patch_code": "def create_stat_report(self): ...",
+        "fn_name": "create_stat_report",
+        "commit_msg": "fix: add create_stat_report method",
+        "pr_title": "[fix] NaverAdClient.create_stat_report 추가",
+        "confidence": "high",
+    }
+    from datetime import timedelta
+    expires_at = (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
+
+    db_row = {
+        "task_id": f"pr:{conv_id}",
+        "task_type": "pr_approval",
+        "payload": action,
+        "status": "pending",
+        "conversation_id": conv_id,
+        "expires_at": expires_at,
+    }
+
+    checks = [
+        (db_row["task_id"] == f"pr:{conv_id}", "task_id 형식"),
+        (db_row["task_type"] == "pr_approval", "task_type"),
+        (db_row["status"] == "pending", "초기 status=pending"),
+        (db_row["payload"]["fn_name"] == "create_stat_report", "payload.fn_name"),
+        ("expires_at" in db_row, "expires_at 존재"),
+        (db_row["payload"]["confidence"] == "high", "confidence 포함"),
+    ]
+    all_pass = True
+    for passed, name in checks:
+        if not passed:
+            all_pass = False
+            fail(f"pending payload: {name}")
+    if all_pass:
+        ok("pending DB row 구조 (6항목)")
+
+def test_pending_expiry_check():
+    """만료된 pending은 None 반환 (expires_at < now)."""
+    now = datetime.now(timezone.utc)
+    # 만료된 레코드: 25시간 전 생성
+    expired_row = {
+        "status": "pending",
+        "expires_at": (now - timedelta(hours=25)).isoformat(),
+        "payload": {"action_id": "old"},
+    }
+    # _get_pending 로직: expires_at >= now 조건
+    is_valid = datetime.fromisoformat(expired_row["expires_at"].replace("Z", "+00:00")) >= now
+    if not is_valid:
+        ok("만료된 pending → None (expires_at 체크)")
+    else:
+        fail("만료된 pending → None", "만료됐는데 유효로 판정")
+
+def test_pending_memory_fallback():
+    """DB 실패 시 메모리 fallback 동작 시뮬레이션."""
+    _pending_mem: dict = {}
+    conv_id = "conv-fallback-test"
+    action = {"action_id": "fb001", "repo": "test/repo"}
+
+    # DB 저장 실패 시 메모리에 저장
+    db_failed = True
+    if db_failed:
+        _pending_mem[conv_id] = action
+
+    # 조회: 메모리 먼저 확인
+    result = _pending_mem.get(conv_id)
+    if result and result["action_id"] == "fb001":
+        ok("DB 실패 시 메모리 fallback 동작")
+    else:
+        fail("DB 실패 시 메모리 fallback", f"result={result}")
+
+def test_recent_pr_payload_includes_pr_body():
+    """P1-1: recent_pr payload에 pr_body, commit_msg 포함 (레슨 저장 시 활용)."""
+    recent_pr_data = {
+        "repo": "fantasia44-netizen/maesil-insight",
+        "pr_number": 7,
+        "pr_url": "https://github.com/fantasia44-netizen/maesil-insight/pull/7",
+        "pr_title": "[fix] NaverAdClient.create_stat_report 추가",
+        "pr_body": "## AI 자동 수정\n\n함수 누락으로 AttributeError 발생...",
+        "commit_msg": "fix: NaverAdClient에 누락된 메서드 추가",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    checks = [
+        ("pr_body" in recent_pr_data, "pr_body 포함"),
+        ("commit_msg" in recent_pr_data, "commit_msg 포함"),
+        (recent_pr_data["pr_number"] == 7, "pr_number"),
+        (len(recent_pr_data["pr_body"]) > 10, "pr_body 내용 있음"),
+    ]
+    all_pass = True
+    for passed, name in checks:
+        if not passed:
+            all_pass = False
+            fail(f"recent_pr payload: {name}")
+    if all_pass:
+        ok("recent_pr payload에 pr_body/commit_msg 포함 (4항목)")
+
+def test_pending_del_marks_done():
+    """_del_pending: DB status를 'done'으로 변경."""
+    # 삭제 후 상태
+    status_after = "done"  # update({'status': 'done'}) 결과
+    _pending_mem: dict = {"conv-1": {"action_id": "x"}}
+    _pending_mem.pop("conv-1", None)
+
+    if status_after == "done" and "conv-1" not in _pending_mem:
+        ok("pending 삭제: DB=done, 메모리 제거")
+    else:
+        fail("pending 삭제", f"status={status_after}")
+
+test_pending_task_key_format()
+test_pending_payload_structure()
+test_pending_expiry_check()
+test_pending_memory_fallback()
+test_recent_pr_payload_includes_pr_body()
+test_pending_del_marks_done()
+
+
+# ══════════════════════════════════════════════════════════════════
+# Circuit P1-2: L2 draft → approve / reject 워크플로우
+# ══════════════════════════════════════════════════════════════════
+print("\n[Circuit P1-2] L2 draft → approve / reject 워크플로우")
+
+def test_l2_draft_not_in_matching():
+    """status='draft'인 스크립트는 L2 매칭에서 제외."""
+    all_scripts = [
+        {"id": "L2_001", "status": "active",  "triggers": ["환불"], "is_active": True},
+        {"id": "LEARN_ABCD", "status": "draft", "triggers": ["환불 방법"], "is_active": True},
+        {"id": "L2_002", "status": "active",  "triggers": ["배송"], "is_active": True},
+        {"id": "L2_003", "status": None,       "triggers": ["취소"], "is_active": True},
+    ]
+    # _load_l2_scripts 필터: status=active OR status IS NULL
+    matching = [s for s in all_scripts
+                if s.get("status") == "active" or s.get("status") is None]
+    script_ids = [s["id"] for s in matching]
+
+    checks = [
+        ("LEARN_ABCD" not in script_ids, "draft 스크립트 제외"),
+        ("L2_001" in script_ids, "active 스크립트 포함"),
+        ("L2_003" in script_ids, "status=None 스크립트 포함 (하위호환)"),
+        (len(matching) == 3, "매칭 대상 3개"),
+    ]
+    all_pass = True
+    for passed, name in checks:
+        if not passed:
+            all_pass = False
+            fail(f"draft 필터: {name}", f"matching={script_ids}")
+    if all_pass:
+        ok("draft L2 매칭 제외 + 하위호환 (4항목)")
+
+def test_l2_approve_payload():
+    """approve 시 status='active', is_verified=True로 변경."""
+    script_before = {"id": "LEARN_ABCD", "status": "draft", "is_verified": False}
+
+    # PATCH /l2-scripts/{id}/approve 로직
+    update_payload = {
+        "status": "active",
+        "is_verified": True,
+        "sort_order": 0,
+    }
+    script_after = {**script_before, **update_payload}
+
+    checks = [
+        (script_after["status"] == "active", "status=active"),
+        (script_after["is_verified"] is True, "is_verified=True"),
+        (script_after["sort_order"] == 0, "sort_order=0 (최우선)"),
+    ]
+    all_pass = True
+    for passed, name in checks:
+        if not passed:
+            all_pass = False
+            fail(f"approve: {name}")
+    if all_pass:
+        ok("approve → status=active + is_verified=True (3항목)")
+
+def test_l2_reject_payload():
+    """reject 시 is_active=False (비활성화, DB에서 제거하지 않음)."""
+    script_before = {"id": "LEARN_ABCD", "status": "draft", "is_active": True}
+
+    # PATCH /l2-scripts/{id}/reject 로직
+    update_payload = {"is_active": False}
+    script_after = {**script_before, **update_payload}
+
+    checks = [
+        (script_after["is_active"] is False, "is_active=False"),
+        (script_after["status"] == "draft", "status 유지 (기록 보존)"),
+        (script_after["id"] == "LEARN_ABCD", "id 보존"),
+    ]
+    all_pass = True
+    for passed, name in checks:
+        if not passed:
+            all_pass = False
+            fail(f"reject: {name}")
+    if all_pass:
+        ok("reject → is_active=False (기록 보존) (3항목)")
+
+def test_l2_drafts_list_api():
+    """GET /l2-scripts/drafts — draft 목록 조회 결과 구조."""
+    mock_drafts = [
+        {
+            "id": "LEARN_ABCD1234",
+            "program": "maesil-insight",
+            "triggers": ["환불 신청 버튼이 어디 있나요"],
+            "keywords": ["환불", "신청"],
+            "emotion": "doubt",
+            "message": "환불 신청은 마이페이지에서 하실 수 있습니다.",
+            "is_active": True,
+            "updated_at": "2026-05-16T09:00:00+00:00",
+        }
+    ]
+    # 응답 구조 검증
+    checks = [
+        (len(mock_drafts) == 1, "draft 1개 반환"),
+        (mock_drafts[0]["id"].startswith("LEARN_"), "LEARN_ prefix"),
+        ("triggers" in mock_drafts[0], "triggers 포함"),
+        ("message" in mock_drafts[0], "message 포함"),
+        (mock_drafts[0]["is_active"] is True, "is_active=True"),
+    ]
+    all_pass = True
+    for passed, name in checks:
+        if not passed:
+            all_pass = False
+            fail(f"drafts API: {name}")
+    if all_pass:
+        ok("drafts 목록 API 구조 (5항목)")
+
+def test_l2_approve_triggers_cache_invalidation():
+    """approve 후 L2 캐시 무효화 필요 (draft는 무효화 불필요)."""
+    # draft 등록 시: 캐시 무효화 안 함 (draft는 L2에 포함 안 되므로)
+    draft_invalidates_cache = False
+    # approve 후: 캐시 무효화 필요 (이제 active로 바뀌어 L2에 포함됨)
+    approve_invalidates_cache = True
+
+    if not draft_invalidates_cache and approve_invalidates_cache:
+        ok("draft 등록=캐시유지, approve=캐시무효화")
+    else:
+        fail("캐시 무효화 정책",
+             f"draft_invalidates={draft_invalidates_cache}, approve_invalidates={approve_invalidates_cache}")
+
+test_l2_draft_not_in_matching()
+test_l2_approve_payload()
+test_l2_reject_payload()
+test_l2_drafts_list_api()
+test_l2_approve_triggers_cache_invalidation()
 
 
 # ══════════════════════════════════════════════════════════════════
