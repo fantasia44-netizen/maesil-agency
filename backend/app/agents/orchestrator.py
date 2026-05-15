@@ -15,23 +15,23 @@ from app.agents.base import _get_anthropic_client, _log_run_end, _log_run_start,
 
 ROUTING_RULES: list[tuple[list[str], list[str]]] = [
     # 키워드 → [agent_types]
-    (["매출", "판매", "주문", "채널", "revenue", "sales", "roas", "광고 성과"],
-     ["sales"]),
-    (["재무", "비용", "손익", "마진", "수익", "정산", "광고비", "finance", "pnl"],
+    (["재무", "비용", "손익", "마진", "수익", "정산", "finance", "pnl"],
      ["finance"]),
     (["재고", "발주", "입고", "출고", "안전재고", "warehouse", "inventory"],
      ["warehouse"]),
-    (["cs", "고객", "상담", "클레임", "반품", "문의", "매요", "maeyo"],
+    (["cs", "상담", "클레임", "반품", "매요", "maeyo"],
      ["cs"]),
     (["테스트", "하네스", "test", "harness", "회귀", "검증"],
      ["tester"]),
-    # 영업 아웃리치: 타겟 발굴 / 제안서 / 셀러 찾기
-    (["타겟", "영업", "제안서", "셀러 찾", "아웃리치", "outreach",
-      "발굴", "리스트 뽑", "홍보 대상", "잠재 고객", "잠재고객",
-      "스토어 찾", "쇼핑몰 찾"],
-     ["outreach"]),
+    # Growth Intelligence: 매출 + 영업 + CS 분석 + 소비자 의도 + 개선 제안 통합
+    (["매출", "판매", "주문", "채널", "revenue", "sales", "roas", "광고 성과",  # 매출
+      "타겟", "영업", "제안서", "셀러", "아웃리치", "outreach", "발굴",          # 영업
+      "cs 분석", "고객 패턴", "소비자", "의도", "이탈", "전환",                  # CS 인텔리전스
+      "개선", "불만", "피드백", "문의 분석", "고객 분석",                         # 개선 제안
+      "그로스", "growth"],
+     ["growth"]),
     (["현황", "브리핑", "보고", "오늘", "아침", "요약", "전체"],
-     ["sales", "finance"]),  # 현황 보고 → sales + finance 기본
+     ["growth", "finance"]),  # 현황 보고 → growth + finance
 ]
 
 
@@ -53,16 +53,19 @@ def llm_route(message: str) -> list[str]:
             max_tokens=128,
             system="""당신은 운영 AI 비서팀의 라우터입니다.
 사용자 메시지를 분석해 적절한 에이전트를 선택하세요.
-가능한 에이전트: sales, finance, warehouse, cs, outreach
-- outreach: 외부 타겟 발굴, 제안서 작성, 셀러 찾기, 영업 리스트
+가능한 에이전트: growth, finance, warehouse, cs
+- growth: 매출 분석, 영업 타겟/제안서, CS 인텔리전스, 소비자 의도 분석, 비즈니스 개선 제안
+- finance: 재무·비용·손익·정산 분석
+- warehouse: 재고·발주·입출고
+- cs: 고객 상담 직접 처리 (매요 AI)
 여러 에이전트가 필요하면 쉼표로 구분해 반환하세요.
-에이전트 이름만 반환하세요. 예: sales,finance""",
+에이전트 이름만 반환하세요. 예: growth,finance""",
             messages=[{"role": "user", "content": f"메시지: {message}"}],
         )
         text = resp.content[0].text.strip().lower()
-        valid = {"sales", "finance", "warehouse", "cs", "outreach"}
+        valid = {"growth", "sales", "finance", "warehouse", "cs", "outreach"}
         agents = [a.strip() for a in text.split(",") if a.strip() in valid]
-        return agents if agents else ["sales"]
+        return agents if agents else ["growth"]
     except Exception:
         return ["sales"]
 
@@ -86,6 +89,7 @@ def _run_single_agent(
     context_messages: list[dict] | None,
 ) -> dict[str, Any]:
     """단일 에이전트 실행 — ThreadPoolExecutor 내부에서 호출."""
+    from app.agents.growth import GrowthAgent
     from app.agents.sales import SalesAgent
     from app.agents.finance import FinanceAgent
     from app.agents.warehouse import WarehouseAgent
@@ -94,12 +98,13 @@ def _run_single_agent(
     from app.agents.outreach import OutreachAgent
 
     AGENT_MAP = {
-        "sales":     SalesAgent,
+        "growth":    GrowthAgent,    # 통합 그로스 에이전트
+        "sales":     SalesAgent,     # legacy (하위 호환)
         "finance":   FinanceAgent,
         "warehouse": WarehouseAgent,
         "cs":        CSAgent,
         "tester":    TesterAgent,
-        "outreach":  OutreachAgent,
+        "outreach":  OutreachAgent,  # legacy (하위 호환)
     }
     cls = AGENT_MAP.get(atype)
     if not cls:

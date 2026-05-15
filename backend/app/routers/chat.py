@@ -20,18 +20,19 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 AGENT_DISPLAY = {
-    "sales":        "세일즈 에이전트",
+    "growth":       "그로스 인텔리전스",   # 매출+영업+CS분석+소비자의도+개선 통합
+    "sales":        "세일즈 에이전트",      # (legacy, growth로 통합됨)
     "finance":      "파이낸스 에이전트",
     "warehouse":    "웨어하우스 에이전트",
     "cs":           "CS 에이전트",
     "tester":       "테스터 에이전트",
     "developer":    "개발 에이전트",
-    "outreach":     "영업 에이전트",
+    "outreach":     "영업 에이전트",        # (legacy, growth로 통합됨)
     "orchestrator": "오케스트레이터",
 }
 
 # force_agent 허용 목록 (오케스트레이터 bypass 가능한 에이전트)
-DIRECT_AGENTS = {"sales", "finance", "warehouse", "cs", "outreach", "developer"}
+DIRECT_AGENTS = {"growth", "sales", "finance", "warehouse", "cs", "outreach", "developer"}
 
 # 개발 에이전트 키워드 (super_admin 전용)
 DEV_KEYWORDS = {
