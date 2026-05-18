@@ -877,7 +877,34 @@ def _extract_relevant_section(content: str, target_symbol: str) -> str:
                 merged = header + "\n\n# ─── 관련 함수 ───\n" + section
                 return merged[:_MAX_SECTION_CHARS]
 
-    # 3) 못 찾음 → 앞 50k자
+    # 3) 로거 태그 / 대시 포함 심볼 — 리터럴 문자열 검색으로 주변 컨텍스트 추출
+    #    예: "PROD-DIAG", "AUTO-RECOVERY" 같은 태그는 코드에 '[PROD-DIAG]' 형태로 존재
+    tag_candidates = [target_symbol]
+    if "." in target_symbol:
+        # "module.TAG" → "TAG", "[TAG]" 모두 시도
+        tag_candidates = [method_part, f"[{method_part}]", class_part]
+    for tag in tag_candidates:
+        if not tag:
+            continue
+        tag_idx = content.find(tag)
+        if tag_idx == -1:
+            continue
+        # 태그가 있는 라인 번호 계산
+        tag_line = content[:tag_idx].count("\n")
+        # 해당 라인 기준 앞뒤 함수/클래스 블록 포함 ±200줄
+        start = max(0, tag_line - 50)
+        end = min(len(lines), tag_line + 200)
+        # 시작 위치를 함수/클래스 시작까지 당기기
+        for up in range(tag_line, max(0, tag_line - 200), -1):
+            s = lines[up].lstrip()
+            if s.startswith("def ") or s.startswith("class "):
+                start = max(0, up - 2)
+                break
+        section = "\n".join(lines[start:end])
+        merged = header + f"\n\n# ─── '{tag}' 태그 주변 코드 (L{start}~{end}) ───\n" + section
+        return merged[:_MAX_SECTION_CHARS]
+
+    # 4) 완전 폴백 → 앞 50k자
     return content[:_MAX_SECTION_CHARS]
 
 
@@ -1322,12 +1349,13 @@ def analyze_and_propose(
                             ]
                         code_search_queries += [cls_name_orig]  # competitor (파일명 매칭 폴백)
                     elif symbol_is_tag:
-                        # 로거 태그인 경우: 클래스 정의 대신 메서드명으로 검색
-                        # (예: auto_recovery, start 등 실제 함수명이 더 정확)
+                        # 로거 태그인 경우: 태그 리터럴 문자열 + 모듈명으로 검색
+                        # (예: "[PROD-DIAG]", "PROD-DIAG" — def 없는 로그 태그)
                         if method_name_orig:
                             code_search_queries += [
-                                f"def {method_name_orig}",     # def auto_recovery
-                                method_name_orig,              # auto_recovery 단독
+                                f"[{method_name_orig}]",       # "[PROD-DIAG]" 리터럴
+                                method_name_orig,              # PROD-DIAG 단독
+                                cls_name_orig,                 # product_diagnosis_views (모듈명)
                             ]
                     else:
                         # 괄호 없이 클래스명 단독 검색 (대괄호는 GitHub search 특수문자)
