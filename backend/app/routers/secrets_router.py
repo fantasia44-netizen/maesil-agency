@@ -69,6 +69,9 @@ def test_secret(name: str) -> dict:
     if name == "anthropic_api_key":
         return _test_anthropic_key(name, value)
 
+    if name == "agency_growth_token":
+        return _test_growth_token(name, value)
+
     # 나머지 — 저장 여부만 확인
     secrets_svc.mark_tested(name, ok=True, error=None)
     return {"ok": True, "note": "값 저장 확인 (연결 테스트 미지원 항목)"}
@@ -120,6 +123,21 @@ def _test_supabase_key(name: str, key: str) -> dict:
     """서비스 롤 키는 URL 없이 단독 검증 불가 — 저장 여부만 확인."""
     secrets_svc.mark_tested(name, ok=True, error=None)
     return {"ok": True, "note": "키 저장 확인 (URL과 함께 사용 시 실제 연결 검증됨)"}
+
+
+def _test_growth_token(name: str, value: str) -> dict:
+    """GROWTH_INTERNAL_TOKEN과 일치 여부 확인."""
+    import hmac
+    import os
+    env_token = os.environ.get("GROWTH_INTERNAL_TOKEN", "").strip()
+    if not env_token:
+        secrets_svc.mark_tested(name, ok=True, error=None)
+        return {"ok": True, "note": "저장 확인 (서버 환경변수 GROWTH_INTERNAL_TOKEN 미설정 — Render에 등록 필요)"}
+    if hmac.compare_digest(value.strip(), env_token):
+        secrets_svc.mark_tested(name, ok=True, error=None)
+        return {"ok": True, "note": "Growth Token 일치 확인"}
+    secrets_svc.mark_tested(name, ok=False, error="token mismatch")
+    raise HTTPException(status_code=400, detail="agency_growth_token이 서버 GROWTH_INTERNAL_TOKEN과 일치하지 않습니다.")
 
 
 def _test_anthropic_key(name: str, key: str) -> dict:
