@@ -1174,12 +1174,48 @@ def _call_claude(system: str, user: str, max_tokens: int = 2000) -> str:
 # 핵심 분석 + 수정안 생성
 # ─────────────────────────────────────────────────────────────────
 
+_META_QUESTION_PATTERNS = re.compile(
+    r"(수정\s*가능|고칠\s*수\s*있|변경\s*가능|할\s*수\s*있|가능한가|할\s*수\s*있나|뭘\s*할\s*수|어떤\s*걸\s*할|무엇을\s*할"
+    r"|what\s+can\s+you|can\s+you\s+(fix|modify|change|update)|what.*capable)",
+    re.I,
+)
+
+
+def _is_meta_question(text: str) -> bool:
+    """에러 분석 요청이 아닌 에이전트 능력·범위 질문 여부 판단."""
+    if _META_QUESTION_PATTERNS.search(text):
+        # 에러 로그 패턴이 함께 있으면 메타 질문이 아님
+        has_error_log = bool(re.search(r'(ERROR|WARNING|Traceback|Exception|500|404)', text, re.I))
+        return not has_error_log
+    return False
+
+
 def analyze_and_propose(
     user_message: str,
     conversation_id: str,
     context_messages: list[dict] | None = None,
 ) -> str:
     """분석 + 수정안 제시. pending action 저장. 응답 텍스트 반환."""
+
+    # ── 0순위: 능력·범위 질문 — 에러 분석 루프 진입 전에 처리 ──────────
+    if _is_meta_question(user_message):
+        programs = _all_programs()
+        prog_names = ", ".join(
+            f"`{p.get('display_name') or p.get('name')}`"
+            for p in programs if p.get("github_repo")
+        ) or "등록된 프로그램 없음"
+        return (
+            "네, 가능합니다.\n\n"
+            "## 개발 에이전트 수정 가능 범위\n\n"
+            f"현재 GitHub 레포가 연결된 프로그램: {prog_names}\n\n"
+            "**할 수 있는 것:**\n"
+            "- 에러 로그 분석 → 원인 파악 → 수정 코드(PROPOSED_FIX) 제시\n"
+            "- `승인` 입력 시 자동으로 GitHub PR 생성\n"
+            "- `머지` 입력 시 PR 자동 머지 → Render 배포 자동 진행\n"
+            "- 동일 에러 재발 여부 확인 (PR 이력 비교)\n\n"
+            "**방법:**\n"
+            "에러 알림을 그대로 이 채팅에 붙여넣으면 바로 분석합니다."
+        )
 
     programs = _all_programs()
     program = _detect_program_from_text(user_message, programs)
@@ -1652,6 +1688,12 @@ def analyze_and_propose(
 - 응답은 항상 한국어로 작성
 - 에러/코드 관련 구체적 요청이 있으면 분석 후 수정안 제시
 - **메시지가 짧거나 단순 호출(예: "개발팀", "안녕")이면 1~2줄로 간단히 맞이하고 무엇을 도와줄지 물어볼 것. 긴 형식 목록 금지**
+
+## 능력·범위 질문 처리 (중요)
+- "수정 가능한가?", "할 수 있나?", "어떤 프로그램 볼 수 있나?" 같은 **능력·범위 질문**은
+  에러 분석 루프로 넘기지 말고 **바로 직접 답변**할 것
+- 연결된 프로그램 목록과 "승인/머지" 워크플로우를 간략히 안내
+- ❌ 에러 심볼 추출 시도, 파일 검색, 코드 분석 금지 — 그냥 능력 설명만 할 것
 
 ## 절대 금지
 - ❌ 사용자에게 "파일을 공유해 주세요" / "코드를 올려주세요" / "보여주세요" 요청 금지
