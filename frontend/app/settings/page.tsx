@@ -76,6 +76,8 @@ const KEY_CARDS: KeyCard[] = [
     hint: "예: https://maesil-insight.onrender.com (Tester 에이전트 하네스 API 호출용)" },
   { name: "harness_api_token", kind: "other", label: "Harness API Token",
     hint: "maesil-insight의 HARNESS_API_TOKEN 환경변수 값 (Tester 에이전트용)" },
+  { name: "maesil_agency_url", kind: "config", label: "maesil-agency 서비스 URL",
+    hint: "예: https://maesil-agency.onrender.com (인사이트→에이전시 GrowthAgent 호출용)" },
   { name: "agency_growth_token", kind: "other", label: "Growth API Token",
     hint: "인사이트 → 에이전시 GrowthAgent 연동 토큰. 에이전시 Render 환경변수 GROWTH_INTERNAL_TOKEN과 동일한 값" },
   // ── 인프라 ──

@@ -72,6 +72,9 @@ def test_secret(name: str) -> dict:
     if name == "agency_growth_token":
         return _test_growth_token(name, value)
 
+    if name == "maesil_agency_url":
+        return _test_supabase_url(name, value)  # HTTP 핑 재사용
+
     # 나머지 — 저장 여부만 확인
     secrets_svc.mark_tested(name, ok=True, error=None)
     return {"ok": True, "note": "값 저장 확인 (연결 테스트 미지원 항목)"}

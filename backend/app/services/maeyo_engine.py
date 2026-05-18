@@ -96,29 +96,46 @@ _l2_cache_ts: dict[str, float] = {}
 _L2_CACHE_TTL = 60.0
 
 
-def _load_l2_scripts(program: str = "maesil-insight") -> list[dict]:
-    """DB에서 L2 스크립트 로드 (TTL 캐시, 프로그램별).
+def _l2_cache_key(program: str, user_role: str | None) -> str:
+    """캐시 키: program + user_role 조합."""
+    return f"{program}:{user_role or 'common'}"
 
+
+def _load_l2_scripts(
+    program: str = "maesil-insight",
+    user_role: str | None = None,
+) -> list[dict]:
+    """DB에서 L2 스크립트 로드 (TTL 캐시, 프로그램 × user_role).
+
+    user_role 매칭 우선순위:
+      1) 해당 역할 전용 스크립트 (user_role 일치)
+      2) 공통 스크립트 (user_role IS NULL)
     정렬 우선순위:
       1) is_verified=True 스크립트 먼저 (오답 방지)
       2) 각 스크립트 내 트리거: 길이 내림차순 (구체적인 것 우선 매칭)
     """
     global _l2_cache, _l2_cache_ts
+    cache_key = _l2_cache_key(program, user_role)
     now = time.time()
-    if now - _l2_cache_ts.get(program, 0.0) < _L2_CACHE_TTL and _l2_cache.get(program):
-        return _l2_cache[program]
+    if now - _l2_cache_ts.get(cache_key, 0.0) < _L2_CACHE_TTL and _l2_cache.get(cache_key):
+        return _l2_cache[cache_key]
     try:
         from app.db.maesil_total_client import get_maesil_total_client
+        # user_role 필터: 해당 역할 전용 + 공통(NULL) 모두 로드
+        role_filter = "user_role.is.null"
+        if user_role:
+            role_filter = f"user_role.eq.{user_role},user_role.is.null"
         resp = (
             get_maesil_total_client()
             .schema("agent_work")
             .table("maeyo_l2_scripts")
-            .select("id,triggers,keywords,emotion,message,action,hint,tts_key,is_verified,status")
+            .select("id,triggers,keywords,emotion,message,action,hint,tts_key,is_verified,status,user_role")
             .eq("is_active", True)
             # P1 보강: status='active'만 로딩 (draft는 관리자 검토 전 — L2 매칭 제외)
             # 하위 호환: status 컬럼 없는 구 레코드는 NULL → neq('draft')로 포함
             .or_("status.eq.active,status.is.null")
             .in_("program", [program, "common"])
+            .or_(role_filter)
             .order("sort_order")
             .execute()
         )
@@ -138,21 +155,24 @@ def _load_l2_scripts(program: str = "maesil-insight") -> list[dict]:
                 "hint":        r.get("hint"),
                 "tts_key":     r.get("tts_key"),
                 "is_verified": bool(r.get("is_verified", False)),
+                "user_role":   r.get("user_role"),  # None=공통
             })
-        # verified 스크립트를 앞에 배치 (동일 트리거 충돌 시 검증된 것 우선)
-        verified   = [s for s in scripts if s["is_verified"]]
-        unverified = [s for s in scripts if not s["is_verified"]]
-        scripts = verified + unverified
+        # 정렬: 역할 전용 스크립트 > 공통, verified > unverified
+        def _sort_key(s: dict) -> tuple:
+            role_priority = 0 if s.get("user_role") == user_role and user_role else 1
+            verified_priority = 0 if s["is_verified"] else 1
+            return (role_priority, verified_priority)
+        scripts.sort(key=_sort_key)
 
-        _l2_cache[program] = scripts
-        _l2_cache_ts[program] = now
+        _l2_cache[cache_key] = scripts
+        _l2_cache_ts[cache_key] = now
         logger.debug(
-            "[maeyo] L2 loaded '%s': total=%d verified=%d",
-            program, len(scripts), len(verified),
+            "[maeyo] L2 loaded '%s' role=%s: total=%d",
+            program, user_role or "common", len(scripts),
         )
     except Exception as e:
         logger.warning("[maeyo] L2 DB 로드 실패 (캐시 유지) program=%s: %s", program, e)
-    return _l2_cache.get(program, [])
+    return _l2_cache.get(cache_key, [])
 
 
 def invalidate_l2_cache() -> None:
@@ -200,12 +220,23 @@ def _build_system_prompt(
     program: str,
     verified_examples: list[dict] | None = None,
 ) -> str:
-    plan    = user_context.get("plan_type", "free")
-    company = user_context.get("company_name", "")
+    plan      = user_context.get("plan_type", "free")
+    company   = user_context.get("company_name", "")
+    user_role = user_context.get("user_role")  # seller | partner | agency | None
     program_display = {
         "maesil-insight": "매실 인사이트(Maesil Insight)",
         "maesil-studio":  "매실 스튜디오(Maesil Studio)",
     }.get(program, program)
+
+    # ── user_role 헤더 블록 (인사이트 전용) ─────────────────────────
+    role_header = ""
+    if program == "maesil-insight" and user_role:
+        _role_labels = {
+            "seller":  "셀러 (스마트스토어/쿠팡 운영)",
+            "partner": "파트너 (매실 재판매/도입 에이전시)",
+            "agency":  "광고대행주 (클라이언트 계정 대신 운영)",
+        }
+        role_header = f"\n【사용자 유형】{_role_labels.get(user_role, user_role)}\n"
 
     is_studio = (program == "maesil-studio")
 
@@ -286,7 +317,33 @@ def _build_system_prompt(
                 rules.append("- 네이버 광고 API가 미연동. ads.naver.com → SA API 사용 관리에서 신청 필요.")
             guidance = "\n".join(rules)
 
-        role_block = f"""\
+        if user_role == "partner":
+            role_block = f"""\
+【역할】
+- {program_display} 파트너 전용 안내 (재판매/도입 지원)
+- 클라이언트 계정 초대·권한 설정 방법 안내
+- 파트너 대시보드·리포트 기능 안내
+- 서비스 오류·에러 해결 안내
+
+【절대 금지】
+- 개별 셀러 매출 데이터 직접 노출 (개인정보 보호)
+- 세금 신고, 법률, 투자 조언
+- 경쟁 서비스 추천"""
+        elif user_role == "agency":
+            role_block = f"""\
+【역할】
+- {program_display} 광고대행 전용 안내
+- 클라이언트 계정 전환·관리 방법 안내
+- 광고 리포트·성과 분석 기능 안내
+- 대행사 정산·청구 관련 안내
+- 서비스 오류·에러 해결 안내
+
+【절대 금지】
+- 직접 광고 집행·입찰 대행 (서비스 범위 밖)
+- 세금 신고, 법률, 투자 조언
+- 경쟁 서비스 추천"""
+        else:
+            role_block = f"""\
 【역할】
 - {program_display} 서비스 사용법, 기능 안내
 - 채널 API 연결 방법 안내
@@ -316,8 +373,7 @@ def _build_system_prompt(
 
     return f"""\
 너는 {program_display}의 AI 도우미 '매요'야.
-플랜: {plan} | 회사: {company}
-
+플랜: {plan} | 회사: {company}{role_header}
 【현재 사용자 상태】
 {ch_status}
 {ad_status}
@@ -428,6 +484,7 @@ def process_message(
     """
     user_context = user_context or {}
     history = history or []
+    user_role: str | None = user_context.get("user_role")  # seller | partner | agency | None
 
     # 대화 턴 제한 — 무한 대화 토큰 낭비 방지
     user_turns = sum(1 for m in history if m.get("role") == "user")
@@ -447,8 +504,8 @@ def process_message(
     if oos:
         return {**oos, "layer": "l2", "script_id": None}
 
-    # L2 스크립트 로드 (캐시) — verified 우선 정렬 포함
-    scripts = _load_l2_scripts(program)
+    # L2 스크립트 로드 (캐시) — program × user_role 분리, verified 우선
+    scripts = _load_l2_scripts(program, user_role)
 
     # L2 FAQ 매칭
     script = _match_l2(message, scripts)
