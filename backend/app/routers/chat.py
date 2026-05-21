@@ -413,7 +413,7 @@ def chat(req: ChatRequest, bg: BackgroundTasks, user: UserContext = Depends(get_
     #   (b) 직전 에이전트가 developer → 대화 맥락 유지
     #   (c) 메시지에 dev 키워드 또는 LLM 판단 yes
     has_pending_dev_action = (
-        user.is_super_admin and conversation_id in dev_chat_agent._pending
+        user.is_super_admin and dev_chat_agent._get_pending(conversation_id) is not None
     )
     # 알림에서 시작된 대화(alert-{alert_id})는 항상 dev 컨텍스트
     is_alert_conversation = (
@@ -455,8 +455,8 @@ def chat(req: ChatRequest, bg: BackgroundTasks, user: UserContext = Depends(get_
     if is_dev:
         _dev_mode_conversations.add(conversation_id)
     # 액션 결정 — LLM 의도 분류 우선, 실패 시 키워드 fallback.
-    has_pending = conversation_id in dev_chat_agent._pending
-    has_recent_pr = conversation_id in dev_chat_agent._recent_pr
+    has_pending = dev_chat_agent._get_pending(conversation_id) is not None
+    has_recent_pr = dev_chat_agent._get_recent_pr(conversation_id) is not None
 
     intent = None
     if user.is_super_admin and is_dev:
