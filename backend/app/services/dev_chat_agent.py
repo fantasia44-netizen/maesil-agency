@@ -667,6 +667,18 @@ def _extract_error_function(text: str) -> str | None:
     if m:
         return m.group(1)
 
+    # ── Python 표준 로깅 포맷: [LEVEL] module: [Description] func 비정상|스킵|... ──
+    # 예: "[WARNING] sync_worker: [Worker sync-w1] claim_order_sync_job 비정상 응답 → 스킵: APIError"
+    m = re.search(
+        r'\[(?:WARNING|ERROR|INFO|DEBUG|CRITICAL)\]\s+[a-z_][a-z0-9_.]*\s*:\s*'
+        r'(?:\[[^\]]+\]\s+)?'        # optional [Worker sync-w1] 등 설명 브라켓
+        r'([a-z_]\w+)'               # 함수명
+        r'\s+(?:비정상|스킵|실패|오류|에러|error|failed|exception)',
+        text, re.I,
+    )
+    if m:
+        return m.group(1)
+
     # ── AttributeError: 'ClassName' object has no attribute 'method' ──
     # 접두사가 있든 없든 (로거 태그 뒤에 붙는 경우 포함) 잡아냄.
     # 예: "[Collector] AD 예외: 'NaverAdClient' object has no attribute 'create_stat_report'"
@@ -1006,7 +1018,22 @@ def _extract_file_paths(text: str) -> list[str]:
             if fp not in found:
                 found.append(fp)
 
-    return found[:16]  # 최대 16개
+    # Python 표준 로깅 포맷: [LEVEL] module_name: message
+    # 예: "[WARNING] sync_worker: [Worker sync-w1] ..." → sync_worker.py
+    for m in re.finditer(
+        r'\[(?:WARNING|ERROR|INFO|DEBUG|CRITICAL)\]\s+([a-z_][a-z0-9_.]+)\s*:',
+        text, re.I,
+    ):
+        mod = m.group(1).split(".")[0]   # 'services.foo' → 'services' 아닌 파일명 부분만
+        # 점 표기면 이미 위 dot-notation 패턴에서 처리됨 — 단일 모듈명만 여기서 추가
+        if "." not in m.group(1):
+            for prefix in ["", "app/services", "services", "workers", "jobs", "tasks"]:
+                fp = f"{prefix}/{mod}.py" if prefix else f"{mod}.py"
+                if fp not in found:
+                    found.append(fp)
+        break  # 첫 번째 레벨 표기만
+
+    return found[:20]  # 최대 20개 (표준 로깅 후보 추가로 상향)
 
 
 def _detect_program_from_text(text: str, programs: list[dict]) -> dict | None:
