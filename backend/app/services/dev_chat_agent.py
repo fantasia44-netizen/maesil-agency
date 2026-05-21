@@ -1520,9 +1520,12 @@ def analyze_and_propose(
                         _extract_relevant_section(content, failing_symbol)
                         if failing_symbol else content[:_MAX_SECTION_CHARS]
                     )
+                    # 스니펫이 한도에 딱 걸리면 잘린 것 — 패치 생성 금지 플래그
+                    _is_truncated = (len(snippet) >= _MAX_SECTION_CHARS)
                     code_context += f"\n\n### {path}\n```\n{snippet}\n```"
                     file_info = {"repo": repo, "path": path, "sha": sha,
-                                 "branch": branch, "original": content}
+                                 "branch": branch, "original": content,
+                                 "is_truncated": _is_truncated}
                 else:
                     logger.warning("3차(DB미러) 전체 미발견 [repo=%s, paths=%s] %.1fms",
                                    repo, file_paths[:3], (_time.monotonic() - _t0) * 1000)
@@ -1539,6 +1542,9 @@ def analyze_and_propose(
                     _extract_relevant_section(cached_content, failing_symbol)
                     if failing_symbol else cached_content[:3000]
                 )
+                _is_truncated_cache = (len(snippet) >= _MAX_SECTION_CHARS)
+                # 캐시 재사용 시 잘림 여부 갱신
+                file_info = {**file_info, "is_truncated": _is_truncated_cache}
                 code_context += f"\n\n### {file_info['path']} (캐시)\n```\n{snippet}\n```"
                 logger.info("파일 캐시 재사용 [%s] %s", conversation_id[:8], file_info["path"])
 
@@ -1910,6 +1916,22 @@ PR제목: <간단한 제목>
 
     # PROPOSED_FIX 파싱 → pending action 저장 후 블록 제거 (채팅에 코드 전체 노출 방지)
     fix_match = re.search(r'\[PROPOSED_FIX\](.*?)\[/PROPOSED_FIX\]', response, re.DOTALL)
+
+    # ── 파일 잘림 감지 → 패치 생성 강제 차단 ────────────────────────────
+    # 컨텍스트가 잘린 상태에서 패치를 생성하면 함수 전체 삭제 같은 대형 오류 발생.
+    # 잘림이 감지되면 PROPOSED_FIX 블록을 무시하고 사용자에게 안내만 반환.
+    if fix_match and file_info and file_info.get("is_truncated"):
+        response = response[:fix_match.start()].rstrip() + response[fix_match.end():]
+        truncated_path = file_info.get("path", "파일")
+        response += (
+            f"\n\n⛔ **파일이 잘려 패치 생성이 차단됐습니다** (`{truncated_path}`)\n"
+            f"파일이 {_MAX_SECTION_CHARS:,}자 한도를 초과해 전체 컨텍스트를 읽지 못했습니다.\n"
+            f"잘린 상태에서 패치를 적용하면 코드가 손상될 수 있어 안전을 위해 차단합니다.\n\n"
+            f"**해결 방법**: GitHub에서 해당 줄을 직접 수정하거나,\n"
+            f"수정할 함수명/줄 번호를 알려주시면 해당 함수만 타겟으로 재시도합니다."
+        )
+        fix_match = None  # 이후 파싱 로직 건너뜀
+
     if fix_match and file_info:
         fix_block = fix_match.group(1).strip()
         # 블록 자체를 응답에서 제거 — 파싱된 내용은 아래에서 action_hint로 요약 표시
