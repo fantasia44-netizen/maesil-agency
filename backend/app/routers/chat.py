@@ -340,10 +340,11 @@ def chat(req: ChatRequest, bg: BackgroundTasks, user: UserContext = Depends(get_
         if fa == "developer":
             _dev_mode_conversations.add(conversation_id)
 
-            # 승인/취소/미리보기 키워드는 force_agent 경로에서도 최우선 처리
+            # 승인/취소/미리보기/머지 키워드는 force_agent 경로에서도 최우선 처리
             _fa_approve = user.is_super_admin and dev_chat_agent.is_approve(req.message)
             _fa_cancel  = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
             _fa_preview = user.is_super_admin and dev_chat_agent.is_preview(req.message)
+            _fa_merge   = user.is_super_admin and dev_chat_agent.is_merge(req.message)
             _fa_has_pending = dev_chat_agent._get_pending(conversation_id) is not None
 
             if _fa_approve:
@@ -352,6 +353,16 @@ def chat(req: ChatRequest, bg: BackgroundTasks, user: UserContext = Depends(get_
                 response_text = dev_chat_agent.cancel_pending(conversation_id)
             elif _fa_preview and _fa_has_pending:
                 response_text = dev_chat_agent.preview_pending(conversation_id)
+            elif _fa_merge:
+                try:
+                    ctx_for_merge = conv_svc.get_messages(conversation_id)
+                except Exception:
+                    ctx_for_merge = []
+                response_text = dev_chat_agent.merge_pending_pr(
+                    conversation_id,
+                    user_message=req.message,
+                    context_messages=ctx_for_merge,
+                )
             else:
                 try:
                     ctx = conv_svc.get_messages(conversation_id)
