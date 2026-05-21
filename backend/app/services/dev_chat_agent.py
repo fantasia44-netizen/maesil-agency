@@ -51,14 +51,20 @@ APPROVE_KEYWORDS = {
 _pending_mem: dict[str, dict[str, Any]] = {}
 _recent_pr_mem: dict[str, dict[str, Any]] = {}
 
+# chat.py 에서 dev_chat_agent._pending / ._recent_pr 로 참조 — 동일 객체 alias
+_pending = _pending_mem
+_recent_pr = _recent_pr_mem
+
 _PENDING_EXPIRE_H = 24   # pending action 만료 (시간)
 _RECENT_PR_EXPIRE_H = 72  # recent PR 정보 보관 (시간)
 
 
 def _set_pending(conversation_id: str, action: dict) -> None:
-    """pending action을 DB에 저장 (Render 재시작 안전)."""
+    """pending action을 DB + 메모리에 저장 (Render 재시작 안전)."""
     from datetime import timedelta
     expires_at = (datetime.now(timezone.utc) + timedelta(hours=_PENDING_EXPIRE_H)).isoformat()
+    # 메모리에 항상 저장 — chat.py의 _pending 체크가 즉시 동작하도록
+    _pending_mem[conversation_id] = action
     try:
         get_maesil_total_client().schema("agent_work").table("pending_tasks").upsert(
             {
@@ -71,10 +77,9 @@ def _set_pending(conversation_id: str, action: dict) -> None:
             },
             on_conflict="task_id",
         ).execute()
-        logger.debug("_set_pending DB 저장 [%s]", conversation_id[:8])
+        logger.debug("_set_pending DB+메모리 저장 [%s]", conversation_id[:8])
     except Exception as e:
-        logger.warning("_set_pending DB 저장 실패 (메모리 fallback): %s", e)
-        _pending_mem[conversation_id] = action
+        logger.warning("_set_pending DB 저장 실패 (메모리만): %s", e)
 
 
 def _get_pending(conversation_id: str) -> dict | None:
