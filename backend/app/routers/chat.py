@@ -339,11 +339,26 @@ def chat(req: ChatRequest, bg: BackgroundTasks, user: UserContext = Depends(get_
         # developer는 dev_chat_agent 서비스 직접 사용 (AGENT_MAP에 없음)
         if fa == "developer":
             _dev_mode_conversations.add(conversation_id)
-            try:
-                ctx = conv_svc.get_messages(conversation_id)
-            except Exception:
-                ctx = []
-            response_text = dev_chat_agent.analyze_and_propose(req.message, conversation_id, ctx)
+
+            # 승인/취소/미리보기 키워드는 force_agent 경로에서도 최우선 처리
+            _fa_approve = user.is_super_admin and dev_chat_agent.is_approve(req.message)
+            _fa_cancel  = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
+            _fa_preview = user.is_super_admin and dev_chat_agent.is_preview(req.message)
+            _fa_has_pending = dev_chat_agent._get_pending(conversation_id) is not None
+
+            if _fa_approve:
+                response_text = dev_chat_agent.execute_pending(conversation_id)
+            elif _fa_cancel:
+                response_text = dev_chat_agent.cancel_pending(conversation_id)
+            elif _fa_preview and _fa_has_pending:
+                response_text = dev_chat_agent.preview_pending(conversation_id)
+            else:
+                try:
+                    ctx = conv_svc.get_messages(conversation_id)
+                except Exception:
+                    ctx = []
+                response_text = dev_chat_agent.analyze_and_propose(req.message, conversation_id, ctx)
+
             run_id = str(uuid.uuid4())
             _save_results(
                 conversation_id, req.message,
