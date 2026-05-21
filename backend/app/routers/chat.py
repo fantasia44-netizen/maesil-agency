@@ -470,18 +470,19 @@ def chat(req: ChatRequest, bg: BackgroundTasks, user: UserContext = Depends(get_
     is_cancel_kw   = user.is_super_admin and dev_chat_agent.is_cancel(req.message)
     is_merge_kw    = user.is_super_admin and dev_chat_agent.is_merge(req.message)
 
-    # 액션 우선순위: LLM (high/medium confidence) > 키워드 fallback
+    # 액션 우선순위: 승인/취소 키워드 최우선 → LLM → 나머지 키워드
+    # 승인·취소는 키워드가 명확하므로 LLM 분류보다 먼저 처리 (LLM 오분류 방지)
     action = None
-    if intent and intent["confidence"] in ("high", "medium"):
-        action = intent["action"]
-    elif is_preview_kw and has_pending:
-        action = "preview"
-    elif is_approve_kw and has_pending:
+    if is_approve_kw:
         action = "approve"
-    elif is_merge_kw:
-        action = "merge"
     elif is_cancel_kw:
         action = "cancel"
+    elif is_preview_kw and has_pending:
+        action = "preview"
+    elif is_merge_kw:
+        action = "merge"
+    elif intent and intent["confidence"] in ("high", "medium"):
+        action = intent["action"]
 
     if action == "preview" and has_pending:
         response_text = dev_chat_agent.preview_pending(conversation_id)
