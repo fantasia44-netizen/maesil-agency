@@ -487,7 +487,8 @@ def chat(req: ChatRequest, bg: BackgroundTasks, user: UserContext = Depends(get_
         response_text = dev_chat_agent.preview_pending(conversation_id)
         agent_type = "developer"
 
-    elif action == "approve" and has_pending:
+    elif action == "approve":
+        # has_pending 여부와 무관하게 execute_pending 호출 — 없으면 내부에서 안내
         response_text = dev_chat_agent.execute_pending(conversation_id)
         agent_type = "developer"
 
