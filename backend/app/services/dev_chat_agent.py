@@ -1813,21 +1813,20 @@ PR 생성 후 안내 문구는 시스템이 자동으로 "`머지` 입력하면 
    - 수정안 만들 때 "다른 함수에도 같은 문제 있는지" 한 번 짚고, PROPOSED_FIX 여러 개 출력 가능
 
 ## 코드 수정 제안 시 형식
-코드 수정이 필요한 경우, 변경이 필요한 함수/클래스만 출력하세요 (파일 전체 X).
-백엔드가 자동으로 원본 파일에서 해당 함수를 찾아 교체합니다.
+**분석 요약은 간결하게** — 변경 이유와 핵심 변경 라인만 2~4줄로 설명.
+코드 전체를 채팅에 쓰지 마세요. 코드는 아래 [PROPOSED_FIX] 블록에만 넣으세요.
 
-⚠️ **클래스 메서드 수정 시 반드시 지켜야 할 규칙**:
-- `함수명`에는 **클래스 이름**을 적으세요 (메서드 이름 X).
-- 코드 블록에는 **클래스 전체**를 출력하세요 (메서드만 X).
-- 예) `NaverAdClient`의 `create_stat_report` 수정 → 함수명: `NaverAdClient`, 코드: `class NaverAdClient:` 전체.
-- 모듈 레벨 함수(클래스 밖)만 함수 이름을 그대로 써도 됩니다.
+PROPOSED_FIX 블록 규칙:
+- 변경이 필요한 함수/메서드만 출력 (파일 전체 X, 클래스 전체 X).
+- 클래스 메서드 수정 시 → `함수명`에 **메서드 이름** 적고, 코드는 **해당 메서드만** 출력.
+- 모듈 레벨 함수 수정 시 → `함수명`에 함수 이름, 코드는 그 함수 전체.
 
 [PROPOSED_FIX]
 파일: <파일경로>
-함수명: <클래스 메서드이면 클래스 이름 / 모듈 레벨 함수이면 함수 이름 (하나만)>
-신뢰도: <high|medium|low — 원인이 명확하고 수정이 단순하면 high, 불확실하면 low>
+함수명: <수정할 함수 또는 메서드 이름 (하나만)>
+신뢰도: <high|medium|low>
 ```python
-<클래스 메서드이면 class 전체 / 모듈 레벨 함수이면 함수 전체>
+<수정된 함수/메서드 전체 — 해당 함수만, 클래스 전체 X>
 ```
 커밋메시지: <fix: 간단한 설명>
 PR제목: <간단한 제목>
@@ -1882,10 +1881,12 @@ PR제목: <간단한 제목>
     # ── 거짓 진술 검출 + 차단 ─────────────────────────────────────────
     response = _sanitize_response(response, has_db_schema="🗄️ DB 스키마 컨텍스트" in code_context)
 
-    # PROPOSED_FIX 파싱 → pending action 저장
+    # PROPOSED_FIX 파싱 → pending action 저장 후 블록 제거 (채팅에 코드 전체 노출 방지)
     fix_match = re.search(r'\[PROPOSED_FIX\](.*?)\[/PROPOSED_FIX\]', response, re.DOTALL)
     if fix_match and file_info:
         fix_block = fix_match.group(1).strip()
+        # 블록 자체를 응답에서 제거 — 파싱된 내용은 아래에서 action_hint로 요약 표시
+        response = response[:fix_match.start()].rstrip() + response[fix_match.end():]
         code_match = re.search(r'```(?:\w+)?\n(.*?)```', fix_block, re.DOTALL)
         commit_match = re.search(r'커밋메시지:\s*(.+)', fix_block)
         pr_title_match = re.search(r'PR제목:\s*(.+)', fix_block)
