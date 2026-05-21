@@ -55,6 +55,9 @@ _recent_pr_mem: dict[str, dict[str, Any]] = {}
 _pending = _pending_mem
 _recent_pr = _recent_pr_mem
 
+# 대화별 마지막 성공 file_info 캐시 — 후속 메시지에서 파일 재탐색 실패 시 재사용
+_file_info_cache: dict[str, dict] = {}
+
 _PENDING_EXPIRE_H = 24   # pending action 만료 (시간)
 _RECENT_PR_EXPIRE_H = 72  # recent PR 정보 보관 (시간)
 
@@ -1523,6 +1526,21 @@ def analyze_and_propose(
                 else:
                     logger.warning("3차(DB미러) 전체 미발견 [repo=%s, paths=%s] %.1fms",
                                    repo, file_paths[:3], (_time.monotonic() - _t0) * 1000)
+
+            # 파일 탐색 성공 시 대화별 캐시 저장
+            if file_info:
+                _file_info_cache[conversation_id] = file_info
+
+            # 탐색 실패 시 이전 대화 턴에서 찾은 file_info 재사용
+            if not file_info and conversation_id in _file_info_cache:
+                file_info = _file_info_cache[conversation_id]
+                cached_content = file_info.get("original", "")
+                snippet = (
+                    _extract_relevant_section(cached_content, failing_symbol)
+                    if failing_symbol else cached_content[:3000]
+                )
+                code_context += f"\n\n### {file_info['path']} (캐시)\n```\n{snippet}\n```"
+                logger.info("파일 캐시 재사용 [%s] %s", conversation_id[:8], file_info["path"])
 
             if not file_info:
                 tried_dirs = ["app/services", "app", "app/utils", "src", "utils", "core", "logs"]
