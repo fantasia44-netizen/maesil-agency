@@ -145,6 +145,27 @@ export default function LeadDetailPage() {
     }
   };
 
+  const clearFinal = async () => {
+    if (!lead) return;
+    if (!confirm("최종 편집본을 초기화하면 다음 미리보기/발송부터 표준 HTML 템플릿(수익 시뮬레이션·파트너 혜택 포함)이 사용됩니다. 계속할까요?")) return;
+    setActionId("clearFinal");
+    try {
+      await apiFetch(`/api/outreach/leads/${lead.id}/email-draft`, {
+        method: "PATCH",
+        body: JSON.stringify({ email_final: "" }),
+        headers: { "Content-Type": "application/json" },
+      }, 10000);
+      showToast("최종 편집본 초기화 완료 — 이제 표준 템플릿으로 발송됩니다");
+      setEditFinal("");
+      setDraftDirty(false);
+      loadLead();
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : "초기화 실패", false);
+    } finally {
+      setActionId(null);
+    }
+  };
+
   const saveDraft = async () => {
     if (!lead) return;
     setActionId("save");
@@ -492,9 +513,19 @@ export default function LeadDetailPage() {
             </div>
 
             <div style={{ marginBottom: "0.75rem" }}>
-              <label style={{ fontSize: "0.75rem", color: "#0369a1", fontWeight: 600, display: "block", marginBottom: 3 }}>
-                최종 발송본 <span style={{ color: "#94a3b8" }}>(이 내용이 발송됨)</span>
-              </label>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 3 }}>
+                <label style={{ fontSize: "0.75rem", color: "#0369a1", fontWeight: 600 }}>
+                  최종 발송본 <span style={{ color: "#94a3b8" }}>(이 내용이 발송됨)</span>
+                </label>
+                {lead?.email_final && (
+                  <button
+                    onClick={clearFinal}
+                    disabled={actionId === "clearFinal"}
+                    style={{ fontSize: "0.7rem", padding: "2px 8px", border: "1px solid #fca5a5", borderRadius: 6, background: "#fff1f2", color: "#dc2626", cursor: "pointer" }}>
+                    {actionId === "clearFinal" ? "초기화 중…" : "✕ 초기화 (표준 템플릿으로)"}
+                  </button>
+                )}
+              </div>
               <textarea
                 value={editFinal}
                 onChange={(e) => { setEditFinal(e.target.value); setDraftDirty(true); }}
