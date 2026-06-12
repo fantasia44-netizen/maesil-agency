@@ -145,12 +145,13 @@ def search_naver_content(
         return {"error": "harness_api_token 미설정"}
 
     # maesil-insight 게이트웨이: /api/v1/naver/search?type=blog|video
+    # sort=date → 최신순 정렬 (오래된 영상 참조 방지)
     url = base_url.rstrip("/") + "/api/v1/naver/search"
     try:
         r = httpx.get(
             url,
             headers={"Authorization": f"Bearer {token}"},
-            params={"query": query, "type": search_type, "display": min(display, 20)},
+            params={"query": query, "type": search_type, "display": min(display, 20), "sort": "date"},
             timeout=15,
         )
         r.raise_for_status()
