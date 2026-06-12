@@ -271,6 +271,7 @@ export default function LeadDetailPage() {
             <div style={{ flex: 1, overflow: "auto" }}>
               <iframe
                 srcDoc={preview.html}
+                sandbox="allow-same-origin allow-popups"
                 style={{ width: "100%", height: "600px", border: "none" }}
                 title="이메일 미리보기"
               />

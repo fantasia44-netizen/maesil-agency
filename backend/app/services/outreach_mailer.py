@@ -95,7 +95,7 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
         </div>
       </div>
       <div class="case-desc" style="margin-top:12px">
-        <a href="https://maesil-insight.com/cases?utm_source=partner&utm_medium=email" style="color:#1A6F3C;font-weight:600">실제 수치 전체 보기 →</a>
+        <a href="https://maesil-insight.com/cases?utm_source=partner&utm_medium=email" target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">실제 수치 전체 보기 →</a>
       </div>
     </div>
 
@@ -146,7 +146,7 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
     </p>
 
     <div class="cta">
-      <a class="btn" href="https://open.kakao.com/o/sg6QOxDg">
+      <a class="btn" href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener">
         카카오 오픈톡으로 상담하기 💬
       </a>
     </div>
