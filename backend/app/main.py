@@ -10,6 +10,26 @@ from app.routers import alert_channels, alerts, auth_router, chat, cs, growth, h
 logger = logging.getLogger(__name__)
 
 
+def _outreach_scanned_today() -> bool:
+    """오늘 날짜에 outreach_scanned_content에 기록이 있으면 True (재시작 후 중복 스캔 방지)."""
+    from datetime import datetime, timezone
+    from app.db.maesil_total_client import get_maesil_total_client
+    try:
+        today_str = datetime.now(timezone.utc).date().isoformat()
+        resp = (
+            get_maesil_total_client()
+            .schema("agent_work")
+            .table("outreach_scanned_content")
+            .select("content_id")
+            .gte("scanned_at", today_str)
+            .limit(1)
+            .execute()
+        )
+        return bool(resp.data)
+    except Exception:
+        return False
+
+
 async def _poll_loop():
     """배포 직후 1회 즉시 실행 후 3분 간격 반복."""
     import asyncio
@@ -66,15 +86,18 @@ async def _poll_loop():
                 except Exception as e:
                     logger.warning("[scheduler] gmail_watcher 실패: %s", e)
 
-            # 멀티채널 영업 스캔 — 하루 1회
+            # 멀티채널 영업 스캔 — 하루 1회 (DB 기준으로 재시작 후에도 중복 방지)
             try:
                 today = datetime.now(timezone.utc).date()
                 if last_youtube_scan_date != today:
-                    from app.services.outreach_pipeline import run_all_platforms
-                    scan_result = await asyncio.to_thread(run_all_platforms)
+                    if not await asyncio.to_thread(_outreach_scanned_today):
+                        from app.services.outreach_pipeline import run_all_platforms
+                        scan_result = await asyncio.to_thread(run_all_platforms)
+                        logger.info("[scheduler] outreach scan done: leads=%d",
+                                    scan_result.get("total_leads_upserted", 0))
+                    else:
+                        logger.info("[scheduler] outreach scan 오늘 이미 실행됨 — 스킵")
                     last_youtube_scan_date = today
-                    logger.info("[scheduler] outreach scan done: leads=%d",
-                                scan_result.get("total_leads_upserted", 0))
             except Exception as e:
                 logger.warning("[scheduler] outreach scan 실패: %s", e)
 
