@@ -44,10 +44,11 @@ def _db():
 
 
 def _mark_touch(touch_id: str, status: str, error: str | None = None) -> None:
-    update: dict = {
-        "status": status,
-        "sent_at": datetime.now(timezone.utc).isoformat() if status == "sent" else None,
-    }
+    update: dict = {"status": status}
+    if status == "sent":
+        update["sent_at"] = datetime.now(timezone.utc).isoformat()
+    elif status == "replied":
+        update["replied_at"] = datetime.now(timezone.utc).isoformat()
     if error:
         update["error_msg"] = error[:500]
     try:

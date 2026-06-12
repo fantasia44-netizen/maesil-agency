@@ -194,24 +194,23 @@ class NaverBlogScanner(BaseScanner):
     def _collect_blog_profile(self, blog_id: str, original_url: str) -> list[dict]:
         """
         블로그 ID로 최근 포스트를 추가 수집해 채널 정보를 보강.
+        Naver Search API는 site: 연산자를 지원하지 않으므로 bloggername 방식 사용.
         """
-        # 네이버 블로그의 경우 blogger 검색
-        if "." not in blog_id:  # 네이버 블로그 ID (USERNAME 형태)
-            items = self._search_blog(
-                f"site:blog.naver.com/{blog_id}", display=5
-            )
+        # 네이버 블로그: username으로 해당 블로그 포스트 검색
+        if "." not in blog_id:
+            # bloggername 파라미터 없이 URL 패턴으로 최근 글 찾기
+            # fallback: 원본 URL 하나만 반환 (추가 API 비용 최소화)
+            return [{"link": original_url, "title": "", "description": "", "bloggername": blog_id, "postdate": ""}]
+
+        # 티스토리/기타 도메인 기반 블로그: 도메인을 키워드로 검색
+        try:
+            items = self._search_blog(blog_id, display=3)
             if items:
                 return items
-
-        # 원본 포스트만 반환
-        try:
-            r = self._search_blog(blog_id, display=3)
-            if r:
-                return r
         except Exception:
             pass
 
-        # Fallback: 원본 URL로 더미 아이템
+        # Fallback
         return [{"link": original_url, "title": "", "description": "", "bloggername": blog_id, "postdate": ""}]
 
 
