@@ -118,31 +118,56 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
     </div>
 
     <div class="earning-box">
-      <div class="earn-title">📊 수익 시뮬레이션 (그로스 플랜 199,000원 기준)</div>
+      <div class="earn-title">📊 수익 시뮬레이션 — 구독자 10명 모집 시 1년 수익 (그로스 플랜 199,000원 기준)</div>
       <table>
         <tr>
-          <td>신규 구독자 10명 · 첫 결제 커미션 (20%)</td>
+          <td>1개월차 · 첫 결제 커미션 (20% × 10명)</td>
           <td>+398,000원</td>
         </tr>
         <tr>
-          <td>10명 재구독 유지 시 매달 (10%)</td>
-          <td>+199,000원/월</td>
-        </tr>
-        <tr>
-          <td style="color:#888;font-size:13px">※ 영상 1개로 꾸준히 유입되는 경우</td>
-          <td style="color:#888;font-size:13px">계속 누적</td>
+          <td>2~12개월 · 재구독 유지 커미션 (10% × 10명 × 11개월)</td>
+          <td>+2,189,000원</td>
         </tr>
       </table>
       <div class="earn-total">
-        <span>30명 안정 구독자 유지 시 예상 월 수익</span>
-        <span>약 267,000원~</span>
+        <span>🎯 10명 모집 시 1년 누적 수익</span>
+        <span>약 2,587,000원</span>
+      </div>
+      <div style="font-size:12px;color:#888;margin-top:8px;line-height:1.6">
+        ※ 영상 1개가 남아있는 한 할인코드로 신규 유입 지속 → 실제 수익은 더 커집니다
       </div>
     </div>
 
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:18px 22px;margin:24px 0">
+      <div style="font-size:13px;color:#065f46;font-weight:700;margin-bottom:10px">🎁 파트너 전용 혜택</div>
+      <table style="width:100%;border-collapse:collapse;font-size:14px">
+        <tr>
+          <td style="padding:5px 0;color:#333">✅ 매실인사이트 <strong>Pro 플랜 1년 무료</strong></td>
+          <td style="text-align:right;color:#065f46;font-weight:600">3,588,000원 상당</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;color:#555;font-size:13px">· 쿠팡 광고 데이터 직접 분석·최적화 체험</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;color:#555;font-size:13px">· 네이버 키워드 랭킹 상승 전략 실습</td>
+          <td></td>
+        </tr>
+        <tr style="border-top:1px solid #bbf7d0">
+          <td style="padding:8px 0 4px;color:#333">✅ 전용 할인코드 + 실시간 전환 통계 대시보드</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td style="padding:4px 0;color:#333">✅ 매달 자동 정산 (익월 10일)</td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+
     <p class="greeting">
-      자세한 파트너 조건, 정산 방식, 실제 사례 데이터는
-      <strong>상담을 통해</strong> 안내드리고 있습니다.<br>
-      편하신 시간에 부담 없이 연락 주시면 됩니다.
+      직접 써보신 후 구독자분들께 소개하실 수 있도록
+      <strong>Pro 플랜 1년 무료 테스트 계정</strong>을 먼저 드립니다.<br>
+      자세한 파트너 조건과 정산 방식은 <strong>상담을 통해</strong> 안내드립니다.
     </p>
 
     <div class="cta">
