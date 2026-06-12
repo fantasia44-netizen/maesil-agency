@@ -186,17 +186,29 @@ def trigger_analysis(lead_id: str, user: UserContext = Depends(require_admin)) -
 @router.post("/leads/analyze-batch")
 def trigger_batch_analysis(
     grades: str = "S,A,B,C,D",
-    limit: int = 100,
+    limit: int = 500,
+    force: bool = False,
     user: UserContext = Depends(require_admin),
 ) -> dict:
-    """discovered 상태 리드 일괄 분석. grades=S,A,B,C,D limit=100"""
+    """리드 일괄 분석.
+    - force=false (기본): discovered 상태만 분석
+    - force=true: draft_ready 포함 재분석 (새 프롬프트 적용)
+    grades=S,A,B,C,D  limit=500
+    """
     import threading, time
 
     grade_list = [g.strip() for g in grades.split(",") if g.strip()]
+
+    if force:
+        # draft_ready + discovered 모두 대상
+        status_filter = ["discovered", "draft_ready"]
+    else:
+        status_filter = ["discovered"]
+
     resp = (
         _db().table("outreach_leads")
-        .select("id, grade")
-        .eq("status", "discovered")
+        .select("id, grade, status")
+        .in_("status", status_filter)
         .in_("grade", grade_list)
         .order("score", desc=True)
         .limit(limit)
@@ -204,7 +216,8 @@ def trigger_batch_analysis(
     )
     rows = resp.data or []
     if not rows:
-        return {"ok": True, "queued": 0, "message": "분석할 리드 없음 (discovered 상태)"}
+        status_desc = "discovered + draft_ready" if force else "discovered"
+        return {"ok": True, "queued": 0, "message": f"분석할 리드 없음 ({status_desc} 상태)"}
 
     ids = [r["id"] for r in rows]
     now_iso = datetime.now(timezone.utc).isoformat()
@@ -224,8 +237,9 @@ def trigger_batch_analysis(
             time.sleep(0.5)  # Haiku API rate limit 여유
 
     threading.Thread(target=_run_batch, daemon=True).start()
-    logger.info("[batch-analyze] %d건 분석 시작 (등급: %s)", len(ids), grades)
-    return {"ok": True, "queued": len(ids), "message": f"{len(ids)}건 일괄 분석 시작됨 (백그라운드)"}
+    reanalyze_note = " (재분석 포함)" if force else ""
+    logger.info("[batch-analyze] %d건 분석 시작 (등급: %s%s)", len(ids), grades, reanalyze_note)
+    return {"ok": True, "queued": len(ids), "message": f"{len(ids)}건 일괄 분석 시작됨 (백그라운드){reanalyze_note}"}
 
 
 @router.get("/leads/{lead_id}/email-preview")
