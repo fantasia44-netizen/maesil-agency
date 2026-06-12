@@ -218,10 +218,7 @@ def update_email_draft(lead_id: str, body: EmailDraftPatch, user: UserContext = 
         update["email_draft"] = body.email_draft
     if body.email_final is not None:
         update["email_final"] = body.email_final
-    resp = _db().table("outreach_leads").update(update).eq("id", lead_id).execute()
-    rows = resp.data or []
-    if not rows:
-        raise HTTPException(404, "리드를 찾을 수 없습니다.")
+    _db().table("outreach_leads").update(update).eq("id", lead_id).execute()
     return {"ok": True}
 
 
@@ -229,10 +226,7 @@ def update_email_draft(lead_id: str, body: EmailDraftPatch, user: UserContext = 
 def approve_lead(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
     """담당자 검토 완료 → approved 상태로 변경."""
     now = datetime.now(timezone.utc).isoformat()
-    resp = _db().table("outreach_leads").update({"status": "approved", "updated_at": now}).eq("id", lead_id).execute()
-    rows = resp.data or []
-    if not rows:
-        raise HTTPException(404, "리드를 찾을 수 없습니다.")
+    _db().table("outreach_leads").update({"status": "approved", "updated_at": now}).eq("id", lead_id).execute()
     return {"ok": True, "status": "approved"}
 
 
@@ -257,11 +251,8 @@ def update_lead_status(lead_id: str, body: StatusPatch, user: UserContext = Depe
     if body.status not in allowed:
         raise HTTPException(400, f"status는 {sorted(allowed)} 중 하나")
     now = datetime.now(timezone.utc).isoformat()
-    resp = _db().table("outreach_leads").update({"status": body.status, "updated_at": now}).eq("id", lead_id).execute()
-    rows = resp.data or []
-    if not rows:
-        raise HTTPException(404, "리드를 찾을 수 없습니다.")
-    return rows[0]
+    _db().table("outreach_leads").update({"status": body.status, "updated_at": now}).eq("id", lead_id).execute()
+    return {"ok": True, "status": body.status}
 
 
 # ── 스캔 트리거 ──────────────────────────────────────────────────────
@@ -387,8 +378,5 @@ def update_touch_status(touch_id: str, body: TouchStatusPatch, user: UserContext
         update["sent_at"] = datetime.now(timezone.utc).isoformat()
     elif body.status == "replied":
         update["replied_at"] = datetime.now(timezone.utc).isoformat()
-    resp = _db().table("outreach_touchpoints").update(update).eq("id", touch_id).execute()
-    rows = resp.data or []
-    if not rows:
-        raise HTTPException(404, "터치포인트를 찾을 수 없습니다.")
-    return rows[0]
+    _db().table("outreach_touchpoints").update(update).eq("id", touch_id).execute()
+    return {"ok": True}
