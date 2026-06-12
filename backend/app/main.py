@@ -23,14 +23,14 @@ async def _poll_loop():
     last_youtube_scan_date = None
     while True:
         try:
-            render_logs.poll_all()
-            ph_svc.check_all()          # 헬스 체크 → program_health 기록
-            alert_dispatcher.dispatch_pending(limit=100)
+            await asyncio.to_thread(render_logs.poll_all)
+            await asyncio.to_thread(ph_svc.check_all)
+            await asyncio.to_thread(alert_dispatcher.dispatch_pending, 100)
 
             # CS 미답변 큐 처리 → feature_docs 자동 생성 (L2.5 축적)
             try:
                 from app.services.feature_kb import process_queue as _fkb_queue
-                fkb_result = _fkb_queue(limit=5)
+                fkb_result = await asyncio.to_thread(_fkb_queue, 5)
                 if fkb_result.get("processed"):
                     logger.info("[scheduler] feature_kb queue processed=%d",
                                 fkb_result["processed"])
@@ -39,7 +39,7 @@ async def _poll_loop():
 
             # 레포 미러 동기화 — 매 사이클 실행하되 commit_sha 변동 없으면 1콜만 (스킵)
             try:
-                mirror_result = repo_mirror.sync_all_active()
+                mirror_result = await asyncio.to_thread(repo_mirror.sync_all_active)
                 ok = sum(1 for r in mirror_result.get("repos", []) if not r.get("error"))
                 logger.info("[scheduler] repo_mirror sync ok=%d/%d",
                             ok, len(mirror_result.get("repos", [])))
@@ -49,7 +49,7 @@ async def _poll_loop():
             # 멀티터치 팔로업 — 매 사이클 (3분마다)
             try:
                 from app.services.outreach_followup import check_pending_followups
-                fu_result = check_pending_followups(limit=10)
+                fu_result = await asyncio.to_thread(check_pending_followups, 10)
                 if fu_result.get("processed"):
                     logger.info("[scheduler] followup processed=%d", fu_result["processed"])
             except Exception as e:
@@ -59,7 +59,7 @@ async def _poll_loop():
             if cycle % 5 == 0:
                 try:
                     from app.services.gmail_watcher import watch_replies
-                    reply_result = watch_replies(limit=30)
+                    reply_result = await asyncio.to_thread(watch_replies, 30)
                     if reply_result.get("found_replies"):
                         logger.info("[scheduler] gmail_watcher: 회신 %d건 발견",
                                     reply_result["found_replies"])
@@ -71,7 +71,7 @@ async def _poll_loop():
                 today = datetime.now(timezone.utc).date()
                 if last_youtube_scan_date != today:
                     from app.services.outreach_pipeline import run_all_platforms
-                    scan_result = run_all_platforms()
+                    scan_result = await asyncio.to_thread(run_all_platforms)
                     last_youtube_scan_date = today
                     logger.info("[scheduler] outreach scan done: leads=%d",
                                 scan_result.get("total_leads_upserted", 0))

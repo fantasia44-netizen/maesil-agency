@@ -263,10 +263,14 @@ export default function OutreachPage() {
   };
 
   // ── 필터링 ──────────────────────────────────────────────────────────
-  const filtered = leads.filter((l) => {
+  // 플랫폼 탭 기준 1차 필터 (상태 카운트 계산에 사용)
+  const platformLeads = platformFilter === "all"
+    ? leads
+    : leads.filter((l) => l.platform === platformFilter);
+
+  const filtered = platformLeads.filter((l) => {
     if (gradeFilter !== "all" && l.grade !== gradeFilter) return false;
     if (statusFilter !== "all" && l.status !== statusFilter) return false;
-    if (platformFilter !== "all" && l.platform !== platformFilter) return false;
     return true;
   });
 
@@ -347,7 +351,7 @@ export default function OutreachPage() {
         <div style={{ display: "flex", gap: "0.4rem", marginBottom: "1rem", flexWrap: "wrap", alignItems: "center" }}>
           <span className="muted" style={{ fontSize: "0.78rem", marginRight: 2 }}>등급:</span>
           {["S", "A", "B", "C", "D"].map((g) => {
-            const cnt = byGrade[g] || 0;
+            const cnt = platformLeads.filter((l) => l.grade === g).length;
             if (!cnt) return null;
             const gc = GRADE_COLOR[g] || { bg: "#e2e8f0", color: "#64748b" };
             return (
@@ -370,11 +374,40 @@ export default function OutreachPage() {
         </div>
       )}
 
-      {/* 상태·플랫폼 필터 */}
-      <div style={{ display: "flex", gap: "0.35rem", marginBottom: "0.5rem", flexWrap: "wrap" }}>
+      {/* 채널 탭 (플랫폼 구분) */}
+      <div style={{ display: "flex", gap: 0, marginBottom: "1rem", borderBottom: "2px solid #e2e8f0" }}>
+        {[
+          { key: "all",        label: "전체",        icon: "📋", color: "#0f172a" },
+          { key: "youtube",    label: "YouTube",     icon: "▶",  color: "#dc2626" },
+          { key: "naver_blog", label: "네이버 블로그", icon: "N",  color: "#03c75a" },
+        ].map(({ key, label, icon, color }) => {
+          const active = platformFilter === key;
+          const cnt = key === "all"
+            ? leads.length
+            : (stats?.by_platform?.[key] ?? 0);
+          return (
+            <button key={key} onClick={() => setPlatformFilter(key)}
+              style={{
+                padding: "8px 18px", border: "none", background: "none", cursor: "pointer",
+                fontSize: "0.85rem", fontWeight: active ? 700 : 400,
+                color: active ? color : "#94a3b8",
+                borderBottom: active ? `2px solid ${color}` : "2px solid transparent",
+                marginBottom: -2, whiteSpace: "nowrap",
+              }}>
+              {icon} {label} <span style={{ fontSize: "0.75rem", opacity: 0.8 }}>{cnt}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 상태 필터 */}
+      <div style={{ display: "flex", gap: "0.35rem", marginBottom: "1rem", flexWrap: "wrap" }}>
         {["all", "discovered", "draft_ready", "approved", "emailed", "replied", "no_reply", "negotiating", "deal", "archived"].map((s) => {
           const active = statusFilter === s;
-          const cnt = s === "all" ? leads.length : (stats?.by_status?.[s] ?? 0);
+          const cnt = s === "all"
+            ? filtered.length
+            : filtered.filter((l) => l.status === s).length;
+          if (s !== "all" && cnt === 0) return null;
           return (
             <button key={s} onClick={() => setStatusFilter(s)}
               style={{
@@ -389,27 +422,6 @@ export default function OutreachPage() {
           );
         })}
       </div>
-
-      {stats && Object.keys(stats.by_platform || {}).length > 1 && (
-        <div style={{ display: "flex", gap: "0.35rem", marginBottom: "1rem", flexWrap: "wrap" }}>
-          <button onClick={() => setPlatformFilter("all")}
-            style={{ padding: "3px 10px", borderRadius: 14, border: "1px solid", fontSize: "0.74rem", cursor: "pointer",
-              borderColor: platformFilter === "all" ? "#0f172a" : "#e2e8f0",
-              background: platformFilter === "all" ? "#0f172a" : "#fff",
-              color: platformFilter === "all" ? "#fff" : "#64748b" }}>
-            전체 플랫폼
-          </button>
-          {Object.entries(stats.by_platform).map(([p, cnt]) => (
-            <button key={p} onClick={() => setPlatformFilter(platformFilter === p ? "all" : p)}
-              style={{ padding: "3px 10px", borderRadius: 14, border: "1px solid", fontSize: "0.74rem", cursor: "pointer",
-                borderColor: platformFilter === p ? "#0369a1" : "#e2e8f0",
-                background: platformFilter === p ? "#eff6ff" : "#fff",
-                color: platformFilter === p ? "#0369a1" : "#64748b" }}>
-              {PLATFORM_LABEL[p] ?? p} {cnt}
-            </button>
-          ))}
-        </div>
-      )}
 
       {/* 리드 목록 */}
       {loading ? (

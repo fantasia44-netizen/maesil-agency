@@ -135,7 +135,7 @@ export default function LeadDetailPage() {
     setActionId("preview");
     try {
       const data = await apiFetch<{ subject: string; html: string }>(
-        `/api/outreach/leads/${lead.id}/email-preview`, {}, 10000
+        `/api/outreach/leads/${lead.id}/email-preview`, {}, 20000
       );
       setPreview(data);
     } catch (e: unknown) {

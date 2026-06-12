@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 _EMAIL_SEQUENCES = {
     1: None,   # 1차는 outreach_mailer.send_single이 생성
     2: {
-        "subject_suffix": "혹시 메일 받으셨나요? (파트너 수익 시뮬레이션 첨부)",
+        "subject_suffix": "혹시 메일 받으셨나요? — 구독자 10명이면 1년 257만원",
         "body_html": """<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:600px;margin:0 auto;padding:24px 28px;background:#fff">
 <p style="font-size:15px;color:#333;line-height:1.8">
 안녕하세요, <strong>{handle}</strong> 운영자님 👋<br><br>
@@ -24,25 +24,33 @@ _EMAIL_SEQUENCES = {
 </p>
 
 <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:18px 22px;margin:20px 0">
-  <div style="color:#e65100;font-size:12px;font-weight:700;margin-bottom:8px">📈 실제 사례 (쿠팡 로하스)</div>
-  <div style="font-size:22px;font-weight:800;color:#1A6F3C">3월 300건 → 5월 1,000%+ 성장</div>
-  <div style="font-size:13px;color:#555;margin-top:6px">대행사 없이 직접, 매실인사이트만으로 달성</div>
+  <div style="color:#e65100;font-size:12px;font-weight:700;margin-bottom:6px">📈 실제 사례</div>
+  <div style="font-size:18px;font-weight:800;color:#1A6F3C">광고비 −75% · ROAS 482→1,080%</div>
+  <div style="font-size:13px;color:#555;margin-top:4px">쿠팡 광고 최적화 3개월, 대행사 없이 직접</div>
+</div>
+
+<div style="background:#f8f8ff;border:1px solid #c5cae9;border-radius:10px;padding:16px 20px;margin:16px 0">
+  <div style="font-size:12px;color:#3949ab;font-weight:700;margin-bottom:10px">📊 구독자 10명 모집 시 1년 수익 (그로스 199,000원 기준)</div>
+  <div style="font-size:14px;color:#444;line-height:2">
+    • 1개월차 첫 결제 커미션 (20% × 10명): <strong>+398,000원</strong><br>
+    • 2~12개월 재구독 커미션 (10% × 10명 × 11개월): <strong>+2,189,000원</strong>
+  </div>
+  <div style="border-top:1px solid #c5cae9;margin-top:10px;padding-top:10px;font-size:15px;font-weight:700;color:#1A6F3C;display:flex;justify-content:space-between">
+    <span>🎯 1년 누적 수익</span><span>약 2,587,000원</span>
+  </div>
+</div>
+
+<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 18px;margin:16px 0;font-size:14px;color:#333;line-height:1.8">
+  🎁 <strong>파트너 전용: Pro 플랜 1년 무료 제공</strong> (3,588,000원 상당)<br>
+  <span style="font-size:13px;color:#555">쿠팡 광고 직접 분석 · 네이버 키워드 랭킹 전략 실습 가능</span>
 </div>
 
 <p style="font-size:15px;color:#333;line-height:1.8">
-<strong>파트너 수익 구조</strong><br>
-• 그로스 플랜(199,000원) 신규 1건 → 즉시 <strong>39,800원</strong> 지급<br>
-• 구독 유지 중 매달 <strong>19,900원</strong> 추가 (최대 12개월)<br>
-• 영상이 남아있는 한 할인코드로 계속 신규 유입 → 패시브 인컴
-</p>
-
-<p style="font-size:15px;color:#333;line-height:1.8">
-자세한 내용은 상담을 통해 안내드리고 있습니다.<br>
-관심이 있으시면 간단히 회신만 주셔도 됩니다.
+자세한 내용은 상담을 통해 안내드립니다. 부담 없이 연락 주세요.
 </p>
 
 <div style="text-align:center;margin:24px 0">
-  <a href="https://open.kakao.com/o/sg6QOxDg"
+  <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener"
      style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 30px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:700">
     카카오 오픈톡으로 상담하기 💬
   </a>
@@ -54,24 +62,24 @@ _EMAIL_SEQUENCES = {
 </div>""",
     },
     3: {
-        "subject_suffix": "마지막으로 한 번만 더 — 파트너 제안",
+        "subject_suffix": "마지막 연락 — Pro 1년 무료 제안 유효합니다",
         "body_html": """<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:600px;margin:0 auto;padding:24px 28px;background:#fff">
 <p style="font-size:15px;color:#333;line-height:1.8">
 안녕하세요, <strong>{handle}</strong> 운영자님 👋<br><br>
-마지막으로 연락드립니다.
+마지막으로 한 번만 더 연락드립니다.
 </p>
 
 <p style="font-size:15px;color:#333;line-height:1.8">
 파트너십이 지금 당장 맞지 않으신다면 완전히 이해합니다.<br><br>
-다만 영상 하나를 올려두면 할인코드로 구독자가 계속 들어오고,
-<strong>매달 자동으로 정산</strong>되는 구조다 보니
-꼭 지금이 아니더라도 언제든 시작하실 수 있습니다.<br><br>
-자세한 조건과 실제 파트너 수익 사례는 상담을 통해 알려드리겠습니다.<br>
-부담 없이 연락 주세요.
+다만 저희 제안 중 하나만 말씀드리면 —<br>
+<strong>영상 하나</strong>를 올려두면 할인코드로 신규 구독자가 계속 유입되고,
+구독자 10명만 되어도 <strong>1년에 약 257만원</strong>이 자동 정산됩니다.<br><br>
+그리고 파트너에게는 <strong>Pro 플랜 1년 무료 계정</strong>을 먼저 드립니다.<br>
+직접 써보시고 구독자분들께 소개하실 수 있도록요.
 </p>
 
 <div style="text-align:center;margin:24px 0">
-  <a href="https://open.kakao.com/o/sg6QOxDg"
+  <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener"
      style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 30px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:700">
     카카오 오픈톡으로 상담하기 💬
   </a>

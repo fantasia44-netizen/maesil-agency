@@ -129,32 +129,16 @@ def list_leads(
     offset: int = 0,
     user: UserContext = Depends(require_admin),
 ) -> list[dict]:
-    """리드 목록 (플랫폼·상태·등급·채널유형 필터)."""
-    q = (
-        _db().table("outreach_leads")
-        .select(
-            "id, platform, platform_url, handle_name, subscriber_count, community_size, "
-            "contact_email, contact_kakao, contact_naver_cafe, contact_instagram, "
-            "best_content_id, best_content_title, best_content_views, "
-            "content_summary, channel_type, approach_strategy, "
-            "conversion_power_score, competitive_risk_score, "
-            "has_paid_course, has_tool_recommendation, sells_own_program, sells_competing_tool, "
-            "score, score_breakdown, grade, status, touch_count, last_touch_at, "
-            "emailed_at, reply_type, reply_summary, created_at, updated_at"
-        )
-        .gte("score", min_score)
-        .order("score", desc=True)
-        .range(offset, offset + limit - 1)
-    )
-    if platform:
-        q = q.eq("platform", platform)
-    if status:
-        q = q.eq("status", status)
-    if grade:
-        q = q.eq("grade", grade)
-    if channel_type:
-        q = q.eq("channel_type", channel_type)
-    resp = q.execute()
+    """리드 목록 (플랫폼·상태·등급·채널유형 필터) — RPC."""
+    resp = _db().rpc("list_outreach_leads", {
+        "p_min_score":    min_score,
+        "p_limit":        limit,
+        "p_offset":       offset,
+        "p_platform":     platform,
+        "p_status":       status,
+        "p_grade":        grade,
+        "p_channel_type": channel_type,
+    }).execute()
     return resp.data or []
 
 
@@ -362,57 +346,32 @@ def trigger_scan_debug(
 
 @router.get("/scan/stats")
 def scan_stats(user: UserContext = Depends(require_admin)) -> dict:
-    """통계: 플랫폼별 리드 수 + 상태별 집계 + 등급별 집계 + KPI."""
+    """통계: 플랫폼별 리드 수 + 상태별 집계 + 등급별 집계 + KPI — RPC."""
     try:
-        leads_resp = _db().table("outreach_leads").select("platform, grade, status").execute()
-        rows = leads_resp.data or []
+        resp = _db().rpc("get_outreach_stats", {}).execute()
+        raw: dict = resp.data or {}
     except Exception as e:
         return {"error": str(e)}
 
-    total = len(rows)
-    by_status: dict[str, int] = {}
-    by_grade: dict[str, int] = {}
-    by_platform: dict[str, int] = {}
-
-    for r in rows:
-        s = r.get("status", "unknown")
-        g = r.get("grade", "?")
-        p = r.get("platform", "unknown")
-        by_status[s] = by_status.get(s, 0) + 1
-        by_grade[g] = by_grade.get(g, 0) + 1
-        by_platform[p] = by_platform.get(p, 0) + 1
-
-    try:
-        content_resp = _db().table("outreach_scanned_content").select("content_id", count="exact").execute()
-        total_scanned = content_resp.count or 0
-    except Exception:
-        total_scanned = 0
-
-    try:
-        touch_resp = _db().table("outreach_touchpoints").select("status, channel").execute()
-        touch_rows = touch_resp.data or []
-        touches_sent = sum(1 for t in touch_rows if t.get("status") == "sent")
-        touches_replied = sum(1 for t in touch_rows if t.get("status") == "replied")
-    except Exception:
-        touches_sent = 0
-        touches_replied = 0
+    by_status: dict[str, int] = raw.get("by_status") or {}
+    total: int = raw.get("total_leads") or 0
 
     return {
-        "total_leads": total,
-        "total_scanned_content": total_scanned,
-        "by_platform": by_platform,
-        "by_status": by_status,
-        "by_grade": by_grade,
+        "total_leads":           total,
+        "total_scanned_content": raw.get("total_scanned_content") or 0,
+        "by_platform":           raw.get("by_platform") or {},
+        "by_status":             by_status,
+        "by_grade":              raw.get("by_grade") or {},
         "kpi": {
-            "discovered": total,
-            "emailed": by_status.get("emailed", 0) + by_status.get("replied", 0)
-                       + by_status.get("no_reply", 0) + by_status.get("negotiating", 0)
-                       + by_status.get("deal", 0),
-            "replied": by_status.get("replied", 0),
+            "discovered":  total,
+            "emailed":     (by_status.get("emailed", 0) + by_status.get("replied", 0)
+                            + by_status.get("no_reply", 0) + by_status.get("negotiating", 0)
+                            + by_status.get("deal", 0)),
+            "replied":     by_status.get("replied", 0),
             "negotiating": by_status.get("negotiating", 0),
-            "deal": by_status.get("deal", 0),
-            "touches_sent": touches_sent,
-            "touches_replied": touches_replied,
+            "deal":        by_status.get("deal", 0),
+            "touches_sent":    raw.get("touches_sent") or 0,
+            "touches_replied": raw.get("touches_replied") or 0,
         },
     }
 

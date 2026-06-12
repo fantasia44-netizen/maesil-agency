@@ -219,5 +219,5 @@ def analyze_lead(lead_id: str) -> dict:
         "ok": True,
         "lead_id": lead_id,
         "channel_type": channel_type,
-        "has_draft": bool(email_draft),
+        "has_draft": bool(email_intro),
     }
