@@ -42,7 +42,6 @@ type Lead = {
   reply_type: string | null;
   reply_summary: string | null;
   reply_received_at: string | null;
-  partnership_fit_reason: string | null;
   touch_count: number;
   last_touch_at: string | null;
   touchpoints: Touchpoint[];
