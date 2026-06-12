@@ -22,7 +22,7 @@ def _db():
 # ── 기본 HTML 템플릿 (email_draft 없을 때 fallback) ──────────────────
 
 def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
-    summary_line = f"<em>{summary}</em><br><br>" if summary else ""
+    summary_line = f"<p style='color:#555;font-size:14px;font-style:italic'>{summary}</p>" if summary else ""
     return f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -32,15 +32,27 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
   body {{ font-family: 'Apple SD Gothic Neo','Malgun Gothic',sans-serif; background:#f5f5f5; margin:0; padding:20px; }}
   .wrap {{ max-width:600px; margin:0 auto; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,.08); }}
   .header {{ background:linear-gradient(135deg,#1A6F3C,#2eaa5e); padding:36px 40px; text-align:center; }}
-  .header h1 {{ color:#fff; margin:0; font-size:22px; font-weight:700; }}
+  .header h1 {{ color:#fff; margin:0; font-size:22px; font-weight:700; letter-spacing:-0.3px; }}
   .header p {{ color:rgba(255,255,255,.85); margin:8px 0 0; font-size:14px; }}
   .body {{ padding:36px 40px; }}
-  .greeting {{ font-size:16px; color:#333; line-height:1.7; }}
-  .highlight {{ background:#f0faf4; border-left:4px solid #2eaa5e; padding:16px 20px; border-radius:6px; margin:24px 0; }}
-  .highlight h3 {{ color:#1A6F3C; margin:0 0 10px; font-size:15px; }}
-  .highlight ul {{ margin:0; padding-left:20px; color:#444; font-size:14px; line-height:1.9; }}
+  .greeting {{ font-size:15px; color:#333; line-height:1.8; }}
+  .case-box {{ background:#fff8e1; border:1px solid #ffe082; border-radius:10px; padding:20px 24px; margin:24px 0; }}
+  .case-box .case-title {{ color:#e65100; font-size:13px; font-weight:700; letter-spacing:0.5px; margin:0 0 10px; text-transform:uppercase; }}
+  .case-box .case-stat {{ font-size:26px; font-weight:800; color:#1A6F3C; margin:6px 0; }}
+  .case-box .case-desc {{ font-size:13px; color:#555; margin:8px 0 0; line-height:1.7; }}
+  .divider {{ border:none; border-top:1px solid #eee; margin:28px 0; }}
+  .highlight {{ background:#f0faf4; border-left:4px solid #2eaa5e; padding:18px 22px; border-radius:6px; margin:24px 0; }}
+  .highlight h3 {{ color:#1A6F3C; margin:0 0 12px; font-size:15px; font-weight:700; }}
+  .highlight ul {{ margin:0; padding-left:20px; color:#444; font-size:14px; line-height:2; }}
+  .earning-box {{ background:#f8f8ff; border:1px solid #c5cae9; border-radius:10px; padding:18px 22px; margin:24px 0; }}
+  .earning-box .earn-title {{ font-size:13px; color:#3949ab; font-weight:700; margin:0 0 12px; }}
+  .earning-box table {{ width:100%; border-collapse:collapse; font-size:14px; }}
+  .earning-box td {{ padding:5px 0; color:#444; }}
+  .earning-box td:last-child {{ text-align:right; font-weight:600; color:#1A6F3C; }}
+  .earning-box .earn-total {{ border-top:1px solid #c5cae9; margin-top:10px; padding-top:10px; font-size:15px; font-weight:700; color:#1A6F3C; display:flex; justify-content:space-between; }}
   .cta {{ text-align:center; margin:32px 0 20px; }}
-  .btn {{ display:inline-block; background:#1A6F3C; color:#fff; padding:14px 32px; border-radius:30px; text-decoration:none; font-size:15px; font-weight:600; }}
+  .btn {{ display:inline-block; background:#1A6F3C; color:#fff !important; padding:15px 36px; border-radius:30px; text-decoration:none; font-size:15px; font-weight:700; letter-spacing:-0.2px; }}
+  .sub-note {{ text-align:center; font-size:13px; color:#888; margin-top:10px; }}
   .footer {{ background:#f9f9f9; border-top:1px solid #eee; padding:20px 40px; font-size:12px; color:#999; text-align:center; line-height:1.8; }}
 </style>
 </head>
@@ -48,37 +60,82 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
 <div class="wrap">
   <div class="header">
     <h1>🌿 매실인사이트 파트너 제안</h1>
-    <p>온라인 셀러를 위한 AI 광고 분석 플랫폼</p>
+    <p>영상 하나로 지속 수익 — 매실 파트너스(MAEPAS)</p>
   </div>
   <div class="body">
     <p class="greeting">
       안녕하세요, <strong>{handle_name}</strong> 채널 운영자님 👋<br><br>
       {summary_line}
-      채널에서 온라인 셀러 분들께 유익한 콘텐츠를 제공하고 계신 걸 보고
+      채널에서 온라인 셀러 분들께 도움이 되는 콘텐츠를 제공하고 계신 걸 보고
       파트너십을 제안드리고 싶어 연락드렸습니다.
     </p>
+
+    <div class="case-box">
+      <div class="case-title">📈 실제 사용 사례</div>
+      <div class="case-stat">3월 300건 → 5월 3,300건+</div>
+      <div class="case-desc">
+        <strong>쿠팡 로하스</strong> — 대행사 없이 직접 매실인사이트로 광고를 최적화한 결과,
+        2개월 만에 <strong>쿠팡 월 주문 1,000% 이상 성장</strong>을 달성했습니다.<br><br>
+        네이버 키워드 랭킹도 개선되어 주요 키워드 상위 노출 유지 중입니다.
+        (<a href="https://maesil-insight.com/partner/?utm_source=partner&utm_medium=email" style="color:#1A6F3C">실제 화면 보기 →</a>)
+      </div>
+    </div>
+
+    <p class="greeting">
+      매실인사이트는 <strong>쿠팡·스마트스토어 광고 데이터를 AI로 자동 분석</strong>해
+      키워드별 ROAS, 예산 최적화, 경쟁사 벤치마크를 한눈에 보여주는 서비스입니다.<br><br>
+      <strong>대행사 없이 직접</strong> 운영해도 전문가 수준의 광고 운영이 가능합니다.
+    </p>
+
+    <hr class="divider">
+
     <div class="highlight">
-      <h3>📦 파트너 혜택 안내</h3>
+      <h3>💰 파트너 수익 구조</h3>
       <ul>
-        <li><strong>수익 쉐어 10~20%</strong> — 파트너 링크로 유입된 신규 구독자 매출의 일부 공유</li>
-        <li><strong>전용 파트너 링크</strong> 및 실시간 전환 통계 대시보드 제공</li>
-        <li><strong>매실인사이트 무료 체험</strong> (3개월) — 직접 사용 후 소개 가능</li>
-        <li>광고·마케팅비 절감 사례 제공 (영상 소재로 활용 가능)</li>
+        <li><strong>첫 결제 20%</strong> 지급 — 신규 구독자 발생 즉시</li>
+        <li><strong>재구독 10%/월</strong> 지속 지급 — 최대 12개월</li>
+        <li>전용 <strong>할인코드</strong> 제공 (구독자 첫 달 10% 할인)</li>
+        <li>영상이 남아있는 한 할인코드로 계속 신규 유입 → <strong>패시브 인컴</strong></li>
       </ul>
     </div>
+
+    <div class="earning-box">
+      <div class="earn-title">📊 수익 시뮬레이션 (그로스 플랜 199,000원 기준)</div>
+      <table>
+        <tr>
+          <td>신규 구독자 10명 · 첫 결제 커미션 (20%)</td>
+          <td>+398,000원</td>
+        </tr>
+        <tr>
+          <td>10명 재구독 유지 시 매달 (10%)</td>
+          <td>+199,000원/월</td>
+        </tr>
+        <tr>
+          <td style="color:#888;font-size:13px">※ 영상 1개로 꾸준히 유입되는 경우</td>
+          <td style="color:#888;font-size:13px">계속 누적</td>
+        </tr>
+      </table>
+      <div class="earn-total">
+        <span>30명 안정 구독자 유지 시 예상 월 수익</span>
+        <span>약 267,000원~</span>
+      </div>
+    </div>
+
     <p class="greeting">
-      매실인사이트는 <strong>쿠팡·스마트스토어 광고 데이터를 AI로 자동 분석</strong>해<br>
-      키워드별 ROAS, 예산 최적화, 경쟁사 벤치마크를 한눈에 보여주는 서비스입니다.<br><br>
-      관심이 있으시면 아래 버튼을 눌러 문의 주세요.
+      자세한 파트너 조건, 정산 방식, 실제 사례 데이터는
+      <strong>상담을 통해</strong> 안내드리고 있습니다.<br>
+      편하신 시간에 부담 없이 연락 주시면 됩니다.
     </p>
+
     <div class="cta">
-      <a class="btn" href="https://maesil-insight.com?utm_source=partner&utm_medium=email&utm_campaign=outreach">
-        파트너십 문의하기
+      <a class="btn" href="https://maesil-insight.com/partner/register?utm_source=partner&utm_medium=email&utm_campaign=outreach&utm_content={handle_name}">
+        파트너 상담 신청하기
       </a>
     </div>
+    <p class="sub-note">자세한 건 상담을 통해 안내드립니다 · 부담 없이 문의해 주세요</p>
   </div>
   <div class="footer">
-    매실인사이트 | 영업팀<br>
+    매실인사이트 | 파트너팀<br>
     수신을 원치 않으시면 이 메일에 "수신거부"라고 회신해 주세요.
   </div>
 </div>
@@ -105,7 +162,7 @@ p{{font-size:15px;color:#333;line-height:1.8}}
 
 
 def _build_subject(handle_name: str) -> str:
-    return f"[매실인사이트] {handle_name}님께 파트너십을 제안드립니다 🌿"
+    return f"[매실인사이트] {handle_name}님, 영상 하나로 매달 수익 내는 파트너 제안드립니다 🌿"
 
 
 # ── 발송 함수 ────────────────────────────────────────────────────────

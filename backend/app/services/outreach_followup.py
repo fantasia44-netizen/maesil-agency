@@ -16,24 +16,74 @@ logger = logging.getLogger(__name__)
 _EMAIL_SEQUENCES = {
     1: None,   # 1차는 outreach_mailer.send_single이 생성
     2: {
-        "subject_suffix": "혹시 메일 받으셨나요?",
-        "body_prefix": (
-            "지난번 파트너십 제안 메일을 보내드렸는데 바쁘신 관계로 못 보셨을 것 같아 다시 한번 연락드립니다.\n\n"
-            "매실인사이트는 쿠팡·스마트스토어 광고 데이터를 AI로 자동 분석해 "
-            "ROAS와 비용을 최적화해드리는 서비스입니다.\n\n"
-            "관심이 있으시면 간단히 회신만 주셔도 됩니다. "
-            "혹시 관심이 없으시다면 말씀해 주시면 더 이상 연락드리지 않겠습니다."
-        ),
+        "subject_suffix": "혹시 메일 받으셨나요? (파트너 수익 시뮬레이션 첨부)",
+        "body_html": """<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:600px;margin:0 auto;padding:24px 28px;background:#fff">
+<p style="font-size:15px;color:#333;line-height:1.8">
+안녕하세요, <strong>{handle}</strong> 운영자님 👋<br><br>
+지난번 파트너십 제안 메일을 보내드렸는데 바쁘신 관계로 못 보셨을 것 같아 다시 한번 연락드립니다.
+</p>
+
+<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:18px 22px;margin:20px 0">
+  <div style="color:#e65100;font-size:12px;font-weight:700;margin-bottom:8px">📈 실제 사례 (쿠팡 로하스)</div>
+  <div style="font-size:22px;font-weight:800;color:#1A6F3C">3월 300건 → 5월 1,000%+ 성장</div>
+  <div style="font-size:13px;color:#555;margin-top:6px">대행사 없이 직접, 매실인사이트만으로 달성</div>
+</div>
+
+<p style="font-size:15px;color:#333;line-height:1.8">
+<strong>파트너 수익 구조</strong><br>
+• 그로스 플랜(199,000원) 신규 1건 → 즉시 <strong>39,800원</strong> 지급<br>
+• 구독 유지 중 매달 <strong>19,900원</strong> 추가 (최대 12개월)<br>
+• 영상이 남아있는 한 할인코드로 계속 신규 유입 → 패시브 인컴
+</p>
+
+<p style="font-size:15px;color:#333;line-height:1.8">
+자세한 내용은 상담을 통해 안내드리고 있습니다.<br>
+관심이 있으시면 간단히 회신만 주셔도 됩니다.
+</p>
+
+<div style="text-align:center;margin:24px 0">
+  <a href="https://maesil-insight.com/partner/register?utm_source=partner&utm_medium=email&utm_campaign=followup2"
+     style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 30px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:700">
+    파트너 상담 신청하기
+  </a>
+</div>
+
+<p style="font-size:12px;color:#999;text-align:center">
+매실인사이트 | 수신을 원치 않으시면 "수신거부"로 회신해 주세요.
+</p>
+</div>""",
     },
     3: {
-        "subject_suffix": "마지막으로 한 번만 더",
-        "body_prefix": (
-            "마지막으로 연락드립니다.\n\n"
-            "파트너십이 맞지 않는다면 완전히 이해합니다. "
-            "다만 혹시라도 구독자분들께 광고비 절감 방법을 소개하고 싶으실 때 "
-            "저희가 떠오르신다면 언제든지 연락 주세요.\n\n"
-            "더 이상 연락드리지 않겠습니다. 채널 항상 잘 보고 있습니다!"
-        ),
+        "subject_suffix": "마지막으로 한 번만 더 — 파트너 제안",
+        "body_html": """<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:600px;margin:0 auto;padding:24px 28px;background:#fff">
+<p style="font-size:15px;color:#333;line-height:1.8">
+안녕하세요, <strong>{handle}</strong> 운영자님 👋<br><br>
+마지막으로 연락드립니다.
+</p>
+
+<p style="font-size:15px;color:#333;line-height:1.8">
+파트너십이 지금 당장 맞지 않으신다면 완전히 이해합니다.<br><br>
+다만 영상 하나를 올려두면 할인코드로 구독자가 계속 들어오고,
+<strong>매달 자동으로 정산</strong>되는 구조다 보니
+꼭 지금이 아니더라도 언제든 시작하실 수 있습니다.<br><br>
+자세한 조건과 실제 파트너 수익 사례는 상담을 통해 알려드리겠습니다.<br>
+부담 없이 연락 주세요.
+</p>
+
+<div style="text-align:center;margin:24px 0">
+  <a href="https://maesil-insight.com/partner/register?utm_source=partner&utm_medium=email&utm_campaign=followup3"
+     style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 30px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:700">
+    파트너 상담 신청하기
+  </a>
+</div>
+
+<p style="font-size:13px;color:#777;text-align:center">
+더 이상 연락드리지 않겠습니다. 채널 항상 잘 보고 있습니다! 🌿
+</p>
+<p style="font-size:12px;color:#999;text-align:center">
+매실인사이트 | 수신을 원치 않으시면 "수신거부"로 회신해 주세요.
+</p>
+</div>""",
     },
 }
 
@@ -88,15 +138,9 @@ def _send_sequence_email(lead: dict, sequence: int, touch_id: str) -> bool:
         return False
 
     from app.services.notify_client import send_email
-    handle = lead.get("handle_name") or "유튜브 채널"
+    handle = lead.get("handle_name") or "채널"
     subject = f"[매실인사이트] {handle}님 — {seq_cfg['subject_suffix']}"
-    html = f"""<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-<p>안녕하세요, <strong>{handle}</strong> 운영자님 👋</p>
-<p style="white-space:pre-line">{seq_cfg['body_prefix']}</p>
-<p style="margin-top:24px;color:#64748b;font-size:12px">
-매실인사이트 | 수신을 원치 않으시면 "수신거부"로 회신해 주세요.
-</p>
-</div>"""
+    html = seq_cfg["body_html"].replace("{handle}", handle)
 
     to = lead.get("contact_email")
     if not to:
