@@ -431,10 +431,10 @@ export default function SettingsPage() {
               <div className="config-field">
                 <label>값</label>
                 <input
-                  type="password"
+                  type={card.kind === "config" ? "text" : "password"}
                   value={inputs[card.name] || ""}
                   onChange={(e) => setInputs({ ...inputs, [card.name]: e.target.value })}
-                  placeholder={ex ? "••••••••  (저장됨 · 덮어쓰려면 입력)" : "키 입력"}
+                  placeholder={ex ? (card.kind === "config" ? "(저장됨 · 덮어쓰려면 입력)" : "••••••••  (저장됨 · 덮어쓰려면 입력)") : "키 입력"}
                 />
               </div>
               <div style={{ display: "flex", gap: "0.5rem" }}>
