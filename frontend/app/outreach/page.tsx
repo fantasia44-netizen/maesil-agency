@@ -186,11 +186,13 @@ export default function OutreachPage() {
 
   useEffect(() => { loadAll(); }, []);
 
-  const triggerBatchAnalyze = async (grades = "S,A,B,C,D") => {
+  const triggerBatchAnalyze = async (grades = "S,A,B,C,D", force = false) => {
     setBatchAnalyzing(true);
     try {
+      const params = new URLSearchParams({ grades, limit: "500" });
+      if (force) params.set("force", "true");
       const res = await apiFetch<{ queued: number; message: string }>(
-        `/api/outreach/leads/analyze-batch?grades=${encodeURIComponent(grades)}&limit=100`,
+        `/api/outreach/leads/analyze-batch?${params.toString()}`,
         { method: "POST" },
         15000,
       );
@@ -268,11 +270,20 @@ export default function OutreachPage() {
     ? leads
     : leads.filter((l) => l.platform === platformFilter);
 
-  const filtered = platformLeads.filter((l) => {
-    if (gradeFilter !== "all" && l.grade !== gradeFilter) return false;
-    if (statusFilter !== "all" && l.status !== statusFilter) return false;
-    return true;
-  });
+  const GRADE_ORDER: Record<string, number> = { S: 0, A: 1, B: 2, C: 3, D: 4 };
+
+  const filtered = platformLeads
+    .filter((l) => {
+      if (gradeFilter !== "all" && l.grade !== gradeFilter) return false;
+      if (statusFilter !== "all" && l.status !== statusFilter) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const ga = GRADE_ORDER[a.grade] ?? 5;
+      const gb = GRADE_ORDER[b.grade] ?? 5;
+      if (ga !== gb) return ga - gb;       // 등급 우선
+      return b.score - a.score;            // 같은 등급 내 점수 내림차순
+    });
 
   const kpi = stats?.kpi;
   const byGrade = stats?.by_grade || {};
@@ -317,6 +328,15 @@ export default function OutreachPage() {
             style={{ fontSize: "0.82rem", padding: "6px 14px", borderColor: "#7c3aed", color: "#7c3aed" }}
           >
             {batchAnalyzing ? "분석 중…" : "🔬 전체 분석"}
+          </button>
+          <button
+            className="btn"
+            onClick={() => triggerBatchAnalyze("S,A,B,C,D", true)}
+            disabled={batchAnalyzing}
+            style={{ fontSize: "0.82rem", padding: "6px 14px", borderColor: "#c2410c", color: "#c2410c" }}
+            title="이미 분석된 draft_ready 리드도 새 프롬프트로 재분석"
+          >
+            {batchAnalyzing ? "분석 중…" : "♻️ 재분석"}
           </button>
         </div>
       </div>
