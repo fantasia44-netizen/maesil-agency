@@ -55,6 +55,17 @@ async def _poll_loop():
             except Exception as e:
                 logger.warning("[scheduler] followup 실패: %s", e)
 
+            # Gmail 회신 감시 — 5사이클마다 (약 15분)
+            if cycle % 5 == 0:
+                try:
+                    from app.services.gmail_watcher import watch_replies
+                    reply_result = watch_replies(limit=30)
+                    if reply_result.get("found_replies"):
+                        logger.info("[scheduler] gmail_watcher: 회신 %d건 발견",
+                                    reply_result["found_replies"])
+                except Exception as e:
+                    logger.warning("[scheduler] gmail_watcher 실패: %s", e)
+
             # 멀티채널 영업 스캔 — 하루 1회
             try:
                 today = datetime.now(timezone.utc).date()

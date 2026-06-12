@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "../../lib/api";
 
 // ── 타입 ──────────────────────────────────────────────────────────────
@@ -147,6 +148,7 @@ function contentLink(lead: Lead): string | null {
 
 // ── 컴포넌트 ──────────────────────────────────────────────────────────
 export default function OutreachPage() {
+  const router = useRouter();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [stats, setStats] = useState<ScanStats | null>(null);
   const [gradeFilter, setGradeFilter] = useState<string>("all");
@@ -536,6 +538,13 @@ export default function OutreachPage() {
                         {actionId === lead.id + ":send" ? "발송 중…" : "📧 발송"}
                       </button>
                     )}
+
+                    {/* 상세 페이지 */}
+                    <button className="btn"
+                      style={{ fontSize: "0.72rem", padding: "3px 8px" }}
+                      onClick={() => router.push(`/outreach/${lead.id}`)}>
+                      상세
+                    </button>
 
                     {/* 전략 토글 */}
                     {lead.approach_strategy && (
