@@ -34,7 +34,7 @@ from app.agents.base import (
     _log_run_start,
     _log_tool_call,
 )
-from app.tools.naver_search_tool import search_naver_shopping
+from app.tools.naver_search_tool import search_naver_shopping, search_naver_content
 from app.tools.write_tools import create_finding, create_snapshot, create_suggestion
 
 logger = logging.getLogger(__name__)
@@ -123,19 +123,75 @@ _GROWTH_EXTRA_TOOLS: list[dict] = [
         },
     },
     {
-        "name": "create_proposal_draft",
-        "description": "특정 셀러를 위한 맞춤 제안서 초안을 저장합니다. sections 5개를 채워주세요.",
+        "name": "search_creator_content",
+        "description": (
+            "유튜버·인플루언서의 최신 콘텐츠를 검색합니다. "
+            "스마트스토어·쿠팡·이커머스 관련 영상/블로그 글을 찾아 "
+            "이메일 제목·본문의 영상 칭찬 소재로 활용하세요."
+        ),
         "input_schema": {
             "type": "object",
             "properties": {
-                "mall_name":    {"type": "string"},
+                "creator_name": {
+                    "type": "string",
+                    "description": "유튜버/블로거 채널명 또는 닉네임",
+                },
+                "topic_hint": {
+                    "type": "string",
+                    "description": "검색에 추가할 주제 힌트 (예: 스마트스토어, 쿠팡, 이커머스)",
+                    "default": "스마트스토어",
+                },
+                "search_type": {
+                    "type": "string",
+                    "enum": ["video", "blog"],
+                    "description": "video: 유튜버 / blog: 블로거",
+                    "default": "video",
+                },
+            },
+            "required": ["creator_name"],
+        },
+    },
+    {
+        "name": "create_proposal_draft",
+        "description": (
+            "셀러·유튜버를 위한 맞춤 제안서/이메일 초안을 저장합니다. "
+            "email_subject 필수. sections 5개를 채워주세요."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "mall_name":    {"type": "string", "description": "셀러/채널명"},
                 "store_url":    {"type": "string"},
                 "product_area": {"type": "string"},
+                "target_type":  {
+                    "type": "string",
+                    "enum": ["seller", "youtuber", "blogger"],
+                    "description": "타겟 유형",
+                    "default": "seller",
+                },
+                "email_subject": {
+                    "type": "string",
+                    "description": (
+                        "이메일 제목 — 친근하고 구체적으로. "
+                        "유튜버면 '채널명님의 [영상제목] 인상 깊었어요' 스타일. "
+                        "스토어 셀러면 '[상품카테고리] 셀러분께 드리는 이익 분석 제안' 스타일."
+                    ),
+                },
+                "referenced_video": {
+                    "type": "object",
+                    "description": "본문에서 칭찬할 영상 정보 (유튜버 타겟 시 필수)",
+                    "properties": {
+                        "title":    {"type": "string", "description": "영상 제목"},
+                        "url":      {"type": "string", "description": "영상 링크"},
+                        "topic":    {"type": "string", "description": "영상이 다룬 핵심 주제 (스마트스토어/쿠팡 관련 내용)"},
+                        "pub_date": {"type": "string", "description": "게시 일자"},
+                    },
+                },
                 "proposal":     {"type": "string"},
                 "sections": {
                     "type": "object",
                     "properties": {
-                        "greeting":          {"type": "string"},
+                        "greeting":          {"type": "string", "description": "인사 + 영상/채널 칭찬 (구체적 내용 언급 필수)"},
                         "insight":           {"type": "string"},
                         "value_proposition": {"type": "string"},
                         "social_proof":      {"type": "string"},
@@ -143,7 +199,7 @@ _GROWTH_EXTRA_TOOLS: list[dict] = [
                     },
                 },
             },
-            "required": ["mall_name", "store_url"],
+            "required": ["mall_name", "store_url", "email_subject"],
         },
     },
 ]
@@ -182,12 +238,43 @@ _BASE_SYSTEM = """당신은 매실인사이트 운영팀의 **그로스 인텔�
 
 매실인사이트 해결책: 워터폴 비용 분해 / POAS (Profit on Ad Spend) / 공헌이익률 / 광고 낭비 경고
 
-#### 제안서 작성 원칙
+#### 제안서 작성 원칙 (스토어 셀러)
 - **소구포인트 = 셀러의 고통**: "광고비 쓰는데 실제 남는 돈을 모르는" 상황을 구체적으로 묘사
 - **ROAS 숫자 금지**: 대신 "원가 반영 시 적자인 키워드", "통장에 돈이 안 남는 이유"로 접근
 - **근거 없는 수치 금지** (fallback 숫자 사용 금지)
 - **sections 5개 필수**: greeting / insight / value_proposition / social_proof / cta
+- **email_subject 필수**: "[카테고리] 셀러분께, 광고비 쓰는데 실제 남는 돈 아시나요?" 스타일
 - 부드럽고 친근한 톤
+
+#### 유튜버/인플루언서 영업 — 별도 워크플로우 (필수 준수)
+
+**유튜버 타겟 요청 시 반드시 이 순서로 진행:**
+
+**1단계: 영상 조사 (search_creator_content 먼저 호출)**
+- `search_creator_content(creator_name, topic_hint="스마트스토어 OR 쿠팡", search_type="video")`
+- **스마트스토어·쿠팡·온라인셀러·이커머스 관련 영상만** 사용 (관계없는 영상 사용 금지)
+- 가장 최근 게시 또는 가장 관련성 높은 영상 1개를 선택
+- 검색 결과가 없으면: topic_hint를 바꿔 재검색 (예: "네이버쇼핑 광고", "쿠팡 판매")
+
+**2단계: 이메일 제목 작성 (email_subject)**
+좋은 예시:
+- "[채널명]님, '[영상 핵심 키워드]' 영상 정말 유익하게 봤어요 😊 — 광고비 이익 분석 제안드려요"
+- "[채널명]님 쿠팡 리뷰 인상 깊었어요 — 셀러분들께 도움될 도구 소개드립니다"
+
+나쁜 예시 (절대 금지):
+- "안녕하세요, 제안드립니다" (익명·추상적)
+- "2025년 최고 영상 감사합니다" (연도만 언급, 내용 없음)
+- 스마트스토어/쿠팡과 무관한 영상 언급
+
+**3단계: greeting 섹션 작성**
+- **"[채널명]님의 '[영상 제목]' 정말 인상 깊었습니다"** — 영상 제목을 그대로 명시
+- 영상에서 다룬 구체적 내용 1가지 언급 (예: "특히 광고비 대비 마진 계산 부분이 인상적이었어요")
+- 해당 내용이 매실인사이트와 어떻게 연결되는지 자연스럽게 연결
+
+**절대 금지:**
+- 조회한 영상 목록에 없는 내용을 창작해서 칭찬
+- 연도·날짜만 언급하고 내용 없이 칭찬
+- 스마트스토어·쿠팡과 관련 없는 영상으로 접근
 
 ### 3. CS 인텔리전스
 - `analyze_cs_data(cs_patterns)` → 자주 묻는 질문 TOP, 감정 분포, L3 갭 비율
@@ -440,6 +527,13 @@ class GrowthAgent(BaseAgent):
                 sort=tool_input.get("sort", "sim"),
             )
 
+        elif tool_name == "search_creator_content":
+            creator = tool_input["creator_name"]
+            topic   = tool_input.get("topic_hint", "스마트스토어")
+            stype   = tool_input.get("search_type", "video")
+            query   = f"{creator} {topic}"
+            return search_naver_content(query=query, search_type=stype, display=10)
+
         elif tool_name == "save_target_list":
             targets = tool_input.get("targets") or []
             sid = create_snapshot(
@@ -456,14 +550,18 @@ class GrowthAgent(BaseAgent):
 
         elif tool_name == "create_proposal_draft":
             payload: dict[str, Any] = {
-                "mall_name":    tool_input["mall_name"],
-                "store_url":    tool_input.get("store_url", ""),
-                "product_area": tool_input.get("product_area", ""),
-                "proposal":     tool_input.get("proposal", ""),
-                "created_at":   datetime.now(timezone.utc).isoformat(),
+                "mall_name":     tool_input["mall_name"],
+                "store_url":     tool_input.get("store_url", ""),
+                "product_area":  tool_input.get("product_area", ""),
+                "target_type":   tool_input.get("target_type", "seller"),
+                "email_subject": tool_input.get("email_subject", ""),
+                "proposal":      tool_input.get("proposal", ""),
+                "created_at":    datetime.now(timezone.utc).isoformat(),
             }
             if tool_input.get("sections"):
                 payload["sections"] = tool_input["sections"]
+            if tool_input.get("referenced_video"):
+                payload["referenced_video"] = tool_input["referenced_video"]
             sid = create_snapshot(
                 run_id=run_id, agent_type=self.agent_type,
                 kind="proposal_draft",

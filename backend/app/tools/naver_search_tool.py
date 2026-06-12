@@ -1,5 +1,5 @@
 """
-네이버 쇼핑 검색 — maesil-insight 게이트웨이 경유.
+네이버 검색 (쇼핑 + 블로그/영상) — maesil-insight 게이트웨이 경유.
 
 인증: maesil_insight_url + harness_api_token (이미 설정된 값 재사용)
 네이버 API 키는 maesil-insight에서 관리 → agency에 별도 등록 불필요.
@@ -123,4 +123,58 @@ def search_naver_shopping(
         "keyword":     keyword,
         "total_items": len(items),
         "sellers":     result_sellers,
+    }
+
+
+def search_naver_content(
+    query: str,
+    search_type: str = "blog",
+    display: int = 10,
+) -> dict:
+    """네이버 블로그/영상 검색 — maesil-insight 게이트웨이 경유.
+
+    search_type: "blog" | "video"
+    Returns list of {title, link, description, pubDate} items.
+    """
+    base_url = get_secret("maesil_insight_url")
+    token    = get_secret("harness_api_token")
+
+    if not base_url:
+        return {"error": "maesil_insight_url 미설정"}
+    if not token:
+        return {"error": "harness_api_token 미설정"}
+
+    # maesil-insight 게이트웨이: /api/v1/naver/search?type=blog|video
+    url = base_url.rstrip("/") + "/api/v1/naver/search"
+    try:
+        r = httpx.get(
+            url,
+            headers={"Authorization": f"Bearer {token}"},
+            params={"query": query, "type": search_type, "display": min(display, 20)},
+            timeout=15,
+        )
+        r.raise_for_status()
+        data  = r.json()
+        items = data.get("items") or []
+    except httpx.HTTPStatusError as e:
+        logger.warning("naver content search error [%s/%s]: %s", search_type, query, e)
+        return {"error": f"인사이트 API 오류: {e.response.status_code}"}
+    except Exception as e:
+        logger.warning("naver content search error [%s/%s]: %s", search_type, query, e)
+        return {"error": str(e)}
+
+    results = []
+    for item in items[:display]:
+        results.append({
+            "title":       _strip_html(item.get("title", "")),
+            "link":        item.get("link", ""),
+            "description": _strip_html(item.get("description", ""))[:200],
+            "pub_date":    item.get("pubDate", ""),
+        })
+
+    return {
+        "query":       query,
+        "search_type": search_type,
+        "total":       len(results),
+        "items":       results,
     }

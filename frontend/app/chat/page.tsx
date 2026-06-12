@@ -78,6 +78,13 @@ type ProposalSections = {
   cta?: string;
 };
 
+type ReferencedVideo = {
+  title?: string;
+  url?: string;
+  topic?: string;
+  pub_date?: string;
+};
+
 type OutreachSnapshot = {
   id: string;
   kind: "outreach_targets" | "proposal_draft";
@@ -87,6 +94,9 @@ type OutreachSnapshot = {
     mall_name?: string;
     store_url?: string;
     product_area?: string;
+    target_type?: "seller" | "youtuber" | "blogger";
+    email_subject?: string;
+    referenced_video?: ReferencedVideo;
     proposal?: string;
     sections?: ProposalSections;
     created_at?: string;
@@ -133,6 +143,11 @@ function openProposalHTML(s: OutreachSnapshot) {
       .join("");
   }
 
+  const emailSubject   = p.email_subject || "";
+  const refVideo       = p.referenced_video;
+  const targetType     = p.target_type || "seller";
+  const targetLabel    = targetType === "youtuber" ? "유튜버" : targetType === "blogger" ? "블로거" : "스토어";
+
   const html = `<!DOCTYPE html><html lang="ko"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>매실 제안서 — ${mallName}</title>
@@ -151,12 +166,14 @@ function openProposalHTML(s: OutreachSnapshot) {
 <div class="ctrl"><button class="btn-p" onclick="window.print()">🖨️ PDF 저장 / 인쇄</button><button class="btn-c" onclick="window.close()">✕</button></div>
 <div class="page">
   <div style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);color:#fff;padding:2.2rem 2.8rem;position:relative">
-    <div style="font-size:.78rem;font-weight:700;color:#4ade80;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.1rem">🌿 Maesil · 영업 제안서</div>
+    <div style="font-size:.78rem;font-weight:700;color:#4ade80;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.1rem">🌿 Maesil · 영업 제안서 · ${targetLabel}</div>
     <h1 style="font-size:1.8rem;font-weight:700;margin-bottom:.3rem">${mallName} 귀중</h1>
-    ${productArea ? `<div style="font-size:.88rem;color:#94a3b8">${productArea}</div>` : ""}
+    ${emailSubject ? `<div style="font-size:.9rem;color:#fde68a;font-weight:600;margin-top:.5rem">📧 ${emailSubject}</div>` : ""}
+    ${refVideo?.title ? `<div style="font-size:.78rem;color:#6ee7b7;margin-top:.35rem">🎬 ${refVideo.url ? `<a href="${refVideo.url}" target="_blank" style="color:#6ee7b7">${refVideo.title}</a>` : refVideo.title}${refVideo.pub_date ? ` (${refVideo.pub_date})` : ""}</div>` : ""}
+    ${productArea ? `<div style="font-size:.88rem;color:#94a3b8;margin-top:.3rem">${productArea}</div>` : ""}
     ${dateStr ? `<div style="position:absolute;top:2.2rem;right:2.8rem;font-size:.76rem;color:#64748b">${dateStr}</div>` : ""}
   </div>
-  ${storeUrl ? `<div style="padding:.9rem 2.8rem;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:.82rem;color:#475569">스토어 · <a href="${storeUrl}" target="_blank" style="color:#2563eb;text-decoration:none">${storeUrl}</a></div>` : ""}
+  ${storeUrl ? `<div style="padding:.9rem 2.8rem;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:.82rem;color:#475569">채널/스토어 · <a href="${storeUrl}" target="_blank" style="color:#2563eb;text-decoration:none">${storeUrl}</a></div>` : ""}
   <div style="padding:2.2rem 2.8rem">
     ${bodyHtml}
   </div>
@@ -348,12 +365,27 @@ function ProposalModal({ snapshot, onClose }: { snapshot: OutreachSnapshot; onCl
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#4ade80",
                           textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "0.35rem" }}>
-              🌿 Maesil 제안서
+              🌿 Maesil 제안서{p.target_type === "youtuber" ? " · 유튜버" : p.target_type === "blogger" ? " · 블로거" : ""}
             </div>
             <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>{p.mall_name}</div>
+            {p.email_subject && (
+              <div style={{ fontSize: "0.82rem", color: "#fde68a", fontWeight: 600,
+                            marginTop: "0.3rem", lineHeight: 1.4 }}>
+                📧 {p.email_subject}
+              </div>
+            )}
+            {p.referenced_video?.title && (
+              <div style={{ fontSize: "0.74rem", color: "#6ee7b7", marginTop: "0.2rem" }}>
+                🎬 참조 영상: {p.referenced_video.url
+                  ? <a href={p.referenced_video.url} target="_blank" rel="noopener noreferrer"
+                       style={{ color: "#6ee7b7" }}>{p.referenced_video.title}</a>
+                  : p.referenced_video.title}
+                {p.referenced_video.pub_date && ` (${p.referenced_video.pub_date})`}
+              </div>
+            )}
             {p.store_url && (
               <a href={p.store_url} target="_blank" rel="noopener noreferrer"
-                 style={{ fontSize: "0.76rem", color: "#93c5fd", textDecoration: "none" }}>
+                 style={{ fontSize: "0.76rem", color: "#93c5fd", textDecoration: "none", display: "block", marginTop: "0.15rem" }}>
                 {p.store_url}
               </a>
             )}
