@@ -15,7 +15,7 @@ from urllib.parse import urlparse
 
 import httpx
 
-from .base import BaseScanner, ContentItem, filter_already_scanned
+from .base import BaseScanner, ContentItem
 
 logger = logging.getLogger(__name__)
 
@@ -85,49 +85,64 @@ class NaverBlogScanner(BaseScanner):
         return urls
 
     def run_scan(self) -> dict:
-        """키워드별 sim+date 병행 수집 → 중복 제거 → fetch_content_details."""
-        all_urls: list[str] = []
-        seen: set[str] = set()
+        """
+        키워드별 sim+date 병행 수집 → blog_id 단위 중복 제거 → fetch_content_details.
 
-        # 관련도순
+        중복 체크: 포스트 URL이 아닌 blog_id(채널)로 outreach_leads 확인.
+        - 네이버 블로그는 같은 인기 포스트가 매일 동일 키워드에서 검색되므로
+          post URL 기반 outreach_scanned_content 체크는 영구 0건을 유발.
+        """
+        # ── 1) 키워드 수집 ──
+        seen_urls: set[str] = set()
+        blog_id_to_best_url: dict[str, str] = {}   # blog_id → 대표 포스트 URL
+
         for kw in _KEYWORDS_SIM:
             for it in self._search_blog(kw, display=_MAX_PER_KW, sort="sim"):
                 url = it.get("link", "")
-                if url and url not in seen:
-                    seen.add(url)
-                    self._api_cache[url] = it
-                    all_urls.append(url)
+                if not url or url in seen_urls:
+                    continue
+                seen_urls.add(url)
+                self._api_cache[url] = it
+                bid = _extract_blog_id(url)
+                if bid and bid not in blog_id_to_best_url:
+                    blog_id_to_best_url[bid] = url
             time.sleep(0.15)
-            if len(all_urls) >= _MAX_ITEMS:
+            if len(blog_id_to_best_url) >= _MAX_ITEMS:
                 break
 
-        # 최신순 (추가 발굴)
-        if len(all_urls) < _MAX_ITEMS:
+        if len(blog_id_to_best_url) < _MAX_ITEMS:
             for kw in _KEYWORDS_DATE:
                 for it in self._search_blog(kw, display=_MAX_PER_KW, sort="date"):
                     url = it.get("link", "")
-                    if url and url not in seen:
-                        seen.add(url)
-                        self._api_cache[url] = it
-                        all_urls.append(url)
+                    if not url or url in seen_urls:
+                        continue
+                    seen_urls.add(url)
+                    self._api_cache[url] = it
+                    bid = _extract_blog_id(url)
+                    if bid and bid not in blog_id_to_best_url:
+                        blog_id_to_best_url[bid] = url
                 time.sleep(0.15)
-                if len(all_urls) >= _MAX_ITEMS:
+                if len(blog_id_to_best_url) >= _MAX_ITEMS:
                     break
 
-        logger.info("[naver_blog] 검색 결과 %d개", len(all_urls))
-        new_urls = filter_already_scanned(self.platform, all_urls)
-        logger.info("[naver_blog] 신규 %d개", len(new_urls))
+        all_blog_ids = list(blog_id_to_best_url.keys())
+        logger.info("[naver_blog] 검색 결과 블로그 %d개", len(all_blog_ids))
 
-        if not new_urls:
-            return {"platform": self.platform, "total_searched": len(all_urls),
+        # ── 2) 이미 outreach_leads에 있는 블로그 제외 ──
+        new_blog_ids = _filter_new_blog_ids(all_blog_ids)
+        logger.info("[naver_blog] 신규 블로그 %d개", len(new_blog_ids))
+
+        if not new_blog_ids:
+            return {"platform": self.platform, "total_searched": len(all_blog_ids),
                     "new_items": 0, "items": [], "new_content_ids": []}
 
+        new_urls = [blog_id_to_best_url[bid] for bid in new_blog_ids]
         items = self.fetch_content_details(new_urls)
         logger.info("[naver_blog] 필터 통과 %d개", len(items))
         return {
             "platform": self.platform,
-            "total_searched": len(all_urls),
-            "new_content_ids": new_urls,
+            "total_searched": len(all_blog_ids),
+            "new_content_ids": new_urls,   # pipeline의 mark_scanned용
             "new_items": len(items),
             "items": items,
         }
@@ -280,6 +295,27 @@ def _normalize_blog_url(blog_id: str, fallback: str) -> str:
     if ".tistory.com" in blog_id:
         return f"https://{blog_id}"
     return fallback
+
+
+def _filter_new_blog_ids(blog_ids: list[str]) -> list[str]:
+    """outreach_leads에 없는 blog_id만 반환 (채널 단위 중복 방지)."""
+    if not blog_ids:
+        return []
+    try:
+        from app.db.maesil_total_client import get_maesil_total_client
+        resp = (
+            get_maesil_total_client()
+            .schema("agent_work")
+            .table("outreach_leads")
+            .select("platform_id")
+            .eq("platform", "naver_blog")
+            .in_("platform_id", blog_ids)
+            .execute()
+        )
+        existing = {r["platform_id"] for r in (resp.data or [])}
+        return [bid for bid in blog_ids if bid not in existing]
+    except Exception:
+        return blog_ids   # DB 오류 시 전부 처리
 
 
 def _parse_naver_date(postdate: str) -> datetime | None:
