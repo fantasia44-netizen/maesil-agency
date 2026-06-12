@@ -241,8 +241,8 @@ def check_pending_followups(limit: int = 20) -> dict:
 
         try:
             if channel == "email" and sequence == 1:
-                # 1차 이메일은 수동 승인 후 발송 — 스케줄러는 건너뜀
-                _mark_touch(touch_id, "skipped")
+                # 1차 이메일은 수동 발송(send_single)이 처리 — 스케줄러는 건너뜀
+                # skipped로 마킹하지 않음: send_single이 발송 후 sent로 업데이트
                 continue
             elif channel == "email":
                 ok = _send_sequence_email(lead, sequence, touch_id)
