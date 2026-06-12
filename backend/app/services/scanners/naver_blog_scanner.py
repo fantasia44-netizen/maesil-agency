@@ -2,7 +2,7 @@
 naver_blog_scanner.py — 네이버 블로그 파트너 발굴 스캐너.
 
 Naver Search API /v1/search/blog 사용 (무료, 25,000콜/일).
-블로그 포스트 → 채널(블로그) 수준 집계 → Claude Haiku GATE 적용.
+블로그 포스트 → 채널(블로그) 수준 집계 → 프로필 스크랩(연락처) → Haiku GATE.
 """
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import logging
 import re
 import time
 from datetime import datetime, timezone
-from urllib.parse import urlparse, quote
+from urllib.parse import urlparse
 
 import httpx
 
@@ -19,216 +19,270 @@ from .base import BaseScanner, ContentItem, filter_already_scanned
 
 logger = logging.getLogger(__name__)
 
-# ── 스캔 키워드 ────────────────────────────────────────────────────────
-KEYWORDS = [
-    "스마트스토어 광고 방법",
-    "쿠팡 로켓그로스 ROAS",
-    "온라인 셀러 마케팅 비용",
-    "스마트스토어 키워드 광고 세팅",
+# ── 키워드 — 관련순(sim) + 최신순(date) 병행 ──────────────────────────
+_KEYWORDS_SIM = [          # 관련도 높은 교육·정보형 블로거 발굴
+    "스마트스토어 광고 최적화 방법",
+    "쿠팡 광고비 절감 ROAS",
+    "쿠팡 로켓그로스 운영 노하우",
+    "네이버 쇼핑 광고 세팅 방법",
+    "온라인 셀러 마케팅 강의",
+    "스마트스토어 운영 노하우 블로그",
+    "쿠팡 광고 분석 방법",
+    "네이버 쇼핑 키워드 전략",
+]
+_KEYWORDS_DATE = [         # 최신 활성 블로거 발굴
+    "스마트스토어 광고 후기",
     "쿠팡파트너스 수익 공개",
-    "쿠팡 광고비 절감",
     "스마트스토어 매출 공개",
-    "온라인 쇼핑몰 광고 분석",
-    "네이버 쇼핑 광고 최적화",
-    "스마트스토어 운영 노하우",
+    "온라인 쇼핑몰 광고비 후기",
 ]
 
-# 네이버 블로그 포스트당 최소 조회수 필터 (Naver API에는 없으므로 제목 키워드로 대체)
-_MIN_CONTENT_LEN = 30    # API description 최소 길이 (짧으면 빈 결과)
-_MAX_RESULTS_PER_KW = 20  # 키워드당 최대 수집 건수
+_MAX_PER_KW = 20           # 키워드당 최대 수집 건수
+_MAX_ITEMS  = 60           # 전체 상한 (API 콜 절약)
 
 
 class NaverBlogScanner(BaseScanner):
-    """네이버 블로그 검색 스캐너."""
-
     platform = "naver_blog"
-    keywords = KEYWORDS
+    keywords  = _KEYWORDS_SIM + _KEYWORDS_DATE   # run_scan용 (사용 안 함, 직접 오버라이드)
 
     def __init__(self, client_id: str, client_secret: str):
-        self.client_id = client_id
+        self.client_id     = client_id
         self.client_secret = client_secret
         self._headers = {
-            "X-Naver-Client-Id": client_id,
+            "X-Naver-Client-Id":     client_id,
             "X-Naver-Client-Secret": client_secret,
         }
-        self._search_cache: dict[str, dict] = {}  # url → API 원본 결과 캐시
+        self._api_cache: dict[str, dict] = {}   # url → API 원본
 
-    # ── Naver Search API ──────────────────────────────────────────────
+    # ── Naver Search API ─────────────────────────────────────────────
 
-    def _search_blog(self, query: str, display: int = 20, start: int = 1) -> list[dict]:
-        """Naver 블로그 검색 API 호출."""
-        url = "https://openapi.naver.com/v1/search/blog"
-        params = {
-            "query": query,
-            "display": display,
-            "start": start,
-            "sort": "date",  # 최신순
-        }
+    def _search_blog(self, query: str, display: int = 20,
+                     sort: str = "sim") -> list[dict]:
         try:
-            r = httpx.get(url, params=params, headers=self._headers, timeout=10)
+            r = httpx.get(
+                "https://openapi.naver.com/v1/search/blog",
+                params={"query": query, "display": display, "sort": sort},
+                headers=self._headers, timeout=10,
+            )
             r.raise_for_status()
-            data = r.json()
-            return data.get("items", [])
+            return r.json().get("items", [])
         except Exception as e:
             logger.warning("Naver blog search 실패 [%s]: %s", query, e)
             return []
 
-    def _fetch_post_content(self, post_url: str) -> str:
-        """블로그 포스트 HTML 파싱 → 본문 텍스트 추출 (최대 3000자)."""
+    # ── BaseScanner 오버라이드 — 직접 run_scan 구현 ───────────────────
+
+    def search(self, keyword: str) -> list[str]:
+        """단일 키워드 → URL 목록 (BaseScanner 호환용, 실제론 run_scan 오버라이드)."""
+        items = self._search_blog(keyword, display=_MAX_PER_KW, sort="sim")
+        time.sleep(0.15)
+        urls = []
+        for it in items:
+            url = it.get("link", "")
+            if url:
+                self._api_cache[url] = it
+                urls.append(url)
+        return urls
+
+    def run_scan(self) -> dict:
+        """키워드별 sim+date 병행 수집 → 중복 제거 → fetch_content_details."""
+        all_urls: list[str] = []
+        seen: set[str] = set()
+
+        # 관련도순
+        for kw in _KEYWORDS_SIM:
+            for it in self._search_blog(kw, display=_MAX_PER_KW, sort="sim"):
+                url = it.get("link", "")
+                if url and url not in seen:
+                    seen.add(url)
+                    self._api_cache[url] = it
+                    all_urls.append(url)
+            time.sleep(0.15)
+            if len(all_urls) >= _MAX_ITEMS:
+                break
+
+        # 최신순 (추가 발굴)
+        if len(all_urls) < _MAX_ITEMS:
+            for kw in _KEYWORDS_DATE:
+                for it in self._search_blog(kw, display=_MAX_PER_KW, sort="date"):
+                    url = it.get("link", "")
+                    if url and url not in seen:
+                        seen.add(url)
+                        self._api_cache[url] = it
+                        all_urls.append(url)
+                time.sleep(0.15)
+                if len(all_urls) >= _MAX_ITEMS:
+                    break
+
+        logger.info("[naver_blog] 검색 결과 %d개", len(all_urls))
+        new_urls = filter_already_scanned(self.platform, all_urls)
+        logger.info("[naver_blog] 신규 %d개", len(new_urls))
+
+        if not new_urls:
+            return {"platform": self.platform, "total_searched": len(all_urls),
+                    "new_items": 0, "items": [], "new_content_ids": []}
+
+        items = self.fetch_content_details(new_urls)
+        logger.info("[naver_blog] 필터 통과 %d개", len(items))
+        return {
+            "platform": self.platform,
+            "total_searched": len(all_urls),
+            "new_content_ids": new_urls,
+            "new_items": len(items),
+            "items": items,
+        }
+
+    # ── ContentItem 변환 ─────────────────────────────────────────────
+
+    def fetch_content_details(self, content_ids: list[str]) -> list[ContentItem]:
+        seen_blog_ids: set[str] = set()
+        results: list[ContentItem] = []
+
+        for post_url in content_ids:
+            blog_id = _extract_blog_id(post_url)
+            if not blog_id or blog_id in seen_blog_ids:
+                continue
+
+            api_item = self._api_cache.get(post_url, {})
+            raw_desc = re.sub(r"<[^>]+>", "", api_item.get("description", "")).strip()
+
+            # 설명이 너무 짧으면 의미 없는 결과 — 스킵
+            if len(raw_desc) < 20:
+                continue
+
+            seen_blog_ids.add(blog_id)
+
+            # 1) 포스트 본문 크롤링 (항상 시도 — 연락처 추출 품질 향상)
+            post_body = self._fetch_post_body(post_url)
+            time.sleep(0.2)
+
+            # 2) 블로그 프로필/소개 페이지 스크랩 (연락처 핵심)
+            profile_text = self._fetch_blog_profile(blog_id, post_url)
+            time.sleep(0.2)
+
+            # 연락처 추출용 통합 텍스트: 프로필 > 포스트 본문 > API description
+            contact_text = f"{profile_text} {post_body} {raw_desc}"
+
+            # 콘텐츠 분석용: 포스트 본문 우선, 없으면 description
+            content_body = post_body if len(post_body) > len(raw_desc) else raw_desc
+
+            handle_name = re.sub(r"<[^>]+>", "",
+                                 api_item.get("bloggername", "") or blog_id).strip()
+            platform_url = _normalize_blog_url(blog_id, post_url)
+            pub_date     = _parse_naver_date(api_item.get("postdate", ""))
+            title        = re.sub(r"<[^>]+>", "",
+                                  api_item.get("title", "")).strip()
+
+            results.append(ContentItem(
+                platform      = "naver_blog",
+                platform_id   = blog_id,
+                platform_url  = platform_url,
+                content_id    = post_url,
+                handle_name   = handle_name or blog_id,
+                content_title = title,
+                content_body  = content_body[:3000],
+                views         = 0,
+                comments      = 0,
+                published_at  = pub_date,
+                subscriber_count = None,   # Naver API 미제공
+                raw_contact_text = contact_text[:6000],
+            ))
+
+            if len(results) >= 40:
+                break
+
+        return results
+
+    # ── 스크래핑 헬퍼 ────────────────────────────────────────────────
+
+    def _fetch_post_body(self, post_url: str) -> str:
+        """포스트 본문 텍스트 추출 (Naver iframe 처리 포함)."""
         try:
             r = httpx.get(post_url, timeout=10, follow_redirects=True,
                           headers={"User-Agent": "Mozilla/5.0"})
             html = r.text
 
-            # 네이버 블로그 iframe 처리
-            iframe_m = re.search(
+            # 네이버 블로그 iframe mainFrame 처리
+            m = re.search(
                 r'<iframe[^>]+id=["\']mainFrame["\'][^>]+src=["\']([^"\']+)["\']', html
             )
-            if iframe_m:
-                iframe_url = "https://blog.naver.com" + iframe_m.group(1)
+            if m:
+                iframe_url = "https://blog.naver.com" + m.group(1)
                 r2 = httpx.get(iframe_url, timeout=10, follow_redirects=True,
-                                headers={"User-Agent": "Mozilla/5.0"})
+                               headers={"User-Agent": "Mozilla/5.0"})
                 html = r2.text
 
-            # 텍스트 추출 (태그 제거)
-            text = re.sub(r"<script[^>]*>.*?</script>", " ", html, flags=re.S)
-            text = re.sub(r"<style[^>]*>.*?</style>", " ", text, flags=re.S)
-            text = re.sub(r"<[^>]+>", " ", text)
-            text = re.sub(r"\s+", " ", text).strip()
-            return text[:3000]
+            return _strip_html(html)[:3000]
         except Exception as e:
             logger.debug("포스트 파싱 실패 [%s]: %s", post_url, e)
             return ""
 
-    def _extract_blog_id(self, link: str) -> str:
+    def _fetch_blog_profile(self, blog_id: str, fallback_url: str) -> str:
         """
-        블로그 URL에서 blog_id(채널 식별자) 추출.
-        https://blog.naver.com/USERNAME/... → USERNAME
-        https://USERNAME.tistory.com/...  → USERNAME.tistory.com
+        블로그 소개/프로필 페이지 스크랩.
+        이메일·카카오 연락처가 주로 여기 있음.
         """
-        parsed = urlparse(link)
-        host = parsed.hostname or ""
-        path = parsed.path
+        if "." in blog_id:
+            # 티스토리: 블로그 메인에서 텍스트 추출
+            try:
+                r = httpx.get(f"https://{blog_id}", timeout=8,
+                              follow_redirects=True,
+                              headers={"User-Agent": "Mozilla/5.0"})
+                return _strip_html(r.text)[:2000]
+            except Exception:
+                return ""
 
-        if "blog.naver.com" in host:
-            parts = [p for p in path.split("/") if p]
-            return parts[0] if parts else link
-        elif ".tistory.com" in host:
-            return host  # 티스토리는 호스트가 채널ID
-        else:
-            return host or link
-
-    # ── BaseScanner 구현 ─────────────────────────────────────────────
-
-    def search(self, keyword: str) -> list[str]:
-        """키워드 검색 → 포스트 URL(content_id) 목록 반환. API 결과를 캐시에 저장."""
-        items = self._search_blog(keyword, display=_MAX_RESULTS_PER_KW)
-        time.sleep(0.1)  # rate limit 준수
-        urls = []
-        for item in items:
-            url = item.get("link", "")
-            if url:
-                self._search_cache[url] = item  # description/title/bloggername 보존
-                urls.append(url)
-        return urls
-
-    def fetch_content_details(self, content_ids: list[str]) -> list[ContentItem]:
-        """포스트 URL 배치 → ContentItem 목록 반환 (채널 단위 중복 제거)."""
-        seen_blog_ids: set[str] = set()
-        results: list[ContentItem] = []
-
-        for post_url in content_ids:
-            blog_id = self._extract_blog_id(post_url)
-            if blog_id in seen_blog_ids:
+        # 네이버 블로그: 소개 페이지 시도
+        candidates = [
+            f"https://blog.naver.com/BlogInfo.nhn?blogId={blog_id}",
+            f"https://blog.naver.com/{blog_id}",
+        ]
+        for url in candidates:
+            try:
+                r = httpx.get(url, timeout=8, follow_redirects=True,
+                              headers={"User-Agent": "Mozilla/5.0"})
+                if r.status_code == 200 and len(r.text) > 200:
+                    text = _strip_html(r.text)[:2000]
+                    if len(text) > 50:
+                        return text
+            except Exception:
                 continue
-
-            # 캐시된 API 결과 우선 사용, 없으면 _collect_blog_profile 호출
-            cached = self._search_cache.get(post_url)
-            if cached:
-                blog_items = [cached]
-            else:
-                blog_items = self._collect_blog_profile(blog_id, post_url)
-            if not blog_items:
-                continue
-
-            best = blog_items[0]
-            # 설명 길이 필터 (캐시 활용 시 통과율 대폭 향상)
-            description = re.sub(r"<[^>]+>", "", best.get("description", ""))
-            if len(description) < _MIN_CONTENT_LEN:
-                continue
-
-            seen_blog_ids.add(blog_id)
-
-            # 포스트 본문 파싱 (선택적: API 설명만으로 부족할 때)
-            body = description
-            if len(body) < 500:
-                body = self._fetch_post_content(best.get("link", post_url)) or body
-                time.sleep(0.3)
-
-            # 연락처 텍스트 수집: 포스트 본문 + 추가 포스트들의 설명
-            all_descs = " ".join(
-                re.sub(r"<[^>]+>", "", it.get("description", ""))
-                for it in blog_items
-            )
-            contact_text = f"{body} {all_descs}"
-
-            # 블로그명 정제
-            handle_name = re.sub(r"<[^>]+>", "", best.get("bloggername", blog_id))
-
-            # 발행일 파싱 (예: "20240105" or RFC format)
-            pub_date = _parse_naver_date(best.get("postdate", ""))
-
-            # 포스트 URL (플랫폼에 맞게 정규화)
-            platform_url = _normalize_blog_url(blog_id, post_url)
-
-            item = ContentItem(
-                platform="naver_blog",
-                platform_id=blog_id,
-                platform_url=platform_url,
-                content_id=post_url,
-                handle_name=handle_name,
-                content_title=re.sub(r"<[^>]+>", "", best.get("title", "")),
-                content_body=body[:3000],
-                views=0,                    # Naver API는 조회수 미제공
-                comments=0,
-                published_at=pub_date,
-                subscriber_count=None,      # 블로그 이웃 수 API 없음
-                raw_contact_text=contact_text[:5000],
-            )
-            results.append(item)
-
-            if len(results) >= 30:          # 키 소진 방지
-                break
-
-        return results
-
-    def _collect_blog_profile(self, blog_id: str, original_url: str) -> list[dict]:
-        """
-        블로그 ID로 최근 포스트를 추가 수집해 채널 정보를 보강.
-        Naver Search API는 site: 연산자를 지원하지 않으므로 bloggername 방식 사용.
-        """
-        # 네이버 블로그: username으로 해당 블로그 포스트 검색
-        if "." not in blog_id:
-            # bloggername 파라미터 없이 URL 패턴으로 최근 글 찾기
-            # fallback: 원본 URL 하나만 반환 (추가 API 비용 최소화)
-            return [{"link": original_url, "title": "", "description": "", "bloggername": blog_id, "postdate": ""}]
-
-        # 티스토리/기타 도메인 기반 블로그: 도메인을 키워드로 검색
-        try:
-            items = self._search_blog(blog_id, display=3)
-            if items:
-                return items
-        except Exception:
-            pass
-
-        # Fallback
-        return [{"link": original_url, "title": "", "description": "", "bloggername": blog_id, "postdate": ""}]
+        return ""
 
 
-# ── 날짜 파싱 유틸 ────────────────────────────────────────────────────
+# ── 공통 유틸 ─────────────────────────────────────────────────────────
+
+def _strip_html(html: str) -> str:
+    text = re.sub(r"<script[^>]*>.*?</script>", " ", html, flags=re.S)
+    text = re.sub(r"<style[^>]*>.*?</style>",  " ", text,  flags=re.S)
+    text = re.sub(r"<[^>]+>", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _extract_blog_id(link: str) -> str:
+    parsed = urlparse(link)
+    host   = parsed.hostname or ""
+    path   = parsed.path
+
+    if "blog.naver.com" in host:
+        parts = [p for p in path.split("/") if p]
+        return parts[0] if parts else ""
+    if ".tistory.com" in host:
+        return host
+    return host or ""
+
+
+def _normalize_blog_url(blog_id: str, fallback: str) -> str:
+    if not blog_id:
+        return fallback
+    if "." not in blog_id:
+        return f"https://blog.naver.com/{blog_id}"
+    if ".tistory.com" in blog_id:
+        return f"https://{blog_id}"
+    return fallback
+
 
 def _parse_naver_date(postdate: str) -> datetime | None:
-    """Naver API postdate (YYYYMMDD) → datetime."""
     if not postdate:
         return None
     try:
@@ -237,58 +291,50 @@ def _parse_naver_date(postdate: str) -> datetime | None:
         return None
 
 
-def _normalize_blog_url(blog_id: str, fallback_url: str) -> str:
-    """blog_id → 채널 홈 URL."""
-    if "." not in blog_id:
-        return f"https://blog.naver.com/{blog_id}"
-    if blog_id.endswith(".tistory.com") or ".tistory.com" in blog_id:
-        return f"https://{blog_id}"
-    return fallback_url
-
-
 # ── Claude Haiku GATE 분석 ────────────────────────────────────────────
 
 def analyze_items_haiku(items: list[ContentItem], api_key: str) -> list[dict]:
     """
     Claude Haiku로 블로그 포스트 일괄 분류.
-    is_seller_content + is_educational GATE + conversion/risk 신호 감지.
+    셀러 콘텐츠 여부 + conversion/risk 신호 감지.
     """
     if not items or not api_key:
         return [{}] * len(items)
 
     import anthropic
-    client = anthropic.Anthropic(api_key=api_key)
+    client  = anthropic.Anthropic(api_key=api_key)
     results: list[dict] = []
 
     for item in items:
-        text_sample = f"""블로그명: {item.handle_name}
-포스트 제목: {item.content_title}
-본문 요약: {item.content_body[:1500]}"""
+        sample = (
+            f"블로그명: {item.handle_name}\n"
+            f"포스트 제목: {item.content_title}\n"
+            f"본문 요약: {item.content_body[:2000]}"
+        )
 
         prompt = f"""아래 블로그 포스트를 분석해 JSON으로만 답하세요.
 
-{text_sample}
+{sample}
 
 판단 기준:
-- is_seller_content: 쿠팡·스마트스토어·네이버쇼핑 등 온라인 셀러/쇼핑몰 관련 내용이면 true
-- is_educational: 다른 셀러에게 정보·방법·노하우를 제공하는 교육적 내용이면 true
-  (단순 "나 얼마 벌었어요" 자랑글은 false)
-- conversion_signals.has_paid_course: 유료 강의 판매 여부
-- conversion_signals.has_paid_membership: 유료 멤버십/카페 운영 여부
-- conversion_signals.has_ebook_sale: 전자책 판매 여부
-- conversion_signals.has_consulting: 유료 컨설팅/코칭 여부
-- conversion_signals.has_tool_recommendation_content: 외부 툴을 추천/소개하는 콘텐츠 여부
-- conversion_signals.has_affiliate_experience: 제휴마케팅/파트너십 경험 언급 여부
-- risk_signals.sells_competing_tool: 자체 엑셀 템플릿·프로그램·대시보드 판매 여부
-- risk_signals.sells_own_program: 자체 유료 강의 프로그램/플랫폼 운영 여부
-- risk_signals.is_competitor_partner: 경쟁 서비스(쿠팡 광고 분석 SaaS 등)의 공식 파트너 여부
-- risk_signals.has_negative_tool_content: 외부 유료 툴에 부정적인 콘텐츠 여부
-- content_summary: 이 블로거가 어떤 콘텐츠를 주로 다루는지 1문장 (한국어)
-- confidence: 판단 신뢰도 (high/medium/low)
+- is_seller_content: 쿠팡·스마트스토어·네이버쇼핑 등 온라인 셀러/쇼핑몰 관련이면 true
+- is_educational: 다른 셀러에게 노하우·방법·정보를 제공하는 교육적 내용이면 true
+- conversion_signals.has_paid_course: 유료 강의 판매
+- conversion_signals.has_paid_membership: 유료 멤버십/카페 운영
+- conversion_signals.has_ebook_sale: 전자책 판매
+- conversion_signals.has_consulting: 유료 컨설팅/코칭
+- conversion_signals.has_tool_recommendation_content: 외부 툴 추천/소개 콘텐츠
+- conversion_signals.has_affiliate_experience: 제휴마케팅/파트너십 경험 언급
+- risk_signals.sells_competing_tool: 자체 엑셀/프로그램/대시보드 판매
+- risk_signals.sells_own_program: 자체 유료 강의 플랫폼 운영
+- risk_signals.is_competitor_partner: 경쟁 광고분석 SaaS 공식 파트너
+- risk_signals.has_negative_tool_content: 외부 유료 툴에 부정적 콘텐츠
+- content_summary: 이 블로거가 주로 다루는 내용 1문장 (한국어)
+- confidence: high/medium/low
 
 {{
-  "is_seller_content": true/false,
-  "is_educational": true/false,
+  "is_seller_content": true,
+  "is_educational": false,
   "conversion_signals": {{
     "has_paid_course": false,
     "has_paid_membership": false,
@@ -304,7 +350,7 @@ def analyze_items_haiku(items: list[ContentItem], api_key: str) -> list[dict]:
     "has_negative_tool_content": false
   }},
   "content_summary": "...",
-  "confidence": "high"
+  "confidence": "medium"
 }}"""
 
         try:

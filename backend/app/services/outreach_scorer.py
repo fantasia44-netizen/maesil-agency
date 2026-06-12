@@ -48,6 +48,7 @@ def calculate_score(item: dict) -> tuple[int, str, dict]:
 
 def _reach_score(item: dict) -> int:
     score = 0
+    platform = item.get("platform", "")
 
     # 연락처
     if item.get("contact_email"):
@@ -69,6 +70,11 @@ def _reach_score(item: dict) -> int:
         score += 10
     elif 500 <= subs < 1000:
         score += 5
+
+    # 네이버 블로그: subscriber_count API 미제공 → 기본 콘텐츠 존재 보너스
+    # 셀러 관련 포스트가 있다는 것 자체가 영향력 신호
+    if platform == "naver_blog" and subs == 0:
+        score += 8  # subscriber_count 미제공 플랫폼 기본 보정
 
     return score
 

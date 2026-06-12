@@ -181,6 +181,7 @@ def run_platform_scan(platform: str) -> dict:
         activity = get_activity_level(item.published_at)
 
         score_input = {
+            "platform": platform,
             "contact_email": contact.email,
             "contact_kakao": contact.kakao,
             "contact_naver_cafe": contact.naver_cafe,
