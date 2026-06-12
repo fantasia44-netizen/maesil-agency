@@ -156,7 +156,7 @@ def run_platform_scan(platform: str) -> dict:
     processed_platform_ids: set[str] = set()
 
     for item, ai_result in zip(items, ai_results):
-        if not is_gate_pass(ai_result):
+        if not is_gate_pass(ai_result, platform=platform):
             continue
         gate_passed += 1
 

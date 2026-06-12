@@ -34,7 +34,7 @@ KEYWORDS = [
 ]
 
 # 네이버 블로그 포스트당 최소 조회수 필터 (Naver API에는 없으므로 제목 키워드로 대체)
-_MIN_CONTENT_LEN = 300   # 최소 콘텐츠 길이 (설명 기준)
+_MIN_CONTENT_LEN = 30    # API description 최소 길이 (짧으면 빈 결과)
 _MAX_RESULTS_PER_KW = 20  # 키워드당 최대 수집 건수
 
 

@@ -130,12 +130,13 @@ def compute_risk_signals(ai_result: dict) -> dict:
     }
 
 
-def is_gate_pass(ai_result: dict) -> bool:
-    """GATE: 셀러 콘텐츠 + 교육/정보 제공형 둘 다 True여야 통과."""
-    return (
-        bool(ai_result.get("is_seller_content"))
-        and bool(ai_result.get("is_educational"))
-    )
+def is_gate_pass(ai_result: dict, platform: str = "") -> bool:
+    """GATE: 셀러 콘텐츠 필수. 블로그는 is_educational 불필요 (유튜브보다 다양한 형식)."""
+    if not ai_result.get("is_seller_content"):
+        return False
+    if platform == "naver_blog":
+        return True
+    return bool(ai_result.get("is_educational"))
 
 
 def get_activity_level(published_at) -> str:
