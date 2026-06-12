@@ -328,9 +328,9 @@ export default function LeadDetailPage() {
 
           {/* 액션 버튼 */}
           <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-            {(lead.status === "discovered" || lead.status === "analyzing") && (
+            {!["emailed","replied","no_reply","negotiating","deal","rejected"].includes(lead.status) && (
               <button className="btn primary" onClick={triggerAnalyze} disabled={!!actionId || lead.status === "analyzing"} style={{ fontSize: "0.82rem" }}>
-                {actionId === "analyze" ? "시작 중…" : lead.status === "analyzing" ? "분석 중…" : "🔬 Haiku 심층분석"}
+                {actionId === "analyze" ? "시작 중…" : lead.status === "analyzing" ? "분석 중…" : lead.status === "discovered" ? "🔬 Haiku 심층분석" : "🔄 재분석"}
               </button>
             )}
             {["draft_ready", "approved"].includes(lead.status) && lead.contact_email && (

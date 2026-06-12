@@ -545,13 +545,13 @@ export default function OutreachPage() {
 
                   {/* 액션 버튼 */}
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", flexShrink: 0, alignItems: "flex-end" }}>
-                    {/* Haiku 심층 분석 */}
-                    {(lead.status === "discovered" || lead.status === "analyzing") && (
+                    {/* 분석 / 재분석 */}
+                    {lead.status !== "emailed" && lead.status !== "replied" && lead.status !== "no_reply" && lead.status !== "negotiating" && lead.status !== "deal" && lead.status !== "rejected" && (
                       <button className="btn primary"
                         style={{ fontSize: "0.74rem", padding: "4px 10px", whiteSpace: "nowrap", opacity: lead.status === "analyzing" ? 0.6 : 1 }}
                         disabled={!!busy || lead.status === "analyzing"}
                         onClick={() => triggerAnalyze(lead)}>
-                        {lead.status === "analyzing" ? "분석중…" : actionId === lead.id + ":analyze" ? "시작중…" : "🔬 분석"}
+                        {lead.status === "analyzing" ? "분석중…" : actionId === lead.id + ":analyze" ? "시작중…" : lead.status === "discovered" ? "🔬 분석" : "🔄 재분석"}
                       </button>
                     )}
 
