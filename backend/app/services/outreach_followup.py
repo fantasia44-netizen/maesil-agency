@@ -188,15 +188,12 @@ def check_pending_followups(limit: int = 20) -> dict:
             continue
 
         try:
-            if channel == "email":
+            if channel == "email" and sequence == 1:
+                # 1차 이메일은 수동 승인 후 발송 — 스케줄러는 건너뜀
+                _mark_touch(touch_id, "skipped")
+                continue
+            elif channel == "email":
                 ok = _send_sequence_email(lead, sequence, touch_id)
-                if ok and sequence == 1:
-                    # 1차 이메일 발송 → lead status 업데이트
-                    _db().table("outreach_leads").update({
-                        "status": "emailed",
-                        "emailed_at": now,
-                        "updated_at": now,
-                    }).eq("id", lead_id).execute()
             else:
                 _notify_manual_touch(lead, channel, touch_id)
 
