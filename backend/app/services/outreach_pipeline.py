@@ -79,7 +79,13 @@ def _merge_into_existing(existing_id: str, new_platform: str, new_url: str,
 
 def _schedule_touchpoints(lead_id: str, has_email: bool,
                           has_instagram: bool, has_cafe: bool) -> None:
-    """터치포인트 시퀀스 예약 (발송은 outreach_followup.py가 담당)."""
+    """터치포인트 시퀀스 예약. 이미 예약된 리드는 건너뜀."""
+    try:
+        existing = _db().table("outreach_touchpoints").select("id").eq("lead_id", lead_id).limit(1).execute()
+        if existing.data:
+            return  # 이미 터치포인트 있음 — 재스캔 시 덮어쓰지 않음
+    except Exception:
+        return
     now = datetime.now(timezone.utc)
     rows = []
     for t in TOUCH_SCHEDULE:
