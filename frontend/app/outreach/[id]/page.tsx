@@ -102,6 +102,9 @@ export default function LeadDetailPage() {
   const [editFinal, setEditFinal] = useState("");
   const [draftDirty, setDraftDirty] = useState(false);
 
+  // 미리보기
+  const [preview, setPreview] = useState<{ subject: string; html: string } | null>(null);
+
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok });
     setTimeout(() => setToast(null), 3000);
@@ -126,6 +129,21 @@ export default function LeadDetailPage() {
   }, [leadId]);
 
   useEffect(() => { loadLead(); }, [loadLead]);
+
+  const openPreview = async () => {
+    if (!lead) return;
+    setActionId("preview");
+    try {
+      const data = await apiFetch<{ subject: string; html: string }>(
+        `/api/outreach/leads/${lead.id}/email-preview`, {}, 10000
+      );
+      setPreview(data);
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : "미리보기 실패", false);
+    } finally {
+      setActionId(null);
+    }
+  };
 
   const saveDraft = async () => {
     if (!lead) return;
@@ -232,6 +250,35 @@ export default function LeadDetailPage() {
 
   return (
     <div style={{ maxWidth: 820, margin: "0 auto" }}>
+      {/* 이메일 미리보기 모달 */}
+      {preview && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 10000,
+          background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
+        }} onClick={() => setPreview(null)}>
+          <div style={{
+            background: "#fff", borderRadius: 12, width: "100%", maxWidth: 680,
+            maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ padding: "14px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 2 }}>제목</div>
+                <div style={{ fontSize: "0.88rem", fontWeight: 600, color: "#0f172a" }}>{preview.subject}</div>
+              </div>
+              <button onClick={() => setPreview(null)} style={{ background: "none", border: "none", fontSize: "1.2rem", cursor: "pointer", color: "#94a3b8", padding: "4px 8px" }}>✕</button>
+            </div>
+            <div style={{ flex: 1, overflow: "auto" }}>
+              <iframe
+                srcDoc={preview.html}
+                style={{ width: "100%", height: "600px", border: "none" }}
+                title="이메일 미리보기"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 토스트 */}
       {toast && (
         <div style={{
@@ -428,7 +475,7 @@ export default function LeadDetailPage() {
 
             <div style={{ marginBottom: "0.6rem" }}>
               <label style={{ fontSize: "0.75rem", color: "#64748b", display: "block", marginBottom: 3 }}>
-                AI 초안 <span style={{ color: "#94a3b8" }}>(자동 생성, 참고용)</span>
+                맞춤 인사 문단 <span style={{ color: "#94a3b8" }}>(AI 생성 · 실제 이메일엔 케이스스터디+수익모델+오픈톡 자동 포함)</span>
               </label>
               <textarea
                 value={editDraft}
@@ -462,7 +509,7 @@ export default function LeadDetailPage() {
               />
             </div>
 
-            <div style={{ display: "flex", gap: "0.5rem" }}>
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
               <button
                 className="btn primary"
                 onClick={saveDraft}
@@ -470,12 +517,19 @@ export default function LeadDetailPage() {
                 style={{ fontSize: "0.82rem", flex: 1 }}>
                 {actionId === "save" ? "저장 중…" : "💾 초안 저장"}
               </button>
+              <button
+                className="btn"
+                onClick={openPreview}
+                disabled={actionId === "preview"}
+                style={{ fontSize: "0.78rem", padding: "5px 12px", borderColor: "#0369a1", color: "#0369a1" }}>
+                {actionId === "preview" ? "로딩…" : "👁 실제 이메일 미리보기"}
+              </button>
               {editDraft && (
                 <button
                   className="btn"
                   onClick={() => { setEditFinal(editDraft); setDraftDirty(true); }}
                   style={{ fontSize: "0.78rem", padding: "5px 10px" }}>
-                  AI 초안 → 최종본 복사
+                  인사문단 → 최종본 복사
                 </button>
               )}
             </div>

@@ -244,6 +244,32 @@ def trigger_batch_analysis(
     return {"ok": True, "queued": len(ids), "message": f"{len(ids)}건 일괄 분석 시작됨 (백그라운드)"}
 
 
+@router.get("/leads/{lead_id}/email-preview")
+def preview_email(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
+    """실제 발송될 이메일 HTML 미리보기."""
+    from app.services.outreach_mailer import _build_email_html, _draft_to_html, _build_subject
+
+    resp = _db().table("outreach_leads").select("*").eq("id", lead_id).limit(1).execute()
+    rows = resp.data or []
+    if not rows:
+        raise HTTPException(404, "리드를 찾을 수 없습니다.")
+    lead = rows[0]
+
+    handle = lead.get("handle_name") or "파트너 채널"
+    subject = lead.get("email_subject") or _build_subject(handle)
+
+    if lead.get("email_final"):
+        html = _draft_to_html(lead["email_final"])
+    else:
+        html = _build_email_html(
+            handle,
+            lead.get("platform_url") or "",
+            lead.get("email_draft") or lead.get("content_summary") or "",
+        )
+
+    return {"ok": True, "subject": subject, "html": html}
+
+
 class EmailDraftPatch(BaseModel):
     email_subject: str | None = None
     email_draft: str | None = None
