@@ -51,6 +51,7 @@ class NaverBlogScanner(BaseScanner):
             "X-Naver-Client-Id": client_id,
             "X-Naver-Client-Secret": client_secret,
         }
+        self._search_cache: dict[str, dict] = {}  # url → API 원본 결과 캐시
 
     # ── Naver Search API ──────────────────────────────────────────────
 
@@ -120,10 +121,16 @@ class NaverBlogScanner(BaseScanner):
     # ── BaseScanner 구현 ─────────────────────────────────────────────
 
     def search(self, keyword: str) -> list[str]:
-        """키워드 검색 → 포스트 URL(content_id) 목록 반환."""
+        """키워드 검색 → 포스트 URL(content_id) 목록 반환. API 결과를 캐시에 저장."""
         items = self._search_blog(keyword, display=_MAX_RESULTS_PER_KW)
         time.sleep(0.1)  # rate limit 준수
-        return [item.get("link", "") for item in items if item.get("link")]
+        urls = []
+        for item in items:
+            url = item.get("link", "")
+            if url:
+                self._search_cache[url] = item  # description/title/bloggername 보존
+                urls.append(url)
+        return urls
 
     def fetch_content_details(self, content_ids: list[str]) -> list[ContentItem]:
         """포스트 URL 배치 → ContentItem 목록 반환 (채널 단위 중복 제거)."""
@@ -135,13 +142,17 @@ class NaverBlogScanner(BaseScanner):
             if blog_id in seen_blog_ids:
                 continue
 
-            # Naver API로 해당 블로그의 최근 포스트 추가 수집
-            blog_items = self._collect_blog_profile(blog_id, post_url)
+            # 캐시된 API 결과 우선 사용, 없으면 _collect_blog_profile 호출
+            cached = self._search_cache.get(post_url)
+            if cached:
+                blog_items = [cached]
+            else:
+                blog_items = self._collect_blog_profile(blog_id, post_url)
             if not blog_items:
                 continue
 
             best = blog_items[0]
-            # 설명 길이 필터
+            # 설명 길이 필터 (캐시 활용 시 통과율 대폭 향상)
             description = re.sub(r"<[^>]+>", "", best.get("description", ""))
             if len(description) < _MIN_CONTENT_LEN:
                 continue
