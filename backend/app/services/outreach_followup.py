@@ -103,7 +103,7 @@ def _send_sequence_email(lead: dict, sequence: int, touch_id: str) -> bool:
         _mark_touch(touch_id, "skipped")
         return False
 
-    result = send_email(to=to, subject=subject, html=html, source="outreach-followup")
+    result = send_email(to=to, subject=subject, html=html, source="maesil-agency")
     ok = result.get("ok", False)
     _mark_touch(touch_id, "sent" if ok else "failed", result.get("error"))
     return ok
@@ -141,7 +141,7 @@ def _notify_manual_touch(lead: dict, channel: str, touch_id: str) -> None:
 </p>
 </div>"""
 
-    result = send_email(to=admin_email, subject=subject, html=html, source="outreach-followup")
+    result = send_email(to=admin_email, subject=subject, html=html, source="maesil-agency")
     _mark_touch(touch_id, "sent" if result.get("ok") else "failed", result.get("error"))
 
 

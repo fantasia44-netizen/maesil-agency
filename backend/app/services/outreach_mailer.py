@@ -139,7 +139,7 @@ def send_single(lead_id: str) -> dict:
             lead.get("content_summary") or "",
         )
 
-    result = send_email(to=to, subject=subject, html=html, source="outreach-agent")
+    result = send_email(to=to, subject=subject, html=html, source="maesil-agency")
 
     if result.get("ok"):
         now = datetime.now(timezone.utc).isoformat()
