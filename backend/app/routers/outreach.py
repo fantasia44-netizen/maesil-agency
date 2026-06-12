@@ -286,6 +286,21 @@ def trigger_scan(
     return {"ok": True, "message": f"스캔 시작됨 ({platform or '전체'}, 백그라운드 실행)"}
 
 
+@router.post("/scan/debug")
+def trigger_scan_debug(
+    platform: str | None = None,
+    user: UserContext = Depends(require_admin),
+) -> dict:
+    """동기 스캔 — 에러 즉시 반환 (디버그용)."""
+    import traceback
+    try:
+        from app.services.outreach_pipeline import run_platform_scan, run_all_platforms
+        result = run_platform_scan(platform) if platform else run_all_platforms()
+        return {"ok": True, "result": result}
+    except Exception as e:
+        return {"ok": False, "error": str(e), "traceback": traceback.format_exc()}
+
+
 @router.get("/scan/stats")
 def scan_stats(user: UserContext = Depends(require_admin)) -> dict:
     """통계: 플랫폼별 리드 수 + 상태별 집계 + 등급별 집계 + KPI."""
