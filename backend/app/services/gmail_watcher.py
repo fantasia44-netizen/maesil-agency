@@ -224,7 +224,7 @@ def _notify_admin_reply(lead: dict, classification: dict) -> None:
 </div>"""
 
     try:
-        send_email(to=admin_email, subject=subject, html=html, source="gmail-watcher")
+        send_email(to=admin_email, subject=subject, html=html, source="maesil-agency")
     except Exception as e:
         logger.warning("회신 알림 발송 실패: %s", e)
 
