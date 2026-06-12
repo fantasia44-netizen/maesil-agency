@@ -46,18 +46,26 @@ async def _poll_loop():
             except Exception as e:
                 logger.warning("[scheduler] repo_mirror sync 실패: %s", e)
 
-            # YouTube 영업 스캔 — 하루 1회 (매일 KST 새벽 4시 무렵)
+            # 멀티터치 팔로업 — 매 사이클 (3분마다)
+            try:
+                from app.services.outreach_followup import check_pending_followups
+                fu_result = check_pending_followups(limit=10)
+                if fu_result.get("processed"):
+                    logger.info("[scheduler] followup processed=%d", fu_result["processed"])
+            except Exception as e:
+                logger.warning("[scheduler] followup 실패: %s", e)
+
+            # 멀티채널 영업 스캔 — 하루 1회
             try:
                 today = datetime.now(timezone.utc).date()
                 if last_youtube_scan_date != today:
-                    from app.services.youtube_scanner import run_daily_scan
-                    scan_result = run_daily_scan()
+                    from app.services.outreach_pipeline import run_all_platforms
+                    scan_result = run_all_platforms()
                     last_youtube_scan_date = today
-                    logger.info("[scheduler] youtube scan done: leads=%d emailed=%d",
-                                scan_result.get("leads_upserted", 0),
-                                scan_result.get("emailed", 0))
+                    logger.info("[scheduler] outreach scan done: leads=%d",
+                                scan_result.get("total_leads_upserted", 0))
             except Exception as e:
-                logger.warning("[scheduler] youtube scan 실패: %s", e)
+                logger.warning("[scheduler] outreach scan 실패: %s", e)
 
             cycle += 1
             logger.info("[scheduler] poll cycle %d done", cycle)
