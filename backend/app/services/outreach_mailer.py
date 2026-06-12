@@ -71,13 +71,25 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
     </p>
 
     <div class="case-box">
-      <div class="case-title">📈 실제 사용 사례</div>
-      <div class="case-stat">3월 300건 → 5월 3,300건+</div>
-      <div class="case-desc">
-        <strong>쿠팡 로하스</strong> — 대행사 없이 직접 매실인사이트로 광고를 최적화한 결과,
-        2개월 만에 <strong>쿠팡 월 주문 1,000% 이상 성장</strong>을 달성했습니다.<br><br>
-        네이버 키워드 랭킹도 개선되어 주요 키워드 상위 노출 유지 중입니다.
-        (<a href="https://maesil-insight.com/partner/?utm_source=partner&utm_medium=email" style="color:#1A6F3C">실제 화면 보기 →</a>)
+      <div class="case-title">📈 실제 사용 사례 — 대행사 없이 직접</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:4px">
+        <div style="flex:1;min-width:200px">
+          <div class="case-stat">광고비 −75%</div>
+          <div style="font-size:13px;color:#555;margin-top:4px;line-height:1.6">
+            ROAS <b>482% → 1,080%</b><br>
+            쿠팡 광고 최적화 (3개월)
+          </div>
+        </div>
+        <div style="flex:1;min-width:200px">
+          <div class="case-stat">44위 → 8위</div>
+          <div style="font-size:13px;color:#555;margin-top:4px;line-height:1.6">
+            네이버 "이유식" 키워드<br>
+            1개월, 대행사 비용 <b>0원</b>
+          </div>
+        </div>
+      </div>
+      <div class="case-desc" style="margin-top:12px">
+        <a href="https://maesil-insight.com/cases?utm_source=partner&utm_medium=email" style="color:#1A6F3C;font-weight:600">실제 수치 전체 보기 →</a>
       </div>
     </div>
 
@@ -128,8 +140,8 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
     </p>
 
     <div class="cta">
-      <a class="btn" href="https://maesil-insight.com/partner/register?utm_source=partner&utm_medium=email&utm_campaign=outreach&utm_content={handle_name}">
-        파트너 상담 신청하기
+      <a class="btn" href="https://open.kakao.com/o/sg6QOxDg">
+        카카오 오픈톡으로 상담하기 💬
       </a>
     </div>
     <p class="sub-note">자세한 건 상담을 통해 안내드립니다 · 부담 없이 문의해 주세요</p>

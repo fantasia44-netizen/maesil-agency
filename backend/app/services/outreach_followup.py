@@ -42,9 +42,9 @@ _EMAIL_SEQUENCES = {
 </p>
 
 <div style="text-align:center;margin:24px 0">
-  <a href="https://maesil-insight.com/partner/register?utm_source=partner&utm_medium=email&utm_campaign=followup2"
+  <a href="https://open.kakao.com/o/sg6QOxDg"
      style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 30px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:700">
-    파트너 상담 신청하기
+    카카오 오픈톡으로 상담하기 💬
   </a>
 </div>
 
@@ -71,9 +71,9 @@ _EMAIL_SEQUENCES = {
 </p>
 
 <div style="text-align:center;margin:24px 0">
-  <a href="https://maesil-insight.com/partner/register?utm_source=partner&utm_medium=email&utm_campaign=followup3"
+  <a href="https://open.kakao.com/o/sg6QOxDg"
      style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 30px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:700">
-    파트너 상담 신청하기
+    카카오 오픈톡으로 상담하기 💬
   </a>
 </div>
 
