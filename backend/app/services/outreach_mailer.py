@@ -205,7 +205,7 @@ p{{font-size:15px;color:#333;line-height:1.8}}
 
 
 def _build_subject(handle_name: str) -> str:
-    return f"[매실인사이트] {handle_name}님, 영상 하나로 매달 수익 내는 파트너 제안드립니다 🌿"
+    return f"{handle_name}님 채널 보고 연락드립니다 🌿"
 
 
 # ── 발송 함수 ────────────────────────────────────────────────────────

@@ -104,7 +104,7 @@ def _sonnet_analyze(lead: dict) -> dict:
   "channel_type": "educator|reviewer|case_sharer|tool_expert|community_admin|influencer",
   "approach_strategy": "접근 전략 1-2문장",
   "partnership_fit_reason": "파트너십 적합 이유 2-3문장",
-  "email_subject": "이메일 제목 (40자 이내)",
+  "email_subject": "이메일 제목 (40자 이내, 친근하고 자연스럽게 — '[매실인사이트]' 같은 브랜드 태그 없이, 채널명 언급하거나 공감대 형성하는 문장)",
   "email_intro": "맞춤 인사 문단 (3-4문장, 채널 언급 포함)"
 }}"""
 
@@ -132,7 +132,7 @@ def _build_default_draft(lead: dict, channel_type: str) -> tuple[str, str]:
     subs = lead.get("subscriber_count") or 0
 
     if channel_type == "educator":
-        subject = f"[매실인사이트] {handle}님 구독자들의 광고 ROAS를 높여드릴 수 있어요"
+        subject = f"{handle}님 채널 보고 연락드립니다 🌿"
         body = (
             f"안녕하세요, {handle} 운영자님!\n\n"
             f"셀러 교육 콘텐츠를 꼼꼼히 살펴보다 연락드렸습니다. "
@@ -143,7 +143,7 @@ def _build_default_draft(lead: dict, channel_type: str) -> tuple[str, str]:
             f"관심 있으시면 부담 없이 회신해 주세요!"
         )
     elif channel_type == "community_admin":
-        subject = f"[매실인사이트] {handle} 커뮤니티 멤버들과 함께하고 싶습니다"
+        subject = f"{handle} 커뮤니티 보고 연락드립니다 🌿"
         body = (
             f"안녕하세요, {handle} 운영자님!\n\n"
             f"커뮤니티를 통해 셀러분들과 활발히 소통하시는 걸 보고 연락드렸습니다.\n\n"
@@ -153,7 +153,7 @@ def _build_default_draft(lead: dict, channel_type: str) -> tuple[str, str]:
             f"운영자님은 3개월 무료로 직접 써보실 수 있습니다. 관심 있으시면 회신 주세요!"
         )
     else:
-        subject = f"[매실인사이트] {handle}님께 파트너십 제안드립니다"
+        subject = f"{handle}님, 파트너 제안 드려도 될까요? 🌿"
         body = (
             f"안녕하세요, {handle} 운영자님!\n\n"
             f"콘텐츠를 보고 파트너십 제안을 드리고 싶어 연락드렸습니다.\n\n"
