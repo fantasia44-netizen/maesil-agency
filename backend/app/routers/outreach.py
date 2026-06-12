@@ -296,6 +296,20 @@ class StatusPatch(BaseModel):
     status: str
 
 
+class GradePatch(BaseModel):
+    grade: str
+
+
+@router.patch("/leads/{lead_id}/grade")
+def update_lead_grade(lead_id: str, body: GradePatch, user: UserContext = Depends(require_admin)) -> dict:
+    """등급 수동 변경 (S/A/B/C/D)."""
+    if body.grade not in ("S", "A", "B", "C", "D"):
+        raise HTTPException(400, "grade는 S/A/B/C/D 중 하나")
+    now = datetime.now(timezone.utc).isoformat()
+    _db().table("outreach_leads").update({"grade": body.grade, "updated_at": now}).eq("id", lead_id).execute()
+    return {"ok": True, "grade": body.grade}
+
+
 @router.patch("/leads/{lead_id}/status")
 def update_lead_status(lead_id: str, body: StatusPatch, user: UserContext = Depends(require_admin)) -> dict:
     allowed = {"discovered","analyzing","draft_ready","approved","emailed",

@@ -255,6 +255,24 @@ export default function LeadDetailPage() {
     }
   };
 
+  const updateLeadGrade = async (grade: string) => {
+    if (!lead) return;
+    setActionId("grade");
+    try {
+      await apiFetch(`/api/outreach/leads/${lead.id}/grade`, {
+        method: "PATCH",
+        body: JSON.stringify({ grade }),
+        headers: { "Content-Type": "application/json" },
+      }, 10000);
+      showToast(`등급 → ${grade}급 변경 완료`);
+      loadLead();
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : "등급 변경 실패", false);
+    } finally {
+      setActionId(null);
+    }
+  };
+
   // ── 렌더 ────────────────────────────────────────────────────────────
 
   if (loading) return <div className="muted" style={{ textAlign: "center", padding: "4rem" }}>로딩 중…</div>;
@@ -341,6 +359,17 @@ export default function LeadDetailPage() {
             {lead.channel_type && ` · ${lead.channel_type}`}
           </div>
         </div>
+
+        {/* 등급 변경 */}
+        <select
+          value={lead.grade}
+          onChange={(e) => updateLeadGrade(e.target.value)}
+          disabled={!!actionId}
+          style={{ fontSize: "0.8rem", padding: "5px 8px", border: `2px solid ${gradeBg}`, borderRadius: 6, background: "#fff", fontWeight: 700, color: gradeBg, minWidth: 70 }}>
+          {["S","A","B","C","D"].map(g => (
+            <option key={g} value={g}>{g}급</option>
+          ))}
+        </select>
 
         {/* 상태 변경 */}
         <select
