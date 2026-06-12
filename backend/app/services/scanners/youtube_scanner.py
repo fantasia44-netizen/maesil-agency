@@ -139,6 +139,37 @@ class YouTubeScanner(BaseScanner):
 
         return items
 
+    def fetch_recent_videos(self, channel_id: str, max_results: int = 5) -> list[dict]:
+        """채널의 최신 영상 목록 반환 (최신순).
+
+        Returns list of {video_id, title, published_at, description, url}
+        """
+        try:
+            resp = self._yt.search().list(
+                channelId=channel_id,
+                part="snippet",
+                order="date",
+                type="video",
+                maxResults=max_results,
+                fields="items(id/videoId,snippet(title,publishedAt,description))",
+            ).execute()
+        except Exception as e:
+            logger.warning("fetch_recent_videos 실패 [%s]: %s", channel_id, e)
+            return []
+
+        results = []
+        for item in resp.get("items", []):
+            vid = item.get("id", {}).get("videoId", "")
+            sn  = item.get("snippet", {})
+            results.append({
+                "video_id":   vid,
+                "title":      sn.get("title", ""),
+                "published_at": sn.get("publishedAt", "")[:10],  # YYYY-MM-DD
+                "description": (sn.get("description") or "")[:300],
+                "url":        f"https://youtu.be/{vid}" if vid else "",
+            })
+        return results
+
     def _fetch_channel_info(self, channel_ids: list[str]) -> dict[str, dict]:
         result: dict[str, dict] = {}
         unique = list(set(channel_ids))

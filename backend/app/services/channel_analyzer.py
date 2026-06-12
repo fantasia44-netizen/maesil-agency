@@ -36,8 +36,44 @@ def _get_anthropic_key() -> str:
     return get_secret("anthropic_api_key") or ""
 
 
-def _sonnet_analyze(lead: dict) -> dict:
-    """Claude Sonnet으로 채널 심층 분석 수행."""
+def _get_latest_relevant_video(lead: dict) -> dict | None:
+    """YouTube API로 채널의 최신 영상 중 스마트스토어·쿠팡 관련 영상을 반환.
+
+    없으면 단순 최신 영상 반환. API 키 없으면 None.
+    """
+    from app.services.secrets import get_secret
+    api_key = get_secret("youtube_api_key")
+    if not api_key:
+        return None
+
+    channel_id = lead.get("platform_id") or lead.get("best_content_id", "")
+    # platform_id가 채널 ID여야 함 (UCxxx 형식)
+    if not channel_id or not channel_id.startswith("UC"):
+        return None
+
+    try:
+        from app.services.scanners.youtube_scanner import YouTubeScanner
+        scanner = YouTubeScanner(api_key)
+        videos = scanner.fetch_recent_videos(channel_id, max_results=10)
+    except Exception as e:
+        logger.warning("최신 영상 조회 실패 [%s]: %s", channel_id, e)
+        return None
+
+    if not videos:
+        return None
+
+    # 스마트스토어·쿠팡·이커머스 관련 영상 우선
+    _KEYWORDS = ["스마트스토어", "쿠팡", "위탁", "온라인판매", "셀러", "광고", "마진", "수익", "부업"]
+    for v in videos:
+        title_lower = (v.get("title") or "").lower()
+        if any(k in title_lower for k in _KEYWORDS):
+            return v
+    # 없으면 가장 최신 영상
+    return videos[0]
+
+
+def _sonnet_analyze(lead: dict, latest_video: dict | None = None) -> dict:
+    """Claude Haiku로 채널 심층 분석 수행."""
     import anthropic
 
     client = anthropic.Anthropic(api_key=_get_anthropic_key())
@@ -62,8 +98,27 @@ def _sonnet_analyze(lead: dict) -> dict:
 
     channel_types_str = "\n".join(f"- {k}: {v}" for k, v in CHANNEL_TYPES.items())
 
-    prompt = f"""당신은 매실인사이트 파트너십 담당 전략가입니다.
-아래 채널 정보를 분석해 파트너십 접근 전략과 맞춤 인사말을 작성하세요.
+    # 영상 참조 정보 구성
+    if latest_video:
+        video_ref_block = (
+            f"- 최신 영상 제목: {latest_video['title']}\n"
+            f"- 최신 영상 게시일: {latest_video.get('published_at', '')}\n"
+            f"- 최신 영상 URL: {latest_video.get('url', '')}\n"
+            f"- 최신 영상 설명: {latest_video.get('description', '')[:150]}"
+        )
+        video_instruction = (
+            f"**반드시 '최신 영상 제목: {latest_video['title']}'을 greeting에서 직접 언급하세요.**\n"
+            f"게시일 {latest_video.get('published_at', '')}의 최신 영상입니다 — '최근에 올리신' 표현 사용."
+        )
+    else:
+        video_ref_block = f"- 대표 콘텐츠 제목: {content_title}\n- 콘텐츠 요약: {content_summary}"
+        video_instruction = (
+            "대표 콘텐츠를 참조하되, 연도가 포함된 제목(예: '2025년 최신...')은 "
+            "연도를 언급하지 말고 내용만 자연스럽게 참조하세요."
+        )
+
+    prompt = f"""당신은 매실인사이트 파트너십 담당자입니다.
+아래 채널 정보를 분석해 파트너십 접근 전략과 맞춤 이메일 초안을 작성하세요.
 
 ## 채널 정보
 - 플랫폼: {platform}
@@ -72,8 +127,7 @@ def _sonnet_analyze(lead: dict) -> dict:
 - 구독자/이웃: {subs:,}명
 - 커뮤니티 규모: {community_size:,}명
 - 파트너 점수: {score}점 ({grade}급)
-- 최고 콘텐츠 제목: {content_title}
-- 콘텐츠 요약: {content_summary}
+{video_ref_block}
 - 플랫폼 운영 현황: {json.dumps(platforms_json, ensure_ascii=False)}
 - 신호 정보:
   * 유료 강의 판매: {has_paid_course}
@@ -91,21 +145,32 @@ def _sonnet_analyze(lead: dict) -> dict:
 1. 채널을 위 유형 중 하나로 분류하세요
 2. 이 채널이 매실인사이트를 추천할 가능성과 이유를 분석하세요
 3. 가장 효과적인 접근 전략을 제시하세요 (구체적, 1-2문장)
-4. **맞춤 인사 문단**을 작성하세요 (email_intro):
-   - "안녕하세요, {handle}님!" 로 시작
-   - 채널 콘텐츠를 실제로 봤다는 느낌 (구체적 콘텐츠/특징 언급, 1-2문장)
-   - 왜 이 채널 구독자들에게 매실인사이트가 도움이 될지 자연스럽게 연결 (1문장)
-   - sells_own_program=True이면 "광고비 절감"보다 "구독자 광고 효율 개선" 각도로
-   - 전체 길이: 3-4문장, 100자 이내
-   - 이 문단만 작성. 케이스스터디·파트너 혜택·CTA는 포함하지 마세요 (별도 삽입됨)
+
+4. **이메일 제목** (email_subject):
+   - 친구에게 DM 보내는 느낌 — 가볍고 친근하게
+   - 영상/채널 내용을 구체적으로 1가지 언급
+   - 40자 이내, 이모지 1개 허용
+   - 좋은 예: "{handle}님 위탁판매 영상 보고 연락드려요 😊"
+   - 좋은 예: "안녕하세요 {handle}님, 영상 보다가 꼭 소개드리고 싶어서요!"
+   - 나쁜 예: "위탁판매 셀러들의 상품 선정을 돕는 도구가 있다면?" (물음표 마케팅 금지)
+   - 나쁜 예: "[매실인사이트] 파트너십 제안드립니다" (브랜드 태그·격식체 금지)
+
+5. **맞춤 인사 문단** (email_intro):
+   {video_instruction}
+   - "안녕하세요, {handle}님!" 으로 시작
+   - 영상 제목을 따옴표로 직접 인용 (예: '위탁판매 준비과정' 영상)
+   - 영상에서 다룬 구체적 내용 1가지 언급 (본인이 봤다는 느낌)
+   - 왜 구독자들에게 매실인사이트가 도움이 될지 자연스럽게 연결 (1문장)
+   - sells_own_program=True이면 "광고비 절감"보다 "구독자 광고 효율 개선" 각도
+   - 전체 3-4문장, 이 문단만 작성 (케이스스터디·CTA는 별도 삽입됨)
 
 아래 JSON 형식으로만 답하세요:
 {{
   "channel_type": "educator|reviewer|case_sharer|tool_expert|community_admin|influencer",
   "approach_strategy": "접근 전략 1-2문장",
   "partnership_fit_reason": "파트너십 적합 이유 2-3문장",
-  "email_subject": "이메일 제목 (40자 이내, 친근하고 자연스럽게 — '[매실인사이트]' 같은 브랜드 태그 없이, 채널명 언급하거나 공감대 형성하는 문장)",
-  "email_intro": "맞춤 인사 문단 (3-4문장, 채널 언급 포함)"
+  "email_subject": "이메일 제목",
+  "email_intro": "맞춤 인사 문단"
 }}"""
 
     try:
@@ -182,9 +247,22 @@ def analyze_lead(lead_id: str) -> dict:
     lead = rows[0]
     handle = lead.get("handle_name", lead_id)
 
-    # Sonnet(실제론 Haiku) 분석
+    # YouTube 최신 영상 조회 (이메일 인사에 최신 영상 반영)
+    latest_video: dict | None = None
+    if lead.get("platform") == "youtube":
+        try:
+            latest_video = _get_latest_relevant_video(lead)
+            if latest_video:
+                logger.info("[analyze_lead] 최신 영상 조회 성공: %s → %s",
+                            handle, latest_video.get("title", ""))
+            else:
+                logger.info("[analyze_lead] 최신 영상 없음 (API 키 없거나 결과 없음): %s", handle)
+        except Exception as e:
+            logger.warning("[analyze_lead] 최신 영상 조회 실패 (계속 진행): %s", e)
+
+    # Haiku 분석
     logger.info("[analyze_lead] 분석 시작: %s (%s)", handle, lead_id)
-    ai = _sonnet_analyze(lead)
+    ai = _sonnet_analyze(lead, latest_video=latest_video)
 
     channel_type = ai.get("channel_type", "influencer")
     approach_strategy = ai.get("approach_strategy", "")
