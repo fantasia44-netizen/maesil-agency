@@ -191,3 +191,150 @@ def _get_studio_url() -> str | None:
     )
     rows = r.data or []
     return rows[0]["value"] if rows else None
+
+
+# ── YouTube 리드 관리 ────────────────────────────────────────────────
+
+@router.get("/leads")
+def list_leads(
+    status: str | None = None,
+    min_score: int = 0,
+    limit: int = 50,
+    offset: int = 0,
+    user: UserContext = Depends(require_admin),
+) -> list[dict]:
+    """YouTube 리드 목록 조회."""
+    q = (
+        get_maesil_total_client()
+        .schema("agent_work")
+        .table("outreach_leads")
+        .select(
+            "id, channel_id, channel_title, channel_url, subscriber_count, "
+            "contact_email, naver_cafe_url, best_video_id, best_video_title, "
+            "best_video_views, content_summary, score, status, emailed_at, created_at, updated_at"
+        )
+        .gte("score", min_score)
+        .order("score", desc=True)
+        .range(offset, offset + limit - 1)
+    )
+    if status:
+        q = q.eq("status", status)
+    resp = q.execute()
+    return resp.data or []
+
+
+@router.get("/leads/{lead_id}")
+def get_lead(
+    lead_id: str,
+    user: UserContext = Depends(require_admin),
+) -> dict:
+    """특정 리드 상세 조회."""
+    resp = (
+        get_maesil_total_client()
+        .schema("agent_work")
+        .table("outreach_leads")
+        .select("*")
+        .eq("id", lead_id)
+        .limit(1)
+        .execute()
+    )
+    rows = resp.data or []
+    if not rows:
+        raise HTTPException(status_code=404, detail="리드를 찾을 수 없습니다.")
+    return rows[0]
+
+
+@router.post("/leads/{lead_id}/send")
+def send_lead_email(
+    lead_id: str,
+    user: UserContext = Depends(require_admin),
+) -> dict:
+    """특정 리드에게 파트너십 이메일 발송."""
+    from app.services.outreach_mailer import send_single
+    result = send_single(lead_id)
+    if not result.get("ok"):
+        raise HTTPException(status_code=400, detail=result.get("error", "발송 실패"))
+    return {"ok": True, "message": "이메일 발송 완료"}
+
+
+@router.patch("/leads/{lead_id}/status")
+def update_lead_status(
+    lead_id: str,
+    body: dict,
+    user: UserContext = Depends(require_admin),
+) -> dict:
+    """리드 상태 업데이트 (new / emailed / replied / rejected)."""
+    from datetime import datetime, timezone
+    allowed = {"new", "emailed", "replied", "rejected"}
+    status = body.get("status", "")
+    if status not in allowed:
+        raise HTTPException(status_code=400, detail=f"status는 {sorted(allowed)} 중 하나")
+
+    now = datetime.now(timezone.utc).isoformat()
+    resp = (
+        get_maesil_total_client()
+        .schema("agent_work")
+        .table("outreach_leads")
+        .update({"status": status, "updated_at": now})
+        .eq("id", lead_id)
+        .execute()
+    )
+    rows = resp.data or []
+    if not rows:
+        raise HTTPException(status_code=404, detail="리드를 찾을 수 없습니다.")
+    return rows[0]
+
+
+@router.post("/scan")
+def trigger_scan(
+    user: UserContext = Depends(require_admin),
+) -> dict:
+    """YouTube 스캔 수동 트리거 (백그라운드 실행)."""
+    import threading
+    from app.services.youtube_scanner import run_daily_scan
+
+    def _run():
+        try:
+            result = run_daily_scan()
+            logger.info("[manual-scan] 완료: %s", result)
+        except Exception as e:
+            logger.error("[manual-scan] 실패: %s", e)
+
+    t = threading.Thread(target=_run, daemon=True)
+    t.start()
+    return {"ok": True, "message": "YouTube 스캔 시작됨 (백그라운드 실행)"}
+
+
+@router.get("/scan/stats")
+def scan_stats(
+    user: UserContext = Depends(require_admin),
+) -> dict:
+    """스캔 통계: 총 리드 수, 상태별 집계, 스캔된 영상 수."""
+    db = get_maesil_total_client().schema("agent_work")
+
+    try:
+        leads_resp = db.table("outreach_leads").select("status", count="exact").execute()
+        total_leads = leads_resp.count or len(leads_resp.data or [])
+    except Exception:
+        total_leads = 0
+
+    try:
+        videos_resp = (
+            db.table("outreach_scanned_videos")
+            .select("video_id", count="exact")
+            .execute()
+        )
+        total_scanned = videos_resp.count or 0
+    except Exception:
+        total_scanned = 0
+
+    status_counts: dict[str, int] = {}
+    for row in (leads_resp.data or []):
+        s = row.get("status", "unknown")
+        status_counts[s] = status_counts.get(s, 0) + 1
+
+    return {
+        "total_leads": total_leads,
+        "total_scanned_videos": total_scanned,
+        "by_status": status_counts,
+    }

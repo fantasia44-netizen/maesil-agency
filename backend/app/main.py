@@ -13,12 +13,14 @@ logger = logging.getLogger(__name__)
 async def _poll_loop():
     """배포 직후 1회 즉시 실행 후 3분 간격 반복."""
     import asyncio
+    from datetime import datetime, timezone
     from app.services import alert_dispatcher, render_logs, repo_mirror
     from app.services import program_health as ph_svc
 
     # 첫 실행은 즉시 (수집전 문제 방지)
     await asyncio.sleep(10)  # 서버 완전 기동 대기
     cycle = 0
+    last_youtube_scan_date = None
     while True:
         try:
             render_logs.poll_all()
@@ -43,6 +45,19 @@ async def _poll_loop():
                             ok, len(mirror_result.get("repos", [])))
             except Exception as e:
                 logger.warning("[scheduler] repo_mirror sync 실패: %s", e)
+
+            # YouTube 영업 스캔 — 하루 1회 (매일 KST 새벽 4시 무렵)
+            try:
+                today = datetime.now(timezone.utc).date()
+                if last_youtube_scan_date != today:
+                    from app.services.youtube_scanner import run_daily_scan
+                    scan_result = run_daily_scan()
+                    last_youtube_scan_date = today
+                    logger.info("[scheduler] youtube scan done: leads=%d emailed=%d",
+                                scan_result.get("leads_upserted", 0),
+                                scan_result.get("emailed", 0))
+            except Exception as e:
+                logger.warning("[scheduler] youtube scan 실패: %s", e)
 
             cycle += 1
             logger.info("[scheduler] poll cycle %d done", cycle)
