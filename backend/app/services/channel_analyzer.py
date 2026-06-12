@@ -63,7 +63,7 @@ def _sonnet_analyze(lead: dict) -> dict:
     channel_types_str = "\n".join(f"- {k}: {v}" for k, v in CHANNEL_TYPES.items())
 
     prompt = f"""당신은 매실인사이트 파트너십 담당 전략가입니다.
-아래 채널 정보를 분석해 파트너십 접근 전략을 수립하고 맞춤형 이메일 초안을 작성하세요.
+아래 채널 정보를 분석해 파트너십 접근 전략과 맞춤 인사말을 작성하세요.
 
 ## 채널 정보
 - 플랫폼: {platform}
@@ -91,18 +91,13 @@ def _sonnet_analyze(lead: dict) -> dict:
 1. 채널을 위 유형 중 하나로 분류하세요
 2. 이 채널이 매실인사이트를 추천할 가능성과 이유를 분석하세요
 3. 가장 효과적인 접근 전략을 제시하세요 (구체적, 1-2문장)
-4. **완전한 이메일 초안**을 작성하세요:
-   - 한국어, 비즈니스 캐주얼 톤
-   - 채널 콘텐츠를 실제로 봤다는 느낌 (구체적 언급)
-   - 매실인사이트 핵심 가치 설명 (쿠팡·스마트스토어 광고 AI 분석, ROAS 최적화)
-   - 파트너 혜택: 수익 쉐어 10~20%, 무료 3개월 체험, 전용 대시보드
-   - 자연스러운 CTA (부담 없이 "관심 있으시면 회신만 주세요" 수준)
-   - 길이: 200~350자 (짧고 임팩트 있게)
-
-## 자체 프로그램 판매자 주의사항
-sells_own_program=True인 경우, 이메일에서 "광고비 절감" 각도보다는
-"구독자들의 광고 효율 개선에 도움이 될 수 있다"는 방향으로 접근하세요.
-직접 경쟁 소지를 최소화하고 보완재 포지셔닝을 강조하세요.
+4. **맞춤 인사 문단**을 작성하세요 (email_intro):
+   - "안녕하세요, {handle}님!" 로 시작
+   - 채널 콘텐츠를 실제로 봤다는 느낌 (구체적 콘텐츠/특징 언급, 1-2문장)
+   - 왜 이 채널 구독자들에게 매실인사이트가 도움이 될지 자연스럽게 연결 (1문장)
+   - sells_own_program=True이면 "광고비 절감"보다 "구독자 광고 효율 개선" 각도로
+   - 전체 길이: 3-4문장, 100자 이내
+   - 이 문단만 작성. 케이스스터디·파트너 혜택·CTA는 포함하지 마세요 (별도 삽입됨)
 
 아래 JSON 형식으로만 답하세요:
 {{
@@ -110,7 +105,7 @@ sells_own_program=True인 경우, 이메일에서 "광고비 절감" 각도보�
   "approach_strategy": "접근 전략 1-2문장",
   "partnership_fit_reason": "파트너십 적합 이유 2-3문장",
   "email_subject": "이메일 제목 (40자 이내)",
-  "email_draft": "이메일 본문 전체 (인사 포함, 서명 제외)"
+  "email_intro": "맞춤 인사 문단 (3-4문장, 채널 언급 포함)"
 }}"""
 
     try:
@@ -195,20 +190,20 @@ def analyze_lead(lead_id: str) -> dict:
     approach_strategy = ai.get("approach_strategy", "")
     partnership_fit = ai.get("partnership_fit_reason", "")
     email_subject = ai.get("email_subject", "")
-    email_draft = ai.get("email_draft", "")
+    email_intro = ai.get("email_intro", "") or ai.get("email_draft", "")  # 하위 호환
 
-    # AI 결과 없으면 기본 초안 사용
-    if not email_draft:
-        email_subject, email_draft = _build_default_draft(lead, channel_type)
+    # AI 실패 시 기본 인사말
+    if not email_intro:
+        email_subject, email_intro = _build_default_draft(lead, channel_type)
 
-    # DB 업데이트
+    # DB 업데이트 — email_draft에 intro 저장, email_final은 건드리지 않음
     now = datetime.now(timezone.utc).isoformat()
     update_payload = {
         "channel_type": channel_type,
         "approach_strategy": approach_strategy[:300] if approach_strategy else None,
         "partnership_fit_reason": partnership_fit[:500] if partnership_fit else None,
         "email_subject": email_subject[:120] if email_subject else None,
-        "email_draft": email_draft,
+        "email_draft": email_intro,  # 맞춤 인사 문단만 저장
         "status": "draft_ready",
         "updated_at": now,
     }

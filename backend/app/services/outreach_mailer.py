@@ -22,7 +22,15 @@ def _db():
 # ── 기본 HTML 템플릿 (email_draft 없을 때 fallback) ──────────────────
 
 def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
-    summary_line = f"<p style='color:#555;font-size:14px;font-style:italic'>{summary}</p>" if summary else ""
+    import html as _html
+    safe_handle = _html.escape(handle_name)
+    # summary가 Haiku 인사 문단이면 그대로, content_summary이면 이탤릭
+    if summary and len(summary) > 60:
+        summary_line = f"<p style='font-size:15px;color:#333;line-height:1.8'>{_html.escape(summary)}</p>"
+    elif summary:
+        summary_line = f"<p style='color:#555;font-size:14px;font-style:italic'>{_html.escape(summary)}</p>"
+    else:
+        summary_line = ""
     return f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -64,10 +72,8 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
   </div>
   <div class="body">
     <p class="greeting">
-      안녕하세요, <strong>{handle_name}</strong> 채널 운영자님 👋<br><br>
+      안녕하세요, <strong>{safe_handle}</strong> 채널 운영자님 👋<br><br>
       {summary_line}
-      채널에서 온라인 셀러 분들께 도움이 되는 콘텐츠를 제공하고 계신 걸 보고
-      파트너십을 제안드리고 싶어 연락드렸습니다.
     </p>
 
     <div class="case-box">
@@ -196,16 +202,15 @@ def send_single(lead_id: str) -> dict:
     handle = lead.get("handle_name") or "파트너 채널"
     subject = lead.get("email_subject") or _build_subject(handle)
 
-    # 본문 우선순위: 담당자 최종 편집 → AI 초안 → 기본 템플릿
+    # 본문 우선순위: 담당자 최종 편집 → HTML 템플릿 (AI 인사 문단 주입)
     if lead.get("email_final"):
         html = _draft_to_html(lead["email_final"])
-    elif lead.get("email_draft"):
-        html = _draft_to_html(lead["email_draft"])
     else:
+        # email_draft = Haiku가 생성한 맞춤 인사 문단 (없으면 기본 인사)
         html = _build_email_html(
             handle,
             lead.get("platform_url") or "",
-            lead.get("content_summary") or "",
+            lead.get("email_draft") or lead.get("content_summary") or "",
         )
 
     result = send_email(to=to, subject=subject, html=html, source="maesil-agency")
