@@ -193,8 +193,7 @@ def run_platform_scan(platform: str) -> dict:
         }
         total, grade, breakdown = calculate_score(score_input)
 
-        # D급 자동 archived
-        status = "archived" if grade == "D" else "discovered"
+        status = "discovered"
 
         payload = {
             "platform": platform,

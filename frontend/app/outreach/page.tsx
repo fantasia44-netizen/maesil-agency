@@ -156,6 +156,7 @@ export default function OutreachPage() {
   const [platformFilter, setPlatformFilter] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [scanLoading, setScanLoading] = useState(false);
+  const [batchAnalyzing, setBatchAnalyzing] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [actionId, setActionId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
@@ -171,7 +172,7 @@ export default function OutreachPage() {
     setErr(null);
     try {
       const [leadsData, statsData] = await Promise.all([
-        apiFetch<Lead[]>("/api/outreach/leads?limit=200&min_score=0", {}, 20000),
+        apiFetch<Lead[]>("/api/outreach/leads?limit=500&min_score=0", {}, 30000),
         apiFetch<ScanStats>("/api/outreach/scan/stats", {}, 15000),
       ]);
       setLeads(leadsData);
@@ -184,6 +185,23 @@ export default function OutreachPage() {
   };
 
   useEffect(() => { loadAll(); }, []);
+
+  const triggerBatchAnalyze = async (grades = "S,A,B,C,D") => {
+    setBatchAnalyzing(true);
+    try {
+      const res = await apiFetch<{ queued: number; message: string }>(
+        `/api/outreach/leads/analyze-batch?grades=${encodeURIComponent(grades)}&limit=100`,
+        { method: "POST" },
+        15000,
+      );
+      showToast(`🔬 ${res.message}`);
+      setTimeout(loadAll, 3000);
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : "일괄 분석 실패", false);
+    } finally {
+      setBatchAnalyzing(false);
+    }
+  };
 
   const triggerScan = async (platform?: string) => {
     setScanLoading(true);
@@ -287,6 +305,14 @@ export default function OutreachPage() {
           </button>
           <button className="btn" onClick={() => triggerScan("naver_blog")} disabled={scanLoading} style={{ fontSize: "0.82rem", padding: "6px 12px" }}>
             N 블로그
+          </button>
+          <button
+            className="btn"
+            onClick={() => triggerBatchAnalyze()}
+            disabled={batchAnalyzing}
+            style={{ fontSize: "0.82rem", padding: "6px 14px", borderColor: "#7c3aed", color: "#7c3aed" }}
+          >
+            {batchAnalyzing ? "분석 중…" : "🔬 전체 분석"}
           </button>
         </div>
       </div>
@@ -403,7 +429,7 @@ export default function OutreachPage() {
             const busy = actionId?.startsWith(lead.id);
 
             return (
-              <div key={lead.id} className="card" style={{ padding: "0.9rem 1.1rem" }}>
+              <div key={lead.id} className="card" style={{ padding: "0.9rem 1.1rem", opacity: lead.grade === "D" ? 0.6 : 1 }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", flexWrap: "wrap" }}>
 
                   {/* 점수 + 등급 */}

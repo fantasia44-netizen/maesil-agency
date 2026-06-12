@@ -179,16 +179,13 @@ def get_lead(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
 
 @router.post("/leads/{lead_id}/analyze")
 def trigger_analysis(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
-    """Sonnet 심층 분석 트리거 (A/S급만). 백그라운드 실행."""
+    """심층 분석 트리거. 백그라운드 실행."""
     import threading
 
     resp = _db().table("outreach_leads").select("id, grade, status").eq("id", lead_id).limit(1).execute()
     rows = resp.data or []
     if not rows:
         raise HTTPException(404, "리드를 찾을 수 없습니다.")
-    lead = rows[0]
-    if lead.get("grade") not in ("S", "A", "B"):
-        raise HTTPException(400, f"C/D급 리드는 심층 분석 대상이 아닙니다 (현재 {lead.get('grade')}급)")
 
     def _run():
         try:
@@ -200,6 +197,51 @@ def trigger_analysis(lead_id: str, user: UserContext = Depends(require_admin)) -
     threading.Thread(target=_run, daemon=True).start()
     _db().table("outreach_leads").update({"status": "analyzing", "updated_at": datetime.now(timezone.utc).isoformat()}).eq("id", lead_id).execute()
     return {"ok": True, "message": "심층 분석 시작됨 (백그라운드)"}
+
+
+@router.post("/leads/analyze-batch")
+def trigger_batch_analysis(
+    grades: str = "S,A,B,C,D",
+    limit: int = 100,
+    user: UserContext = Depends(require_admin),
+) -> dict:
+    """discovered 상태 리드 일괄 분석. grades=S,A,B,C,D limit=100"""
+    import threading, time
+
+    grade_list = [g.strip() for g in grades.split(",") if g.strip()]
+    resp = (
+        _db().table("outreach_leads")
+        .select("id, grade")
+        .eq("status", "discovered")
+        .in_("grade", grade_list)
+        .order("score", desc=True)
+        .limit(limit)
+        .execute()
+    )
+    rows = resp.data or []
+    if not rows:
+        return {"ok": True, "queued": 0, "message": "분석할 리드 없음 (discovered 상태)"}
+
+    ids = [r["id"] for r in rows]
+    now_iso = datetime.now(timezone.utc).isoformat()
+    _db().table("outreach_leads").update({"status": "analyzing", "updated_at": now_iso}).in_("id", ids).execute()
+
+    def _run_batch():
+        try:
+            from app.services.channel_analyzer import analyze_lead
+        except ImportError as e:
+            logger.error("[batch-analyze] import 실패: %s", e)
+            return
+        for lead_id in ids:
+            try:
+                analyze_lead(lead_id)
+            except Exception as e:
+                logger.error("[batch-analyze] 실패 [%s]: %s", lead_id, e)
+            time.sleep(0.5)  # Haiku API rate limit 여유
+
+    threading.Thread(target=_run_batch, daemon=True).start()
+    logger.info("[batch-analyze] %d건 분석 시작 (등급: %s)", len(ids), grades)
+    return {"ok": True, "queued": len(ids), "message": f"{len(ids)}건 일괄 분석 시작됨 (백그라운드)"}
 
 
 class EmailDraftPatch(BaseModel):
