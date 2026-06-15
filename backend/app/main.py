@@ -76,6 +76,16 @@ async def _poll_loop():
             except Exception as e:
                 logger.warning("[scheduler] followup 실패: %s", e)
 
+            # 콜드 드립 — 유튜버 콜드 메일 저속 발송 (기본 off, 세팅 후 활성)
+            try:
+                from app.services.outreach_cold_drip import process_cold_drip
+                drip = await asyncio.to_thread(process_cold_drip)
+                if drip.get("sent"):
+                    logger.info("[scheduler] cold_drip sent → %s (%s/%s)",
+                                drip.get("to"), drip.get("sent_today"), drip.get("cap"))
+            except Exception as e:
+                logger.warning("[scheduler] cold_drip 실패: %s", e)
+
             # Gmail 회신 감시 — 5사이클마다 (약 15분). 기본 off(영업이 카톡 오픈챗으로 전환).
             if settings.enable_gmail_watcher and cycle % 5 == 0:
                 try:
