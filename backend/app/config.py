@@ -50,6 +50,39 @@ class Settings(BaseSettings):
     # 이메일 회신 추적이 다시 필요하면 ENABLE_GMAIL_WATCHER=1.
     enable_gmail_watcher: bool = False
 
+    # ── 영업 이메일 컴플라이언스 (정보통신망법) ────────────────────────
+    # 수신거부 링크 베이스 URL. 예: https://maesil-agency.onrender.com
+    # 비우면 메일에 링크 없이 "수신거부 회신" 안내만 표기.
+    unsubscribe_base_url: str = ""
+    # 광고 메일 하단 전송자 정보(상호·연락처·주소 등). 법적 표기 의무.
+    outreach_sender_info: str = "매실인사이트 · support@maesil-insight.com"
+    # 제목 맨 앞 "(광고)" 자동 표기 (영리 광고성 메일 의무).
+    outreach_ad_prefix: bool = True
+    # 야간(21~08시 KST) 자동 팔로업 발송 보류.
+    outreach_quiet_hours: bool = True
+
+    # 영업 메일 제목 템플릿 — 운영자가 직접 카피 통제. {handle}=채널명, {company}=회사명.
+    # (광고) 접두는 발송 시 자동 부착되므로 여기엔 넣지 말 것.
+    outreach_influencer_subject: str = "광고비 -75% 줄인 실제 데이터, 영상 소재로 써보실래요?"
+    outreach_agency_subject: str = "무료체험 — {company}님 네이버·쿠팡 광고 리포트 10분 자동화"
+    # 희소성 후킹: N>0 이면 "현재 셀러 유튜버 N팀만 테스트 파트너 모집 중" 노출.
+    # 0이면 숨김(거짓 희소성 방지 — 실제 한정할 때만 숫자 입력).
+    outreach_beta_slots: int = 0
+    # 메일 내 링크 (매파스 파트너 페이지 / 실제 사례 페이지)
+    outreach_maepas_url: str = "https://maesil-insight.com/partners"
+    outreach_cases_url: str = "https://maesil-insight.com/cases"
+
+    # ── 콜드 드립 발송 (유튜버 콜드 — Gmail API, 별도 Workspace 메일박스) ──
+    # 세팅(메일박스+gmail OAuth 시크릿) 완료 후 1로 켜면 스케줄러가 자동 발송.
+    outreach_cold_drip_enabled: bool = False
+    outreach_daily_cap: int = 30            # 하루 최대 발송 수
+    outreach_drip_grades: str = "S,A"       # 발송 대상 등급 (콤마)
+    outreach_send_start_hour: int = 10      # 발송 시작 시각 (KST)
+    outreach_send_end_hour: int = 17        # 발송 종료 시각 (KST)
+    outreach_kakao_url: str = "https://open.kakao.com/o/sg6QOxDg"  # 오픈톡 실제 링크
+    # gmail 발송 시크릿은 secrets 테이블 사용:
+    #   outreach_gmail_client_id / _client_secret / _refresh_token / outreach_gmail_from
+
     @property
     def cors_origin_list(self) -> list[str]:
         # 와일드카드는 credentials와 충돌 + 보안 위험 → 거부

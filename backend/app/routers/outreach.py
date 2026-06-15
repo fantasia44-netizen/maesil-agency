@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 
 from app.auth import UserContext, require_admin
@@ -244,7 +244,10 @@ def trigger_batch_analysis(
 @router.get("/leads/{lead_id}/email-preview")
 def preview_email(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
     """실제 발송될 이메일 HTML 미리보기."""
-    from app.services.outreach_mailer import _build_email_html, _draft_to_html, _build_subject
+    from app.services.outreach_mailer import (
+        _build_email_html, _draft_to_html, _build_subject,
+        _build_agency_email_html, _build_agency_subject, _is_agency_lead,
+    )
 
     resp = _db().table("outreach_leads").select("*").eq("id", lead_id).limit(1).execute()
     rows = resp.data or []
@@ -252,17 +255,25 @@ def preview_email(lead_id: str, user: UserContext = Depends(require_admin)) -> d
         raise HTTPException(404, "리드를 찾을 수 없습니다.")
     lead = rows[0]
 
-    handle = lead.get("handle_name") or "파트너 채널"
-    subject = lead.get("email_subject") or _build_subject(handle)
+    is_agency = _is_agency_lead(lead)
+    handle = lead.get("handle_name") or ("대행사" if is_agency else "파트너 채널")
+    subject = lead.get("email_subject") or (
+        _build_agency_subject(handle) if is_agency else _build_subject(handle)
+    )
 
     if lead.get("email_final"):
         html = _draft_to_html(lead["email_final"])
+    elif is_agency:
+        html = _build_agency_email_html(handle, lead.get("email_draft") or "")
     else:
-        html = _build_email_html(
-            handle,
-            lead.get("platform_url") or "",
-            lead.get("email_draft") or lead.get("content_summary") or "",
-        )
+        intro = lead.get("email_draft")
+        if not intro:
+            try:
+                from app.services.outreach_personalize import build_personal_intro
+                intro = build_personal_intro(lead)
+            except Exception:
+                intro = None
+        html = _build_email_html(handle, lead.get("platform_url") or "", intro or "")
 
     return {"ok": True, "subject": subject, "html": html}
 
@@ -305,6 +316,74 @@ def send_lead_email(lead_id: str, user: UserContext = Depends(require_admin)) ->
     return {"ok": True, "message": "이메일 발송 완료"}
 
 
+# ── 수신거부 / 차단 (정보통신망법 컴플라이언스) ────────────────────────
+
+def _unsub_page(message: str, ok: bool = True) -> str:
+    color = "#059669" if ok else "#dc2626"
+    icon = "✓" if ok else "✕"
+    return f"""<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0"><title>수신거부</title></head>
+<body style="font-family:sans-serif;background:#f8fafc;margin:0;padding:60px 20px;text-align:center">
+<div style="max-width:440px;margin:0 auto;background:#fff;border-radius:14px;padding:40px 32px;box-shadow:0 2px 16px rgba(0,0,0,.06)">
+<div style="font-size:40px;color:{color}">{icon}</div>
+<h2 style="color:#1e293b;font-size:18px;margin:16px 0 8px">{message}</h2>
+<p style="color:#64748b;font-size:14px;line-height:1.7">앞으로 영업 메일이 발송되지 않습니다.<br>문의: support@maesil-insight.com</p>
+</div></body></html>"""
+
+
+@router.get("/unsubscribe", response_class=HTMLResponse)
+def unsubscribe(token: str = "") -> HTMLResponse:
+    """공개 수신거부 엔드포인트 (메일 링크). 토큰 검증 후 suppression 등록."""
+    from app.services.outreach_suppression import verify_unsub_token, add_suppression
+    addr = verify_unsub_token(token) if token else None
+    if not addr:
+        return HTMLResponse(_unsub_page("유효하지 않은 수신거부 링크입니다.", ok=False), status_code=400)
+    add_suppression(addr, reason="unsubscribe", source="link")
+    return HTMLResponse(_unsub_page(f"{addr} 님, 수신거부가 완료되었습니다.", ok=True))
+
+
+@router.post("/unsubscribe", response_class=HTMLResponse)
+def unsubscribe_post(token: str = "") -> HTMLResponse:
+    """RFC 8058 One-Click 수신거부 (메일 클라이언트 자동 호출)."""
+    return unsubscribe(token)
+
+
+@router.get("/r")
+def track_click(lid: str = "") -> RedirectResponse:
+    """오픈톡 링크 클릭 추적 → 기록 후 실제 오픈톡으로 리다이렉트 (공개)."""
+    from app.config import settings
+    dest = settings.outreach_kakao_url or "https://maesil-insight.com"
+    if lid:
+        try:
+            now = datetime.now(timezone.utc).isoformat()
+            rows = _db().table("outreach_leads").select("click_count").eq("id", lid).limit(1).execute().data or []
+            cc = (rows[0].get("click_count") if rows else 0) or 0
+            _db().table("outreach_leads").update({
+                "click_count": cc + 1, "clicked_at": now, "updated_at": now,
+            }).eq("id", lid).execute()
+            logger.info("[click] 오픈톡 클릭 lead=%s (%d회)", lid, cc + 1)
+        except Exception as e:
+            logger.warning("click 기록 실패 [%s]: %s", lid, e)
+    return RedirectResponse(dest, status_code=302)
+
+
+class SuppressRequest(BaseModel):
+    email: str
+    reason: str = "manual"   # manual | bounce | complaint | blocked
+    note: str | None = None
+
+
+@router.post("/suppress")
+def suppress_email(body: SuppressRequest, user: UserContext = Depends(require_admin)) -> dict:
+    """관리자 수동 차단(BLOCKED 등). suppression 등록 + 리드 상태 전환."""
+    from app.services.outreach_suppression import add_suppression
+    if not body.email.strip():
+        raise HTTPException(400, "email 필요")
+    if add_suppression(body.email, reason=body.reason, source="admin", note=body.note):
+        return {"ok": True, "email": body.email.strip().lower()}
+    raise HTTPException(400, "차단 처리 실패")
+
+
 class StatusPatch(BaseModel):
     status: str
 
@@ -332,6 +411,26 @@ def update_lead_status(lead_id: str, body: StatusPatch, user: UserContext = Depe
     now = datetime.now(timezone.utc).isoformat()
     _db().table("outreach_leads").update({"status": body.status, "updated_at": now}).eq("id", lead_id).execute()
     return {"ok": True, "status": body.status}
+
+
+# ── 광고대행사 임포트 (공식 인증 명단 큐레이션) ────────────────────────
+
+@router.post("/agencies/import")
+def import_official_agencies(
+    source: str = "coupang_official",
+    enrich: bool = True,
+    user: UserContext = Depends(require_admin),
+) -> dict:
+    """네이버/쿠팡 공식 광고대행사를 ad_agency 리드로 적재 (발송 안 함, discovered 상태).
+    source: 'coupang_official' | 'naver_official'
+    enrich: 홈페이지에서 이메일 보강 시도.
+    """
+    from app.services import outreach_agency_importer as imp
+    if source == "coupang_official":
+        return imp.import_coupang_official(enrich=enrich)
+    if source == "naver_official":
+        return imp.import_naver_official(enrich=enrich)
+    raise HTTPException(400, "source는 'coupang_official' 또는 'naver_official'")
 
 
 # ── 스캔 트리거 ──────────────────────────────────────────────────────

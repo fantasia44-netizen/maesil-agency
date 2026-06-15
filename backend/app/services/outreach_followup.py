@@ -146,14 +146,26 @@ def _send_sequence_email(lead: dict, sequence: int, touch_id: str) -> bool:
         return False
 
     from app.services.notify_client import send_email
+    from app.services.outreach_suppression import (
+        is_suppressed, with_ad_subject, inject_compliance_footer,
+    )
     handle = lead.get("handle_name") or "채널"
-    subject = f"[매실인사이트] {handle}님 — {seq_cfg['subject_suffix']}"
+    subject = f"{handle}님 — {seq_cfg['subject_suffix']}"
     html = seq_cfg["body_html"].replace("{handle}", handle)
 
     to = lead.get("contact_email")
     if not to:
         _mark_touch(touch_id, "skipped")
         return False
+
+    # 수신거부/차단 차단
+    if is_suppressed(to):
+        _mark_touch(touch_id, "skipped", "suppressed")
+        return False
+
+    # 컴플라이언스: (광고) 제목 + 전송자정보/수신거부 푸터
+    subject = with_ad_subject(subject)
+    html = inject_compliance_footer(html, to)
 
     result = send_email(to=to, subject=subject, html=html, source="maesil-agency")
     ok = result.get("ok", False)
@@ -235,9 +247,17 @@ def check_pending_followups(limit: int = 20) -> dict:
             errors.append(f"lead 조회 실패 [{lead_id}]: {e}")
             continue
 
-        if not lead or lead.get("status") in ("rejected", "archived", "deal"):
+        if not lead or lead.get("status") in (
+            "rejected", "archived", "deal", "unsubscribe", "blocked"
+        ):
             _mark_touch(touch_id, "skipped")
             continue
+
+        # 야간(21~08 KST) 자동 이메일 발송 보류 — pending 유지, 다음 주기 처리
+        if channel == "email":
+            from app.services.outreach_suppression import is_quiet_hours
+            if is_quiet_hours():
+                continue
 
         try:
             if channel == "email" and sequence == 1:
