@@ -16,9 +16,9 @@ _store: dict[str, dict[str, Any]] = {}  # run_id → job
 _TTL = 600  # 10분
 
 
-def create(run_id: str) -> None:
+def create(run_id: str, owner: str | None = None) -> None:
     with _lock:
-        _store[run_id] = {"status": "pending", "result": None, "ts": time.monotonic()}
+        _store[run_id] = {"status": "pending", "result": None, "ts": time.monotonic(), "owner": owner}
 
 
 def complete(run_id: str, result: dict[str, Any]) -> None:

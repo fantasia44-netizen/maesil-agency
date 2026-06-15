@@ -14,6 +14,39 @@ from app.db.maesil_total_client import get_maesil_total_client
 from app.db.registry_client import get_db_client
 
 
+_MAX_PARAM_LEN = 500
+
+
+def _to_sql_literal(key: str, value: Any) -> str:
+    """파라미터 값을 안전한 SQL 리터럴로 변환.
+
+    - bool/int/float: 숫자/불리언 리터럴 (str() 직접 주입 금지 — 타입 강제)
+    - None: NULL
+    - str: 제어문자(특히 NUL) 차단, 길이 제한, 작은따옴표 doubling.
+           PostgreSQL standard_conforming_strings=on 가정(기본값).
+    - 그 외 타입: 거부 (리스트/딕트 등 객체 주입 차단)
+    """
+    if value is None:
+        return "NULL"
+    if isinstance(value, bool):
+        return "TRUE" if value else "FALSE"
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, float):
+        if value != value or value in (float("inf"), float("-inf")):
+            raise ValueError(f"Invalid numeric parameter '{key}'")
+        return repr(value)
+    if isinstance(value, str):
+        if "\x00" in value:
+            raise ValueError(f"Parameter '{key}' contains NUL byte")
+        if len(value) > _MAX_PARAM_LEN:
+            raise ValueError(f"Parameter '{key}' too long (>{_MAX_PARAM_LEN})")
+        # 백슬래시는 standard_conforming_strings=on 에서 리터럴이므로 따옴표만 이스케이프
+        safe_val = value.replace("'", "''")
+        return f"'{safe_val}'"
+    raise ValueError(f"Unsupported parameter type for '{key}': {type(value).__name__}")
+
+
 def run_readonly_sql(
     template_key: str,
     params: dict[str, Any],
@@ -41,16 +74,18 @@ def run_readonly_sql(
     db_name = template["db"]
     sql = template["sql"].strip()
 
-    # 파라미터 치환 (:param → %(param)s 스타일)
+    # 템플릿이 선언한 파라미터만 허용 (선언 외 키 주입 차단)
+    declared = set(template.get("params", []))
+
+    # 파라미터 치환 (:param → 리터럴). 자유 SQL이 아니라 고정 템플릿 + 검증된 리터럴.
     for key, value in params.items():
+        if declared and key not in declared:
+            _audit(template_key, agent_type, run_id, "denied", None, 0,
+                   f"undeclared param '{key}' for template '{template_key}'")
+            raise ValueError(f"Undeclared parameter for '{template_key}': {key}")
         placeholder = f":{key}"
-        if isinstance(value, str):
-            safe_val = value.replace("'", "''")
-            sql = sql.replace(placeholder, f"'{safe_val}'")
-        elif value is None:
-            sql = sql.replace(placeholder, "NULL")
-        else:
-            sql = sql.replace(placeholder, str(value))
+        literal = _to_sql_literal(key, value)
+        sql = sql.replace(placeholder, literal)
 
     start = time.monotonic()
     status = "ok"

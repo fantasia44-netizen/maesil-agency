@@ -1,23 +1,19 @@
--- super_admin 계정 최초 생성
--- Supabase SQL Editor에서 1회 실행 후 이 파일 삭제 권장
-
-INSERT INTO agent_work.users (
-    email,
-    password_hash,
-    role,
-    display_name,
-    is_active
-)
-VALUES (
-    'support@maesil-insight.com',
-    '$2b$12$C5XZ/NLkebvyVgBqIrq2.ezvpIhNkmn5e7mJRHL0o3XK0zW248U1G',
-    'super_admin',
-    '관리자',
-    true
-)
-ON CONFLICT (email) DO UPDATE
-    SET password_hash = EXCLUDED.password_hash,
-        role          = EXCLUDED.role,
-        display_name  = EXCLUDED.display_name,
-        is_active     = EXCLUDED.is_active,
-        updated_at    = now();
+-- super_admin 최초 계정 생성
+--
+-- ⚠️ 보안: 이전 버전에는 평문 해시가 하드코딩되어 있었습니다(레포 유출 시 위험).
+--    이제 자격증명을 코드/레포에 두지 않습니다. 아래 두 방법 중 하나를 사용하세요.
+--
+-- 방법 A (권장) — 코드 변경 없이 앱의 부트스트랩 엔드포인트 사용:
+--    users 테이블이 비어 있을 때 1회만 동작합니다.
+--      curl -X POST https://<your-host>/api/auth/setup \
+--           -H 'Content-Type: application/json' \
+--           -d '{"email":"you@example.com","password":"<강력한-비밀번호>","display_name":"관리자"}'
+--
+-- 방법 B — SQL로 직접 생성(해시를 로컬에서 만들어 붙여넣기):
+--    1) 로컬에서 해시 생성:
+--         python -c "from passlib.context import CryptContext; print(CryptContext(schemes=['bcrypt']).hash('여기에-실제-비밀번호'))"
+--    2) 아래 :PASSWORD_HASH / :EMAIL 을 실제 값으로 바꿔 1회 실행 후, 비밀번호를 즉시 교체.
+--
+-- INSERT INTO agent_work.users (email, password_hash, role, display_name, is_active)
+-- VALUES ('you@example.com', '<생성한-bcrypt-해시>', 'super_admin', '관리자', true)
+-- ON CONFLICT (email) DO NOTHING;   -- 기존 계정 비밀번호를 덮어쓰지 않음

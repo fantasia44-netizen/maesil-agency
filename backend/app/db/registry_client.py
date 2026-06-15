@@ -34,20 +34,11 @@ def get_db_client(db_name: str) -> Client:
     if not url:
         raise ValueError(f"DB '{db_name}' has no supabase_url configured")
 
-    # secrets에서 API 키 조회
+    # secrets에서 API 키 조회 (봉투암호화 복호화 포함)
     key = None
     if key_ref:
-        sec = (
-            autotool.schema("agent_work")
-            .table("secrets")
-            .select("value")
-            .eq("name", key_ref)
-            .limit(1)
-            .execute()
-        )
-        sec_rows = sec.data or []
-        if sec_rows:
-            key = sec_rows[0]["value"]
+        from app.services.secrets import get_secret
+        key = get_secret(key_ref)
 
     if not key:
         raise ValueError(f"No API key found for DB '{db_name}' (key_ref={key_ref})")
@@ -57,15 +48,5 @@ def get_db_client(db_name: str) -> Client:
 
 def get_operator_id(db_name: str) -> str | None:
     """secrets에서 operator_id 조회 (예: 'maesil_total_operator_id')."""
-    autotool = get_maesil_total_client()
-    name = f"{db_name}_operator_id"
-    sec = (
-        autotool.schema("agent_work")
-        .table("secrets")
-        .select("value")
-        .eq("name", name)
-        .limit(1)
-        .execute()
-    )
-    rows = sec.data or []
-    return rows[0]["value"] if rows else None
+    from app.services.secrets import get_secret
+    return get_secret(f"{db_name}_operator_id")
