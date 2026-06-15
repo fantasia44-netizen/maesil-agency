@@ -66,7 +66,7 @@ def memory_dev(
         }
     except Exception as e:
         logger.warning("memory_dev 조회 실패: %s", e)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="dev 메모리 조회 중 오류가 발생했습니다.")
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -191,7 +191,7 @@ def memory_growth(
                           "Supabase → Settings → API → Reload schema cache 후 재시도하세요.",
             }
         logger.warning("memory_growth 조회 실패: %s", e)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="growth 메모리 조회 중 오류가 발생했습니다.")
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -220,7 +220,7 @@ def memory_sales(
         }
     except Exception as e:
         logger.warning("memory_sales 조회 실패: %s", e)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="sales 메모리 조회 중 오류가 발생했습니다.")
 
 
 # ─────────────────────────────────────────────────────────────────

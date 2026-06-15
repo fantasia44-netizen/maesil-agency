@@ -106,9 +106,9 @@ def growth_chat(req: GrowthChatRequest) -> GrowthChatResponse:
             ["growth"],
             operator_id=req.operator_id,
         )
-    except Exception as e:
+    except Exception:
         logger.exception("GrowthAgent 실행 오류 [op=%s]", req.operator_id)
-        raise HTTPException(status_code=500, detail=f"GrowthAgent 오류: {e}")
+        raise HTTPException(status_code=500, detail="GrowthAgent 처리 중 오류가 발생했습니다.")
 
     result = results[0] if results else {}
     reply = result.get("message", "분석 결과를 가져올 수 없습니다.")
@@ -170,12 +170,21 @@ def _build_enriched_message(message: str, ctx: dict, program: str) -> str:
 # ─────────────────────────────────────────────────────────────────
 # 관리자용 — Growth 대화 조회 (JWT 인증)
 # ─────────────────────────────────────────────────────────────────
+def _guard_growth_read(user: UserContext) -> None:
+    """Growth 대화는 operator 매출 등 민감 데이터 → 기본 super_admin 전용.
+    GROWTH_ADMIN_ONLY=0 으로 완화 가능(권장 안 함)."""
+    from app.config import settings
+    if settings.growth_admin_only and not user.is_super_admin:
+        raise HTTPException(403, "관리자 전용")
+
+
 @router.get("/conversations")
 def list_growth_conversations(
     limit: int = 30,
     program: str | None = None,
     user: UserContext = Depends(get_current_user),
 ) -> list[dict]:
+    _guard_growth_read(user)
     from app.services import conversations as conv_svc
     return conv_svc.list_conversations(limit=limit)
 
@@ -185,6 +194,7 @@ def get_growth_conversation(
     conversation_id: str,
     user: UserContext = Depends(get_current_user),
 ) -> dict:
+    _guard_growth_read(user)
     from app.services import conversations as conv_svc
     messages = conv_svc.get_messages(conversation_id)
     return {"conversation_id": conversation_id, "messages": messages}

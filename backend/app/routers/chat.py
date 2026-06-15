@@ -307,6 +307,10 @@ def poll_run(run_id: str, user: UserContext = Depends(get_current_user)) -> dict
     job = job_store.get(run_id)
     if not job:
         raise HTTPException(status_code=404, detail="작업을 찾을 수 없습니다.")
+    # 소유자 격리: 본인 작업 또는 super_admin 만 조회 가능
+    owner = job.get("owner")
+    if owner and not user.is_super_admin and str(owner) != str(user.id):
+        raise HTTPException(status_code=404, detail="작업을 찾을 수 없습니다.")
     if job["status"] == "pending":
         return {"status": "pending", "run_id": run_id}
     if job["status"] == "error":
@@ -396,7 +400,7 @@ def chat(req: ChatRequest, bg: BackgroundTasks, user: UserContext = Depends(get_
         # 느린 에이전트 → 백그라운드 처리
         if fa in _BG_AGENTS:
             job_run_id = str(uuid.uuid4())
-            job_store.create(job_run_id)
+            job_store.create(job_run_id, owner=user.id)
             bg.add_task(_bg_run_agents, job_run_id, req.message, conversation_id,
                         [fa], user.operator_id, ctx_msgs, user.id, title)
             return ChatResponse(
@@ -623,7 +627,7 @@ def morning_briefing(
     user_message = "☀️ 아침 현황 보고"
 
     job_run_id = str(uuid.uuid4())
-    job_store.create(job_run_id)
+    job_store.create(job_run_id, owner=user.id)
     bg.add_task(_bg_briefing, job_run_id, conversation_id, user_message, user.operator_id, user.id)
 
     return ChatResponse(

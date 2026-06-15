@@ -13,10 +13,14 @@ POST /api/auth/join               — 초대 토큰으로 계정 생성 (공개)
 """
 from __future__ import annotations
 
+import hashlib
+import hmac
 import secrets
+import threading
+import time
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
 from app.auth import (
@@ -25,12 +29,62 @@ from app.auth import (
     get_current_user,
     get_user_by_email,
     hash_password,
+    invalidate_revalidate_cache,
     require_admin,
     verify_password,
 )
+from app.config import settings
 from app.db.maesil_total_client import get_maesil_total_client
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+
+# ─────────────────────────────────────────────────────────────────
+# 로그인 무차별 대입 방어 (인메모리). LOGIN_MAX_ATTEMPTS=0 이면 비활성.
+# ─────────────────────────────────────────────────────────────────
+_login_fail: dict[str, list[float]] = {}   # key → 실패 시각 목록
+_login_lock = threading.Lock()
+
+
+def _client_ip(request: Request) -> str:
+    fwd = request.headers.get("x-forwarded-for", "")
+    if fwd:
+        return fwd.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+def _login_key(request: Request, email: str) -> str:
+    return f"{_client_ip(request)}|{(email or '').lower().strip()}"
+
+
+def _login_check_locked(key: str) -> None:
+    if settings.login_max_attempts <= 0:
+        return
+    window = settings.login_lockout_minutes * 60
+    now = time.monotonic()
+    with _login_lock:
+        fails = [t for t in _login_fail.get(key, []) if now - t < window]
+        _login_fail[key] = fails
+        if len(fails) >= settings.login_max_attempts:
+            raise HTTPException(
+                429, "로그인 시도가 너무 많습니다. 잠시 후 다시 시도하세요."
+            )
+
+
+def _login_record_fail(key: str) -> None:
+    if settings.login_max_attempts <= 0:
+        return
+    with _login_lock:
+        _login_fail.setdefault(key, []).append(time.monotonic())
+
+
+def _login_reset(key: str) -> None:
+    with _login_lock:
+        _login_fail.pop(key, None)
+
+
+def _hash_invite_token(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
 
 
 def _users_table():
@@ -50,26 +104,31 @@ def _now() -> str:
 # ─────────────────────────────────────────────────────────────────
 
 def _find_invite(token: str) -> dict | None:
-    """유효한 invite 토큰 row 반환. 만료/사용됨/없음이면 None."""
-    import hmac
+    """유효한 invite 토큰 row 반환. 만료/사용됨/없음이면 None.
+
+    신규: payload.token_hash(sha256) 와 비교.
+    레거시: payload.token(평문) 도 호환 비교.
+    """
     if not token or len(token) < 16:
         return None
+    token_hash = _hash_invite_token(token)
     now_iso = _now()
     resp = _snapshots_table().select("*").eq("kind", "invite").gt("valid_until", now_iso).execute()
     for row in (resp.data or []):
         payload = row.get("payload") or {}
-        stored = payload.get("token") or ""
-        if not stored:
-            continue
         if payload.get("used_at"):
             continue
-        if hmac.compare_digest(str(stored), str(token)):
+        stored_hash = payload.get("token_hash") or ""
+        if stored_hash and hmac.compare_digest(str(stored_hash), token_hash):
+            return row
+        legacy = payload.get("token") or ""   # 레거시 평문 호환
+        if legacy and hmac.compare_digest(str(legacy), str(token)):
             return row
     return None
 
 
 class InviteCreateRequest(BaseModel):
-    role: str = "super_admin"  # 초대할 역할 (기본 팀원 = super_admin)
+    role: str = "customer"  # 최소권한 기본값. super_admin 초대는 명시적으로 지정.
 
 
 class JoinRequest(BaseModel):
@@ -88,11 +147,12 @@ def create_invite(body: InviteCreateRequest, admin: UserContext = Depends(requir
     token = secrets.token_urlsafe(24)
     valid_until = (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
 
+    # 토큰은 해시만 저장(DB 유출 시에도 토큰 재사용 불가). 평문은 응답으로 1회만 반환.
     _snapshots_table().insert({
         "agent_type": "system",
         "kind": "invite",
         "payload": {
-            "token": token,
+            "token_hash": _hash_invite_token(token),
             "role": body.role,
             "created_by": admin.email,
         },
@@ -110,7 +170,7 @@ def check_invite(token: str) -> dict:
     if not row:
         raise HTTPException(404, "유효하지 않거나 만료된 초대 링크입니다.")
     payload = row.get("payload") or {}
-    return {"valid": True, "role": payload.get("role", "super_admin")}
+    return {"valid": True, "role": payload.get("role", "customer")}
 
 
 @router.post("/join")
@@ -159,7 +219,7 @@ def join(body: JoinRequest) -> dict:
     if get_user_by_email(body.email):
         raise HTTPException(409, "이미 사용 중인 이메일입니다.")
 
-    role = claimed_payload.get("role", "super_admin")
+    role = claimed_payload.get("role", "customer")
     if role not in ("super_admin", "customer"):
         raise HTTPException(500, "초대 link role 설정 오류")
 
@@ -206,14 +266,21 @@ class LoginResponse(BaseModel):
 
 
 @router.post("/login", response_model=LoginResponse)
-def login(body: LoginRequest) -> LoginResponse:
+def login(body: LoginRequest, request: Request) -> LoginResponse:
+    lk = _login_key(request, body.email)
+    _login_check_locked(lk)
+
     user = get_user_by_email(body.email)
     if not user:
+        _login_record_fail(lk)
         raise HTTPException(401, "이메일 또는 비밀번호가 올바르지 않습니다.")
     if not user.get("is_active", True):
         raise HTTPException(403, "비활성화된 계정입니다. 관리자에게 문의하세요.")
     if not verify_password(body.password, user["password_hash"]):
+        _login_record_fail(lk)
         raise HTTPException(401, "이메일 또는 비밀번호가 올바르지 않습니다.")
+
+    _login_reset(lk)
 
     # last_login_at 갱신
     try:
@@ -352,6 +419,7 @@ def patch_user(user_id: str, body: PatchUserRequest, admin: UserContext = Depend
     rows = resp.data or []
     if not rows:
         raise HTTPException(404, "user not found")
+    invalidate_revalidate_cache(user_id)  # 비활성화/강등 즉시 반영
     rows[0].pop("password_hash", None)
     return rows[0]
 

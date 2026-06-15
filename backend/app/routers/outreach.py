@@ -111,9 +111,8 @@ def send_to_studio(snapshot_id: str, user: UserContext = Depends(require_admin))
 
 
 def _get_studio_url() -> str | None:
-    r = _db().table("secrets").select("value").eq("name", "maesil_studio_url").limit(1).execute()
-    rows = r.data or []
-    return rows[0]["value"] if rows else None
+    from app.services.secrets import get_secret
+    return get_secret("maesil_studio_url")
 
 
 # ── YouTube 리드 관리 (v4) ────────────────────────────────────────────

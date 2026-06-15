@@ -1,16 +1,79 @@
 """
 Secrets store — agent_work.secrets 테이블 래퍼.
-Phase 1: 평문 저장. Phase 2에서 암호화 레이어 추가 예정.
+
+봉투암호화(Fernet): SECRETS_ENC_KEY 환경변수가 설정되면 저장 시 자동 암호화,
+조회 시 자동 복호화. 키 미설정 시 평문 저장으로 폴백(기존 호환).
+기존 평문 row 는 그대로 읽히며, 다시 저장(/settings에서 재입력)하면 암호화됩니다.
 """
+import logging
 import threading
 import time
 from datetime import datetime, timezone
 from typing import Optional
 
+from app.config import settings
 from app.db.maesil_total_client import get_maesil_total_client
+
+logger = logging.getLogger(__name__)
 
 TABLE = "secrets"
 SCHEMA = "agent_work"
+
+# ── 봉투암호화 (Fernet) ───────────────────────────────────────────
+_ENC_PREFIX = "enc:v1:"
+_fernet = None
+_fernet_init = False
+_fernet_lock = threading.Lock()
+_warned_plaintext = False
+
+
+def _get_fernet():
+    """SECRETS_ENC_KEY 로 Fernet 인스턴스 생성(1회 캐시). 키 없으면 None."""
+    global _fernet, _fernet_init
+    if _fernet_init:
+        return _fernet
+    with _fernet_lock:
+        if _fernet_init:
+            return _fernet
+        key = (settings.secrets_enc_key or "").strip()
+        if key:
+            try:
+                from cryptography.fernet import Fernet
+                _fernet = Fernet(key.encode())
+            except Exception as e:
+                logger.error("SECRETS_ENC_KEY 로 Fernet 초기화 실패 — 평문 폴백: %s", e)
+                _fernet = None
+        _fernet_init = True
+        return _fernet
+
+
+def _encrypt(value: str) -> str:
+    """저장용 암호화. 키 없으면 평문 그대로(경고 1회)."""
+    global _warned_plaintext
+    f = _get_fernet()
+    if f is None:
+        if not _warned_plaintext:
+            logger.warning("SECRETS_ENC_KEY 미설정 — 시크릿이 평문으로 저장됩니다.")
+            _warned_plaintext = True
+        return value
+    return _ENC_PREFIX + f.encrypt(value.encode()).decode()
+
+
+def _decrypt(stored: Optional[str]) -> Optional[str]:
+    """조회용 복호화. enc 접두사 없으면 레거시 평문으로 간주해 그대로 반환."""
+    if stored is None:
+        return None
+    if not stored.startswith(_ENC_PREFIX):
+        return stored  # 레거시 평문
+    f = _get_fernet()
+    if f is None:
+        logger.error("암호화된 시크릿이 있으나 SECRETS_ENC_KEY 가 없어 복호화 불가.")
+        return None
+    try:
+        return f.decrypt(stored[len(_ENC_PREFIX):].encode()).decode()
+    except Exception as e:
+        logger.error("시크릿 복호화 실패: %s", e)
+        return None
 
 # ── 인메모리 캐시 (프로세스 내 60초 TTL) ───────────────────────────
 _cache: dict[str, tuple[Optional[str], float]] = {}  # name → (value, expire_at)
@@ -50,7 +113,8 @@ def get_secret(name: str) -> Optional[str]:
         return cached
     resp = _table().select("value").eq("name", name).limit(1).execute()
     rows = resp.data or []
-    value = rows[0]["value"] if rows else None
+    raw = rows[0]["value"] if rows else None
+    value = _decrypt(raw)
     _cache_set(name, value)
     if value is not None:
         _touch_last_used(name)
@@ -62,7 +126,7 @@ def upsert_secret(name: str, value: str, kind: str, notes: str | None = None) ->
     _table().upsert(
         {
             "name": name,
-            "value": value,
+            "value": _encrypt(value),
             "kind": kind,
             "notes": notes,
             "updated_at": now,

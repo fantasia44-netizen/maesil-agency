@@ -1,7 +1,8 @@
+import hmac
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
@@ -75,8 +76,8 @@ async def _poll_loop():
             except Exception as e:
                 logger.warning("[scheduler] followup 실패: %s", e)
 
-            # Gmail 회신 감시 — 5사이클마다 (약 15분)
-            if cycle % 5 == 0:
+            # Gmail 회신 감시 — 5사이클마다 (약 15분). 기본 off(영업이 카톡 오픈챗으로 전환).
+            if settings.enable_gmail_watcher and cycle % 5 == 0:
                 try:
                     from app.services.gmail_watcher import watch_replies
                     reply_result = await asyncio.to_thread(watch_replies, 30)
@@ -108,9 +109,23 @@ async def _poll_loop():
         await asyncio.sleep(180)  # 3분 후 반복
 
 
+def _warn_insecure_flags() -> None:
+    """위험한 운영 플래그가 켜져 있으면 시작 시 경고."""
+    import os
+    if os.environ.get("CS_ALLOW_UNAUTH", "").lower() in ("1", "true", "yes"):
+        logger.warning("⚠️ CS_ALLOW_UNAUTH 활성 — CS 엔드포인트가 무인증입니다. 운영에서 끄세요.")
+    if os.environ.get("GROWTH_ALLOW_UNAUTH", "").lower() in ("1", "true", "yes"):
+        logger.warning("⚠️ GROWTH_ALLOW_UNAUTH 활성 — Growth 엔드포인트가 무인증입니다. 운영에서 끄세요.")
+    if settings.enable_debug_endpoints:
+        logger.warning("⚠️ ENABLE_DEBUG_ENDPOINTS 활성 — /admin/* 디버그 엔드포인트가 노출됩니다.")
+    if not settings.secrets_enc_key:
+        logger.warning("⚠️ SECRETS_ENC_KEY 미설정 — 시크릿이 평문으로 저장됩니다. 설정을 권장합니다.")
+
+
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     import asyncio
+    _warn_insecure_flags()
     task = asyncio.create_task(_poll_loop())
     logger.info("[scheduler] 3분 폴링 스케줄러 시작")
     yield
@@ -147,14 +162,26 @@ def root() -> dict:
     return {"service": "maesil-agency", "version": app.version}
 
 
-@app.get("/admin/dev-agent-debug")
-def admin_dev_agent_debug(token: str = "", program_name: str = "maesil-sync-worker-1",
-                          table_name: str = "naver_ad_sync_log") -> dict:
-    """introspector 단독 진단 — 어느 단계에서 막히는지 추적."""
-    from app.config import settings
-    if token != settings.api_bearer_token:
-        from fastapi import HTTPException
+def _require_debug_admin(x_admin_token: str | None) -> None:
+    """관리자 디버그 엔드포인트 게이트.
+
+    - ENABLE_DEBUG_ENDPOINTS=1 일 때만 동작(기본 비활성 → 404).
+    - 토큰은 쿼리스트링이 아닌 X-Admin-Token 헤더로 전달(로그 노출 방지).
+    - 상수시간 비교(hmac.compare_digest).
+    """
+    if not settings.enable_debug_endpoints:
+        raise HTTPException(404, "Not Found")
+    token = (x_admin_token or "").strip()
+    if not token or not hmac.compare_digest(token, settings.api_bearer_token):
         raise HTTPException(403, "forbidden")
+
+
+@app.get("/admin/dev-agent-debug")
+def admin_dev_agent_debug(program_name: str = "maesil-sync-worker-1",
+                          table_name: str = "naver_ad_sync_log",
+                          x_admin_token: str | None = Header(default=None, alias="X-Admin-Token")) -> dict:
+    """introspector 단독 진단 — 어느 단계에서 막히는지 추적."""
+    _require_debug_admin(x_admin_token)
 
     from app.services import db_introspector
 
@@ -210,16 +237,14 @@ def admin_dev_agent_debug(token: str = "", program_name: str = "maesil-sync-work
 
 
 @app.post("/admin/repo-mirror/sync")
-def admin_repo_mirror_sync(token: str = "", repo: str = "", force: bool = False) -> dict:
+def admin_repo_mirror_sync(repo: str = "", force: bool = False,
+                           x_admin_token: str | None = Header(default=None, alias="X-Admin-Token")) -> dict:
     """레포 미러 수동 동기화 (배포 직후 1회 또는 단일 레포 강제 갱신).
 
     - repo 비우면 전체, 지정시 해당 레포만
     - force=true 면 commit sha 같아도 강제 재다운
     """
-    from app.config import settings
-    if token != settings.api_bearer_token:
-        from fastapi import HTTPException
-        raise HTTPException(403, "forbidden")
+    _require_debug_admin(x_admin_token)
     from app.services import repo_mirror
     if repo:
         return repo_mirror.sync_repo(repo, force=force)
@@ -227,12 +252,9 @@ def admin_repo_mirror_sync(token: str = "", repo: str = "", force: bool = False)
 
 
 @app.get("/admin/inspect-insight")
-def inspect_insight(token: str = "") -> dict:
+def inspect_insight(x_admin_token: str | None = Header(default=None, alias="X-Admin-Token")) -> dict:
     """임시: maesil-insight 스키마 탐색 (슈퍼어드민 전용, 작업 후 제거)."""
-    from app.config import settings
-    if token != settings.api_bearer_token:
-        from fastapi import HTTPException
-        raise HTTPException(403, "forbidden")
+    _require_debug_admin(x_admin_token)
     try:
         from app.db.registry_client import get_db_client
         client = get_db_client("maesil-insight")
@@ -266,14 +288,11 @@ def inspect_insight(token: str = "") -> dict:
 
 
 @app.get("/admin/inspect-insight-performance")
-def inspect_insight_performance(token: str = "") -> dict:
+def inspect_insight_performance(x_admin_token: str | None = Header(default=None, alias="X-Admin-Token")) -> dict:
     """maesil-insight 성과/광고 관련 테이블 전체 컬럼 목록 조회.
     insight_benchmark.py 쿼리 수정 전 실제 스키마 파악용.
     """
-    from app.config import settings
-    if token != settings.api_bearer_token:
-        from fastapi import HTTPException
-        raise HTTPException(403, "forbidden")
+    _require_debug_admin(x_admin_token)
     try:
         from app.db.registry_client import get_db_client
         client = get_db_client("maesil-insight")
