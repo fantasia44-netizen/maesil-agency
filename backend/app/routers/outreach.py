@@ -373,6 +373,38 @@ class SuppressRequest(BaseModel):
     note: str | None = None
 
 
+@router.post("/test-send")
+def test_send(to: str = "", lead_id: str = "", user: UserContext = Depends(require_admin)) -> dict:
+    """Gmail 발송 파이프라인 테스트 — 지정 주소로 샘플 1통 발송 (콜드 드립/실제 리드 안 건드림).
+    OAuth 연결·도달·렌더·클릭추적 검증용. to=본인이메일 권장."""
+    from app.services import outreach_gmail_sender as gm
+    from app.services.outreach_mailer import build_lead_email
+
+    if not to.strip():
+        raise HTTPException(400, "to(수신 이메일)가 필요합니다.")
+    if not gm.is_configured():
+        raise HTTPException(400, "outreach_gmail_* 시크릿이 없습니다 (/settings에서 등록).")
+
+    if lead_id:
+        rows = _db().table("outreach_leads").select("*").eq("id", lead_id).limit(1).execute().data or []
+        if not rows:
+            raise HTTPException(404, "리드를 찾을 수 없습니다.")
+        lead = rows[0]
+        lead["contact_email"] = to  # 테스트는 본인 주소로만
+    else:
+        lead = {
+            "id": "test", "platform": "youtube", "handle_name": "테스트채널",
+            "contact_email": to,
+            "email_draft": '최근 올리신 "테스트 영상" 잘 봤습니다. (발송 파이프라인 테스트 메일입니다)',
+            "best_content_title": "테스트 인기 영상",
+        }
+    subject, html = build_lead_email(lead)
+    result = gm.send(to, subject, html)
+    if not result.get("ok"):
+        raise HTTPException(400, f"발송 실패: {result.get('error')}")
+    return {"ok": True, "to": to, "id": result.get("id"), "subject": subject}
+
+
 @router.post("/suppress")
 def suppress_email(body: SuppressRequest, user: UserContext = Depends(require_admin)) -> dict:
     """관리자 수동 차단(BLOCKED 등). suppression 등록 + 리드 상태 전환."""
