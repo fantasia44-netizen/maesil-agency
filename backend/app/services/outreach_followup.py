@@ -248,7 +248,8 @@ def check_pending_followups(limit: int = 20) -> dict:
             continue
 
         if not lead or lead.get("status") in (
-            "rejected", "archived", "deal", "unsubscribe", "blocked"
+            "rejected", "archived", "deal", "unsubscribe", "blocked",
+            "discovered", "analyzing", "draft_ready",
         ):
             _mark_touch(touch_id, "skipped")
             continue
