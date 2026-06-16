@@ -182,15 +182,26 @@ p{{font-size:15px;color:#333;line-height:1.8}}
 </div></body></html>"""
 
 
-def _build_subject(handle_name: str) -> str:
-    # 제목 카피는 운영자가 OUTREACH_INFLUENCER_SUBJECT 로 직접 통제.
-    # 발송 시 맨 앞 "(광고)" 자동 부착.
+def _build_subject(handle_name: str, channel_type: str | None = None) -> str:
+    # 운영자가 OUTREACH_INFLUENCER_SUBJECT 로 직접 통제 가능.
+    # 미설정 시 채널 타입별 개인화 제목 사용.
     from app.config import settings
-    tmpl = settings.outreach_influencer_subject or "광고비·ROAS 콘텐츠 소재가 부족하신가요?"
-    try:
-        return tmpl.format(handle=handle_name)
-    except Exception:
-        return tmpl
+    if settings.outreach_influencer_subject:
+        tmpl = settings.outreach_influencer_subject
+        try:
+            return tmpl.format(handle=handle_name)
+        except Exception:
+            return tmpl
+    # 채널 타입별 제목
+    subject_map = {
+        "educator":        f"{handle_name}님 강의 보고 연락드립니다",
+        "reviewer":        f"{handle_name}님 리뷰 보고 연락드립니다",
+        "case_sharer":     f"{handle_name}님 사례 영상 보고 연락드립니다",
+        "tool_expert":     f"{handle_name}님 채널 보고 연락드립니다",
+        "community_admin": f"{handle_name} 커뮤니티 보고 연락드립니다",
+        "influencer":      f"{handle_name}님 채널 보고 연락드립니다",
+    }
+    return subject_map.get(channel_type or "", f"{handle_name}님 채널 보고 연락드립니다")
 
 
 # ── 광고대행사 전용 템플릿 (maesil-insight Agency 채널) ──────────────────
@@ -317,7 +328,8 @@ def build_lead_email(lead: dict) -> tuple[str, str]:
     is_agency = _is_agency_lead(lead)
     handle = lead.get("handle_name") or ("대행사" if is_agency else "파트너 채널")
     subject = lead.get("email_subject") or (
-        _build_agency_subject(handle) if is_agency else _build_subject(handle)
+        _build_agency_subject(handle) if is_agency
+        else _build_subject(handle, lead.get("channel_type"))
     )
     if lead.get("email_final"):
         html = _draft_to_html(lead["email_final"])
