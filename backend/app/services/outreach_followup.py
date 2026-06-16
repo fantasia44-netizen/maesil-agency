@@ -207,11 +207,41 @@ def _notify_manual_touch(lead: dict, channel: str, touch_id: str) -> None:
     _mark_touch(touch_id, "sent" if result.get("ok") else "failed", result.get("error"))
 
 
+FOLLOWUP_DAILY_CAP = 20  # 팔로업 이메일 하루 최대 발송 수
+
+
+def _followup_sent_today() -> int:
+    """오늘(KST) 팔로업으로 발송된 이메일 터치포인트 수."""
+    from datetime import date, timedelta, timezone as tz
+    kst = tz(timedelta(hours=9))
+    today_kst = datetime.now(kst).date().isoformat()
+    try:
+        resp = (
+            _db().table("outreach_touchpoints")
+            .select("id", count="exact")
+            .eq("status", "sent")
+            .eq("channel", "email")
+            .gt("touch_sequence", 1)
+            .gte("sent_at", today_kst)
+            .execute()
+        )
+        return resp.count or 0
+    except Exception:
+        return 0
+
+
 def check_pending_followups(limit: int = 20) -> dict:
     """
     scheduled_for가 지난 pending 터치포인트를 처리.
-    스케줄러에서 3분마다 호출.
+    스케줄러에서 3분마다 호출. 하루 FOLLOWUP_DAILY_CAP통 제한.
     """
+    # 일일 한도 체크
+    sent_today = _followup_sent_today()
+    if sent_today >= FOLLOWUP_DAILY_CAP:
+        return {"processed": 0, "errors": [], "capped": True}
+    remaining = FOLLOWUP_DAILY_CAP - sent_today
+    limit = min(limit, remaining)
+
     now = datetime.now(timezone.utc).isoformat()
     try:
         resp = (
