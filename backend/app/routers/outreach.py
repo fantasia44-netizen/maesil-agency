@@ -185,7 +185,7 @@ def trigger_analysis(lead_id: str, user: UserContext = Depends(require_admin)) -
 @router.post("/leads/analyze-batch")
 def trigger_batch_analysis(
     grades: str = "S,A,B,C,D",
-    limit: int = 500,
+    limit: int = 1000,
     force: bool = False,
     user: UserContext = Depends(require_admin),
 ) -> dict:

@@ -238,7 +238,7 @@ export default function OutreachPage() {
   const triggerBatchAnalyze = async (grades = "S,A,B,C,D", force = false) => {
     setBatchAnalyzing(true);
     try {
-      const params = new URLSearchParams({ grades, limit: "500" });
+      const params = new URLSearchParams({ grades, limit: "1000" });
       if (force) params.set("force", "true");
       const res = await apiFetch<{ queued: number; message: string }>(
         `/api/outreach/leads/analyze-batch?${params.toString()}`,

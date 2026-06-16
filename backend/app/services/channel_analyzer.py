@@ -280,7 +280,14 @@ def analyze_lead(lead_id: str) -> dict:
     _preserve_status = {"emailed", "no_reply", "replied", "negotiating", "deal", "rejected", "archived"}
     lead_resp = _db().table("outreach_leads").select("status").eq("id", lead_id).limit(1).execute()
     current_status = ((lead_resp.data or [{}])[0].get("status") or "")
-    next_status = current_status if current_status in _preserve_status else "draft_ready"
+    # 분석 완료 후 자동 approved (D급 제외) — 수동 승인 불필요
+    grade = lead.get("grade", "D")
+    if current_status in _preserve_status:
+        next_status = current_status
+    elif grade in ("S", "A", "B", "C"):
+        next_status = "approved"
+    else:
+        next_status = "draft_ready"  # D급은 수동 검토
 
     update_payload = {
         "channel_type": channel_type,
