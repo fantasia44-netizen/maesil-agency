@@ -98,6 +98,15 @@ const KEY_CARDS: KeyCard[] = [
     hint: "OAuth 인증 후 발급되는 refresh_token — 만료 없이 액세스 토큰 갱신에 사용" },
   { name: "gmail_from_email", kind: "config", label: "Gmail 발신 이메일 주소 (선택)",
     hint: "outreach 이메일 발송에 사용한 Gmail 주소 — 회신 추적의 기준점" },
+  // ── 영업 발송용 Gmail (outreach_gmail_sender) ──
+  { name: "outreach_gmail_client_id", kind: "other", label: "영업발송 Gmail Client ID",
+    hint: "Google Cloud Console → OAuth 2.0 클라이언트 (데스크톱 앱) — 콜드메일 발송 전용" },
+  { name: "outreach_gmail_client_secret", kind: "other", label: "영업발송 Gmail Client Secret",
+    hint: "outreach_gmail_client_id와 쌍을 이루는 시크릿" },
+  { name: "outreach_gmail_refresh_token", kind: "other", label: "영업발송 Gmail Refresh Token",
+    hint: "OAuth 인증 후 발급되는 refresh_token — 영업 콜드메일 발송에 사용" },
+  { name: "outreach_gmail_from", kind: "config", label: "영업발송 Gmail 발신자 주소",
+    hint: "예: 매실 파트너십 <partner@maesil.net> — 콜드메일 발신자로 표시됨" },
   // ── 인프라 ──
   { name: "render_api", kind: "render", label: "Render API Token",
     hint: "Render Account Settings → API Keys (프로그램 상태 수집용)" },
