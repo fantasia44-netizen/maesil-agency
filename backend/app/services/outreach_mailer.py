@@ -375,11 +375,13 @@ def send_single(lead_id: str) -> dict:
         except Exception as e:
             logger.warning("outreach_mailer: emailed 상태 업데이트 실패: %s", e)
 
-        # 1차 이메일 터치포인트 → sent 로 마킹
+        # 1차 이메일 터치포인트 → sent 마킹 + 발송 제목/본문 기록
         try:
             _db().table("outreach_touchpoints").update({
                 "status": "sent",
                 "sent_at": now,
+                "sent_subject": subject,
+                "sent_body": html[:10000],
             }).eq("lead_id", lead_id).eq("touch_sequence", 1).eq("status", "pending").execute()
         except Exception as e:
             logger.warning("outreach_mailer: touchpoint 상태 업데이트 실패: %s", e)
