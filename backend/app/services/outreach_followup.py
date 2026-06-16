@@ -130,12 +130,13 @@ def _send_sequence_email(lead: dict, sequence: int, touch_id: str) -> bool:
     elif sequence == 3:
         latest_title = None
         try:
-            from app.services.outreach_personalize import get_latest_video_title
+            from app.services.outreach_personalize import get_latest_video_title, shorten_title_for_subject
             latest_title = get_latest_video_title(lead.get("platform_id"))
+            raw = lead.get("best_content_title") or ""
+            short = shorten_title_for_subject(raw, handle) if raw else ""
         except Exception:
-            pass
-        raw = lead.get("best_content_title") or ""
-        short = (raw[:10] + "…") if len(raw) > 10 else raw
+            raw = lead.get("best_content_title") or ""
+            short = (raw[:15] + "…") if len(raw) > 15 else raw
         subject = f'"{short}" 보고 또 연락드립니다' if short else f"{handle}님께 마지막으로 연락드립니다"
         html = _seq3_html(handle, latest_title)
     else:
@@ -158,6 +159,14 @@ def _send_sequence_email(lead: dict, sequence: int, touch_id: str) -> bool:
 
     result = send_email(to=to, subject=subject, html=html, source="maesil-agency")
     ok = result.get("ok", False)
+    # 발송 제목/본문 DB 기록
+    try:
+        _db().table("outreach_touchpoints").update({
+            "sent_subject": subject,
+            "sent_body": html[:10000],  # 최대 10KB
+        }).eq("id", touch_id).execute()
+    except Exception as e:
+        logger.warning("touchpoint 발송내용 저장 실패 [%s]: %s", touch_id, e)
     _mark_touch(touch_id, "sent" if ok else "failed", result.get("error"))
     return ok
 

@@ -82,3 +82,50 @@ def build_personal_intro(lead: dict) -> str | None:
     if not top_title and not latest_title:
         return None
     return generate_video_praise(lead.get("handle_name") or "", top_title, latest_title)
+
+
+def shorten_title_for_subject(title: str | None, handle: str = "") -> str:
+    """영상 제목을 이메일 제목용으로 축약 (Haiku). 실패 시 채널명 폴백.
+
+    목표: 앞 태그([…], (…), 숫자편 등) 제거 후 핵심 키워드 15자 이내.
+    폴백 우선순위:
+      1. Haiku 정상 응답
+      2. 제목 앞 태그 제거 후 앞 15자 단순 자르기
+      3. 채널명만 사용
+    """
+    if not title:
+        return handle or ""
+
+    # 폴백: 태그 제거 후 단순 자르기
+    import re
+    cleaned = re.sub(r"^[\[\(【「『][^\]\)】」』]*[\]\)】」』]\s*", "", title).strip()
+    cleaned = re.sub(r"^\d+[편화회부]\s*[\|ㅣ:·\-]\s*", "", cleaned).strip()
+    simple_fallback = (cleaned[:15] + "…") if len(cleaned) > 15 else cleaned
+    if not simple_fallback:
+        simple_fallback = (title[:15] + "…") if len(title) > 15 else title
+
+    try:
+        from app.services.secrets import get_secret
+        key = get_secret("anthropic_api_key")
+        if not key:
+            return simple_fallback
+        import anthropic
+        client = anthropic.Anthropic(api_key=key)
+        prompt = (
+            f"유튜브 영상 제목을 이메일 제목에 쓸 수 있도록 핵심만 15자 이내로 줄여주세요.\n"
+            f"규칙: [태그], (태그), 회차번호, 특수기호 제거. 핵심 키워드만. 줄인 텍스트만 출력(따옴표 없이).\n"
+            f"원본: {title}"
+        )
+        resp = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=30,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        result = (resp.content[0].text or "").strip().strip('"').strip("'")
+        # 결과 검증: 비어있거나 너무 길면 폴백
+        if not result or len(result) > 20:
+            return simple_fallback
+        return result
+    except Exception as e:
+        logger.warning("shorten_title_for_subject 실패 [%s]: %s", title, e)
+        return simple_fallback
