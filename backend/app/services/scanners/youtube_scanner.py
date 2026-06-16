@@ -173,32 +173,42 @@ class YouTubeScanner(BaseScanner):
 
     def fetch_recent_videos(self, channel_id: str, max_results: int = 5) -> list[dict]:
         """채널의 최신 영상 목록 반환 (최신순).
-
+        search.list(쿼터 100) 대신 playlistItems.list(쿼터 1) 사용.
         Returns list of {video_id, title, published_at, description, url}
         """
         try:
-            resp = self._yt.search().list(
-                channelId=channel_id,
+            # 1) 채널의 업로드 플레이리스트 ID 조회 (1유닛)
+            ch_resp = self._yt.channels().list(
+                id=channel_id,
+                part="contentDetails",
+                fields="items(contentDetails/relatedPlaylists/uploads)",
+            ).execute()
+            items = ch_resp.get("items", [])
+            if not items:
+                return []
+            uploads_id = items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
+
+            # 2) 플레이리스트 최신 영상 조회 (1유닛)
+            pl_resp = self._yt.playlistItems().list(
+                playlistId=uploads_id,
                 part="snippet",
-                order="date",
-                type="video",
                 maxResults=max_results,
-                fields="items(id/videoId,snippet(title,publishedAt,description))",
+                fields="items(snippet(resourceId/videoId,title,publishedAt,description))",
             ).execute()
         except Exception as e:
             logger.warning("fetch_recent_videos 실패 [%s]: %s", channel_id, e)
             return []
 
         results = []
-        for item in resp.get("items", []):
-            vid = item.get("id", {}).get("videoId", "")
-            sn  = item.get("snippet", {})
+        for item in pl_resp.get("items", []):
+            sn = item.get("snippet", {})
+            vid = sn.get("resourceId", {}).get("videoId", "")
             results.append({
-                "video_id":   vid,
-                "title":      sn.get("title", ""),
-                "published_at": sn.get("publishedAt", "")[:10],  # YYYY-MM-DD
+                "video_id":    vid,
+                "title":       sn.get("title", ""),
+                "published_at": sn.get("publishedAt", "")[:10],
                 "description": (sn.get("description") or "")[:300],
-                "url":        f"https://youtu.be/{vid}" if vid else "",
+                "url":         f"https://youtu.be/{vid}" if vid else "",
             })
         return results
 
