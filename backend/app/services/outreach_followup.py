@@ -14,86 +14,63 @@ logger = logging.getLogger(__name__)
 
 # 이메일 시퀀스별 제목/본문 빌더
 _EMAIL_SEQUENCES = {
-    1: None,   # 1차는 outreach_mailer.send_single이 생성
-    2: {
-        "subject_suffix": "혹시 메일 받으셨나요? — 구독자 10명이면 1년 257만원",
-        "body_html": """<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:600px;margin:0 auto;padding:24px 28px;background:#fff">
-<p style="font-size:15px;color:#333;line-height:1.8">
-안녕하세요, <strong>{handle}</strong> 운영자님 👋<br><br>
-지난번 파트너십 제안 메일을 보내드렸는데 바쁘신 관계로 못 보셨을 것 같아 다시 한번 연락드립니다.
-</p>
-
-<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:18px 22px;margin:20px 0">
-  <div style="color:#e65100;font-size:12px;font-weight:700;margin-bottom:6px">📈 실제 사례</div>
-  <div style="font-size:18px;font-weight:800;color:#1A6F3C">광고비 −75% · ROAS 482→1,080%</div>
-  <div style="font-size:13px;color:#555;margin-top:4px">쿠팡 광고 최적화 3개월, 대행사 없이 직접</div>
-</div>
-
-<div style="background:#f8f8ff;border:1px solid #c5cae9;border-radius:10px;padding:16px 20px;margin:16px 0">
-  <div style="font-size:12px;color:#3949ab;font-weight:700;margin-bottom:10px">📊 구독자 10명 모집 시 1년 수익 (그로스 199,000원 기준)</div>
-  <div style="font-size:14px;color:#444;line-height:2">
-    • 1개월차 첫 결제 커미션 (20% × 10명): <strong>+398,000원</strong><br>
-    • 2~12개월 재구독 커미션 (10% × 10명 × 11개월): <strong>+2,189,000원</strong>
-  </div>
-  <div style="border-top:1px solid #c5cae9;margin-top:10px;padding-top:10px;font-size:15px;font-weight:700;color:#1A6F3C;display:flex;justify-content:space-between">
-    <span>🎯 1년 누적 수익</span><span>약 2,587,000원</span>
-  </div>
-</div>
-
-<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 18px;margin:16px 0;font-size:14px;color:#333;line-height:1.8">
-  🎁 <strong>파트너 전용: Pro 플랜 1년 무료 제공</strong> (3,588,000원 상당)<br>
-  <span style="font-size:13px;color:#555">쿠팡 광고 직접 분석 · 네이버 키워드 랭킹 전략 실습 가능</span>
-</div>
-
-<p style="font-size:15px;color:#333;line-height:1.8">
-자세한 내용은 상담을 통해 안내드립니다. 부담 없이 연락 주세요.
-</p>
-
-<div style="text-align:center;margin:24px 0">
-  <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener"
-     style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 30px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:700">
-    카카오 오픈톡으로 상담하기 💬
-  </a>
-</div>
-
-<p style="font-size:12px;color:#999;text-align:center">
-매실인사이트 | 수신을 원치 않으시면 "수신거부"로 회신해 주세요.
-</p>
-</div>""",
-    },
-    3: {
-        "subject_suffix": "마지막 연락 — Pro 1년 무료 제안 유효합니다",
-        "body_html": """<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:600px;margin:0 auto;padding:24px 28px;background:#fff">
-<p style="font-size:15px;color:#333;line-height:1.8">
-안녕하세요, <strong>{handle}</strong> 운영자님 👋<br><br>
-마지막으로 한 번만 더 연락드립니다.
-</p>
-
-<p style="font-size:15px;color:#333;line-height:1.8">
-파트너십이 지금 당장 맞지 않으신다면 완전히 이해합니다.<br><br>
-다만 저희 제안 중 하나만 말씀드리면 —<br>
-<strong>영상 하나</strong>를 올려두면 할인코드로 신규 구독자가 계속 유입되고,
-구독자 10명만 되어도 <strong>1년에 약 257만원</strong>이 자동 정산됩니다.<br><br>
-그리고 파트너에게는 <strong>Pro 플랜 1년 무료 계정</strong>을 먼저 드립니다.<br>
-직접 써보시고 구독자분들께 소개하실 수 있도록요.
-</p>
-
-<div style="text-align:center;margin:24px 0">
-  <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener"
-     style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 30px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:700">
-    카카오 오픈톡으로 상담하기 💬
-  </a>
-</div>
-
-<p style="font-size:13px;color:#777;text-align:center">
-더 이상 연락드리지 않겠습니다. 채널 항상 잘 보고 있습니다! 🌿
-</p>
-<p style="font-size:12px;color:#999;text-align:center">
-매실인사이트 | 수신을 원치 않으시면 "수신거부"로 회신해 주세요.
-</p>
-</div>""",
-    },
+    1: None,   # 1차는 outreach_mailer.send_single이 생성 (최고조회 영상 칭찬)
+    2: None,   # 2차는 _send_sequence_email에서 동적 생성 (채널명 개인화)
+    3: None,   # 3차는 _send_sequence_email에서 동적 생성 (최신 영상 제목 개인화)
 }
+
+
+def _seq2_html(handle: str, best_title: str | None) -> str:
+    """2차: 채널명 기반, 최고조회 영상 재언급."""
+    import html as _html
+    h = _html.escape(handle)
+    praise = f'특히 <strong>"{_html.escape(best_title)}"</strong> 영상이 정말 인상 깊었습니다.' if best_title else f"<strong>{h}</strong> 채널 콘텐츠가 정말 좋더라고요."
+    return f"""<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:600px;margin:0 auto;padding:24px 28px;background:#fff">
+<p style="font-size:15px;color:#333;line-height:1.8">
+안녕하세요, <strong>{h}</strong>님 👋<br><br>
+지난번 메일을 보내드렸는데 혹시 못 보셨을까 해서 다시 한번 연락드립니다.<br><br>
+{praise}<br><br>
+짧게 한 가지만 말씀드리면 — 채널에 영상 하나만 올려두셔도 구독자 10명 모집 시 <strong>연간 약 257만원</strong> 자동 정산이 가능합니다.<br>
+파트너 분들께는 <strong>Pro 플랜 1년 무료</strong>로 먼저 드리고 있어요.
+</p>
+<div style="text-align:center;margin:24px 0">
+  <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener"
+     style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 30px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:700">
+    카카오 오픈톡으로 상담하기 💬
+  </a>
+</div>
+<p style="font-size:12px;color:#999;text-align:center">
+매실인사이트 | 수신을 원치 않으시면 "수신거부"로 회신해 주세요.
+</p>
+</div>"""
+
+
+def _seq3_html(handle: str, latest_title: str | None) -> str:
+    """3차: 최신 영상 칭찬, 마지막 연락."""
+    import html as _html
+    h = _html.escape(handle)
+    praise = f'최근에 올리신 <strong>"{_html.escape(latest_title)}"</strong> 영상도 잘 봤습니다.' if latest_title else f"채널 항상 잘 보고 있습니다."
+    return f"""<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:600px;margin:0 auto;padding:24px 28px;background:#fff">
+<p style="font-size:15px;color:#333;line-height:1.8">
+안녕하세요, <strong>{h}</strong>님 👋<br><br>
+마지막으로 한 번만 더 연락드립니다.<br><br>
+{praise}<br><br>
+파트너십이 지금 당장 맞지 않으신다면 완전히 이해합니다.<br>
+혹시 나중에라도 관심이 생기시면 편하게 연락 주세요.
+</p>
+<div style="text-align:center;margin:24px 0">
+  <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener"
+     style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 30px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:700">
+    카카오 오픈톡으로 상담하기 💬
+  </a>
+</div>
+<p style="font-size:13px;color:#777;text-align:center">
+더 이상 연락드리지 않겠습니다. 채널 항상 응원합니다 🌿
+</p>
+<p style="font-size:12px;color:#999;text-align:center">
+매실인사이트 | 수신을 원치 않으시면 "수신거부"로 회신해 주세요.
+</p>
+</div>"""
 
 
 def _db():
@@ -140,18 +117,30 @@ def _send_sequence_email(lead: dict, sequence: int, touch_id: str) -> bool:
         _mark_touch(touch_id, "sent" if ok else "failed", result.get("error"))
         return ok
 
-    seq_cfg = _EMAIL_SEQUENCES.get(sequence)
-    if not seq_cfg:
-        _mark_touch(touch_id, "skipped")
-        return False
-
     from app.services.notify_client import send_email
     from app.services.outreach_suppression import (
         is_suppressed, with_ad_subject, inject_compliance_footer,
     )
     handle = lead.get("handle_name") or "채널"
-    subject = f"{handle}님 — {seq_cfg['subject_suffix']}"
-    html = seq_cfg["body_html"].replace("{handle}", handle)
+
+    if sequence == 2:
+        best_title = lead.get("best_content_title")
+        subject = f"{handle}님 채널 보고 연락드립니다"
+        html = _seq2_html(handle, best_title)
+    elif sequence == 3:
+        latest_title = None
+        try:
+            from app.services.outreach_personalize import get_latest_video_title
+            latest_title = get_latest_video_title(lead.get("platform_id"))
+        except Exception:
+            pass
+        raw = lead.get("best_content_title") or ""
+        short = (raw[:10] + "…") if len(raw) > 10 else raw
+        subject = f'"{short}" 보고 또 연락드립니다' if short else f"{handle}님께 마지막으로 연락드립니다"
+        html = _seq3_html(handle, latest_title)
+    else:
+        _mark_touch(touch_id, "skipped")
+        return False
 
     to = lead.get("contact_email")
     if not to:
