@@ -23,11 +23,11 @@ logger = logging.getLogger(__name__)
 # ── 터치포인트 예약 일정 ──────────────────────────────────────────────
 TOUCH_SCHEDULE = [
     {"sequence": 1, "channel": "email",                "delay_days": 0},
-    {"sequence": 2, "channel": "email",                "delay_days": 3},
-    {"sequence": 3, "channel": "email",                "delay_days": 10},
-    {"sequence": 4, "channel": "instagram_dm",         "delay_days": 14},
-    {"sequence": 5, "channel": "naver_cafe_message",   "delay_days": 17},
-    {"sequence": 6, "channel": "youtube_comment",      "delay_days": 21},
+    {"sequence": 2, "channel": "email",                "delay_days": 7},
+    {"sequence": 3, "channel": "email",                "delay_days": 14},
+    {"sequence": 4, "channel": "instagram_dm",         "delay_days": 21},
+    {"sequence": 5, "channel": "naver_cafe_message",   "delay_days": 28},
+    {"sequence": 6, "channel": "youtube_comment",      "delay_days": 35},
 ]
 
 

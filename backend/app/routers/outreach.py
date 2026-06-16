@@ -536,6 +536,33 @@ def scan_stats(user: UserContext = Depends(require_admin)) -> dict:
 
 # ── 터치포인트 관리 ──────────────────────────────────────────────────
 
+@router.get("/touchpoints")
+def get_all_touchpoints(
+    status: str = "",
+    channel: str = "",
+    limit: int = 200,
+    user: UserContext = Depends(require_admin),
+) -> list[dict]:
+    """전체 발송 이력 — 리드 정보 조인 포함."""
+    q = (
+        _db().table("outreach_touchpoints")
+        .select("*, outreach_leads(handle_name, contact_email, platform, grade, status)")
+        .order("sent_at", desc=True)
+        .limit(limit)
+    )
+    if status:
+        q = q.eq("status", status)
+    if channel:
+        q = q.eq("channel", channel)
+    rows = q.execute().data or []
+    # 조인 필드 평탄화
+    result = []
+    for r in rows:
+        lead = r.pop("outreach_leads", None) or {}
+        result.append({**r, **{f"lead_{k}": v for k, v in lead.items()}})
+    return result
+
+
 @router.get("/leads/{lead_id}/touchpoints")
 def get_touchpoints(lead_id: str, user: UserContext = Depends(require_admin)) -> list[dict]:
     resp = (

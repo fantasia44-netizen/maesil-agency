@@ -146,6 +146,39 @@ function contentLink(lead: Lead): string | null {
   return lead.best_content_id; // 블로그 URL 자체
 }
 
+// ── 발송이력 타입 ──────────────────────────────────────────────────────
+type TouchLog = {
+  id: string;
+  touch_sequence: number;
+  channel: string;
+  status: string;
+  scheduled_for: string | null;
+  sent_at: string | null;
+  replied_at: string | null;
+  lead_handle_name: string | null;
+  lead_contact_email: string | null;
+  lead_platform: string | null;
+  lead_grade: string | null;
+  lead_status: string | null;
+};
+
+const TOUCH_STATUS_LABEL: Record<string, { label: string; color: string; bg: string }> = {
+  pending:  { label: "예약됨",   color: "#92400e", bg: "#fffbeb" },
+  sent:     { label: "발송완료", color: "#166534", bg: "#f0fdf4" },
+  failed:   { label: "실패",     color: "#b91c1c", bg: "#fef2f2" },
+  replied:  { label: "회신옴",   color: "#7c3aed", bg: "#faf5ff" },
+  bounced:  { label: "반송",     color: "#64748b", bg: "#f8fafc" },
+  skipped:  { label: "건너뜀",   color: "#94a3b8", bg: "#f1f5f9" },
+};
+
+const TOUCH_CHANNEL_ICON: Record<string, string> = {
+  email:               "📧",
+  instagram_dm:        "📸",
+  naver_cafe_message:  "💬",
+  youtube_comment:     "▶",
+  kakao_message:       "💛",
+};
+
 // ── 컴포넌트 ──────────────────────────────────────────────────────────
 export default function OutreachPage() {
   const router = useRouter();
@@ -161,10 +194,26 @@ export default function OutreachPage() {
   const [actionId, setActionId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [mainTab, setMainTab] = useState<"leads" | "history">("leads");
+  const [touchLogs, setTouchLogs] = useState<TouchLog[]>([]);
+  const [touchLoading, setTouchLoading] = useState(false);
+  const [touchStatusFilter, setTouchStatusFilter] = useState<string>("all");
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok });
     setTimeout(() => setToast(null), 3200);
+  };
+
+  const loadTouchLogs = async () => {
+    setTouchLoading(true);
+    try {
+      const data = await apiFetch<TouchLog[]>("/api/outreach/touchpoints?limit=300", {}, 15000);
+      setTouchLogs(data);
+    } catch {
+      showToast("발송 이력 로드 실패", false);
+    } finally {
+      setTouchLoading(false);
+    }
   };
 
   const loadAll = async () => {
@@ -394,6 +443,129 @@ export default function OutreachPage() {
         </div>
       )}
 
+      {/* 메인 탭: 리드목록 / 발송이력 */}
+      <div style={{ display: "flex", gap: 0, marginBottom: "1.25rem", borderBottom: "2px solid #e2e8f0" }}>
+        {([
+          { key: "leads",   label: "리드 목록",  icon: "📋" },
+          { key: "history", label: "발송 이력",  icon: "📨" },
+        ] as const).map(({ key, label, icon }) => {
+          const active = mainTab === key;
+          return (
+            <button key={key} onClick={() => {
+              setMainTab(key);
+              if (key === "history" && touchLogs.length === 0) loadTouchLogs();
+            }}
+              style={{
+                padding: "8px 20px", border: "none", background: "none", cursor: "pointer",
+                fontSize: "0.88rem", fontWeight: active ? 700 : 400,
+                color: active ? "#0f172a" : "#94a3b8",
+                borderBottom: active ? "2px solid #0f172a" : "2px solid transparent",
+                marginBottom: -2,
+              }}>
+              {icon} {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── 발송 이력 탭 ── */}
+      {mainTab === "history" && (
+        <div>
+          {/* 상태 필터 */}
+          <div style={{ display: "flex", gap: "0.35rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+            {["all", "sent", "pending", "failed", "replied", "bounced", "skipped"].map((s) => {
+              const active = touchStatusFilter === s;
+              const cnt = s === "all" ? touchLogs.length : touchLogs.filter(t => t.status === s).length;
+              if (s !== "all" && cnt === 0) return null;
+              const ts = TOUCH_STATUS_LABEL[s];
+              return (
+                <button key={s} onClick={() => setTouchStatusFilter(s)}
+                  style={{
+                    padding: "4px 12px", borderRadius: 18, border: "1px solid",
+                    borderColor: active ? "#0f172a" : "#e2e8f0",
+                    background: active ? "#0f172a" : "#fff",
+                    color: active ? "#fff" : "#64748b",
+                    fontSize: "0.76rem", cursor: "pointer", fontWeight: active ? 600 : 400,
+                  }}>
+                  {s === "all" ? `전체 ${cnt}` : `${ts?.label ?? s} ${cnt}`}
+                </button>
+              );
+            })}
+            <button onClick={loadTouchLogs} disabled={touchLoading}
+              style={{ marginLeft: "auto", fontSize: "0.76rem", padding: "4px 12px", borderRadius: 18,
+                border: "1px solid #e2e8f0", background: "#fff", color: "#64748b", cursor: "pointer" }}>
+              {touchLoading ? "새로고침…" : "🔄 새로고침"}
+            </button>
+          </div>
+
+          {touchLoading ? (
+            <div className="muted" style={{ textAlign: "center", padding: "3rem" }}>로딩 중…</div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
+              {touchLogs
+                .filter(t => touchStatusFilter === "all" || t.status === touchStatusFilter)
+                .map((t) => {
+                  const ts = TOUCH_STATUS_LABEL[t.status] ?? { label: t.status, color: "#64748b", bg: "#f1f5f9" };
+                  const gc = GRADE_COLOR[t.lead_grade ?? ""] ?? { bg: "#e2e8f0", color: "#64748b" };
+                  const isAuto = t.touch_sequence > 1;
+                  const timeStr = t.sent_at
+                    ? new Date(t.sent_at).toLocaleString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+                    : t.scheduled_for
+                    ? `예약: ${new Date(t.scheduled_for).toLocaleString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}`
+                    : "-";
+                  return (
+                    <div key={t.id} className="card" style={{ padding: "0.7rem 1rem", display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+                      {/* 차수 + 채널 */}
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 40 }}>
+                        <div style={{ fontSize: "1.1rem" }}>{TOUCH_CHANNEL_ICON[t.channel] ?? "📌"}</div>
+                        <div style={{ fontSize: "0.68rem", color: "#94a3b8" }}>{t.touch_sequence}차</div>
+                      </div>
+
+                      {/* 리드 정보 */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}>
+                          <span style={{ fontWeight: 600, fontSize: "0.88rem" }}>{t.lead_handle_name ?? "-"}</span>
+                          {t.lead_grade && (
+                            <span style={{ fontSize: "0.68rem", fontWeight: 700, padding: "1px 6px", borderRadius: 8, background: gc.bg, color: gc.color }}>
+                              {t.lead_grade}급
+                            </span>
+                          )}
+                          <span style={{ fontSize: "0.72rem", padding: "2px 8px", borderRadius: 10, background: ts.bg, color: ts.color, fontWeight: 600 }}>
+                            {ts.label}
+                          </span>
+                          <span style={{ fontSize: "0.68rem", padding: "1px 7px", borderRadius: 8,
+                            background: isAuto ? "#eff6ff" : "#f0fdf4",
+                            color: isAuto ? "#1d4ed8" : "#15803d",
+                            border: `1px solid ${isAuto ? "#bfdbfe" : "#bbf7d0"}` }}>
+                            {isAuto ? "자동" : "수동"}
+                          </span>
+                        </div>
+                        <div className="muted" style={{ fontSize: "0.75rem", marginTop: 2 }}>
+                          {t.lead_contact_email ?? "-"} · {PLATFORM_LABEL[t.lead_platform ?? ""] ?? t.lead_platform}
+                          {t.replied_at && <span style={{ color: "#7c3aed", marginLeft: 6 }}>회신: {new Date(t.replied_at).toLocaleDateString("ko-KR")}</span>}
+                        </div>
+                      </div>
+
+                      {/* 시간 */}
+                      <div style={{ fontSize: "0.75rem", color: "#94a3b8", textAlign: "right", whiteSpace: "nowrap" }}>
+                        {timeStr}
+                      </div>
+                    </div>
+                  );
+                })}
+              {touchLogs.filter(t => touchStatusFilter === "all" || t.status === touchStatusFilter).length === 0 && (
+                <div className="card" style={{ textAlign: "center", color: "#94a3b8", padding: "2rem" }}>
+                  발송 이력이 없습니다.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── 리드 목록 탭 ── */}
+      {mainTab === "leads" && <>
+
       {/* 채널 탭 (플랫폼 구분) */}
       <div style={{ display: "flex", gap: 0, marginBottom: "1rem", borderBottom: "2px solid #e2e8f0" }}>
         {[
@@ -453,7 +625,7 @@ export default function OutreachPage() {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-          {filtered.map((lead) => {
+          {filtered.map((lead: Lead) => {
             const sc = STATUS_COLOR[lead.status] ?? STATUS_COLOR.discovered;
             const gc = GRADE_COLOR[lead.grade] ?? { bg: "#e2e8f0", color: "#64748b" };
             const isExpanded = expandedId === lead.id;
@@ -633,6 +805,7 @@ export default function OutreachPage() {
           })}
         </div>
       )}
+      </> }
     </div>
   );
 }
