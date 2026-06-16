@@ -255,26 +255,8 @@ def preview_email(lead_id: str, user: UserContext = Depends(require_admin)) -> d
         raise HTTPException(404, "리드를 찾을 수 없습니다.")
     lead = rows[0]
 
-    is_agency = _is_agency_lead(lead)
-    handle = lead.get("handle_name") or ("대행사" if is_agency else "파트너 채널")
-    subject = lead.get("email_subject") or (
-        _build_agency_subject(handle) if is_agency else _build_subject(handle)
-    )
-
-    if lead.get("email_final"):
-        html = _draft_to_html(lead["email_final"])
-    elif is_agency:
-        html = _build_agency_email_html(handle, lead.get("email_draft") or "")
-    else:
-        intro = lead.get("email_draft")
-        if not intro:
-            try:
-                from app.services.outreach_personalize import build_personal_intro
-                intro = build_personal_intro(lead)
-            except Exception:
-                intro = None
-        html = _build_email_html(handle, lead.get("platform_url") or "", intro or "")
-
+    from app.services.outreach_mailer import build_lead_email
+    subject, html = build_lead_email(lead)
     return {"ok": True, "subject": subject, "html": html}
 
 
