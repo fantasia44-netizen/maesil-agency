@@ -199,8 +199,8 @@ def trigger_batch_analysis(
     grade_list = [g.strip() for g in grades.split(",") if g.strip()]
 
     if force:
-        # draft_ready + discovered + emailed (이미 발송됐어도 제목/본문 재생성)
-        status_filter = ["discovered", "draft_ready", "emailed", "no_reply"]
+        # 전체 재분석 — approved 포함, 발송 완료/협의중/딜/거절/보관 제외
+        status_filter = ["discovered", "draft_ready", "approved", "emailed", "no_reply"]
     else:
         status_filter = ["discovered"]
 
