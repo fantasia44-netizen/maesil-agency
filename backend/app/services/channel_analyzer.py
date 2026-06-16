@@ -276,13 +276,19 @@ def analyze_lead(lead_id: str) -> dict:
 
     # DB 업데이트 — email_draft에 intro 저장, email_final은 건드리지 않음
     now = datetime.now(timezone.utc).isoformat()
+    # emailed/no_reply/replied/negotiating/deal 상태는 재분석해도 상태 유지
+    _preserve_status = {"emailed", "no_reply", "replied", "negotiating", "deal", "rejected", "archived"}
+    lead_resp = _db().table("outreach_leads").select("status").eq("id", lead_id).limit(1).execute()
+    current_status = ((lead_resp.data or [{}])[0].get("status") or "")
+    next_status = current_status if current_status in _preserve_status else "draft_ready"
+
     update_payload = {
         "channel_type": channel_type,
         "approach_strategy": approach_strategy[:300] if approach_strategy else None,
         "partnership_fit_reason": partnership_fit[:500] if partnership_fit else None,
         "email_subject": email_subject[:120] if email_subject else None,
         "email_draft": email_intro,  # 맞춤 인사 문단만 저장
-        "status": "draft_ready",
+        "status": next_status,
         "updated_at": now,
     }
 
