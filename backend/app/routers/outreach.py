@@ -218,9 +218,14 @@ def trigger_batch_analysis(
         status_desc = "discovered + draft_ready" if force else "discovered"
         return {"ok": True, "queued": 0, "message": f"분석할 리드 없음 ({status_desc} 상태)"}
 
+    # emailed/no_reply 등 보존 상태는 analyzing으로 바꾸지 않음
+    _preserve = {"emailed", "no_reply", "replied", "negotiating", "deal", "rejected", "archived"}
+    ids_to_analyze = [r["id"] for r in rows if r.get("status") not in _preserve]
+    ids_preserve = [r["id"] for r in rows if r.get("status") in _preserve]
     ids = [r["id"] for r in rows]
     now_iso = datetime.now(timezone.utc).isoformat()
-    _db().table("outreach_leads").update({"status": "analyzing", "updated_at": now_iso}).in_("id", ids).execute()
+    if ids_to_analyze:
+        _db().table("outreach_leads").update({"status": "analyzing", "updated_at": now_iso}).in_("id", ids_to_analyze).execute()
 
     def _run_batch():
         try:
