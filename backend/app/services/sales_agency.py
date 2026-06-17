@@ -121,40 +121,44 @@ def _sonnet_briefing(raw: dict) -> dict:
     def _s(rows, max_rows=20) -> str:
         return json.dumps(rows[:max_rows], ensure_ascii=False, default=str)
 
-    prompt = f"""당신은 매실인사이트의 영업 에이전시입니다.
-아래 실제 매출·광고·손익 데이터를 보고 **정밀 브리핑**을 작성하세요.
+    prompt = f"""당신은 매실인사이트의 영업 에이전시(자비스)입니다.
+아래 실제 데이터를 분석해 **정밀 브리핑**을 작성하세요.
 오늘 날짜: {today_str}
 
 ## 데이터
 
-### 오늘 채널별 매출
+### 오늘 채널별 주문/매출 (api_orders)
 {_s(raw.get("today", []))}
 
 ### 최근 30일 일별×채널 매출
 {_s(raw.get("revenue_30d", []), 60)}
 
-### 월별 요약 (최근 3개월)
+### 월별 채널별 매출 요약 (최근 3개월)
 {_s(raw.get("monthly", []))}
 
 ### 상위 판매 상품 TOP10 (30일)
 {_s(raw.get("top_products", []))}
 
-### 채널별 광고비/ROAS (30일)
-{_s(raw.get("ad_spend", []))}
+### 채널별 수수료·비용 구조 (channel_costs)
+{_s(raw.get("channel_costs", []))}
 
-### 일별 손익 스냅샷 (최근 14일)
-{_s(raw.get("profit", []), 30)}
+### 채널별 정산 현황 (api_settlements, 최근 30일)
+{_s(raw.get("settlements", []), 30)}
+
+### 지출 내역 (expenses, 최근 14일)
+{_s(raw.get("expenses", []))}
 
 ## 브리핑 요구사항
-1. **headline**: 오늘 영업 상황 1줄 요약 (숫자 포함, 40자 이내)
-2. **sections**: 4개 섹션
-   - 오늘 매출 현황 (채널별 실적, 전일/전월 대비 이상 포착)
-   - 30일 트렌드 분석 (성장/하락 채널, MoM 변화)
-   - 광고 효율 (채널별 ROAS, 비효율 채널 지목)
-   - 손익 요약 (순이익, 마진율, 광고비 비중)
-3. **alerts**: 즉시 조치 필요 항목 (level: warning/critical, message: 구체적 수치 포함)
+1. **headline**: 오늘 영업 상황 1줄 요약 (구체적 수치 포함, 40자 이내)
+2. **sections**: 4개 섹션 (각 body는 3~5줄, 수치 중심)
+   - 오늘 매출 현황: 채널별 주문수·매출액, 이상 포착
+   - 30일 트렌드: 성장/하락 채널, 주력 상품 변화
+   - 정산·수익성: 채널별 net_settlement vs gross_sales, 수수료 부담율
+   - 지출·비용: 최근 지출 카테고리별 요약, 이상 항목
+3. **alerts**: 즉시 조치 필요 항목 (없으면 빈 배열)
+   - 매출 급락, 정산 이상, 지출 급증 등 level: warning/critical
 
-데이터가 없는 항목은 "데이터 없음"으로 표기하고 계속 진행하세요.
+데이터 없는 항목은 "데이터 없음"으로 표기하고 계속 진행하세요.
 
 JSON으로만 답하세요:
 {{
