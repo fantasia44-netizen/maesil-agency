@@ -435,7 +435,7 @@ export default function OutreachPage() {
             { label: "회신 수신", value: kpi.replied, color: "#d97706", sub: "이메일+카톡" },
             { label: "협의 중", value: kpi.negotiating, color: "#7c3aed", sub: null },
             { label: "제휴 완료", value: kpi.deal, color: "#065f46", sub: null },
-            { label: "팔로업 발송", value: kpi.touches_sent - kpi.emailed, color: "#0369a1", sub: `(초기 ${kpi.emailed} + 팔로업 ${kpi.touches_sent - kpi.emailed})` },
+            { label: "팔로업 발송", value: Math.max(0, kpi.touches_sent - kpi.emailed), color: "#0369a1", sub: `(초기 ${kpi.emailed} + 팔로업 ${Math.max(0, kpi.touches_sent - kpi.emailed)})` },
           ].map((k) => (
             <div key={k.label} className="card" style={{ textAlign: "center", padding: "0.75rem" }}>
               <div style={{ fontSize: "1.5rem", fontWeight: 700, color: k.color }}>{k.value}</div>
