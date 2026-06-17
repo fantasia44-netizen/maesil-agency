@@ -43,6 +43,14 @@ def _run_warehouse_bg():
         logger.error("[briefing] 창고 에이전시 실패: %s", e)
 
 
+def _run_cs_bg():
+    from app.services.cs_agency import run_briefing
+    try:
+        run_briefing()
+    except Exception as e:
+        logger.error("[briefing] CS 에이전시 실패: %s", e)
+
+
 @router.post("/run")
 def run_briefing(
     agency: str = "all",   # "sales" | "outreach" | "warehouse" | "all"
@@ -59,6 +67,9 @@ def run_briefing(
     if agency in ("warehouse", "all"):
         threading.Thread(target=_run_warehouse_bg, daemon=True).start()
         launched.append("warehouse")
+    if agency in ("cs", "all"):
+        threading.Thread(target=_run_cs_bg, daemon=True).start()
+        launched.append("cs")
     if not launched:
         raise HTTPException(400, "agency는 sales|outreach|warehouse|all 중 하나")
     return {"ok": True, "launched": launched, "message": "브리핑 실행 중 — 30~60초 후 새로고침하세요"}
@@ -70,7 +81,7 @@ def run_briefing(
 def get_latest_briefings(user: UserContext = Depends(require_admin)) -> dict:
     """영업 + 창고 최신 브리핑 각 1건 반환."""
     result: dict = {}
-    for agency_type in ("sales", "outreach", "warehouse"):
+    for agency_type in ("sales", "outreach", "warehouse", "cs"):
         try:
             resp = (
                 _db().table("agency_briefings")
