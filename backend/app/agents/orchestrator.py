@@ -178,18 +178,18 @@ BRIEFING_MESSAGES = {
     ),
     "finance": (
         "오늘 아침 재무 현황 보고를 작성해주세요. "
-        "정산·지출·매출 현황을 조회해서 간결하게 정리해주세요. "
-        "template: finance.settlement_summary, finance.expenses_by_category, finance.daily_revenue"
+        "정산·광고비·일별 손익 현황을 조회해서 간결하게 정리해주세요. "
+        "template: finance.settlement_summary, finance.ad_spend_by_channel, finance.daily_profit"
     ),
     "warehouse": (
         "오늘 아침 재고 현황 보고를 작성해주세요. "
         "안전재고 이하 상품이 있는지 확인하고 발주 필요 여부를 알려주세요. "
-        "template: warehouse.low_stock_items"
+        "template: warehouse.low_stock_items, warehouse.inventory_status"
     ),
     "cs": (
         "오늘 아침 CS 현황 보고를 작성해주세요. "
         "최근 고객 문의량과 매요AI 레이어별 통계를 조회해서 간결하게 정리해주세요. "
-        "template: cs.volume_by_day, cs.maeyo_question_log"
+        "template: cs.volume_by_day, cs.maeyo_layer_stats"
     ),
 }
 

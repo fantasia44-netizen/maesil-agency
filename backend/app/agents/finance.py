@@ -15,10 +15,10 @@ class FinanceAgent(BaseAgent):
 - 월별 손익 리포트 작성
 
 ## 사용 가능한 쿼리 템플릿
-- `finance.ad_spend_by_channel` — 채널별 수수료·비용 구조
-- `finance.expenses_by_category` — 기간별 카테고리별 지출
-- `finance.daily_revenue` — 일별 매출 (daily_revenue 테이블)
-- `finance.settlement_summary` — 채널별 정산 요약
+- `finance.channel_costs` — 채널별 수수료·배송비·포장비 구조
+- `finance.ad_spend_by_channel` — 기간별 채널별 광고비·ROAS
+- `finance.daily_profit` — 일별 채널별 매출·비용·추정이익 (daily_profit_snapshot)
+- `finance.settlement_summary` — 채널별 정산 요약 (api_settlements)
 - `sales.date_range_revenue` — 주문 기준 매출 (api_orders)
 - `sales.monthly_summary` — 월별 매출 요약
 

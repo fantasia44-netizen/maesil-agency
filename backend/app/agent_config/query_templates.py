@@ -1,12 +1,12 @@
 """
 에이전트가 사용할 수 있는 승인된 SQL 쿼리 템플릿.
 자유 SQL 금지 — 이 목록에 있는 것만 실행 가능.
+실제 maesil-insight DB 스키마 기준 (2026-06-17 검증).
 """
 
 QUERY_TEMPLATES: dict[str, dict] = {
 
     # ───────────── SALES ─────────────
-    # maesil-insight는 단일 테넌트 — operator_id 컬럼 없음
     "sales.today_revenue_by_channel": {
         "db": "maesil-insight",
         "allowed_agents": ["sales", "growth", "orchestrator"],
@@ -18,11 +18,12 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    SUM(settlement_amount) AS net_revenue
             FROM public.api_orders
             WHERE order_date = :target_date
+              AND operator_id = :operator_id
               AND order_status NOT IN ('cancelled', 'returned')
             GROUP BY channel
             ORDER BY gross_revenue DESC NULLS LAST
         """,
-        "params": ["target_date"],
+        "params": ["target_date", "operator_id"],
     },
 
     "sales.date_range_revenue": {
@@ -37,11 +38,12 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    SUM(settlement_amount) AS net_revenue
             FROM public.api_orders
             WHERE order_date BETWEEN :date_from AND :date_to
+              AND operator_id = :operator_id
               AND order_status NOT IN ('cancelled', 'returned')
             GROUP BY channel, order_date
             ORDER BY order_date DESC, gross_revenue DESC NULLS LAST
         """,
-        "params": ["date_from", "date_to"],
+        "params": ["date_from", "date_to", "operator_id"],
     },
 
     "sales.monthly_summary": {
@@ -56,11 +58,12 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    SUM(settlement_amount) AS net_revenue
             FROM public.api_orders
             WHERE order_date >= :date_from
+              AND operator_id = :operator_id
               AND order_status NOT IN ('cancelled', 'returned')
             GROUP BY year_month, channel
             ORDER BY year_month DESC, gross_revenue DESC NULLS LAST
         """,
-        "params": ["date_from"],
+        "params": ["date_from", "operator_id"],
     },
 
     "sales.top_products": {
@@ -74,19 +77,20 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    SUM(total_amount) AS gross_revenue
             FROM public.api_orders
             WHERE order_date BETWEEN :date_from AND :date_to
+              AND operator_id = :operator_id
               AND order_status NOT IN ('cancelled', 'returned')
             GROUP BY product_name, channel
             ORDER BY gross_revenue DESC NULLS LAST
             LIMIT 20
         """,
-        "params": ["date_from", "date_to"],
+        "params": ["date_from", "date_to", "operator_id"],
     },
 
     # ───────────── FINANCE ─────────────
-    "finance.ad_spend_by_channel": {
+    "finance.channel_costs": {
         "db": "maesil-insight",
         "allowed_agents": ["finance", "sales", "growth", "orchestrator"],
-        "description": "채널별 비용 구조 (channel_costs — 수수료율/배송비/포장비)",
+        "description": "채널별 수수료·배송비·포장비 구조 (channel_costs)",
         "sql": """
             SELECT channel,
                    fee_rate,
@@ -95,49 +99,52 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    other_cost,
                    memo
             FROM public.channel_costs
-            WHERE is_deleted IS NOT TRUE
+            WHERE operator_id = :operator_id
+              AND is_deleted IS NOT TRUE
             ORDER BY channel
         """,
-        "params": [],
+        "params": ["operator_id"],
     },
 
-    "finance.expenses_by_category": {
+    "finance.ad_spend_by_channel": {
         "db": "maesil-insight",
-        "allowed_agents": ["finance", "orchestrator"],
-        "description": "기간별 카테고리별 지출",
+        "allowed_agents": ["finance", "sales", "growth", "orchestrator"],
+        "description": "기간별 채널별 광고비·ROAS (ad_spend)",
         "sql": """
-            SELECT expense_month,
-                   category,
-                   subcategory,
-                   SUM(amount) AS total_amount,
-                   COUNT(*) AS count
-            FROM public.expenses
-            WHERE expense_date BETWEEN :date_from AND :date_to
-              AND is_deleted IS NOT TRUE
-            GROUP BY expense_month, category, subcategory
-            ORDER BY expense_month DESC, total_amount DESC NULLS LAST
+            SELECT channel,
+                   SUM(cost) AS total_cost,
+                   SUM(revenue) AS total_revenue,
+                   ROUND(AVG(roas)::numeric, 2) AS avg_roas,
+                   SUM(clicks) AS total_clicks,
+                   SUM(impressions) AS total_impressions
+            FROM public.ad_spend
+            WHERE date BETWEEN :date_from AND :date_to
+              AND operator_id = :operator_id
+            GROUP BY channel
+            ORDER BY total_cost DESC NULLS LAST
         """,
-        "params": ["date_from", "date_to"],
+        "params": ["date_from", "date_to", "operator_id"],
     },
 
-    "finance.daily_revenue": {
+    "finance.daily_profit": {
         "db": "maesil-insight",
         "allowed_agents": ["finance", "orchestrator"],
-        "description": "일별 매출 (daily_revenue 테이블)",
+        "description": "일별 채널별 매출·비용·추정이익 (daily_profit_snapshot)",
         "sql": """
-            SELECT revenue_date,
+            SELECT date,
                    channel,
-                   product_name,
-                   category,
-                   SUM(qty) AS total_qty,
-                   SUM(revenue) AS total_revenue
-            FROM public.daily_revenue
-            WHERE revenue_date BETWEEN :date_from AND :date_to
-              AND is_deleted IS NOT TRUE
-            GROUP BY revenue_date, channel, product_name, category
-            ORDER BY revenue_date DESC, total_revenue DESC NULLS LAST
+                   gross_revenue,
+                   order_count,
+                   platform_fee,
+                   ad_cost,
+                   cogs,
+                   (gross_revenue - platform_fee - ad_cost - cogs) AS est_profit
+            FROM public.daily_profit_snapshot
+            WHERE date BETWEEN :date_from AND :date_to
+              AND operator_id = :operator_id
+            ORDER BY date DESC, gross_revenue DESC NULLS LAST
         """,
-        "params": ["date_from", "date_to"],
+        "params": ["date_from", "date_to", "operator_id"],
     },
 
     "finance.settlement_summary": {
@@ -154,80 +161,92 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    point_discount
             FROM public.api_settlements
             WHERE settlement_date BETWEEN :date_from AND :date_to
+              AND operator_id = :operator_id
             ORDER BY settlement_date DESC, gross_sales DESC NULLS LAST
         """,
-        "params": ["date_from", "date_to"],
+        "params": ["date_from", "date_to", "operator_id"],
     },
 
     # ───────────── WAREHOUSE ─────────────
     "warehouse.low_stock_items": {
         "db": "maesil-insight",
         "allowed_agents": ["warehouse", "orchestrator"],
-        "description": "안전재고 이하 상품 목록 (inventory)",
+        "description": "안전재고 이하 상품 목록 (inventory_items)",
         "sql": """
             SELECT product_name,
-                   current_stock,
+                   sku,
+                   current_qty,
                    safety_stock,
-                   (current_stock - safety_stock) AS stock_gap,
+                   (current_qty - safety_stock) AS stock_gap,
                    category,
-                   location,
-                   expiry_date
-            FROM public.inventory
-            WHERE current_stock <= safety_stock
+                   lead_time_days
+            FROM public.inventory_items
+            WHERE operator_id = :operator_id
+              AND is_active IS NOT FALSE
+              AND current_qty <= safety_stock
             ORDER BY stock_gap ASC
         """,
-        "params": [],
+        "params": ["operator_id"],
     },
 
     "warehouse.inventory_status": {
         "db": "maesil-insight",
         "allowed_agents": ["warehouse", "orchestrator"],
-        "description": "전체 재고 현황 (inventory)",
+        "description": "전체 재고 현황 (inventory_items)",
         "sql": """
             SELECT product_name,
-                   current_stock,
+                   sku,
+                   current_qty,
                    safety_stock,
                    category,
-                   location,
-                   storage_method,
-                   expiry_date,
+                   unit,
+                   lead_time_days,
                    updated_at
-            FROM public.inventory
-            ORDER BY current_stock ASC
+            FROM public.inventory_items
+            WHERE operator_id = :operator_id
+              AND is_active IS NOT FALSE
+            ORDER BY current_qty ASC
         """,
-        "params": [],
+        "params": ["operator_id"],
     },
 
-    "warehouse.purchase_plans": {
+    "warehouse.outbound_by_product": {
         "db": "maesil-insight",
         "allowed_agents": ["warehouse", "orchestrator"],
-        "description": "발주 계획 (purchase_orders)",
-        "sql": """
-            SELECT id,
-                   created_at::date AS order_date,
-                   status,
-                   memo
-            FROM public.purchase_orders
-            WHERE created_at >= :since
-            ORDER BY created_at DESC
-        """,
-        "params": ["since"],
-    },
-
-    "outbound.daily_by_channel": {
-        "db": "maesil-insight",
-        "allowed_agents": ["warehouse", "orchestrator"],
-        "description": "기간별 출고 현황 (outbound_logs)",
+        "description": "기간별 상품별 입출고 현황 (inventory_movement)",
         "sql": """
             SELECT product_name,
-                   COUNT(*) AS shipment_count
-            FROM public.outbound_logs
-            WHERE created_at::date BETWEEN :date_from AND :date_to
-            GROUP BY product_name
-            ORDER BY shipment_count DESC NULLS LAST
+                   sku,
+                   movement_type,
+                   SUM(qty_out) AS total_out,
+                   SUM(qty_in) AS total_in,
+                   COUNT(*) AS movement_count
+            FROM public.inventory_movement
+            WHERE date BETWEEN :date_from AND :date_to
+              AND operator_id = :operator_id
+            GROUP BY product_name, sku, movement_type
+            ORDER BY total_out DESC NULLS LAST
             LIMIT 30
         """,
-        "params": ["date_from", "date_to"],
+        "params": ["date_from", "date_to", "operator_id"],
+    },
+
+    # ───────────── CS (maesil-insight) ─────────────
+    "cs.maeyo_layer_stats": {
+        "db": "maesil-insight",
+        "allowed_agents": ["cs", "orchestrator"],
+        "description": "매요 CS 레이어별 통계 (maeyo_question_log)",
+        "sql": """
+            SELECT layer,
+                   COUNT(*) AS count,
+                   DATE(created_at AT TIME ZONE 'Asia/Seoul') AS date
+            FROM public.maeyo_question_log
+            WHERE created_at >= :since
+              AND operator_id = :operator_id
+            GROUP BY layer, date
+            ORDER BY date DESC, count DESC
+        """,
+        "params": ["since", "operator_id"],
     },
 
     # ───────────── CS (maesil-total agent_work 스키마) ─────────────
@@ -246,10 +265,10 @@ QUERY_TEMPLATES: dict[str, dict] = {
         "params": ["since"],
     },
 
-    "cs.maeyo_question_log": {
+    "cs.message_by_role": {
         "db": "maesil-total",
         "allowed_agents": ["cs", "orchestrator"],
-        "description": "매요 CS 메시지 수 (maeyo_messages)",
+        "description": "매요 CS 메시지 수 role별 (maeyo_messages)",
         "sql": """
             SELECT DATE(created_at AT TIME ZONE 'Asia/Seoul') AS date,
                    role,
