@@ -1,19 +1,11 @@
 """
-창고 에이전시 — maesil-insight 재고·생산·출고 데이터 수집 + AI 진단 브리핑.
+창고 에이전시 — maesil-insight 재고·출고 데이터 수집 + AI 진단 브리핑.
 
-run_briefing() → {ok, headline, sections, alerts, raw_data}
-  1. operator_id 조회
-  2. 쿼리 템플릿으로 데이터 수집
-     - 안전재고 이하 품목 (위험 재고)
-     - 전체 재고 현황
-     - 발주 계획 (이번달/다음달)
-     - 생산 실적 (30일, 계획 vs 실제)
-     - 진행 중 생산
-     - 출고 현황 (30일, 채널별)
-     - 출고 대기 / 반품
-     - 재고 이동 순변동
-  3. Claude Sonnet → 재고·생산·출고 통합 브리핑
-  4. agency_briefings 저장
+실제 연동 테이블:
+  - inventory          : 재고 현황 (current_stock, safety_stock)
+  - outbound_logs      : 출고 기록
+  - api_orders         : 판매 추이 (재고 소진 예측용)
+  - purchase_orders    : 발주 현황
 """
 from __future__ import annotations
 
@@ -31,11 +23,6 @@ def _db():
     return get_maesil_total_client().schema("agent_work")
 
 
-def _get_operator_id() -> str:
-    from app.services.secrets import get_secret
-    return get_secret("maesil-insight_operator_id") or ""
-
-
 def _get_anthropic_key() -> str:
     from app.services.secrets import get_secret
     return get_secret("anthropic_api_key") or ""
@@ -50,92 +37,40 @@ def _query(template_key: str, params: dict) -> list[dict]:
         return []
 
 
-def _collect_data(operator_id: str) -> dict:
+def _collect_data() -> dict:
     today = date.today()
-    ym_now = today.strftime("%Y-%m")
-    # 이번달 + 다음달 발주 계획
-    ym_from = (today.replace(day=1) - timedelta(days=1)).replace(day=1).strftime("%Y-%m")
+    d30_from = (today - timedelta(days=30)).isoformat()
+    today_str = today.isoformat()
 
     raw: dict = {}
 
-    # 안전재고 이하 (위험 재고) — 즉시 발주 필요
-    raw["low_stock"] = _query("warehouse.low_stock_items", {
-        "operator_id": operator_id,
-    })
+    # 안전재고 이하 위험 품목
+    raw["low_stock"] = _query("warehouse.low_stock_items", {})
 
     # 전체 재고 현황
-    raw["inventory"] = _query("warehouse.inventory_status", {
-        "operator_id": operator_id,
+    raw["inventory"] = _query("warehouse.inventory_status", {})
+
+    # 발주 현황
+    raw["purchase_orders"] = _query("warehouse.purchase_plans", {
+        "since": (today - timedelta(days=90)).isoformat() + "T00:00:00+00:00",
     })
 
-    # 발주 계획 (최근 2개월)
-    raw["purchase_plans"] = _query("warehouse.purchase_plans", {
-        "operator_id": operator_id,
-        "year_month_from": ym_from,
-    })
-
-    # 판매 추이 참조 (재고 소진 예측용 — 30일)
+    # 최근 30일 판매 상위 상품 (재고 소진 예측용)
     raw["sales_30d"] = _query("sales.top_products", {
-        "operator_id": operator_id,
-        "date_from": (today - timedelta(days=30)).isoformat(),
-        "date_to": today.isoformat(),
+        "date_from": d30_from,
+        "date_to": today_str,
     })[:15]
 
-    # ── 생산 실적 (30일) ──
-    raw["production_30d"] = _query("production.daily_output", {
-        "operator_id": operator_id,
-        "date_from": (today - timedelta(days=30)).isoformat(),
-        "date_to": today.isoformat(),
-    })
-
-    # 진행 중 / 예정 생산
-    raw["production_in_progress"] = _query("production.in_progress", {
-        "operator_id": operator_id,
-    })
-
-    # 월별 생산 요약 (최근 2개월)
-    raw["production_monthly"] = _query("production.monthly_summary", {
-        "operator_id": operator_id,
-        "date_from": (today.replace(day=1) - timedelta(days=1)).replace(day=1).isoformat(),
-    })
-
-    # ── 출고 현황 (30일, 채널별) ──
-    raw["shipments_30d"] = _query("shipment.daily_by_channel", {
-        "operator_id": operator_id,
-        "date_from": (today - timedelta(days=30)).isoformat(),
-        "date_to": today.isoformat(),
-    })
-
-    # 상품별 출고량 집계
-    raw["shipment_products"] = _query("shipment.product_summary", {
-        "operator_id": operator_id,
-        "date_from": (today - timedelta(days=30)).isoformat(),
-        "date_to": today.isoformat(),
-    })[:20]
-
-    # 출고 대기
-    raw["shipment_pending"] = _query("shipment.pending", {
-        "operator_id": operator_id,
-    })
-
-    # 반품
-    raw["returns_30d"] = _query("shipment.returns", {
-        "operator_id": operator_id,
-        "date_from": (today - timedelta(days=30)).isoformat(),
-    })
-
-    # 재고 이동 순변동 (생산 입고 - 출고)
-    raw["inventory_movement"] = _query("inventory.movement_summary", {
-        "operator_id": operator_id,
-        "date_from": (today - timedelta(days=30)).isoformat(),
-        "date_to": today.isoformat(),
+    # 최근 30일 출고 현황
+    raw["outbound_30d"] = _query("outbound.daily_by_channel", {
+        "date_from": d30_from,
+        "date_to": today_str,
     })
 
     return raw
 
 
 def _sonnet_briefing(raw: dict) -> dict:
-    """Claude Sonnet → 창고/재고/생산/출고 통합 브리핑 JSON 생성."""
     import anthropic
 
     client = anthropic.Anthropic(api_key=_get_anthropic_key())
@@ -144,69 +79,44 @@ def _sonnet_briefing(raw: dict) -> dict:
     def _s(rows, max_rows=30) -> str:
         return json.dumps(rows[:max_rows], ensure_ascii=False, default=str)
 
-    prompt = f"""당신은 매실인사이트의 창고·생산·출고 통합 에이전시입니다.
-아래 실제 재고·생산·출고 데이터를 분석해 **정밀 운영 브리핑**을 작성하세요.
+    prompt = f"""당신은 매실인사이트의 창고·재고 관리 에이전시(자비스)입니다.
+아래 실제 재고·출고·판매 데이터를 분석해 **정밀 운영 브리핑**을 작성하세요.
 오늘 날짜: {today_str}
 
 ## 데이터
 
-### 안전재고 이하 위험 품목
+### 안전재고 이하 위험 품목 (즉시 발주 필요)
 {_s(raw.get("low_stock", []))}
 
-### 전체 재고 현황
+### 전체 재고 현황 (inventory)
 {_s(raw.get("inventory", []))}
 
-### 발주 계획 (최근 2개월)
-{_s(raw.get("purchase_plans", []))}
+### 발주 현황 (purchase_orders, 최근 90일)
+{_s(raw.get("purchase_orders", []))}
 
-### 최근 30일 판매 상위 상품
+### 최근 30일 판매 상위 상품 (재고 소진 속도 참조)
 {_s(raw.get("sales_30d", []))}
 
-### 최근 30일 생산 실적 (일별, 계획 vs 실제)
-{_s(raw.get("production_30d", []))}
-
-### 현재 진행 중/예정 생산
-{_s(raw.get("production_in_progress", []))}
-
-### 월별 생산 요약
-{_s(raw.get("production_monthly", []))}
-
-### 최근 30일 채널별 출고 현황
-{_s(raw.get("shipments_30d", []))}
-
-### 최근 30일 상품별 출고량
-{_s(raw.get("shipment_products", []))}
-
-### 출고 대기 건
-{_s(raw.get("shipment_pending", []))}
-
-### 최근 30일 반품
-{_s(raw.get("returns_30d", []))}
-
-### 재고 이동 순변동 (생산입고 - 출고)
-{_s(raw.get("inventory_movement", []))}
+### 최근 30일 출고 현황 (outbound_logs)
+{_s(raw.get("outbound_30d", []))}
 
 ## 브리핑 요구사항
-1. **headline**: 창고·생산·출고 종합 상황 1줄 요약 (40자 이내, 핵심 수량 포함)
-2. **sections**: 6개 섹션 — **각 섹션에 반드시 실제 수량(개/박스 등) 숫자를 명시**
-   - 재고 현황 요약 (총 SKU 수, 위험재고 품목수, 최소/최대 재고 품목 수량)
-   - 생산 실적 (30일 총 생산량, 계획 달성률%, 진행 중 생산 품목·수량)
-   - 판매(출고) 현황 (30일 총 출고량, 채널별 출고 수량, 반품 수량)
-   - 재고 순변동 (품목별 총입고-총출고=순변동 수량, 음수 위험 품목)
-   - 위험 재고 상세 (stock_gap 수량, lead_time 기준 소진 예상일)
-   - 발주·생산 액션 플랜 (발주 필요 품목·수량, 우선순위)
-3. **alerts**: 즉시 조치 항목 (level: warning/critical, 수량 포함)
-   - critical: 재고 소진 임박(lead_time 내), 생산 달성률 70% 미만, 출고 장기 적체
-   - warning: 발주 계획 미수립, 반품율 이상, net_change 음수 품목
+1. **headline**: 재고 상황 1줄 요약 (위험 품목 수·재고 수치 포함, 40자 이내)
+2. **sections**: 4개 섹션 (수치 중심)
+   - 재고 현황: 총 SKU 수, 위험재고 품목, 재고 많은/적은 상품 TOP3
+   - 소진 예측: 판매 속도 기준 재고 소진 예상 품목 (일수 계산)
+   - 출고 현황: 30일 출고 상위 상품, 이상 감지
+   - 발주 액션: 즉시 발주 필요 품목·수량, 우선순위
+3. **alerts**: 즉시 조치 항목 (없으면 빈 배열)
+   - critical: 재고 0 임박, 안전재고 50% 미만
+   - warning: 발주 계획 미수립, 유통기한 임박(expiry_date 기준)
 
-데이터 없는 섹션은 "연동 필요"라고 명시하세요.
+데이터 없는 섹션은 "연동 필요"로 표기하세요.
 
 JSON으로만 답하세요:
 {{
   "headline": "...",
   "sections": [
-    {{"title": "...", "body": "..."}},
-    {{"title": "...", "body": "..."}},
     {{"title": "...", "body": "..."}},
     {{"title": "...", "body": "..."}},
     {{"title": "...", "body": "..."}},
@@ -235,18 +145,16 @@ JSON으로만 답하세요:
 
 
 def run_briefing() -> dict:
-    """창고 에이전시 브리핑 실행 + DB 저장."""
-    operator_id = _get_operator_id()
-    if not operator_id:
-        return {"ok": False, "error": "maesil-insight_operator_id 시크릿 미설정"}
+    from app.services.secrets import get_secret
+    operator_id = get_secret("maesil-insight_operator_id") or ""
 
     today = date.today()
-    raw = _collect_data(operator_id)
+    raw = _collect_data()
 
     all_empty = all(not v for v in raw.values())
     if all_empty:
         _save(agency_type="warehouse", status="no_data", operator_id=operator_id,
-              headline="데이터 없음", sections=[], alerts=[], raw_data=raw,
+              headline="재고 데이터 없음", sections=[], alerts=[], raw_data=raw,
               period_from=today, period_to=today)
         return {"ok": True, "status": "no_data", "message": "재고 데이터가 없습니다"}
 
