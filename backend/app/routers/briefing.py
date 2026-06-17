@@ -24,7 +24,15 @@ def _run_sales_bg():
     try:
         run_briefing()
     except Exception as e:
-        logger.error("[briefing] 영업 에이전시 실패: %s", e)
+        logger.error("[briefing] 영업(매출) 에이전시 실패: %s", e)
+
+
+def _run_outreach_bg():
+    from app.services.outreach_briefing import run_briefing
+    try:
+        run_briefing()
+    except Exception as e:
+        logger.error("[briefing] 영업(CRM) 에이전시 실패: %s", e)
 
 
 def _run_warehouse_bg():
@@ -37,19 +45,22 @@ def _run_warehouse_bg():
 
 @router.post("/run")
 def run_briefing(
-    agency: str = "all",   # "sales" | "warehouse" | "all"
+    agency: str = "all",   # "sales" | "outreach" | "warehouse" | "all"
     user: UserContext = Depends(require_admin),
 ) -> dict:
-    """영업/창고 에이전시 브리핑 실행 (백그라운드). agency=sales|warehouse|all."""
+    """브리핑 실행 (백그라운드). agency=sales|outreach|warehouse|all."""
     launched = []
     if agency in ("sales", "all"):
         threading.Thread(target=_run_sales_bg, daemon=True).start()
         launched.append("sales")
+    if agency in ("outreach", "all"):
+        threading.Thread(target=_run_outreach_bg, daemon=True).start()
+        launched.append("outreach")
     if agency in ("warehouse", "all"):
         threading.Thread(target=_run_warehouse_bg, daemon=True).start()
         launched.append("warehouse")
     if not launched:
-        raise HTTPException(400, "agency는 sales|warehouse|all 중 하나")
+        raise HTTPException(400, "agency는 sales|outreach|warehouse|all 중 하나")
     return {"ok": True, "launched": launched, "message": "브리핑 실행 중 — 30~60초 후 새로고침하세요"}
 
 
@@ -59,7 +70,7 @@ def run_briefing(
 def get_latest_briefings(user: UserContext = Depends(require_admin)) -> dict:
     """영업 + 창고 최신 브리핑 각 1건 반환."""
     result: dict = {}
-    for agency_type in ("sales", "warehouse"):
+    for agency_type in ("sales", "outreach", "warehouse"):
         try:
             resp = (
                 _db().table("agency_briefings")
