@@ -54,7 +54,7 @@ def _next_lead(grades: list[str]) -> dict | None:
             _db().table("outreach_leads")
             .select("*")
             .eq("platform", "youtube")
-            .in_("status", ["discovered", "approved", "draft_ready"])
+            .in_("status", ["approved"])
             .in_("grade", grades)
             .is_("emailed_at", "null")
             .not_.is_("contact_email", "null")
