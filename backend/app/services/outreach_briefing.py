@@ -39,10 +39,10 @@ def _collect_data() -> dict:
     raw: dict = {}
 
     try:
-        # 전체 리드 상태별 집계
+        # 전체 리드 상태별 집계 (click_count/clicked_at은 미구현 컬럼 제외)
         resp = db.table("outreach_leads").select(
             "status, grade, platform, channel_type, "
-            "open_count, opened_at, click_count, clicked_at, "
+            "open_count, opened_at, "
             "contact_email, contact_name, channel_name, "
             "created_at, updated_at"
         ).execute()
@@ -80,7 +80,7 @@ def _collect_data() -> dict:
             emailed += 1
         if (l.get("open_count") or 0) > 0:
             opened += 1
-        if (l.get("click_count") or 0) > 0:
+        if False:  # click_count 미구현 — 추후 SQL 추가 후 활성화
             clicked += 1
         if st == "replied":
             replied += 1
@@ -121,7 +121,7 @@ def _collect_data() -> dict:
 
     # 이메일 지표 (비율)
     open_rate   = round(opened  / emailed * 100, 1) if emailed else 0
-    click_rate  = round(clicked / emailed * 100, 1) if emailed else 0
+    click_rate  = 0  # click_count 미구현
     reply_rate  = round(replied / emailed * 100, 1) if emailed else 0
     unsub_rate  = round(unsub   / emailed * 100, 1) if emailed else 0
 
@@ -188,7 +188,7 @@ def _sonnet_briefing(raw: dict) -> dict:
 1. **headline**: 영업 진행 현황 1줄 요약 (40자 이내, 핵심 숫자 포함)
 2. **sections**: 5개 섹션
    - 퍼널 현황 (총 리드→발송→오픈→회신→협상→계약 수치, 각 전환율)
-   - 이메일 성과 (오픈율, 클릭율, 회신율, 수신거부율 — 업계 평균 대비 평가)
+   - 이메일 성과 (오픈율, 회신율, 수신거부율 — 업계 평균 대비 평가)
    - 즉시 팔로업 필요 (협상 중 리드 이름/상태, 7일+ 미회신 리드 리스트)
    - 관심 신호 포착 (최근 7일 오픈 리드 — 재접촉 우선순위)
    - 등급·플랫폼 분석 (어떤 등급/플랫폼에서 전환율이 높은지, 집중 방향 제안)

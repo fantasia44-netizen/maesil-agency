@@ -89,9 +89,9 @@ def run_readonly_sql(
         literal = _to_sql_literal(key, value)
         sql = sql.replace(placeholder, literal)
 
-    # 미치환 플레이스홀더 탐지
+    # 미치환 플레이스홀더 탐지 (::numeric 등 PG 타입 캐스트 제외)
     import re as _re
-    remaining = _re.findall(r":[a-z_][a-z0-9_]*", sql)
+    remaining = _re.findall(r"(?<!:):[a-z_][a-z0-9_]*", sql)
     if remaining:
         missing = [r[1:] for r in remaining]
         raise ValueError(f"Missing params for '{template_key}': {missing}")
