@@ -246,8 +246,10 @@ class BaseAgent:
             template_key = tool_input["template_key"]
             params = tool_input.get("params", {})
             # 공통 파라미터 자동 주입
-            if operator_id and "operator_id" not in params:
-                params["operator_id"] = operator_id
+            if "operator_id" not in params:
+                oid = operator_id or get_operator_id("maesil-insight") or get_operator_id("maesil-total")
+                if oid:
+                    params["operator_id"] = oid
             today = date.today().isoformat()
             yesterday = (date.today() - timedelta(days=1)).isoformat()
             month_start = date.today().strftime("%Y-%m-01")

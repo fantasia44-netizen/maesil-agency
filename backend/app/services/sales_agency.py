@@ -62,52 +62,49 @@ def _fmt_won(amount) -> str:
     return f"{n:,}"
 
 
-def _collect_data(operator_id: str) -> dict:
+def _collect_data() -> dict:
     today = date.today()
     today_str = today.isoformat()
     d30_from = (today - timedelta(days=30)).isoformat()
-    month_from = today.replace(day=1).isoformat()
-    ym_from = today.strftime("%Y-%m")
+    d14_from = (today - timedelta(days=14)).isoformat()
+    d90_from = (today - timedelta(days=90)).isoformat()
 
     raw: dict = {}
 
     # 오늘 채널별 매출
     raw["today"] = _query("sales.today_revenue_by_channel", {
-        "operator_id": operator_id,
         "target_date": today_str,
     })
 
     # 최근 30일 일별×채널 매출
     raw["revenue_30d"] = _query("sales.date_range_revenue", {
-        "operator_id": operator_id,
         "date_from": d30_from,
         "date_to": today_str,
     })
 
     # 월별 요약 (최근 3개월)
     raw["monthly"] = _query("sales.monthly_summary", {
-        "operator_id": operator_id,
-        "date_from": (today - timedelta(days=90)).isoformat(),
+        "date_from": d90_from,
     })
 
     # 상위 상품 (30일)
     raw["top_products"] = _query("sales.top_products", {
-        "operator_id": operator_id,
         "date_from": d30_from,
         "date_to": today_str,
     })[:10]
 
-    # 채널별 광고비/ROAS (30일)
-    raw["ad_spend"] = _query("finance.ad_spend_by_channel", {
-        "operator_id": operator_id,
-        "date_from": d30_from,
+    # 채널별 비용 구조
+    raw["channel_costs"] = _query("finance.ad_spend_by_channel", {})
+
+    # 기간별 지출 (최근 14일)
+    raw["expenses"] = _query("finance.expenses_by_category", {
+        "date_from": d14_from,
         "date_to": today_str,
     })
 
-    # 일별 손익 (최근 14일)
-    raw["profit"] = _query("finance.daily_profit_snapshot", {
-        "operator_id": operator_id,
-        "date_from": (today - timedelta(days=14)).isoformat(),
+    # 정산 요약 (최근 30일)
+    raw["settlements"] = _query("finance.settlement_summary", {
+        "date_from": d30_from,
         "date_to": today_str,
     })
 
@@ -192,17 +189,15 @@ JSON으로만 답하세요:
 
 def run_briefing() -> dict:
     """영업 에이전시 브리핑 실행 + DB 저장."""
-    operator_id = _get_operator_id()
-    if not operator_id:
-        return {"ok": False, "error": "maesil-insight_operator_id 시크릿 미설정"}
+    operator_id = _get_operator_id()  # agency_briefings 저장용으로만 사용
 
     today = date.today()
-    raw = _collect_data(operator_id)
+    raw = _collect_data()
 
     # 전체 데이터 없음 체크
     all_empty = all(not v for v in raw.values())
     if all_empty:
-        _save(agency_type="sales", status="no_data", operator_id=operator_id,
+        _save(agency_type="sales", status="no_data", operator_id=operator_id or "",
               headline="데이터 없음", sections=[], alerts=[], raw_data=raw,
               period_from=today, period_to=today)
         return {"ok": True, "status": "no_data", "message": "수집된 데이터가 없습니다"}
@@ -212,7 +207,7 @@ def run_briefing() -> dict:
     sections = ai.get("sections") or []
     alerts = ai.get("alerts") or []
 
-    _save(agency_type="sales", status="ok", operator_id=operator_id,
+    _save(agency_type="sales", status="ok", operator_id=operator_id or "",
           headline=headline, sections=sections, alerts=alerts, raw_data=raw,
           period_from=today - timedelta(days=30), period_to=today)
 
