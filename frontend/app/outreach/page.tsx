@@ -39,6 +39,10 @@ type Lead = {
   touch_count: number;
   last_touch_at: string | null;
   emailed_at: string | null;
+  opened_at: string | null;
+  open_count: number;
+  click_count: number;
+  clicked_at: string | null;
   reply_type: string | null;
   reply_summary: string | null;
   created_at: string;
@@ -194,7 +198,7 @@ export default function OutreachPage() {
   const [actionId, setActionId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [mainTab, setMainTab] = useState<"leads" | "history">("leads");
+  const [mainTab, setMainTab] = useState<"leads" | "history" | "report">("leads");
   const [touchLogs, setTouchLogs] = useState<TouchLog[]>([]);
   const [touchLoading, setTouchLoading] = useState(false);
   const [touchStatusFilter, setTouchStatusFilter] = useState<string>("all");
@@ -443,11 +447,12 @@ export default function OutreachPage() {
         </div>
       )}
 
-      {/* 메인 탭: 리드목록 / 발송이력 */}
+      {/* 메인 탭: 리드목록 / 발송이력 / 영업보고서 */}
       <div style={{ display: "flex", gap: 0, marginBottom: "1.25rem", borderBottom: "2px solid #e2e8f0" }}>
         {([
           { key: "leads",   label: "리드 목록",  icon: "📋" },
           { key: "history", label: "발송 이력",  icon: "📨" },
+          { key: "report",  label: "영업 보고서", icon: "📊" },
         ] as const).map(({ key, label, icon }) => {
           const active = mainTab === key;
           return (
@@ -806,6 +811,308 @@ export default function OutreachPage() {
         </div>
       )}
       </> }
+
+      {/* ── 영업 보고서 탭 ── */}
+      {mainTab === "report" && stats && (() => {
+        const bs = stats.by_status;
+        const k = stats.kpi;
+
+        // 퍼널 스텝
+        const funnel = [
+          { label: "발굴",   value: k.discovered,  color: "#1d4ed8", icon: "🔍" },
+          { label: "발송",   value: k.emailed,      color: "#0369a1", icon: "📧" },
+          { label: "회신",   value: k.replied,      color: "#d97706", icon: "💬" },
+          { label: "협의중", value: k.negotiating,  color: "#7c3aed", icon: "🤝" },
+          { label: "제휴완료", value: k.deal,        color: "#065f46", icon: "✅" },
+        ];
+
+        // 이메일 반응 지표
+        const emailedLeads = leads.filter(l => ["emailed","replied","no_reply","negotiating","deal","unsubscribe"].includes(l.status));
+        const openedLeads = leads.filter(l => l.open_count > 0);
+        const clickedLeads = leads.filter(l => l.click_count > 0);
+        const unsubLeads = leads.filter(l => l.status === "unsubscribe");
+
+        // 즉시 조치 필요
+        const actionNeeded = [
+          { label: "초안 완료 (승인 대기)", leads: leads.filter(l => l.status === "draft_ready"), color: "#c2410c" },
+          { label: "승인됨 (발송 대기)",   leads: leads.filter(l => l.status === "approved"),   color: "#0369a1" },
+          { label: "회신 옴 (후속 필요)",  leads: leads.filter(l => l.status === "replied"),    color: "#d97706" },
+          { label: "협의 중 (클로징 필요)", leads: leads.filter(l => l.status === "negotiating"), color: "#7c3aed" },
+        ].filter(g => g.leads.length > 0);
+
+        // 등급별 전환 분석
+        const gradeReport = ["S", "A", "B", "C", "D"].map(g => {
+          const gl = leads.filter(l => l.grade === g);
+          const emailed = gl.filter(l => ["emailed","replied","no_reply","negotiating","deal"].includes(l.status)).length;
+          const replied = gl.filter(l => ["replied","negotiating","deal"].includes(l.status)).length;
+          const deal = gl.filter(l => l.status === "deal").length;
+          return { grade: g, total: gl.length, emailed, replied, deal };
+        }).filter(r => r.total > 0);
+
+        // 플랫폼별 집계
+        const platformReport = Object.entries(stats.by_platform || {})
+          .map(([platform, total]) => {
+            const pl = leads.filter(l => l.platform === platform);
+            const emailed = pl.filter(l => ["emailed","replied","no_reply","negotiating","deal"].includes(l.status)).length;
+            const deal = pl.filter(l => l.status === "deal").length;
+            return { platform, total, emailed, deal };
+          })
+          .sort((a, b) => b.total - a.total);
+
+        const pct = (a: number, b: number) => b === 0 ? "-" : `${Math.round(a / b * 100)}%`;
+
+        return (
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+
+            {/* 퍼널 */}
+            <div>
+              <h3 style={{ margin: "0 0 0.75rem", fontSize: "0.9rem", fontWeight: 700, color: "#374151" }}>영업 퍼널</h3>
+              <div style={{ display: "flex", gap: "0.25rem", alignItems: "stretch", flexWrap: "wrap" }}>
+                {funnel.map((step, i) => {
+                  const prev = i > 0 ? funnel[i - 1].value : null;
+                  const convRate = prev != null ? pct(step.value, prev) : null;
+                  return (
+                    <div key={step.label} style={{ display: "flex", alignItems: "center", gap: "0.25rem", flexWrap: "wrap" }}>
+                      <div className="card" style={{
+                        padding: "1rem 1.25rem", textAlign: "center", minWidth: 90,
+                        borderTop: `3px solid ${step.color}`,
+                      }}>
+                        <div style={{ fontSize: "1.6rem", marginBottom: 4 }}>{step.icon}</div>
+                        <div style={{ fontSize: "1.75rem", fontWeight: 800, color: step.color }}>{step.value}</div>
+                        <div style={{ fontSize: "0.72rem", color: "#64748b", marginTop: 2 }}>{step.label}</div>
+                        {convRate && (
+                          <div style={{ fontSize: "0.68rem", marginTop: 4, padding: "2px 6px", borderRadius: 8,
+                            background: "#f0fdf4", color: "#15803d", fontWeight: 600 }}>
+                            ↑{convRate}
+                          </div>
+                        )}
+                      </div>
+                      {i < funnel.length - 1 && (
+                        <div style={{ color: "#cbd5e1", fontSize: "1.2rem", flexShrink: 0 }}>›</div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="muted" style={{ fontSize: "0.72rem", marginTop: 6 }}>
+                전체 발송률 {pct(k.emailed, k.discovered)} · 회신률 {pct(k.replied, k.emailed)} · 제휴전환률 {pct(k.deal, k.emailed)}
+              </div>
+            </div>
+
+            {/* 이메일 반응 지표 */}
+            <div>
+              <h3 style={{ margin: "0 0 0.75rem", fontSize: "0.9rem", fontWeight: 700, color: "#374151" }}>이메일 반응 지표</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "0.6rem" }}>
+                {[
+                  {
+                    label: "오픈율",
+                    value: pct(openedLeads.length, emailedLeads.length),
+                    sub: `${openedLeads.length}/${emailedLeads.length}명`,
+                    color: "#0369a1",
+                    icon: "👁",
+                    note: "이미지 로드 기반 — Gmail 등은 집계 제외될 수 있음",
+                  },
+                  {
+                    label: "카톡 클릭율",
+                    value: pct(clickedLeads.length, emailedLeads.length),
+                    sub: `${clickedLeads.length}/${emailedLeads.length}명`,
+                    color: "#d97706",
+                    icon: "💬",
+                    note: "카카오 오픈톡 링크 클릭",
+                  },
+                  {
+                    label: "수신거부율",
+                    value: pct(unsubLeads.length, emailedLeads.length),
+                    sub: `${unsubLeads.length}명`,
+                    color: "#dc2626",
+                    icon: "🚫",
+                    note: "링크 클릭 수신거부",
+                  },
+                ].map(m => (
+                  <div key={m.label} className="card" style={{ padding: "0.9rem 1rem" }}>
+                    <div style={{ fontSize: "1.3rem", marginBottom: 4 }}>{m.icon}</div>
+                    <div style={{ fontSize: "1.6rem", fontWeight: 800, color: m.color }}>{m.value}</div>
+                    <div style={{ fontWeight: 600, fontSize: "0.82rem", marginTop: 2 }}>{m.label}</div>
+                    <div className="muted" style={{ fontSize: "0.71rem", marginTop: 2 }}>{m.sub}</div>
+                    <div className="muted" style={{ fontSize: "0.68rem", marginTop: 4, lineHeight: 1.4 }}>{m.note}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 오픈한 리드 목록 */}
+              {openedLeads.length > 0 && (
+                <div style={{ marginTop: "0.75rem" }}>
+                  <div className="muted" style={{ fontSize: "0.75rem", marginBottom: "0.4rem" }}>메일 열어본 리드</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                    {openedLeads.map(l => {
+                      const gc = GRADE_COLOR[l.grade] ?? { bg: "#e2e8f0", color: "#64748b" };
+                      const sc = STATUS_COLOR[l.status] ?? STATUS_COLOR.discovered;
+                      return (
+                        <div key={l.id} className="card" style={{ padding: "0.55rem 0.9rem", display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                          <span style={{ padding: "1px 6px", borderRadius: 8, fontSize: "0.68rem",
+                            fontWeight: 700, background: gc.bg, color: gc.color, flexShrink: 0 }}>
+                            {l.grade}
+                          </span>
+                          <span style={{ fontWeight: 600, fontSize: "0.83rem" }}>{l.handle_name ?? "-"}</span>
+                          <span style={{ fontSize: "0.71rem", padding: "1px 7px", borderRadius: 8,
+                            background: sc.bg, color: sc.color, border: `1px solid ${sc.border}` }}>
+                            {STATUS_LABEL[l.status] ?? l.status}
+                          </span>
+                          <span className="muted" style={{ fontSize: "0.71rem" }}>
+                            {l.open_count}회 오픈 · 최초 {fmtDate(l.opened_at)}
+                          </span>
+                          {l.click_count > 0 && (
+                            <span style={{ fontSize: "0.71rem", color: "#d97706", marginLeft: 4 }}>
+                              💬 카톡 {l.click_count}회 클릭
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 즉시 조치 필요 */}
+            {actionNeeded.length > 0 && (
+              <div>
+                <h3 style={{ margin: "0 0 0.75rem", fontSize: "0.9rem", fontWeight: 700, color: "#374151" }}>즉시 조치 필요</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                  {actionNeeded.map(group => (
+                    <div key={group.label} className="card" style={{ padding: "0.75rem 1rem" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                        <span style={{ fontWeight: 600, fontSize: "0.85rem", color: group.color }}>
+                          {group.label}
+                        </span>
+                        <span style={{ fontSize: "0.8rem", fontWeight: 700, color: group.color }}>
+                          {group.leads.length}건
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                        {group.leads.slice(0, 5).map(l => {
+                          const gc = GRADE_COLOR[l.grade] ?? { bg: "#e2e8f0", color: "#64748b" };
+                          return (
+                            <div key={l.id} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem" }}>
+                              <span style={{ padding: "1px 6px", borderRadius: 8, fontSize: "0.68rem",
+                                fontWeight: 700, background: gc.bg, color: gc.color, flexShrink: 0 }}>
+                                {l.grade}
+                              </span>
+                              <span style={{ fontWeight: 500 }}>{l.handle_name ?? "-"}</span>
+                              <span className="muted" style={{ fontSize: "0.72rem" }}>
+                                {PLATFORM_LABEL[l.platform] ?? l.platform}
+                                {l.last_touch_at && ` · 마지막 ${fmtDate(l.last_touch_at)}`}
+                              </span>
+                              <button
+                                onClick={() => { setMainTab("leads"); setStatusFilter(group.leads[0]?.status ?? "all"); }}
+                                style={{ marginLeft: "auto", fontSize: "0.68rem", padding: "2px 8px",
+                                  border: "1px solid #e2e8f0", borderRadius: 6, background: "#fff",
+                                  color: "#64748b", cursor: "pointer" }}>
+                                목록 보기
+                              </button>
+                            </div>
+                          );
+                        })}
+                        {group.leads.length > 5 && (
+                          <div className="muted" style={{ fontSize: "0.72rem" }}>외 {group.leads.length - 5}건 더</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 등급별 전환 분석 */}
+            <div>
+              <h3 style={{ margin: "0 0 0.75rem", fontSize: "0.9rem", fontWeight: 700, color: "#374151" }}>등급별 전환 분석</h3>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.82rem" }}>
+                  <thead>
+                    <tr style={{ borderBottom: "2px solid #e2e8f0" }}>
+                      {["등급", "발굴", "발송", "발송률", "회신", "회신률", "제휴", "전환률"].map(h => (
+                        <th key={h} style={{ padding: "6px 12px", textAlign: "right", fontWeight: 600,
+                          color: "#64748b", fontSize: "0.75rem", whiteSpace: "nowrap" }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gradeReport.map(r => {
+                      const gc = GRADE_COLOR[r.grade] ?? { bg: "#e2e8f0", color: "#64748b" };
+                      return (
+                        <tr key={r.grade} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                          <td style={{ padding: "8px 12px" }}>
+                            <span style={{ padding: "2px 8px", borderRadius: 8, fontWeight: 700,
+                              fontSize: "0.75rem", background: gc.bg, color: gc.color }}>
+                              {r.grade}급
+                            </span>
+                          </td>
+                          <td style={{ padding: "8px 12px", textAlign: "right", fontWeight: 600 }}>{r.total}</td>
+                          <td style={{ padding: "8px 12px", textAlign: "right" }}>{r.emailed}</td>
+                          <td style={{ padding: "8px 12px", textAlign: "right", color: "#0369a1" }}>{pct(r.emailed, r.total)}</td>
+                          <td style={{ padding: "8px 12px", textAlign: "right" }}>{r.replied}</td>
+                          <td style={{ padding: "8px 12px", textAlign: "right", color: "#d97706" }}>{pct(r.replied, r.emailed)}</td>
+                          <td style={{ padding: "8px 12px", textAlign: "right", fontWeight: 600 }}>{r.deal}</td>
+                          <td style={{ padding: "8px 12px", textAlign: "right", color: "#065f46", fontWeight: 700 }}>{pct(r.deal, r.emailed)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* 플랫폼별 성과 */}
+            <div>
+              <h3 style={{ margin: "0 0 0.75rem", fontSize: "0.9rem", fontWeight: 700, color: "#374151" }}>플랫폼별 성과</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                {platformReport.map(p => {
+                  const bar = p.total > 0 ? Math.round(p.emailed / p.total * 100) : 0;
+                  return (
+                    <div key={p.platform} className="card" style={{ padding: "0.7rem 1rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.35rem" }}>
+                        <span style={{ fontWeight: 600, fontSize: "0.85rem" }}>{PLATFORM_LABEL[p.platform] ?? p.platform}</span>
+                        <div style={{ display: "flex", gap: "0.75rem", fontSize: "0.78rem" }}>
+                          <span>발굴 <strong>{p.total}</strong></span>
+                          <span style={{ color: "#0369a1" }}>발송 <strong>{p.emailed}</strong></span>
+                          <span style={{ color: "#065f46" }}>제휴 <strong>{p.deal}</strong></span>
+                        </div>
+                      </div>
+                      <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, overflow: "hidden" }}>
+                        <div style={{ height: "100%", width: `${bar}%`, background: "#0369a1", borderRadius: 3, transition: "width 0.3s" }} />
+                      </div>
+                      <div className="muted" style={{ fontSize: "0.7rem", marginTop: 3 }}>발송률 {pct(p.emailed, p.total)}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 상태별 전체 현황 */}
+            <div>
+              <h3 style={{ margin: "0 0 0.75rem", fontSize: "0.9rem", fontWeight: 700, color: "#374151" }}>상태별 전체 현황</h3>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                {Object.entries(bs)
+                  .sort(([,a],[,b]) => (b as number) - (a as number))
+                  .map(([status, cnt]) => {
+                    const sc = STATUS_COLOR[status] ?? { bg: "#f1f5f9", color: "#64748b", border: "#e2e8f0" };
+                    return (
+                      <div key={status} style={{
+                        padding: "0.5rem 0.9rem", borderRadius: 10,
+                        background: sc.bg, border: `1px solid ${sc.border}`,
+                        display: "flex", flexDirection: "column", alignItems: "center", minWidth: 80,
+                      }}>
+                        <div style={{ fontSize: "1.2rem", fontWeight: 700, color: sc.color }}>{cnt as number}</div>
+                        <div style={{ fontSize: "0.7rem", color: sc.color, opacity: 0.8 }}>{STATUS_LABEL[status] ?? status}</div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+
+          </div>
+        );
+      })()}
     </div>
   );
 }

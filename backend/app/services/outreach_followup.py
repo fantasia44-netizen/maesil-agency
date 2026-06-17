@@ -119,7 +119,7 @@ def _send_sequence_email(lead: dict, sequence: int, touch_id: str) -> bool:
 
     from app.services.notify_client import send_email
     from app.services.outreach_suppression import (
-        is_suppressed, with_ad_subject, inject_compliance_footer,
+        is_suppressed, with_ad_subject, inject_compliance_footer, inject_open_pixel,
     )
     handle = lead.get("handle_name") or "채널"
 
@@ -156,6 +156,7 @@ def _send_sequence_email(lead: dict, sequence: int, touch_id: str) -> bool:
     # 컴플라이언스: (광고) 제목 + 전송자정보/수신거부 푸터
     subject = with_ad_subject(subject)
     html = inject_compliance_footer(html, to)
+    html = inject_open_pixel(html, lead.get("id") or "")
 
     result = send_email(to=to, subject=subject, html=html, source="maesil-agency")
     ok = result.get("ok", False)

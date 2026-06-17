@@ -236,6 +236,7 @@ def analyze_lead(lead_id: str) -> dict:
     """
     리드 심층 분석 엔트리포인트.
     outreach.py 라우터에서 백그라운드 스레드로 호출.
+    ad_agency 플랫폼은 agency_analyzer로 위임.
     """
     # 리드 조회
     resp = _db().table("outreach_leads").select("*").eq("id", lead_id).limit(1).execute()
@@ -246,6 +247,11 @@ def analyze_lead(lead_id: str) -> dict:
 
     lead = rows[0]
     handle = lead.get("handle_name", lead_id)
+
+    # 광고대행사 → agency_analyzer 위임
+    if lead.get("platform") == "ad_agency" or lead.get("channel_type") in ("ad_agency", "coupang_official", "naver_official"):
+        from app.services.outreach_agency_analyzer import analyze_agency_lead
+        return analyze_agency_lead(lead_id)
 
     # YouTube 최신 영상 조회 (이메일 인사에 최신 영상 반영)
     latest_video: dict | None = None

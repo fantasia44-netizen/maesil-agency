@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from pydantic import BaseModel
 
 from app.auth import UserContext, require_admin
@@ -246,6 +246,20 @@ def trigger_batch_analysis(
     return {"ok": True, "queued": len(ids), "message": f"{len(ids)}건 일괄 분석 시작됨 (백그라운드){reanalyze_note}"}
 
 
+@router.get("/leads/{lead_id}/agency-briefing", response_class=HTMLResponse)
+def get_agency_briefing(lead_id: str, user: UserContext = Depends(require_admin)) -> HTMLResponse:
+    """광고대행사 AI 브리핑 HTML 반환."""
+    resp = _db().table("outreach_leads").select("agency_briefing,handle_name").eq("id", lead_id).limit(1).execute()
+    rows = resp.data or []
+    if not rows:
+        return HTMLResponse("<h1>리드 없음</h1>", status_code=404)
+    briefing = (rows[0].get("agency_briefing") or {})
+    html = briefing.get("briefing_html") or ""
+    if not html:
+        return HTMLResponse("<p style='padding:2rem;color:#64748b'>브리핑이 아직 생성되지 않았습니다. AI 브리핑 생성 버튼을 눌러주세요.</p>")
+    return HTMLResponse(content=html, media_type="text/html; charset=utf-8")
+
+
 @router.get("/leads/{lead_id}/email-preview")
 def preview_email(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
     """실제 발송될 이메일 HTML 미리보기."""
@@ -326,6 +340,13 @@ def unsubscribe(token: str = "") -> HTMLResponse:
     if not addr:
         return HTMLResponse(_unsub_page("유효하지 않은 수신거부 링크입니다.", ok=False), status_code=400)
     add_suppression(addr, reason="unsubscribe", source="link")
+    # 해당 이메일 리드 상태 → unsubscribe
+    try:
+        now = datetime.now(timezone.utc).isoformat()
+        _db().table("outreach_leads").update({"status": "unsubscribe", "updated_at": now}) \
+            .eq("contact_email", addr.strip().lower()).execute()
+    except Exception as e:
+        logger.warning("수신거부 리드 상태 업데이트 실패 [%s]: %s", addr, e)
     return HTMLResponse(_unsub_page(f"{addr} 님, 수신거부가 완료되었습니다.", ok=True))
 
 
@@ -333,6 +354,33 @@ def unsubscribe(token: str = "") -> HTMLResponse:
 def unsubscribe_post(token: str = "") -> HTMLResponse:
     """RFC 8058 One-Click 수신거부 (메일 클라이언트 자동 호출)."""
     return unsubscribe(token)
+
+
+_PIXEL_GIF = (
+    b"\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00"
+    b"\xff\xff\xff\x00\x00\x00\x21\xf9\x04\x00\x00\x00\x00\x00"
+    b"\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b"
+)
+
+
+@router.get("/px")
+def track_open(lid: str = "") -> Response:
+    """이메일 오픈 픽셀 (1×1 GIF). 인증 없음 — 메일 클라이언트가 호출."""
+    if lid:
+        try:
+            now = datetime.now(timezone.utc).isoformat()
+            rows = _db().table("outreach_leads").select("open_count,opened_at").eq("id", lid).limit(1).execute().data or []
+            if rows:
+                oc = (rows[0].get("open_count") or 0) + 1
+                upd: dict = {"open_count": oc, "updated_at": now}
+                if not rows[0].get("opened_at"):
+                    upd["opened_at"] = now
+                _db().table("outreach_leads").update(upd).eq("id", lid).execute()
+                logger.info("[open] 이메일 오픈 lead=%s (%d회)", lid, oc)
+        except Exception as e:
+            logger.warning("open 기록 실패 [%s]: %s", lid, e)
+    return Response(content=_PIXEL_GIF, media_type="image/gif",
+                    headers={"Cache-Control": "no-store, no-cache, must-revalidate", "Pragma": "no-cache"})
 
 
 @router.get("/r")

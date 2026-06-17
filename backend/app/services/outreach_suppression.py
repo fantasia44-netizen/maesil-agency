@@ -150,6 +150,17 @@ def inject_compliance_footer(html: str, email: str) -> str:
     return html + footer
 
 
+def inject_open_pixel(html: str, lead_id: str) -> str:
+    """이메일 오픈 추적 픽셀 삽입 (</body> 직전)."""
+    base = (settings.unsubscribe_base_url or "").rstrip("/")
+    if not base or not lead_id:
+        return html
+    pixel = f'<img src="{base}/api/outreach/px?lid={lead_id}" width="1" height="1" alt="" style="display:none">'
+    if "</body>" in html:
+        return html.replace("</body>", pixel + "</body>", 1)
+    return html + pixel
+
+
 def is_quiet_hours(now: datetime | None = None) -> bool:
     """KST 기준 21:00~08:00 이면 True (자동 발송 보류 시간대)."""
     if not settings.outreach_quiet_hours:

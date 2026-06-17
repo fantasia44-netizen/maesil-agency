@@ -47,6 +47,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           {admin && <Link href="/">대시보드</Link>}
           {admin && <Link href="/cs">CS 관리</Link>}
           {admin && <Link href="/outreach">영업</Link>}
+          {admin && <Link href="/briefing">브리핑</Link>}
           {admin && <Link href="/settings">설정</Link>}
         </nav>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.75rem" }}>

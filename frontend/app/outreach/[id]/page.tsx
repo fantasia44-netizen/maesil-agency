@@ -15,6 +15,22 @@ type Touchpoint = {
   replied_at: string | null;
 };
 
+type AgencyBriefing = {
+  diagnosis: string[];
+  agency_profile: string;
+  pitch_angle: string;
+  briefing_sections: { title: string; body: string }[];
+  crawl_meta: {
+    pages_fetched: number;
+    team_size: number | null;
+    client_count: number | null;
+    founded_year: number | null;
+    coupang_certified: boolean;
+    naver_certified: boolean;
+  };
+  generated_at: string | null;
+};
+
 type Lead = {
   id: string;
   platform: string;
@@ -44,6 +60,7 @@ type Lead = {
   reply_received_at: string | null;
   touch_count: number;
   last_touch_at: string | null;
+  agency_briefing: AgencyBriefing | null;
   touchpoints: Touchpoint[];
   created_at: string;
   updated_at: string;
@@ -104,6 +121,9 @@ export default function LeadDetailPage() {
 
   // 미리보기
   const [preview, setPreview] = useState<{ subject: string; html: string } | null>(null);
+
+  // 브리핑 모달
+  const [briefingHtml, setBriefingHtml] = useState<string | null>(null);
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok });
@@ -194,10 +214,27 @@ export default function LeadDetailPage() {
     setActionId("analyze");
     try {
       await apiFetch(`/api/outreach/leads/${lead.id}/analyze`, { method: "POST" }, 10000);
-      showToast("분석 시작됨 — 잠시 후 새로고침하세요");
-      setTimeout(loadLead, 4000);
+      const label = isAgency ? "AI 브리핑 생성 시작됨 — 웹사이트 분석 중 (30초~1분 소요)" : "분석 시작됨 — 잠시 후 새로고침하세요";
+      showToast(label);
+      setTimeout(loadLead, isAgency ? 35000 : 4000);
     } catch (e: unknown) {
       showToast(e instanceof Error ? e.message : "분석 실패", false);
+    } finally {
+      setActionId(null);
+    }
+  };
+
+  const openBriefing = async () => {
+    if (!lead) return;
+    setActionId("briefing");
+    try {
+      const resp = await fetch(`/api/outreach/leads/${lead.id}/agency-briefing`, {
+        headers: { "Authorization": `Bearer ${localStorage.getItem("token") || ""}` },
+      });
+      const html = await resp.text();
+      setBriefingHtml(html);
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : "브리핑 로드 실패", false);
     } finally {
       setActionId(null);
     }
@@ -286,6 +323,8 @@ export default function LeadDetailPage() {
   const gradeBg = GRADE_BG[lead.grade] || "#e2e8f0";
   const replyInfo = lead.reply_type ? REPLY_TYPE_LABEL[lead.reply_type] : null;
   const touchpoints = lead.touchpoints || [];
+  const isAgency = lead.platform === "ad_agency" || ["ad_agency","coupang_official","naver_official"].includes(lead.channel_type || "");
+  const briefing = lead.agency_briefing;
 
   return (
     <div style={{ maxWidth: 820, margin: "0 auto" }}>
@@ -313,6 +352,43 @@ export default function LeadDetailPage() {
                 sandbox="allow-same-origin allow-popups"
                 style={{ width: "100%", height: "600px", border: "none" }}
                 title="이메일 미리보기"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 브리핑 모달 */}
+      {briefingHtml && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 10001,
+          background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
+        }} onClick={() => setBriefingHtml(null)}>
+          <div style={{
+            background: "#fff", borderRadius: 12, width: "100%", maxWidth: 720,
+            maxHeight: "92vh", overflow: "hidden", display: "flex", flexDirection: "column",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ padding: "12px 18px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span style={{ fontWeight: 700, fontSize: "0.88rem" }}>📋 AI 브리핑 — {lead.handle_name}</span>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  onClick={() => {
+                    const win = window.open("", "_blank");
+                    if (win) { win.document.write(briefingHtml); win.document.close(); }
+                  }}
+                  style={{ fontSize: "0.75rem", padding: "4px 10px", border: "1px solid #e2e8f0", borderRadius: 6, background: "#fff", color: "#475569", cursor: "pointer" }}>
+                  새 탭으로 열기
+                </button>
+                <button onClick={() => setBriefingHtml(null)} style={{ background: "none", border: "none", fontSize: "1.2rem", cursor: "pointer", color: "#94a3b8" }}>✕</button>
+              </div>
+            </div>
+            <div style={{ flex: 1, overflow: "auto" }}>
+              <iframe
+                srcDoc={briefingHtml}
+                sandbox="allow-same-origin allow-popups"
+                style={{ width: "100%", height: "700px", border: "none" }}
+                title="AI 브리핑"
               />
             </div>
           </div>
@@ -424,11 +500,79 @@ export default function LeadDetailPage() {
             </div>
           )}
 
+          {/* 대행사 AI 진단 결과 */}
+          {isAgency && briefing && (
+            <div className="card" style={{ borderColor: "#c7d2fe" }}>
+              <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "#4f46e5", marginBottom: "0.6rem" }}>
+                🤖 AI 브리핑 생성 완료
+              </div>
+              {/* 크롤 메타 */}
+              {briefing.crawl_meta && (
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.6rem" }}>
+                  {briefing.crawl_meta.pages_fetched > 0 && (
+                    <span style={{ fontSize: "0.7rem", padding: "2px 8px", borderRadius: 8, background: "#eff6ff", color: "#1d4ed8" }}>
+                      🌐 {briefing.crawl_meta.pages_fetched}페이지 수집
+                    </span>
+                  )}
+                  {briefing.crawl_meta.team_size && (
+                    <span style={{ fontSize: "0.7rem", padding: "2px 8px", borderRadius: 8, background: "#f0fdf4", color: "#15803d" }}>
+                      👥 팀 ~{briefing.crawl_meta.team_size}명
+                    </span>
+                  )}
+                  {briefing.crawl_meta.client_count && (
+                    <span style={{ fontSize: "0.7rem", padding: "2px 8px", borderRadius: 8, background: "#fef9c3", color: "#92400e" }}>
+                      🏢 클라이언트 ~{briefing.crawl_meta.client_count}개
+                    </span>
+                  )}
+                  {briefing.crawl_meta.coupang_certified && (
+                    <span style={{ fontSize: "0.7rem", padding: "2px 8px", borderRadius: 8, background: "#fef2f2", color: "#b91c1c", fontWeight: 700 }}>
+                      쿠팡 공식 ✓
+                    </span>
+                  )}
+                  {briefing.crawl_meta.naver_certified && (
+                    <span style={{ fontSize: "0.7rem", padding: "2px 8px", borderRadius: 8, background: "#f0fdf4", color: "#065f46", fontWeight: 700 }}>
+                      네이버 공식 ✓
+                    </span>
+                  )}
+                </div>
+              )}
+              {/* 고통 포인트 */}
+              {briefing.diagnosis?.length > 0 && (
+                <div style={{ marginBottom: "0.5rem" }}>
+                  <div style={{ fontSize: "0.72rem", color: "#ef4444", fontWeight: 700, marginBottom: "0.3rem" }}>운영 고통 포인트</div>
+                  {briefing.diagnosis.map((d, i) => (
+                    <div key={i} style={{ fontSize: "0.78rem", color: "#374151", padding: "4px 0", borderBottom: "1px solid #f1f5f9", lineHeight: 1.5 }}>
+                      💢 {d}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* 피치 각도 */}
+              {briefing.pitch_angle && (
+                <div style={{ padding: "8px 10px", background: "#eff6ff", borderRadius: 6, fontSize: "0.78rem", color: "#1e40af", lineHeight: 1.6 }}>
+                  💡 <strong>영업 각도:</strong> {briefing.pitch_angle}
+                </div>
+              )}
+              <div className="muted" style={{ fontSize: "0.68rem", marginTop: 6 }}>
+                생성: {briefing.generated_at ? new Date(briefing.generated_at).toLocaleString("ko-KR") : "-"}
+              </div>
+            </div>
+          )}
+
           {/* 액션 버튼 */}
           <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
             {!["emailed","replied","no_reply","negotiating","deal","rejected"].includes(lead.status) && (
               <button className="btn primary" onClick={triggerAnalyze} disabled={!!actionId || lead.status === "analyzing"} style={{ fontSize: "0.82rem" }}>
-                {actionId === "analyze" ? "시작 중…" : lead.status === "analyzing" ? "분석 중…" : lead.status === "discovered" ? "🔬 Haiku 심층분석" : "🔄 재분석"}
+                {actionId === "analyze" ? "시작 중…" : lead.status === "analyzing" ? "분석 중…"
+                  : isAgency
+                    ? (briefing ? "🔄 브리핑 재생성" : "🏢 AI 브리핑 생성")
+                    : (lead.status === "discovered" ? "🔬 Haiku 심층분석" : "🔄 재분석")}
+              </button>
+            )}
+            {isAgency && briefing && (
+              <button className="btn" onClick={openBriefing} disabled={actionId === "briefing"}
+                style={{ fontSize: "0.82rem", borderColor: "#4f46e5", color: "#4f46e5" }}>
+                {actionId === "briefing" ? "로딩…" : "📋 브리핑 보기"}
               </button>
             )}
             {["draft_ready", "approved"].includes(lead.status) && lead.contact_email && (

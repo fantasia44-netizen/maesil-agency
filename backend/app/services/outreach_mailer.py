@@ -345,8 +345,10 @@ def build_lead_email(lead: dict) -> tuple[str, str]:
                 intro = None
         html = _build_email_html(handle, lead.get("platform_url") or "", intro or "")
 
+    from app.services.outreach_suppression import inject_open_pixel
     subject = with_ad_subject(subject)
     html = inject_compliance_footer(html, lead.get("contact_email") or "")
+    html = inject_open_pixel(html, lead.get("id") or "")
     html = _rewrite_kakao_link(html, lead.get("id"))
     return subject, html
 
