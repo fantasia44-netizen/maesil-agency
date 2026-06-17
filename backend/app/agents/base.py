@@ -246,7 +246,10 @@ class BaseAgent:
             template_key = tool_input["template_key"]
             params = tool_input.get("params", {})
             # 공통 파라미터 자동 주입
-            if "operator_id" not in params:
+            # operator_id는 템플릿이 선언한 경우에만 주입
+            from app.agent_config.query_templates import QUERY_TEMPLATES
+            tmpl_declared = set(QUERY_TEMPLATES.get(template_key, {}).get("params", []))
+            if "operator_id" not in params and "operator_id" in tmpl_declared:
                 oid = operator_id or get_operator_id("maesil-insight") or get_operator_id("maesil-total")
                 if oid:
                     params["operator_id"] = oid

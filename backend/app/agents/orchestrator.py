@@ -178,8 +178,8 @@ BRIEFING_MESSAGES = {
     ),
     "finance": (
         "오늘 아침 재무 현황 보고를 작성해주세요. "
-        "이번 달 광고비와 손익 현황을 조회해서 간결하게 정리해주세요. "
-        "template: finance.ad_spend_by_channel, finance.daily_profit_snapshot"
+        "정산·지출·매출 현황을 조회해서 간결하게 정리해주세요. "
+        "template: finance.settlement_summary, finance.expenses_by_category, finance.daily_revenue"
     ),
     "warehouse": (
         "오늘 아침 재고 현황 보고를 작성해주세요. "
