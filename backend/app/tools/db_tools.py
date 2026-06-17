@@ -78,7 +78,9 @@ def run_readonly_sql(
     declared = set(template.get("params", []))
 
     # 파라미터 치환 (:param → 리터럴). 자유 SQL이 아니라 고정 템플릿 + 검증된 리터럴.
-    for key, value in params.items():
+    # 긴 이름 우선 치환 (부분 매칭 방지: :date_from 치환 전에 :date가 먼저 걸리는 문제)
+    sorted_params = sorted(params.items(), key=lambda kv: -len(kv[0]))
+    for key, value in sorted_params:
         if declared and key not in declared:
             _audit(template_key, agent_type, run_id, "denied", None, 0,
                    f"undeclared param '{key}' for template '{template_key}'")
@@ -86,6 +88,13 @@ def run_readonly_sql(
         placeholder = f":{key}"
         literal = _to_sql_literal(key, value)
         sql = sql.replace(placeholder, literal)
+
+    # 미치환 플레이스홀더 탐지
+    import re as _re
+    remaining = _re.findall(r":[a-z_][a-z0-9_]*", sql)
+    if remaining:
+        missing = [r[1:] for r in remaining]
+        raise ValueError(f"Missing params for '{template_key}': {missing}")
 
     start = time.monotonic()
     status = "ok"
