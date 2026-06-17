@@ -8,7 +8,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
     # ───────────── SALES ─────────────
     "sales.today_revenue_by_channel": {
         "db": "maesil-insight",
-        "allowed_agents": ["sales", "orchestrator"],
+        "allowed_agents": ["sales", "growth", "orchestrator"],
         "description": "오늘 채널별 주문수/매출",
         "sql": """
             SELECT channel,
@@ -26,7 +26,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
 
     "sales.date_range_revenue": {
         "db": "maesil-insight",
-        "allowed_agents": ["sales", "finance", "orchestrator"],
+        "allowed_agents": ["sales", "finance", "growth", "orchestrator"],
         "description": "기간별 채널별 매출",
         "sql": """
             SELECT channel,
@@ -45,7 +45,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
 
     "sales.monthly_summary": {
         "db": "maesil-insight",
-        "allowed_agents": ["sales", "finance", "orchestrator"],
+        "allowed_agents": ["sales", "finance", "growth", "orchestrator"],
         "description": "월별 매출 요약",
         "sql": """
             SELECT TO_CHAR(order_date, 'YYYY-MM') AS year_month,
@@ -64,7 +64,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
 
     "sales.top_products": {
         "db": "maesil-insight",
-        "allowed_agents": ["sales", "orchestrator"],
+        "allowed_agents": ["sales", "growth", "orchestrator"],
         "description": "기간 내 상위 판매 상품",
         "sql": """
             SELECT product_name,
@@ -84,7 +84,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
     # ───────────── FINANCE ─────────────
     "finance.ad_spend_by_channel": {
         "db": "maesil-insight",
-        "allowed_agents": ["finance", "sales", "orchestrator"],
+        "allowed_agents": ["finance", "sales", "growth", "orchestrator"],
         "description": "기간별 채널별 광고비",
         "sql": """
             SELECT channel,

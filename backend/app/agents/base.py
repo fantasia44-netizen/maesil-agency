@@ -261,8 +261,11 @@ class BaseAgent:
                 "since": month_start + "T00:00:00+00:00",
                 "limit": 20,
             }
+            # 템플릿에 선언된 파라미터만 주입 (미선언 파라미터 거부 방지)
+            from app.agent_config.query_templates import QUERY_TEMPLATES
+            declared = set(QUERY_TEMPLATES.get(template_key, {}).get("params", []))
             for k, v in defaults.items():
-                if k not in params:
+                if k not in params and (not declared or k in declared):
                     params[k] = v
             rows = run_readonly_sql(template_key, params, self.agent_type, run_id)
             return {"rows": rows, "count": len(rows)}
