@@ -91,22 +91,48 @@ class YouTubeScanner(BaseScanner):
     platform = "youtube"
     keywords = KEYWORDS
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_keys: list[str]):
+        """api_keys: 최대 3개, 429 시 순서대로 전환."""
         from googleapiclient.discovery import build
-        self._yt = build("youtube", "v3", developerKey=api_key, cache_discovery=False)
+        self._keys = [k for k in api_keys if k]
+        self._key_idx = 0
+        self._clients = [
+            build("youtube", "v3", developerKey=k, cache_discovery=False)
+            for k in self._keys
+        ]
+
+    @property
+    def _yt(self):
+        return self._clients[self._key_idx]
+
+    def _next_key(self) -> bool:
+        """다음 키로 전환. 더 이상 없으면 False."""
+        if self._key_idx + 1 < len(self._clients):
+            self._key_idx += 1
+            logger.info("YouTube API 키 전환: #%d → #%d", self._key_idx, self._key_idx + 1)
+            return True
+        return False
 
     def search(self, keyword: str) -> list[str]:
-        try:
-            resp = self._yt.search().list(
-                q=keyword, part="id", type="video",
-                videoDuration="medium",
-                relevanceLanguage="ko", regionCode="KR",
-                maxResults=50, fields="items(id/videoId)",
-            ).execute()
-            return [item["id"]["videoId"] for item in resp.get("items", [])]
-        except Exception as e:
-            logger.warning("YouTube search 실패 [%s]: %s", keyword, e)
-            return []
+        for attempt in range(len(self._clients)):
+            try:
+                resp = self._yt.search().list(
+                    q=keyword, part="id", type="video",
+                    videoDuration="medium",
+                    relevanceLanguage="ko", regionCode="KR",
+                    maxResults=50, fields="items(id/videoId)",
+                ).execute()
+                return [item["id"]["videoId"] for item in resp.get("items", [])]
+            except Exception as e:
+                if "429" in str(e) or "quotaExceeded" in str(e) or "rateLimitExceeded" in str(e):
+                    logger.warning("YouTube 할당량 초과 (키 #%d), 다음 키 시도", self._key_idx + 1)
+                    if not self._next_key():
+                        logger.error("YouTube API 키 모두 소진 [%s]", keyword)
+                        return []
+                else:
+                    logger.warning("YouTube search 실패 [%s]: %s", keyword, e)
+                    return []
+        return []
 
     def fetch_content_details(self, content_ids: list[str]) -> list[ContentItem]:
         items: list[ContentItem] = []

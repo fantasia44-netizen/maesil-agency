@@ -126,8 +126,14 @@ def run_platform_scan(platform: str) -> dict:
         api_key = get_secret("youtube_api_key")
         if not api_key:
             return {"ok": False, "error": "youtube_api_key 미설정"}
+        # 키 2·3번 있으면 함께 사용 (429 시 자동 전환)
+        api_keys = [k for k in [
+            api_key,
+            get_secret("youtube_api_key_2"),
+            get_secret("youtube_api_key_3"),
+        ] if k]
         from app.services.scanners.youtube_scanner import YouTubeScanner, analyze_items_haiku
-        scanner = YouTubeScanner(api_key)
+        scanner = YouTubeScanner(api_keys)
         analyzer = lambda items: analyze_items_haiku(items, get_secret("anthropic_api_key") or "")
     elif platform == "naver_blog":
         client_id = get_secret("naver_client_id")
