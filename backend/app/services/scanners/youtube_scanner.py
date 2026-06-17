@@ -267,18 +267,18 @@ _PROMPT = """\
     "has_tool_recommendation_content": true/false
   }},
   "risk_signals": {{
-    "sells_competing_tool": true/false,
+    "promotes_other_program": true/false,
     "sells_own_program": true/false,
-    "is_competitor_partner": true/false,
-    "has_negative_tool_content": true/false
+    "is_program_company": true/false
   }}
 }}
 
 판단 기준:
 - is_educational: 타인(셀러/예비셀러)에게 교육·정보를 제공하는 채널이면 true
   (단순 수익 인증 브이로그, 본인 쇼핑몰 운영 기록만 있으면 false)
-- sells_competing_tool: 자체 개발 엑셀/프로그램/대시보드를 판매하면 true
-- sells_own_program: 자체 강의 외에 자체 소프트웨어나 자동화툴을 판매하면 true"""
+- promotes_other_program: 특정 경쟁 프로그램/앱/웹서비스를 파트너로 적극 홍보하면 true (어플=프로그램=웹 동일)
+- sells_own_program: 자체 개발한 프로그램/앱/웹서비스/자동화툴을 판매하면 true (어플=프로그램=웹 동일, 강의 판매는 해당 없음)
+- is_program_company: 채널 운영 주체가 소프트웨어/프로그램/SaaS 업체 자체이면 true"""
 
 
 def analyze_items_haiku(items: list[ContentItem], api_key: str) -> list[dict]:

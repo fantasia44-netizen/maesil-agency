@@ -82,13 +82,12 @@ def _reach_score(item: dict) -> int:
 def compute_conversion_signals(ai_result: dict) -> dict:
     """
     Claude Haiku 분석 결과에서 conversion_power_score 계산.
-    ai_result: Claude JSON 응답의 conversion_signals 섹션
+    강의 판매(has_paid_course)는 중립 — 강의팔이도 파트너 가능하므로 점수 미반영.
     """
     signals = ai_result.get("conversion_signals", {})
     score = 0
 
-    if signals.get("has_paid_course"):
-        score += 15
+    # has_paid_course 제외 — 강의 판매 자체는 중립 (리스크도 보너스도 아님)
     if signals.get("has_paid_membership"):
         score += 12
     if signals.get("has_consulting"):
@@ -113,26 +112,27 @@ def compute_conversion_signals(ai_result: dict) -> dict:
 
 def compute_risk_signals(ai_result: dict) -> dict:
     """
-    Claude Haiku 분석 결과에서 competitive_risk_score 계산.
+    경쟁 리스크 3가지만 차감:
+    1. promotes_other_program  — 타 프로그램/앱/웹 홍보 (경쟁사 파트너)
+    2. sells_own_program       — 자체 개발 프로그램/앱/웹 판매
+    3. is_program_company      — 프로그램/소프트웨어 업체 자체
+    (어플=프로그램=웹 동일 취급)
     """
     signals = ai_result.get("risk_signals", {})
     score = 0
 
-    if signals.get("sells_competing_tool"):
+    if signals.get("promotes_other_program"):   # 타 프로그램 홍보
+        score += 35
+    if signals.get("sells_own_program"):         # 자체 개발 프로그램/앱/웹
         score += 30
-    if signals.get("sells_own_program"):
-        score += 20
-    if signals.get("is_competitor_partner"):
-        score += 25
-    if signals.get("has_negative_tool_content"):
-        score += 15
+    if signals.get("is_program_company"):        # 프로그램 업체 자체
+        score += 40
 
     return {
         "competitive_risk_score": min(score, 40),
-        "sells_competing_tool": bool(signals.get("sells_competing_tool")),
+        "promotes_other_program": bool(signals.get("promotes_other_program")),
         "sells_own_program": bool(signals.get("sells_own_program")),
-        "is_competitor_partner": bool(signals.get("is_competitor_partner")),
-        "has_negative_tool_content": bool(signals.get("has_negative_tool_content")),
+        "is_program_company": bool(signals.get("is_program_company")),
     }
 
 

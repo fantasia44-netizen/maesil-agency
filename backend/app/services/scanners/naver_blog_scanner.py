@@ -361,10 +361,9 @@ def analyze_items_haiku(items: list[ContentItem], api_key: str) -> list[dict]:
 - conversion_signals.has_consulting: 유료 컨설팅/코칭
 - conversion_signals.has_tool_recommendation_content: 외부 툴 추천/소개 콘텐츠
 - conversion_signals.has_affiliate_experience: 제휴마케팅/파트너십 경험 언급
-- risk_signals.sells_competing_tool: 자체 엑셀/프로그램/대시보드 판매
-- risk_signals.sells_own_program: 자체 유료 강의 플랫폼 운영
-- risk_signals.is_competitor_partner: 경쟁 광고분석 SaaS 공식 파트너
-- risk_signals.has_negative_tool_content: 외부 유료 툴에 부정적 콘텐츠
+- risk_signals.promotes_other_program: 특정 경쟁 프로그램/앱/웹서비스를 파트너로 적극 홍보하면 true (어플=프로그램=웹 동일)
+- risk_signals.sells_own_program: 자체 개발 프로그램/앱/웹서비스/자동화툴을 판매하면 true (강의 판매는 해당 없음)
+- risk_signals.is_program_company: 블로그 운영 주체가 소프트웨어/프로그램/SaaS 업체 자체이면 true
 - content_summary: 이 블로거가 주로 다루는 내용 1문장 (한국어)
 - confidence: high/medium/low
 
@@ -380,10 +379,9 @@ def analyze_items_haiku(items: list[ContentItem], api_key: str) -> list[dict]:
     "has_affiliate_experience": false
   }},
   "risk_signals": {{
-    "sells_competing_tool": false,
+    "promotes_other_program": false,
     "sells_own_program": false,
-    "is_competitor_partner": false,
-    "has_negative_tool_content": false
+    "is_program_company": false
   }},
   "content_summary": "...",
   "confidence": "medium"
