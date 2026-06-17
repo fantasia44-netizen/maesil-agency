@@ -404,16 +404,17 @@ export default function OutreachPage() {
       {kpi && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "0.6rem", marginBottom: "1.5rem" }}>
           {[
-            { label: "전체 발굴", value: kpi.discovered, color: "#0f172a" },
-            { label: "이메일 발송", value: kpi.emailed, color: "#15803d" },
-            { label: "회신 수신", value: kpi.replied, color: "#d97706" },
-            { label: "협의 중", value: kpi.negotiating, color: "#7c3aed" },
-            { label: "제휴 완료", value: kpi.deal, color: "#065f46" },
-            { label: "터치 발송", value: kpi.touches_sent, color: "#0369a1" },
+            { label: "전체 발굴", value: kpi.discovered, color: "#0f172a", sub: null },
+            { label: "발송 리드", value: kpi.emailed, color: "#15803d", sub: `총 ${kpi.touches_sent}회 발송` },
+            { label: "회신 수신", value: kpi.replied, color: "#d97706", sub: "이메일+카톡" },
+            { label: "협의 중", value: kpi.negotiating, color: "#7c3aed", sub: null },
+            { label: "제휴 완료", value: kpi.deal, color: "#065f46", sub: null },
+            { label: "팔로업 발송", value: kpi.touches_sent - kpi.emailed, color: "#0369a1", sub: `(초기 ${kpi.emailed} + 팔로업 ${kpi.touches_sent - kpi.emailed})` },
           ].map((k) => (
             <div key={k.label} className="card" style={{ textAlign: "center", padding: "0.75rem" }}>
               <div style={{ fontSize: "1.5rem", fontWeight: 700, color: k.color }}>{k.value}</div>
               <div className="muted" style={{ fontSize: "0.72rem" }}>{k.label}</div>
+              {k.sub && <div style={{ fontSize: "0.64rem", color: "#94a3b8", marginTop: 2 }}>{k.sub}</div>}
             </div>
           ))}
         </div>
@@ -771,6 +772,30 @@ export default function OutreachPage() {
                         disabled={!!busy}
                         onClick={() => approveAndSend(lead)}>
                         {actionId === lead.id + ":send" ? "발송 중…" : "📧 발송"}
+                      </button>
+                    )}
+
+                    {/* 카톡/기타 채널 회신 빠른 처리 */}
+                    {["emailed", "no_reply"].includes(lead.status) && (
+                      <button className="btn"
+                        style={{
+                          fontSize: "0.72rem", padding: "4px 9px", whiteSpace: "nowrap",
+                          background: "#fef9c3", border: "1px solid #fde68a", color: "#92400e",
+                        }}
+                        disabled={!!busy}
+                        onClick={() => updateStatus(lead, "replied")}>
+                        📱 카톡 회신
+                      </button>
+                    )}
+                    {lead.status === "replied" && (
+                      <button className="btn"
+                        style={{
+                          fontSize: "0.72rem", padding: "4px 9px", whiteSpace: "nowrap",
+                          background: "#f0fdf4", border: "1px solid #86efac", color: "#166534",
+                        }}
+                        disabled={!!busy}
+                        onClick={() => updateStatus(lead, "negotiating")}>
+                        🤝 협의 중으로
                       </button>
                     )}
 
