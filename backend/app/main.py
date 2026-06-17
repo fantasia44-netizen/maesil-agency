@@ -83,6 +83,8 @@ async def _poll_loop():
                 if drip.get("sent"):
                     logger.info("[scheduler] cold_drip sent → %s (%s/%s)",
                                 drip.get("to"), drip.get("sent_today"), drip.get("cap"))
+                elif drip.get("skipped"):
+                    logger.info("[scheduler] cold_drip skipped: %s", drip.get("skipped"))
             except Exception as e:
                 logger.warning("[scheduler] cold_drip 실패: %s", e)
 
