@@ -239,6 +239,23 @@ export default function OutreachPage() {
 
   useEffect(() => { loadAll(); }, []);
 
+  const triggerRescore = async () => {
+    setBatchAnalyzing(true);
+    try {
+      const res = await apiFetch<{ queued: number; message: string }>(
+        "/api/outreach/leads/rescore",
+        { method: "POST" },
+        15000,
+      );
+      showToast(`📊 ${res.message}`);
+      setTimeout(loadAll, 35000);
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : "등급 재채점 실패", false);
+    } finally {
+      setBatchAnalyzing(false);
+    }
+  };
+
   const triggerBatchAnalyze = async (grades = "S,A,B,C,D", force = false) => {
     setBatchAnalyzing(true);
     try {
@@ -390,6 +407,15 @@ export default function OutreachPage() {
             title="이미 분석된 draft_ready 리드도 새 프롬프트로 재분석"
           >
             {batchAnalyzing ? "분석 중…" : "♻️ 재분석"}
+          </button>
+          <button
+            className="btn"
+            onClick={triggerRescore}
+            disabled={batchAnalyzing}
+            style={{ fontSize: "0.82rem", padding: "6px 14px", borderColor: "#0369a1", color: "#0369a1" }}
+            title="AI 재실행 없이 새 등급 기준으로 전체 재채점 (빠름)"
+          >
+            {batchAnalyzing ? "채점 중…" : "📊 등급 재채점"}
           </button>
         </div>
       </div>

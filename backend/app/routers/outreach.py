@@ -246,6 +246,127 @@ def trigger_batch_analysis(
     return {"ok": True, "queued": len(ids), "message": f"{len(ids)}건 일괄 분석 시작됨 (백그라운드){reanalyze_note}"}
 
 
+@router.post("/leads/rescore")
+def trigger_rescore(
+    limit: int = 2000,
+    user: UserContext = Depends(require_admin),
+) -> dict:
+    """기존 리드 등급 재채점 (AI 재실행 없음).
+    DB에 저장된 신호값으로 새 scorer 기준 재계산 → score/grade/score_breakdown 업데이트.
+    구 필드(sells_competing_tool, is_competitor_partner 등) → 새 필드 매핑 포함.
+    """
+    import threading
+
+    resp = (
+        _db().table("outreach_leads")
+        .select(
+            "id, grade, status, platform, "
+            "contact_email, contact_kakao, contact_naver_cafe, community_size, activity_level, "
+            "subscriber_count, platforms_json, "
+            # 구 리스크 필드
+            "sells_competing_tool, sells_own_program, is_competitor_partner, has_negative_tool_content, "
+            # 신 리스크 필드 (재스캔 리드)
+            "promotes_other_program, is_program_company, "
+            # 전환력 필드
+            "has_paid_course, has_paid_membership, has_ebook_sale, has_consulting, "
+            "has_affiliate_exp, has_tool_recommendation"
+        )
+        .limit(limit)
+        .execute()
+    )
+    rows = resp.data or []
+    if not rows:
+        return {"ok": True, "rescored": 0, "message": "리드 없음"}
+
+    def _run_rescore():
+        from app.services.outreach_scorer import calculate_score
+        now_iso = datetime.now(timezone.utc).isoformat()
+        _preserve_status = {"emailed", "no_reply", "replied", "negotiating", "deal", "rejected", "archived", "unsubscribe", "blocked"}
+        updated = 0
+
+        for lead in rows:
+            try:
+                # ── 리스크 신호 매핑 (구 → 신) ──────────────────────────
+                # 신 필드가 있으면 우선 사용, 없으면 구 필드로 추정
+                promotes_other = (
+                    lead.get("promotes_other_program")
+                    or lead.get("is_competitor_partner")  # 구: 경쟁사 파트너 ≈ 타 프로그램 홍보
+                ) or False
+                sells_own = lead.get("sells_own_program") or lead.get("sells_competing_tool") or False
+                is_prog_co = lead.get("is_program_company") or False
+
+                # ── 전환력 신호 ──────────────────────────────────────────
+                # has_paid_course는 이제 보너스 없음
+                conversion_power = 0
+                if lead.get("has_paid_membership"):
+                    conversion_power += 12
+                if lead.get("has_consulting"):
+                    conversion_power += 10
+                if lead.get("has_ebook_sale"):
+                    conversion_power += 8
+                if lead.get("has_tool_recommendation"):
+                    conversion_power += 8
+                if lead.get("has_affiliate_exp"):
+                    conversion_power += 5
+                conversion_power = min(conversion_power, 40)
+
+                # ── 리스크 점수 ──────────────────────────────────────────
+                risk_score = 0
+                if promotes_other:
+                    risk_score += 35
+                if sells_own:
+                    risk_score += 30
+                if is_prog_co:
+                    risk_score += 40
+                risk_score = min(risk_score, 40)
+
+                score_input = {
+                    "platform": lead.get("platform", ""),
+                    "contact_email": lead.get("contact_email"),
+                    "contact_kakao": lead.get("contact_kakao"),
+                    "contact_naver_cafe": lead.get("contact_naver_cafe"),
+                    "community_size": lead.get("community_size"),
+                    "activity_level": lead.get("activity_level"),
+                    "subscriber_count": lead.get("subscriber_count") or 0,
+                    "platforms_json": lead.get("platforms_json") or [],
+                    "conversion_power_score": conversion_power,
+                    "competitive_risk_score": risk_score,
+                    # 신 필드도 업데이트
+                    "promotes_other_program": bool(promotes_other),
+                    "sells_own_program": bool(sells_own),
+                    "is_program_company": bool(is_prog_co),
+                }
+                total, new_grade, breakdown = calculate_score(score_input)
+
+                # 상태 재결정 (발송/협의 등 보존)
+                cur_status = lead.get("status") or "discovered"
+                if cur_status in _preserve_status:
+                    new_status = cur_status
+                elif new_grade in ("S", "A", "B", "C"):
+                    new_status = "approved"
+                else:
+                    new_status = "draft_ready"
+
+                _db().table("outreach_leads").update({
+                    "score": total,
+                    "grade": new_grade,
+                    "score_breakdown": breakdown,
+                    "promotes_other_program": bool(promotes_other),
+                    "sells_own_program": bool(sells_own),
+                    "is_program_company": bool(is_prog_co),
+                    "status": new_status,
+                    "updated_at": now_iso,
+                }).eq("id", lead["id"]).execute()
+                updated += 1
+            except Exception as e:
+                logger.error("[rescore] 실패 [%s]: %s", lead.get("id"), e)
+
+        logger.info("[rescore] 완료: %d/%d건 재채점", updated, len(rows))
+
+    threading.Thread(target=_run_rescore, daemon=True).start()
+    return {"ok": True, "queued": len(rows), "message": f"{len(rows)}건 등급 재채점 시작됨 (백그라운드, 약 10~30초)"}
+
+
 @router.get("/leads/{lead_id}/agency-briefing", response_class=HTMLResponse)
 def get_agency_briefing(lead_id: str, user: UserContext = Depends(require_admin)) -> HTMLResponse:
     """광고대행사 AI 브리핑 HTML 반환."""
