@@ -9,7 +9,7 @@ type Section = { title: string; body: string };
 
 type Briefing = {
   id: string;
-  agency_type: "sales" | "outreach" | "warehouse";
+  agency_type: "sales" | "outreach" | "warehouse" | "cs" | "finance";
   status: "ok" | "error" | "no_data";
   headline: string | null;
   sections: Section[] | null;
@@ -24,6 +24,8 @@ type LatestBriefings = {
   sales: Briefing | null;
   outreach: Briefing | null;
   warehouse: Briefing | null;
+  cs: Briefing | null;
+  finance: Briefing | null;
 };
 
 // ── 헬퍼 ──────────────────────────────────────────────────────────
@@ -170,7 +172,7 @@ function BriefingPanel({
 
 // ── 메인 ──────────────────────────────────────────────────────────
 export default function BriefingPage() {
-  const [briefings, setBriefings] = useState<LatestBriefings>({ sales: null, outreach: null, warehouse: null });
+  const [briefings, setBriefings] = useState<LatestBriefings>({ sales: null, outreach: null, warehouse: null, cs: null, finance: null });
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
@@ -209,7 +211,7 @@ export default function BriefingPage() {
   };
 
   const runAll = async () => {
-    setRunning({ sales: true, outreach: true, warehouse: true });
+    setRunning({ sales: true, outreach: true, warehouse: true, cs: true, finance: true });
     try {
       const res = await apiFetch<{ ok: boolean; message: string }>(
         "/api/briefing/run?agency=all", { method: "POST" }, 10000
@@ -228,6 +230,8 @@ export default function BriefingPage() {
     ...(briefings.sales?.alerts?.filter(a => a.level === "critical") || []),
     ...(briefings.outreach?.alerts?.filter(a => a.level === "critical") || []),
     ...(briefings.warehouse?.alerts?.filter(a => a.level === "critical") || []),
+    ...(briefings.cs?.alerts?.filter(a => a.level === "critical") || []),
+    ...(briefings.finance?.alerts?.filter(a => a.level === "critical") || []),
   ];
 
   return (
@@ -282,31 +286,47 @@ export default function BriefingPage() {
         </div>
       )}
 
-      {/* 3열 그리드 */}
+      {/* 그리드 */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "0.9rem" }}>
         <BriefingPanel
           briefing={briefings.sales}
-          title="배마마 매출 현황"
+          title="영업 매출 현황"
           icon="📈"
           accentColor="#0369a1"
           running={!!running.sales}
           onRun={() => runOne("sales")}
         />
         <BriefingPanel
-          briefing={briefings.outreach}
-          title="매실인사이트 영업 진행"
-          icon="🎯"
-          accentColor="#059669"
-          running={!!running.outreach}
-          onRun={() => runOne("outreach")}
+          briefing={briefings.finance}
+          title="재무·정산·지출"
+          icon="💰"
+          accentColor="#b45309"
+          running={!!running.finance}
+          onRun={() => runOne("finance")}
         />
         <BriefingPanel
           briefing={briefings.warehouse}
-          title="창고·생산·출고"
+          title="창고·재고"
           icon="📦"
           accentColor="#7c3aed"
           running={!!running.warehouse}
           onRun={() => runOne("warehouse")}
+        />
+        <BriefingPanel
+          briefing={briefings.cs}
+          title="CS·매요 현황"
+          icon="💬"
+          accentColor="#0891b2"
+          running={!!running.cs}
+          onRun={() => runOne("cs")}
+        />
+        <BriefingPanel
+          briefing={briefings.outreach}
+          title="파트너 영업 CRM"
+          icon="🎯"
+          accentColor="#059669"
+          running={!!running.outreach}
+          onRun={() => runOne("outreach")}
         />
       </div>
 
