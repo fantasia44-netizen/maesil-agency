@@ -16,7 +16,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    COUNT(*) AS order_count,
                    SUM(total_amount) AS gross_revenue,
                    SUM(settlement_amount) AS net_revenue
-            FROM api_orders
+            FROM public.api_orders
             WHERE order_date = :target_date
               AND order_status NOT IN ('cancelled', 'returned')
             GROUP BY channel
@@ -35,7 +35,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    COUNT(*) AS order_count,
                    SUM(total_amount) AS gross_revenue,
                    SUM(settlement_amount) AS net_revenue
-            FROM api_orders
+            FROM public.api_orders
             WHERE order_date BETWEEN :date_from AND :date_to
               AND order_status NOT IN ('cancelled', 'returned')
             GROUP BY channel, order_date
@@ -54,7 +54,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    COUNT(*) AS order_count,
                    SUM(total_amount) AS gross_revenue,
                    SUM(settlement_amount) AS net_revenue
-            FROM api_orders
+            FROM public.api_orders
             WHERE order_date >= :date_from
               AND order_status NOT IN ('cancelled', 'returned')
             GROUP BY year_month, channel
@@ -72,7 +72,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    channel,
                    SUM(qty) AS total_qty,
                    SUM(total_amount) AS gross_revenue
-            FROM api_orders
+            FROM public.api_orders
             WHERE order_date BETWEEN :date_from AND :date_to
               AND order_status NOT IN ('cancelled', 'returned')
             GROUP BY product_name, channel
@@ -94,7 +94,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    packaging,
                    other_cost,
                    memo
-            FROM channel_costs
+            FROM public.channel_costs
             WHERE is_deleted IS NOT TRUE
             ORDER BY channel
         """,
@@ -111,7 +111,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    subcategory,
                    SUM(amount) AS total_amount,
                    COUNT(*) AS count
-            FROM expenses
+            FROM public.expenses
             WHERE expense_date BETWEEN :date_from AND :date_to
               AND is_deleted IS NOT TRUE
             GROUP BY expense_month, category, subcategory
@@ -131,7 +131,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    category,
                    SUM(qty) AS total_qty,
                    SUM(revenue) AS total_revenue
-            FROM daily_revenue
+            FROM public.daily_revenue
             WHERE revenue_date BETWEEN :date_from AND :date_to
               AND is_deleted IS NOT TRUE
             GROUP BY revenue_date, channel, product_name, category
@@ -152,7 +152,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    net_settlement,
                    coupon_discount,
                    point_discount
-            FROM api_settlements
+            FROM public.api_settlements
             WHERE settlement_date BETWEEN :date_from AND :date_to
             ORDER BY settlement_date DESC, gross_sales DESC NULLS LAST
         """,
@@ -172,7 +172,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    category,
                    location,
                    expiry_date
-            FROM inventory
+            FROM public.inventory
             WHERE current_stock <= safety_stock
             ORDER BY stock_gap ASC
         """,
@@ -192,7 +192,7 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    storage_method,
                    expiry_date,
                    updated_at
-            FROM inventory
+            FROM public.inventory
             ORDER BY current_stock ASC
         """,
         "params": [],
@@ -207,11 +207,27 @@ QUERY_TEMPLATES: dict[str, dict] = {
                    created_at::date AS order_date,
                    status,
                    memo
-            FROM purchase_orders
+            FROM public.purchase_orders
             WHERE created_at >= :since
             ORDER BY created_at DESC
         """,
         "params": ["since"],
+    },
+
+    "outbound.daily_by_channel": {
+        "db": "maesil-insight",
+        "allowed_agents": ["warehouse", "orchestrator"],
+        "description": "기간별 출고 현황 (outbound_logs)",
+        "sql": """
+            SELECT product_name,
+                   COUNT(*) AS shipment_count
+            FROM public.outbound_logs
+            WHERE created_at::date BETWEEN :date_from AND :date_to
+            GROUP BY product_name
+            ORDER BY shipment_count DESC NULLS LAST
+            LIMIT 30
+        """,
+        "params": ["date_from", "date_to"],
     },
 
     # ───────────── CS (maesil-total agent_work 스키마) ─────────────
