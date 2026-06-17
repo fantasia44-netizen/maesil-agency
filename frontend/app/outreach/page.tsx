@@ -8,7 +8,7 @@ import { apiFetch } from "../../lib/api";
 type LeadStatus =
   | "discovered" | "analyzing" | "draft_ready" | "approved"
   | "emailed" | "replied" | "no_reply" | "negotiating"
-  | "deal" | "rejected" | "archived";
+  | "deal" | "rejected" | "archived" | "unsubscribe";
 
 type Lead = {
   id: string;
