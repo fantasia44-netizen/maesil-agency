@@ -107,6 +107,50 @@ def _update_lead_touch_summary(lead_id: str, channel: str) -> None:
         logger.warning("lead touch 요약 업데이트 실패 [%s]: %s", lead_id, e)
 
 
+def _send_cold_drip_seq1(lead: dict, touch_id: str) -> bool:
+    """1차 콜드 드립 이메일 — Gmail API(outreach_gmail_sender) 사용."""
+    from app.services import outreach_gmail_sender as gm
+    from app.services.outreach_mailer import build_lead_email
+    from app.services.outreach_suppression import is_suppressed
+
+    to = lead.get("contact_email")
+    if not to:
+        _mark_touch(touch_id, "skipped")
+        return False
+    if is_suppressed(to):
+        _mark_touch(touch_id, "skipped", "suppressed")
+        try:
+            now_iso = datetime.now(timezone.utc).isoformat()
+            _db().table("outreach_leads").update(
+                {"status": "unsubscribe", "updated_at": now_iso}
+            ).eq("id", lead["id"]).execute()
+        except Exception:
+            pass
+        return False
+
+    subject, html = build_lead_email(lead)
+    result = gm.send(to, subject, html)
+    ok = result.get("ok", False)
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    if ok:
+        try:
+            _db().table("outreach_leads").update({
+                "status": "emailed", "emailed_at": now_iso, "updated_at": now_iso,
+            }).eq("id", lead["id"]).execute()
+        except Exception as e:
+            logger.warning("cold drip lead 상태 갱신 실패 [%s]: %s", lead["id"], e)
+        try:
+            _db().table("outreach_touchpoints").update({
+                "sent_subject": subject, "sent_at": now_iso,
+            }).eq("id", touch_id).execute()
+        except Exception:
+            pass
+
+    _mark_touch(touch_id, "sent" if ok else "failed", result.get("error"))
+    return ok
+
+
 def _send_sequence_email(lead: dict, sequence: int, touch_id: str) -> bool:
     """이메일 시퀀스 발송."""
     if sequence == 1:
@@ -291,9 +335,7 @@ def check_pending_followups(limit: int = 20) -> dict:
 
         try:
             if channel == "email" and sequence == 1:
-                # 1차 이메일은 수동 발송(send_single)이 처리 — 스케줄러는 건너뜀
-                # skipped로 마킹하지 않음: send_single이 발송 후 sent로 업데이트
-                continue
+                ok = _send_cold_drip_seq1(lead, touch_id)
             elif channel == "email":
                 ok = _send_sequence_email(lead, sequence, touch_id)
             else:

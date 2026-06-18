@@ -1,21 +1,18 @@
 """
-outreach_cold_drip.py — 유튜버 콜드 메일 저속 드립 발송.
+outreach_cold_drip.py — 유튜버 콜드 메일 일별 발송 스케줄 DB화.
 
-스케줄러(3분 주기)에서 process_cold_drip() 호출.
-정책: OUTREACH_COLD_DRIP_ENABLED=1 일 때만, 업무시간(평일 KST 10~17),
-하루 OUTREACH_DAILY_CAP(기본 30)통, 발송 간격 = 업무시간/일일상한(기본 ~14분).
-발송은 별도 Workspace 메일박스 Gmail API (outreach_gmail_sender).
+매일 KST 오전 8시 이후 첫 스케줄러 사이클에서 schedule_daily_cold_drip() 호출.
+approved 리드 최대 N개를 선택해 outreach_touchpoints(seq=1, pending)로 오전8시~오후8시
+균등 분산 예약. 실제 발송은 outreach_followup.check_pending_followups() 가 담당.
 """
 from __future__ import annotations
 
 import logging
-import time
 from datetime import datetime, timedelta, timezone
 
 logger = logging.getLogger(__name__)
 
 _KST = timezone(timedelta(hours=9))
-_last_send_mono = 0.0  # 발송 간격 페이싱(프로세스 메모리). 재시작 시 0 — 무방.
 
 
 def _db():
@@ -23,54 +20,56 @@ def _db():
     return get_maesil_total_client().schema("agent_work")
 
 
-def _within_business_hours(now_kst: datetime, start_h: int, end_h: int) -> bool:
-    if now_kst.weekday() >= 5:  # 토(5)·일(6) 제외
-        return False
-    return start_h <= now_kst.hour < end_h
+def _today_kst_str() -> str:
+    return datetime.now(_KST).date().isoformat()
 
 
-def _sent_today() -> int:
-    """오늘(KST) 발송된 유튜버 콜드 리드 수 — 재시작 후에도 상한 유지(DB 기준)."""
-    start_kst = datetime.now(_KST).replace(hour=0, minute=0, second=0, microsecond=0)
-    start_utc = start_kst.astimezone(timezone.utc).isoformat()
+def already_scheduled_today() -> bool:
+    """오늘(KST) seq=1 pending/sent 터치포인트가 이미 있으면 True."""
+    today_kst = _today_kst_str()
     try:
         resp = (
-            _db().table("outreach_leads")
+            _db().table("outreach_touchpoints")
             .select("id", count="exact")
-            .eq("platform", "youtube")
-            .gte("emailed_at", start_utc)
+            .eq("touch_sequence", 1)
+            .eq("channel", "email")
+            .in_("status", ["pending", "sent"])
+            .gte("scheduled_for", today_kst)
             .execute()
         )
-        return resp.count or 0
+        return (resp.count or 0) > 0
     except Exception as e:
-        logger.warning("_sent_today 조회 실패: %s", e)
-        return 0
+        logger.warning("already_scheduled_today 조회 실패: %s", e)
+        return False
 
 
-def _next_lead(grades: list[str]) -> dict | None:
-    """발송 대상 1건: 유튜브·이메일 있음·미발송·지정 등급, 점수순."""
+def _eligible_leads(cap: int, grades: list[str]) -> list[dict]:
+    """오늘 발송 대상: approved + 이메일 있음 + 미발송, 점수순."""
     try:
         resp = (
             _db().table("outreach_leads")
-            .select("*")
+            .select("id, contact_email, handle_name, platform, grade, score")
             .eq("platform", "youtube")
             .in_("status", ["approved"])
             .in_("grade", grades)
             .is_("emailed_at", "null")
             .not_.is_("contact_email", "null")
             .order("score", desc=True)
-            .limit(1)
+            .limit(cap)
             .execute()
         )
-        rows = resp.data or []
-        return rows[0] if rows else None
+        return resp.data or []
     except Exception as e:
-        logger.warning("_next_lead 조회 실패: %s", e)
-        return None
+        logger.warning("eligible_leads 조회 실패: %s", e)
+        return []
 
 
-def process_cold_drip() -> dict:
-    global _last_send_mono
+def schedule_daily_cold_drip() -> dict:
+    """
+    오늘 발송 리스트를 outreach_touchpoints DB에 생성.
+    이미 오늘 일정이 있거나, 업무시간 전이거나, disabled면 스킵.
+    반환: {"scheduled": N} 또는 {"skipped": reason}
+    """
     from app.config import settings
 
     if not settings.outreach_cold_drip_enabled:
@@ -81,80 +80,65 @@ def process_cold_drip() -> dict:
         return {"skipped": "gmail not configured"}
 
     now_kst = datetime.now(_KST)
-    if not _within_business_hours(now_kst, settings.outreach_send_start_hour,
-                                  settings.outreach_send_end_hour):
-        return {"skipped": "outside business hours"}
+    if now_kst.weekday() >= 5:
+        return {"skipped": "weekend"}
+    if now_kst.hour < settings.outreach_send_start_hour:
+        return {"skipped": "before business hours"}
+
+    if already_scheduled_today():
+        return {"skipped": "already scheduled today"}
 
     cap = max(1, settings.outreach_daily_cap)
-    sent = _sent_today()
-    if sent >= cap:
-        return {"skipped": "daily cap reached", "sent_today": sent}
-
-    # 발송 간격(분) = 업무시간 / 상한
-    window_min = max(1, (settings.outreach_send_end_hour - settings.outreach_send_start_hour) * 60)
-    gap_sec = (window_min / cap) * 60
-    if _last_send_mono and (time.monotonic() - _last_send_mono) < gap_sec:
-        return {"skipped": "pacing", "sent_today": sent}
-
     grades = [g.strip() for g in settings.outreach_drip_grades.split(",") if g.strip()]
-    lead = _next_lead(grades)
-    if not lead:
-        return {"skipped": "no eligible lead", "sent_today": sent}
+    leads = _eligible_leads(cap, grades)
 
-    to = lead.get("contact_email")
-    lead_id = lead.get("id")
+    if not leads:
+        return {"skipped": "no eligible leads", "scheduled": 0}
 
-    # 수신거부/차단 → 발송 제외 + 상태 전환(재선택 방지)
-    from app.services.outreach_suppression import is_suppressed
-    if is_suppressed(to):
+    # 오전 start_hour ~ end_hour KST 균등 분산
+    start_h = settings.outreach_send_start_hour
+    end_h = settings.outreach_send_end_hour
+    today = now_kst.date()
+    window_sec = (end_h - start_h) * 3600
+    n = len(leads)
+    gap_sec = window_sec / n if n > 1 else window_sec
+
+    records = []
+    for i, lead in enumerate(leads):
+        offset_sec = int(gap_sec * i)
+        scheduled_kst = datetime(today.year, today.month, today.day,
+                                 start_h, 0, 0, tzinfo=_KST) + timedelta(seconds=offset_sec)
+        # 과거 시각이면 지금 + 1분으로 (오늘 늦게 처음 실행 시)
+        if scheduled_kst < datetime.now(_KST):
+            scheduled_kst = datetime.now(_KST) + timedelta(minutes=1 + i)
+        records.append({
+            "lead_id": lead["id"],
+            "touch_sequence": 1,
+            "channel": "email",
+            "status": "pending",
+            "scheduled_for": scheduled_kst.astimezone(timezone.utc).isoformat(),
+        })
+
+    # 기존 오늘 seq=1 pending 제거 후 일괄 삽입 (멱등)
+    try:
+        today_str = _today_kst_str()
+        _db().table("outreach_touchpoints").delete()\
+            .eq("touch_sequence", 1)\
+            .eq("channel", "email")\
+            .eq("status", "pending")\
+            .gte("scheduled_for", today_str)\
+            .execute()
+    except Exception as e:
+        logger.warning("기존 pending 정리 실패: %s", e)
+
+    inserted = 0
+    chunk = 50
+    for i in range(0, len(records), chunk):
         try:
-            _db().table("outreach_leads").update(
-                {"status": "unsubscribe", "updated_at": datetime.now(timezone.utc).isoformat()}
-            ).eq("id", lead_id).execute()
-        except Exception:
-            pass
-        return {"skipped": "suppressed lead", "sent_today": sent}
-
-    from app.services.outreach_mailer import build_lead_email
-    subject, html = build_lead_email(lead)
-    result = gm.send(to, subject, html)
-
-    now_iso = datetime.now(timezone.utc).isoformat()
-    if result.get("ok"):
-        _last_send_mono = time.monotonic()
-        try:
-            _db().table("outreach_leads").update({
-                "status": "emailed", "emailed_at": now_iso, "updated_at": now_iso,
-            }).eq("id", lead_id).execute()
+            _db().table("outreach_touchpoints").insert(records[i:i+chunk]).execute()
+            inserted += len(records[i:i+chunk])
         except Exception as e:
-            logger.warning("드립 발송 후 상태 갱신 실패 [%s]: %s", lead_id, e)
+            logger.error("cold drip 예약 삽입 실패 (chunk %d): %s", i, e)
 
-        # 터치포인트 1차 기록 (발송 이력 통합 추적용)
-        try:
-            _db().table("outreach_touchpoints").upsert({
-                "lead_id": lead_id,
-                "touch_sequence": 1,
-                "channel": "email",
-                "status": "sent",
-                "scheduled_for": now_iso,
-                "sent_at": now_iso,
-            }, on_conflict="lead_id,touch_sequence").execute()
-            # 2~3차 팔로업 이메일 예약 (7일, 14일 후)
-            for seq, days in [(2, 7), (3, 14)]:
-                scheduled = (datetime.now(timezone.utc) + timedelta(days=days)).isoformat()
-                _db().table("outreach_touchpoints").upsert({
-                    "lead_id": lead_id,
-                    "touch_sequence": seq,
-                    "channel": "email",
-                    "status": "pending",
-                    "scheduled_for": scheduled,
-                }, on_conflict="lead_id,touch_sequence").execute()
-        except Exception as e:
-            logger.warning("드립 터치포인트 기록 실패 [%s]: %s", lead_id, e)
-
-        logger.info("[cold_drip] 발송 %s → %s (%d/%d)",
-                    lead.get("handle_name"), to, sent + 1, cap)
-        return {"sent": 1, "to": to, "sent_today": sent + 1, "cap": cap}
-
-    logger.warning("[cold_drip] 발송 실패 %s → %s: %s", lead.get("handle_name"), to, result.get("error"))
-    return {"error": result.get("error"), "sent_today": sent}
+    logger.info("[cold_drip] 오늘 발송 예약 %d건 생성", inserted)
+    return {"scheduled": inserted}

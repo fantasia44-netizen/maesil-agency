@@ -76,15 +76,14 @@ async def _poll_loop():
             except Exception as e:
                 logger.warning("[scheduler] followup 실패: %s", e)
 
-            # 콜드 드립 — 유튜버 콜드 메일 저속 발송 (기본 off, 세팅 후 활성)
+            # 콜드 드립 — 하루 1회 오늘 발송 리스트 DB 예약 (기본 off, 세팅 후 활성)
             try:
-                from app.services.outreach_cold_drip import process_cold_drip
-                drip = await asyncio.to_thread(process_cold_drip)
-                if drip.get("sent"):
-                    logger.info("[scheduler] cold_drip sent → %s (%s/%s)",
-                                drip.get("to"), drip.get("sent_today"), drip.get("cap"))
+                from app.services.outreach_cold_drip import schedule_daily_cold_drip
+                drip = await asyncio.to_thread(schedule_daily_cold_drip)
+                if drip.get("scheduled"):
+                    logger.info("[scheduler] cold_drip 오늘 예약 %d건 생성", drip["scheduled"])
                 elif drip.get("skipped"):
-                    logger.info("[scheduler] cold_drip skipped: %s", drip.get("skipped"))
+                    logger.debug("[scheduler] cold_drip skipped: %s", drip["skipped"])
             except Exception as e:
                 logger.warning("[scheduler] cold_drip 실패: %s", e)
 
