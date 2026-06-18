@@ -37,7 +37,7 @@ def _query(template_key: str, params: dict) -> list[dict]:
         return []
 
 
-def _collect_data() -> dict:
+def _collect_data(operator_id: str) -> dict:
     today = date.today()
     d30_from = (today - timedelta(days=30)).isoformat()
     today_str = today.isoformat()
@@ -45,26 +45,27 @@ def _collect_data() -> dict:
     raw: dict = {}
 
     # 안전재고 이하 위험 품목
-    raw["low_stock"] = _query("warehouse.low_stock_items", {})
+    raw["low_stock"] = _query("warehouse.low_stock_items", {
+        "operator_id": operator_id,
+    })
 
     # 전체 재고 현황
-    raw["inventory"] = _query("warehouse.inventory_status", {})
-
-    # 발주 현황
-    raw["purchase_orders"] = _query("warehouse.purchase_plans", {
-        "since": (today - timedelta(days=90)).isoformat() + "T00:00:00+00:00",
+    raw["inventory"] = _query("warehouse.inventory_status", {
+        "operator_id": operator_id,
     })
 
     # 최근 30일 판매 상위 상품 (재고 소진 예측용)
     raw["sales_30d"] = _query("sales.top_products", {
         "date_from": d30_from,
         "date_to": today_str,
+        "operator_id": operator_id,
     })[:15]
 
-    # 최근 30일 출고 현황
-    raw["outbound_30d"] = _query("outbound.daily_by_channel", {
+    # 최근 30일 입출고 현황
+    raw["outbound_30d"] = _query("warehouse.outbound_by_product", {
         "date_from": d30_from,
         "date_to": today_str,
+        "operator_id": operator_id,
     })
 
     return raw
@@ -149,7 +150,7 @@ def run_briefing() -> dict:
     operator_id = get_secret("maesil-insight_operator_id") or ""
 
     today = date.today()
-    raw = _collect_data()
+    raw = _collect_data(operator_id)
 
     all_empty = all(not v for v in raw.values())
     if all_empty:

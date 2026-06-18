@@ -2,10 +2,10 @@
 재무 에이전시 — 정산·지출·수익성 분석 브리핑.
 
 실제 연동 테이블 (maesil-insight):
-  - api_settlements : 채널별 정산
-  - expenses        : 지출 내역
-  - channel_costs   : 채널별 수수료 구조
-  - daily_revenue   : 일별 매출
+  - api_settlements      : 채널별 정산
+  - ad_spend             : 광고비·ROAS
+  - channel_costs        : 채널별 수수료 구조
+  - daily_profit_snapshot: 일별 손익 스냅샷
 """
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ def _query(template_key: str, params: dict) -> list[dict]:
         return []
 
 
-def _collect_data() -> dict:
+def _collect_data(operator_id: str) -> dict:
     today = date.today()
     d30_from = (today - timedelta(days=30)).isoformat()
     d14_from = (today - timedelta(days=14)).isoformat()
@@ -50,28 +50,34 @@ def _collect_data() -> dict:
     raw["settlements_30d"] = _query("finance.settlement_summary", {
         "date_from": d30_from,
         "date_to": today_str,
+        "operator_id": operator_id,
     })
 
     # 채널별 정산 (최근 90일 — 월별 비교용)
     raw["settlements_90d"] = _query("finance.settlement_summary", {
         "date_from": d90_from,
         "date_to": today_str,
+        "operator_id": operator_id,
     })
 
-    # 지출 내역 (최근 30일)
-    raw["expenses_30d"] = _query("finance.expenses_by_category", {
+    # 채널별 광고비·ROAS (최근 30일)
+    raw["ad_spend_30d"] = _query("finance.ad_spend_by_channel", {
         "date_from": d30_from,
         "date_to": today_str,
+        "operator_id": operator_id,
     })
 
-    # 일별 매출 (최근 14일)
-    raw["revenue_14d"] = _query("finance.daily_revenue", {
+    # 일별 손익 스냅샷 (최근 14일)
+    raw["daily_profit_14d"] = _query("finance.daily_profit", {
         "date_from": d14_from,
         "date_to": today_str,
+        "operator_id": operator_id,
     })
 
     # 채널별 수수료 구조
-    raw["channel_costs"] = _query("finance.ad_spend_by_channel", {})
+    raw["channel_costs"] = _query("finance.channel_costs", {
+        "operator_id": operator_id,
+    })
 
     return raw
 
@@ -99,11 +105,11 @@ def _sonnet_briefing(raw: dict) -> dict:
 ### 채널별 정산 현황 (최근 90일 — 월별 추이)
 {_s(raw.get("settlements_90d", []), 60)}
 
-### 지출 내역 카테고리별 (최근 30일, expenses)
-{_s(raw.get("expenses_30d", []))}
+### 채널별 광고비·ROAS (최근 30일, ad_spend)
+{_s(raw.get("ad_spend_30d", []))}
 
-### 일별 매출 (최근 14일, daily_revenue)
-{_s(raw.get("revenue_14d", []))}
+### 일별 손익 스냅샷 (최근 14일, daily_profit_snapshot)
+{_s(raw.get("daily_profit_14d", []))}
 
 ### 채널별 수수료·비용 구조 (channel_costs)
 {_s(raw.get("channel_costs", []))}
@@ -157,7 +163,7 @@ def run_briefing() -> dict:
     operator_id = get_secret("maesil-insight_operator_id") or ""
 
     today = date.today()
-    raw = _collect_data()
+    raw = _collect_data(operator_id)
 
     all_empty = all(not v for v in raw.values())
     if all_empty:

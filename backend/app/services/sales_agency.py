@@ -62,11 +62,10 @@ def _fmt_won(amount) -> str:
     return f"{n:,}"
 
 
-def _collect_data() -> dict:
+def _collect_data(operator_id: str) -> dict:
     today = date.today()
     today_str = today.isoformat()
     d30_from = (today - timedelta(days=30)).isoformat()
-    d14_from = (today - timedelta(days=14)).isoformat()
     d90_from = (today - timedelta(days=90)).isoformat()
 
     raw: dict = {}
@@ -74,38 +73,41 @@ def _collect_data() -> dict:
     # 오늘 채널별 매출
     raw["today"] = _query("sales.today_revenue_by_channel", {
         "target_date": today_str,
+        "operator_id": operator_id,
     })
 
     # 최근 30일 일별×채널 매출
     raw["revenue_30d"] = _query("sales.date_range_revenue", {
         "date_from": d30_from,
         "date_to": today_str,
+        "operator_id": operator_id,
     })
 
     # 월별 요약 (최근 3개월)
     raw["monthly"] = _query("sales.monthly_summary", {
         "date_from": d90_from,
+        "operator_id": operator_id,
     })
 
     # 상위 상품 (30일)
     raw["top_products"] = _query("sales.top_products", {
         "date_from": d30_from,
         "date_to": today_str,
+        "operator_id": operator_id,
     })[:10]
 
-    # 채널별 비용 구조
-    raw["channel_costs"] = _query("finance.ad_spend_by_channel", {})
-
-    # 기간별 지출 (최근 14일)
-    raw["expenses"] = _query("finance.expenses_by_category", {
-        "date_from": d14_from,
+    # 채널별 광고비·ROAS (최근 30일)
+    raw["ad_spend"] = _query("finance.ad_spend_by_channel", {
+        "date_from": d30_from,
         "date_to": today_str,
+        "operator_id": operator_id,
     })
 
     # 정산 요약 (최근 30일)
     raw["settlements"] = _query("finance.settlement_summary", {
         "date_from": d30_from,
         "date_to": today_str,
+        "operator_id": operator_id,
     })
 
     return raw
@@ -139,14 +141,11 @@ def _sonnet_briefing(raw: dict) -> dict:
 ### 상위 판매 상품 TOP10 (30일)
 {_s(raw.get("top_products", []))}
 
-### 채널별 수수료·비용 구조 (channel_costs)
-{_s(raw.get("channel_costs", []))}
+### 채널별 광고비·ROAS (ad_spend, 최근 30일)
+{_s(raw.get("ad_spend", []))}
 
 ### 채널별 정산 현황 (api_settlements, 최근 30일)
 {_s(raw.get("settlements", []), 30)}
-
-### 지출 내역 (expenses, 최근 14일)
-{_s(raw.get("expenses", []))}
 
 ## 브리핑 요구사항
 1. **headline**: 오늘 영업 상황 1줄 요약 (구체적 수치 포함, 40자 이내)
@@ -154,7 +153,7 @@ def _sonnet_briefing(raw: dict) -> dict:
    - 오늘 매출 현황: 채널별 주문수·매출액, 이상 포착
    - 30일 트렌드: 성장/하락 채널, 주력 상품 변화
    - 정산·수익성: 채널별 net_settlement vs gross_sales, 수수료 부담율
-   - 지출·비용: 최근 지출 카테고리별 요약, 이상 항목
+   - 광고·비용: 채널별 광고비·ROAS, 효율 이상 항목
 3. **alerts**: 즉시 조치 필요 항목 (없으면 빈 배열)
    - 매출 급락, 정산 이상, 지출 급증 등 level: warning/critical
 
@@ -193,10 +192,10 @@ JSON으로만 답하세요:
 
 def run_briefing() -> dict:
     """영업 에이전시 브리핑 실행 + DB 저장."""
-    operator_id = _get_operator_id()  # agency_briefings 저장용으로만 사용
+    operator_id = _get_operator_id()
 
     today = date.today()
-    raw = _collect_data()
+    raw = _collect_data(operator_id)
 
     # 전체 데이터 없음 체크
     all_empty = all(not v for v in raw.values())
