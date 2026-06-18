@@ -147,7 +147,29 @@ def _send_cold_drip_seq1(lead: dict, touch_id: str) -> bool:
         except Exception:
             pass
 
-    _mark_touch(touch_id, "sent" if ok else "failed", result.get("error"))
+    if ok:
+        _mark_touch(touch_id, "sent")
+    else:
+        _mark_touch(touch_id, "failed", result.get("error"))
+        # 실패 누적 체크 — 2회 이상이면 리드를 send_failed로 전환
+        try:
+            fail_resp = (
+                _db().table("outreach_touchpoints")
+                .select("id", count="exact")
+                .eq("lead_id", lead["id"])
+                .eq("touch_sequence", 1)
+                .eq("status", "failed")
+                .execute()
+            )
+            if (fail_resp.count or 0) >= 2:
+                _db().table("outreach_leads").update({
+                    "status": "send_failed",
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                }).eq("id", lead["id"]).execute()
+                logger.warning("[cold_drip] 2회 실패 → send_failed [%s]", lead["id"])
+        except Exception as e:
+            logger.warning("실패 횟수 체크 실패 [%s]: %s", lead["id"], e)
+
     return ok
 
 
