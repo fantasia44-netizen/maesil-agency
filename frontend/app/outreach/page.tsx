@@ -202,6 +202,7 @@ export default function OutreachPage() {
   const [touchLogs, setTouchLogs] = useState<TouchLog[]>([]);
   const [touchLoading, setTouchLoading] = useState(false);
   const [touchStatusFilter, setTouchStatusFilter] = useState<string>("all");
+  const [touchDateFilter, setTouchDateFilter] = useState<"today" | "all">("today");
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok });
@@ -503,11 +504,45 @@ export default function OutreachPage() {
       {/* ── 발송 이력 탭 ── */}
       {mainTab === "history" && (
         <div>
+          {/* 날짜 필터 */}
+          <div style={{ display: "flex", gap: "0.35rem", marginBottom: "0.6rem", alignItems: "center" }}>
+            {(["today", "all"] as const).map((d) => {
+              const active = touchDateFilter === d;
+              const label = d === "today" ? "📅 오늘" : "전체";
+              return (
+                <button key={d} onClick={() => setTouchDateFilter(d)}
+                  style={{
+                    padding: "4px 14px", borderRadius: 18, border: "1px solid",
+                    borderColor: active ? "#7c3aed" : "#e2e8f0",
+                    background: active ? "#7c3aed" : "#fff",
+                    color: active ? "#fff" : "#64748b",
+                    fontSize: "0.76rem", cursor: "pointer", fontWeight: active ? 600 : 400,
+                  }}>{label}</button>
+              );
+            })}
+            {touchDateFilter === "today" && (() => {
+              const todayKST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
+              const todayStr = `${todayKST.getFullYear()}-${String(todayKST.getMonth()+1).padStart(2,"0")}-${String(todayKST.getDate()).padStart(2,"0")}`;
+              const todaySent = touchLogs.filter(t => t.status === "sent" && t.sent_at?.startsWith(todayStr)).length;
+              const todayPending = touchLogs.filter(t => t.status === "pending" && t.scheduled_for?.startsWith(todayStr)).length;
+              return (
+                <span style={{ fontSize: "0.75rem", color: "#64748b", marginLeft: 4 }}>
+                  발송됨 <strong style={{ color: "#166534" }}>{todaySent}</strong>건 · 예약됨 <strong style={{ color: "#92400e" }}>{todayPending}</strong>건
+                </span>
+              );
+            })()}
+          </div>
+
           {/* 상태 필터 */}
           <div style={{ display: "flex", gap: "0.35rem", marginBottom: "1rem", flexWrap: "wrap" }}>
             {["all", "sent", "pending", "failed", "replied", "bounced", "skipped"].map((s) => {
+              const todayKST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
+              const todayStr = `${todayKST.getFullYear()}-${String(todayKST.getMonth()+1).padStart(2,"0")}-${String(todayKST.getDate()).padStart(2,"0")}`;
+              const dateFiltered = touchDateFilter === "today"
+                ? touchLogs.filter(t => (t.sent_at ?? t.scheduled_for ?? "").startsWith(todayStr))
+                : touchLogs;
               const active = touchStatusFilter === s;
-              const cnt = s === "all" ? touchLogs.length : touchLogs.filter(t => t.status === s).length;
+              const cnt = s === "all" ? dateFiltered.length : dateFiltered.filter(t => t.status === s).length;
               if (s !== "all" && cnt === 0) return null;
               const ts = TOUCH_STATUS_LABEL[s];
               return (
@@ -534,8 +569,13 @@ export default function OutreachPage() {
             <div className="muted" style={{ textAlign: "center", padding: "3rem" }}>로딩 중…</div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
-              {touchLogs
-                .filter(t => touchStatusFilter === "all" || t.status === touchStatusFilter)
+              {(() => {
+                const todayKST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
+                const todayStr = `${todayKST.getFullYear()}-${String(todayKST.getMonth()+1).padStart(2,"0")}-${String(todayKST.getDate()).padStart(2,"0")}`;
+                return touchLogs
+                  .filter(t => touchDateFilter === "all" || (t.sent_at ?? t.scheduled_for ?? "").startsWith(todayStr))
+                  .filter(t => touchStatusFilter === "all" || t.status === touchStatusFilter);
+              })()
                 .map((t) => {
                   const ts = TOUCH_STATUS_LABEL[t.status] ?? { label: t.status, color: "#64748b", bg: "#f1f5f9" };
                   const gc = GRADE_COLOR[t.lead_grade ?? ""] ?? { bg: "#e2e8f0", color: "#64748b" };
@@ -585,11 +625,18 @@ export default function OutreachPage() {
                     </div>
                   );
                 })}
-              {touchLogs.filter(t => touchStatusFilter === "all" || t.status === touchStatusFilter).length === 0 && (
-                <div className="card" style={{ textAlign: "center", color: "#94a3b8", padding: "2rem" }}>
-                  발송 이력이 없습니다.
-                </div>
-              )}
+              {(() => {
+                const todayKST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
+                const todayStr = `${todayKST.getFullYear()}-${String(todayKST.getMonth()+1).padStart(2,"0")}-${String(todayKST.getDate()).padStart(2,"0")}`;
+                const filtered = touchLogs
+                  .filter(t => touchDateFilter === "all" || (t.sent_at ?? t.scheduled_for ?? "").startsWith(todayStr))
+                  .filter(t => touchStatusFilter === "all" || t.status === touchStatusFilter);
+                return filtered.length === 0 ? (
+                  <div className="card" style={{ textAlign: "center", color: "#94a3b8", padding: "2rem" }}>
+                    {touchDateFilter === "today" ? "오늘 발송 내역이 없습니다." : "발송 이력이 없습니다."}
+                  </div>
+                ) : null;
+              })()}
             </div>
           )}
         </div>
