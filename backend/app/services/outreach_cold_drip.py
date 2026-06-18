@@ -128,6 +128,30 @@ def process_cold_drip() -> dict:
             }).eq("id", lead_id).execute()
         except Exception as e:
             logger.warning("드립 발송 후 상태 갱신 실패 [%s]: %s", lead_id, e)
+
+        # 터치포인트 1차 기록 (발송 이력 통합 추적용)
+        try:
+            _db().table("outreach_touchpoints").upsert({
+                "lead_id": lead_id,
+                "touch_sequence": 1,
+                "channel": "email",
+                "status": "sent",
+                "scheduled_for": now_iso,
+                "sent_at": now_iso,
+            }, on_conflict="lead_id,touch_sequence").execute()
+            # 2~3차 팔로업 이메일 예약 (7일, 14일 후)
+            for seq, days in [(2, 7), (3, 14)]:
+                scheduled = (datetime.now(timezone.utc) + timedelta(days=days)).isoformat()
+                _db().table("outreach_touchpoints").upsert({
+                    "lead_id": lead_id,
+                    "touch_sequence": seq,
+                    "channel": "email",
+                    "status": "pending",
+                    "scheduled_for": scheduled,
+                }, on_conflict="lead_id,touch_sequence").execute()
+        except Exception as e:
+            logger.warning("드립 터치포인트 기록 실패 [%s]: %s", lead_id, e)
+
         logger.info("[cold_drip] 발송 %s → %s (%d/%d)",
                     lead.get("handle_name"), to, sent + 1, cap)
         return {"sent": 1, "to": to, "sent_today": sent + 1, "cap": cap}
