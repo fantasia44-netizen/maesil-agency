@@ -25,16 +25,16 @@ def _today_kst_str() -> str:
 
 
 def already_scheduled_today() -> bool:
-    """오늘(KST) seq=1 pending/sent 터치포인트가 이미 있으면 True."""
-    today_kst = _today_kst_str()
+    """미래 시각 pending seq=1이 있어야 배치 생성된 것으로 판단. 수동 발송과 구분."""
+    now_utc = datetime.now(timezone.utc).isoformat()
     try:
         resp = (
             _db().table("outreach_touchpoints")
             .select("id", count="exact")
             .eq("touch_sequence", 1)
             .eq("channel", "email")
-            .in_("status", ["pending", "sent"])
-            .gte("scheduled_for", today_kst)
+            .eq("status", "pending")
+            .gt("scheduled_for", now_utc)
             .execute()
         )
         return (resp.count or 0) > 0
