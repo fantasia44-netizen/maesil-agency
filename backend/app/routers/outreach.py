@@ -225,7 +225,11 @@ def trigger_batch_analysis(
     ids = [r["id"] for r in rows]
     now_iso = datetime.now(timezone.utc).isoformat()
     if ids_to_analyze:
-        _db().table("outreach_leads").update({"status": "analyzing", "updated_at": now_iso}).in_("id", ids_to_analyze).execute()
+        # Supabase .in_() URL 길이 제한 → 100개씩 청크 업데이트
+        chunk_size = 100
+        for i in range(0, len(ids_to_analyze), chunk_size):
+            chunk = ids_to_analyze[i:i + chunk_size]
+            _db().table("outreach_leads").update({"status": "analyzing", "updated_at": now_iso}).in_("id", chunk).execute()
 
     def _run_batch():
         try:

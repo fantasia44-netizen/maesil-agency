@@ -225,7 +225,7 @@ export default function OutreachPage() {
     setErr(null);
     try {
       const [leadsData, statsData] = await Promise.all([
-        apiFetch<Lead[]>("/api/outreach/leads?limit=500&min_score=0", {}, 30000),
+        apiFetch<Lead[]>("/api/outreach/leads?limit=2000&min_score=0", {}, 30000),
         apiFetch<ScanStats>("/api/outreach/scan/stats", {}, 15000),
       ]);
       setLeads(leadsData);
