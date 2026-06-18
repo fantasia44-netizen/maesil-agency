@@ -75,10 +75,10 @@ class Settings(BaseSettings):
     # ── 콜드 드립 발송 (유튜버 콜드 — Gmail API, 별도 Workspace 메일박스) ──
     # 세팅(메일박스+gmail OAuth 시크릿) 완료 후 1로 켜면 스케줄러가 자동 발송.
     outreach_cold_drip_enabled: bool = False
-    outreach_daily_cap: int = 50            # 하루 최대 발송 수
+    outreach_daily_cap: int = 100           # 하루 최대 발송 수
     outreach_drip_grades: str = "S,A,B,C"  # 발송 대상 등급 (콤마)
-    outreach_send_start_hour: int = 10      # 발송 시작 시각 (KST)
-    outreach_send_end_hour: int = 17        # 발송 종료 시각 (KST)
+    outreach_send_start_hour: int = 8       # 발송 시작 시각 (KST)
+    outreach_send_end_hour: int = 20        # 발송 종료 시각 (KST)
     outreach_kakao_url: str = "https://open.kakao.com/o/sg6QOxDg"  # 오픈톡 실제 링크
     # gmail 발송 시크릿은 secrets 테이블 사용:
     #   outreach_gmail_client_id / _client_secret / _refresh_token / outreach_gmail_from
