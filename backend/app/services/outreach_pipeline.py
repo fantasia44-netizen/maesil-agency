@@ -278,3 +278,39 @@ def run_all_platforms() -> dict:
     total_leads = sum(r.get("leads_upserted", 0) for r in results)
     logger.info("[pipeline] 전체 스캔 완료 — 총 리드 %d건", total_leads)
     return {"ok": True, "platforms": results, "total_leads_upserted": total_leads}
+
+
+def auto_analyze_pending(limit: int = 5) -> dict:
+    """스케줄러용: discovered/stuck-analyzing 리드를 매 사이클 N개씩 자동 분석.
+
+    분석 완료 → channel_analyzer가 grade에 따라 status=approved/draft_ready로 업데이트.
+    cold_drip 스케줄러가 approved 리드를 다음 사이클에 자동 픽업.
+    """
+    import time
+    from app.db.maesil_total_client import get_maesil_total_client
+
+    db = get_maesil_total_client().schema("agent_work")
+    resp = (
+        db.table("outreach_leads")
+        .select("id")
+        .in_("status", ["discovered", "analyzing"])
+        .order("score", desc=True)
+        .limit(limit)
+        .execute()
+    )
+    ids = [r["id"] for r in (resp.data or [])]
+    if not ids:
+        return {"analyzed": 0}
+
+    from app.services.channel_analyzer import analyze_lead
+    ok = 0
+    for lead_id in ids:
+        try:
+            analyze_lead(lead_id)
+            ok += 1
+        except Exception as e:
+            logger.warning("[auto-analyze] 실패 [%s]: %s", lead_id, e)
+        time.sleep(0.5)
+
+    logger.info("[auto-analyze] %d/%d건 처리 완료", ok, len(ids))
+    return {"analyzed": ok}

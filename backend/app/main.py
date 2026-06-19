@@ -76,6 +76,15 @@ async def _poll_loop():
             except Exception as e:
                 logger.warning("[scheduler] followup 실패: %s", e)
 
+            # 리드 자동 분석 — 매 사이클 discovered/analyzing 리드 5개씩 처리 → approved 전환
+            try:
+                from app.services.outreach_pipeline import auto_analyze_pending
+                ana = await asyncio.to_thread(auto_analyze_pending, 5)
+                if ana.get("analyzed"):
+                    logger.info("[scheduler] auto-analyze %d건 처리", ana["analyzed"])
+            except Exception as e:
+                logger.warning("[scheduler] auto-analyze 실패: %s", e)
+
             # 콜드 드립 — 하루 1회 오늘 발송 리스트 DB 예약 (기본 off, 세팅 후 활성)
             try:
                 from app.services.outreach_cold_drip import schedule_daily_cold_drip
