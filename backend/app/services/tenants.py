@@ -27,15 +27,28 @@ def get_default_tenant_id() -> str | None:
 
 
 def list_active_outreach_tenants() -> list[dict]:
-    """status=active 인 테넌트 목록 (Phase 5 멀티테넌트 스케줄러용)."""
+    """영업 스케줄러 대상 테넌트 — status=active 이고, 트라이얼이 만료되지 않은 것만.
+
+    (plan=trial 인데 trial_ends_at 가 지났으면 제외 → 14일 무료가 실제로 종료됨.
+     internal/유료 플랜은 만료 무관.)
+    """
+    from datetime import datetime, timezone
     try:
         resp = (
             _db().table("tenants")
-            .select("id, name, plan, status")
+            .select("id, name, plan, status, trial_ends_at")
             .eq("status", "active")
             .execute()
         )
-        return resp.data or []
+        rows = resp.data or []
     except Exception as e:
         logger.warning("list_active_outreach_tenants 실패: %s", e)
         return []
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    out = []
+    for t in rows:
+        if t.get("plan") == "trial" and t.get("trial_ends_at") and t["trial_ends_at"] < now_iso:
+            continue  # 만료된 트라이얼 — 영업 정지
+        out.append(t)
+    return out
