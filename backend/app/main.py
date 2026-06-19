@@ -6,7 +6,7 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import alert_channels, alerts, auth_router, briefing, chat, cs, growth, health, memory, oauth_gmail, outreach, programs, secrets_router, widgets
+from app.routers import alert_channels, alerts, auth_router, billing, briefing, chat, cs, growth, health, memory, oauth_gmail, outreach, programs, secrets_router, widgets
 
 logger = logging.getLogger(__name__)
 
@@ -139,6 +139,14 @@ async def _poll_loop():
             except Exception as e:
                 logger.warning("[scheduler] 활성 테넌트 조회 실패: %s", e)
 
+            # 정기결제 주기 처리 — 약 1시간마다 (20사이클)
+            if cycle % 20 == 0:
+                try:
+                    from app.services.plans import process_billing_cycle
+                    await asyncio.to_thread(process_billing_cycle)
+                except Exception as e:
+                    logger.warning("[scheduler] billing cycle 실패: %s", e)
+
             cycle += 1
             logger.info("[scheduler] poll cycle %d done", cycle)
         except Exception as e:
@@ -192,6 +200,7 @@ app.include_router(cs.router)
 app.include_router(growth.router)
 app.include_router(outreach.router)
 app.include_router(oauth_gmail.router)
+app.include_router(billing.router)
 app.include_router(memory.router)
 app.include_router(briefing.router)
 
