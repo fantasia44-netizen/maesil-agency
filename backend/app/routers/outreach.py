@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from pydantic import BaseModel
 
-from app.auth import UserContext, require_admin
+from app.auth import UserContext, get_current_user
 from app.db.maesil_total_client import get_maesil_total_client
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ def _require_tid(user: UserContext) -> str:
 # ── 기존 스냅샷 엔드포인트 (유지) ──────────────────────────────────────
 
 @router.get("/snapshots")
-def list_snapshots(user: UserContext = Depends(require_admin)) -> list[dict]:
+def list_snapshots(user: UserContext = Depends(get_current_user)) -> list[dict]:
     resp = (
         _db().table("snapshots")
         .select("id, kind, payload, created_at, valid_until")
@@ -43,7 +43,7 @@ def list_snapshots(user: UserContext = Depends(require_admin)) -> list[dict]:
 
 
 @router.get("/snapshots/{snapshot_id}")
-def get_snapshot(snapshot_id: str, user: UserContext = Depends(require_admin)) -> dict:
+def get_snapshot(snapshot_id: str, user: UserContext = Depends(get_current_user)) -> dict:
     resp = (
         _db().table("snapshots")
         .select("id, kind, payload, created_at, valid_until")
@@ -60,7 +60,7 @@ def get_snapshot(snapshot_id: str, user: UserContext = Depends(require_admin)) -
 
 
 @router.get("/snapshots/{snapshot_id}/html", response_class=HTMLResponse)
-def get_proposal_html(snapshot_id: str, user: UserContext = Depends(require_admin)) -> HTMLResponse:
+def get_proposal_html(snapshot_id: str, user: UserContext = Depends(get_current_user)) -> HTMLResponse:
     resp = (
         _db().table("snapshots")
         .select("id, kind, payload, created_at")
@@ -78,7 +78,7 @@ def get_proposal_html(snapshot_id: str, user: UserContext = Depends(require_admi
 
 
 @router.post("/snapshots/{snapshot_id}/send-to-studio")
-def send_to_studio(snapshot_id: str, user: UserContext = Depends(require_admin)) -> dict:
+def send_to_studio(snapshot_id: str, user: UserContext = Depends(get_current_user)) -> dict:
     resp = (
         _db().table("snapshots")
         .select("id, kind, payload, created_at")
@@ -137,7 +137,7 @@ def list_leads(
     min_score: int = 0,
     limit: int = 50,
     offset: int = 0,
-    user: UserContext = Depends(require_admin),
+    user: UserContext = Depends(get_current_user),
 ) -> list[dict]:
     """리드 목록 (플랫폼·상태·등급·채널유형 필터) — RPC."""
     resp = _db().rpc("list_outreach_leads", {
@@ -154,7 +154,7 @@ def list_leads(
 
 
 @router.get("/leads/{lead_id}")
-def get_lead(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
+def get_lead(lead_id: str, user: UserContext = Depends(get_current_user)) -> dict:
     tid = _require_tid(user)
     resp = _db().table("outreach_leads").select("*").eq("tenant_id", tid).eq("id", lead_id).limit(1).execute()
     rows = resp.data or []
@@ -175,7 +175,7 @@ def get_lead(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
 
 
 @router.post("/leads/{lead_id}/analyze")
-def trigger_analysis(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
+def trigger_analysis(lead_id: str, user: UserContext = Depends(get_current_user)) -> dict:
     """심층 분석 트리거. 백그라운드 실행."""
     import threading
     tid = _require_tid(user)
@@ -202,7 +202,7 @@ def trigger_batch_analysis(
     grades: str = "S,A,B,C,D",
     limit: int = 1000,
     force: bool = False,
-    user: UserContext = Depends(require_admin),
+    user: UserContext = Depends(get_current_user),
 ) -> dict:
     """리드 일괄 분석.
     - force=false (기본): discovered 상태만 분석
@@ -270,7 +270,7 @@ def trigger_batch_analysis(
 @router.post("/leads/rescore")
 def trigger_rescore(
     limit: int = 2000,
-    user: UserContext = Depends(require_admin),
+    user: UserContext = Depends(get_current_user),
 ) -> dict:
     """기존 리드 등급 재채점 (AI 재실행 없음).
     DB에 저장된 신호값으로 새 scorer 기준 재계산 → score/grade/score_breakdown 업데이트.
@@ -391,7 +391,7 @@ def trigger_rescore(
 
 
 @router.get("/leads/{lead_id}/agency-briefing", response_class=HTMLResponse)
-def get_agency_briefing(lead_id: str, user: UserContext = Depends(require_admin)) -> HTMLResponse:
+def get_agency_briefing(lead_id: str, user: UserContext = Depends(get_current_user)) -> HTMLResponse:
     """광고대행사 AI 브리핑 HTML 반환."""
     resp = _db().table("outreach_leads").select("agency_briefing,handle_name").eq("tenant_id", _require_tid(user)).eq("id", lead_id).limit(1).execute()
     rows = resp.data or []
@@ -405,7 +405,7 @@ def get_agency_briefing(lead_id: str, user: UserContext = Depends(require_admin)
 
 
 @router.get("/leads/{lead_id}/email-preview")
-def preview_email(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
+def preview_email(lead_id: str, user: UserContext = Depends(get_current_user)) -> dict:
     """실제 발송될 이메일 HTML 미리보기."""
     from app.services.outreach_mailer import (
         _build_email_html, _draft_to_html, _build_subject,
@@ -430,7 +430,7 @@ class EmailDraftPatch(BaseModel):
 
 
 @router.patch("/leads/{lead_id}/email-draft")
-def update_email_draft(lead_id: str, body: EmailDraftPatch, user: UserContext = Depends(require_admin)) -> dict:
+def update_email_draft(lead_id: str, body: EmailDraftPatch, user: UserContext = Depends(get_current_user)) -> dict:
     """이메일 초안 편집 저장."""
     update: dict = {"updated_at": datetime.now(timezone.utc).isoformat()}
     if body.email_subject is not None:
@@ -444,7 +444,7 @@ def update_email_draft(lead_id: str, body: EmailDraftPatch, user: UserContext = 
 
 
 @router.post("/leads/{lead_id}/approve")
-def approve_lead(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
+def approve_lead(lead_id: str, user: UserContext = Depends(get_current_user)) -> dict:
     """담당자 검토 완료 → approved 상태로 변경."""
     now = datetime.now(timezone.utc).isoformat()
     _db().table("outreach_leads").update({"status": "approved", "updated_at": now}).eq("tenant_id", _require_tid(user)).eq("id", lead_id).execute()
@@ -452,7 +452,7 @@ def approve_lead(lead_id: str, user: UserContext = Depends(require_admin)) -> di
 
 
 @router.post("/leads/{lead_id}/send")
-def send_lead_email(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
+def send_lead_email(lead_id: str, user: UserContext = Depends(get_current_user)) -> dict:
     """수동 이메일 발송 (approved 상태 권장, email 있어야 함)."""
     from app.services.outreach_mailer import send_single
     result = send_single(_require_tid(user), lead_id)
@@ -560,7 +560,7 @@ class SuppressRequest(BaseModel):
 
 
 @router.post("/test-send")
-def test_send(to: str = "", lead_id: str = "", user: UserContext = Depends(require_admin)) -> dict:
+def test_send(to: str = "", lead_id: str = "", user: UserContext = Depends(get_current_user)) -> dict:
     """Gmail 발송 파이프라인 테스트 — 지정 주소로 샘플 1통 발송 (콜드 드립/실제 리드 안 건드림).
     OAuth 연결·도달·렌더·클릭추적 검증용. to=본인이메일 권장."""
     from app.services import outreach_gmail_sender as gm
@@ -593,7 +593,7 @@ def test_send(to: str = "", lead_id: str = "", user: UserContext = Depends(requi
 
 
 @router.get("/config")
-def get_outreach_config(user: UserContext = Depends(require_admin)) -> dict:
+def get_outreach_config(user: UserContext = Depends(get_current_user)) -> dict:
     """테넌트 영업 설정 조회 (없으면 기본값)."""
     from app.services.tenant_config import load_config
     c = load_config(_require_tid(user))
@@ -628,7 +628,7 @@ class OutreachConfigPatch(BaseModel):
 
 
 @router.put("/config")
-def update_outreach_config(body: OutreachConfigPatch, user: UserContext = Depends(require_admin)) -> dict:
+def update_outreach_config(body: OutreachConfigPatch, user: UserContext = Depends(get_current_user)) -> dict:
     """테넌트 영업 설정 저장 (cap/등급/업무시간/타임존/키워드 등)."""
     from app.services.tenant_config import save_config
     patch = {k: v for k, v in body.model_dump().items() if v is not None}
@@ -643,8 +643,38 @@ class GmailSecretsPatch(BaseModel):
     from_addr: str | None = None
 
 
+class PlatformKeysPatch(BaseModel):
+    youtube_api_key: str | None = None
+    youtube_api_key_2: str | None = None
+    youtube_api_key_3: str | None = None
+    naver_client_id: str | None = None
+    naver_client_secret: str | None = None
+    anthropic_api_key: str | None = None
+
+
+@router.get("/platform-keys")
+def get_platform_keys_status(user: UserContext = Depends(get_current_user)) -> dict:
+    """테넌트 플랫폼 API키 설정 여부(값 미반환)."""
+    from app.services.secrets import get_tenant_secret
+    tid = _require_tid(user)
+    names = ["youtube_api_key", "youtube_api_key_2", "youtube_api_key_3",
+             "naver_client_id", "naver_client_secret", "anthropic_api_key"]
+    return {n: bool(get_tenant_secret(tid, n)) for n in names}
+
+
+@router.put("/platform-keys")
+def set_platform_keys(body: PlatformKeysPatch, user: UserContext = Depends(get_current_user)) -> dict:
+    """테넌트 플랫폼 API키 저장 (YouTube/Naver/Anthropic — 본인 키)."""
+    from app.services.secrets import upsert_tenant_secret
+    tid = _require_tid(user)
+    for name, val in body.model_dump().items():
+        if val is not None and val.strip():
+            upsert_tenant_secret(tid, name, val.strip(), "api_key")
+    return {"ok": True}
+
+
 @router.get("/gmail-secrets")
-def get_gmail_secrets_status(user: UserContext = Depends(require_admin)) -> dict:
+def get_gmail_secrets_status(user: UserContext = Depends(get_current_user)) -> dict:
     """테넌트의 Gmail OAuth 시크릿 설정 상태(값은 미반환)."""
     from app.services.secrets import get_tenant_secret
     tid = _require_tid(user)
@@ -659,7 +689,7 @@ def get_gmail_secrets_status(user: UserContext = Depends(require_admin)) -> dict
 
 
 @router.put("/gmail-secrets")
-def set_gmail_secrets(body: GmailSecretsPatch, user: UserContext = Depends(require_admin)) -> dict:
+def set_gmail_secrets(body: GmailSecretsPatch, user: UserContext = Depends(get_current_user)) -> dict:
     """테넌트가 자기 Google Console OAuth 클라이언트 정보 저장(연결 전 단계).
     refresh_token은 OAuth 연결(/api/oauth/gmail/start)로 채워짐."""
     from app.services.secrets import upsert_tenant_secret
@@ -674,7 +704,7 @@ def set_gmail_secrets(body: GmailSecretsPatch, user: UserContext = Depends(requi
 
 
 @router.post("/suppress")
-def suppress_email(body: SuppressRequest, user: UserContext = Depends(require_admin)) -> dict:
+def suppress_email(body: SuppressRequest, user: UserContext = Depends(get_current_user)) -> dict:
     """관리자 수동 차단(BLOCKED 등). suppression 등록 + 리드 상태 전환."""
     from app.services.outreach_suppression import add_suppression
     if not body.email.strip():
@@ -693,7 +723,7 @@ class GradePatch(BaseModel):
 
 
 @router.patch("/leads/{lead_id}/grade")
-def update_lead_grade(lead_id: str, body: GradePatch, user: UserContext = Depends(require_admin)) -> dict:
+def update_lead_grade(lead_id: str, body: GradePatch, user: UserContext = Depends(get_current_user)) -> dict:
     """등급 수동 변경 (S/A/B/C/D)."""
     if body.grade not in ("S", "A", "B", "C", "D"):
         raise HTTPException(400, "grade는 S/A/B/C/D 중 하나")
@@ -703,7 +733,7 @@ def update_lead_grade(lead_id: str, body: GradePatch, user: UserContext = Depend
 
 
 @router.patch("/leads/{lead_id}/status")
-def update_lead_status(lead_id: str, body: StatusPatch, user: UserContext = Depends(require_admin)) -> dict:
+def update_lead_status(lead_id: str, body: StatusPatch, user: UserContext = Depends(get_current_user)) -> dict:
     allowed = {"discovered","analyzing","draft_ready","approved","emailed",
                "replied","no_reply","negotiating","deal","rejected","archived"}
     if body.status not in allowed:
@@ -719,7 +749,7 @@ def update_lead_status(lead_id: str, body: StatusPatch, user: UserContext = Depe
 def import_official_agencies(
     source: str = "coupang_official",
     enrich: bool = True,
-    user: UserContext = Depends(require_admin),
+    user: UserContext = Depends(get_current_user),
 ) -> dict:
     """네이버/쿠팡 공식 광고대행사를 ad_agency 리드로 적재 (발송 안 함, discovered 상태).
     source: 'coupang_official' | 'naver_official'
@@ -739,7 +769,7 @@ def import_official_agencies(
 @router.post("/scan")
 def trigger_scan(
     platform: str | None = None,
-    user: UserContext = Depends(require_admin),
+    user: UserContext = Depends(get_current_user),
 ) -> dict:
     """전체 or 특정 플랫폼 스캔 수동 트리거 (백그라운드)."""
     import threading
@@ -760,7 +790,7 @@ def trigger_scan(
 @router.post("/scan/debug")
 def trigger_scan_debug(
     platform: str | None = None,
-    user: UserContext = Depends(require_admin),
+    user: UserContext = Depends(get_current_user),
 ) -> dict:
     """동기 스캔 — 에러 즉시 반환 (디버그용)."""
     import traceback
@@ -774,7 +804,7 @@ def trigger_scan_debug(
 
 
 @router.get("/scan/stats")
-def scan_stats(user: UserContext = Depends(require_admin)) -> dict:
+def scan_stats(user: UserContext = Depends(get_current_user)) -> dict:
     """통계: 플랫폼별 리드 수 + 상태별 집계 + 등급별 집계 + KPI — RPC."""
     try:
         resp = _db().rpc("get_outreach_stats", {"p_tenant_id": _require_tid(user)}).execute()
@@ -806,7 +836,7 @@ def scan_stats(user: UserContext = Depends(require_admin)) -> dict:
 
 
 @router.get("/cold-drip/diagnostics")
-def cold_drip_diagnostics(user: UserContext = Depends(require_admin)) -> dict:
+def cold_drip_diagnostics(user: UserContext = Depends(get_current_user)) -> dict:
     """cold_drip 발송이 '왜 적은지' 펀넬로 진단.
 
     게이트(활성·Gmail·업무시간) + 공급 펀넬(상태별·자격·이메일 누락·분석 백로그)
@@ -901,7 +931,7 @@ def get_all_touchpoints(
     status: str = "",
     channel: str = "",
     limit: int = 200,
-    user: UserContext = Depends(require_admin),
+    user: UserContext = Depends(get_current_user),
 ) -> list[dict]:
     """전체 발송 이력 — 리드 정보 별도 조회 포함."""
     import logging as _log
@@ -945,7 +975,7 @@ def get_all_touchpoints(
 
 
 @router.get("/leads/{lead_id}/touchpoints")
-def get_touchpoints(lead_id: str, user: UserContext = Depends(require_admin)) -> list[dict]:
+def get_touchpoints(lead_id: str, user: UserContext = Depends(get_current_user)) -> list[dict]:
     resp = (
         _db().table("outreach_touchpoints")
         .select("*")
@@ -962,7 +992,7 @@ class TouchStatusPatch(BaseModel):
 
 
 @router.patch("/touchpoints/{touch_id}/status")
-def update_touch_status(touch_id: str, body: TouchStatusPatch, user: UserContext = Depends(require_admin)) -> dict:
+def update_touch_status(touch_id: str, body: TouchStatusPatch, user: UserContext = Depends(get_current_user)) -> dict:
     """터치포인트 수동 상태 변경 (담당자가 DM 보냈을 때 'sent' 처리 등)."""
     allowed = {"pending","sent","failed","replied","bounced","skipped"}
     if body.status not in allowed:

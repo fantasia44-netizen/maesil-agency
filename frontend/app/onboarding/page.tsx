@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { getUser, logout, type StoredUser } from "../../lib/api";
 
 const GREEN = "#1A6F3C";
@@ -52,26 +53,29 @@ export default function OnboardingPage() {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
-          <Item n={1} title="Gmail 연결" soon
+          <Item n={1} title="Gmail 연결"
             desc="내 Google 계정을 연결하면 본인 메일함에서 콜드메일이 발송됩니다(도달률·평판 분리)." />
-          <Item n={2} title="타겟 키워드 설정" soon
+          <Item n={2} title="타겟 키워드 설정"
             desc="찾고 싶은 유튜버·블로거 키워드를 입력하면 AI가 매일 잠재 파트너를 발굴합니다." />
-          <Item n={3} title="자동 발송 시작" soon
+          <Item n={3} title="자동 발송 켜기"
             desc="발굴·분석·발송·팔로업이 자동으로 진행됩니다. 대시보드에서 성과만 확인하세요." />
         </div>
 
-        <div style={{
-          marginTop: "1.8rem", background: "#e7f4ec", border: "1px solid #cdeBD8",
-          borderRadius: 12, padding: "1.1rem 1.2rem", fontSize: "0.88rem", color: "#14532d", lineHeight: 1.6,
-        }}>
-          <strong>준비 중입니다.</strong> 셀프 설정(Gmail 연결·키워드)과 내 대시보드가 곧 열립니다.
-          오픈되면 가입하신 이메일로 안내드릴게요.
+        <div style={{ display: "flex", gap: "0.7rem", justifyContent: "center", marginTop: "2rem", flexWrap: "wrap" }}>
+          <Link href="/settings/outreach" style={{
+            padding: "0.8rem 1.8rem", borderRadius: 10, fontSize: "0.95rem", fontWeight: 700,
+            color: "#fff", textDecoration: "none", background: GREEN,
+          }}>설정하러 가기 →</Link>
+          <Link href="/outreach" style={{
+            padding: "0.8rem 1.8rem", borderRadius: 10, fontSize: "0.95rem", fontWeight: 600,
+            color: "#334155", textDecoration: "none", background: "#fff", border: "1px solid #e2e8f0",
+          }}>내 영업 대시보드</Link>
         </div>
 
-        <div style={{ textAlign: "center", marginTop: "1.8rem" }}>
+        <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
           <button onClick={logout} style={{
-            fontSize: "0.82rem", padding: "0.5rem 1.1rem", border: "1px solid #e2e8f0",
-            borderRadius: 8, background: "#fff", cursor: "pointer", color: "#64748b",
+            fontSize: "0.8rem", padding: "0.4rem 1rem", border: "none",
+            background: "transparent", cursor: "pointer", color: "#94a3b8",
           }}>로그아웃</button>
         </div>
       </div>

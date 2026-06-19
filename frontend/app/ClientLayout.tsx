@@ -43,6 +43,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           <Link href="/chat">대화</Link>
           <Link href="/history">이전 대화</Link>
 
+          {/* 고객(customer) — 자기 영업 */}
+          {!admin && <Link href="/outreach">영업</Link>}
+          {!admin && <Link href="/settings/outreach">설정</Link>}
+
           {/* super_admin 전용 */}
           {admin && <Link href="/">대시보드</Link>}
           {admin && <Link href="/cs">CS 관리</Link>}

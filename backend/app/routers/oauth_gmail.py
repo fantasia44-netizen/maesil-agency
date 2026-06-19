@@ -27,7 +27,7 @@ import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 
-from app.auth import UserContext, require_admin
+from app.auth import UserContext, get_current_user
 from app.tenant_context import TenantContext
 
 logger = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ def _redirect_uri() -> str | None:
 
 
 @router.get("/start")
-def start(user: UserContext = Depends(require_admin)) -> dict:
+def start(user: UserContext = Depends(get_current_user)) -> dict:
     """동의 URL 생성. 프런트가 fetch 후 window.location 으로 이동."""
     from app.routers.outreach import _require_tid
     from app.services.secrets import get_tenant_secret
