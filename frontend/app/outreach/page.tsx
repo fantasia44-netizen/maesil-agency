@@ -287,6 +287,47 @@ export default function OutreachPage() {
     }
   };
 
+  const runDiagnostics = async () => {
+    try {
+      type Diag = {
+        gates: { enabled: boolean; gmail_configured: boolean; now_kst: string; weekend: boolean;
+                 business_hours: boolean; daily_cap: number; drip_grades: string; platforms: string[] };
+        today: { scheduled_seq1: number; sent_seq1: number; room: number };
+        supply: { eligible_now: number; approved_total: number; approved_unsent: number;
+                  approved_no_email: number; approved_off_platform: number;
+                  discovered_backlog: number; analyzing_backlog: number };
+        hint: string;
+      };
+      const d = await apiFetch<Diag>("/api/outreach/cold-drip/diagnostics", {}, 20000);
+      const g = d.gates, t = d.today, s = d.supply;
+      const blockedGate = !g.enabled ? "❌ cold_drip 꺼짐"
+        : !g.gmail_configured ? "❌ Gmail 미설정"
+        : g.weekend ? "⏸ 주말(발송안함)"
+        : !g.business_hours ? `⏸ 업무시간 외 (현재 ${g.now_kst.slice(11,16)} KST)`
+        : "✅ 게이트 통과";
+      const msg = [
+        `[cold_drip 진단]  ${blockedGate}`,
+        ``,
+        `■ 오늘: 예약 ${t.scheduled_seq1} · 발송 ${t.sent_seq1} / cap ${g.daily_cap} (여유 ${t.room})`,
+        ``,
+        `■ 공급 펀넬`,
+        `  지금 발송가능(eligible): ${s.eligible_now}  ← 이게 작으면 예약도 작음`,
+        `  approved 전체: ${s.approved_total} (미발송 ${s.approved_unsent})`,
+        `  approved인데 이메일 없음: ${s.approved_no_email}`,
+        `  approved인데 youtube/naver 아님: ${s.approved_off_platform}`,
+        `  분석 대기(discovered): ${s.discovered_backlog}`,
+        `  분석 중/고착(analyzing): ${s.analyzing_backlog}`,
+        ``,
+        `대상등급 ${g.drip_grades} · 플랫폼 ${g.platforms.join("+")}`,
+        ``,
+        `💡 ${d.hint}`,
+      ].join("\n");
+      alert(msg);
+    } catch (e: unknown) {
+      showToast(e instanceof Error ? e.message : "진단 실패", false);
+    }
+  };
+
   const triggerScan = async (platform?: string) => {
     setScanLoading(true);
     try {
@@ -428,6 +469,14 @@ export default function OutreachPage() {
             title="AI 재실행 없이 새 등급 기준으로 전체 재채점 (빠름)"
           >
             {batchAnalyzing ? "채점 중…" : "📊 등급 재채점"}
+          </button>
+          <button
+            className="btn"
+            onClick={runDiagnostics}
+            style={{ fontSize: "0.82rem", padding: "6px 14px", borderColor: "#15803d", color: "#15803d" }}
+            title="cold_drip 자동발송이 왜 적은지 — 게이트·공급 펀넬 진단"
+          >
+            🔍 발송 진단
           </button>
         </div>
       </div>

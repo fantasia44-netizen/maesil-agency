@@ -694,6 +694,92 @@ def scan_stats(user: UserContext = Depends(require_admin)) -> dict:
     }
 
 
+@router.get("/cold-drip/diagnostics")
+def cold_drip_diagnostics(user: UserContext = Depends(require_admin)) -> dict:
+    """cold_drip 발송이 '왜 적은지' 펀넬로 진단.
+
+    게이트(활성·Gmail·업무시간) + 공급 펀넬(상태별·자격·이메일 누락·분석 백로그)
+    + 오늘 예약/발송 수를 한 번에 반환. 발송이 적으면 어느 단계에서 막히는지 즉시 식별.
+    """
+    from datetime import timedelta
+    from app.config import settings
+    from app.services import outreach_gmail_sender as gm
+
+    _KST = timezone(timedelta(hours=9))
+    now_kst = datetime.now(_KST)
+    db = _db()
+
+    grades = [g.strip() for g in settings.outreach_drip_grades.split(",") if g.strip()]
+    plats = ["youtube", "naver_blog"]
+
+    def _lead_count(build) -> int:
+        try:
+            q = db.table("outreach_leads").select("id", count="exact")
+            return build(q).execute().count or 0
+        except Exception:
+            return -1
+
+    eligible_now = _lead_count(lambda q: q
+        .in_("platform", plats).eq("status", "approved").in_("grade", grades)
+        .is_("emailed_at", "null").not_.is_("contact_email", "null"))
+    approved_total    = _lead_count(lambda q: q.eq("status", "approved"))
+    approved_no_email = _lead_count(lambda q: q.eq("status", "approved").is_("contact_email", "null"))
+    approved_unsent   = _lead_count(lambda q: q.eq("status", "approved").is_("emailed_at", "null"))
+    approved_onplat   = _lead_count(lambda q: q.eq("status", "approved").in_("platform", plats))
+    approved_offplat  = (approved_total - approved_onplat) if (approved_total >= 0 and approved_onplat >= 0) else -1
+    discovered_backlog = _lead_count(lambda q: q.eq("status", "discovered"))
+    analyzing_backlog  = _lead_count(lambda q: q.eq("status", "analyzing"))
+
+    # 오늘(KST) seq=1 예약/발송 수
+    today_start = datetime(now_kst.year, now_kst.month, now_kst.day, tzinfo=_KST)
+    today_a = today_start.astimezone(timezone.utc).isoformat()
+    today_b = (today_start + timedelta(days=1)).astimezone(timezone.utc).isoformat()
+
+    def _touch_count(statuses) -> int:
+        try:
+            return (db.table("outreach_touchpoints").select("id", count="exact")
+                .eq("touch_sequence", 1).eq("channel", "email").in_("status", statuses)
+                .gte("scheduled_for", today_a).lt("scheduled_for", today_b)
+                .execute().count) or 0
+        except Exception:
+            return -1
+
+    scheduled_today = _touch_count(["pending", "sent"])
+    sent_today = _touch_count(["sent"])
+
+    return {
+        "gates": {
+            "enabled":          settings.outreach_cold_drip_enabled,
+            "gmail_configured": gm.is_configured(),
+            "now_kst":          now_kst.isoformat(timespec="seconds"),
+            "weekend":          now_kst.weekday() >= 5,
+            "business_hours":   settings.outreach_send_start_hour <= now_kst.hour < settings.outreach_send_end_hour,
+            "daily_cap":        settings.outreach_daily_cap,
+            "drip_grades":      settings.outreach_drip_grades,
+            "platforms":        plats,
+        },
+        "today": {
+            "scheduled_seq1": scheduled_today,
+            "sent_seq1":      sent_today,
+            "room":           max(0, settings.outreach_daily_cap - scheduled_today),
+        },
+        "supply": {
+            "eligible_now":       eligible_now,        # ← 지금 즉시 발송 가능한 리드 수
+            "approved_total":     approved_total,
+            "approved_unsent":    approved_unsent,
+            "approved_no_email":  approved_no_email,   # 승인됐지만 이메일 없어 발송 불가
+            "approved_off_platform": approved_offplat, # 승인됐지만 youtube/naver 아님
+            "discovered_backlog": discovered_backlog,  # 분석 대기 (approved 공급원)
+            "analyzing_backlog":  analyzing_backlog,   # 분석 중/고착 가능
+        },
+        "hint": (
+            "eligible_now가 작고 discovered_backlog가 크면 → 분석 처리량 부족(auto_analyze 5/cycle). "
+            "approved_no_email가 크면 → 연락처 수집 실패로 발송 불가. "
+            "eligible_now가 큰데 scheduled_today가 작으면 → 스케줄러/배포 확인."
+        ),
+    }
+
+
 # ── 터치포인트 관리 ──────────────────────────────────────────────────
 
 @router.get("/touchpoints")
