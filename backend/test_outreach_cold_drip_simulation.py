@@ -162,7 +162,7 @@ for k, v in {
     object.__setattr__(settings, k, v)
 
 import app.services.outreach_gmail_sender as gm
-gm.is_configured = lambda: True
+gm.is_configured = lambda *a, **k: True
 
 supp.is_quiet_hours = lambda: False
 

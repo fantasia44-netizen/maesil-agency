@@ -80,7 +80,11 @@ class Settings(BaseSettings):
     outreach_send_start_hour: int = 8       # 발송 시작 시각 (KST)
     outreach_send_end_hour: int = 20        # 발송 종료 시각 (KST)
     outreach_kakao_url: str = "https://open.kakao.com/o/sg6QOxDg"  # 오픈톡 실제 링크
-    # gmail 발송 시크릿은 secrets 테이블 사용:
+    # 테넌트별 Gmail OAuth 콜백 URI (모든 테넌트 공통 = 우리 백엔드 콜백).
+    # 각 테넌트가 자기 Google Console의 승인된 리디렉트 URI에 이 값을 등록.
+    # 미설정 시 전역 시크릿 outreach_oauth_redirect_uri 로 대체 가능.
+    outreach_oauth_redirect_uri: str = ""
+    # gmail 발송 시크릿은 secrets 테이블 사용(테넌트별, 전역 fallback):
     #   outreach_gmail_client_id / _client_secret / _refresh_token / outreach_gmail_from
 
     @property

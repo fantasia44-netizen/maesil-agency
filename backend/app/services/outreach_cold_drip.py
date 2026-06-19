@@ -83,7 +83,7 @@ def schedule_daily_cold_drip(tenant_id: str) -> dict:
         return {"skipped": "disabled"}
 
     from app.services import outreach_gmail_sender as gm
-    if not gm.is_configured():
+    if not gm.is_configured(tenant_id):
         return {"skipped": "gmail not configured"}
 
     now_kst = datetime.now(_KST)

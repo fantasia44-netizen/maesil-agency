@@ -108,10 +108,11 @@ def _table():
 
 
 def get_secret(name: str) -> Optional[str]:
+    """전역 시크릿 조회 (tenant_id IS NULL). 인프라/공용 키용 — 시그니처 불변."""
     hit, cached = _cache_get(name)
     if hit:
         return cached
-    resp = _table().select("value").eq("name", name).limit(1).execute()
+    resp = _table().select("value").is_("tenant_id", "null").eq("name", name).limit(1).execute()
     rows = resp.data or []
     raw = rows[0]["value"] if rows else None
     value = _decrypt(raw)
@@ -121,19 +122,58 @@ def get_secret(name: str) -> Optional[str]:
     return value
 
 
-def upsert_secret(name: str, value: str, kind: str, notes: str | None = None) -> None:
+def get_tenant_secret(tenant_id: str | None, name: str) -> Optional[str]:
+    """테넌트 시크릿 조회 — (tenant_id, name) 우선, 없으면 전역(get_secret) fallback.
+
+    tenant_id 가 None 이면 전역과 동일. outreach 발송 경로(Gmail/플랫폼키)에서 사용.
+    """
+    if not tenant_id:
+        return get_secret(name)
+    key = f"t:{tenant_id}:{name}"
+    hit, cached = _cache_get(key)
+    if hit:
+        return cached
+    try:
+        resp = _table().select("value").eq("tenant_id", tenant_id).eq("name", name).limit(1).execute()
+        rows = resp.data or []
+    except Exception:
+        rows = []
+    if rows:
+        value = _decrypt(rows[0]["value"])
+    else:
+        value = get_secret(name)  # 전역 fallback (자체 캐시)
+    _cache_set(key, value)
+    return value
+
+
+def _manual_upsert(tenant_id: str | None, name: str, value: str, kind: str, notes: str | None) -> None:
+    """on_conflict 회피(전역은 partial unique, 값 NULL 비교 이슈) — 존재 확인 후 update/insert."""
     now = datetime.now(timezone.utc).isoformat()
-    _table().upsert(
-        {
-            "name": name,
-            "value": _encrypt(value),
-            "kind": kind,
-            "notes": notes,
-            "updated_at": now,
-        },
-        on_conflict="name",
-    ).execute()
-    invalidate_cache(name)  # 저장 즉시 캐시 무효화
+    enc = _encrypt(value)
+    t = _table()
+    q = t.select("name").eq("name", name)
+    q = q.is_("tenant_id", "null") if tenant_id is None else q.eq("tenant_id", tenant_id)
+    exists = bool((q.limit(1).execute().data) or [])
+    payload = {"value": enc, "kind": kind, "notes": notes, "updated_at": now}
+    if exists:
+        u = _table().update(payload).eq("name", name)
+        u = u.is_("tenant_id", "null") if tenant_id is None else u.eq("tenant_id", tenant_id)
+        u.execute()
+    else:
+        _table().insert({"tenant_id": tenant_id, "name": name, **payload}).execute()
+
+
+def upsert_secret(name: str, value: str, kind: str, notes: str | None = None) -> None:
+    """전역 시크릿 저장 (tenant_id NULL). 시그니처 불변."""
+    _manual_upsert(None, name, value, kind, notes)
+    invalidate_cache(name)
+
+
+def upsert_tenant_secret(tenant_id: str, name: str, value: str, kind: str,
+                         notes: str | None = None) -> None:
+    """테넌트 시크릿 저장."""
+    _manual_upsert(tenant_id, name, value, kind, notes)
+    invalidate_cache(f"t:{tenant_id}:{name}")
 
 
 def mark_tested(name: str, ok: bool, error: str | None = None) -> None:

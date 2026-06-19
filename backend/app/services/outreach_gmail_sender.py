@@ -24,23 +24,25 @@ _TOKEN_URL = "https://oauth2.googleapis.com/token"
 _SEND_URL = "https://gmail.googleapis.com/gmail/v1/users/me/messages/send"
 
 
-def _secret(name: str) -> str | None:
-    from app.services.secrets import get_secret
-    return get_secret(name)
+def _secret(tenant_id: str | None, name: str) -> str | None:
+    """테넌트별 Gmail 시크릿 — 없으면 전역 fallback (super_admin/기본 테넌트)."""
+    from app.services.secrets import get_tenant_secret
+    return get_tenant_secret(tenant_id, name)
 
 
-def is_configured() -> bool:
-    return all(_secret(n) for n in (
+def is_configured(tenant_id: str | None = None) -> bool:
+    """해당 테넌트(또는 전역)의 Gmail OAuth 시크릿 3종이 모두 있으면 True."""
+    return all(_secret(tenant_id, n) for n in (
         "outreach_gmail_client_id",
         "outreach_gmail_client_secret",
         "outreach_gmail_refresh_token",
     ))
 
 
-def _access_token() -> str | None:
-    cid = _secret("outreach_gmail_client_id")
-    csec = _secret("outreach_gmail_client_secret")
-    rtok = _secret("outreach_gmail_refresh_token")
+def _access_token(tenant_id: str | None = None) -> str | None:
+    cid = _secret(tenant_id, "outreach_gmail_client_id")
+    csec = _secret(tenant_id, "outreach_gmail_client_secret")
+    rtok = _secret(tenant_id, "outreach_gmail_refresh_token")
     if not (cid and csec and rtok):
         return None
     try:
@@ -55,13 +57,13 @@ def _access_token() -> str | None:
         return None
 
 
-def send(to: str, subject: str, html: str) -> dict:
-    """Gmail API로 단일 발송. Returns {ok, id?, error?}."""
-    token = _access_token()
+def send(tenant_id: str | None, to: str, subject: str, html: str) -> dict:
+    """Gmail API로 단일 발송(테넌트별 Gmail). Returns {ok, id?, error?}."""
+    token = _access_token(tenant_id)
     if not token:
         return {"ok": False, "error": "outreach gmail 인증 실패(시크릿 확인)"}
 
-    from_addr = _secret("outreach_gmail_from") or "partner@maesil-partners.com"
+    from_addr = _secret(tenant_id, "outreach_gmail_from") or "partner@maesil-partners.com"
 
     msg = MIMEMultipart("alternative")
     msg["To"] = to

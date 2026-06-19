@@ -565,30 +565,67 @@ def test_send(to: str = "", lead_id: str = "", user: UserContext = Depends(requi
     OAuth 연결·도달·렌더·클릭추적 검증용. to=본인이메일 권장."""
     from app.services import outreach_gmail_sender as gm
     from app.services.outreach_mailer import build_lead_email
+    tid = _require_tid(user)
 
     if not to.strip():
         raise HTTPException(400, "to(수신 이메일)가 필요합니다.")
-    if not gm.is_configured():
+    if not gm.is_configured(tid):
         raise HTTPException(400, "outreach_gmail_* 시크릿이 없습니다 (/settings에서 등록).")
 
     if lead_id:
-        rows = _db().table("outreach_leads").select("*").eq("tenant_id", _require_tid(user)).eq("id", lead_id).limit(1).execute().data or []
+        rows = _db().table("outreach_leads").select("*").eq("tenant_id", tid).eq("id", lead_id).limit(1).execute().data or []
         if not rows:
             raise HTTPException(404, "리드를 찾을 수 없습니다.")
         lead = rows[0]
         lead["contact_email"] = to  # 테스트는 본인 주소로만
     else:
         lead = {
-            "id": "test", "platform": "youtube", "handle_name": "테스트채널",
+            "id": "test", "tenant_id": tid, "platform": "youtube", "handle_name": "테스트채널",
             "contact_email": to,
             "email_draft": '최근 올리신 "테스트 영상" 잘 봤습니다. (발송 파이프라인 테스트 메일입니다)',
             "best_content_title": "테스트 인기 영상",
         }
     subject, html = build_lead_email(lead)
-    result = gm.send(to, subject, html)
+    result = gm.send(tid, to, subject, html)
     if not result.get("ok"):
         raise HTTPException(400, f"발송 실패: {result.get('error')}")
     return {"ok": True, "to": to, "id": result.get("id"), "subject": subject}
+
+
+class GmailSecretsPatch(BaseModel):
+    client_id: str | None = None
+    client_secret: str | None = None
+    from_addr: str | None = None
+
+
+@router.get("/gmail-secrets")
+def get_gmail_secrets_status(user: UserContext = Depends(require_admin)) -> dict:
+    """테넌트의 Gmail OAuth 시크릿 설정 상태(값은 미반환)."""
+    from app.services.secrets import get_tenant_secret
+    tid = _require_tid(user)
+    def _has(n: str) -> bool:
+        return bool(get_tenant_secret(tid, n))
+    return {
+        "client_id":     _has("outreach_gmail_client_id"),
+        "client_secret": _has("outreach_gmail_client_secret"),
+        "refresh_token": _has("outreach_gmail_refresh_token"),  # OAuth 연결 완료 여부
+        "from_addr":     get_tenant_secret(tid, "outreach_gmail_from") or None,
+    }
+
+
+@router.put("/gmail-secrets")
+def set_gmail_secrets(body: GmailSecretsPatch, user: UserContext = Depends(require_admin)) -> dict:
+    """테넌트가 자기 Google Console OAuth 클라이언트 정보 저장(연결 전 단계).
+    refresh_token은 OAuth 연결(/api/oauth/gmail/start)로 채워짐."""
+    from app.services.secrets import upsert_tenant_secret
+    tid = _require_tid(user)
+    if body.client_id is not None:
+        upsert_tenant_secret(tid, "outreach_gmail_client_id", body.client_id.strip(), "oauth")
+    if body.client_secret is not None:
+        upsert_tenant_secret(tid, "outreach_gmail_client_secret", body.client_secret.strip(), "oauth")
+    if body.from_addr is not None:
+        upsert_tenant_secret(tid, "outreach_gmail_from", body.from_addr.strip(), "config")
+    return {"ok": True}
 
 
 @router.post("/suppress")
@@ -781,7 +818,7 @@ def cold_drip_diagnostics(user: UserContext = Depends(require_admin)) -> dict:
     return {
         "gates": {
             "enabled":          settings.outreach_cold_drip_enabled,
-            "gmail_configured": gm.is_configured(),
+            "gmail_configured": gm.is_configured(tid),
             "now_kst":          now_kst.isoformat(timespec="seconds"),
             "weekend":          now_kst.weekday() >= 5,
             "business_hours":   settings.outreach_send_start_hour <= now_kst.hour < settings.outreach_send_end_hour,

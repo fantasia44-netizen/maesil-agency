@@ -129,7 +129,7 @@ def _send_cold_drip_seq1(tenant_id: str, lead: dict, touch_id: str) -> bool:
         return False
 
     subject, html = build_lead_email(lead)
-    result = gm.send(to, subject, html)  # Phase 3: 테넌트별 Gmail
+    result = gm.send(tenant_id, to, subject, html)  # 테넌트별 Gmail
     ok = result.get("ok", False)
 
     now_iso = datetime.now(timezone.utc).isoformat()

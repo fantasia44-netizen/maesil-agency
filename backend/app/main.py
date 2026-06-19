@@ -6,7 +6,7 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import alert_channels, alerts, auth_router, briefing, chat, cs, growth, health, memory, outreach, programs, secrets_router, widgets
+from app.routers import alert_channels, alerts, auth_router, briefing, chat, cs, growth, health, memory, oauth_gmail, outreach, programs, secrets_router, widgets
 
 logger = logging.getLogger(__name__)
 
@@ -184,6 +184,7 @@ app.include_router(alerts.router)
 app.include_router(cs.router)
 app.include_router(growth.router)
 app.include_router(outreach.router)
+app.include_router(oauth_gmail.router)
 app.include_router(memory.router)
 app.include_router(briefing.router)
 
