@@ -239,6 +239,7 @@ export default function OutreachPage() {
   };
 
   useEffect(() => { loadAll(); }, []);
+  useEffect(() => { if (mainTab === "history") loadTouchLogs(); }, [mainTab]);
 
   const triggerRescore = async () => {
     setBatchAnalyzing(true);
@@ -486,7 +487,6 @@ export default function OutreachPage() {
           return (
             <button key={key} onClick={() => {
               setMainTab(key);
-              if (key === "history" && touchLogs.length === 0) loadTouchLogs();
             }}
               style={{
                 padding: "8px 20px", border: "none", background: "none", cursor: "pointer",
