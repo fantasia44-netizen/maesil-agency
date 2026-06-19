@@ -83,7 +83,7 @@ async def _poll_loop():
                 if drip.get("scheduled"):
                     logger.info("[scheduler] cold_drip 오늘 예약 %d건 생성", drip["scheduled"])
                 elif drip.get("skipped"):
-                    logger.debug("[scheduler] cold_drip skipped: %s", drip["skipped"])
+                    logger.info("[scheduler] cold_drip skipped: %s", drip["skipped"])
             except Exception as e:
                 logger.warning("[scheduler] cold_drip 실패: %s", e)
 
