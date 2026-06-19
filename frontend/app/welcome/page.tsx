@@ -42,7 +42,7 @@ export default function WelcomePage() {
         padding: "1rem 1.5rem", maxWidth: 1080, margin: "0 auto",
       }}>
         <div style={{ fontWeight: 800, fontSize: "1.15rem", letterSpacing: "-0.02em" }}>
-          🌿 매실 파트너스
+          maesil-agency
         </div>
         <div style={{ display: "flex", gap: "0.6rem" }}>
           <Link href="/login" style={{
@@ -117,7 +117,7 @@ export default function WelcomePage() {
       </section>
 
       <footer style={{ textAlign: "center", padding: "2rem 1.5rem", color: "#94a3b8", fontSize: "0.8rem" }}>
-        🌿 매실 파트너스 · 인플루언서 영업 자동화
+        maesil-agency · 인플루언서 영업 자동화
       </footer>
     </div>
   );

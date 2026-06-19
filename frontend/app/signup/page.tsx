@@ -48,7 +48,7 @@ export default function SignupPage() {
         background: "#fff", borderRadius: 14, boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
       }}>
         <div style={{ textAlign: "center", marginBottom: "1.8rem" }}>
-          <div style={{ fontSize: "1.5rem", fontWeight: 800 }}>🌿 매실 파트너스</div>
+          <div style={{ fontSize: "1.5rem", fontWeight: 800 }}>maesil-agency</div>
           <div style={{ color: "#64748b", fontSize: "0.85rem", marginTop: 6 }}>
             14일 무료 — 내 영업 워크스페이스 만들기
           </div>
