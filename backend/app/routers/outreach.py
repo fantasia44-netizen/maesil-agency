@@ -703,10 +703,10 @@ def get_all_touchpoints(
     limit: int = 200,
     user: UserContext = Depends(require_admin),
 ) -> list[dict]:
-    """전체 발송 이력 — 리드 정보 조인 포함."""
+    """전체 발송 이력 — 리드 정보 별도 조회 포함."""
     q = (
         _db().table("outreach_touchpoints")
-        .select("*, outreach_leads(handle_name, contact_email, platform, grade, status)")
+        .select("*")
         .order("scheduled_for", desc=True)
         .limit(limit)
     )
@@ -715,11 +715,26 @@ def get_all_touchpoints(
     if channel:
         q = q.eq("channel", channel)
     rows = q.execute().data or []
-    # 조인 필드 평탄화
+
+    # lead_id 목록으로 리드 정보 일괄 조회
+    lead_ids = list({r["lead_id"] for r in rows if r.get("lead_id")})
+    leads_map: dict = {}
+    if lead_ids:
+        chunk = 100
+        for i in range(0, len(lead_ids), chunk):
+            try:
+                lr = _db().table("outreach_leads")\
+                    .select("id, handle_name, contact_email, platform, grade, status")\
+                    .in_("id", lead_ids[i:i+chunk]).execute()
+                for l in (lr.data or []):
+                    leads_map[l["id"]] = l
+            except Exception:
+                pass
+
     result = []
     for r in rows:
-        lead = r.pop("outreach_leads", None) or {}
-        result.append({**r, **{f"lead_{k}": v for k, v in lead.items()}})
+        lead = leads_map.get(r.get("lead_id") or "", {})
+        result.append({**r, **{f"lead_{k}": v for k, v in lead.items() if k != "id"}})
     return result
 
 
