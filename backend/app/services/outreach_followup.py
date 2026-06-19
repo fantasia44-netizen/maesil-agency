@@ -278,10 +278,10 @@ def _notify_manual_touch(lead: dict, channel: str, touch_id: str) -> None:
 FOLLOWUP_DAILY_CAP = 20  # 팔로업 이메일 하루 최대 발송 수
 
 
-def _followup_sent_today(tenant_id: str) -> int:
-    """오늘(KST) 팔로업으로 발송된 이메일 터치포인트 수(테넌트 스코프)."""
-    from datetime import date, timedelta, timezone as tz
-    kst = tz(timedelta(hours=9))
+def _followup_sent_today(tenant_id: str, tzinfo=None) -> int:
+    """오늘(테넌트 타임존) 팔로업으로 발송된 이메일 터치포인트 수(테넌트 스코프)."""
+    from datetime import timedelta, timezone as tz
+    kst = tzinfo or tz(timedelta(hours=9))
     today_kst = datetime.now(kst).date().isoformat()
     try:
         resp = (
@@ -306,8 +306,10 @@ def check_pending_followups(tenant_id: str, limit: int = 20) -> dict:
     """
     # 일일 한도(FOLLOWUP_DAILY_CAP)는 팔로업(2·3차)에만 적용.
     # 1차 콜드드립(seq=1)은 한도와 무관하게 발송 — 분리 조회로 팔로업이 1차를 굶기지 않게 함.
+    from app.services.tenant_config import load_config
+    cfg = load_config(tenant_id)
     now = datetime.now(timezone.utc).isoformat()
-    fu_sent_today = _followup_sent_today(tenant_id)
+    fu_sent_today = _followup_sent_today(tenant_id, cfg.tz)
     fu_room = max(0, FOLLOWUP_DAILY_CAP - fu_sent_today)
     errors: list[str] = []
 
@@ -353,10 +355,10 @@ def check_pending_followups(tenant_id: str, limit: int = 20) -> dict:
             _mark_touch(touch_id, "skipped")
             continue
 
-        # 야간(21~08 KST) 자동 이메일 발송 보류 — pending 유지, 다음 주기 처리
+        # 야간(테넌트 타임존 업무시간 외) 자동 이메일 발송 보류 — pending 유지, 다음 주기 처리
         if channel == "email":
             from app.services.outreach_suppression import is_quiet_hours
-            if is_quiet_hours():
+            if is_quiet_hours(cfg):
                 continue
 
         try:

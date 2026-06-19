@@ -122,29 +122,32 @@ def run_platform_scan(tenant_id: str, platform: str) -> dict:
     특정 플랫폼 스캔 실행(테넌트 스코프).
     platform: 'youtube' | 'naver_blog'
     """
-    from app.services.secrets import get_secret
+    from app.services.secrets import get_tenant_secret
+    from app.services.tenant_config import load_config
+    cfg = load_config(tenant_id)
+    anthropic_key = get_tenant_secret(tenant_id, "anthropic_api_key") or ""
 
     if platform == "youtube":
-        api_key = get_secret("youtube_api_key")
+        api_key = get_tenant_secret(tenant_id, "youtube_api_key")
         if not api_key:
             return {"ok": False, "error": "youtube_api_key 미설정"}
         # 키 2·3번 있으면 함께 사용 (429 시 자동 전환)
         api_keys = [k for k in [
             api_key,
-            get_secret("youtube_api_key_2"),
-            get_secret("youtube_api_key_3"),
+            get_tenant_secret(tenant_id, "youtube_api_key_2"),
+            get_tenant_secret(tenant_id, "youtube_api_key_3"),
         ] if k]
         from app.services.scanners.youtube_scanner import YouTubeScanner, analyze_items_haiku
-        scanner = YouTubeScanner(api_keys)
-        analyzer = lambda items: analyze_items_haiku(items, get_secret("anthropic_api_key") or "")
+        scanner = YouTubeScanner(api_keys, cfg.keywords_youtube)
+        analyzer = lambda items: analyze_items_haiku(items, anthropic_key)
     elif platform == "naver_blog":
-        client_id = get_secret("naver_client_id")
-        client_secret = get_secret("naver_client_secret")
+        client_id = get_tenant_secret(tenant_id, "naver_client_id")
+        client_secret = get_tenant_secret(tenant_id, "naver_client_secret")
         if not client_id:
             return {"ok": False, "error": "naver_client_id 미설정"}
         from app.services.scanners.naver_blog_scanner import NaverBlogScanner, analyze_items_haiku
-        scanner = NaverBlogScanner(client_id, client_secret)
-        analyzer = lambda items: analyze_items_haiku(items, get_secret("anthropic_api_key") or "")
+        scanner = NaverBlogScanner(client_id, client_secret, cfg.keywords_naver)
+        analyzer = lambda items: analyze_items_haiku(items, anthropic_key)
     else:
         return {"ok": False, "error": f"미지원 플랫폼: {platform}"}
 
@@ -269,13 +272,13 @@ def run_platform_scan(tenant_id: str, platform: str) -> dict:
 
 
 def run_all_platforms(tenant_id: str) -> dict:
-    """모든 활성 플랫폼 순차 스캔(테넌트 스코프)."""
-    from app.services.secrets import get_secret
+    """모든 활성 플랫폼 순차 스캔(테넌트 스코프, 테넌트 키 보유 플랫폼만)."""
+    from app.services.secrets import get_tenant_secret
     results = []
 
-    if get_secret("youtube_api_key"):
+    if get_tenant_secret(tenant_id, "youtube_api_key"):
         results.append(run_platform_scan(tenant_id, "youtube"))
-    if get_secret("naver_client_id"):
+    if get_tenant_secret(tenant_id, "naver_client_id"):
         results.append(run_platform_scan(tenant_id, "naver_blog"))
 
     total_leads = sum(r.get("leads_upserted", 0) for r in results)

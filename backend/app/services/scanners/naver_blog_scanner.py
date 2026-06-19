@@ -49,9 +49,10 @@ class NaverBlogScanner(BaseScanner):
     platform = "naver_blog"
     keywords  = _KEYWORDS_SIM + _KEYWORDS_DATE   # run_scan용 (사용 안 함, 직접 오버라이드)
 
-    def __init__(self, client_id: str, client_secret: str):
+    def __init__(self, client_id: str, client_secret: str, keywords: list[str] | None = None):
         self.client_id     = client_id
         self.client_secret = client_secret
+        self._tenant_keywords = keywords or None   # 테넌트별 키워드(없으면 모듈 기본)
         self._headers = {
             "X-Naver-Client-Id":     client_id,
             "X-Naver-Client-Secret": client_secret,
@@ -88,19 +89,23 @@ class NaverBlogScanner(BaseScanner):
                 urls.append(url)
         return urls
 
-    def run_scan(self) -> dict:
+    def run_scan(self, tenant_id: str) -> dict:
         """
         키워드별 sim+date 병행 수집 → blog_id 단위 중복 제거 → fetch_content_details.
+        테넌트 스코프 dedup + 테넌트별 키워드.
 
         중복 체크: 포스트 URL이 아닌 blog_id(채널)로 outreach_leads 확인.
         - 네이버 블로그는 같은 인기 포스트가 매일 동일 키워드에서 검색되므로
           post URL 기반 outreach_scanned_content 체크는 영구 0건을 유발.
         """
+        sim_kws  = self._tenant_keywords or _KEYWORDS_SIM
+        date_kws = self._tenant_keywords or _KEYWORDS_DATE
+
         # ── 1) 키워드 수집 ──
         seen_urls: set[str] = set()
         blog_id_to_best_url: dict[str, str] = {}   # blog_id → 대표 포스트 URL
 
-        for kw in _KEYWORDS_SIM:
+        for kw in sim_kws:
             for it in self._search_blog(kw, display=_MAX_PER_KW, sort="sim"):
                 url = it.get("link", "")
                 if not url or url in seen_urls:
@@ -115,7 +120,7 @@ class NaverBlogScanner(BaseScanner):
                 break
 
         if len(blog_id_to_best_url) < _MAX_ITEMS:
-            for kw in _KEYWORDS_DATE:
+            for kw in date_kws:
                 for it in self._search_blog(kw, display=_MAX_PER_KW, sort="date"):
                     url = it.get("link", "")
                     if not url or url in seen_urls:
@@ -132,8 +137,8 @@ class NaverBlogScanner(BaseScanner):
         all_blog_ids = list(blog_id_to_best_url.keys())
         logger.info("[naver_blog] 검색 결과 블로그 %d개", len(all_blog_ids))
 
-        # ── 2) 이미 outreach_leads에 있는 블로그 제외 ──
-        new_blog_ids = _filter_new_blog_ids(all_blog_ids)
+        # ── 2) 이미 outreach_leads에 있는 블로그 제외 (테넌트 스코프) ──
+        new_blog_ids = _filter_new_blog_ids(tenant_id, all_blog_ids)
         logger.info("[naver_blog] 신규 블로그 %d개", len(new_blog_ids))
 
         if not new_blog_ids:
@@ -301,8 +306,8 @@ def _normalize_blog_url(blog_id: str, fallback: str) -> str:
     return fallback
 
 
-def _filter_new_blog_ids(blog_ids: list[str]) -> list[str]:
-    """outreach_leads에 없는 blog_id만 반환 (채널 단위 중복 방지)."""
+def _filter_new_blog_ids(tenant_id: str, blog_ids: list[str]) -> list[str]:
+    """해당 테넌트의 outreach_leads에 없는 blog_id만 반환 (채널 단위 중복 방지)."""
     if not blog_ids:
         return []
     try:
@@ -312,6 +317,7 @@ def _filter_new_blog_ids(blog_ids: list[str]) -> list[str]:
             .schema("agent_work")
             .table("outreach_leads")
             .select("platform_id")
+            .eq("tenant_id", tenant_id)
             .eq("platform", "naver_blog")
             .in_("platform_id", blog_ids)
             .execute()

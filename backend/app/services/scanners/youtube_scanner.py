@@ -91,9 +91,11 @@ class YouTubeScanner(BaseScanner):
     platform = "youtube"
     keywords = KEYWORDS
 
-    def __init__(self, api_keys: list[str]):
-        """api_keys: 최대 3개, 429 시 순서대로 전환."""
+    def __init__(self, api_keys: list[str], keywords: list[str] | None = None):
+        """api_keys: 최대 3개, 429 시 순서대로 전환. keywords: 테넌트별(없으면 기본)."""
         from googleapiclient.discovery import build
+        if keywords:
+            self.keywords = keywords   # 인스턴스 속성이 클래스 기본 KEYWORDS를 덮음
         self._keys = [k for k in api_keys if k]
         self._key_idx = 0
         self._clients = [

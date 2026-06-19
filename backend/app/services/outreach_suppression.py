@@ -168,8 +168,14 @@ def inject_open_pixel(html: str, lead_id: str) -> str:
     return html + pixel
 
 
-def is_quiet_hours(now: datetime | None = None) -> bool:
-    """KST 기준 21:00~08:00 이면 True (자동 발송 보류 시간대)."""
+def is_quiet_hours(cfg=None, now: datetime | None = None) -> bool:
+    """발송 보류 시간대 판정. cfg(TenantOutreachConfig) 주면 테넌트 타임존/업무시간 기준,
+    없으면 전역 폴백(KST 21:00~08:00)."""
+    if cfg is not None:
+        if not cfg.quiet_hours:
+            return False
+        h = (now or datetime.now(cfg.tz)).astimezone(cfg.tz).hour
+        return h < cfg.send_start_hour or h >= cfg.send_end_hour
     if not settings.outreach_quiet_hours:
         return False
     h = (now or datetime.now(_KST)).astimezone(_KST).hour

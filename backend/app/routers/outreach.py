@@ -592,6 +592,51 @@ def test_send(to: str = "", lead_id: str = "", user: UserContext = Depends(requi
     return {"ok": True, "to": to, "id": result.get("id"), "subject": subject}
 
 
+@router.get("/config")
+def get_outreach_config(user: UserContext = Depends(require_admin)) -> dict:
+    """테넌트 영업 설정 조회 (없으면 기본값)."""
+    from app.services.tenant_config import load_config
+    c = load_config(_require_tid(user))
+    return {
+        "cold_drip_enabled": c.cold_drip_enabled, "daily_cap": c.daily_cap,
+        "drip_grades": c.drip_grades, "send_start_hour": c.send_start_hour,
+        "send_end_hour": c.send_end_hour, "timezone": c.timezone,
+        "quiet_hours": c.quiet_hours, "ad_prefix": c.ad_prefix,
+        "kakao_url": c.kakao_url, "sender_info": c.sender_info,
+        "influencer_subject": c.influencer_subject, "agency_subject": c.agency_subject,
+        "unsubscribe_base_url": c.unsubscribe_base_url,
+        "keywords_youtube": c.keywords_youtube, "keywords_naver": c.keywords_naver,
+    }
+
+
+class OutreachConfigPatch(BaseModel):
+    cold_drip_enabled: bool | None = None
+    daily_cap: int | None = None
+    drip_grades: str | None = None
+    send_start_hour: int | None = None
+    send_end_hour: int | None = None
+    timezone: str | None = None
+    quiet_hours: bool | None = None
+    ad_prefix: bool | None = None
+    kakao_url: str | None = None
+    sender_info: str | None = None
+    influencer_subject: str | None = None
+    agency_subject: str | None = None
+    unsubscribe_base_url: str | None = None
+    keywords_youtube: list[str] | None = None
+    keywords_naver: list[str] | None = None
+
+
+@router.put("/config")
+def update_outreach_config(body: OutreachConfigPatch, user: UserContext = Depends(require_admin)) -> dict:
+    """테넌트 영업 설정 저장 (cap/등급/업무시간/타임존/키워드 등)."""
+    from app.services.tenant_config import save_config
+    patch = {k: v for k, v in body.model_dump().items() if v is not None}
+    if patch:
+        save_config(_require_tid(user), patch)
+    return {"ok": True}
+
+
 class GmailSecretsPatch(BaseModel):
     client_id: str | None = None
     client_secret: str | None = None
@@ -768,15 +813,16 @@ def cold_drip_diagnostics(user: UserContext = Depends(require_admin)) -> dict:
     + 오늘 예약/발송 수를 한 번에 반환. 발송이 적으면 어느 단계에서 막히는지 즉시 식별.
     """
     from datetime import timedelta
-    from app.config import settings
     from app.services import outreach_gmail_sender as gm
+    from app.services.tenant_config import load_config
 
-    _KST = timezone(timedelta(hours=9))
-    now_kst = datetime.now(_KST)
     db = _db()
     tid = _require_tid(user)
+    cfg = load_config(tid)
+    _KST = cfg.tz
+    now_kst = datetime.now(_KST)
 
-    grades = [g.strip() for g in settings.outreach_drip_grades.split(",") if g.strip()]
+    grades = cfg.grade_list
     plats = ["youtube", "naver_blog"]
 
     def _lead_count(build) -> int:
@@ -817,19 +863,19 @@ def cold_drip_diagnostics(user: UserContext = Depends(require_admin)) -> dict:
 
     return {
         "gates": {
-            "enabled":          settings.outreach_cold_drip_enabled,
+            "enabled":          cfg.cold_drip_enabled,
             "gmail_configured": gm.is_configured(tid),
             "now_kst":          now_kst.isoformat(timespec="seconds"),
             "weekend":          now_kst.weekday() >= 5,
-            "business_hours":   settings.outreach_send_start_hour <= now_kst.hour < settings.outreach_send_end_hour,
-            "daily_cap":        settings.outreach_daily_cap,
-            "drip_grades":      settings.outreach_drip_grades,
+            "business_hours":   cfg.send_start_hour <= now_kst.hour < cfg.send_end_hour,
+            "daily_cap":        cfg.daily_cap,
+            "drip_grades":      cfg.drip_grades,
             "platforms":        plats,
         },
         "today": {
             "scheduled_seq1": scheduled_today,
             "sent_seq1":      sent_today,
-            "room":           max(0, settings.outreach_daily_cap - scheduled_today),
+            "room":           max(0, cfg.daily_cap - scheduled_today),
         },
         "supply": {
             "eligible_now":       eligible_now,        # ← 지금 즉시 발송 가능한 리드 수

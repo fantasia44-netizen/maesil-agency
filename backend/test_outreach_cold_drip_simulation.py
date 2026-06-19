@@ -150,26 +150,35 @@ FAKE = FakeDB()
 drip._db = lambda: FAKE
 followup._db = lambda: FAKE
 
+# tenant_config: 가짜 DB(설정 테이블 없음) → settings 기본값으로 폴백
+import app.services.tenant_config as tcfg
+tcfg._db = lambda: FAKE
+import app.services.outreach_pipeline as pipe  # noqa
+
 # 설정/Gmail 주입
 from app.config import settings
-for k, v in {
-    "outreach_cold_drip_enabled": True,
-    "outreach_send_start_hour": 8,
-    "outreach_send_end_hour": 20,
-    "outreach_daily_cap": 100,
-    "outreach_drip_grades": "S,A,B,C",
-}.items():
-    object.__setattr__(settings, k, v)
+def set_settings(**kw):
+    for k, v in kw.items():
+        object.__setattr__(settings, k, v)
+    tcfg.invalidate()   # cfg 캐시 무효화 → 다음 load_config가 새 settings 반영
+set_settings(
+    outreach_cold_drip_enabled=True,
+    outreach_send_start_hour=8,
+    outreach_send_end_hour=20,
+    outreach_daily_cap=100,
+    outreach_drip_grades="S,A,B,C",
+)
 
 import app.services.outreach_gmail_sender as gm
 gm.is_configured = lambda *a, **k: True
 
-supp.is_quiet_hours = lambda: False
+supp.is_quiet_hours = lambda *a, **k: False
 
 
 def reset_db():
     FAKE.tables = {"outreach_leads": [], "outreach_touchpoints": []}
     FAKE.seq = 0
+    tcfg.invalidate()
 
 
 def L(**kw):
@@ -222,14 +231,14 @@ check("누적 3건", len(FAKE.tables["outreach_touchpoints"]), 3)
 
 # 2-4) cap 도달 시 중단
 reset_db()
-object.__setattr__(settings, "outreach_daily_cap", 2)
+set_settings(outreach_daily_cap=2)
 FAKE.tables["outreach_leads"] = [L(id=f"e{i}", platform="youtube", grade="A", score=90 - i) for i in range(5)]
 c1 = drip.schedule_daily_cold_drip("t1")
 check("cap=2 — 첫 호출 2건", c1.get("scheduled"), 2)
 c2 = drip.schedule_daily_cold_drip("t1")
 check("cap 도달 → 추가 0건", c2.get("scheduled"), 0)
 check("cap 도달 skip 사유", c2.get("skipped"), "daily cap reached")
-object.__setattr__(settings, "outreach_daily_cap", 100)
+set_settings(outreach_daily_cap=100)
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -278,7 +287,7 @@ check("여유 시 팔로업도 발송", 2 in sent_seq, True)
 # ──────────────────────────────────────────────────────────────────
 section("4. 교차 테넌트 격리 — 한 테넌트는 다른 테넌트 리드를 못 봄")
 reset_db()
-object.__setattr__(settings, "outreach_daily_cap", 100)
+set_settings(outreach_daily_cap=100)
 FAKE.tables["outreach_leads"] = [
     L(id="t1a", tenant_id="t1", platform="youtube", grade="A", score=90),
     L(id="t1b", tenant_id="t1", platform="naver_blog", grade="B", score=80),

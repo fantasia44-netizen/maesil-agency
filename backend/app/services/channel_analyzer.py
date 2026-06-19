@@ -31,18 +31,18 @@ def _db():
     return get_maesil_total_client().schema("agent_work")
 
 
-def _get_anthropic_key() -> str:
-    from app.services.secrets import get_secret
-    return get_secret("anthropic_api_key") or ""
+def _get_anthropic_key(tenant_id: str | None = None) -> str:
+    from app.services.secrets import get_tenant_secret
+    return get_tenant_secret(tenant_id, "anthropic_api_key") or ""
 
 
 def _get_latest_relevant_video(lead: dict) -> dict | None:
     """YouTube API로 채널의 최신 영상 중 스마트스토어·쿠팡 관련 영상을 반환.
 
-    없으면 단순 최신 영상 반환. API 키 없으면 None.
+    없으면 단순 최신 영상 반환. API 키 없으면 None. (테넌트별 키)
     """
-    from app.services.secrets import get_secret
-    api_key = get_secret("youtube_api_key")
+    from app.services.secrets import get_tenant_secret
+    api_key = get_tenant_secret(lead.get("tenant_id"), "youtube_api_key")
     if not api_key:
         return None
 
@@ -76,7 +76,7 @@ def _sonnet_analyze(lead: dict, latest_video: dict | None = None) -> dict:
     """Claude Haiku로 채널 심층 분석 수행."""
     import anthropic
 
-    client = anthropic.Anthropic(api_key=_get_anthropic_key())
+    client = anthropic.Anthropic(api_key=_get_anthropic_key(lead.get("tenant_id")))
 
     platform = lead.get("platform", "")
     handle = lead.get("handle_name", "")

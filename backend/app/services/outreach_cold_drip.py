@@ -73,24 +73,26 @@ def _eligible_leads(tenant_id: str, cap: int, grades: list[str]) -> list[dict]:
 
 def schedule_daily_cold_drip(tenant_id: str) -> dict:
     """
-    오늘 발송 리스트를 outreach_touchpoints DB에 생성(테넌트 스코프).
+    오늘 발송 리스트를 outreach_touchpoints DB에 생성(테넌트 스코프 + 테넌트 설정).
     이미 오늘 일정이 있거나, 업무시간 전이거나, disabled면 스킵.
     반환: {"scheduled": N} 또는 {"skipped": reason}
     """
-    from app.config import settings
+    from app.services.tenant_config import load_config
+    cfg = load_config(tenant_id)
 
-    if not settings.outreach_cold_drip_enabled:
+    if not cfg.cold_drip_enabled:
         return {"skipped": "disabled"}
 
     from app.services import outreach_gmail_sender as gm
     if not gm.is_configured(tenant_id):
         return {"skipped": "gmail not configured"}
 
-    now_kst = datetime.now(_KST)
+    tz = cfg.tz
+    now_kst = datetime.now(tz)
     if now_kst.weekday() >= 5:
         return {"skipped": "weekend"}
-    start_h = settings.outreach_send_start_hour
-    end_h = settings.outreach_send_end_hour
+    start_h = cfg.send_start_hour
+    end_h = cfg.send_end_hour
     if now_kst.hour < start_h:
         return {"skipped": "before business hours"}
     if now_kst.hour >= end_h:
@@ -98,23 +100,23 @@ def schedule_daily_cold_drip(tenant_id: str) -> dict:
 
     # ── top-up 방식: 매 사이클 오늘 누적이 cap 미만이면 부족분만 추가 예약 ──
     # (8am 1회 스냅샷-잠금이 아니라, 분석이 새 approved 리드를 만들수록 그날 안에 cap까지 채움)
-    cap = max(1, settings.outreach_daily_cap)
-    scheduled_ids = _scheduled_lead_ids_today(tenant_id)   # 오늘 이미 예약/발송된 seq=1 리드
+    cap = max(1, cfg.daily_cap)
+    scheduled_ids = _scheduled_lead_ids_today(tenant_id, tz)   # 오늘 이미 예약/발송된 seq=1 리드
     already = len(scheduled_ids)
     room = cap - already
     if room <= 0:
         return {"skipped": "daily cap reached", "scheduled": 0, "today_total": already, "cap": cap}
 
-    grades = [g.strip() for g in settings.outreach_drip_grades.split(",") if g.strip()]
+    grades = cfg.grade_list
     # 여유있게 가져와 이미 예약된 리드 제외 후 room개 선택
     candidates = _eligible_leads(tenant_id, room + already + 50, grades)
     leads = [l for l in candidates if l["id"] not in scheduled_ids][:room]
     if not leads:
         return {"skipped": "no eligible leads", "scheduled": 0, "today_total": already, "cap": cap}
 
-    # 지금 ~ end_h(KST) 남은 시간에 분산
+    # 지금 ~ end_h(테넌트 타임존) 남은 시간에 분산
     today = now_kst.date()
-    end_dt = datetime(today.year, today.month, today.day, end_h, 0, 0, tzinfo=_KST)
+    end_dt = datetime(today.year, today.month, today.day, end_h, 0, 0, tzinfo=tz)
     remaining_sec = max(60, int((end_dt - now_kst).total_seconds()))
     n = len(leads)
     gap_sec = remaining_sec / n if n > 1 else 0
@@ -144,11 +146,12 @@ def schedule_daily_cold_drip(tenant_id: str) -> dict:
     return {"scheduled": inserted, "today_total": already + inserted, "cap": cap}
 
 
-def _scheduled_lead_ids_today(tenant_id: str) -> set:
-    """오늘(KST) seq=1 이메일 터치포인트가 있는(pending+sent) 리드 id 집합(테넌트 스코프).
+def _scheduled_lead_ids_today(tenant_id: str, tz=None) -> set:
+    """오늘(테넌트 타임존) seq=1 이메일 터치포인트가 있는(pending+sent) 리드 id 집합.
     top-up 시 이미 예약/발송된 리드를 제외하고 cap 누적을 계산하는 데 사용."""
-    now_kst = datetime.now(_KST)
-    today_start = datetime(now_kst.year, now_kst.month, now_kst.day, 0, 0, 0, tzinfo=_KST)
+    tz = tz or _KST
+    now_kst = datetime.now(tz)
+    today_start = datetime(now_kst.year, now_kst.month, now_kst.day, 0, 0, 0, tzinfo=tz)
     tomorrow_start = today_start + timedelta(days=1)
     a = today_start.astimezone(timezone.utc).isoformat()
     b = tomorrow_start.astimezone(timezone.utc).isoformat()
