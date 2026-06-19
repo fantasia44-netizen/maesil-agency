@@ -54,7 +54,7 @@ def _eligible_leads(cap: int, grades: list[str]) -> list[dict]:
         resp = (
             _db().table("outreach_leads")
             .select("id, contact_email, handle_name, platform, grade, score")
-            .eq("platform", "youtube")
+            .in_("platform", ["youtube", "naver_blog"])
             .in_("status", ["approved"])
             .in_("grade", grades)
             .is_("emailed_at", "null")
@@ -87,35 +87,39 @@ def schedule_daily_cold_drip() -> dict:
     now_kst = datetime.now(_KST)
     if now_kst.weekday() >= 5:
         return {"skipped": "weekend"}
-    if now_kst.hour < settings.outreach_send_start_hour:
-        return {"skipped": "before business hours"}
-
-    if already_scheduled_today():
-        return {"skipped": "already scheduled today"}
-
-    cap = max(1, settings.outreach_daily_cap)
-    grades = [g.strip() for g in settings.outreach_drip_grades.split(",") if g.strip()]
-    leads = _eligible_leads(cap, grades)
-
-    if not leads:
-        return {"skipped": "no eligible leads", "scheduled": 0}
-
-    # 오전 start_hour ~ end_hour KST 균등 분산
     start_h = settings.outreach_send_start_hour
     end_h = settings.outreach_send_end_hour
+    if now_kst.hour < start_h:
+        return {"skipped": "before business hours"}
+    if now_kst.hour >= end_h:
+        return {"skipped": "after business hours"}
+
+    # ── top-up 방식: 매 사이클 오늘 누적이 cap 미만이면 부족분만 추가 예약 ──
+    # (8am 1회 스냅샷-잠금이 아니라, 분석이 새 approved 리드를 만들수록 그날 안에 cap까지 채움)
+    cap = max(1, settings.outreach_daily_cap)
+    scheduled_ids = _scheduled_lead_ids_today()   # 오늘 이미 예약/발송된 seq=1 리드
+    already = len(scheduled_ids)
+    room = cap - already
+    if room <= 0:
+        return {"skipped": "daily cap reached", "scheduled": 0, "today_total": already, "cap": cap}
+
+    grades = [g.strip() for g in settings.outreach_drip_grades.split(",") if g.strip()]
+    # 여유있게 가져와 이미 예약된 리드 제외 후 room개 선택
+    candidates = _eligible_leads(room + already + 50, grades)
+    leads = [l for l in candidates if l["id"] not in scheduled_ids][:room]
+    if not leads:
+        return {"skipped": "no eligible leads", "scheduled": 0, "today_total": already, "cap": cap}
+
+    # 지금 ~ end_h(KST) 남은 시간에 분산
     today = now_kst.date()
-    window_sec = (end_h - start_h) * 3600
+    end_dt = datetime(today.year, today.month, today.day, end_h, 0, 0, tzinfo=_KST)
+    remaining_sec = max(60, int((end_dt - now_kst).total_seconds()))
     n = len(leads)
-    gap_sec = window_sec / n if n > 1 else window_sec
+    gap_sec = remaining_sec / n if n > 1 else 0
 
     records = []
     for i, lead in enumerate(leads):
-        offset_sec = int(gap_sec * i)
-        scheduled_kst = datetime(today.year, today.month, today.day,
-                                 start_h, 0, 0, tzinfo=_KST) + timedelta(seconds=offset_sec)
-        # 과거 시각이면 지금 + 1분으로 (오늘 늦게 처음 실행 시)
-        if scheduled_kst < datetime.now(_KST):
-            scheduled_kst = datetime.now(_KST) + timedelta(minutes=1 + i)
+        scheduled_kst = now_kst + timedelta(seconds=int(gap_sec * i) + 30)
         records.append({
             "lead_id": lead["id"],
             "touch_sequence": 1,
@@ -123,18 +127,6 @@ def schedule_daily_cold_drip() -> dict:
             "status": "pending",
             "scheduled_for": scheduled_kst.astimezone(timezone.utc).isoformat(),
         })
-
-    # 기존 오늘 seq=1 pending 제거 후 일괄 삽입 (멱등)
-    try:
-        today_str = _today_kst_str()
-        _db().table("outreach_touchpoints").delete()\
-            .eq("touch_sequence", 1)\
-            .eq("channel", "email")\
-            .eq("status", "pending")\
-            .gte("scheduled_for", today_str)\
-            .execute()
-    except Exception as e:
-        logger.warning("기존 pending 정리 실패: %s", e)
 
     inserted = 0
     chunk = 50
@@ -145,5 +137,30 @@ def schedule_daily_cold_drip() -> dict:
         except Exception as e:
             logger.error("cold drip 예약 삽입 실패 (chunk %d): %s", i, e)
 
-    logger.info("[cold_drip] 오늘 발송 예약 %d건 생성", inserted)
-    return {"scheduled": inserted}
+    logger.info("[cold_drip] top-up 예약 +%d건 (오늘 누적 %d/%d)", inserted, already + inserted, cap)
+    return {"scheduled": inserted, "today_total": already + inserted, "cap": cap}
+
+
+def _scheduled_lead_ids_today() -> set:
+    """오늘(KST) seq=1 이메일 터치포인트가 있는(pending+sent) 리드 id 집합.
+    top-up 시 이미 예약/발송된 리드를 제외하고 cap 누적을 계산하는 데 사용."""
+    now_kst = datetime.now(_KST)
+    today_start = datetime(now_kst.year, now_kst.month, now_kst.day, 0, 0, 0, tzinfo=_KST)
+    tomorrow_start = today_start + timedelta(days=1)
+    a = today_start.astimezone(timezone.utc).isoformat()
+    b = tomorrow_start.astimezone(timezone.utc).isoformat()
+    try:
+        resp = (
+            _db().table("outreach_touchpoints")
+            .select("lead_id")
+            .eq("touch_sequence", 1)
+            .eq("channel", "email")
+            .in_("status", ["pending", "sent"])
+            .gte("scheduled_for", a)
+            .lt("scheduled_for", b)
+            .execute()
+        )
+        return {r["lead_id"] for r in (resp.data or []) if r.get("lead_id")}
+    except Exception as e:
+        logger.warning("_scheduled_lead_ids_today 조회 실패: %s", e)
+        return set()

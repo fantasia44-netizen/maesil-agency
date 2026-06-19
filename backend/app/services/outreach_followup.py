@@ -302,31 +302,32 @@ def check_pending_followups(limit: int = 20) -> dict:
     scheduled_for가 지난 pending 터치포인트를 처리.
     스케줄러에서 3분마다 호출. 하루 FOLLOWUP_DAILY_CAP통 제한.
     """
-    # 일일 한도 체크
-    sent_today = _followup_sent_today()
-    if sent_today >= FOLLOWUP_DAILY_CAP:
-        return {"processed": 0, "errors": [], "capped": True}
-    remaining = FOLLOWUP_DAILY_CAP - sent_today
-    limit = min(limit, remaining)
-
+    # 일일 한도(FOLLOWUP_DAILY_CAP)는 팔로업(2·3차)에만 적용.
+    # 1차 콜드드립(seq=1)은 한도와 무관하게 발송 — 분리 조회로 팔로업이 1차를 굶기지 않게 함.
     now = datetime.now(timezone.utc).isoformat()
-    try:
-        resp = (
+    fu_sent_today = _followup_sent_today()
+    fu_room = max(0, FOLLOWUP_DAILY_CAP - fu_sent_today)
+    errors: list[str] = []
+
+    def _fetch_due(seq_eq=None, seq_gt=None, lim=0):
+        if lim <= 0:
+            return []
+        q = (
             _db().table("outreach_touchpoints")
             .select("id, lead_id, touch_sequence, channel")
             .eq("status", "pending")
             .lte("scheduled_for", now)
-            .order("scheduled_for")
-            .limit(limit)
-            .execute()
         )
-    except Exception as e:
-        logger.error("followup: touchpoints 조회 실패: %s", e)
-        return {"processed": 0, "errors": [str(e)]}
+        q = q.eq("touch_sequence", seq_eq) if seq_eq is not None else q.gt("touch_sequence", seq_gt)
+        try:
+            return (q.order("scheduled_for").limit(lim).execute().data) or []
+        except Exception as e:
+            errors.append(f"touchpoints 조회 실패: {e}")
+            return []
 
-    touches = resp.data or []
+    # 1차(콜드드립)는 한도 무관 limit건, 2·3차 팔로업은 남은 한도(fu_room)만큼
+    touches = _fetch_due(seq_eq=1, lim=limit) + _fetch_due(seq_gt=1, lim=fu_room)
     processed = 0
-    errors: list[str] = []
 
     for touch in touches:
         lead_id = touch["lead_id"]
