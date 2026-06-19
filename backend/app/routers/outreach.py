@@ -704,17 +704,21 @@ def get_all_touchpoints(
     user: UserContext = Depends(require_admin),
 ) -> list[dict]:
     """전체 발송 이력 — 리드 정보 별도 조회 포함."""
+    import logging as _log
+    _logger = _log.getLogger(__name__)
     q = (
         _db().table("outreach_touchpoints")
         .select("*")
-        .order("scheduled_for", desc=True)
+        .order("created_at", desc=True)
         .limit(limit)
     )
     if status:
         q = q.eq("status", status)
     if channel:
         q = q.eq("channel", channel)
-    rows = q.execute().data or []
+    resp = q.execute()
+    _logger.info("[touchpoints] count=%s error=%s", len(resp.data or []), getattr(resp, 'error', None))
+    rows = resp.data or []
 
     # lead_id 목록으로 리드 정보 일괄 조회
     lead_ids = list({r["lead_id"] for r in rows if r.get("lead_id")})
