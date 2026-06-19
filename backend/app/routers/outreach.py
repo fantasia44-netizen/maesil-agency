@@ -707,7 +707,7 @@ def get_all_touchpoints(
     q = (
         _db().table("outreach_touchpoints")
         .select("*, outreach_leads(handle_name, contact_email, platform, grade, status)")
-        .order("scheduled_for", desc=True, nullsfirst=False)
+        .order("scheduled_for", desc=True)
         .limit(limit)
     )
     if status:
