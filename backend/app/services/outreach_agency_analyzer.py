@@ -375,12 +375,12 @@ def _build_briefing_html(lead: dict, ai: dict, crawl: dict) -> str:
 
 # ── 메인 엔트리포인트 ────────────────────────────────────────────────
 
-def analyze_agency_lead(lead_id: str) -> dict:
+def analyze_agency_lead(tenant_id: str, lead_id: str) -> dict:
     """
-    광고대행사 리드 심층 분석 + 브리핑 생성.
+    광고대행사 리드 심층 분석 + 브리핑 생성(테넌트 스코프).
     outreach 라우터에서 백그라운드 스레드로 호출.
     """
-    resp = _db().table("outreach_leads").select("*").eq("id", lead_id).limit(1).execute()
+    resp = _db().table("outreach_leads").select("*").eq("tenant_id", tenant_id).eq("id", lead_id).limit(1).execute()
     rows = resp.data or []
     if not rows:
         return {"ok": False, "error": "lead not found"}
@@ -444,7 +444,7 @@ def analyze_agency_lead(lead_id: str) -> dict:
             "content_summary": ai.get("agency_profile", "")[:500] or None,
             "status": next_status,
             "updated_at": now,
-        }).eq("id", lead_id).execute()
+        }).eq("tenant_id", tenant_id).eq("id", lead_id).execute()
         logger.info("[agency_analyze] 완료: %s → status=%s", company, next_status)
     except Exception as e:
         logger.error("[agency_analyze] DB 저장 실패 [%s]: %s", company, e)

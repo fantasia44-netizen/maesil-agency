@@ -82,7 +82,7 @@ def _enrich_email(website: str) -> str | None:
     return None
 
 
-def import_agencies(entries: list[dict], source: str, enrich: bool = True) -> dict:
+def import_agencies(tenant_id: str, entries: list[dict], source: str, enrich: bool = True) -> dict:
     """공식 대행사 목록을 outreach_leads에 upsert.
 
     entries: [{name, website, phone?}]
@@ -115,6 +115,7 @@ def import_agencies(entries: list[dict], source: str, enrich: bool = True) -> di
         content_summary = " · ".join(summary_bits)
 
         payload = {
+            "tenant_id": tenant_id,
             "platform": PLATFORM,
             "platform_id": domain,
             "platform_url": f"https://{domain}",
@@ -135,7 +136,7 @@ def import_agencies(entries: list[dict], source: str, enrich: bool = True) -> di
         }
         try:
             resp = _db().table("outreach_leads").upsert(
-                payload, on_conflict="platform,platform_id"
+                payload, on_conflict="tenant_id,platform,platform_id"
             ).execute()
             if resp.data:
                 upserted += 1
@@ -148,12 +149,12 @@ def import_agencies(entries: list[dict], source: str, enrich: bool = True) -> di
             "email_enriched": enriched, "leads": rows_out}
 
 
-def import_coupang_official(enrich: bool = True) -> dict:
-    return import_agencies(COUPANG_OFFICIAL, "coupang_official", enrich=enrich)
+def import_coupang_official(tenant_id: str, enrich: bool = True) -> dict:
+    return import_agencies(tenant_id, COUPANG_OFFICIAL, "coupang_official", enrich=enrich)
 
 
-def import_naver_official(enrich: bool = True) -> dict:
+def import_naver_official(tenant_id: str, enrich: bool = True) -> dict:
     if not NAVER_OFFICIAL:
         return {"ok": False, "error": "NAVER_OFFICIAL 목록이 비어 있습니다 "
                 "(saedu.naver.com 공식대행사 명단을 채워주세요)."}
-    return import_agencies(NAVER_OFFICIAL, "naver_official", enrich=enrich)
+    return import_agencies(tenant_id, NAVER_OFFICIAL, "naver_official", enrich=enrich)

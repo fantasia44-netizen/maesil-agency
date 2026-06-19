@@ -36,13 +36,14 @@ def _db():
     return get_maesil_total_client().schema("agent_work")
 
 
-def _upsert_lead(payload: dict) -> str | None:
-    """outreach_leads에 업서트. 생성된 id 반환."""
+def _upsert_lead(tenant_id: str, payload: dict) -> str | None:
+    """outreach_leads에 업서트(테넌트 스코프). 생성된 id 반환."""
     try:
+        payload["tenant_id"] = tenant_id
         payload["updated_at"] = datetime.now(timezone.utc).isoformat()
         resp = (
             _db().table("outreach_leads")
-            .upsert(payload, on_conflict="platform,platform_id")
+            .upsert(payload, on_conflict="tenant_id,platform,platform_id")
             .execute()
         )
         rows = resp.data or []
@@ -53,11 +54,11 @@ def _upsert_lead(payload: dict) -> str | None:
         return None
 
 
-def _merge_into_existing(existing_id: str, new_platform: str, new_url: str,
+def _merge_into_existing(tenant_id: str, existing_id: str, new_platform: str, new_url: str,
                          new_subscribers: int | None) -> None:
-    """동일인의 새 플랫폼 정보를 기존 리드에 병합."""
+    """동일인의 새 플랫폼 정보를 기존 리드에 병합(테넌트 스코프)."""
     try:
-        resp = _db().table("outreach_leads").select("platforms_json, score").eq("id", existing_id).limit(1).execute()
+        resp = _db().table("outreach_leads").select("platforms_json, score").eq("tenant_id", tenant_id).eq("id", existing_id).limit(1).execute()
         if not resp.data:
             return
         lead = resp.data[0]
@@ -71,17 +72,17 @@ def _merge_into_existing(existing_id: str, new_platform: str, new_url: str,
                 "platforms_json": platforms,
                 "score": new_score,
                 "updated_at": datetime.now(timezone.utc).isoformat(),
-            }).eq("id", existing_id).execute()
+            }).eq("tenant_id", tenant_id).eq("id", existing_id).execute()
             logger.info("lead 병합 [%s] + %s → score +%d", existing_id, new_platform, bonus)
     except Exception as e:
         logger.warning("lead 병합 실패 [%s]: %s", existing_id, e)
 
 
-def _schedule_touchpoints(lead_id: str, has_email: bool,
+def _schedule_touchpoints(tenant_id: str, lead_id: str, has_email: bool,
                           has_instagram: bool, has_cafe: bool) -> None:
-    """터치포인트 시퀀스 예약. 이미 예약된 리드는 건너뜀."""
+    """터치포인트 시퀀스 예약(테넌트 스탬프). 이미 예약된 리드는 건너뜀."""
     try:
-        existing = _db().table("outreach_touchpoints").select("id").eq("lead_id", lead_id).limit(1).execute()
+        existing = _db().table("outreach_touchpoints").select("id").eq("tenant_id", tenant_id).eq("lead_id", lead_id).limit(1).execute()
         if existing.data:
             return  # 이미 터치포인트 있음 — 재스캔 시 덮어쓰지 않음
     except Exception:
@@ -97,6 +98,7 @@ def _schedule_touchpoints(lead_id: str, has_email: bool,
         if ch == "naver_cafe_message" and not has_cafe:
             continue
         rows.append({
+            "tenant_id": tenant_id,
             "lead_id": lead_id,
             "touch_sequence": t["sequence"],
             "channel": ch,
@@ -115,9 +117,9 @@ def _schedule_touchpoints(lead_id: str, has_email: bool,
 
 # ── 메인 파이프라인 ──────────────────────────────────────────────────
 
-def run_platform_scan(platform: str) -> dict:
+def run_platform_scan(tenant_id: str, platform: str) -> dict:
     """
-    특정 플랫폼 스캔 실행.
+    특정 플랫폼 스캔 실행(테넌트 스코프).
     platform: 'youtube' | 'naver_blog'
     """
     from app.services.secrets import get_secret
@@ -147,7 +149,7 @@ def run_platform_scan(platform: str) -> dict:
         return {"ok": False, "error": f"미지원 플랫폼: {platform}"}
 
     # 스캔 실행
-    scan_result = scanner.run_scan()
+    scan_result = scanner.run_scan(tenant_id)
     items: list[ContentItem] = scan_result.get("items", [])
 
     if not items:
@@ -174,10 +176,10 @@ def run_platform_scan(platform: str) -> dict:
         # 연락처 추출
         contact = extract_contact(item.raw_contact_text)
 
-        # 동일인 타 플랫폼 병합 확인
-        existing_id = find_existing_lead_by_contact(contact.email, contact.kakao)
+        # 동일인 타 플랫폼 병합 확인 (테넌트 내)
+        existing_id = find_existing_lead_by_contact(tenant_id, contact.email, contact.kakao)
         if existing_id:
-            _merge_into_existing(existing_id, platform, item.platform_url, item.subscriber_count)
+            _merge_into_existing(tenant_id, existing_id, platform, item.platform_url, item.subscriber_count)
             content_id_to_lead_id[item.content_id] = existing_id
             continue
 
@@ -237,13 +239,14 @@ def run_platform_scan(platform: str) -> dict:
             "last_scanned_at": datetime.now(timezone.utc).isoformat(),
         }
 
-        lead_id = _upsert_lead(payload)
+        lead_id = _upsert_lead(tenant_id, payload)
         if lead_id:
             leads_upserted += 1
             content_id_to_lead_id[item.content_id] = lead_id
             # 터치포인트 예약 (A/S급만, email 있어야 의미 있음)
             if grade in ("S", "A") and contact.email:
                 _schedule_touchpoints(
+                    tenant_id,
                     lead_id,
                     has_email=bool(contact.email),
                     has_instagram=bool(contact.instagram),
@@ -251,7 +254,7 @@ def run_platform_scan(platform: str) -> dict:
                 )
 
     # 스캔 기록
-    mark_scanned(platform, scan_result.get("new_content_ids", []), content_id_to_lead_id)
+    mark_scanned(tenant_id, platform, scan_result.get("new_content_ids", []), content_id_to_lead_id)
 
     result = {
         "ok": True,
@@ -265,23 +268,23 @@ def run_platform_scan(platform: str) -> dict:
     return result
 
 
-def run_all_platforms() -> dict:
-    """모든 활성 플랫폼 순차 스캔."""
+def run_all_platforms(tenant_id: str) -> dict:
+    """모든 활성 플랫폼 순차 스캔(테넌트 스코프)."""
     from app.services.secrets import get_secret
     results = []
 
     if get_secret("youtube_api_key"):
-        results.append(run_platform_scan("youtube"))
+        results.append(run_platform_scan(tenant_id, "youtube"))
     if get_secret("naver_client_id"):
-        results.append(run_platform_scan("naver_blog"))
+        results.append(run_platform_scan(tenant_id, "naver_blog"))
 
     total_leads = sum(r.get("leads_upserted", 0) for r in results)
     logger.info("[pipeline] 전체 스캔 완료 — 총 리드 %d건", total_leads)
     return {"ok": True, "platforms": results, "total_leads_upserted": total_leads}
 
 
-def auto_analyze_pending(limit: int = 5) -> dict:
-    """스케줄러용: discovered/stuck-analyzing 리드를 매 사이클 N개씩 자동 분석.
+def auto_analyze_pending(tenant_id: str, limit: int = 5) -> dict:
+    """스케줄러용: discovered/stuck-analyzing 리드를 매 사이클 N개씩 자동 분석(테넌트 스코프).
 
     분석 완료 → channel_analyzer가 grade에 따라 status=approved/draft_ready로 업데이트.
     cold_drip 스케줄러가 approved 리드를 다음 사이클에 자동 픽업.
@@ -293,6 +296,7 @@ def auto_analyze_pending(limit: int = 5) -> dict:
     resp = (
         db.table("outreach_leads")
         .select("id")
+        .eq("tenant_id", tenant_id)
         .in_("status", ["discovered", "analyzing"])
         .order("score", desc=True)
         .limit(limit)
@@ -306,7 +310,7 @@ def auto_analyze_pending(limit: int = 5) -> dict:
     ok = 0
     for lead_id in ids:
         try:
-            analyze_lead(lead_id)
+            analyze_lead(tenant_id, lead_id)
             ok += 1
         except Exception as e:
             logger.warning("[auto-analyze] 실패 [%s]: %s", lead_id, e)

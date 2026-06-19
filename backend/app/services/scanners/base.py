@@ -100,8 +100,8 @@ def extract_contact(text: str) -> ContactInfo:
 
 # ── 중복 확인 공통 로직 ───────────────────────────────────────────────
 
-def filter_already_scanned(platform: str, content_ids: list[str]) -> list[str]:
-    """outreach_scanned_content에 없는 content_id만 반환."""
+def filter_already_scanned(tenant_id: str, platform: str, content_ids: list[str]) -> list[str]:
+    """해당 테넌트가 아직 스캔하지 않은 content_id만 반환 (테넌트별 dedup)."""
     if not content_ids:
         return []
     from app.db.maesil_total_client import get_maesil_total_client
@@ -111,6 +111,7 @@ def filter_already_scanned(platform: str, content_ids: list[str]) -> list[str]:
             .schema("agent_work")
             .table("outreach_scanned_content")
             .select("content_id")
+            .eq("tenant_id", tenant_id)
             .eq("platform", platform)
             .in_("content_id", content_ids)
             .execute()
@@ -121,18 +122,18 @@ def filter_already_scanned(platform: str, content_ids: list[str]) -> list[str]:
         return content_ids
 
 
-def mark_scanned(platform: str, content_ids: list[str], lead_id_map: dict[str, str]) -> None:
-    """스캔한 content_id를 outreach_scanned_content에 기록."""
+def mark_scanned(tenant_id: str, platform: str, content_ids: list[str], lead_id_map: dict[str, str]) -> None:
+    """스캔한 content_id를 outreach_scanned_content에 기록 (테넌트 스탬프)."""
     if not content_ids:
         return
     from app.db.maesil_total_client import get_maesil_total_client
     rows = [
-        {"platform": platform, "content_id": cid, "lead_id": lead_id_map.get(cid)}
+        {"tenant_id": tenant_id, "platform": platform, "content_id": cid, "lead_id": lead_id_map.get(cid)}
         for cid in content_ids
     ]
     try:
         get_maesil_total_client().schema("agent_work").table("outreach_scanned_content").upsert(
-            rows, on_conflict="platform,content_id"
+            rows, on_conflict="tenant_id,platform,content_id"
         ).execute()
     except Exception as e:
         import logging
@@ -141,19 +142,19 @@ def mark_scanned(platform: str, content_ids: list[str], lead_id_map: dict[str, s
 
 # ── 동일인 병합 로직 ──────────────────────────────────────────────────
 
-def find_existing_lead_by_contact(email: str | None, kakao: str | None) -> str | None:
-    """동일 이메일 or 카카오 링크로 이미 등록된 리드 id 반환."""
+def find_existing_lead_by_contact(tenant_id: str, email: str | None, kakao: str | None) -> str | None:
+    """같은 테넌트 내 동일 이메일 or 카카오 링크로 등록된 리드 id 반환 (테넌트별 병합)."""
     if not email and not kakao:
         return None
     from app.db.maesil_total_client import get_maesil_total_client
     db = get_maesil_total_client().schema("agent_work").table("outreach_leads")
     try:
         if email:
-            resp = db.select("id").eq("contact_email", email).limit(1).execute()
+            resp = db.select("id").eq("tenant_id", tenant_id).eq("contact_email", email).limit(1).execute()
             if resp.data:
                 return resp.data[0]["id"]
         if kakao:
-            resp = db.select("id").eq("contact_kakao", kakao).limit(1).execute()
+            resp = db.select("id").eq("tenant_id", tenant_id).eq("contact_kakao", kakao).limit(1).execute()
             if resp.data:
                 return resp.data[0]["id"]
     except Exception:
@@ -175,9 +176,9 @@ class BaseScanner(ABC):
     def fetch_content_details(self, content_ids: list[str]) -> list[ContentItem]:
         """content_id 배치 조회 → ContentItem 목록 반환 (필터 포함)."""
 
-    def run_scan(self) -> dict[str, Any]:
+    def run_scan(self, tenant_id: str) -> dict[str, Any]:
         """
-        전체 스캔 실행 (공통 로직).
+        전체 스캔 실행 (공통 로직). 테넌트별 dedup.
         Returns: { platform, total_searched, new_items, items }
         """
         import logging
@@ -195,7 +196,7 @@ class BaseScanner(ABC):
 
         logger.info("[%s] 검색 결과 %d개", self.platform, len(all_ids))
 
-        new_ids = filter_already_scanned(self.platform, all_ids)
+        new_ids = filter_already_scanned(tenant_id, self.platform, all_ids)
         logger.info("[%s] 신규 %d개", self.platform, len(new_ids))
 
         if not new_ids:

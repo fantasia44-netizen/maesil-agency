@@ -173,7 +173,7 @@ def reset_db():
 
 
 def L(**kw):
-    base = {"contact_email": "x@y.com", "status": "approved", "grade": "B",
+    base = {"tenant_id": "t1", "contact_email": "x@y.com", "status": "approved", "grade": "B",
             "platform": "youtube", "score": 50, "handle_name": "h", "emailed_at": None}
     base.update(kw); return base
 
@@ -190,7 +190,7 @@ FAKE.tables["outreach_leads"] = [
     L(id="noem", platform="youtube", grade="A", contact_email=None),  # X: 이메일 없음
     L(id="insta", platform="instagram", grade="A"),            # X: 플랫폼 제외
 ]
-elig = {l["id"] for l in drip._eligible_leads(100, ["S", "A", "B", "C"])}
+elig = {l["id"] for l in drip._eligible_leads("t1", 100, ["S", "A", "B", "C"])}
 check("자격 리드 = youtube/naver approved S~C 미발송", elig, {"y1", "n1"})
 
 
@@ -203,20 +203,20 @@ FAKE.tables["outreach_leads"] = [
     L(id="y1", platform="youtube", grade="A", score=90),
     L(id="n1", platform="naver_blog", grade="B", score=80),
 ]
-r1 = drip.schedule_daily_cold_drip()
+r1 = drip.schedule_daily_cold_drip("t1")
 check("첫 호출 2건 예약", r1.get("scheduled"), 2)
 tps = FAKE.tables["outreach_touchpoints"]
 check("seq=1 email pending 2건", sorted([(t["touch_sequence"], t["channel"], t["status"]) for t in tps]),
       [(1, "email", "pending"), (1, "email", "pending")])
 
 # 2-2) 재호출 — 이미 예약된 리드 제외 → 중복 없음
-r2 = drip.schedule_daily_cold_drip()
+r2 = drip.schedule_daily_cold_drip("t1")
 check("재호출 추가 0건(중복 방지)", r2.get("scheduled"), 0)
 check("터치포인트 여전히 2건", len(FAKE.tables["outreach_touchpoints"]), 2)
 
 # 2-3) 새 approved 리드 등장 → top-up으로 그날 추가 예약
 FAKE.tables["outreach_leads"].append(L(id="y2", platform="youtube", grade="A", score=85))
-r3 = drip.schedule_daily_cold_drip()
+r3 = drip.schedule_daily_cold_drip("t1")
 check("top-up 1건 추가 예약", r3.get("scheduled"), 1)
 check("누적 3건", len(FAKE.tables["outreach_touchpoints"]), 3)
 
@@ -224,9 +224,9 @@ check("누적 3건", len(FAKE.tables["outreach_touchpoints"]), 3)
 reset_db()
 object.__setattr__(settings, "outreach_daily_cap", 2)
 FAKE.tables["outreach_leads"] = [L(id=f"e{i}", platform="youtube", grade="A", score=90 - i) for i in range(5)]
-c1 = drip.schedule_daily_cold_drip()
+c1 = drip.schedule_daily_cold_drip("t1")
 check("cap=2 — 첫 호출 2건", c1.get("scheduled"), 2)
-c2 = drip.schedule_daily_cold_drip()
+c2 = drip.schedule_daily_cold_drip("t1")
 check("cap 도달 → 추가 0건", c2.get("scheduled"), 0)
 check("cap 도달 skip 사유", c2.get("skipped"), "daily cap reached")
 object.__setattr__(settings, "outreach_daily_cap", 100)
@@ -237,10 +237,10 @@ section("3. check_pending_followups — 1차/팔로업 분리 (한도 버그 수
 
 # send 함수 모킹: 호출된 touch_sequence 기록
 sent_seq = []
-followup._send_cold_drip_seq1 = lambda lead, tid: (sent_seq.append(1) or True)
-followup._send_sequence_email = lambda lead, seq, tid: (sent_seq.append(seq) or True)
+followup._send_cold_drip_seq1 = lambda tenant_id, lead, tid: (sent_seq.append(1) or True)
+followup._send_sequence_email = lambda tenant_id, lead, seq, tid: (sent_seq.append(seq) or True)
 followup._update_lead_touch_summary = lambda *a, **k: None
-followup._auto_no_reply = lambda: None
+followup._auto_no_reply = lambda *a, **k: None
 followup.datetime = FakeDateTime  # quiet-hours 무관하게 now 고정
 
 past = "2026-06-15T00:00:00+00:00"  # 이미 지난 시각(due)
@@ -253,26 +253,52 @@ def seed_touches():
         L(id="Lb", status="emailed"),      # 팔로업 대상
     ]
     FAKE.tables["outreach_touchpoints"] = [
-        {"id": "s1", "lead_id": "La", "touch_sequence": 1, "channel": "email", "status": "pending", "scheduled_for": past},
-        {"id": "f2", "lead_id": "Lb", "touch_sequence": 2, "channel": "email", "status": "pending", "scheduled_for": past},
+        {"id": "s1", "tenant_id": "t1", "lead_id": "La", "touch_sequence": 1, "channel": "email", "status": "pending", "scheduled_for": past},
+        {"id": "f2", "tenant_id": "t1", "lead_id": "Lb", "touch_sequence": 2, "channel": "email", "status": "pending", "scheduled_for": past},
     ]
 
 
 # 3-1) 팔로업 한도 도달(20) — 1차는 발송, 팔로업은 차단
 seed_touches()
 sent_seq.clear()
-followup._followup_sent_today = lambda: followup.FOLLOWUP_DAILY_CAP  # 한도 꽉 참
-followup.check_pending_followups(limit=10)
+followup._followup_sent_today = lambda *a: followup.FOLLOWUP_DAILY_CAP  # 한도 꽉 참
+followup.check_pending_followups("t1", limit=10)
 check("한도 도달 시 1차(seq=1)는 발송됨", 1 in sent_seq, True)
 check("한도 도달 시 팔로업(seq=2)은 차단됨", 2 in sent_seq, False)
 
 # 3-2) 한도 여유 — 1차 + 팔로업 모두 발송
 seed_touches()
 sent_seq.clear()
-followup._followup_sent_today = lambda: 0
-followup.check_pending_followups(limit=10)
+followup._followup_sent_today = lambda *a: 0
+followup.check_pending_followups("t1", limit=10)
 check("여유 시 1차 발송", 1 in sent_seq, True)
 check("여유 시 팔로업도 발송", 2 in sent_seq, True)
+
+
+# ──────────────────────────────────────────────────────────────────
+section("4. 교차 테넌트 격리 — 한 테넌트는 다른 테넌트 리드를 못 봄")
+reset_db()
+object.__setattr__(settings, "outreach_daily_cap", 100)
+FAKE.tables["outreach_leads"] = [
+    L(id="t1a", tenant_id="t1", platform="youtube", grade="A", score=90),
+    L(id="t1b", tenant_id="t1", platform="naver_blog", grade="B", score=80),
+    L(id="t2a", tenant_id="t2", platform="youtube", grade="A", score=95),  # 다른 테넌트
+    L(id="t2b", tenant_id="t2", platform="youtube", grade="S", score=99),
+]
+# t1 자격 조회 → t1 리드만
+elig_t1 = {l["id"] for l in drip._eligible_leads("t1", 100, ["S", "A", "B", "C"])}
+check("t1 자격 = t1 리드만", elig_t1, {"t1a", "t1b"})
+# t1 예약 → t1 리드만 seq=1 생성, t2 미포함
+r = drip.schedule_daily_cold_drip("t1")
+check("t1 예약 2건", r.get("scheduled"), 2)
+scheduled_leads = {t["lead_id"] for t in FAKE.tables["outreach_touchpoints"]}
+check("t1 터치포인트에 t2 리드 없음", scheduled_leads, {"t1a", "t1b"})
+check("모든 터치포인트 tenant_id=t1", all(t["tenant_id"] == "t1" for t in FAKE.tables["outreach_touchpoints"]), True)
+# t2 예약 → t2 리드만 (t1 예약과 독립)
+r2 = drip.schedule_daily_cold_drip("t2")
+check("t2 예약 2건(독립)", r2.get("scheduled"), 2)
+t2_sched = {t["lead_id"] for t in FAKE.tables["outreach_touchpoints"] if t["tenant_id"] == "t2"}
+check("t2 터치포인트 = t2 리드만", t2_sched, {"t2a", "t2b"})
 
 
 # ──────────────────────────────────────────────────────────────────

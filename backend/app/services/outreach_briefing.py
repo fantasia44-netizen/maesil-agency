@@ -35,17 +35,23 @@ def _collect_data() -> dict:
     db = _db()
     today = date.today()
     d30_from = (today - timedelta(days=30)).isoformat()
+    # Phase 2: 브리핑은 super_admin 기본 워크스페이스 기준 (per-tenant 브리핑은 후속 단계)
+    from app.services.tenants import get_default_tenant_id
+    _tid = get_default_tenant_id()
 
     raw: dict = {}
 
     try:
         # 전체 리드 상태별 집계 (click_count/clicked_at은 미구현 컬럼 제외)
-        resp = db.table("outreach_leads").select(
+        q = db.table("outreach_leads").select(
             "status, grade, platform, channel_type, "
             "open_count, opened_at, "
             "contact_email, contact_name, channel_name, "
             "created_at, updated_at"
-        ).execute()
+        )
+        if _tid:
+            q = q.eq("tenant_id", _tid)
+        resp = q.execute()
         leads = resp.data or []
     except Exception as e:
         logger.warning("[outreach_briefing] 리드 조회 실패: %s", e)

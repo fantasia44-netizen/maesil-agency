@@ -232,14 +232,14 @@ def _build_default_draft(lead: dict, channel_type: str) -> tuple[str, str]:
     return subject, body
 
 
-def analyze_lead(lead_id: str) -> dict:
+def analyze_lead(tenant_id: str, lead_id: str) -> dict:
     """
-    리드 심층 분석 엔트리포인트.
+    리드 심층 분석 엔트리포인트(테넌트 스코프).
     outreach.py 라우터에서 백그라운드 스레드로 호출.
     ad_agency 플랫폼은 agency_analyzer로 위임.
     """
     # 리드 조회
-    resp = _db().table("outreach_leads").select("*").eq("id", lead_id).limit(1).execute()
+    resp = _db().table("outreach_leads").select("*").eq("tenant_id", tenant_id).eq("id", lead_id).limit(1).execute()
     rows = resp.data or []
     if not rows:
         logger.error("[analyze_lead] 리드 없음: %s", lead_id)
@@ -251,7 +251,7 @@ def analyze_lead(lead_id: str) -> dict:
     # 광고대행사 → agency_analyzer 위임
     if lead.get("platform") == "ad_agency" or lead.get("channel_type") in ("ad_agency", "coupang_official", "naver_official"):
         from app.services.outreach_agency_analyzer import analyze_agency_lead
-        return analyze_agency_lead(lead_id)
+        return analyze_agency_lead(tenant_id, lead_id)
 
     # YouTube 최신 영상 조회 (이메일 인사에 최신 영상 반영)
     latest_video: dict | None = None
@@ -284,7 +284,7 @@ def analyze_lead(lead_id: str) -> dict:
     now = datetime.now(timezone.utc).isoformat()
     # emailed/no_reply/replied/negotiating/deal 상태는 재분석해도 상태 유지
     _preserve_status = {"emailed", "no_reply", "replied", "negotiating", "deal", "rejected", "archived"}
-    lead_resp = _db().table("outreach_leads").select("status").eq("id", lead_id).limit(1).execute()
+    lead_resp = _db().table("outreach_leads").select("status").eq("tenant_id", tenant_id).eq("id", lead_id).limit(1).execute()
     current_status = ((lead_resp.data or [{}])[0].get("status") or "")
     # 분석 완료 후 자동 approved (D급 제외) — 수동 승인 불필요
     grade = lead.get("grade", "D")
@@ -306,7 +306,7 @@ def analyze_lead(lead_id: str) -> dict:
     }
 
     try:
-        _db().table("outreach_leads").update(update_payload).eq("id", lead_id).execute()
+        _db().table("outreach_leads").update(update_payload).eq("tenant_id", tenant_id).eq("id", lead_id).execute()
         logger.info("[analyze_lead] 완료: %s → channel_type=%s, draft_ready", handle, channel_type)
     except Exception as e:
         logger.error("[analyze_lead] DB 업데이트 실패 [%s]: %s", lead_id, e)

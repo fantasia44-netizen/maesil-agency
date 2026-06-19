@@ -41,40 +41,46 @@ def _norm(email: str) -> str:
 
 
 # ── 수신거부 토큰 (상태 비저장 HMAC) ───────────────────────────────────
-def make_unsub_token(email: str) -> str:
+def make_unsub_token(tenant_id: str, email: str) -> str:
+    """HMAC 서명 unsub 토큰. payload=tenant_id|email (콜백에서 테넌트 복원)."""
     e = _norm(email)
-    b = base64.urlsafe_b64encode(e.encode()).decode().rstrip("=")
-    sig = hmac.new(_secret(), e.encode(), hashlib.sha256).hexdigest()[:24]
+    payload = f"{tenant_id}|{e}"
+    b = base64.urlsafe_b64encode(payload.encode()).decode().rstrip("=")
+    sig = hmac.new(_secret(), payload.encode(), hashlib.sha256).hexdigest()[:24]
     return f"{b}.{sig}"
 
 
-def verify_unsub_token(token: str) -> str | None:
+def verify_unsub_token(token: str) -> tuple[str | None, str] | None:
+    """반환: (tenant_id, email). 구 토큰(email만)은 tenant_id=None (레거시 하위호환)."""
     try:
         b, sig = (token or "").split(".", 1)
         pad = "=" * (-len(b) % 4)
-        email = base64.urlsafe_b64decode(b + pad).decode()
-        expected = hmac.new(_secret(), email.encode(), hashlib.sha256).hexdigest()[:24]
-        if hmac.compare_digest(sig, expected):
-            return email
+        payload = base64.urlsafe_b64decode(b + pad).decode()
+        expected = hmac.new(_secret(), payload.encode(), hashlib.sha256).hexdigest()[:24]
+        if not hmac.compare_digest(sig, expected):
+            return None
+        if "|" in payload:
+            tid, email = payload.split("|", 1)
+            return (tid, email)
+        return (None, payload)  # 구 토큰 — 이미 발송된 메일의 링크
     except Exception:
-        pass
-    return None
+        return None
 
 
-def unsubscribe_link(email: str) -> str | None:
+def unsubscribe_link(tenant_id: str, email: str) -> str | None:
     base = (settings.unsubscribe_base_url or "").rstrip("/")
     if not base:
         return None
-    return f"{base}/api/outreach/unsubscribe?token={make_unsub_token(email)}"
+    return f"{base}/api/outreach/unsubscribe?token={make_unsub_token(tenant_id, email)}"
 
 
 # ── suppression 목록 ──────────────────────────────────────────────────
-def is_suppressed(email: str) -> bool:
+def is_suppressed(tenant_id: str, email: str) -> bool:
     e = _norm(email)
     if not e:
         return False
     try:
-        resp = _db().table(TABLE).select("email").eq("email", e).limit(1).execute()
+        resp = _db().table(TABLE).select("email").eq("tenant_id", tenant_id).eq("email", e).limit(1).execute()
         return bool(resp.data)
     except Exception as ex:
         msg = str(ex).lower()
@@ -88,7 +94,7 @@ def is_suppressed(email: str) -> bool:
         return True
 
 
-def add_suppression(email: str, reason: str = "unsubscribe",
+def add_suppression(tenant_id: str, email: str, reason: str = "unsubscribe",
                     source: str = "link", note: str | None = None) -> bool:
     e = _norm(email)
     if not e:
@@ -96,15 +102,16 @@ def add_suppression(email: str, reason: str = "unsubscribe",
     now = datetime.now(timezone.utc).isoformat()
     try:
         _db().table(TABLE).upsert(
-            {"email": e, "reason": reason, "source": source, "note": note, "created_at": now},
-            on_conflict="email",
+            {"tenant_id": tenant_id, "email": e, "reason": reason, "source": source,
+             "note": note, "created_at": now},
+            on_conflict="tenant_id,email",
         ).execute()
-        # 해당 이메일의 리드 상태도 전환 → 이후 팔로업 차단
+        # 해당 테넌트의 같은 이메일 리드 상태도 전환 → 이후 팔로업 차단
         new_status = "blocked" if reason == "blocked" else "unsubscribe"
         try:
             _db().table("outreach_leads").update(
                 {"status": new_status, "updated_at": now}
-            ).eq("contact_email", e).execute()
+            ).eq("tenant_id", tenant_id).eq("contact_email", e).execute()
         except Exception as ex:
             logger.warning("리드 상태 전환 실패 [%s]: %s", e, ex)
         logger.info("suppression 추가 [%s] reason=%s source=%s", e, reason, source)
@@ -123,11 +130,11 @@ def with_ad_subject(subject: str) -> str:
     return s if s.lstrip().startswith("(광고)") else f"(광고) {s}"
 
 
-def compliance_footer_html(email: str) -> str:
+def compliance_footer_html(tenant_id: str, email: str) -> str:
     """전송자 정보 + 수신거부 수단 표준 푸터."""
     import html as _html
     sender = _html.escape(settings.outreach_sender_info or "매실인사이트")
-    link = unsubscribe_link(email)
+    link = unsubscribe_link(tenant_id, email)
     if link:
         # 발신이 noreply + 카톡 유도 모델 → 회신 안내 제거, 링크 전용
         unsub = f'수신거부: <a href="{link}" target="_blank" rel="noopener">클릭</a>'
@@ -142,9 +149,9 @@ def compliance_footer_html(email: str) -> str:
     )
 
 
-def inject_compliance_footer(html: str, email: str) -> str:
+def inject_compliance_footer(tenant_id: str, html: str, email: str) -> str:
     """HTML 본문에 컴플라이언스 푸터 삽입(</body> 직전, 없으면 끝에 추가)."""
-    footer = compliance_footer_html(email)
+    footer = compliance_footer_html(tenant_id, email)
     if "</body>" in html:
         return html.replace("</body>", footer + "</body>", 1)
     return html + footer

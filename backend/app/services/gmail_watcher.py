@@ -231,9 +231,9 @@ def _notify_admin_reply(lead: dict, classification: dict) -> None:
 
 # ── 메인 감시 루프 ────────────────────────────────────────────────────
 
-def watch_replies(limit: int = 30) -> dict:
+def watch_replies(tenant_id: str, limit: int = 30) -> dict:
     """
-    emailed 리드 회신 감시. 스케줄러에서 15분마다 호출.
+    emailed 리드 회신 감시(테넌트 스코프). 스케줄러에서 15분마다 호출.
     """
     client_id = _get_secret("gmail_client_id")
     client_secret = _get_secret("gmail_client_secret")
@@ -253,6 +253,7 @@ def watch_replies(limit: int = 30) -> dict:
         resp = (
             _db().table("outreach_leads")
             .select("id, handle_name, contact_email, platform_url, score, grade, emailed_at")
+            .eq("tenant_id", tenant_id)
             .eq("status", "emailed")
             .is_("reply_type", "null")
             .order("emailed_at", desc=True)
@@ -347,7 +348,7 @@ def watch_replies(limit: int = 30) -> dict:
                 "reply_summary": summary[:300],
                 "reply_received_at": reply_date.isoformat() if reply_date else now,
                 "updated_at": now,
-            }).eq("id", lead["id"]).execute()
+            }).eq("tenant_id", tenant_id).eq("id", lead["id"]).execute()
             logger.info("[gmail_watcher] 회신 감지: %s → %s (%s)", lead.get("handle_name"), reply_type, new_status)
         except Exception as e:
             logger.error("[gmail_watcher] DB 업데이트 실패 [%s]: %s", lead["id"], e)

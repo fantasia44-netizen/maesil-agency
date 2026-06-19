@@ -19,6 +19,13 @@ def _db():
     return get_maesil_total_client().schema("agent_work")
 
 
+def _require_tid(user: UserContext) -> str:
+    """현재 유저의 워크스페이스(tenant) id. 영업 데이터 격리 키."""
+    if not user.tenant_id:
+        raise HTTPException(403, "연결된 워크스페이스가 없습니다. 관리자에게 문의하세요.")
+    return user.tenant_id
+
+
 # ── 기존 스냅샷 엔드포인트 (유지) ──────────────────────────────────────
 
 @router.get("/snapshots")
@@ -26,6 +33,7 @@ def list_snapshots(user: UserContext = Depends(require_admin)) -> list[dict]:
     resp = (
         _db().table("snapshots")
         .select("id, kind, payload, created_at, valid_until")
+        .eq("tenant_id", _require_tid(user))
         .in_("kind", ["outreach_targets", "proposal_draft"])
         .order("created_at", desc=True)
         .limit(50)
@@ -39,6 +47,7 @@ def get_snapshot(snapshot_id: str, user: UserContext = Depends(require_admin)) -
     resp = (
         _db().table("snapshots")
         .select("id, kind, payload, created_at, valid_until")
+        .eq("tenant_id", _require_tid(user))
         .eq("id", snapshot_id)
         .in_("kind", ["outreach_targets", "proposal_draft"])
         .limit(1)
@@ -55,6 +64,7 @@ def get_proposal_html(snapshot_id: str, user: UserContext = Depends(require_admi
     resp = (
         _db().table("snapshots")
         .select("id, kind, payload, created_at")
+        .eq("tenant_id", _require_tid(user))
         .eq("id", snapshot_id)
         .eq("kind", "proposal_draft")
         .limit(1)
@@ -72,6 +82,7 @@ def send_to_studio(snapshot_id: str, user: UserContext = Depends(require_admin))
     resp = (
         _db().table("snapshots")
         .select("id, kind, payload, created_at")
+        .eq("tenant_id", _require_tid(user))
         .eq("id", snapshot_id)
         .eq("kind", "proposal_draft")
         .limit(1)
@@ -130,6 +141,7 @@ def list_leads(
 ) -> list[dict]:
     """리드 목록 (플랫폼·상태·등급·채널유형 필터) — RPC."""
     resp = _db().rpc("list_outreach_leads", {
+        "p_tenant_id":    _require_tid(user),
         "p_min_score":    min_score,
         "p_limit":        limit,
         "p_offset":       offset,
@@ -143,7 +155,8 @@ def list_leads(
 
 @router.get("/leads/{lead_id}")
 def get_lead(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
-    resp = _db().table("outreach_leads").select("*").eq("id", lead_id).limit(1).execute()
+    tid = _require_tid(user)
+    resp = _db().table("outreach_leads").select("*").eq("tenant_id", tid).eq("id", lead_id).limit(1).execute()
     rows = resp.data or []
     if not rows:
         raise HTTPException(404, "리드를 찾을 수 없습니다.")
@@ -152,6 +165,7 @@ def get_lead(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
     tp_resp = (
         _db().table("outreach_touchpoints")
         .select("*")
+        .eq("tenant_id", tid)
         .eq("lead_id", lead_id)
         .order("touch_sequence")
         .execute()
@@ -164,8 +178,9 @@ def get_lead(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
 def trigger_analysis(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
     """심층 분석 트리거. 백그라운드 실행."""
     import threading
+    tid = _require_tid(user)
 
-    resp = _db().table("outreach_leads").select("id, grade, status").eq("id", lead_id).limit(1).execute()
+    resp = _db().table("outreach_leads").select("id, grade, status").eq("tenant_id", tid).eq("id", lead_id).limit(1).execute()
     rows = resp.data or []
     if not rows:
         raise HTTPException(404, "리드를 찾을 수 없습니다.")
@@ -173,12 +188,12 @@ def trigger_analysis(lead_id: str, user: UserContext = Depends(require_admin)) -
     def _run():
         try:
             from app.services.channel_analyzer import analyze_lead
-            analyze_lead(lead_id)
+            analyze_lead(tid, lead_id)
         except Exception as e:
             logger.error("[analyze] 실패 [%s]: %s", lead_id, e)
 
     threading.Thread(target=_run, daemon=True).start()
-    _db().table("outreach_leads").update({"status": "analyzing", "updated_at": datetime.now(timezone.utc).isoformat()}).eq("id", lead_id).execute()
+    _db().table("outreach_leads").update({"status": "analyzing", "updated_at": datetime.now(timezone.utc).isoformat()}).eq("tenant_id", tid).eq("id", lead_id).execute()
     return {"ok": True, "message": "심층 분석 시작됨 (백그라운드)"}
 
 
@@ -195,6 +210,7 @@ def trigger_batch_analysis(
     grades=S,A,B,C,D  limit=500
     """
     import threading, time
+    tid = _require_tid(user)
 
     grade_list = [g.strip() for g in grades.split(",") if g.strip()]
 
@@ -207,6 +223,7 @@ def trigger_batch_analysis(
     resp = (
         _db().table("outreach_leads")
         .select("id, grade, status")
+        .eq("tenant_id", tid)
         .in_("status", status_filter)
         .in_("grade", grade_list)
         .order("score", desc=True)
@@ -229,7 +246,7 @@ def trigger_batch_analysis(
         chunk_size = 100
         for i in range(0, len(ids_to_analyze), chunk_size):
             chunk = ids_to_analyze[i:i + chunk_size]
-            _db().table("outreach_leads").update({"status": "analyzing", "updated_at": now_iso}).in_("id", chunk).execute()
+            _db().table("outreach_leads").update({"status": "analyzing", "updated_at": now_iso}).eq("tenant_id", tid).in_("id", chunk).execute()
 
     def _run_batch():
         try:
@@ -239,7 +256,7 @@ def trigger_batch_analysis(
             return
         for lead_id in ids:
             try:
-                analyze_lead(lead_id)
+                analyze_lead(tid, lead_id)
             except Exception as e:
                 logger.error("[batch-analyze] 실패 [%s]: %s", lead_id, e)
             time.sleep(0.5)  # Haiku API rate limit 여유
@@ -260,6 +277,7 @@ def trigger_rescore(
     구 필드(sells_competing_tool, is_competitor_partner 등) → 새 필드 매핑 포함.
     """
     import threading
+    tid = _require_tid(user)
 
     resp = (
         _db().table("outreach_leads")
@@ -275,6 +293,7 @@ def trigger_rescore(
             "has_paid_course, has_paid_membership, has_ebook_sale, has_consulting, "
             "has_affiliate_exp, has_tool_recommendation"
         )
+        .eq("tenant_id", tid)
         .limit(limit)
         .execute()
     )
@@ -360,7 +379,7 @@ def trigger_rescore(
                     "is_program_company": bool(is_prog_co),
                     "status": new_status,
                     "updated_at": now_iso,
-                }).eq("id", lead["id"]).execute()
+                }).eq("tenant_id", tid).eq("id", lead["id"]).execute()
                 updated += 1
             except Exception as e:
                 logger.error("[rescore] 실패 [%s]: %s", lead.get("id"), e)
@@ -374,7 +393,7 @@ def trigger_rescore(
 @router.get("/leads/{lead_id}/agency-briefing", response_class=HTMLResponse)
 def get_agency_briefing(lead_id: str, user: UserContext = Depends(require_admin)) -> HTMLResponse:
     """광고대행사 AI 브리핑 HTML 반환."""
-    resp = _db().table("outreach_leads").select("agency_briefing,handle_name").eq("id", lead_id).limit(1).execute()
+    resp = _db().table("outreach_leads").select("agency_briefing,handle_name").eq("tenant_id", _require_tid(user)).eq("id", lead_id).limit(1).execute()
     rows = resp.data or []
     if not rows:
         return HTMLResponse("<h1>리드 없음</h1>", status_code=404)
@@ -393,7 +412,7 @@ def preview_email(lead_id: str, user: UserContext = Depends(require_admin)) -> d
         _build_agency_email_html, _build_agency_subject, _is_agency_lead,
     )
 
-    resp = _db().table("outreach_leads").select("*").eq("id", lead_id).limit(1).execute()
+    resp = _db().table("outreach_leads").select("*").eq("tenant_id", _require_tid(user)).eq("id", lead_id).limit(1).execute()
     rows = resp.data or []
     if not rows:
         raise HTTPException(404, "리드를 찾을 수 없습니다.")
@@ -420,7 +439,7 @@ def update_email_draft(lead_id: str, body: EmailDraftPatch, user: UserContext = 
         update["email_draft"] = body.email_draft
     if body.email_final is not None:
         update["email_final"] = body.email_final
-    _db().table("outreach_leads").update(update).eq("id", lead_id).execute()
+    _db().table("outreach_leads").update(update).eq("tenant_id", _require_tid(user)).eq("id", lead_id).execute()
     return {"ok": True}
 
 
@@ -428,7 +447,7 @@ def update_email_draft(lead_id: str, body: EmailDraftPatch, user: UserContext = 
 def approve_lead(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
     """담당자 검토 완료 → approved 상태로 변경."""
     now = datetime.now(timezone.utc).isoformat()
-    _db().table("outreach_leads").update({"status": "approved", "updated_at": now}).eq("id", lead_id).execute()
+    _db().table("outreach_leads").update({"status": "approved", "updated_at": now}).eq("tenant_id", _require_tid(user)).eq("id", lead_id).execute()
     return {"ok": True, "status": "approved"}
 
 
@@ -436,7 +455,7 @@ def approve_lead(lead_id: str, user: UserContext = Depends(require_admin)) -> di
 def send_lead_email(lead_id: str, user: UserContext = Depends(require_admin)) -> dict:
     """수동 이메일 발송 (approved 상태 권장, email 있어야 함)."""
     from app.services.outreach_mailer import send_single
-    result = send_single(lead_id)
+    result = send_single(_require_tid(user), lead_id)
     if not result.get("ok"):
         raise HTTPException(400, result.get("error", "발송 실패"))
     return {"ok": True, "message": "이메일 발송 완료"}
@@ -461,15 +480,22 @@ def _unsub_page(message: str, ok: bool = True) -> str:
 def unsubscribe(token: str = "") -> HTMLResponse:
     """공개 수신거부 엔드포인트 (메일 링크). 토큰 검증 후 suppression 등록."""
     from app.services.outreach_suppression import verify_unsub_token, add_suppression
-    addr = verify_unsub_token(token) if token else None
-    if not addr:
+    parsed = verify_unsub_token(token) if token else None
+    if not parsed:
         return HTMLResponse(_unsub_page("유효하지 않은 수신거부 링크입니다.", ok=False), status_code=400)
-    add_suppression(addr, reason="unsubscribe", source="link")
-    # 해당 이메일 리드 상태 → unsubscribe
+    tid, addr = parsed
+    if not tid:
+        # 구 토큰(멀티테넌트 이전) → 기본 테넌트로 처리
+        from app.services.tenants import get_default_tenant_id
+        tid = get_default_tenant_id()
+    if not tid:
+        return HTMLResponse(_unsub_page("처리 중 오류가 발생했습니다.", ok=False), status_code=500)
+    add_suppression(tid, addr, reason="unsubscribe", source="link")
+    # 해당 테넌트의 같은 이메일 리드 상태 → unsubscribe
     try:
         now = datetime.now(timezone.utc).isoformat()
         _db().table("outreach_leads").update({"status": "unsubscribe", "updated_at": now}) \
-            .eq("contact_email", addr.strip().lower()).execute()
+            .eq("tenant_id", tid).eq("contact_email", addr.strip().lower()).execute()
     except Exception as e:
         logger.warning("수신거부 리드 상태 업데이트 실패 [%s]: %s", addr, e)
     return HTMLResponse(_unsub_page(f"{addr} 님, 수신거부가 완료되었습니다.", ok=True))
@@ -546,7 +572,7 @@ def test_send(to: str = "", lead_id: str = "", user: UserContext = Depends(requi
         raise HTTPException(400, "outreach_gmail_* 시크릿이 없습니다 (/settings에서 등록).")
 
     if lead_id:
-        rows = _db().table("outreach_leads").select("*").eq("id", lead_id).limit(1).execute().data or []
+        rows = _db().table("outreach_leads").select("*").eq("tenant_id", _require_tid(user)).eq("id", lead_id).limit(1).execute().data or []
         if not rows:
             raise HTTPException(404, "리드를 찾을 수 없습니다.")
         lead = rows[0]
@@ -571,7 +597,7 @@ def suppress_email(body: SuppressRequest, user: UserContext = Depends(require_ad
     from app.services.outreach_suppression import add_suppression
     if not body.email.strip():
         raise HTTPException(400, "email 필요")
-    if add_suppression(body.email, reason=body.reason, source="admin", note=body.note):
+    if add_suppression(_require_tid(user), body.email, reason=body.reason, source="admin", note=body.note):
         return {"ok": True, "email": body.email.strip().lower()}
     raise HTTPException(400, "차단 처리 실패")
 
@@ -590,7 +616,7 @@ def update_lead_grade(lead_id: str, body: GradePatch, user: UserContext = Depend
     if body.grade not in ("S", "A", "B", "C", "D"):
         raise HTTPException(400, "grade는 S/A/B/C/D 중 하나")
     now = datetime.now(timezone.utc).isoformat()
-    _db().table("outreach_leads").update({"grade": body.grade, "updated_at": now}).eq("id", lead_id).execute()
+    _db().table("outreach_leads").update({"grade": body.grade, "updated_at": now}).eq("tenant_id", _require_tid(user)).eq("id", lead_id).execute()
     return {"ok": True, "grade": body.grade}
 
 
@@ -601,7 +627,7 @@ def update_lead_status(lead_id: str, body: StatusPatch, user: UserContext = Depe
     if body.status not in allowed:
         raise HTTPException(400, f"status는 {sorted(allowed)} 중 하나")
     now = datetime.now(timezone.utc).isoformat()
-    _db().table("outreach_leads").update({"status": body.status, "updated_at": now}).eq("id", lead_id).execute()
+    _db().table("outreach_leads").update({"status": body.status, "updated_at": now}).eq("tenant_id", _require_tid(user)).eq("id", lead_id).execute()
     return {"ok": True, "status": body.status}
 
 
@@ -618,10 +644,11 @@ def import_official_agencies(
     enrich: 홈페이지에서 이메일 보강 시도.
     """
     from app.services import outreach_agency_importer as imp
+    tid = _require_tid(user)
     if source == "coupang_official":
-        return imp.import_coupang_official(enrich=enrich)
+        return imp.import_coupang_official(tid, enrich=enrich)
     if source == "naver_official":
-        return imp.import_naver_official(enrich=enrich)
+        return imp.import_naver_official(tid, enrich=enrich)
     raise HTTPException(400, "source는 'coupang_official' 또는 'naver_official'")
 
 
@@ -635,10 +662,11 @@ def trigger_scan(
     """전체 or 특정 플랫폼 스캔 수동 트리거 (백그라운드)."""
     import threading
     from app.services.outreach_pipeline import run_platform_scan, run_all_platforms
+    tid = _require_tid(user)
 
     def _run():
         try:
-            result = run_platform_scan(platform) if platform else run_all_platforms()
+            result = run_platform_scan(tid, platform) if platform else run_all_platforms(tid)
             logger.info("[manual-scan] 완료: %s", result)
         except Exception as e:
             logger.error("[manual-scan] 실패: %s", e)
@@ -654,9 +682,10 @@ def trigger_scan_debug(
 ) -> dict:
     """동기 스캔 — 에러 즉시 반환 (디버그용)."""
     import traceback
+    tid = _require_tid(user)
     try:
         from app.services.outreach_pipeline import run_platform_scan, run_all_platforms
-        result = run_platform_scan(platform) if platform else run_all_platforms()
+        result = run_platform_scan(tid, platform) if platform else run_all_platforms(tid)
         return {"ok": True, "result": result}
     except Exception as e:
         return {"ok": False, "error": str(e), "traceback": traceback.format_exc()}
@@ -666,7 +695,7 @@ def trigger_scan_debug(
 def scan_stats(user: UserContext = Depends(require_admin)) -> dict:
     """통계: 플랫폼별 리드 수 + 상태별 집계 + 등급별 집계 + KPI — RPC."""
     try:
-        resp = _db().rpc("get_outreach_stats", {}).execute()
+        resp = _db().rpc("get_outreach_stats", {"p_tenant_id": _require_tid(user)}).execute()
         raw: dict = resp.data or {}
     except Exception as e:
         return {"error": str(e)}
@@ -708,13 +737,14 @@ def cold_drip_diagnostics(user: UserContext = Depends(require_admin)) -> dict:
     _KST = timezone(timedelta(hours=9))
     now_kst = datetime.now(_KST)
     db = _db()
+    tid = _require_tid(user)
 
     grades = [g.strip() for g in settings.outreach_drip_grades.split(",") if g.strip()]
     plats = ["youtube", "naver_blog"]
 
     def _lead_count(build) -> int:
         try:
-            q = db.table("outreach_leads").select("id", count="exact")
+            q = db.table("outreach_leads").select("id", count="exact").eq("tenant_id", tid)
             return build(q).execute().count or 0
         except Exception:
             return -1
@@ -738,6 +768,7 @@ def cold_drip_diagnostics(user: UserContext = Depends(require_admin)) -> dict:
     def _touch_count(statuses) -> int:
         try:
             return (db.table("outreach_touchpoints").select("id", count="exact")
+                .eq("tenant_id", tid)
                 .eq("touch_sequence", 1).eq("channel", "email").in_("status", statuses)
                 .gte("scheduled_for", today_a).lt("scheduled_for", today_b)
                 .execute().count) or 0
@@ -792,9 +823,11 @@ def get_all_touchpoints(
     """전체 발송 이력 — 리드 정보 별도 조회 포함."""
     import logging as _log
     _logger = _log.getLogger(__name__)
+    tid = _require_tid(user)
     q = (
         _db().table("outreach_touchpoints")
         .select("*")
+        .eq("tenant_id", tid)
         .order("created_at", desc=True)
         .limit(limit)
     )
@@ -815,7 +848,7 @@ def get_all_touchpoints(
             try:
                 lr = _db().table("outreach_leads")\
                     .select("id, handle_name, contact_email, platform, grade, status")\
-                    .in_("id", lead_ids[i:i+chunk]).execute()
+                    .eq("tenant_id", tid).in_("id", lead_ids[i:i+chunk]).execute()
                 for l in (lr.data or []):
                     leads_map[l["id"]] = l
             except Exception:
@@ -833,6 +866,7 @@ def get_touchpoints(lead_id: str, user: UserContext = Depends(require_admin)) ->
     resp = (
         _db().table("outreach_touchpoints")
         .select("*")
+        .eq("tenant_id", _require_tid(user))
         .eq("lead_id", lead_id)
         .order("touch_sequence")
         .execute()
@@ -855,5 +889,5 @@ def update_touch_status(touch_id: str, body: TouchStatusPatch, user: UserContext
         update["sent_at"] = datetime.now(timezone.utc).isoformat()
     elif body.status == "replied":
         update["replied_at"] = datetime.now(timezone.utc).isoformat()
-    _db().table("outreach_touchpoints").update(update).eq("id", touch_id).execute()
+    _db().table("outreach_touchpoints").update(update).eq("tenant_id", _require_tid(user)).eq("id", touch_id).execute()
     return {"ok": True}

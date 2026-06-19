@@ -107,8 +107,8 @@ def _update_lead_touch_summary(lead_id: str, channel: str) -> None:
         logger.warning("lead touch 요약 업데이트 실패 [%s]: %s", lead_id, e)
 
 
-def _send_cold_drip_seq1(lead: dict, touch_id: str) -> bool:
-    """1차 콜드 드립 이메일 — Gmail API(outreach_gmail_sender) 사용."""
+def _send_cold_drip_seq1(tenant_id: str, lead: dict, touch_id: str) -> bool:
+    """1차 콜드 드립 이메일 — Gmail API(outreach_gmail_sender) 사용(테넌트 스코프)."""
     from app.services import outreach_gmail_sender as gm
     from app.services.outreach_mailer import build_lead_email
     from app.services.outreach_suppression import is_suppressed
@@ -117,19 +117,19 @@ def _send_cold_drip_seq1(lead: dict, touch_id: str) -> bool:
     if not to:
         _mark_touch(touch_id, "skipped")
         return False
-    if is_suppressed(to):
+    if is_suppressed(tenant_id, to):
         _mark_touch(touch_id, "skipped", "suppressed")
         try:
             now_iso = datetime.now(timezone.utc).isoformat()
             _db().table("outreach_leads").update(
                 {"status": "unsubscribe", "updated_at": now_iso}
-            ).eq("id", lead["id"]).execute()
+            ).eq("tenant_id", tenant_id).eq("id", lead["id"]).execute()
         except Exception:
             pass
         return False
 
     subject, html = build_lead_email(lead)
-    result = gm.send(to, subject, html)
+    result = gm.send(to, subject, html)  # Phase 3: 테넌트별 Gmail
     ok = result.get("ok", False)
 
     now_iso = datetime.now(timezone.utc).isoformat()
@@ -137,7 +137,7 @@ def _send_cold_drip_seq1(lead: dict, touch_id: str) -> bool:
         try:
             _db().table("outreach_leads").update({
                 "status": "emailed", "emailed_at": now_iso, "updated_at": now_iso,
-            }).eq("id", lead["id"]).execute()
+            }).eq("tenant_id", tenant_id).eq("id", lead["id"]).execute()
         except Exception as e:
             logger.warning("cold drip lead 상태 갱신 실패 [%s]: %s", lead["id"], e)
         try:
@@ -156,6 +156,7 @@ def _send_cold_drip_seq1(lead: dict, touch_id: str) -> bool:
             fail_resp = (
                 _db().table("outreach_touchpoints")
                 .select("id", count="exact")
+                .eq("tenant_id", tenant_id)
                 .eq("lead_id", lead["id"])
                 .eq("touch_sequence", 1)
                 .eq("status", "failed")
@@ -165,7 +166,7 @@ def _send_cold_drip_seq1(lead: dict, touch_id: str) -> bool:
                 _db().table("outreach_leads").update({
                     "status": "send_failed",
                     "updated_at": datetime.now(timezone.utc).isoformat(),
-                }).eq("id", lead["id"]).execute()
+                }).eq("tenant_id", tenant_id).eq("id", lead["id"]).execute()
                 logger.warning("[cold_drip] 2회 실패 → send_failed [%s]", lead["id"])
         except Exception as e:
             logger.warning("실패 횟수 체크 실패 [%s]: %s", lead["id"], e)
@@ -173,12 +174,12 @@ def _send_cold_drip_seq1(lead: dict, touch_id: str) -> bool:
     return ok
 
 
-def _send_sequence_email(lead: dict, sequence: int, touch_id: str) -> bool:
-    """이메일 시퀀스 발송."""
+def _send_sequence_email(tenant_id: str, lead: dict, sequence: int, touch_id: str) -> bool:
+    """이메일 시퀀스 발송(테넌트 스코프)."""
     if sequence == 1:
         # 1차: outreach_mailer.send_single 사용
         from app.services.outreach_mailer import send_single
-        result = send_single(lead["id"])
+        result = send_single(tenant_id, lead["id"])
         ok = result.get("ok", False)
         _mark_touch(touch_id, "sent" if ok else "failed", result.get("error"))
         return ok
@@ -214,14 +215,14 @@ def _send_sequence_email(lead: dict, sequence: int, touch_id: str) -> bool:
         _mark_touch(touch_id, "skipped")
         return False
 
-    # 수신거부/차단 차단
-    if is_suppressed(to):
+    # 수신거부/차단 차단 (테넌트 스코프)
+    if is_suppressed(tenant_id, to):
         _mark_touch(touch_id, "skipped", "suppressed")
         return False
 
     # 컴플라이언스: (광고) 제목 + 전송자정보/수신거부 푸터
     subject = with_ad_subject(subject)
-    html = inject_compliance_footer(html, to)
+    html = inject_compliance_footer(tenant_id, html, to)
     html = inject_open_pixel(html, lead.get("id") or "")
 
     result = send_email(to=to, subject=subject, html=html, source="maesil-agency")
@@ -277,8 +278,8 @@ def _notify_manual_touch(lead: dict, channel: str, touch_id: str) -> None:
 FOLLOWUP_DAILY_CAP = 20  # 팔로업 이메일 하루 최대 발송 수
 
 
-def _followup_sent_today() -> int:
-    """오늘(KST) 팔로업으로 발송된 이메일 터치포인트 수."""
+def _followup_sent_today(tenant_id: str) -> int:
+    """오늘(KST) 팔로업으로 발송된 이메일 터치포인트 수(테넌트 스코프)."""
     from datetime import date, timedelta, timezone as tz
     kst = tz(timedelta(hours=9))
     today_kst = datetime.now(kst).date().isoformat()
@@ -286,6 +287,7 @@ def _followup_sent_today() -> int:
         resp = (
             _db().table("outreach_touchpoints")
             .select("id", count="exact")
+            .eq("tenant_id", tenant_id)
             .eq("status", "sent")
             .eq("channel", "email")
             .gt("touch_sequence", 1)
@@ -297,15 +299,15 @@ def _followup_sent_today() -> int:
         return 0
 
 
-def check_pending_followups(limit: int = 20) -> dict:
+def check_pending_followups(tenant_id: str, limit: int = 20) -> dict:
     """
-    scheduled_for가 지난 pending 터치포인트를 처리.
+    scheduled_for가 지난 pending 터치포인트를 처리(테넌트 스코프).
     스케줄러에서 3분마다 호출. 하루 FOLLOWUP_DAILY_CAP통 제한.
     """
     # 일일 한도(FOLLOWUP_DAILY_CAP)는 팔로업(2·3차)에만 적용.
     # 1차 콜드드립(seq=1)은 한도와 무관하게 발송 — 분리 조회로 팔로업이 1차를 굶기지 않게 함.
     now = datetime.now(timezone.utc).isoformat()
-    fu_sent_today = _followup_sent_today()
+    fu_sent_today = _followup_sent_today(tenant_id)
     fu_room = max(0, FOLLOWUP_DAILY_CAP - fu_sent_today)
     errors: list[str] = []
 
@@ -315,6 +317,7 @@ def check_pending_followups(limit: int = 20) -> dict:
         q = (
             _db().table("outreach_touchpoints")
             .select("id, lead_id, touch_sequence, channel")
+            .eq("tenant_id", tenant_id)
             .eq("status", "pending")
             .lte("scheduled_for", now)
         )
@@ -335,9 +338,9 @@ def check_pending_followups(limit: int = 20) -> dict:
         channel = touch["channel"]
         touch_id = touch["id"]
 
-        # 리드 조회
+        # 리드 조회 (테넌트 스코프)
         try:
-            lead_resp = _db().table("outreach_leads").select("*").eq("id", lead_id).limit(1).execute()
+            lead_resp = _db().table("outreach_leads").select("*").eq("tenant_id", tenant_id).eq("id", lead_id).limit(1).execute()
             lead = (lead_resp.data or [None])[0]
         except Exception as e:
             errors.append(f"lead 조회 실패 [{lead_id}]: {e}")
@@ -358,9 +361,9 @@ def check_pending_followups(limit: int = 20) -> dict:
 
         try:
             if channel == "email" and sequence == 1:
-                ok = _send_cold_drip_seq1(lead, touch_id)
+                ok = _send_cold_drip_seq1(tenant_id, lead, touch_id)
             elif channel == "email":
-                ok = _send_sequence_email(lead, sequence, touch_id)
+                ok = _send_sequence_email(tenant_id, lead, sequence, touch_id)
             else:
                 _notify_manual_touch(lead, channel, touch_id)
 
@@ -372,20 +375,20 @@ def check_pending_followups(limit: int = 20) -> dict:
             _mark_touch(touch_id, "failed", str(e))
 
     # 7일 무응답 → no_reply 자동 전환
-    _auto_no_reply()
+    _auto_no_reply(tenant_id)
 
     logger.info("followup: processed=%d errors=%d", processed, len(errors))
     return {"processed": processed, "errors": errors}
 
 
-def _auto_no_reply() -> None:
-    """이메일 발송 후 7일 무응답 리드 → no_reply 상태로 전환."""
+def _auto_no_reply(tenant_id: str) -> None:
+    """이메일 발송 후 7일 무응답 리드 → no_reply 상태로 전환(테넌트 스코프)."""
     from datetime import timedelta
     cutoff = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
     try:
         _db().table("outreach_leads").update({
             "status": "no_reply",
             "updated_at": datetime.now(timezone.utc).isoformat(),
-        }).eq("status", "emailed").lt("emailed_at", cutoff).execute()
+        }).eq("tenant_id", tenant_id).eq("status", "emailed").lt("emailed_at", cutoff).execute()
     except Exception as e:
         logger.warning("auto_no_reply 실패: %s", e)

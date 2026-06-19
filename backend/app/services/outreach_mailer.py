@@ -347,17 +347,17 @@ def build_lead_email(lead: dict) -> tuple[str, str]:
 
     from app.services.outreach_suppression import inject_open_pixel
     subject = with_ad_subject(subject)
-    html = inject_compliance_footer(html, lead.get("contact_email") or "")
+    html = inject_compliance_footer(lead.get("tenant_id") or "", html, lead.get("contact_email") or "")
     html = inject_open_pixel(html, lead.get("id") or "")
     html = _rewrite_kakao_link(html, lead.get("id"))
     return subject, html
 
 
-def send_single(lead_id: str) -> dict:
-    """특정 리드에게 이메일 발송. email_final → email_draft → 기본 템플릿 순서."""
+def send_single(tenant_id: str, lead_id: str) -> dict:
+    """특정 리드에게 이메일 발송(테넌트 스코프). email_final → email_draft → 기본 템플릿 순서."""
     from app.services.notify_client import send_email
 
-    resp = _db().table("outreach_leads").select("*").eq("id", lead_id).limit(1).execute()
+    resp = _db().table("outreach_leads").select("*").eq("tenant_id", tenant_id).eq("id", lead_id).limit(1).execute()
     rows = resp.data or []
     if not rows:
         return {"ok": False, "error": "lead not found"}
@@ -367,9 +367,9 @@ def send_single(lead_id: str) -> dict:
     if not to:
         return {"ok": False, "error": "이메일 주소 없음"}
 
-    # 수신거부/차단 목록 발송 전 차단
+    # 수신거부/차단 목록 발송 전 차단 (테넌트 스코프)
     from app.services.outreach_suppression import is_suppressed
-    if is_suppressed(to):
+    if is_suppressed(tenant_id, to):
         logger.info("outreach_mailer: 발송 차단(suppressed) → %s", to)
         return {"ok": False, "error": "수신거부/차단된 수신자", "suppressed": True}
 
@@ -385,7 +385,7 @@ def send_single(lead_id: str) -> dict:
                 "status": "emailed",
                 "emailed_at": now,
                 "updated_at": now,
-            }).eq("id", lead_id).execute()
+            }).eq("tenant_id", tenant_id).eq("id", lead_id).execute()
         except Exception as e:
             logger.warning("outreach_mailer: emailed 상태 업데이트 실패: %s", e)
 
@@ -396,7 +396,7 @@ def send_single(lead_id: str) -> dict:
                 "sent_at": now,
                 "sent_subject": subject,
                 "sent_body": html[:10000],
-            }).eq("lead_id", lead_id).eq("touch_sequence", 1).eq("status", "pending").execute()
+            }).eq("tenant_id", tenant_id).eq("lead_id", lead_id).eq("touch_sequence", 1).eq("status", "pending").execute()
         except Exception as e:
             logger.warning("outreach_mailer: touchpoint 상태 업데이트 실패: %s", e)
 
