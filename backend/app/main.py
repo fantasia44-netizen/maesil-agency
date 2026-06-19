@@ -32,6 +32,62 @@ def _outreach_scanned_today(tenant_id: str) -> bool:
         return False
 
 
+async def _run_tenant_outreach_cycle(tenant_id: str, cycle: int, scan_dates: dict) -> None:
+    """한 테넌트의 영업 작업 1사이클 — 각 단계 독립 try/except(한 단계 실패가 다음을 안 막음)."""
+    import asyncio
+    from datetime import datetime, timezone
+    tag = (tenant_id or "")[:8]
+
+    # 멀티터치 팔로업 (1차 콜드드립 + 2·3차)
+    try:
+        from app.services.outreach_followup import check_pending_followups
+        fu = await asyncio.to_thread(check_pending_followups, tenant_id, 10)
+        if fu.get("processed"):
+            logger.info("[scheduler:%s] followup processed=%d", tag, fu["processed"])
+    except Exception as e:
+        logger.warning("[scheduler:%s] followup 실패: %s", tag, e)
+
+    # 리드 자동 분석 (discovered/analyzing → approved)
+    try:
+        from app.services.outreach_pipeline import auto_analyze_pending
+        ana = await asyncio.to_thread(auto_analyze_pending, tenant_id, 5)
+        if ana.get("analyzed"):
+            logger.info("[scheduler:%s] auto-analyze %d건", tag, ana["analyzed"])
+    except Exception as e:
+        logger.warning("[scheduler:%s] auto-analyze 실패: %s", tag, e)
+
+    # 콜드 드립 예약 (cfg.cold_drip_enabled 아니면 내부 스킵)
+    try:
+        from app.services.outreach_cold_drip import schedule_daily_cold_drip
+        drip = await asyncio.to_thread(schedule_daily_cold_drip, tenant_id)
+        if drip.get("scheduled"):
+            logger.info("[scheduler:%s] cold_drip 예약 %d건", tag, drip["scheduled"])
+    except Exception as e:
+        logger.warning("[scheduler:%s] cold_drip 실패: %s", tag, e)
+
+    # Gmail 회신 감시 (5사이클마다)
+    if settings.enable_gmail_watcher and cycle % 5 == 0:
+        try:
+            from app.services.gmail_watcher import watch_replies
+            rep = await asyncio.to_thread(watch_replies, tenant_id, 30)
+            if rep.get("found_replies"):
+                logger.info("[scheduler:%s] 회신 %d건", tag, rep["found_replies"])
+        except Exception as e:
+            logger.warning("[scheduler:%s] gmail_watcher 실패: %s", tag, e)
+
+    # 멀티채널 발굴 스캔 — 테넌트별 하루 1회
+    try:
+        today = datetime.now(timezone.utc).date()
+        if scan_dates.get(tenant_id) != today:
+            if not await asyncio.to_thread(_outreach_scanned_today, tenant_id):
+                from app.services.outreach_pipeline import run_all_platforms
+                sr = await asyncio.to_thread(run_all_platforms, tenant_id)
+                logger.info("[scheduler:%s] scan done: leads=%d", tag, sr.get("total_leads_upserted", 0))
+            scan_dates[tenant_id] = today
+    except Exception as e:
+        logger.warning("[scheduler:%s] scan 실패: %s", tag, e)
+
+
 async def _poll_loop():
     """배포 직후 1회 즉시 실행 후 3분 간격 반복."""
     import asyncio
@@ -42,9 +98,7 @@ async def _poll_loop():
     # 첫 실행은 즉시 (수집전 문제 방지)
     await asyncio.sleep(10)  # 서버 완전 기동 대기
     cycle = 0
-    last_youtube_scan_date = None
-    # Phase 2: 영업 작업은 기본 테넌트 1개로 단일 동작 (Phase 5에서 활성 테넌트 순회로 확장)
-    from app.services.tenants import get_default_tenant_id
+    scan_dates: dict = {}   # tenant_id → 마지막 스캔 날짜 (테넌트별 하루 1회)
     while True:
         try:
             await asyncio.to_thread(render_logs.poll_all)
@@ -70,67 +124,20 @@ async def _poll_loop():
             except Exception as e:
                 logger.warning("[scheduler] repo_mirror sync 실패: %s", e)
 
-            # 영업 작업 대상 테넌트 (Phase 2: 기본 테넌트 1개)
-            outreach_tid = await asyncio.to_thread(get_default_tenant_id)
-
-            # 멀티터치 팔로업 — 매 사이클 (3분마다)
-            if outreach_tid:
-                try:
-                    from app.services.outreach_followup import check_pending_followups
-                    fu_result = await asyncio.to_thread(check_pending_followups, outreach_tid, 10)
-                    if fu_result.get("processed"):
-                        logger.info("[scheduler] followup processed=%d", fu_result["processed"])
-                except Exception as e:
-                    logger.warning("[scheduler] followup 실패: %s", e)
-
-            # 리드 자동 분석 — 매 사이클 discovered/analyzing 리드 5개씩 처리 → approved 전환
-            if outreach_tid:
-                try:
-                    from app.services.outreach_pipeline import auto_analyze_pending
-                    ana = await asyncio.to_thread(auto_analyze_pending, outreach_tid, 5)
-                    if ana.get("analyzed"):
-                        logger.info("[scheduler] auto-analyze %d건 처리", ana["analyzed"])
-                except Exception as e:
-                    logger.warning("[scheduler] auto-analyze 실패: %s", e)
-
-            # 콜드 드립 — 하루 1회 오늘 발송 리스트 DB 예약 (기본 off, 세팅 후 활성)
-            if outreach_tid:
-                try:
-                    from app.services.outreach_cold_drip import schedule_daily_cold_drip
-                    drip = await asyncio.to_thread(schedule_daily_cold_drip, outreach_tid)
-                    if drip.get("scheduled"):
-                        logger.info("[scheduler] cold_drip 오늘 예약 %d건 생성", drip["scheduled"])
-                    elif drip.get("skipped"):
-                        logger.info("[scheduler] cold_drip skipped: %s", drip["skipped"])
-                except Exception as e:
-                    logger.warning("[scheduler] cold_drip 실패: %s", e)
-
-            # Gmail 회신 감시 — 5사이클마다 (약 15분)
-            if outreach_tid and settings.enable_gmail_watcher and cycle % 5 == 0:
-                try:
-                    from app.services.gmail_watcher import watch_replies
-                    reply_result = await asyncio.to_thread(watch_replies, outreach_tid, 30)
-                    if reply_result.get("found_replies"):
-                        logger.info("[scheduler] gmail_watcher: 회신 %d건 발견",
-                                    reply_result["found_replies"])
-                except Exception as e:
-                    logger.warning("[scheduler] gmail_watcher 실패: %s", e)
-
-            # 멀티채널 영업 스캔 — 하루 1회
-            if outreach_tid:
-                try:
-                    today = datetime.now(timezone.utc).date()
-                    if last_youtube_scan_date != today:
-                        if not await asyncio.to_thread(_outreach_scanned_today, outreach_tid):
-                            from app.services.outreach_pipeline import run_all_platforms
-                            scan_result = await asyncio.to_thread(run_all_platforms, outreach_tid)
-                            logger.info("[scheduler] outreach scan done: leads=%d",
-                                        scan_result.get("total_leads_upserted", 0))
-                        else:
-                            logger.info("[scheduler] outreach scan 오늘 이미 실행됨 — 스킵")
-                        last_youtube_scan_date = today
-                except Exception as e:
-                    logger.warning("[scheduler] outreach scan 실패: %s", e)
+            # 영업 작업 — 활성 테넌트 전체 순회 (Phase 5). 테넌트별 독립 try/except.
+            try:
+                from app.services.tenants import list_active_outreach_tenants
+                active = await asyncio.to_thread(list_active_outreach_tenants)
+                for t in active:
+                    tid = t.get("id")
+                    if not tid:
+                        continue
+                    try:
+                        await _run_tenant_outreach_cycle(tid, cycle, scan_dates)
+                    except Exception as e:
+                        logger.warning("[scheduler] tenant %s 사이클 실패: %s", str(tid)[:8], e)
+            except Exception as e:
+                logger.warning("[scheduler] 활성 테넌트 조회 실패: %s", e)
 
             cycle += 1
             logger.info("[scheduler] poll cycle %d done", cycle)
