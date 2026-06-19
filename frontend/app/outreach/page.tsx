@@ -222,8 +222,10 @@ export default function OutreachPage() {
     setTouchLoading(true);
     try {
       const data = await apiFetch<TouchLog[]>("/api/outreach/touchpoints?limit=300", {}, 15000);
-      setTouchLogs(data);
-    } catch {
+      console.log("[touchLogs] API returned:", Array.isArray(data) ? data.length : data);
+      setTouchLogs(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error("[touchLogs] error:", e);
       showToast("발송 이력 로드 실패", false);
     } finally {
       setTouchLoading(false);
