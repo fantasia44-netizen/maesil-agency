@@ -310,6 +310,7 @@ def me(user: UserContext = Depends(get_current_user)) -> dict:
         "role": user.role,
         "display_name": user.display_name,
         "insight_operator_id": user.insight_operator_id,
+        "tenant_id": user.tenant_id,
         "is_super_admin": user.is_super_admin,
     }
 

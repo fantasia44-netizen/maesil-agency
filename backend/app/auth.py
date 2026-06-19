@@ -59,12 +59,14 @@ class UserContext:
         role: str,
         insight_operator_id: str | None,
         display_name: str | None = None,
+        tenant_id: str | None = None,
     ):
         self.id = id
         self.email = email
         self.role = role
-        self.insight_operator_id = insight_operator_id  # 데이터 격리 키
+        self.insight_operator_id = insight_operator_id  # 매실인사이트 분석 격리 키
         self.display_name = display_name
+        self.tenant_id = tenant_id  # 영업 워크스페이스 격리 키 (tenants.id)
 
     @property
     def is_super_admin(self) -> bool:
@@ -94,6 +96,8 @@ def create_token(user_row: dict) -> str:
         "role":                 user_row["role"],
         "insight_operator_id":  str(user_row["insight_operator_id"])
                                 if user_row.get("insight_operator_id") else None,
+        "tenant_id":            str(user_row["tenant_id"])
+                                if user_row.get("tenant_id") else None,
         "display_name":         user_row.get("display_name"),
         "exp": datetime.now(timezone.utc) + timedelta(days=JWT_EXPIRE_DAYS),
     }
@@ -137,7 +141,7 @@ def _fresh_user_row(user_id: str) -> dict | None:
     try:
         resp = (
             _users_table()
-            .select("id, role, is_active, insight_operator_id, display_name")
+            .select("id, role, is_active, insight_operator_id, display_name, tenant_id")
             .eq("id", user_id)
             .limit(1)
             .execute()
@@ -173,6 +177,7 @@ def get_current_user(request: Request) -> UserContext:
     role = payload["role"]
     insight_operator_id = payload.get("insight_operator_id")
     display_name = payload.get("display_name")
+    tenant_id = payload.get("tenant_id")  # 구 JWT엔 없음 → 아래 DB revalidate로 보충
 
     # 매 요청 재검증: 비활성화/권한변경 즉시 반영 (AUTH_REVALIDATE=0 이면 생략)
     if settings.auth_revalidate:
@@ -188,6 +193,8 @@ def get_current_user(request: Request) -> UserContext:
                 str(row["insight_operator_id"]) if row.get("insight_operator_id") else None
             )
             display_name = row.get("display_name", display_name)
+            if row.get("tenant_id"):
+                tenant_id = str(row["tenant_id"])
 
     return UserContext(
         id=user_id,
@@ -195,6 +202,7 @@ def get_current_user(request: Request) -> UserContext:
         role=role,
         insight_operator_id=insight_operator_id,
         display_name=display_name,
+        tenant_id=tenant_id,
     )
 
 
@@ -203,6 +211,17 @@ def require_admin(user: UserContext = Depends(get_current_user)) -> UserContext:
     if not user.is_super_admin:
         raise HTTPException(403, "관리자 권한이 필요합니다.")
     return user
+
+
+def require_tenant(user: UserContext = Depends(get_current_user)) -> "TenantContext":
+    """테넌트 스코프(영업) 라우트용 — 본인 워크스페이스 컨텍스트 주입.
+
+    Phase 0: 본인 tenant_id 반환. super_admin 임퍼소네이트(X-Tenant-Id)는 Phase 6.
+    """
+    from app.tenant_context import TenantContext
+    if not user.tenant_id:
+        raise HTTPException(403, "연결된 워크스페이스가 없습니다. 관리자에게 문의하세요.")
+    return TenantContext(tenant_id=user.tenant_id)
 
 
 # 기존 routers가 Depends(require_bearer)를 사용하므로 호환성 유지
