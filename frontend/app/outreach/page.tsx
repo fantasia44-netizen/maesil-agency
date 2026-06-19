@@ -200,6 +200,15 @@ export default function OutreachPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [mainTab, setMainTab] = useState<"leads" | "history" | "report">("leads");
   const [touchLogs, setTouchLogs] = useState<TouchLog[]>([]);
+
+  // UTC ISO → KST 날짜 문자열 (YYYY-MM-DD)
+  const toKSTDate = (iso: string | null | undefined): string => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+    return kst.toISOString().slice(0, 10);
+  };
+  const todayKSTStr = toKSTDate(new Date().toISOString());
   const [touchLoading, setTouchLoading] = useState(false);
   const [touchStatusFilter, setTouchStatusFilter] = useState<string>("all");
   const [touchDateFilter, setTouchDateFilter] = useState<"today" | "all">("today");
@@ -521,10 +530,8 @@ export default function OutreachPage() {
               );
             })}
             {touchDateFilter === "today" && (() => {
-              const todayKST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
-              const todayStr = `${todayKST.getFullYear()}-${String(todayKST.getMonth()+1).padStart(2,"0")}-${String(todayKST.getDate()).padStart(2,"0")}`;
-              const todaySent = touchLogs.filter(t => t.status === "sent" && t.sent_at?.startsWith(todayStr)).length;
-              const todayPending = touchLogs.filter(t => t.status === "pending" && t.scheduled_for?.startsWith(todayStr)).length;
+              const todaySent = touchLogs.filter(t => t.status === "sent" && toKSTDate(t.sent_at) === todayKSTStr).length;
+              const todayPending = touchLogs.filter(t => t.status === "pending" && toKSTDate(t.scheduled_for) === todayKSTStr).length;
               return (
                 <span style={{ fontSize: "0.75rem", color: "#64748b", marginLeft: 4 }}>
                   발송됨 <strong style={{ color: "#166534" }}>{todaySent}</strong>건 · 예약됨 <strong style={{ color: "#92400e" }}>{todayPending}</strong>건
@@ -536,10 +543,8 @@ export default function OutreachPage() {
           {/* 상태 필터 */}
           <div style={{ display: "flex", gap: "0.35rem", marginBottom: "1rem", flexWrap: "wrap" }}>
             {["all", "sent", "pending", "failed", "replied", "bounced", "skipped"].map((s) => {
-              const todayKST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
-              const todayStr = `${todayKST.getFullYear()}-${String(todayKST.getMonth()+1).padStart(2,"0")}-${String(todayKST.getDate()).padStart(2,"0")}`;
               const dateFiltered = touchDateFilter === "today"
-                ? touchLogs.filter(t => (t.sent_at ?? t.scheduled_for ?? "").startsWith(todayStr))
+                ? touchLogs.filter(t => toKSTDate(t.sent_at ?? t.scheduled_for) === todayKSTStr)
                 : touchLogs;
               const active = touchStatusFilter === s;
               const cnt = s === "all" ? dateFiltered.length : dateFiltered.filter(t => t.status === s).length;
@@ -570,10 +575,8 @@ export default function OutreachPage() {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
               {(() => {
-                const todayKST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
-                const todayStr = `${todayKST.getFullYear()}-${String(todayKST.getMonth()+1).padStart(2,"0")}-${String(todayKST.getDate()).padStart(2,"0")}`;
                 return touchLogs
-                  .filter(t => touchDateFilter === "all" || (t.sent_at ?? t.scheduled_for ?? "").startsWith(todayStr))
+                  .filter(t => touchDateFilter === "all" || toKSTDate(t.sent_at ?? t.scheduled_for) === todayKSTStr)
                   .filter(t => touchStatusFilter === "all" || t.status === touchStatusFilter);
               })()
                 .map((t) => {
@@ -626,10 +629,8 @@ export default function OutreachPage() {
                   );
                 })}
               {(() => {
-                const todayKST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
-                const todayStr = `${todayKST.getFullYear()}-${String(todayKST.getMonth()+1).padStart(2,"0")}-${String(todayKST.getDate()).padStart(2,"0")}`;
                 const filtered = touchLogs
-                  .filter(t => touchDateFilter === "all" || (t.sent_at ?? t.scheduled_for ?? "").startsWith(todayStr))
+                  .filter(t => touchDateFilter === "all" || toKSTDate(t.sent_at ?? t.scheduled_for) === todayKSTStr)
                   .filter(t => touchStatusFilter === "all" || t.status === touchStatusFilter);
                 return filtered.length === 0 ? (
                   <div className="card" style={{ textAlign: "center", color: "#94a3b8", padding: "2rem" }}>
