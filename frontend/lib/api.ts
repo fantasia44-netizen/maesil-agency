@@ -29,6 +29,7 @@ export type StoredUser = {
   role: "super_admin" | "customer";
   display_name: string | null;
   insight_operator_id: string | null;
+  tenant_id?: string | null;
 };
 
 export function getUser(): StoredUser | null {
@@ -111,6 +112,34 @@ export async function login(email: string, password: string): Promise<StoredUser
     role: data.role,
     display_name: data.display_name,
     insight_operator_id: data.insight_operator_id,
+  };
+  setUser(user);
+  return user;
+}
+
+// ── 셀프 가입 ────────────────────────────────────────────────────────
+export async function signup(
+  email: string,
+  password: string,
+  company: string,
+): Promise<StoredUser> {
+  const res = await fetch(`${BASE}/api/auth/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, company, display_name: company }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "가입 실패");
+  }
+  const data = await res.json();
+  setToken(data.token);
+  const user: StoredUser = {
+    email: data.email,
+    role: data.role,
+    display_name: data.display_name,
+    insight_operator_id: data.insight_operator_id ?? null,
+    tenant_id: data.tenant_id ?? null,
   };
   setUser(user);
   return user;

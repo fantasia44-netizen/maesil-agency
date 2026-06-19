@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { login } from "../../lib/api";
 import { useRouter } from "next/navigation";
 
@@ -117,8 +118,11 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p style={{ textAlign: "center", color: "#94a3b8", fontSize: "0.75rem", marginTop: "1.5rem" }}>
-          매실인사이트 이용 고객 전용
+        <p style={{ textAlign: "center", color: "#64748b", fontSize: "0.82rem", marginTop: "1.5rem" }}>
+          계정이 없으신가요?{" "}
+          <Link href="/signup" style={{ color: "#1A6F3C", fontWeight: 600, textDecoration: "none" }}>
+            무료로 시작하기
+          </Link>
         </p>
       </div>
     </div>

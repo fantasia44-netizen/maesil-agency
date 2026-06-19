@@ -249,6 +249,96 @@ def join(body: JoinRequest) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────────
+# 셀프 가입 (공개) — 새 워크스페이스(tenant) 생성 + 자동 로그인
+# ─────────────────────────────────────────────────────────────────
+
+class SignupRequest(BaseModel):
+    email: str
+    password: str
+    company: str | None = None      # 워크스페이스/회사명
+    display_name: str | None = None
+
+
+def _tenants_table():
+    return get_maesil_total_client().schema("agent_work").table("tenants")
+
+
+def _tenant_config_table():
+    return get_maesil_total_client().schema("agent_work").table("tenant_outreach_config")
+
+
+@router.post("/signup")
+def signup(body: SignupRequest) -> dict:
+    """초대 없이 셀프 가입 — 새 워크스페이스(trial) + customer 계정 생성 후 자동 로그인."""
+    email = (body.email or "").lower().strip()
+    if not email or "@" not in email:
+        raise HTTPException(400, "올바른 이메일을 입력하세요.")
+    if len(body.password or "") < 8:
+        raise HTTPException(400, "비밀번호는 8자 이상이어야 합니다.")
+    if get_user_by_email(email):
+        raise HTTPException(409, "이미 사용 중인 이메일입니다.")
+
+    now = _now()
+    trial_ends = (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
+    ws_name = (body.company or body.display_name or email.split("@")[0]).strip() or "내 워크스페이스"
+
+    # 1) 워크스페이스(tenant) 생성 (owner는 유저 생성 후 연결)
+    t_resp = _tenants_table().insert({
+        "name": ws_name, "plan": "trial", "status": "active",
+        "trial_ends_at": trial_ends, "created_at": now, "updated_at": now,
+    }).execute()
+    t_rows = t_resp.data or []
+    if not t_rows:
+        raise HTTPException(500, "워크스페이스 생성 실패")
+    tenant_id = t_rows[0]["id"]
+
+    # 2) customer 계정 생성 (이 워크스페이스 소속)
+    try:
+        u_resp = _users_table().insert({
+            "email": email,
+            "password_hash": hash_password(body.password),
+            "role": "customer",
+            "display_name": (body.display_name or body.company or None),
+            "tenant_id": tenant_id,
+            "is_active": True,
+            "created_at": now, "updated_at": now,
+        }).execute()
+        user = (u_resp.data or [None])[0]
+        if not user:
+            raise RuntimeError("user insert returned no row")
+    except Exception as e:
+        # 보상: 방금 만든 빈 워크스페이스 제거
+        try:
+            _tenants_table().delete().eq("id", tenant_id).execute()
+        except Exception:
+            pass
+        msg = str(e)
+        if "duplicate" in msg.lower() or "unique" in msg.lower():
+            raise HTTPException(409, "이미 사용 중인 이메일입니다.")
+        raise HTTPException(500, "계정 생성 실패")
+
+    # 3) 워크스페이스 소유자 연결 + 영업 설정 시드(콜드드립 OFF: Gmail 연결 후 활성)
+    try:
+        _tenants_table().update({"owner_user_id": user["id"], "updated_at": now}).eq("id", tenant_id).execute()
+    except Exception:
+        pass
+    try:
+        _tenant_config_table().upsert(
+            {"tenant_id": tenant_id, "cold_drip_enabled": False, "created_at": now, "updated_at": now},
+            on_conflict="tenant_id",
+        ).execute()
+    except Exception:
+        pass
+
+    token = create_token(user)
+    return {
+        "ok": True, "token": token, "email": user["email"], "role": user["role"],
+        "display_name": user.get("display_name"), "tenant_id": tenant_id,
+        "insight_operator_id": None,
+    }
+
+
+# ─────────────────────────────────────────────────────────────────
 # 로그인
 # ─────────────────────────────────────────────────────────────────
 
