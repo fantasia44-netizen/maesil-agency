@@ -49,15 +49,20 @@ def already_scheduled_today(tenant_id: str) -> bool:
         return False
 
 
-def _eligible_leads(tenant_id: str, cap: int, grades: list[str]) -> list[dict]:
-    """오늘 발송 대상: approved + 이메일 있음 + 미발송, 점수순(테넌트 스코프)."""
+def _eligible_leads(tenant_id: str, cap: int, grades: list[str],
+                    statuses: list[str] | None = None) -> list[dict]:
+    """발송 대상 리드: 미발송 + 이메일 있음 + 점수순.
+    statuses 미지정 시 approved만. D급 fallback은 draft_ready 포함해서 호출.
+    """
+    if statuses is None:
+        statuses = ["approved"]
     try:
         resp = (
             _db().table("outreach_leads")
             .select("id, contact_email, handle_name, platform, grade, score")
             .eq("tenant_id", tenant_id)
             .in_("platform", ["youtube", "naver_blog"])
-            .in_("status", ["approved"])
+            .in_("status", statuses)
             .in_("grade", grades)
             .is_("emailed_at", "null")
             .not_.is_("contact_email", "null")
@@ -107,10 +112,20 @@ def schedule_daily_cold_drip(tenant_id: str) -> dict:
     if room <= 0:
         return {"skipped": "daily cap reached", "scheduled": 0, "today_total": already, "cap": cap}
 
-    grades = cfg.grade_list
-    # 여유있게 가져와 이미 예약된 리드 제외 후 room개 선택
+    grades = cfg.grade_list  # 기본 S,A,B,C
     candidates = _eligible_leads(tenant_id, room + already + 50, grades)
     leads = [l for l in candidates if l["id"] not in scheduled_ids][:room]
+
+    # D급 fallback: S/A/B/C로 room 못 채우면 D급(approved+draft_ready)으로 보충
+    if len(leads) < room:
+        used_ids = scheduled_ids | {l["id"] for l in leads}
+        d_candidates = _eligible_leads(tenant_id, room + already + 50, ["D"],
+                                       statuses=["approved", "draft_ready"])
+        d_leads = [l for l in d_candidates if l["id"] not in used_ids][:room - len(leads)]
+        if d_leads:
+            logger.info("[cold_drip] D급 fallback %d건 추가", len(d_leads))
+            leads = leads + d_leads
+
     if not leads:
         return {"skipped": "no eligible leads", "scheduled": 0, "today_total": already, "cap": cap}
 
