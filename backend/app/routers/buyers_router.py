@@ -183,3 +183,97 @@ def trigger_scan(body: ScanRequest, user: UserContext = Depends(_require_admin))
     t.join(timeout=180)
 
     return result_holder if result_holder else {"status": "scanning", "message": "백그라운드 실행 중"}
+
+
+# ── 이메일 초안 생성 ─────────────────────────────────────────────────────────
+
+@router.post("/{buyer_id}/email-draft")
+def generate_email_draft(buyer_id: str, user: UserContext = Depends(_require_admin)) -> dict:
+    """Claude Haiku로 바이어 맞춤 영문 이메일 초안 생성."""
+    rows = _db().table("buyer_leads").select("*").eq("id", buyer_id).limit(1).execute().data or []
+    if not rows:
+        raise HTTPException(404, "바이어 없음")
+    b = rows[0]
+
+    from app.services.secrets import get_secret
+    api_key = get_secret("anthropic_api_key")
+    if not api_key:
+        raise HTTPException(400, "anthropic_api_key 미설정")
+
+    import anthropic
+    client = anthropic.Anthropic(api_key=api_key)
+
+    prompt = f"""You are a B2B export sales specialist for a Korean company.
+Write a professional cold email to a potential overseas buyer.
+
+Buyer information:
+- Company: {b.get('company_name', '')}
+- Country: {b.get('country', '')}
+- Contact: {b.get('contact_name') or 'Purchasing Manager'}
+- Title: {b.get('contact_title') or 'Import Manager'}
+- Industry: {b.get('industry') or 'Import/Distribution'}
+- Product interest: {b.get('product_interest') or 'Korean products'}
+- Source: {b.get('source', '')}
+
+Write a concise, professional cold email (subject + body).
+- Language: English (the buyer's country is {b.get('country', '')})
+- Tone: professional but warm
+- Length: 150-200 words body
+- Mention their specific product interest
+- End with a clear CTA (schedule a call or request a catalog)
+
+Return JSON only:
+{{"subject": "...", "body_html": "<p>...</p>..."}}"""
+
+    msg = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=800,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    import json, re
+    text = msg.content[0].text.strip()
+    m = re.search(r'\{.*\}', text, re.DOTALL)
+    if not m:
+        raise HTTPException(500, "초안 생성 실패")
+    try:
+        draft = json.loads(m.group(0))
+    except Exception:
+        raise HTTPException(500, "초안 파싱 실패")
+    return {"subject": draft.get("subject", ""), "body_html": draft.get("body_html", "")}
+
+
+# ── 이메일 발송 ──────────────────────────────────────────────────────────────
+
+class EmailSendRequest(BaseModel):
+    subject: str
+    body_html: str
+
+
+@router.post("/{buyer_id}/send-email")
+def send_email_to_buyer(buyer_id: str, body: EmailSendRequest,
+                        user: UserContext = Depends(_require_admin)) -> dict:
+    """Gmail API로 바이어에게 이메일 발송 + 상태 contacted로 변경."""
+    rows = _db().table("buyer_leads").select("*").eq("id", buyer_id).limit(1).execute().data or []
+    if not rows:
+        raise HTTPException(404, "바이어 없음")
+    b = rows[0]
+    email = (b.get("contact_email") or "").strip()
+    if not email:
+        raise HTTPException(400, "이메일 주소 없음")
+
+    from app.services.outreach_gmail_sender import send, is_configured
+    if not is_configured():
+        raise HTTPException(400, "Gmail 미설정 — Settings > outreach_gmail_* 시크릿 확인")
+
+    result = send(None, email, body.subject, body.body_html)
+    if not result.get("ok"):
+        raise HTTPException(502, f"발송 실패: {result.get('error')}")
+
+    now = datetime.now(timezone.utc).isoformat()
+    _db().table("buyer_leads").update({
+        "status": "contacted",
+        "emailed_at": now,
+        "updated_at": now,
+    }).eq("id", buyer_id).execute()
+
+    return {"ok": True, "message_id": result.get("id")}
