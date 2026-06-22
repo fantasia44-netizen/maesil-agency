@@ -27,6 +27,10 @@ export default function BuyersPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ company_name: "", country: "", contact_name: "", contact_email: "", contact_title: "", industry: "", product_interest: "" });
   const [saving, setSaving] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [scanKeywords, setScanKeywords] = useState("korean food, k-beauty, kimchi");
+  const [scanResult, setScanResult] = useState<string>("");
+  const [showScan, setShowScan] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   function load() {
@@ -50,6 +54,24 @@ export default function BuyersPage() {
     setForm({ company_name: "", country: "", contact_name: "", contact_email: "", contact_title: "", industry: "", product_interest: "" });
     load();
     setSaving(false);
+  }
+
+  async function runScan() {
+    const keywords = scanKeywords.split(",").map(k => k.trim()).filter(Boolean);
+    if (!keywords.length) return;
+    setScanning(true);
+    setScanResult("");
+    try {
+      const d = await apiFetch("/api/buyers/scan", {
+        method: "POST",
+        body: JSON.stringify({ keywords, sources: ["importyeti", "ec21", "tradekey"], limit_per_source: 30 }),
+      });
+      setScanResult(`발굴 완료: ${d.inserted || 0}건 저장 / ${d.unique || 0}건 고유 / ${d.total_found || 0}건 수집`);
+      load();
+    } catch {
+      setScanResult("스캔 실패");
+    }
+    setScanning(false);
   }
 
   async function changeStatus(id: string, status: string) {
@@ -84,11 +106,46 @@ export default function BuyersPage() {
             CSV 업로드
             <input ref={fileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={uploadCsv} />
           </label>
+          <button onClick={() => setShowScan(v => !v)} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid #2563eb", background: "#eff6ff", color: "#2563eb", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}>
+            🔍 자동 발굴
+          </button>
           <button onClick={() => setShowForm(v => !v)} style={{ padding: "7px 16px", borderRadius: 8, border: "none", background: "#0f172a", color: "#fff", cursor: "pointer", fontSize: "0.875rem" }}>
             + 바이어 추가
           </button>
         </div>
       </div>
+
+      {/* 자동 발굴 패널 */}
+      {showScan && (
+        <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 10, padding: "1.25rem", marginBottom: "1.25rem" }}>
+          <div style={{ fontWeight: 600, fontSize: "0.9rem", marginBottom: "0.75rem", color: "#1e40af" }}>
+            🔍 무료 바이어 자동 발굴 (ImportYeti · EC21 · TradeKey)
+          </div>
+          <div style={{ fontSize: "0.8rem", color: "#3b82f6", marginBottom: "0.75rem" }}>
+            키워드 쉼표 구분 입력 → 해외 B2B 디렉토리에서 수입업체 자동 수집
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <input
+              value={scanKeywords}
+              onChange={e => setScanKeywords(e.target.value)}
+              placeholder="korean food, k-beauty, kimchi, cosmetics"
+              style={{ flex: 1, minWidth: 280, padding: "7px 10px", borderRadius: 8, border: "1px solid #bfdbfe", fontSize: "0.875rem" }}
+            />
+            <button onClick={runScan} disabled={scanning} style={{
+              padding: "7px 18px", borderRadius: 8, border: "none",
+              background: scanning ? "#93c5fd" : "#2563eb", color: "#fff",
+              cursor: scanning ? "default" : "pointer", fontSize: "0.875rem", fontWeight: 600, whiteSpace: "nowrap",
+            }}>
+              {scanning ? "발굴 중… (최대 2분)" : "발굴 시작"}
+            </button>
+          </div>
+          {scanResult && (
+            <div style={{ marginTop: "0.75rem", fontSize: "0.85rem", fontWeight: 600, color: "#1e40af" }}>
+              ✅ {scanResult}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 필터 */}
       <div style={{ display: "flex", gap: 8, marginBottom: "1.25rem", flexWrap: "wrap" }}>

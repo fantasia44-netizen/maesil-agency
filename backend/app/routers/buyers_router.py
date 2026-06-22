@@ -145,3 +145,41 @@ def patch_buyer(buyer_id: str, body: BuyerPatch,
 @router.delete("/{buyer_id}", status_code=204)
 def delete_buyer(buyer_id: str, user: UserContext = Depends(_require_admin)) -> None:
     _db().table("buyer_leads").delete().eq("id", buyer_id).execute()
+
+
+# ── 자동 발굴 ────────────────────────────────────────────────────────────────
+
+class ScanRequest(BaseModel):
+    keywords: list[str]                      # ["korean food", "k-beauty", "kimchi"]
+    sources: list[str] | None = None         # ["importyeti", "ec21", "tradekey"]
+    limit_per_source: int = 30
+
+
+@router.post("/scan")
+def trigger_scan(body: ScanRequest, user: UserContext = Depends(_require_admin)) -> dict:
+    """무료 소스에서 바이어 자동 발굴 (ImportYeti + EC21 + TradeKey)."""
+    import asyncio
+    from app.services.buyer_scanner import scan_buyers
+
+    if not body.keywords:
+        raise HTTPException(400, "keywords 최소 1개 필요")
+
+    # 백그라운드 실행 (오래 걸릴 수 있어 즉시 응답 후 처리)
+    import threading
+    result_holder: dict = {}
+
+    def run():
+        try:
+            result_holder.update(scan_buyers(
+                keywords=body.keywords,
+                sources=body.sources,
+                limit_per_source=body.limit_per_source,
+            ))
+        except Exception as e:
+            result_holder["error"] = str(e)
+
+    t = threading.Thread(target=run, daemon=True)
+    t.start()
+    t.join(timeout=120)  # 최대 2분 대기
+
+    return result_holder if result_holder else {"status": "scanning", "message": "백그라운드 실행 중"}
