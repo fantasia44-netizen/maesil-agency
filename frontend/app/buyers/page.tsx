@@ -29,6 +29,7 @@ export default function BuyersPage() {
   const [saving, setSaving] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [scanKeywords, setScanKeywords] = useState("korean food, k-beauty, kimchi");
+  const [scanCountries, setScanCountries] = useState<string[]>([]);
   const [scanResult, setScanResult] = useState<string>("");
   const [showScan, setShowScan] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -64,7 +65,7 @@ export default function BuyersPage() {
     try {
       const d = await apiFetch("/api/buyers/scan", {
         method: "POST",
-        body: JSON.stringify({ keywords, sources: ["importyeti", "ec21", "tradekey"], limit_per_source: 30 }),
+        body: JSON.stringify({ keywords, countries: scanCountries.length ? scanCountries : null, limit_per_source: 30 }),
       });
       setScanResult(`발굴 완료: ${d.inserted || 0}건 저장 / ${d.unique || 0}건 고유 / ${d.total_found || 0}건 수집`);
       load();
@@ -122,21 +123,48 @@ export default function BuyersPage() {
             🔍 무료 바이어 자동 발굴 (ImportYeti · EC21 · TradeKey)
           </div>
           <div style={{ fontSize: "0.8rem", color: "#3b82f6", marginBottom: "0.75rem" }}>
-            키워드 쉼표 구분 입력 → 해외 B2B 디렉토리에서 수입업체 자동 수집
+            키워드 + 국가 선택 → EC21 · TradeKey · Europages · ExportHub에서 바이어 자동 수집
           </div>
-          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+          <div style={{ marginBottom: "0.75rem" }}>
+            <div style={{ fontSize: "0.75rem", color: "#64748b", marginBottom: 6 }}>검색 키워드 (쉼표 구분)</div>
             <input
               value={scanKeywords}
               onChange={e => setScanKeywords(e.target.value)}
               placeholder="korean food, k-beauty, kimchi, cosmetics"
-              style={{ flex: 1, minWidth: 280, padding: "7px 10px", borderRadius: 8, border: "1px solid #bfdbfe", fontSize: "0.875rem" }}
+              style={{ width: "100%", padding: "7px 10px", borderRadius: 8, border: "1px solid #bfdbfe", fontSize: "0.875rem", boxSizing: "border-box" }}
             />
+          </div>
+          <div style={{ marginBottom: "0.75rem" }}>
+            <div style={{ fontSize: "0.75rem", color: "#64748b", marginBottom: 6 }}>
+              국가 선택 (미선택 시 전세계)
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {["USA","Japan","China","Germany","UK","France","Australia","Canada","UAE","Vietnam","Thailand","Indonesia","Singapore","India","Brazil","Mexico","Italy","Spain","Netherlands","Saudi Arabia","Turkey","Malaysia","Philippines","Poland","South Africa","Egypt","Russia"].map(c => (
+                <button key={c} onClick={() => setScanCountries(prev =>
+                  prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]
+                )} style={{
+                  padding: "3px 10px", borderRadius: 99, fontSize: "0.78rem", cursor: "pointer",
+                  border: "1px solid",
+                  borderColor: scanCountries.includes(c) ? "#2563eb" : "#e2e8f0",
+                  background: scanCountries.includes(c) ? "#2563eb" : "#fff",
+                  color: scanCountries.includes(c) ? "#fff" : "#374151",
+                  fontWeight: scanCountries.includes(c) ? 600 : 400,
+                }}>{c}</button>
+              ))}
+            </div>
+            {scanCountries.length > 0 && (
+              <button onClick={() => setScanCountries([])} style={{ marginTop: 6, fontSize: "0.75rem", color: "#64748b", background: "none", border: "none", cursor: "pointer" }}>
+                전체 초기화
+              </button>
+            )}
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <button onClick={runScan} disabled={scanning} style={{
               padding: "7px 18px", borderRadius: 8, border: "none",
               background: scanning ? "#93c5fd" : "#2563eb", color: "#fff",
               cursor: scanning ? "default" : "pointer", fontSize: "0.875rem", fontWeight: 600, whiteSpace: "nowrap",
             }}>
-              {scanning ? "발굴 중… (최대 2분)" : "발굴 시작"}
+              {scanning ? `발굴 중… (${scanCountries.length ? scanCountries.length + "개국" : "전세계"})` : "발굴 시작"}
             </button>
           </div>
           {scanResult && (
