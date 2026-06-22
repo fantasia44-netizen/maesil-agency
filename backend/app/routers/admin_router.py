@@ -114,21 +114,36 @@ def get_tenant(tenant_id: str, user: UserContext = Depends(_require_super_admin)
 
 
 class TenantPatch(BaseModel):
-    status: str | None = None  # active / suspended
+    status: str | None = None   # active / suspended
     plan: str | None = None
+    trial_days: int | None = None  # 트라이얼 연장 일수
 
 
 @router.patch("/tenants/{tenant_id}")
 def patch_tenant(tenant_id: str, body: TenantPatch,
                  user: UserContext = Depends(_require_super_admin)) -> dict:
-    allowed = {"active", "suspended"}
-    if body.status and body.status not in allowed:
-        raise HTTPException(400, f"status는 {allowed} 중 하나")
+    allowed_status = {"active", "suspended"}
+    if body.status and body.status not in allowed_status:
+        raise HTTPException(400, f"status는 {allowed_status} 중 하나")
+
     upd: dict = {"updated_at": datetime.now(timezone.utc).isoformat()}
     if body.status:
         upd["status"] = body.status
     if body.plan:
         upd["plan"] = body.plan
+    if body.trial_days:
+        from datetime import timedelta
+        rows = _db().table("tenants").select("trial_ends_at").eq("id", tenant_id).limit(1).execute().data or []
+        base = datetime.now(timezone.utc)
+        if rows and rows[0].get("trial_ends_at"):
+            try:
+                existing = datetime.fromisoformat(rows[0]["trial_ends_at"].replace("Z", "+00:00"))
+                if existing > base:
+                    base = existing
+            except Exception:
+                pass
+        upd["trial_ends_at"] = (base + timedelta(days=body.trial_days)).isoformat()
+
     _db().table("tenants").update(upd).eq("id", tenant_id).execute()
     return {"ok": True, "tenant_id": tenant_id, **upd}
 
