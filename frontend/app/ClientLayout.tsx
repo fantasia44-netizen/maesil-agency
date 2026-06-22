@@ -44,6 +44,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           {admin && <Link href="/admin">관리자</Link>}
           {admin && <Link href="/outreach">영업</Link>}
           {admin && <Link href="/buyers">바이어발굴</Link>}
+          {admin && <Link href="/brand">브랜드관리</Link>}
           {admin && <Link href="/cs">CS관리</Link>}
           {admin && <Link href="/warehouse">창고·물류</Link>}
           {admin && <Link href="/accounting">회계</Link>}
