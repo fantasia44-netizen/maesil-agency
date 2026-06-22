@@ -50,7 +50,7 @@ async def _run_tenant_outreach_cycle(tenant_id: str, cycle: int, scan_dates: dic
     # 리드 자동 분석 (discovered/analyzing → approved)
     try:
         from app.services.outreach_pipeline import auto_analyze_pending
-        ana = await asyncio.to_thread(auto_analyze_pending, tenant_id, 5)
+        ana = await asyncio.to_thread(auto_analyze_pending, tenant_id, 20)
         if ana.get("analyzed"):
             logger.info("[scheduler:%s] auto-analyze %d건", tag, ana["analyzed"])
     except Exception as e:
