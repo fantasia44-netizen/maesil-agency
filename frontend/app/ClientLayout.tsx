@@ -39,21 +39,22 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       <header className="app-header">
         <div className="brand">maesil-agency</div>
         <nav>
-          {/* 모든 유저 */}
-          <Link href="/chat">대화</Link>
-          <Link href="/history">이전 대화</Link>
-
-          {/* 고객(customer) — 자기 영업 */}
-          {!admin && <Link href="/outreach">영업</Link>}
-          {!admin && <Link href="/settings/outreach">설정</Link>}
-          {!admin && <Link href="/billing">요금제</Link>}
-
           {/* super_admin 전용 */}
           {admin && <Link href="/">대시보드</Link>}
-          {admin && <Link href="/cs">CS 관리</Link>}
           {admin && <Link href="/outreach">영업</Link>}
+          {admin && <Link href="/buyers">바이어발굴</Link>}
+          {admin && <Link href="/cs">CS관리</Link>}
+          {admin && <Link href="/warehouse">창고·물류</Link>}
+          {admin && <Link href="/accounting">회계</Link>}
           {admin && <Link href="/briefing">브리핑</Link>}
+          {admin && <Link href="/chat">대화</Link>}
           {admin && <Link href="/settings">설정</Link>}
+
+          {/* 고객(customer) */}
+          {!admin && <Link href="/outreach">영업</Link>}
+          {!admin && <Link href="/chat">대화</Link>}
+          {!admin && <Link href="/settings/outreach">설정</Link>}
+          {!admin && <Link href="/billing">요금제</Link>}
         </nav>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "0.75rem" }}>
           {user && (
