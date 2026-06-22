@@ -63,7 +63,7 @@ export default function BuyersPage() {
     setScanning(true);
     setScanResult("");
     try {
-      const d = await apiFetch("/api/buyers/scan", {
+      const d: any = await apiFetch("/api/buyers/scan", {
         method: "POST",
         body: JSON.stringify({ keywords, countries: scanCountries.length ? scanCountries : null, limit_per_source: 30 }),
       });
