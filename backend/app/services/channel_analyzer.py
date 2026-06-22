@@ -290,10 +290,8 @@ def analyze_lead(tenant_id: str, lead_id: str) -> dict:
     grade = lead.get("grade", "D")
     if current_status in _preserve_status:
         next_status = current_status
-    elif grade in ("S", "A", "B", "C"):
-        next_status = "approved"
     else:
-        next_status = "draft_ready"  # D급은 수동 검토
+        next_status = "approved"  # 전 등급 자동 승인
 
     update_payload = {
         "channel_type": channel_type,

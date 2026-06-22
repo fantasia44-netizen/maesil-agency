@@ -350,7 +350,7 @@ def check_pending_followups(tenant_id: str, limit: int = 20) -> dict:
 
         if not lead or lead.get("status") in (
             "rejected", "archived", "deal", "unsubscribe", "blocked",
-            "discovered", "analyzing", "draft_ready",
+            "discovered", "analyzing",
         ):
             _mark_touch(touch_id, "skipped")
             continue

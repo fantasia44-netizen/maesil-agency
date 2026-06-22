@@ -116,11 +116,10 @@ def schedule_daily_cold_drip(tenant_id: str) -> dict:
     candidates = _eligible_leads(tenant_id, room + already + 50, grades)
     leads = [l for l in candidates if l["id"] not in scheduled_ids][:room]
 
-    # D급 fallback: S/A/B/C로 room 못 채우면 D급(approved+draft_ready)으로 보충
+    # D급 fallback: S/A/B/C로 room 못 채우면 D급(approved)으로 보충
     if len(leads) < room:
         used_ids = scheduled_ids | {l["id"] for l in leads}
-        d_candidates = _eligible_leads(tenant_id, room + already + 50, ["D"],
-                                       statuses=["approved", "draft_ready"])
+        d_candidates = _eligible_leads(tenant_id, room + already + 50, ["D"])
         d_leads = [l for l in d_candidates if l["id"] not in used_ids][:room - len(leads)]
         if d_leads:
             logger.info("[cold_drip] D급 fallback %d건 추가", len(d_leads))
