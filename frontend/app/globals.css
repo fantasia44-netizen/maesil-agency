@@ -21,9 +21,12 @@ a { color: inherit; text-decoration: none; }
 
 .app-header .brand { font-weight: 700; font-size: 1.05rem; }
 
-.app-header nav { display: flex; gap: 1.25rem; }
+.app-header nav { display: flex; gap: 1.25rem; align-items: center; }
 .app-header nav a { font-size: 0.9rem; color: #475569; }
 .app-header nav a:hover { color: #0f172a; }
+.nav-dropdown-item a { display: block; padding: 0.45rem 0.75rem; font-size: 0.875rem; color: #475569; border-radius: 6px; }
+.nav-dropdown-item a:hover { background: #f8fafc; color: #0f172a; }
+.nav-dropdown-active a { display: block; padding: 0.45rem 0.75rem; font-size: 0.875rem; color: #0f172a; font-weight: 600; border-radius: 6px; background: #f1f5f9; }
 
 .app-main { padding: 1.5rem; max-width: 1200px; margin: 0 auto; }
 
