@@ -41,6 +41,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <nav>
           {/* super_admin 전용 */}
           {admin && <Link href="/">대시보드</Link>}
+          {admin && <Link href="/admin">관리자</Link>}
           {admin && <Link href="/outreach">영업</Link>}
           {admin && <Link href="/buyers">바이어발굴</Link>}
           {admin && <Link href="/cs">CS관리</Link>}
