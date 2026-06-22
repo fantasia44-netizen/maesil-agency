@@ -72,7 +72,7 @@ def patch_profile(profile_id: str, body: ProfileCreate,
     return {"ok": True}
 
 
-@router.delete("/profiles/{profile_id}", status_code=204)
+@router.delete("/profiles/{profile_id}", status_code=204, response_model=None)
 def delete_profile(profile_id: str, user: UserContext = Depends(_require_admin)) -> None:
     _db().table("brand_profiles").delete().eq("id", profile_id).execute()
 

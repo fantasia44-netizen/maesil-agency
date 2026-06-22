@@ -113,6 +113,6 @@ def create_entry(body: EntryCreate, user: UserContext = Depends(_require_admin))
     return (resp.data or [{}])[0]
 
 
-@router.delete("/entries/{entry_id}", status_code=204)
+@router.delete("/entries/{entry_id}", status_code=204, response_model=None)
 def delete_entry(entry_id: str, user: UserContext = Depends(_require_admin)) -> None:
     _db().table("accounting_entries").delete().eq("id", entry_id).execute()

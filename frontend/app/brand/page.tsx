@@ -46,8 +46,8 @@ export default function BrandPage() {
   });
 
   useEffect(() => {
-    apiFetch("/api/brand/profiles").then(d => {
-      setProfiles(Array.isArray(d) ? d : []);
+    apiFetch("/api/brand/profiles").then((d: any) => {
+      setProfiles(Array.isArray(d) ? d as Profile[] : []);
     }).finally(() => setLoading(false));
   }, []);
 
@@ -55,7 +55,7 @@ export default function BrandPage() {
     setSelected(p);
     setFilterCountry("");
     setDiscoverMsg("");
-    const d = await apiFetch(`/api/brand/profiles/${p.id}/results?limit=200`);
+    const d: any = await apiFetch(`/api/brand/profiles/${p.id}/results?limit=200`);
     setResults(d.rows || []);
     setByCountry(d.by_country || {});
   }
@@ -63,11 +63,11 @@ export default function BrandPage() {
   async function createProfile() {
     if (!form.company_name) return;
     const cats = form.product_categories.split(",").map(s => s.trim()).filter(Boolean);
-    const d = await apiFetch("/api/brand/profiles", {
+    const d: any = await apiFetch("/api/brand/profiles", {
       method: "POST",
       body: JSON.stringify({ ...form, product_categories: cats }),
     });
-    setProfiles(prev => [d, ...prev]);
+    setProfiles(prev => [d as Profile, ...prev]);
     setShowForm(false);
     setForm({ company_name: "", brand_name: "", product_categories: "", description: "", target_countries: [] });
   }
@@ -76,12 +76,12 @@ export default function BrandPage() {
     if (!selected) return;
     setDiscovering(true);
     setDiscoverMsg("🔍 현지어 키워드 번역 + 바이어 발굴 중… (최대 5분)");
-    const d = await apiFetch(`/api/brand/profiles/${selected.id}/discover`, { method: "POST" });
+    const d: any = await apiFetch(`/api/brand/profiles/${selected.id}/discover`, { method: "POST" });
     if (d.error) {
       setDiscoverMsg(`❌ 오류: ${d.error}`);
     } else if (d.total_saved !== undefined) {
       setDiscoverMsg(`✅ 완료: ${d.total_found}건 발굴 → ${d.total_saved}건 저장 (${(d.countries || []).join(", ")})`);
-      const r = await apiFetch(`/api/brand/profiles/${selected.id}/results?limit=200`);
+      const r: any = await apiFetch(`/api/brand/profiles/${selected.id}/results?limit=200`);
       setResults(r.rows || []);
       setByCountry(r.by_country || {});
     } else {
@@ -98,9 +98,9 @@ export default function BrandPage() {
   async function saveAll() {
     if (!selected) return;
     const params = filterCountry ? `?country=${filterCountry}` : "";
-    const d = await apiFetch(`/api/brand/profiles/${selected.id}/results/save-all${params}`, { method: "POST" });
+    const d: any = await apiFetch(`/api/brand/profiles/${selected.id}/results/save-all${params}`, { method: "POST" });
     alert(`${d.saved}건 바이어발굴 탭으로 저장됨`);
-    const r = await apiFetch(`/api/brand/profiles/${selected.id}/results?limit=200`);
+    const r: any = await apiFetch(`/api/brand/profiles/${selected.id}/results?limit=200`);
     setResults(r.rows || []);
   }
 

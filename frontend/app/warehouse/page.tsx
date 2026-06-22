@@ -21,7 +21,7 @@ export default function WarehousePage() {
     const ep = tab === "stock" ? "/api/warehouse/summary"
              : tab === "production" ? "/api/warehouse/production"
              : "/api/warehouse/shipments";
-    apiFetch(ep).then(d => {
+    apiFetch(ep).then((d: any) => {
       if (d.error) { setError(d.error); return; }
       if (tab === "stock") setStock(d.items || []);
       else if (tab === "production") setProduction(d.rows || []);

@@ -142,7 +142,7 @@ def patch_buyer(buyer_id: str, body: BuyerPatch,
     return {"ok": True}
 
 
-@router.delete("/{buyer_id}", status_code=204)
+@router.delete("/{buyer_id}", status_code=204, response_model=None)
 def delete_buyer(buyer_id: str, user: UserContext = Depends(_require_admin)) -> None:
     _db().table("buyer_leads").delete().eq("id", buyer_id).execute()
 

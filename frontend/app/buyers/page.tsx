@@ -39,7 +39,7 @@ export default function BuyersPage() {
     const params = new URLSearchParams({ limit: "100" });
     if (filterStatus) params.set("status", filterStatus);
     if (search) params.set("q", search);
-    apiFetch(`/api/buyers?${params}`).then(d => {
+    apiFetch(`/api/buyers?${params}`).then((d: any) => {
       setBuyers(d.rows || []);
       setTotal(d.total || 0);
     }).finally(() => setLoading(false));

@@ -38,8 +38,8 @@ export default function AccountingPage() {
       apiFetch("/api/accounting/summary"),
       apiFetch("/api/accounting/entries?limit=100"),
     ]).then(([s, e]) => {
-      setSummary(s);
-      setEntries(Array.isArray(e) ? e : []);
+      setSummary(s as Summary);
+      setEntries(Array.isArray(e) ? e as Entry[] : []);
     }).finally(() => setLoading(false));
   }
 

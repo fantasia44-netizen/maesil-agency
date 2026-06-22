@@ -51,8 +51,8 @@ export default function AdminPage() {
       apiFetch("/api/admin/stats"),
       apiFetch("/api/admin/tenants"),
     ]).then(([s, t]) => {
-      setStats(s);
-      setTenants(t);
+      setStats(s as Stats);
+      setTenants(t as Tenant[]);
     }).finally(() => setLoading(false));
   }, []);
 
