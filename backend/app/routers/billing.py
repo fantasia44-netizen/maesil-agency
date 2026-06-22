@@ -111,6 +111,7 @@ def subscribe(body: SubscribeReq, ctx: TenantContext = Depends(require_tenant)) 
         ctx.tenant_id, bk, price,
         order_name=f"maesil-agency {plans.PLANS[body.plan]['name']} 구독",
         pg=sub.get("billing_key_pg") or "card",
+        customer={"customData": {"tenant_id": ctx.tenant_id}},
     )
     now = datetime.now(timezone.utc)
     if not res.get("success"):
@@ -139,9 +140,41 @@ def cancel(ctx: TenantContext = Depends(require_tenant)) -> dict:
     return {"ok": True, "message": "현재 기간 종료까지 사용 가능합니다."}
 
 
+@router.post("/retry")
+def retry_payment(ctx: TenantContext = Depends(require_tenant)) -> dict:
+    """past_due 상태 구독 재결제 시도."""
+    sub = plans.get_subscription(ctx.tenant_id)
+    if not sub:
+        raise HTTPException(400, "구독 정보 없음")
+    if sub.get("status") not in ("past_due", "active"):
+        raise HTTPException(400, "재결제 대상이 아닙니다")
+    bk = sub.get("billing_key")
+    amt = sub.get("amount") or 0
+    plan_key = sub.get("plan") or "starter"
+    if not bk or not amt:
+        raise HTTPException(400, "결제수단 또는 금액 정보 없음")
+    res = portone.charge_subscription(
+        ctx.tenant_id, bk, amt,
+        order_name=f"maesil-agency {plans.PLANS.get(plan_key, {}).get('name', plan_key)} 재결제",
+        pg=sub.get("billing_key_pg") or "card",
+    )
+    now = datetime.now(timezone.utc)
+    if not res.get("success"):
+        plans.upsert_subscription(ctx.tenant_id, {"status": "past_due", "last_error": res.get("error")})
+        raise HTTPException(402, f"결제 실패: {res.get('error')}")
+    plans.upsert_subscription(ctx.tenant_id, {
+        "status": "active", "last_error": None,
+        "current_period_start": now.isoformat(),
+        "current_period_end": (now + timedelta(days=30)).isoformat(),
+        "last_payment_id": res.get("payment_id"),
+    })
+    plans.set_tenant_plan(ctx.tenant_id, plan_key, "active")
+    return {"ok": True, "payment_id": res.get("payment_id")}
+
+
 @router.post("/webhook")
 async def webhook(request: Request) -> dict:
-    """PortOne 웹훅 — 서명 검증 + 멱등 처리(이벤트 기록)."""
+    """PortOne 웹훅 — 서명 검증 + 멱등 처리 + 구독 상태 반영."""
     body = await request.body()
     if not portone.verify_webhook(body, dict(request.headers)):
         raise HTTPException(401, "invalid signature")
@@ -150,14 +183,42 @@ async def webhook(request: Request) -> dict:
         data = _j.loads(body.decode("utf-8"))
     except Exception:
         data = {}
+
     event_id = request.headers.get("webhook-id") or request.headers.get("Webhook-Id") or ""
     if event_id:
         try:
-            # 중복 이벤트면 무시 (PK 충돌)
             _db().table("billing_events").insert({
                 "event_id": event_id, "kind": data.get("type"), "payload": data,
             }).execute()
         except Exception:
             return {"ok": True, "dedup": True}
-    logger.info("[billing] webhook %s", data.get("type"))
+
+    event_type = data.get("type") or ""
+    payment = data.get("data") or data.get("payment") or {}
+    custom_data = payment.get("customData") or payment.get("custom_data") or {}
+    tenant_id = (custom_data.get("tenant_id") or "").strip()
+
+    now = datetime.now(timezone.utc)
+
+    if event_type in ("Transaction.Paid", "transaction.paid") and tenant_id:
+        amt = (payment.get("amount") or {}).get("total") or payment.get("amount") or 0
+        plans.upsert_subscription(tenant_id, {
+            "status": "active", "last_error": None,
+            "current_period_start": now.isoformat(),
+            "current_period_end": (now + timedelta(days=30)).isoformat(),
+            "last_payment_id": payment.get("paymentId") or payment.get("payment_id") or "",
+        })
+        logger.info("[billing] webhook Paid tenant=%s amt=%s", tenant_id, amt)
+
+    elif event_type in ("Transaction.Failed", "transaction.failed") and tenant_id:
+        err = (payment.get("failureReason") or {}).get("message") or payment.get("message") or event_type
+        plans.upsert_subscription(tenant_id, {"status": "past_due", "last_error": err})
+        plans.set_tenant_plan(tenant_id, plans.get_subscription(tenant_id).get("plan") or "starter", "suspended")
+        logger.warning("[billing] webhook Failed tenant=%s err=%s", tenant_id, err)
+
+    elif event_type in ("BillingKey.Deleted", "billing_key.deleted") and tenant_id:
+        plans.upsert_subscription(tenant_id, {"billing_key": None, "status": "canceled"})
+        logger.info("[billing] webhook BillingKey.Deleted tenant=%s", tenant_id)
+
+    logger.info("[billing] webhook %s tenant=%s", event_type, tenant_id or "(unknown)")
     return {"ok": True}

@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 # plan key → 표시명/월요금(원)/한도
 PLANS: dict[str, dict] = {
     "starter": {"name": "스타터", "price": 49000,  "daily_cap_max": 50,  "lead_cap": 2000},
+    "growth":  {"name": "그로스", "price": 99000,  "daily_cap_max": 100, "lead_cap": 5000},
     "pro":     {"name": "프로",    "price": 149000, "daily_cap_max": 200, "lead_cap": 10000},
 }
 TRIAL = {"name": "무료체험", "price": 0, "daily_cap_max": 20, "lead_cap": 500}

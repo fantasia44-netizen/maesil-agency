@@ -70,7 +70,8 @@ def charge_subscription(tenant_id: str, billing_key: str, amount: int, order_nam
         "orderName": order_name,
         "amount": {"total": amount},
         "currency": "KRW",
-        "customer": customer or {},
+        "customer": {k: v for k, v in (customer or {}).items() if k != "customData"},
+        "customData": (customer or {}).get("customData"),
     }
     try:
         r = httpx.post(f"{_BASE}/payments/{payment_id}/billing-key", headers=_headers(), json=payload, timeout=15)

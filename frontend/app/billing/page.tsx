@@ -89,6 +89,16 @@ export default function BillingPage() {
     } catch (e) { flash(e instanceof Error ? e.message : "해지 실패"); }
   }
 
+  async function retryPayment() {
+    if (!confirm("재결제를 시도하시겠습니까?")) return;
+    setBusy(true);
+    try {
+      await apiFetch("/api/billing/retry", { method: "POST" }, 30000);
+      flash("재결제 성공!"); load();
+    } catch (e) { flash(e instanceof Error ? e.message : "재결제 실패"); }
+    finally { setBusy(false); }
+  }
+
   const sub = status?.subscription;
   const card: React.CSSProperties = { background: "#fff", border: "1px solid #eef2f0", borderRadius: 14, padding: "1.4rem 1.5rem", marginBottom: "1.2rem" };
 
@@ -119,7 +129,15 @@ export default function BillingPage() {
           {sub?.status === "active" && (
             <button onClick={cancelSub} style={{ padding: "0.55rem 1.1rem", borderRadius: 8, fontSize: "0.85rem", color: "#dc2626", background: "#fff", border: "1px solid #fecaca", cursor: "pointer" }}>구독 해지</button>
           )}
+          {sub?.status === "past_due" && (
+            <button disabled={busy} onClick={retryPayment} style={{ padding: "0.55rem 1.1rem", borderRadius: 8, fontSize: "0.85rem", fontWeight: 700, color: "#fff", background: "#dc2626", border: "none", cursor: "pointer" }}>🔄 재결제 시도</button>
+          )}
         </div>
+        {sub?.status === "past_due" && (
+          <div style={{ marginTop: 10, padding: "0.6rem 0.9rem", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, fontSize: "0.8rem", color: "#dc2626" }}>
+            ⚠️ 결제 실패 — 카드를 확인하고 재결제를 시도하세요. 서비스 이용이 일시 중단됩니다.
+          </div>
+        )}
         {!poCfg?.configured && <div style={{ marginTop: 10, fontSize: "0.78rem", color: "#b45309" }}>⚠️ 결제 시스템(PortOne) 미설정 — 관리자가 설정해야 결제됩니다.</div>}
       </div>
 
