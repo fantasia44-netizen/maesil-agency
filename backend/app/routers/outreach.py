@@ -929,10 +929,10 @@ def cold_drip_diagnostics(user: UserContext = Depends(get_current_user)) -> dict
 
     eligible_now = _lead_count(lambda q: q
         .in_("platform", plats).eq("status", "approved").in_("grade", grades)
-        .is_("emailed_at", "null").not_.is_("contact_email", "null"))
+        .is_("emailed_at", "null").not_.is_("contact_email", "null").neq("contact_email", ""))
     d_eligible = _lead_count(lambda q: q
         .in_("platform", plats).eq("status", "approved").in_("grade", ["D"])
-        .is_("emailed_at", "null").not_.is_("contact_email", "null"))
+        .is_("emailed_at", "null").not_.is_("contact_email", "null").neq("contact_email", ""))
     approved_total    = _lead_count(lambda q: q.eq("status", "approved"))
     approved_no_email = _lead_count(lambda q: q.eq("status", "approved").is_("contact_email", "null"))
     approved_unsent   = _lead_count(lambda q: q.eq("status", "approved").is_("emailed_at", "null"))
