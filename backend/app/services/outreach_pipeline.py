@@ -246,6 +246,23 @@ def run_platform_scan(tenant_id: str, platform: str) -> dict:
         if lead_id:
             leads_upserted += 1
             content_id_to_lead_id[item.content_id] = lead_id
+
+            # 이메일 없으면 채널 외부 링크 크롤링으로 이메일 수집 시도 (YouTube만)
+            if not contact.email and platform == "youtube":
+                try:
+                    from app.services.email_link_crawler import find_email_from_channel_links
+                    channel_id = item.platform_id  # YouTube channel ID
+                    crawled_email = find_email_from_channel_links(channel_id, "", delay=0.3)
+                    if crawled_email:
+                        contact.email = crawled_email
+                        _db().table("outreach_leads").update({
+                            "contact_email": crawled_email,
+                            "updated_at": datetime.now(timezone.utc).isoformat(),
+                        }).eq("tenant_id", tenant_id).eq("id", lead_id).execute()
+                        logger.info("[pipeline] 링크 크롤링 이메일 수집 [%s] → %s", item.handle_name, crawled_email)
+                except Exception as e:
+                    logger.debug("[pipeline] 링크 크롤링 실패 [%s]: %s", item.platform_id, e)
+
             # 터치포인트 예약 (A/S급만, email 있어야 의미 있음)
             if grade in ("S", "A") and contact.email:
                 _schedule_touchpoints(

@@ -65,6 +65,16 @@ async def _run_tenant_outreach_cycle(tenant_id: str, cycle: int, scan_dates: dic
     except Exception as e:
         logger.warning("[scheduler:%s] cold_drip 실패: %s", tag, e)
 
+    # 이메일 없는 리드 링크 크롤링 (10사이클마다 — 약 30분 간격, 최대 30건씩)
+    if cycle % 10 == 0:
+        try:
+            from app.services.email_link_crawler import bulk_crawl_missing_emails
+            crawl = await asyncio.to_thread(bulk_crawl_missing_emails, tenant_id, 30)
+            if crawl.get("found"):
+                logger.info("[scheduler:%s] 링크 크롤링 이메일 복구 %d건", tag, crawl["found"])
+        except Exception as e:
+            logger.warning("[scheduler:%s] 링크 크롤링 실패: %s", tag, e)
+
     # Gmail 회신 감시 (5사이클마다)
     if settings.enable_gmail_watcher and cycle % 5 == 0:
         try:
