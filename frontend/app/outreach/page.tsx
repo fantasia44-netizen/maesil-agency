@@ -293,7 +293,7 @@ export default function OutreachPage() {
         gates: { enabled: boolean; gmail_configured: boolean; now_kst: string; weekend: boolean;
                  business_hours: boolean; daily_cap: number; drip_grades: string; platforms: string[] };
         today: { scheduled_seq1: number; sent_seq1: number; room: number };
-        supply: { eligible_now: number; approved_total: number; approved_unsent: number;
+        supply: { eligible_now: number; d_eligible: number; approved_total: number; approved_unsent: number;
                   approved_no_email: number; approved_off_platform: number;
                   discovered_backlog: number; analyzing_backlog: number };
         hint: string;
@@ -311,7 +311,7 @@ export default function OutreachPage() {
         `■ 오늘: 예약 ${t.scheduled_seq1} · 발송 ${t.sent_seq1} / cap ${g.daily_cap} (여유 ${t.room})`,
         ``,
         `■ 공급 펀넬`,
-        `  지금 발송가능(eligible): ${s.eligible_now}  ← 이게 작으면 예약도 작음`,
+        `  S/A/B/C eligible: ${s.eligible_now}  D급 eligible: ${s.d_eligible}  ← 둘 다 0이면 리드 고갈`,
         `  approved 전체: ${s.approved_total} (미발송 ${s.approved_unsent})`,
         `  approved인데 이메일 없음: ${s.approved_no_email}`,
         `  approved인데 youtube/naver 아님: ${s.approved_off_platform}`,
@@ -322,7 +322,16 @@ export default function OutreachPage() {
         ``,
         `💡 ${d.hint}`,
       ].join("\n");
-      alert(msg);
+      const doSchedule = (s.eligible_now === 0 && s.d_eligible === 0)
+        ? false
+        : confirm(`${msg}\n\n지금 즉시 예약 실행할까요? (스케줄러 대기 없이 바로 적용)`);
+      if (doSchedule) {
+        const r = await apiFetch<{ scheduled?: number; skipped?: string }>("/api/outreach/cold-drip/schedule-now", { method: "POST" }, 30000);
+        showToast(r.scheduled ? `예약 완료: ${r.scheduled}건` : `스킵: ${r.skipped ?? "알 수 없음"}`, !!r.scheduled);
+        await loadTouchLogs();
+      } else {
+        alert(msg);
+      }
     } catch (e: unknown) {
       showToast(e instanceof Error ? e.message : "진단 실패", false);
     }

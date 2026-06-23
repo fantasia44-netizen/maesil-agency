@@ -865,6 +865,9 @@ def cold_drip_diagnostics(user: UserContext = Depends(get_current_user)) -> dict
     eligible_now = _lead_count(lambda q: q
         .in_("platform", plats).eq("status", "approved").in_("grade", grades)
         .is_("emailed_at", "null").not_.is_("contact_email", "null"))
+    d_eligible = _lead_count(lambda q: q
+        .in_("platform", plats).eq("status", "approved").in_("grade", ["D"])
+        .is_("emailed_at", "null").not_.is_("contact_email", "null"))
     approved_total    = _lead_count(lambda q: q.eq("status", "approved"))
     approved_no_email = _lead_count(lambda q: q.eq("status", "approved").is_("contact_email", "null"))
     approved_unsent   = _lead_count(lambda q: q.eq("status", "approved").is_("emailed_at", "null"))
@@ -908,7 +911,8 @@ def cold_drip_diagnostics(user: UserContext = Depends(get_current_user)) -> dict
             "room":           max(0, cfg.daily_cap - scheduled_today),
         },
         "supply": {
-            "eligible_now":       eligible_now,        # ← 지금 즉시 발송 가능한 리드 수
+            "eligible_now":       eligible_now,        # S/A/B/C급 지금 즉시 발송 가능한 리드 수
+            "d_eligible":         d_eligible,           # D급 fallback 발송가능 리드 수
             "approved_total":     approved_total,
             "approved_unsent":    approved_unsent,
             "approved_no_email":  approved_no_email,   # 승인됐지만 이메일 없어 발송 불가
@@ -917,11 +921,22 @@ def cold_drip_diagnostics(user: UserContext = Depends(get_current_user)) -> dict
             "analyzing_backlog":  analyzing_backlog,   # 분석 중/고착 가능
         },
         "hint": (
-            "eligible_now가 작고 discovered_backlog가 크면 → 분석 처리량 부족(auto_analyze 5/cycle). "
+            "eligible_now가 작고 d_eligible도 작으면 → 이메일 있는 approved 리드 고갈. "
+            "d_eligible이 큰데 scheduled_today가 0이면 → 스케줄러 미실행 또는 배포 확인. "
             "approved_no_email가 크면 → 연락처 수집 실패로 발송 불가. "
             "eligible_now가 큰데 scheduled_today가 작으면 → 스케줄러/배포 확인."
         ),
     }
+
+
+
+@router.post("/cold-drip/schedule-now")
+def cold_drip_schedule_now(user: UserContext = Depends(get_current_user)) -> dict:
+    """cold_drip 스케줄러를 즉시 수동 실행 (업무시간·주말 체크 무시)."""
+    from app.services.outreach_cold_drip import schedule_daily_cold_drip
+    tid = _require_tid(user)
+    result = schedule_daily_cold_drip(tid, force=True)
+    return result
 
 
 # ── 터치포인트 관리 ──────────────────────────────────────────────────

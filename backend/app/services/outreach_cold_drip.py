@@ -76,10 +76,11 @@ def _eligible_leads(tenant_id: str, cap: int, grades: list[str],
         return []
 
 
-def schedule_daily_cold_drip(tenant_id: str) -> dict:
+def schedule_daily_cold_drip(tenant_id: str, force: bool = False) -> dict:
     """
     오늘 발송 리스트를 outreach_touchpoints DB에 생성(테넌트 스코프 + 테넌트 설정).
     이미 오늘 일정이 있거나, 업무시간 전이거나, disabled면 스킵.
+    force=True면 업무시간·주말 체크 무시.
     반환: {"scheduled": N} 또는 {"skipped": reason}
     """
     from app.services.tenant_config import load_config
@@ -94,14 +95,15 @@ def schedule_daily_cold_drip(tenant_id: str) -> dict:
 
     tz = cfg.tz
     now_kst = datetime.now(tz)
-    if now_kst.weekday() >= 5:
-        return {"skipped": "weekend"}
-    start_h = cfg.send_start_hour
-    end_h = cfg.send_end_hour
-    if now_kst.hour < start_h:
-        return {"skipped": "before business hours"}
-    if now_kst.hour >= end_h:
-        return {"skipped": "after business hours"}
+    if not force:
+        if now_kst.weekday() >= 5:
+            return {"skipped": "weekend"}
+        start_h = cfg.send_start_hour
+        end_h = cfg.send_end_hour
+        if now_kst.hour < start_h:
+            return {"skipped": "before business hours"}
+        if now_kst.hour >= end_h:
+            return {"skipped": "after business hours"}
 
     # ── top-up 방식: 매 사이클 오늘 누적이 cap 미만이면 부족분만 추가 예약 ──
     # (8am 1회 스냅샷-잠금이 아니라, 분석이 새 approved 리드를 만들수록 그날 안에 cap까지 채움)
@@ -128,9 +130,10 @@ def schedule_daily_cold_drip(tenant_id: str) -> dict:
     if not leads:
         return {"skipped": "no eligible leads", "scheduled": 0, "today_total": already, "cap": cap}
 
-    # 지금 ~ end_h(테넌트 타임존) 남은 시간에 분산
+    # 지금 ~ send_end_hour(테넌트 타임존) 남은 시간에 분산
+    _end_h = cfg.send_end_hour
     today = now_kst.date()
-    end_dt = datetime(today.year, today.month, today.day, end_h, 0, 0, tzinfo=tz)
+    end_dt = datetime(today.year, today.month, today.day, _end_h, 0, 0, tzinfo=tz)
     remaining_sec = max(60, int((end_dt - now_kst).total_seconds()))
     n = len(leads)
     gap_sec = remaining_sec / n if n > 1 else 0
