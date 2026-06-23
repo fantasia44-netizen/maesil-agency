@@ -157,7 +157,7 @@ def translate_result_to_korean(texts: list[str], source_lang: str, anthropic_key
 def run_brand_discovery(brand_id: str, anthropic_key: str) -> dict:
     """브랜드 ID 기준으로 전체 발굴 파이프라인 실행."""
     from app.db.maesil_total_client import get_maesil_total_client
-    from app.services.buyer_scanner import scrape_ec21_buyers, scrape_tradekey_buyers
+    from app.services.buyer_scanner import _scan_ai
     from datetime import datetime, timezone
 
     db = get_maesil_total_client().schema("agent_work")
@@ -202,13 +202,10 @@ def run_brand_discovery(brand_id: str, anthropic_key: str) -> dict:
             except Exception:
                 kw_id = None
 
-            # 3. 현지어 키워드로 검색
+            # 3. 현지어 키워드로 AI 발굴 + 웹사이트 검증
             local_kw = t["keyword_local"]
-            buyers: list[dict] = []
-            buyers.extend(scrape_ec21_buyers(local_kw, country, limit=20))
-            time.sleep(1)
-            buyers.extend(scrape_tradekey_buyers(local_kw, country, limit=15))
-            time.sleep(1)
+            buyers: list[dict] = _scan_ai(local_kw, country, 15, anthropic_key)
+            time.sleep(0.5)
 
             if not buyers:
                 continue

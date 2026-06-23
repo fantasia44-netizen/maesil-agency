@@ -195,9 +195,9 @@ export default function BuyersPage() {
     try {
       const d: any = await apiFetch("/api/buyers/scan", {
         method: "POST",
-        body: JSON.stringify({ keywords, countries: scanCountries.length ? scanCountries : null, limit_per_source: 30 }),
+        body: JSON.stringify({ keywords, countries: scanCountries.length ? scanCountries : null, sources: ["ai", "importyeti"], limit_per_source: 20 }),
       });
-      setScanResult(`발굴 완료: ${d.inserted || 0}건 저장 / ${d.unique || 0}건 고유 / ${d.total_found || 0}건 수집`);
+      setScanResult(`발굴 완료: ${d.inserted || 0}건 저장 (이메일 ${d.with_email || 0}건) / 고유 ${d.unique || 0} / 수집 ${d.total_found || 0}`);
       load();
     } catch { setScanResult("스캔 실패"); }
     setScanning(false);
@@ -250,7 +250,11 @@ export default function BuyersPage() {
       {showScan && (
         <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 10, padding: "1.25rem", marginBottom: "1.25rem" }}>
           <div style={{ fontWeight: 600, fontSize: "0.9rem", marginBottom: "0.5rem", color: "#1e40af" }}>
-            🔍 무료 바이어 자동 발굴 (EC21 · TradeKey · Europages · ExportHub)
+            🔍 AI 바이어 자동 발굴 (Claude 후보생성 + 웹사이트 실검증 + ImportYeti 미국통관)
+          </div>
+          <div style={{ fontSize: "0.72rem", color: "#64748b", marginBottom: "0.6rem", lineHeight: 1.5 }}>
+            Claude가 키워드·국가별 실제 수입상/유통사를 찾고, 각 회사 웹사이트를 직접 크롤링해
+            존재 여부 검증 + 연락처 이메일을 자동 추출합니다. (별도 API 키 불필요)
           </div>
           <div style={{ marginBottom: "0.75rem" }}>
             <div style={{ fontSize: "0.75rem", color: "#64748b", marginBottom: 4 }}>검색 키워드 (쉼표 구분)</div>
