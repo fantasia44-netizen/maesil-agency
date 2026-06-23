@@ -502,6 +502,22 @@ export default function OutreachPage() {
           >
             📧 이메일 재추출
           </button>
+          <button
+            className="btn"
+            onClick={async () => {
+              if (!confirm("이메일 없는 유튜브 리드 최대 200건의 외부 링크(블로그·카페·링크트리 등)를 크롤링합니다.\n수 분 소요됩니다. 시작할까요?")) return;
+              try {
+                const r = await apiFetch<{ ok: boolean; message: string }>("/api/outreach/leads/crawl-emails", { method: "POST" }, 30000);
+                showToast(`🔗 ${r.message}`, true);
+              } catch (e: unknown) {
+                showToast(e instanceof Error ? e.message : "링크 크롤링 실패", false);
+              }
+            }}
+            style={{ fontSize: "0.82rem", padding: "6px 14px", borderColor: "#0369a1", color: "#0369a1" }}
+            title="유튜버 채널 외부 링크(블로그·카페·링크트리) 크롤링해 이메일 수집"
+          >
+            🔗 링크 크롤링
+          </button>
         </div>
       </div>
 

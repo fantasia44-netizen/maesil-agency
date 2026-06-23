@@ -267,6 +267,26 @@ def trigger_batch_analysis(
     return {"ok": True, "queued": len(ids), "message": f"{len(ids)}건 일괄 분석 시작됨 (백그라운드){reanalyze_note}"}
 
 
+@router.post("/leads/crawl-emails")
+def crawl_emails_from_links(
+    limit: int = 200,
+    user: UserContext = Depends(get_current_user),
+) -> dict:
+    """이메일 없는 YouTube 리드의 채널 외부 링크(블로그·카페·링크트리 등) 크롤링해 이메일 추출.
+    백그라운드 실행. 완료 시 로그에서 확인.
+    """
+    import threading
+    tid = _require_tid(user)
+
+    def _run():
+        from app.services.email_link_crawler import bulk_crawl_missing_emails
+        result = bulk_crawl_missing_emails(tid, limit=limit)
+        logger.info("[crawl-emails] 결과: %s", result)
+
+    threading.Thread(target=_run, daemon=True).start()
+    return {"ok": True, "message": f"최대 {limit}건 크롤링 시작 (백그라운드). 수 분 소요."}
+
+
 @router.post("/leads/reextract-emails")
 def reextract_emails(
     limit: int = 2000,
