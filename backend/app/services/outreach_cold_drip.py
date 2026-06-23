@@ -66,6 +66,7 @@ def _eligible_leads(tenant_id: str, cap: int, grades: list[str],
             .in_("grade", grades)
             .is_("emailed_at", "null")
             .not_.is_("contact_email", "null")
+            .neq("contact_email", "")
             .order("score", desc=True)
             .limit(cap)
             .execute()
