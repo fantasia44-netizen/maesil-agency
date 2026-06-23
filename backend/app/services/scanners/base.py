@@ -59,6 +59,12 @@ class ContentItem:
 # ── 연락처 추출 (공통) ────────────────────────────────────────────────
 
 _EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}")
+# 오브퍼스케이트 이메일: "abc at gmail dot com", "abc[at]naver[dot]com", "abc(at)daum(dot)net"
+_EMAIL_OBFUSCATED_RE = re.compile(
+    r"([a-zA-Z0-9._%+\-]+)\s*[\[\(]?\s*(?:at|@)\s*[\]\)]?\s*"
+    r"([a-zA-Z0-9.\-]+)\s*[\[\(]?\s*(?:dot|\.)\s*[\]\)]?\s*([a-zA-Z]{2,})",
+    re.IGNORECASE,
+)
 _CAFE_RE = re.compile(r"https?://cafe\.naver\.com/[^\s\"'<>]+")
 _KAKAO_CHANNEL_RE = re.compile(r"https?://(?:pf|ch)\.kakao\.com/[^\s\"'<>]+")
 _KAKAO_OPENCHAT_RE = re.compile(r"https?://open\.kakao\.com/[^\s\"'<>]+")
@@ -74,6 +80,10 @@ def extract_contact(text: str) -> ContactInfo:
     m = _EMAIL_RE.search(text)
     if m:
         info.email = m.group(0)
+    else:
+        m2 = _EMAIL_OBFUSCATED_RE.search(text)
+        if m2:
+            info.email = f"{m2.group(1)}@{m2.group(2)}.{m2.group(3)}"
 
     m = _CAFE_RE.search(text)
     if m:

@@ -487,6 +487,21 @@ export default function OutreachPage() {
           >
             🔍 발송 진단
           </button>
+          <button
+            className="btn"
+            onClick={async () => {
+              try {
+                const r = await apiFetch<{ queued: number; message: string }>("/api/outreach/leads/reextract-emails", { method: "POST" }, 30000);
+                showToast(`📧 ${r.message}`, true);
+              } catch (e: unknown) {
+                showToast(e instanceof Error ? e.message : "이메일 재추출 실패", false);
+              }
+            }}
+            style={{ fontSize: "0.82rem", padding: "6px 14px", borderColor: "#7c3aed", color: "#7c3aed" }}
+            title="이메일 없는 리드의 저장된 텍스트에서 이메일 재파싱 (오브퍼스케이트 포함)"
+          >
+            📧 이메일 재추출
+          </button>
         </div>
       </div>
 

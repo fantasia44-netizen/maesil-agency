@@ -267,6 +267,51 @@ def trigger_batch_analysis(
     return {"ok": True, "queued": len(ids), "message": f"{len(ids)}건 일괄 분석 시작됨 (백그라운드){reanalyze_note}"}
 
 
+@router.post("/leads/reextract-emails")
+def reextract_emails(
+    limit: int = 2000,
+    user: UserContext = Depends(get_current_user),
+) -> dict:
+    """이메일 없는 approved 리드의 raw_contact_text를 재파싱해 이메일 추출.
+    오브퍼스케이트 패턴 개선 등 이후 기존 리드 소급 적용에 사용.
+    """
+    import threading
+    tid = _require_tid(user)
+    resp = (
+        _db().table("outreach_leads")
+        .select("id, raw_contact_text")
+        .eq("tenant_id", tid)
+        .is_("contact_email", "null")
+        .not_.is_("raw_contact_text", "null")
+        .in_("status", ["approved", "discovered", "analyzing", "draft_ready"])
+        .limit(limit)
+        .execute()
+    )
+    rows = resp.data or []
+
+    def _run():
+        from app.services.scanners.base import extract_contact
+        updated = 0
+        for r in rows:
+            txt = r.get("raw_contact_text") or ""
+            if not txt:
+                continue
+            contact = extract_contact(txt)
+            if contact.email:
+                try:
+                    _db().table("outreach_leads").update({
+                        "contact_email": contact.email,
+                        "updated_at": datetime.now(timezone.utc).isoformat(),
+                    }).eq("tenant_id", tid).eq("id", r["id"]).execute()
+                    updated += 1
+                except Exception as e:
+                    logger.warning("reextract email 업데이트 실패 [%s]: %s", r["id"], e)
+        logger.info("[reextract-emails] %d/%d건 이메일 복구 완료", updated, len(rows))
+
+    threading.Thread(target=_run, daemon=True).start()
+    return {"ok": True, "queued": len(rows), "message": f"{len(rows)}건 재추출 시작 (백그라운드)"}
+
+
 @router.post("/leads/rescore")
 def trigger_rescore(
     limit: int = 2000,

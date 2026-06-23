@@ -251,8 +251,8 @@ class YouTubeScanner(BaseScanner):
             batch = unique[i:i+50]
             try:
                 resp = self._yt.channels().list(
-                    id=",".join(batch), part="snippet,statistics",
-                    fields="items(id,snippet(description,customUrl),statistics(subscriberCount))",
+                    id=",".join(batch), part="snippet,statistics,brandingSettings",
+                    fields="items(id,snippet(description,customUrl),statistics(subscriberCount),brandingSettings(channel(description,keywords)))",
                 ).execute()
             except Exception as e:
                 logger.warning("channels.list 실패: %s", e)
@@ -261,10 +261,11 @@ class YouTubeScanner(BaseScanner):
                 cid = item["id"]
                 sn = item.get("snippet", {})
                 cu = sn.get("customUrl", "")
+                bs_desc = (item.get("brandingSettings") or {}).get("channel", {}).get("description", "")
                 result[cid] = {
                     "subscriber_count": int(item.get("statistics", {}).get("subscriberCount", 0) or 0),
                     "channel_url": f"https://www.youtube.com/{cu}" if cu else f"https://www.youtube.com/channel/{cid}",
-                    "description": sn.get("description", "")[:2000],
+                    "description": sn.get("description", "")[:2000] + " " + bs_desc[:1000],
                 }
         return result
 
