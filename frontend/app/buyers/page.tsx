@@ -218,7 +218,17 @@ export default function BuyersPage() {
       method: "POST", headers: { Authorization: `Bearer ${token}` }, body: fd,
     });
     const d = await resp.json();
-    alert(`${d.inserted}건 업로드 완료`);
+    if (!resp.ok) {
+      alert(`업로드 실패: ${d.detail || "형식 확인"}`);
+    } else {
+      const mapped = Object.entries(d.column_mapping || {}).map(([k, v]) => `${k}→${v}`).join(", ");
+      alert(
+        `✅ ${d.inserted}건 등록 완료\n` +
+        `(중복 제외 ${d.duplicates_skipped || 0} · 회사명없음 ${d.rows_no_company || 0} · 전체 ${d.total_rows || 0}행)\n\n` +
+        `자동 인식된 컬럼:\n${mapped || "(없음)"}` +
+        (d.notes_columns?.length ? `\n메모로 보존: ${d.notes_columns.join(", ")}` : "")
+      );
+    }
     load();
     if (fileRef.current) fileRef.current.value = "";
   }
@@ -234,8 +244,8 @@ export default function BuyersPage() {
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <label style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", cursor: "pointer", fontSize: "0.875rem", color: "#374151" }}>
-            CSV 업로드
-            <input ref={fileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={uploadCsv} />
+            엑셀/CSV 업로드
+            <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" style={{ display: "none" }} onChange={uploadCsv} />
           </label>
           <button onClick={() => setShowScan(v => !v)} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid #2563eb", background: "#eff6ff", color: "#2563eb", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}>
             🔍 자동 발굴
@@ -338,8 +348,9 @@ export default function BuyersPage() {
         </div>
       )}
 
-      <div style={{ fontSize: "0.75rem", color: "#94a3b8", marginBottom: "1rem" }}>
-        CSV 컬럼: company_name, country, contact_name, contact_email, contact_title, industry, product_interest
+      <div style={{ fontSize: "0.75rem", color: "#94a3b8", marginBottom: "1rem", lineHeight: 1.5 }}>
+        📂 aT BMS · KOTRA · KITA에서 받은 엑셀/CSV를 <b>컬럼명 그대로</b> 올리면 자동 인식됩니다
+        (업체명·회사명·company → 회사명, 이메일·email → 이메일, 취급품목 → 관심제품 등 · 한글 인코딩 자동)
       </div>
 
       {/* 바이어 테이블 */}

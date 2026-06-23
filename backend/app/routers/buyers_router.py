@@ -89,36 +89,61 @@ async def import_csv(
     file: UploadFile = File(...),
     user: UserContext = Depends(_require_admin),
 ) -> dict:
-    """CSV 컬럼: company_name, country, contact_name, contact_email, contact_title, industry, product_interest"""
+    """엑셀(.xlsx/.xls)·CSV 유연 임포트 — 컬럼명 한글/영문 자동 인식.
+
+    aT BMS / KOTRA / KITA 등에서 받은 파일을 컬럼명 그대로 업로드 가능.
+    (업체명/회사명/company → company_name, 이메일/email → contact_email 등)
+    """
+    from app.services.buyer_import import parse_buyer_file
+
     content = await file.read()
-    text = content.decode("utf-8-sig")
-    reader = csv.DictReader(io.StringIO(text))
-    rows = []
-    now = datetime.now(timezone.utc).isoformat()
-    for row in reader:
-        if not row.get("company_name"):
-            continue
-        rows.append({
-            "company_name": row.get("company_name", "").strip(),
-            "country": row.get("country", "").strip(),
-            "contact_name": row.get("contact_name", "").strip() or None,
-            "contact_email": row.get("contact_email", "").strip() or None,
-            "contact_title": row.get("contact_title", "").strip() or None,
-            "industry": row.get("industry", "").strip() or None,
-            "product_interest": row.get("product_interest", "").strip() or None,
-            "source": "csv",
-            "status": "discovered",
-            "created_at": now,
-            "updated_at": now,
-        })
+    try:
+        parsed = parse_buyer_file(file.filename or "", content)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        logger.warning("[buyers/import] 파싱 실패: %s", e)
+        raise HTTPException(400, f"파일 처리 실패: {e}")
+
+    rows = parsed["rows"]
     if not rows:
-        raise HTTPException(400, "유효한 행 없음 (company_name 필수)")
+        raise HTTPException(400, "유효한 행 없음 (회사명이 있는 행이 없습니다)")
+
+    # 기존 회사명(+국가) 적재 — 중복 삽입 방지
+    existing: set[str] = set()
+    try:
+        ex = _db().table("buyer_leads").select("company_name, country").limit(5000).execute().data or []
+        for r in ex:
+            existing.add(f"{(r.get('company_name') or '').lower().strip()}::{(r.get('country') or '').lower().strip()}")
+    except Exception:
+        pass
+
+    now = datetime.now(timezone.utc).isoformat()
+    to_insert = []
+    dup = 0
+    seen = set(existing)
+    for r in rows:
+        key = f"{r['company_name'].lower().strip()}::{(r.get('country') or '').lower().strip()}"
+        if key in seen:
+            dup += 1
+            continue
+        seen.add(key)
+        to_insert.append({**r, "source": "import", "status": "discovered",
+                          "created_at": now, "updated_at": now})
 
     inserted = 0
-    for i in range(0, len(rows), 100):
-        _db().table("buyer_leads").insert(rows[i:i+100]).execute()
-        inserted += len(rows[i:i+100])
-    return {"inserted": inserted}
+    for i in range(0, len(to_insert), 100):
+        _db().table("buyer_leads").insert(to_insert[i:i+100]).execute()
+        inserted += len(to_insert[i:i+100])
+
+    return {
+        "inserted": inserted,
+        "duplicates_skipped": dup,
+        "rows_no_company": parsed["skipped_no_company"],
+        "column_mapping": parsed["mapping"],
+        "notes_columns": parsed["notes_columns"],
+        "total_rows": len(rows),
+    }
 
 
 class BuyerPatch(BaseModel):
