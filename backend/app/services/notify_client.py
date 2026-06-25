@@ -23,7 +23,7 @@ class NotifyError(RuntimeError):
     pass
 
 
-def send_email(to: str, subject: str, html: str, source: str = SOURCE, timeout: float = 10.0) -> dict:
+def send_email(to: str, subject: str, html: str, source: str = SOURCE, timeout: float = 30.0) -> dict:
     """maesil-insight 메일 게이트웨이로 단일 수신자 메일 발송.
 
     Returns: { ok: bool, id: str | None, status: int, error: str | None }
