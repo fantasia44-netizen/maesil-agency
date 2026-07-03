@@ -123,14 +123,12 @@ def _escalate_if_needed(program_name: str, current_status: str) -> bool:
     if current_status not in ("down", "degraded"):
         return False
 
-    # 최근 N건 확인 (현재 포함 N-1건 이전)
+    # 최근 N건 확인 — 현재 사이클 row는 호출 전에 이미 INSERT됨 (recent[0] = 현재)
+    # current_status를 다시 앞에 붙이면 이중집계되어 N-1사이클 만에 발행되므로 recent만 검사
     recent = _recent_health(program_name, _ESCALATE_CONSECUTIVE)
-    # 이전 기록이 부족하면 스킵
-    if len(recent) < _ESCALATE_CONSECUTIVE - 1:
+    if len(recent) < _ESCALATE_CONSECUTIVE:
         return False
-    # 현재 + 이전 N-1건 모두 down/degraded이어야 에스컬레이션
-    combined = [current_status] + recent[:_ESCALATE_CONSECUTIVE - 1]
-    if not all(s in ("down", "degraded") for s in combined):
+    if not all(s in ("down", "degraded") for s in recent):
         return False
 
     # 쿨다운 확인 — 최근 N분 내 동일 프로그램 critical 이미 발행했으면 스킵
@@ -162,7 +160,7 @@ def _escalate_if_needed(program_name: str, current_status: str) -> bool:
             "message":      (
                 f"{program_name}의 헬스체크가 {_ESCALATE_CONSECUTIVE}사이클 연속 "
                 f"{'down' if current_status == 'down' else 'degraded'} 상태입니다.\n"
-                f"최근 상태 이력: {combined}\n"
+                f"최근 상태 이력: {recent}\n"
                 f"Render 대시보드 또는 로그를 확인하세요."
             ),
             "created_at":   datetime.now(timezone.utc).isoformat(),

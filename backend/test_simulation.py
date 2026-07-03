@@ -154,31 +154,31 @@ section("3. program_health - escalation 로직")
 ESCALATE_CONSECUTIVE = 3
 
 def can_escalate(current, recent, cooldown=False):
+    # recent = INSERT 후 조회한 최근 N건 (recent[0] = 현재 사이클)
     if current not in ("down","degraded"):
         return False
-    if len(recent) < ESCALATE_CONSECUTIVE - 1:
+    if len(recent) < ESCALATE_CONSECUTIVE:
         return False
-    combined = [current] + list(recent[:ESCALATE_CONSECUTIVE - 1])
-    if not all(s in ("down","degraded") for s in combined):
+    if not all(s in ("down","degraded") for s in recent):
         return False
     if cooldown:
         return False
     return True
 
 check("3사이클 down -> escalate",
-      can_escalate("down", ["down","down"]), True)
+      can_escalate("down", ["down","down","down"]), True)
 check("3사이클 degraded -> escalate",
-      can_escalate("degraded", ["degraded","degraded"]), True)
+      can_escalate("degraded", ["degraded","degraded","degraded"]), True)
 check("down+degraded 혼합 -> escalate",
-      can_escalate("down", ["degraded","down"]), True)
-check("기록 1건뿐 -> no escalate",
-      can_escalate("down", ["down"]), False)
+      can_escalate("down", ["down","degraded","down"]), True)
+check("2사이클 down뿐 -> no escalate (이중집계 버그 회귀 방지)",
+      can_escalate("down", ["down","down"]), False)
 check("중간에 up 있음 -> no escalate",
-      can_escalate("down", ["up","down"]), False)
+      can_escalate("down", ["down","up","down"]), False)
 check("현재 up -> no escalate",
-      can_escalate("up", ["down","down"]), False)
+      can_escalate("up", ["up","down","down"]), False)
 check("쿨다운 중 -> no escalate",
-      can_escalate("down", ["down","down"], cooldown=True), False)
+      can_escalate("down", ["down","down","down"], cooldown=True), False)
 check("기록 없음 -> no escalate",
       can_escalate("down", []), False)
 
@@ -275,7 +275,7 @@ section("7. 통합 시나리오 — alert 발생부터 escalation까지")
 # ════════════════════════════════════════════════════════
 
 # 시나리오: maesil-sync-worker가 3사이클 연속 down
-health_history = ["down", "down"]  # 이전 2사이클
+health_history = ["down", "down", "down"]  # 현재 포함 3사이클 (INSERT 후 조회)
 current = "down"
 
 # Step 1: escalation 조건 충족?
