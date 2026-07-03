@@ -378,3 +378,13 @@ maesil-agency/
 - 개발 에이전트는 첫 번째 파일만 읽음 (컨텍스트 크기 관리)
 - GitHub PR은 base 브랜치로만 생성 (main 직접 푸시 없음)
 - `inspect_insight.py` 파일은 백엔드 루트에 존재하지만 production 코드 미포함
+
+---
+
+## 헬스모니터 escalation 오프바이원 수정 (2026-07-04, a943758)
+
+- `backend/app/services/program_health.py` `_escalate_if_needed`: 현재 사이클 row를 INSERT한 **뒤** `_recent_health`를 조회하므로 결과에 현재가 이미 포함되는데, `current_status`를 다시 앞에 붙여 이중집계 → **실제 2사이클 연속 down만으로 "3사이클 연속 다운" critical alert 오발행**.
+- 실사례: 7/3 20:28 KST maesil-total 알림 — 실제 이력 up→down→down (2사이클, 3분 만에 자동회복)이었는데 3사이클로 발행됨.
+- 수정: recent N건(현재 포함)만 검사. `test_simulation.py` 케이스 동기화, 55/55 PASS.
+- ⚠️ 부수 교훈: alert의 "AI 에러 분석"이 무관한 로컬 조사 스크립트(_check_*.py)를 구문오류로 지목했으나 전부 오진(py_compile 정상). AI 분석의 원인추정은 반드시 재검증 후 조치할 것.
+- 참고: maesil-total 헬스체크 URL = https://autotool.onrender.com (registry: agent_work.program_registry). 경량 /healthz, 상세 /health 엔드포인트 존재.
