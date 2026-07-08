@@ -155,8 +155,14 @@ def schedule_daily_cold_drip(tenant_id: str, force: bool = False) -> dict:
     chunk = 50
     for i in range(0, len(records), chunk):
         try:
-            _db().table("outreach_touchpoints").insert(records[i:i+chunk]).execute()
-            inserted += len(records[i:i+chunk])
+            # upsert + 중복 무시: 전날 seq=1 터치포인트가 남은 리드가 후보에 다시 잡혀도
+            # 23505 대신 조용히 건너뛰고, 나머지 행은 정상 삽입 (Postgres 로그 소음 방지)
+            resp = _db().table("outreach_touchpoints").upsert(
+                records[i:i+chunk],
+                on_conflict="lead_id,touch_sequence",
+                ignore_duplicates=True,
+            ).execute()
+            inserted += len(resp.data or [])
         except Exception as e:
             logger.error("cold drip 예약 삽입 실패 (chunk %d): %s", i, e)
 

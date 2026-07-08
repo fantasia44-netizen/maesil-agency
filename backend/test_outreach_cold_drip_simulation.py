@@ -71,6 +71,8 @@ class FakeQuery:
     def order(self, c, desc=False): self.order_col = c; self.order_desc = desc; return self
     def limit(self, n): self.limit_n = n; return self
     def insert(self, p): self.op = ("insert", p); return self
+    def upsert(self, p, on_conflict="", ignore_duplicates=False):
+        self.op = ("upsert", (p, on_conflict, ignore_duplicates)); return self
     def update(self, p): self.op = ("update", p); return self
     def delete(self): self.op = ("delete", None); return self
 
@@ -100,6 +102,26 @@ class FakeQuery:
                         it["id"] = f"tp{self.store.seq}"
                     rows.append(it)
                 return FakeResp(items)
+            if kind == "upsert":
+                payload, on_conflict, ignore_dup = payload
+                items = payload if isinstance(payload, list) else [payload]
+                cols = [c.strip() for c in on_conflict.split(",") if c.strip()]
+                written = []
+                for it in items:
+                    it = dict(it)
+                    dup = next((r for r in rows if cols and all(r.get(c) == it.get(c) for c in cols)), None)
+                    if dup is not None:
+                        if ignore_dup:
+                            continue  # ON CONFLICT DO NOTHING
+                        dup.update(it)
+                        written.append(dict(dup))
+                        continue
+                    if "id" not in it:
+                        self.store.seq += 1
+                        it["id"] = f"tp{self.store.seq}"
+                    rows.append(it)
+                    written.append(dict(it))
+                return FakeResp(written)
             if kind == "update":
                 m = [r for r in rows if self._match(r)]
                 for r in m:

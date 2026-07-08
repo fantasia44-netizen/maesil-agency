@@ -264,7 +264,9 @@ def _insert_event(program_name: str, severity: str, title: str, message: str, ra
     """dedup_key 충돌이면 무시. 새로 들어가면 True."""
     dedup_key = make_dedup_key(program_name, message)
     try:
-        _events_table().insert(
+        # upsert + 중복 무시(ON CONFLICT DO NOTHING) — insert 후 23505를 삼키는 방식은
+        # Postgres 로그에 에러가 남아 대시보드를 오염시킴 (SQL 054 전제: dedup 인덱스 non-partial)
+        resp = _events_table().upsert(
             {
                 "program_name": program_name,
                 "severity": severity,
@@ -273,9 +275,11 @@ def _insert_event(program_name: str, severity: str, title: str, message: str, ra
                 "message": message[:4000],
                 "dedup_key": dedup_key,
                 "raw": raw or {},
-            }
+            },
+            on_conflict="dedup_key",
+            ignore_duplicates=True,
         ).execute()
-        return True
+        return bool(resp.data)
     except Exception as e:
         # unique 충돌 등은 무시
         msg = str(e).lower()

@@ -108,8 +108,9 @@ def _schedule_touchpoints(tenant_id: str, lead_id: str, has_email: bool,
     if not rows:
         return
     try:
+        # ignore_duplicates: 경합 시 기존 터치포인트(status/sent_at)를 pending으로 덮어쓰지 않음
         _db().table("outreach_touchpoints").upsert(
-            rows, on_conflict="lead_id,touch_sequence"
+            rows, on_conflict="lead_id,touch_sequence", ignore_duplicates=True
         ).execute()
     except Exception as e:
         logger.warning("touchpoints 예약 실패 [%s]: %s", lead_id, e)
