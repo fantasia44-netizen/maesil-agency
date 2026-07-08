@@ -262,28 +262,34 @@ def _upsert_cursor(program_name: str, last_seen_at: datetime, error: str | None 
 
 def _insert_event(program_name: str, severity: str, title: str, message: str, raw: dict) -> bool:
     """dedup_key 충돌이면 무시. 새로 들어가면 True."""
-    dedup_key = make_dedup_key(program_name, message)
+    row = {
+        "program_name": program_name,
+        "severity": severity,
+        "source": "render-logs",
+        "title": title,
+        "message": message[:4000],
+        "dedup_key": make_dedup_key(program_name, message),
+        "raw": raw or {},
+    }
     try:
         # upsert + 중복 무시(ON CONFLICT DO NOTHING) — insert 후 23505를 삼키는 방식은
         # Postgres 로그에 에러가 남아 대시보드를 오염시킴 (SQL 054 전제: dedup 인덱스 non-partial)
         resp = _events_table().upsert(
-            {
-                "program_name": program_name,
-                "severity": severity,
-                "source": "render-logs",
-                "title": title,
-                "message": message[:4000],
-                "dedup_key": dedup_key,
-                "raw": raw or {},
-            },
-            on_conflict="dedup_key",
-            ignore_duplicates=True,
+            row, on_conflict="dedup_key", ignore_duplicates=True
         ).execute()
         return bool(resp.data)
     except Exception as e:
-        # unique 충돌 등은 무시
         msg = str(e).lower()
-        if "duplicate" in msg or "unique" in msg or "23505" in msg:
+        # SQL 054 미실행(partial 인덱스는 ON CONFLICT 추론 불가, 42P10) → 구방식 insert 폴백
+        if "42p10" in msg or "no unique or exclusion constraint" in msg:
+            try:
+                _events_table().insert(row).execute()
+                return True
+            except Exception as e2:
+                msg = str(e2).lower()
+                e = e2
+        # unique 충돌 등은 무시
+        if "duplicate" in msg or "23505" in msg:
             return False
         logger.warning("alert_events insert error: %s", e)
         return False

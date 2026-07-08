@@ -149,8 +149,7 @@ def detect_and_report_bug(
         import hashlib
         dedup_src = f"cs-bug:{program}:{user_message[:100]}"
         dedup_key = "cs:" + hashlib.sha256(dedup_src.encode()).hexdigest()[:16]
-        # upsert + 중복 무시 — dedup 충돌 시 23505가 Postgres 로그에 남지 않도록 (SQL 054 전제)
-        resp = get_maesil_total_client().schema("agent_work").table("alert_events").upsert({
+        row = {
             "program_name": program,
             "severity": "warning",
             "source": "cs-report",
@@ -162,9 +161,19 @@ def detect_and_report_bug(
             ),
             "dedup_key": dedup_key,
             "raw": {"conversation_id": conversation_id, "source": "maeyo_cs"},
-        }, on_conflict="dedup_key", ignore_duplicates=True).execute()
-        if not resp.data:
-            return False  # 이미 동일 dedup_key alert 존재
+        }
+        tbl = get_maesil_total_client().schema("agent_work").table("alert_events")
+        try:
+            # upsert + 중복 무시 — dedup 충돌 시 23505가 Postgres 로그에 남지 않도록 (SQL 054 전제)
+            resp = tbl.upsert(row, on_conflict="dedup_key", ignore_duplicates=True).execute()
+            if not resp.data:
+                return False  # 이미 동일 dedup_key alert 존재
+        except Exception as e:
+            m = str(e).lower()
+            if "42p10" not in m and "no unique or exclusion constraint" not in m:
+                raise
+            # SQL 054 미실행 폴백 — 구방식 insert (23505는 바깥 except가 처리)
+            tbl.insert(row).execute()
         logger.info("CS 버그 신호 alert 생성 [%s]: %s", program, user_message[:60])
         return True
     except Exception as e:
