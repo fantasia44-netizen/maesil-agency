@@ -25,7 +25,7 @@ def get_latest_video_title(channel_id: str | None) -> str | None:
         if not key:
             return None
         from app.services.scanners.youtube_scanner import YouTubeScanner
-        vids = YouTubeScanner(key).fetch_recent_videos(channel_id, max_results=1)
+        vids = YouTubeScanner([key]).fetch_recent_videos(channel_id, max_results=1)
         return (vids[0].get("title") or None) if vids else None
     except Exception as e:
         logger.warning("get_latest_video_title 실패 [%s]: %s", channel_id, e)

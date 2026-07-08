@@ -53,7 +53,7 @@ def _get_latest_relevant_video(lead: dict) -> dict | None:
 
     try:
         from app.services.scanners.youtube_scanner import YouTubeScanner
-        scanner = YouTubeScanner(api_key)
+        scanner = YouTubeScanner([api_key])
         videos = scanner.fetch_recent_videos(channel_id, max_results=10)
     except Exception as e:
         logger.warning("최신 영상 조회 실패 [%s]: %s", channel_id, e)
