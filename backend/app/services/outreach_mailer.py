@@ -320,6 +320,13 @@ def send_single(tenant_id: str, lead_id: str) -> dict:
     if not to:
         return {"ok": False, "error": "이메일 주소 없음"}
 
+    # 비실재 도메인 반송(bounce) 방지 — 발신 평판 보호
+    from app.services.email_validation import validate_email_for_send
+    ok_email, why = validate_email_for_send(to)
+    if not ok_email:
+        logger.warning("outreach_mailer: 비실재 이메일 발송 차단 [%s] %s (%s)", lead_id, to, why)
+        return {"ok": False, "error": f"비실재 이메일({why})", "bad_email": True}
+
     # 수신거부/차단 목록 발송 전 차단 (테넌트 스코프)
     from app.services.outreach_suppression import is_suppressed
     if is_suppressed(tenant_id, to):

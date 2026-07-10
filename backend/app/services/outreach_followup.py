@@ -121,15 +121,37 @@ def _update_lead_touch_summary(lead_id: str, channel: str) -> None:
         logger.warning("lead touch 요약 업데이트 실패 [%s]: %s", lead_id, e)
 
 
+def _mark_bad_email(tenant_id: str, lead_id: str, touch_id: str, reason: str) -> None:
+    """비실재 이메일 리드 처리 — 현재 터치 skip + 남은 pending 터치 일괄 skip + 리드 send_failed.
+    반송(bounce)은 발신 평판을 깎으므로 발송 자체를 막는다."""
+    _mark_touch(touch_id, "skipped", f"bad_email:{reason}")
+    now_iso = datetime.now(timezone.utc).isoformat()
+    try:
+        _db().table("outreach_touchpoints").update(
+            {"status": "skipped", "error_msg": f"bad_email:{reason}"}
+        ).eq("tenant_id", tenant_id).eq("lead_id", lead_id).eq("status", "pending").execute()
+        _db().table("outreach_leads").update(
+            {"status": "send_failed", "updated_at": now_iso}
+        ).eq("tenant_id", tenant_id).eq("id", lead_id).execute()
+        logger.warning("[followup] 비실재 이메일 리드 차단 [%s]: %s", lead_id, reason)
+    except Exception as e:
+        logger.warning("[followup] bad_email 처리 실패 [%s]: %s", lead_id, e)
+
+
 def _send_cold_drip_seq1(tenant_id: str, lead: dict, touch_id: str) -> bool:
     """1차 콜드 드립 이메일 — Gmail API(outreach_gmail_sender) 사용(테넌트 스코프)."""
     from app.services import outreach_gmail_sender as gm
     from app.services.outreach_mailer import build_lead_email
     from app.services.outreach_suppression import is_suppressed
+    from app.services.email_validation import validate_email_for_send
 
     to = lead.get("contact_email")
     if not to:
         _mark_touch(touch_id, "skipped")
+        return False
+    ok_email, why = validate_email_for_send(to)
+    if not ok_email:
+        _mark_bad_email(tenant_id, lead["id"], touch_id, why)
         return False
     if is_suppressed(tenant_id, to):
         _mark_touch(touch_id, "skipped", "suppressed")
@@ -238,6 +260,11 @@ def _send_sequence_email(tenant_id: str, lead: dict, sequence: int, touch_id: st
     to = lead.get("contact_email")
     if not to:
         _mark_touch(touch_id, "skipped")
+        return False
+    from app.services.email_validation import validate_email_for_send
+    ok_email, why = validate_email_for_send(to)
+    if not ok_email:
+        _mark_bad_email(tenant_id, lead["id"], touch_id, why)
         return False
 
     # 수신거부/차단 차단 (테넌트 스코프)

@@ -85,6 +85,13 @@ def extract_contact(text: str) -> ContactInfo:
         if m2:
             info.email = f"{m2.group(1)}@{m2.group(2)}.{m2.group(3)}"
 
+    # 오추출 방어 — 'th@compounds.with' 같은 비실재 TLD가 리드로 저장돼
+    # 발송 반송(bounce)을 만들던 문제. 문법+TLD 검증 실패 시 버림.
+    if info.email:
+        from app.services.email_validation import is_plausible_email
+        if not is_plausible_email(info.email):
+            info.email = None
+
     m = _CAFE_RE.search(text)
     if m:
         info.naver_cafe = m.group(0).rstrip("/.,)")
