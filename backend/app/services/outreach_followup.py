@@ -12,11 +12,13 @@ from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
-# 이메일 시퀀스별 제목/본문 빌더
+# 이메일 시퀀스별 제목/본문 빌더 (총 5터치 — 2026-07 수신거부 0건 확인 후 3회→5회 확대)
 _EMAIL_SEQUENCES = {
-    1: None,   # 1차는 outreach_mailer.send_single이 생성 (최고조회 영상 칭찬)
-    2: None,   # 2차는 _send_sequence_email에서 동적 생성 (채널명 개인화)
-    3: None,   # 3차는 _send_sequence_email에서 동적 생성 (최신 영상 제목 개인화)
+    1: None,   # 1차는 outreach_mailer.send_single이 생성 (v2: 자기검증+실사례)
+    2: None,   # 2차: 재확인 + 무료체험 (채널명·최고조회 영상 개인화)
+    3: None,   # 3차: 실사례 스토리 (숫자의 출처 공개)
+    4: None,   # 4차: 파트너(매파스) 조건 각도
+    5: None,   # 5차: 브레이크업 — 마지막 연락 (최신 영상 개인화)
 }
 
 
@@ -40,8 +42,39 @@ def _seq2_html(handle: str, best_title: str | None) -> str:
 </div>"""
 
 
-def _seq3_html(handle: str, latest_title: str | None) -> str:
-    """3차: 짧은 개인 메일 톤 — 최신 영상 칭찬, 마지막 연락(압박 없이)."""
+def _seq3_html(handle: str) -> str:
+    """3차: 실사례 스토리 — 1·2차 숫자의 출처를 공개해 성능 의심에 답함."""
+    import html as _html
+    h = _html.escape(handle)
+    return f"""<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:560px;margin:0 auto;padding:8px 4px;color:#333;font-size:14.5px;line-height:1.9">
+<p>안녕하세요, {h}님.</p>
+<p>지난 메일에 적었던 "광고비 794만원 → 193만원" 숫자, 출처가 궁금하실 것 같아 짧게 남깁니다.</p>
+<p>저희가 직접 운영하는 쿠팡 계정입니다. 3개월간 손실 키워드를 걷어내면서 광고비를 월 567만원 줄였는데,
+매출은 오히려 8.8% 늘고 ROAS는 482%에서 1,080%가 됐습니다.
+과정 데이터를 그대로 공개해뒀습니다 — <a href="https://maesil-insight.com/cases?utm_source=outreach&utm_medium=email" target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">사례 데이터 보기</a>.</p>
+<p>{h}님 스토어에서도 같은 게 보이는지 <a href="https://maesil-insight.com?utm_source=outreach&utm_medium=email" target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">7일 무료(카드 등록 없음)</a>로 직접 확인해보실 수 있습니다.</p>
+<p>궁금한 점은 <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">카톡</a>으로 편하게 물어봐 주세요.</p>
+</div>"""
+
+
+def _seq4_html(handle: str) -> str:
+    """4차: 파트너(매파스) 조건 각도 — 이득 관점, 사실 그대로."""
+    import html as _html
+    h = _html.escape(handle)
+    return f"""<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:560px;margin:0 auto;padding:8px 4px;color:#333;font-size:14.5px;line-height:1.9">
+<p>안녕하세요, {h}님.</p>
+<p>이번엔 도구 얘기 말고, 파트너 조건만 정리해서 남깁니다.</p>
+<p>{h}님 추천으로 구독자가 가입하면 <strong>첫 결제의 20%</strong>, 이후 구독이 유지되는 동안
+<strong>매달 10%</strong>(최대 12개월)가 정산됩니다. 월말 마감 후 익월 10일 계좌이체이고,
+그로스 플랜 기준 10명 유지 시 월 약 20만원입니다.
+자세한 조건은 <a href="https://maesil-insight.com/partners?utm_source=outreach&utm_medium=email" target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">여기</a>에 있습니다.</p>
+<p>영상 제작 의무나 홍보 조건은 없습니다. 먼저 써보고 판단하셔도 됩니다.</p>
+<p>관심 있으시면 <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">카톡</a> 주세요.</p>
+</div>"""
+
+
+def _seq5_html(handle: str, latest_title: str | None) -> str:
+    """5차: 브레이크업 — 최신 영상 칭찬, 마지막 연락(압박 없이)."""
     import html as _html
     h = _html.escape(handle)
     praise = f'최근 올리신 "{_html.escape(latest_title)}" 영상도 잘 봤습니다.' if latest_title else "채널 항상 잘 보고 있습니다."
@@ -181,6 +214,12 @@ def _send_sequence_email(tenant_id: str, lead: dict, sequence: int, touch_id: st
         subject = f"{handle}님 채널 보고 연락드립니다"
         html = _seq2_html(handle, best_title)
     elif sequence == 3:
+        subject = f"{handle}님, 지난번 광고비 절감 숫자의 출처입니다"
+        html = _seq3_html(handle)
+    elif sequence == 4:
+        subject = f"{handle}님, 파트너 조건만 정리해서 남깁니다"
+        html = _seq4_html(handle)
+    elif sequence == 5:
         latest_title = None
         try:
             from app.services.outreach_personalize import get_latest_video_title, shorten_title_for_subject
@@ -190,8 +229,8 @@ def _send_sequence_email(tenant_id: str, lead: dict, sequence: int, touch_id: st
         except Exception:
             raw = lead.get("best_content_title") or ""
             short = (raw[:15] + "…") if len(raw) > 15 else raw
-        subject = f'"{short}" 보고 또 연락드립니다' if short else f"{handle}님께 마지막으로 연락드립니다"
-        html = _seq3_html(handle, latest_title)
+        subject = f'"{short}" 보고 마지막으로 연락드립니다' if short else f"{handle}님께 마지막으로 연락드립니다"
+        html = _seq5_html(handle, latest_title)
     else:
         _mark_touch(touch_id, "skipped")
         return False
@@ -261,7 +300,7 @@ def _notify_manual_touch(lead: dict, channel: str, touch_id: str) -> None:
     _mark_touch(touch_id, "sent" if result.get("ok") else "failed", result.get("error"))
 
 
-FOLLOWUP_DAILY_CAP = 20  # 팔로업 이메일 하루 최대 발송 수
+FOLLOWUP_DAILY_CAP = 40  # 팔로업 이메일 하루 최대 발송 수 (5터치 확대에 맞춰 20→40, 수신거부 0건 확인)
 
 
 def _followup_sent_today(tenant_id: str, tzinfo=None) -> int:

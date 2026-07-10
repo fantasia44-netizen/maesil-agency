@@ -116,13 +116,24 @@ def _schedule_touchpoints(tenant_id: str, lead_id: str, has_email: bool,
         logger.warning("touchpoints 예약 실패 [%s]: %s", lead_id, e)
 
 
+# 이메일 팔로업 시퀀스 (등급 무관, 1차 발송 후): 2·3·4·5차 — 총 5터치
+# (2026-07 수신거부 0건 확인 후 3회 → 5회 확대. 5차가 브레이크업 메일)
+EMAIL_FOLLOWUP_SCHEDULE = [
+    {"sequence": 2, "delay_days": 7},
+    {"sequence": 3, "delay_days": 14},
+    {"sequence": 4, "delay_days": 21},
+    {"sequence": 5, "delay_days": 28},
+]
+
+
 def schedule_email_followups(tenant_id: str, lead_id: str) -> None:
-    """1차 이메일 발송 성공 직후 호출 — 등급 무관 2차(+7일)/3차(+14일) 이메일 팔로업 예약.
+    """1차 이메일 발송 성공 직후 호출 — 등급 무관 2~5차 이메일 팔로업 예약.
 
     _schedule_touchpoints(S/A 전용, 스캔 시점 멀티채널 6단계)와 별개 경로.
     cold_drip으로 발송된 대다수 리드는 seq=1만 생성되고 2차 이후가 없었던 게
     "1차 발송 322건 중 314건이 팔로업 전무" 버그의 원인이었음 — 이 함수가 그 구멍을 메움.
-    이미 seq2/3이 있으면(스캔 시 S/A로 예약됐던 경우 등) ignore_duplicates로 건드리지 않음.
+    이미 해당 seq가 있으면(스캔 시 S/A 멀티채널로 예약된 seq4 인스타 DM 등)
+    ignore_duplicates로 건드리지 않음 — S/A는 이메일 3회+멀티채널, 나머지는 이메일 5회.
     """
     now = datetime.now(timezone.utc)
     rows = [
@@ -134,7 +145,7 @@ def schedule_email_followups(tenant_id: str, lead_id: str) -> None:
             "status": "pending",
             "scheduled_for": (now + timedelta(days=t["delay_days"])).isoformat(),
         }
-        for t in TOUCH_SCHEDULE if t["sequence"] in (2, 3)
+        for t in EMAIL_FOLLOWUP_SCHEDULE
     ]
     try:
         _db().table("outreach_touchpoints").upsert(
