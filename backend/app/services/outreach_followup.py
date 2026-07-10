@@ -20,56 +20,36 @@ _EMAIL_SEQUENCES = {
 }
 
 
+# 2·3차 팔로업: 1차 이미 열어본 사람(38% 오픈) 대비 회신률이 낮았던 원인 분석 결과
+# 반영 — 사례/수익표/버튼 반복(=대량발송 광고로 재인식) 대신 짧은 개인 메일 톤 플레인 텍스트로 전환.
+# 컴플라이언스 푸터·수신거부 링크는 outreach_suppression.inject_compliance_footer가 별도 삽입하므로
+# 여기서 서명/수신거부 문구를 중복으로 넣지 않음.
+
 def _seq2_html(handle: str, best_title: str | None) -> str:
-    """2차: 채널명 기반, 최고조회 영상 재언급."""
+    """2차: 짧은 개인 메일 톤 — 최고조회 영상 재언급, 부담 없는 재확인."""
     import html as _html
     h = _html.escape(handle)
-    praise = f'특히 <strong>"{_html.escape(best_title)}"</strong> 영상이 정말 인상 깊었습니다.' if best_title else f"<strong>{h}</strong> 채널 콘텐츠가 정말 좋더라고요."
-    return f"""<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:600px;margin:0 auto;padding:24px 28px;background:#fff">
-<p style="font-size:15px;color:#333;line-height:1.8">
-안녕하세요, <strong>{h}</strong>님 👋<br><br>
-지난번 메일을 보내드렸는데 혹시 못 보셨을까 해서 다시 한번 연락드립니다.<br><br>
-{praise}<br><br>
-짧게 한 가지만 말씀드리면 — 채널에 영상 하나만 올려두셔도 구독자 10명 모집 시 <strong>연간 약 257만원</strong> 자동 정산이 가능합니다.<br>
-파트너 분들께는 <strong>Pro 플랜 1년 무료</strong>로 먼저 드리고 있어요.
-</p>
-<div style="text-align:center;margin:24px 0">
-  <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener"
-     style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 30px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:700">
-    카카오 오픈톡으로 상담하기 💬
-  </a>
-</div>
-<p style="font-size:12px;color:#999;text-align:center">
-매실인사이트 | 수신을 원치 않으시면 "수신거부"로 회신해 주세요.
-</p>
+    praise = f'"{_html.escape(best_title)}" 영상 잘 봤습니다.' if best_title else f"채널 콘텐츠 잘 보고 있습니다."
+    return f"""<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:560px;margin:0 auto;padding:8px 4px;color:#333;font-size:14.5px;line-height:1.9">
+<p>안녕하세요, {h}님.</p>
+<p>지난주에 메일 한 통 드렸는데 혹시 못 보셨을까 해서 다시 연락드립니다.</p>
+<p>{praise}</p>
+<p>부담 드리려는 건 아니고, 관심 있으시면 <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">카톡으로 편하게</a> 말씀 주세요.</p>
+<p>감사합니다.</p>
 </div>"""
 
 
 def _seq3_html(handle: str, latest_title: str | None) -> str:
-    """3차: 최신 영상 칭찬, 마지막 연락."""
+    """3차: 짧은 개인 메일 톤 — 최신 영상 칭찬, 마지막 연락(압박 없이)."""
     import html as _html
     h = _html.escape(handle)
-    praise = f'최근에 올리신 <strong>"{_html.escape(latest_title)}"</strong> 영상도 잘 봤습니다.' if latest_title else f"채널 항상 잘 보고 있습니다."
-    return f"""<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:600px;margin:0 auto;padding:24px 28px;background:#fff">
-<p style="font-size:15px;color:#333;line-height:1.8">
-안녕하세요, <strong>{h}</strong>님 👋<br><br>
-마지막으로 한 번만 더 연락드립니다.<br><br>
-{praise}<br><br>
-파트너십이 지금 당장 맞지 않으신다면 완전히 이해합니다.<br>
-혹시 나중에라도 관심이 생기시면 편하게 연락 주세요.
-</p>
-<div style="text-align:center;margin:24px 0">
-  <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener"
-     style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 30px;border-radius:30px;text-decoration:none;font-size:14px;font-weight:700">
-    카카오 오픈톡으로 상담하기 💬
-  </a>
-</div>
-<p style="font-size:13px;color:#777;text-align:center">
-더 이상 연락드리지 않겠습니다. 채널 항상 응원합니다 🌿
-</p>
-<p style="font-size:12px;color:#999;text-align:center">
-매실인사이트 | 수신을 원치 않으시면 "수신거부"로 회신해 주세요.
-</p>
+    praise = f'최근 올리신 "{_html.escape(latest_title)}" 영상도 잘 봤습니다.' if latest_title else "채널 항상 잘 보고 있습니다."
+    return f"""<div style="font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;max-width:560px;margin:0 auto;padding:8px 4px;color:#333;font-size:14.5px;line-height:1.9">
+<p>안녕하세요, {h}님.</p>
+<p>마지막으로 한 번만 더 연락드립니다.</p>
+<p>{praise}</p>
+<p>지금 당장 맞지 않으시면 괜찮습니다. 나중에라도 관심 생기시면 <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">카톡</a>으로 편하게 연락 주세요.</p>
+<p>채널 항상 응원하겠습니다.</p>
 </div>"""
 
 
@@ -146,6 +126,11 @@ def _send_cold_drip_seq1(tenant_id: str, lead: dict, touch_id: str) -> bool:
             }).eq("id", touch_id).execute()
         except Exception:
             pass
+        try:
+            from app.services.outreach_pipeline import schedule_email_followups
+            schedule_email_followups(tenant_id, lead["id"])
+        except Exception as e:
+            logger.warning("팔로업 예약 실패 [%s]: %s", lead["id"], e)
 
     if ok:
         _mark_touch(touch_id, "sent")
