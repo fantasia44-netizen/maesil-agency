@@ -91,8 +91,9 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
 
   <p>써보시고 괜찮다 싶으실 때 — 그때 파트너(<a href="{maepas_url}?utm_source=outreach&utm_medium=email"
   target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">매파스</a>) 이야기를
-  나누고 싶습니다. 추천으로 구독자가 가입하면 <strong>첫 결제 20% + 재구독 10%</strong>가
-  매월 정산됩니다 (그로스 플랜 구독자 10명 유지 기준 월 약 20만원).
+  나누고 싶습니다. 추천으로 구독자가 가입하면 <strong>첫 결제의 20%</strong>, 이후
+  <strong>구독 유지 기간 매달 10%</strong>(최대 12개월)를 드립니다 — 그로스 플랜 기준
+  10명 유지 시 월 약 20만원이고, 월말 마감 후 익월 10일에 계좌로 정산됩니다.
   영상 제작 의무나 홍보 조건은 없습니다.</p>
 
   {scarcity_block}
