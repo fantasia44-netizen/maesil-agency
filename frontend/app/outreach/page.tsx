@@ -221,7 +221,7 @@ export default function OutreachPage() {
   const loadTouchLogs = async () => {
     setTouchLoading(true);
     try {
-      const data = await apiFetch<TouchLog[]>("/api/outreach/touchpoints?limit=300", {}, 15000);
+      const data = await apiFetch<TouchLog[]>("/api/outreach/touchpoints?limit=5000", {}, 30000);
       setTouchLogs(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error("[touchLogs] error:", e);
@@ -236,7 +236,7 @@ export default function OutreachPage() {
     setErr(null);
     try {
       const [leadsData, statsData] = await Promise.all([
-        apiFetch<Lead[]>("/api/outreach/leads?limit=2000&min_score=0", {}, 30000),
+        apiFetch<Lead[]>("/api/outreach/leads?limit=10000&min_score=0", {}, 60000),
         apiFetch<ScanStats>("/api/outreach/scan/stats", {}, 15000),
       ]);
       setLeads(leadsData);

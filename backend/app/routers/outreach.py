@@ -139,18 +139,31 @@ def list_leads(
     offset: int = 0,
     user: UserContext = Depends(get_current_user),
 ) -> list[dict]:
-    """리드 목록 (플랫폼·상태·등급·채널유형 필터) — RPC."""
-    resp = _db().rpc("list_outreach_leads", {
-        "p_tenant_id":    _require_tid(user),
-        "p_min_score":    min_score,
-        "p_limit":        limit,
-        "p_offset":       offset,
-        "p_platform":     platform,
-        "p_status":       status,
-        "p_grade":        grade,
-        "p_channel_type": channel_type,
-    }).execute()
-    return resp.data or []
+    """리드 목록 (플랫폼·상태·등급·채널유형 필터) — RPC.
+
+    PostgREST가 응답당 최대 1,000행으로 자르므로(RPC 포함) 1,000행 단위로
+    루프 조회해 limit까지 채움 — "발굴 1,293인데 목록은 1,000" 문제 수정.
+    """
+    tid = _require_tid(user)
+    page = 1000
+    rows: list[dict] = []
+    while len(rows) < limit:
+        take = min(page, limit - len(rows))
+        resp = _db().rpc("list_outreach_leads", {
+            "p_tenant_id":    tid,
+            "p_min_score":    min_score,
+            "p_limit":        take,
+            "p_offset":       offset + len(rows),
+            "p_platform":     platform,
+            "p_status":       status,
+            "p_grade":        grade,
+            "p_channel_type": channel_type,
+        }).execute()
+        batch = resp.data or []
+        rows.extend(batch)
+        if len(batch) < take:
+            break
+    return rows
 
 
 @router.get("/leads/{lead_id}")
@@ -297,17 +310,24 @@ def reextract_emails(
     """
     import threading
     tid = _require_tid(user)
-    resp = (
-        _db().table("outreach_leads")
-        .select("id, raw_contact_text")
-        .eq("tenant_id", tid)
-        .is_("contact_email", "null")
-        .not_.is_("raw_contact_text", "null")
-        .in_("status", ["approved", "discovered", "analyzing", "draft_ready"])
-        .limit(limit)
-        .execute()
-    )
-    rows = resp.data or []
+    # PostgREST 1,000행 상한 우회 — range 페이지네이션
+    rows: list[dict] = []
+    while len(rows) < limit:
+        take = min(1000, limit - len(rows))
+        batch = (
+            _db().table("outreach_leads")
+            .select("id, raw_contact_text")
+            .eq("tenant_id", tid)
+            .is_("contact_email", "null")
+            .not_.is_("raw_contact_text", "null")
+            .in_("status", ["approved", "discovered", "analyzing", "draft_ready"])
+            .order("id")
+            .range(len(rows), len(rows) + take - 1)
+            .execute()
+        ).data or []
+        rows.extend(batch)
+        if len(batch) < take:
+            break
 
     def _run():
         from app.services.scanners.base import extract_contact
@@ -344,25 +364,33 @@ def trigger_rescore(
     import threading
     tid = _require_tid(user)
 
-    resp = (
-        _db().table("outreach_leads")
-        .select(
-            "id, grade, status, platform, "
-            "contact_email, contact_kakao, contact_naver_cafe, community_size, activity_level, "
-            "subscriber_count, platforms_json, "
-            # 구 리스크 필드
-            "sells_competing_tool, sells_own_program, is_competitor_partner, has_negative_tool_content, "
-            # 신 리스크 필드 (재스캔 리드)
-            "promotes_other_program, is_program_company, "
-            # 전환력 필드
-            "has_paid_course, has_paid_membership, has_ebook_sale, has_consulting, "
-            "has_affiliate_exp, has_tool_recommendation"
-        )
-        .eq("tenant_id", tid)
-        .limit(limit)
-        .execute()
+    _COLS = (
+        "id, grade, status, platform, "
+        "contact_email, contact_kakao, contact_naver_cafe, community_size, activity_level, "
+        "subscriber_count, platforms_json, "
+        # 구 리스크 필드
+        "sells_competing_tool, sells_own_program, is_competitor_partner, has_negative_tool_content, "
+        # 신 리스크 필드 (재스캔 리드)
+        "promotes_other_program, is_program_company, "
+        # 전환력 필드
+        "has_paid_course, has_paid_membership, has_ebook_sale, has_consulting, "
+        "has_affiliate_exp, has_tool_recommendation"
     )
-    rows = resp.data or []
+    # PostgREST 1,000행 상한 우회 — 전 리드 재채점 시 1,000건 이후가 조용히 누락되던 문제
+    rows: list[dict] = []
+    while len(rows) < limit:
+        take = min(1000, limit - len(rows))
+        batch = (
+            _db().table("outreach_leads")
+            .select(_COLS)
+            .eq("tenant_id", tid)
+            .order("id")
+            .range(len(rows), len(rows) + take - 1)
+            .execute()
+        ).data or []
+        rows.extend(batch)
+        if len(batch) < take:
+            break
     if not rows:
         return {"ok": True, "rescored": 0, "message": "리드 없음"}
 
@@ -1013,24 +1041,33 @@ def get_all_touchpoints(
     limit: int = 200,
     user: UserContext = Depends(get_current_user),
 ) -> list[dict]:
-    """전체 발송 이력 — 리드 정보 별도 조회 포함."""
+    """전체 발송 이력 — 리드 정보 별도 조회 포함.
+
+    PostgREST 응답당 1,000행 상한을 range 페이지네이션으로 우회해 limit까지 조회.
+    """
     import logging as _log
     _logger = _log.getLogger(__name__)
     tid = _require_tid(user)
-    q = (
-        _db().table("outreach_touchpoints")
-        .select("*")
-        .eq("tenant_id", tid)
-        .order("created_at", desc=True)
-        .limit(limit)
-    )
-    if status:
-        q = q.eq("status", status)
-    if channel:
-        q = q.eq("channel", channel)
-    resp = q.execute()
-    _logger.info("[touchpoints] count=%s error=%s", len(resp.data or []), getattr(resp, 'error', None))
-    rows = resp.data or []
+    page = 1000
+    rows: list[dict] = []
+    while len(rows) < limit:
+        take = min(page, limit - len(rows))
+        q = (
+            _db().table("outreach_touchpoints")
+            .select("*")
+            .eq("tenant_id", tid)
+            .order("created_at", desc=True)
+            .range(len(rows), len(rows) + take - 1)
+        )
+        if status:
+            q = q.eq("status", status)
+        if channel:
+            q = q.eq("channel", channel)
+        batch = q.execute().data or []
+        rows.extend(batch)
+        if len(batch) < take:
+            break
+    _logger.info("[touchpoints] count=%s", len(rows))
 
     # lead_id 목록으로 리드 정보 일괄 조회
     lead_ids = list({r["lead_id"] for r in rows if r.get("lead_id")})
