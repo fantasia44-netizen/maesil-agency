@@ -86,6 +86,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
           {admin && <NavGroup label="국내영업" pathname={pathname}>
             <Link href="/outreach">리드관리</Link>
+            <Link href="/offline">오프라인영업</Link>
           </NavGroup>}
 
           {admin && <NavGroup label="해외영업" pathname={pathname}>

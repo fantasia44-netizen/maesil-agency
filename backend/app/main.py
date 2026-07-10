@@ -6,7 +6,7 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import admin_router, accounting_router, alert_channels, alerts, auth_router, billing, brand_router, briefing, buyers_router, chat, cs, growth, health, memory, oauth_gmail, outreach, programs, secrets_router, warehouse_router, widgets
+from app.routers import admin_router, accounting_router, alert_channels, alerts, auth_router, billing, brand_router, briefing, buyers_router, chat, cs, growth, health, memory, oauth_gmail, offline_router, outreach, programs, secrets_router, warehouse_router, widgets
 
 logger = logging.getLogger(__name__)
 
@@ -157,6 +157,16 @@ async def _poll_loop():
                 except Exception as e:
                     logger.warning("[scheduler] billing cycle 실패: %s", e)
 
+            # 오프라인 영업 관리 알림 — 하루 1회 (체험만료 D-7/방치, 액션 기한, 코칭주기, 정체)
+            try:
+                today_off = datetime.now(timezone.utc).date()
+                if scan_dates.get("_offline_alerts") != today_off:
+                    from app.services.offline_alerts import check_offline_alerts
+                    await asyncio.to_thread(check_offline_alerts)
+                    scan_dates["_offline_alerts"] = today_off
+            except Exception as e:
+                logger.warning("[scheduler] offline alerts 실패: %s", e)
+
             cycle += 1
             logger.info("[scheduler] poll cycle %d done", cycle)
         except Exception as e:
@@ -218,6 +228,7 @@ app.include_router(warehouse_router.router)
 app.include_router(accounting_router.router)
 app.include_router(buyers_router.router)
 app.include_router(brand_router.router)
+app.include_router(offline_router.router)
 
 
 @app.get("/")
