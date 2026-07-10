@@ -85,6 +85,17 @@ async def _run_tenant_outreach_cycle(tenant_id: str, cycle: int, scan_dates: dic
         except Exception as e:
             logger.warning("[scheduler:%s] gmail_watcher 실패: %s", tag, e)
 
+    # Gmail 반송(bounce) 감시 (5사이클마다 ≈ 15분) — 발신 평판 보호라 watcher 플래그와
+    # 무관하게 상시 실행 (시크릿 없으면 내부에서 skip)
+    if cycle % 5 == 0:
+        try:
+            from app.services.gmail_watcher import watch_bounces
+            bo = await asyncio.to_thread(watch_bounces, tenant_id, 20)
+            if bo.get("blocked"):
+                logger.info("[scheduler:%s] 반송 차단 %d건", tag, bo["blocked"])
+        except Exception as e:
+            logger.warning("[scheduler:%s] bounce watcher 실패: %s", tag, e)
+
     # 멀티채널 발굴 스캔 — 테넌트별 하루 1회
     try:
         today = datetime.now(timezone.utc).date()

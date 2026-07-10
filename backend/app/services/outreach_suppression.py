@@ -107,7 +107,8 @@ def add_suppression(tenant_id: str, email: str, reason: str = "unsubscribe",
             on_conflict="tenant_id,email",
         ).execute()
         # 해당 테넌트의 같은 이메일 리드 상태도 전환 → 이후 팔로업 차단
-        new_status = "blocked" if reason == "blocked" else "unsubscribe"
+        # bounced는 수신거부가 아니므로 send_failed로 — 수신거부 지표 오염 방지
+        new_status = {"blocked": "blocked", "bounced": "send_failed"}.get(reason, "unsubscribe")
         try:
             _db().table("outreach_leads").update(
                 {"status": new_status, "updated_at": now}

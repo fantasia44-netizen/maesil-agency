@@ -229,6 +229,124 @@ def _notify_admin_reply(lead: dict, classification: dict) -> None:
         logger.warning("회신 알림 발송 실패: %s", e)
 
 
+# ── 반송(bounce) 감시 ─────────────────────────────────────────────────
+
+_BOUNCE_EMAIL_RE = None  # lazy
+
+
+def _extract_failed_recipients(token: str, message_id: str, own_addrs: set[str]) -> set[str]:
+    """반송 메시지에서 실패 수신자 추출 — X-Failed-Recipients 헤더 우선, 본문 정규식 폴백."""
+    import re
+    global _BOUNCE_EMAIL_RE
+    if _BOUNCE_EMAIL_RE is None:
+        _BOUNCE_EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}")
+    found: set[str] = set()
+    try:
+        r = httpx.get(
+            f"{_GMAIL_API_BASE}/users/me/messages/{message_id}",
+            params={"format": "full"},
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=15,
+        )
+        r.raise_for_status()
+        msg = r.json()
+        headers = msg.get("payload", {}).get("headers", [])
+        xfailed = _header_val(headers, "X-Failed-Recipients")
+        if xfailed:
+            found.update(m.group(0).lower() for m in _BOUNCE_EMAIL_RE.finditer(xfailed))
+        if not found:
+            body = _extract_text_from_payload(msg.get("payload", {}))[:4000]
+            found.update(m.group(0).lower() for m in _BOUNCE_EMAIL_RE.finditer(body))
+    except Exception as e:
+        logger.debug("[bounce] 메시지 파싱 실패 [%s]: %s", message_id, e)
+    # 자기 자신/데몬 주소 제외
+    return {
+        a for a in found
+        if a not in own_addrs
+        and not a.startswith(("mailer-daemon", "postmaster", "noreply", "no-reply"))
+        and "google" not in a.split("@", 1)[-1]
+    }
+
+
+def watch_bounces(tenant_id: str, limit: int = 20) -> dict:
+    """발송 메일함의 반송(mailer-daemon) 감시 → 해당 리드 발송 중단.
+
+    도메인은 실재하지만 계정이 없는 주소(550 5.1.1, 예: monicafromkore@gmail.com)는
+    발송 전 DNS 검증으로 못 잡음 — 반송을 감지해서 남은 팔로업(2~5차)이 같은 주소로
+    반복 반송되며 발신 평판을 깎는 걸 차단한다. 처리 내용:
+      리드 send_failed + pending 터치 일괄 skip + suppression 등록(영구 차단).
+    idempotent(재실행 무해)라 별도 처리이력 없이 최근 3일 창을 매번 재검사.
+    """
+    client_id = _get_secret("gmail_client_id")
+    client_secret = _get_secret("gmail_client_secret")
+    refresh_token = _get_secret("gmail_refresh_token")
+    from_email = _get_secret("gmail_from_email") or ""
+    if not all([client_id, client_secret, refresh_token]):
+        return {"skipped": True, "reason": "Gmail 시크릿 미설정"}
+
+    token = _get_access_token(client_id, client_secret, refresh_token)  # type: ignore[arg-type]
+    if not token:
+        return {"ok": False, "error": "액세스 토큰 갱신 실패"}
+
+    own = {a.lower() for a in [from_email, _get_secret("outreach_gmail_from") or ""] if a}
+    # 표시명 포함 형식("매실 <x@y>")에서 주소만
+    own = {a.split("<")[-1].rstrip(">").strip() for a in own}
+
+    try:
+        r = httpx.get(
+            f"{_GMAIL_API_BASE}/users/me/messages",
+            params={"q": "from:(mailer-daemon OR postmaster) newer_than:3d", "maxResults": limit},
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=15,
+        )
+        r.raise_for_status()
+        msg_ids = [m["id"] for m in r.json().get("messages", [])]
+    except Exception as e:
+        return {"ok": False, "error": f"반송 검색 실패: {e}"}
+
+    if not msg_ids:
+        return {"ok": True, "bounces": 0, "blocked": 0}
+
+    failed_addrs: set[str] = set()
+    for mid in msg_ids:
+        failed_addrs |= _extract_failed_recipients(token, mid, own)
+
+    blocked = 0
+    for addr in failed_addrs:
+        try:
+            rows = (
+                _db().table("outreach_leads")
+                .select("id, handle_name, status")
+                .eq("tenant_id", tenant_id)
+                .ilike("contact_email", addr)
+                .limit(1)
+                .execute()
+            ).data or []
+            if not rows:
+                continue
+            lead = rows[0]
+            if lead["status"] in ("deal", "replied", "negotiating"):
+                continue  # 이미 대화 중인 리드는 건드리지 않음
+            now = datetime.now(timezone.utc).isoformat()
+            _db().table("outreach_touchpoints").update(
+                {"status": "skipped", "error_msg": "bounced"}
+            ).eq("tenant_id", tenant_id).eq("lead_id", lead["id"]).eq("status", "pending").execute()
+            if lead["status"] != "send_failed":
+                _db().table("outreach_leads").update(
+                    {"status": "send_failed", "updated_at": now}
+                ).eq("tenant_id", tenant_id).eq("id", lead["id"]).execute()
+                blocked += 1
+                logger.warning("[bounce] 반송 감지 → 발송 중단: %s <%s>", lead.get("handle_name"), addr)
+            from app.services.outreach_suppression import add_suppression
+            add_suppression(tenant_id, addr, reason="bounced")
+        except Exception as e:
+            logger.warning("[bounce] 리드 처리 실패 [%s]: %s", addr, e)
+
+    if blocked:
+        logger.info("[bounce] 반송 %d주소 중 신규 차단 %d건", len(failed_addrs), blocked)
+    return {"ok": True, "bounces": len(failed_addrs), "blocked": blocked}
+
+
 # ── 메인 감시 루프 ────────────────────────────────────────────────────
 
 def watch_replies(tenant_id: str, limit: int = 30) -> dict:
