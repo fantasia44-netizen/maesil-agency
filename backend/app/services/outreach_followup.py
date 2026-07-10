@@ -34,6 +34,7 @@ def _seq2_html(handle: str, best_title: str | None) -> str:
 <p>안녕하세요, {h}님.</p>
 <p>지난주에 메일 한 통 드렸는데 혹시 못 보셨을까 해서 다시 연락드립니다.</p>
 <p>{praise}</p>
+<p>지난 메일의 광고비 절감 숫자가 믿기 어려우실 수 있어서 — <a href="https://maesil-insight.com?utm_source=outreach&utm_medium=email" target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">카드 등록 없이 7일 무료</a>로 본인 스토어 데이터에서 직접 확인하실 수 있습니다. 세팅은 제가 직접 도와드립니다.</p>
 <p>부담 드리려는 건 아니고, 관심 있으시면 <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">카톡으로 편하게</a> 말씀 주세요.</p>
 <p>감사합니다.</p>
 </div>"""

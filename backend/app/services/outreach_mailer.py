@@ -22,24 +22,36 @@ def _db():
 # ── 기본 HTML 템플릿 (email_draft 없을 때 fallback) ──────────────────
 
 def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
+    """1차 콜드메일 v2 (2026-07 실데이터 기반 개정).
+
+    v1 성과: 오픈 38.4% / 회신 0.8% — 열리는데 답이 없는 메일이었음.
+    3~8회 재오픈한 리드 인터뷰·오프라인 영업 결과에서 확인된 회신을 막는 두 의심에 대응:
+      ① 성능 의심("이게 진짜 되나") → 회사 주장 대신 자기검증 제안:
+         7일 무료·카드등록 불필요(maesil-insight.com 실제 정책)로 본인 스토어 데이터 직접 확인.
+      ② 이득 의심("나한테 그만큼 떨어지나") → 과장 수익표(연 2,587만원) 삭제,
+         현실적 숫자 1줄 + "영상/홍보 의무 없음"으로 리스크 프레이밍 제거.
+    형식: 마케팅 박스 나열형 → 절제된 개인 메일 톤 (재오픈 시 '대량 광고' 재인식 방지).
+    오프라인 영업의 검증된 클로저("처음부터 코칭") 반영 — 연결·세팅 1:1 지원 약속.
+    타겟 언어: 파워유저(엑셀 수동 광고 세팅) 고통 명명 — 애이엔 사례에서 검증.
+    """
     import html as _html
     safe_handle = _html.escape(handle_name)
     # summary = 개인화 오프너(상대 영상 칭찬). 있으면 그걸 오프너로, 없으면 일반 인사.
     if summary:
         opener = _html.escape(summary)
     else:
-        opener = f"<strong>{safe_handle}</strong> 채널 잘 보고 있습니다."
+        opener = f"{safe_handle} 채널 잘 보고 있습니다."
 
     from app.config import settings
     maepas_url = settings.outreach_maepas_url or "https://maesil-insight.com/partners"
     cases_url = settings.outreach_cases_url or "https://maesil-insight.com/cases"
+    trial_url = "https://maesil-insight.com"
 
     # 희소성 후킹 — OUTREACH_BETA_SLOTS>0 일 때만 (거짓 희소성 방지)
     _slots = settings.outreach_beta_slots
     scarcity_block = (
-        f'<div style="background:#fff7ed;border:1px dashed #fb923c;border-radius:8px;'
-        f'padding:12px 16px;margin:20px 0;font-size:13.5px;color:#9a3412;text-align:center">'
-        f'⏳ 현재 셀러 유튜버 <strong>{_slots}팀만</strong> 테스트 파트너로 모집 중입니다.</div>'
+        f'<p style="font-size:13.5px;color:#9a3412;margin:20px 0">'
+        f'⏳ 초기 파트너는 셀러 유튜버 <strong>{_slots}팀만</strong> 모시고 있습니다.</p>'
     ) if _slots and _slots > 0 else ""
 
     return f"""<!DOCTYPE html>
@@ -47,118 +59,58 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  body {{ font-family: 'Apple SD Gothic Neo','Malgun Gothic',sans-serif; background:#f5f5f5; margin:0; padding:20px; }}
-  .wrap {{ max-width:600px; margin:0 auto; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,.08); }}
-  .header {{ background:linear-gradient(135deg,#1A6F3C,#2eaa5e); padding:36px 40px; text-align:center; }}
-  .header h1 {{ color:#fff; margin:0; font-size:22px; font-weight:700; letter-spacing:-0.3px; }}
-  .header p {{ color:rgba(255,255,255,.85); margin:8px 0 0; font-size:14px; }}
-  .body {{ padding:36px 40px; }}
-  .greeting {{ font-size:15px; color:#333; line-height:1.8; }}
-  .case-box {{ background:#fff8e1; border:1px solid #ffe082; border-radius:10px; padding:20px 24px; margin:24px 0; }}
-  .case-box .case-title {{ color:#e65100; font-size:13px; font-weight:700; letter-spacing:0.5px; margin:0 0 10px; text-transform:uppercase; }}
-  .case-box .case-stat {{ font-size:26px; font-weight:800; color:#1A6F3C; margin:6px 0; }}
-  .case-box .case-desc {{ font-size:13px; color:#555; margin:8px 0 0; line-height:1.7; }}
-  .divider {{ border:none; border-top:1px solid #eee; margin:28px 0; }}
-  .highlight {{ background:#f0faf4; border-left:4px solid #2eaa5e; padding:18px 22px; border-radius:6px; margin:24px 0; }}
-  .highlight h3 {{ color:#1A6F3C; margin:0 0 12px; font-size:15px; font-weight:700; }}
-  .highlight ul {{ margin:0; padding-left:20px; color:#444; font-size:14px; line-height:2; }}
-  .earning-box {{ background:#f8f8ff; border:1px solid #c5cae9; border-radius:10px; padding:18px 22px; margin:24px 0; }}
-  .earning-box .earn-title {{ font-size:13px; color:#3949ab; font-weight:700; margin:0 0 12px; }}
-  .earning-box table {{ width:100%; border-collapse:collapse; font-size:14px; }}
-  .earning-box td {{ padding:5px 0; color:#444; }}
-  .earning-box td:last-child {{ text-align:right; font-weight:600; color:#1A6F3C; }}
-  .earning-box .earn-total {{ border-top:1px solid #c5cae9; margin-top:10px; padding-top:10px; font-size:15px; font-weight:700; color:#1A6F3C; display:flex; justify-content:space-between; }}
-  .cta {{ text-align:center; margin:32px 0 20px; }}
-  .btn {{ display:inline-block; background:#1A6F3C; color:#fff !important; padding:15px 36px; border-radius:30px; text-decoration:none; font-size:15px; font-weight:700; letter-spacing:-0.2px; }}
-  .sub-note {{ text-align:center; font-size:13px; color:#888; margin-top:10px; }}
-  .footer {{ background:#f9f9f9; border-top:1px solid #eee; padding:20px 40px; font-size:12px; color:#999; text-align:center; line-height:1.8; }}
-</style>
 </head>
-<body>
-<div class="wrap">
-  <div class="header">
-    <h1>실제 셀러가 만든 쿠팡·네이버 광고 분석 도구</h1>
-    <p>{safe_handle}님께 Pro 1년 무료로 드립니다</p>
+<body style="margin:0;padding:20px;background:#fafafa">
+<div style="max-width:580px;margin:0 auto;background:#fff;border-radius:10px;padding:32px 34px;
+            font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#333;
+            font-size:14.5px;line-height:1.9">
+
+  <p>안녕하세요, <strong>{safe_handle}</strong>님.</p>
+  <p>{opener}</p>
+
+  <p>혹시 {safe_handle}님도 쿠팡·네이버 광고 성과를 <strong>엑셀로 내려받아
+  키워드별로 손으로 정리</strong>하고 계신가요? 저희는 그 작업이 지겨워서
+  직접 도구를 만든 셀러들입니다. 아마존 셀러들에게 헬리움10이 있다면,
+  쿠팡·스마트스토어 셀러에게는 이런 게 하나 있어야 한다고 생각했습니다.</p>
+
+  <div style="background:#f8faf9;border-left:3px solid #1A6F3C;border-radius:6px;
+              padding:16px 20px;margin:22px 0;font-size:13.5px;line-height:1.8;color:#444">
+    실제 운영 계정 기준 — 쿠팡 광고비 <strong>월 794만원 → 193만원</strong> (월 567만원 절감),
+    매출은 오히려 +8.8%, ROAS <strong>482% → 1,080%</strong> (3개월).<br>
+    네이버는 대행사 없이 키워드 교체만으로 <strong>44위 → 8위</strong> (1개월).<br>
+    <a href="{cases_url}?utm_source=outreach&utm_medium=email" target="_blank" rel="noopener"
+       style="color:#1A6F3C;font-weight:600">→ 사례 데이터 직접 보기</a>
   </div>
-  <div class="body">
-    <p class="greeting">
-      안녕하세요, <strong>{safe_handle}</strong>님 👋<br>
-      {opener}<br><br>
-      이 메일은 단순 협찬 제안이 아닙니다. 실제 셀러가 자신의 <strong>쿠팡·스마트스토어</strong>를
-      성장시키려고 직접 만든 광고 분석 도구를, <strong>{safe_handle}</strong>님께 <strong>무료로</strong>
-      드리고 싶어 연락드렸습니다.
-    </p>
 
-    <div class="case-box">
-      <div class="case-title">📈 실제 사례</div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:4px">
-        <div style="flex:1;min-width:200px">
-          <div class="case-stat">광고비 −75%</div>
-          <div style="font-size:13px;color:#555;margin-top:4px;line-height:1.6">
-            ROAS <b>482% → 1,080%</b><br>쿠팡 광고 최적화 (3개월)
-          </div>
-        </div>
-        <div style="flex:1;min-width:200px">
-          <div class="case-stat">44위 → 8위</div>
-          <div style="font-size:13px;color:#555;margin-top:4px;line-height:1.6">
-            네이버 식품 카테고리 키워드<br>1개월
-          </div>
-        </div>
-      </div>
-      <div style="margin-top:12px">
-        <a href="{cases_url}?utm_source=outreach&utm_medium=email" target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600;font-size:13px;text-decoration:none">실제 사례 자세히 보기 →</a>
-      </div>
-    </div>
+  <p>이 숫자가 바로 안 믿기시는 게 정상입니다. 그래서 말로 설득하는 대신 —
+  <strong>{safe_handle}님 스토어 데이터로 직접 확인</strong>해보시길 권합니다.
+  <a href="{trial_url}?utm_source=outreach&utm_medium=email" target="_blank" rel="noopener"
+     style="color:#1A6F3C;font-weight:600">7일 무료, 카드 등록 없음</a>이고,
+  채널 연결부터 세팅까지 제가 1:1로 직접 잡아드립니다.
+  써보고 별로면 그냥 두시면 됩니다. 어떤 의무도 없습니다.</p>
 
-    <p class="greeting">
-      이 데이터를 공개하려는 게 아닙니다.<br>
-      <strong>{safe_handle}</strong>님이 직접 써보며 <strong>본인만의 실제 사례와 콘텐츠</strong>를 만들 수 있도록
-      <strong>Pro 버전을 1년 무료</strong>로 드리려는 겁니다.
-    </p>
+  <p>써보시고 괜찮다 싶으실 때 — 그때 파트너(<a href="{maepas_url}?utm_source=outreach&utm_medium=email"
+  target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">매파스</a>) 이야기를
+  나누고 싶습니다. 추천으로 구독자가 가입하면 <strong>첫 결제 20% + 재구독 10%</strong>가
+  매월 정산됩니다 (그로스 플랜 구독자 10명 유지 기준 월 약 20만원).
+  영상 제작 의무나 홍보 조건은 없습니다.</p>
 
-    <hr class="divider">
+  {scarcity_block}
 
-    <div class="highlight">
-      <h3>이렇게 활용하실 수 있어요</h3>
-      <ul>
-        <li><strong>① 영상 소재</strong> — "광고비 줄이는 과정", "키워드 순위 올리는 과정"이 그대로 영상 콘텐츠가 됩니다</li>
-        <li><strong>② 직접 실적</strong> — 광고비·키워드·순위·매출 데이터를 직접 분석해 실제 결과를</li>
-        <li><strong>③ 구독자에게 실제 도움</strong> — 실제 데이터로 설명 → 채널 신뢰도↑</li>
-        <li><strong>④ 광고 수익</strong> — 콘텐츠가 늘면 조회수·광고 수익도 함께 증가할 수 있습니다</li>
-        <li><strong>⑤ 파트너 수익</strong> — 아래 매파스로 부가수익까지</li>
-      </ul>
-    </div>
-
-    <div class="earning-box">
-      <div class="earn-title">🤝 매파스(매실 파트너스) — 쿠팡파트너스, 아시죠?</div>
-      <p style="font-size:13.5px;color:#444;line-height:1.7;margin:0 0 12px">
-        쿠팡파트너스처럼 매실인사이트도 <strong>매파스</strong>를 운영합니다.
-        내 추천으로 구독자가 가입하면 <strong>첫 결제 20% + 재구독 10%</strong> 커미션을 드립니다.
-      </p>
-      <table>
-        <tr><td>10유저 유지 시</td><td>매월 약 20만원 <span style="color:#888;font-weight:400">(1년 약 258만원)</span></td></tr>
-        <tr><td>100유저 유지 시</td><td>매월 약 200만원 <span style="color:#888;font-weight:400">(1년 약 2,587만원)</span></td></tr>
-      </table>
-      <div style="font-size:11.5px;color:#888;margin-top:8px">※ 그로스 플랜(199,000원/월)·재구독 10% 기준 예시 — 구독 유지 시 매월 정산</div>
-      <div style="margin-top:12px">
-        <a href="{maepas_url}?utm_source=outreach&utm_medium=email" target="_blank" rel="noopener" style="color:#3949ab;font-weight:600;font-size:13px;text-decoration:none">매파스 자세히 보기 →</a>
-      </div>
-    </div>
-
-    {scarcity_block}
-
-    <div class="cta">
-      <a class="btn" href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener">
-        카카오 오픈톡으로 이야기하기 💬
-      </a>
-    </div>
-    <p class="sub-note">관심 있으시면 편하게 이야기 나누고 싶습니다 · 부담 없이 문의해 주세요</p>
-
-    <p style="font-size:11.5px;color:#9ca3af;line-height:1.7;margin-top:20px">
-      ※ 위 사례·수익은 개인의 결과 및 예시이며, 성과는 운영 상황에 따라 다를 수 있습니다.
-    </p>
+  <div style="text-align:center;margin:28px 0 8px">
+    <a href="https://open.kakao.com/o/sg6QOxDg" target="_blank" rel="noopener"
+       style="display:inline-block;background:#1A6F3C;color:#fff;padding:13px 32px;
+              border-radius:30px;text-decoration:none;font-size:14.5px;font-weight:700">
+      카톡으로 편하게 물어보기 💬
+    </a>
   </div>
+  <p style="text-align:center;font-size:12.5px;color:#999;margin-top:6px">
+    질문만 하셔도 됩니다 · 무료체험 세팅도 카톡으로 도와드립니다
+  </p>
+
+  <p style="font-size:11.5px;color:#9ca3af;line-height:1.7;margin-top:20px">
+    ※ 위 사례는 실제 운영 계정의 결과이며, 성과는 운영 상황에 따라 다를 수 있습니다.
+  </p>
 </div>
 </body>
 </html>"""
