@@ -190,6 +190,14 @@ def _format_email_html(event: dict, analysis: "dev_agent.ErrorAnalysis | None" =
     return subject, html
 
 
+def _is_quota_error(err: str | None) -> bool:
+    """이메일 provider 일일 quota 초과(429) 여부. 서킷브레이커 트리거."""
+    if not err:
+        return False
+    e = err.lower()
+    return "429" in e or "quota" in e or "too many requests" in e
+
+
 def _send_to_channel(event: dict, channel: dict) -> dict:
     """1개 이벤트를 1개 채널로 발송. 반환: {channel_id, kind, sent_at, ok, error}."""
     now = datetime.now(timezone.utc).isoformat()
@@ -246,6 +254,9 @@ def dispatch_pending(limit: int = 50) -> dict:
     total_sends = 0
     ok_sends = 0
     errors: list[dict] = []
+    # 서킷브레이커: 이메일 quota(429)를 한 번이라도 만나면 이 사이클 내 이메일 발송 중단.
+    # (quota 소진 상태에서 계속 시도하면 폭주 + Claude 분석 비용 낭비)
+    email_circuit_open = False
 
     for ev in events:
         ok_entries: list[dict] = []   # 성공한 채널만 마킹 (실패는 제외 → 재시도 대상)
@@ -257,6 +268,9 @@ def dispatch_pending(limit: int = 50) -> dict:
                 continue  # 이전 사이클에서 이미 성공 → 스킵
             if not _meets_severity(ch.get("severity_min", "error"), ev.get("severity", "error")):
                 continue
+            # quota 서킷 열림 → 이메일 채널은 건너뜀 (다음 사이클 재시도 대상으로 남김)
+            if email_circuit_open and ch.get("kind") == "email":
+                continue
             entry = _send_to_channel(ev, ch)
             total_sends += 1
             if entry.get("ok"):
@@ -266,6 +280,9 @@ def dispatch_pending(limit: int = 50) -> dict:
                 errors.append({"event_id": ev["id"], "channel_id": ch["id"], "error": entry.get("error")})
                 logger.warning("dispatcher: 채널 발송 실패 [event=%s channel=%s]: %s",
                                ev.get("id"), ch.get("id"), entry.get("error"))
+                if ch.get("kind") == "email" and _is_quota_error(entry.get("error")):
+                    email_circuit_open = True
+                    logger.error("dispatcher: 이메일 quota 초과 감지 — 이번 사이클 이메일 발송 중단(서킷 오픈)")
 
         # 성공한 채널이 1개 이상 있을 때만 마킹 (실패 채널은 다음 사이클 재시도)
         if ok_entries:

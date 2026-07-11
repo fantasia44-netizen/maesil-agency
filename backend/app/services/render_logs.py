@@ -64,7 +64,10 @@ EXCLUDE_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r'"module":\s*"email".*"msg":\s*"이메일', re.I),
     # maesil-agency 자체 알림 에이전트 동작 로그 (INFO여도 ERROR 키워드 포함)
     re.compile(r"\[maesil-agency\s*·\s*(ERROR|WARNING|INFO)\]", re.I),
-    re.compile(r'"path":\s*"/api/v1/notify/', re.I),  # notify 엔드포인트 호출 로그
+    re.compile(r'"path":\s*"/api/v1/notify/', re.I),  # notify 엔드포인트 호출 로그(JSON 구조화 로그)
+    # 액세스 로그 형식도 차단 — "POST /api/v1/notify/email HTTP/1.1" 502
+    # (알림 발송 실패가 다시 알림을 만드는 피드백 루프의 직접 원인)
+    re.compile(r"(GET|POST|PUT|DELETE|PATCH)\s+/api/v1/notify/", re.I),
     # 네이버 광고 API — 지표 준비중(code=20007)은 정상 비즈니스 응답
     re.compile(r'"code"\s*:\s*20007', re.I),
     re.compile(r'지표\s*준비중', re.I),
