@@ -33,6 +33,11 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
     형식: 마케팅 박스 나열형 → 절제된 개인 메일 톤 (재오픈 시 '대량 광고' 재인식 방지).
     오프라인 영업의 검증된 클로저("처음부터 코칭") 반영 — 연결·세팅 1:1 지원 약속.
     타겟 언어: 파워유저(엑셀 수동 광고 세팅) 고통 명명 — 애이엔 사례에서 검증.
+
+    v3(2026-07-15): 경쟁 인텔 반영 — ③ '정직한 데이터 vs 크롤링' 차별화 추가.
+      경쟁 툴(빅셀/장사왕)은 로그인 크롤링이라 부정확·잘 깨짐 → 매실은 공식 데이터,
+      쿠팡이 부풀린 1P 로켓 ROAS(1,532%)를 실질(919%)로 바로잡는다는 구체 증거.
+      채널별 랜딩(/coupang·/naver)으로 자기 채널 페이지 자기선택 유도.
     """
     import html as _html
     safe_handle = _html.escape(handle_name)
@@ -46,6 +51,8 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
     maepas_url = settings.outreach_maepas_url or "https://maesil-insight.com/partners"
     cases_url = settings.outreach_cases_url or "https://maesil-insight.com/cases"
     trial_url = "https://maesil-insight.com"
+    coupang_url = "https://maesil-insight.com/coupang"
+    naver_url = "https://maesil-insight.com/naver"
 
     # 희소성 후킹 — OUTREACH_BETA_SLOTS>0 일 때만 (거짓 희소성 방지)
     _slots = settings.outreach_beta_slots
@@ -82,12 +89,23 @@ def _build_email_html(handle_name: str, platform_url: str, summary: str) -> str:
        style="color:#1A6F3C;font-weight:600">→ 사례 데이터 직접 보기</a>
   </div>
 
+  <p>혹시 다른 셀러 프로그램 써보셨다면, 잘 되다가 갑자기 숫자가 이상해진 적
+  있으실 거예요. 대부분 로그인해서 화면을 몰래 긁는 방식이라 쿠팡·네이버가
+  화면만 바꿔도 틀어집니다. 저흰 공식 데이터만 씁니다 — 심지어 쿠팡이 부풀려
+  보여주는 <strong>1P 로켓 ROAS 1,532%</strong>도 납품가 기준
+  <strong>실질 919%</strong>로 바로잡아 드려요. 화면 긁은 추정치가 아니라,
+  통장이랑 맞는 숫자입니다.</p>
+
   <p>이 숫자가 바로 안 믿기시는 게 정상입니다. 그래서 말로 설득하는 대신 —
   <strong>{safe_handle}님 스토어 데이터로 직접 확인</strong>해보시길 권합니다.
+  <a href="{coupang_url}?utm_source=outreach&utm_medium=email" target="_blank" rel="noopener"
+     style="color:#1A6F3C;font-weight:600">쿠팡</a> ·
+  <a href="{naver_url}?utm_source=outreach&utm_medium=email" target="_blank" rel="noopener"
+     style="color:#1A6F3C;font-weight:600">스마트스토어</a> 어느 쪽이든,
   <a href="{trial_url}?utm_source=outreach&utm_medium=email" target="_blank" rel="noopener"
-     style="color:#1A6F3C;font-weight:600">7일 무료, 카드 등록 없음</a>이고,
-  채널 연결부터 세팅까지 제가 1:1로 직접 잡아드립니다.
-  써보고 별로면 그냥 두시면 됩니다. 어떤 의무도 없습니다.</p>
+     style="color:#1A6F3C;font-weight:600">7일 무료, 카드 등록 없음</a>으로
+  본인 데이터에서 바로 보실 수 있습니다. 채널 연결부터 세팅까지 제가 1:1로
+  직접 잡아드리고, 써보고 별로면 그냥 두시면 됩니다. 어떤 의무도 없습니다.</p>
 
   <p>써보시고 괜찮다 싶으실 때 — 그때 파트너(<a href="{maepas_url}?utm_source=outreach&utm_medium=email"
   target="_blank" rel="noopener" style="color:#1A6F3C;font-weight:600">매파스</a>) 이야기를
