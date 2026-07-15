@@ -225,7 +225,7 @@ def find_email_from_channel_links(
 
 def bulk_crawl_missing_emails(
     tenant_id: str,
-    limit: int = 200,
+    limit: int = 20000,
     delay: float = 0.6,
 ) -> dict:
     """
@@ -245,17 +245,25 @@ def bulk_crawl_missing_emails(
         youtube_api_key = ""
 
     # 이메일 없는 YouTube approved 리드 조회
-    resp = (
-        db.table("outreach_leads")
-        .select("id, platform_url, handle_name")
-        .eq("tenant_id", tenant_id)
-        .eq("platform", "youtube")
-        .is_("contact_email", "null")
-        .in_("status", ["approved", "draft_ready"])
-        .limit(limit)
-        .execute()
-    )
-    leads = resp.data or []
+    # PostgREST 1,000행 상한 우회 페이지네이션 — 단일 .limit(200)이 미발송 785명 중
+    # 200명만 크롤링하던 문제 수정. 미발송 리드 전체를 대상으로 한다.
+    leads: list[dict] = []
+    while len(leads) < limit:
+        take = min(1000, limit - len(leads))
+        batch = (
+            db.table("outreach_leads")
+            .select("id, platform_url, handle_name")
+            .eq("tenant_id", tenant_id)
+            .eq("platform", "youtube")
+            .is_("contact_email", "null")
+            .in_("status", ["approved", "draft_ready"])
+            .order("id")
+            .range(len(leads), len(leads) + take - 1)
+            .execute()
+        ).data or []
+        leads.extend(batch)
+        if len(batch) < take:
+            break
     logger.info("[bulk_crawl] YouTube 이메일 없는 리드 %d건 크롤링 시작", len(leads))
 
     found = 0

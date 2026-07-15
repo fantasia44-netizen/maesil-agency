@@ -282,11 +282,12 @@ def trigger_batch_analysis(
 
 @router.post("/leads/crawl-emails")
 def crawl_emails_from_links(
-    limit: int = 200,
+    limit: int = 20000,
     user: UserContext = Depends(get_current_user),
 ) -> dict:
     """이메일 없는 YouTube 리드의 채널 외부 링크(블로그·카페·링크트리 등) 크롤링해 이메일 추출.
     백그라운드 실행. 완료 시 로그에서 확인.
+    기본 limit 20000 — 미발송 리드 전체 대상(과거 200 상한이 785명 중 200만 크롤링).
     """
     import threading
     tid = _require_tid(user)
@@ -302,7 +303,7 @@ def crawl_emails_from_links(
 
 @router.post("/leads/reextract-emails")
 def reextract_emails(
-    limit: int = 2000,
+    limit: int = 20000,
     user: UserContext = Depends(get_current_user),
 ) -> dict:
     """이메일 없는 approved 리드의 raw_contact_text를 재파싱해 이메일 추출.
@@ -360,12 +361,13 @@ def reextract_emails(
 
 @router.post("/leads/rescore")
 def trigger_rescore(
-    limit: int = 2000,
+    limit: int = 20000,
     user: UserContext = Depends(get_current_user),
 ) -> dict:
     """기존 리드 등급 재채점 (AI 재실행 없음).
     DB에 저장된 신호값으로 새 scorer 기준 재계산 → score/grade/score_breakdown 업데이트.
     구 필드(sells_competing_tool, is_competitor_partner 등) → 새 필드 매핑 포함.
+    limit 기본 20000 — 전 리드 대상(로컬 재계산이라 비용 없음, 페이지네이션).
     """
     import threading
     tid = _require_tid(user)
