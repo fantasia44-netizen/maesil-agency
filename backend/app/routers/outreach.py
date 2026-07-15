@@ -213,14 +213,14 @@ def trigger_analysis(lead_id: str, user: UserContext = Depends(get_current_user)
 @router.post("/leads/analyze-batch")
 def trigger_batch_analysis(
     grades: str = "S,A,B,C,D",
-    limit: int = 1000,
+    limit: int = 20000,
     force: bool = False,
     user: UserContext = Depends(get_current_user),
 ) -> dict:
     """리드 일괄 분석.
     - force=false (기본): discovered 상태만 분석
     - force=true: draft_ready 포함 재분석 (새 프롬프트 적용)
-    grades=S,A,B,C,D  limit=500
+    limit 기본 20000 — 대상 전체 분석(글자 분석은 Haiku라 건당 비용 미미, 페이지네이션).
     """
     import threading, time
     tid = _require_tid(user)
@@ -233,17 +233,23 @@ def trigger_batch_analysis(
     else:
         status_filter = ["discovered"]
 
-    resp = (
-        _db().table("outreach_leads")
-        .select("id, grade, status")
-        .eq("tenant_id", tid)
-        .in_("status", status_filter)
-        .in_("grade", grade_list)
-        .order("score", desc=True)
-        .limit(limit)
-        .execute()
-    )
-    rows = resp.data or []
+    # PostgREST 1,000행 상한 우회 페이지네이션 — 대상 전체 분석
+    rows: list[dict] = []
+    while len(rows) < limit:
+        take = min(1000, limit - len(rows))
+        batch = (
+            _db().table("outreach_leads")
+            .select("id, grade, status")
+            .eq("tenant_id", tid)
+            .in_("status", status_filter)
+            .in_("grade", grade_list)
+            .order("score", desc=True)
+            .range(len(rows), len(rows) + take - 1)
+            .execute()
+        ).data or []
+        rows.extend(batch)
+        if len(batch) < take:
+            break
     if not rows:
         status_desc = "discovered + draft_ready" if force else "discovered"
         return {"ok": True, "queued": 0, "message": f"분석할 리드 없음 ({status_desc} 상태)"}
