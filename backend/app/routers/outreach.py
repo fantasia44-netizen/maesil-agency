@@ -310,27 +310,33 @@ def reextract_emails(
     """
     import threading
     tid = _require_tid(user)
-    # PostgREST 1,000행 상한 우회 — range 페이지네이션
-    rows: list[dict] = []
-    while len(rows) < limit:
-        take = min(1000, limit - len(rows))
-        batch = (
-            _db().table("outreach_leads")
-            .select("id, raw_contact_text")
-            .eq("tenant_id", tid)
-            .is_("contact_email", "null")
-            .not_.is_("raw_contact_text", "null")
-            .in_("status", ["approved", "discovered", "analyzing", "draft_ready"])
-            .order("id")
-            .range(len(rows), len(rows) + take - 1)
-            .execute()
-        ).data or []
-        rows.extend(batch)
-        if len(batch) < take:
-            break
 
     def _run():
+        # DB 조회를 요청 밖(백그라운드)으로 — raw_contact_text가 커서 동기 조회 시
+        # 프론트 30초 타임아웃(fetch failed)을 넘기던 문제 수정. 링크 크롤링과 동일 패턴.
         from app.services.scanners.base import extract_contact
+        rows: list[dict] = []
+        try:
+            while len(rows) < limit:
+                take = min(1000, limit - len(rows))
+                batch = (
+                    _db().table("outreach_leads")
+                    .select("id, raw_contact_text")
+                    .eq("tenant_id", tid)
+                    .is_("contact_email", "null")
+                    .not_.is_("raw_contact_text", "null")
+                    .in_("status", ["approved", "discovered", "analyzing", "draft_ready"])
+                    .order("id")
+                    .range(len(rows), len(rows) + take - 1)
+                    .execute()
+                ).data or []
+                rows.extend(batch)
+                if len(batch) < take:
+                    break
+        except Exception as e:
+            logger.warning("[reextract-emails] 리드 조회 실패: %s", e)
+            return
+
         updated = 0
         for r in rows:
             txt = r.get("raw_contact_text") or ""
@@ -349,7 +355,7 @@ def reextract_emails(
         logger.info("[reextract-emails] %d/%d건 이메일 복구 완료", updated, len(rows))
 
     threading.Thread(target=_run, daemon=True).start()
-    return {"ok": True, "queued": len(rows), "message": f"{len(rows)}건 재추출 시작 (백그라운드)"}
+    return {"ok": True, "message": "이메일 재추출 시작 (백그라운드). 수 분 소요."}
 
 
 @router.post("/leads/rescore")
@@ -376,26 +382,32 @@ def trigger_rescore(
         "has_paid_course, has_paid_membership, has_ebook_sale, has_consulting, "
         "has_affiliate_exp, has_tool_recommendation"
     )
-    # PostgREST 1,000행 상한 우회 — 전 리드 재채점 시 1,000건 이후가 조용히 누락되던 문제
-    rows: list[dict] = []
-    while len(rows) < limit:
-        take = min(1000, limit - len(rows))
-        batch = (
-            _db().table("outreach_leads")
-            .select(_COLS)
-            .eq("tenant_id", tid)
-            .order("id")
-            .range(len(rows), len(rows) + take - 1)
-            .execute()
-        ).data or []
-        rows.extend(batch)
-        if len(batch) < take:
-            break
-    if not rows:
-        return {"ok": True, "rescored": 0, "message": "리드 없음"}
-
     def _run_rescore():
         from app.services.outreach_scorer import calculate_score
+        # DB 조회도 백그라운드로 — 요청 안 동기 조회가 프론트 타임아웃(fetch failed) 유발.
+        # PostgREST 1,000행 상한 우회 페이지네이션.
+        rows: list[dict] = []
+        try:
+            while len(rows) < limit:
+                take = min(1000, limit - len(rows))
+                batch = (
+                    _db().table("outreach_leads")
+                    .select(_COLS)
+                    .eq("tenant_id", tid)
+                    .order("id")
+                    .range(len(rows), len(rows) + take - 1)
+                    .execute()
+                ).data or []
+                rows.extend(batch)
+                if len(batch) < take:
+                    break
+        except Exception as e:
+            logger.warning("[rescore] 리드 조회 실패: %s", e)
+            return
+        if not rows:
+            logger.info("[rescore] 리드 없음")
+            return
+
         now_iso = datetime.now(timezone.utc).isoformat()
         _preserve_status = {"emailed", "no_reply", "replied", "negotiating", "deal", "rejected", "archived", "unsubscribe", "blocked"}
         updated = 0
@@ -480,7 +492,7 @@ def trigger_rescore(
         logger.info("[rescore] 완료: %d/%d건 재채점", updated, len(rows))
 
     threading.Thread(target=_run_rescore, daemon=True).start()
-    return {"ok": True, "queued": len(rows), "message": f"{len(rows)}건 등급 재채점 시작됨 (백그라운드, 약 10~30초)"}
+    return {"ok": True, "message": "등급 재채점 시작됨 (백그라운드, 약 10~30초)"}
 
 
 @router.get("/leads/{lead_id}/agency-briefing", response_class=HTMLResponse)
