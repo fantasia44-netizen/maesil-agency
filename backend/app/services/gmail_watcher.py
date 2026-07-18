@@ -318,7 +318,8 @@ def watch_bounces(tenant_id: str, limit: int = 20) -> dict:
     발송 전 DNS 검증으로 못 잡음 — 반송을 감지해서 남은 팔로업(2~5차)이 같은 주소로
     반복 반송되며 발신 평판을 깎는 걸 차단한다. 처리 내용:
       리드 send_failed + pending 터치 일괄 skip + suppression 등록(영구 차단).
-    idempotent(재실행 무해)라 별도 처리이력 없이 최근 3일 창을 매번 재검사.
+    idempotent(재실행 무해)라 별도 처리이력 없이 최근 14일 창을 매번 재검사.
+    (창을 3→14일로 넓혀, watcher가 며칠 끊겼다 복구돼도 그 사이 쌓인 반송을 소급 처리.)
     """
     client_id = _get_secret("gmail_client_id")
     client_secret = _get_secret("gmail_client_secret")
@@ -339,7 +340,7 @@ def watch_bounces(tenant_id: str, limit: int = 20) -> dict:
     try:
         r = httpx.get(
             f"{_GMAIL_API_BASE}/users/me/messages",
-            params={"q": "from:(mailer-daemon OR postmaster) newer_than:3d", "maxResults": limit},
+            params={"q": "from:(mailer-daemon OR postmaster) newer_than:14d", "maxResults": max(limit, 100)},
             headers={"Authorization": f"Bearer {token}"},
             timeout=15,
         )
