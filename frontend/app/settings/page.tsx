@@ -391,6 +391,16 @@ export default function SettingsPage() {
     }
   };
 
+  // 감시용 Gmail 재연결 — OAuth 흐름 시작 (gmail_refresh_token 재발급)
+  const reconnectGmailWatch = async () => {
+    try {
+      const r = await apiFetch<{ auth_url: string }>("/api/oauth/gmail-watch/start", {}, 15000);
+      window.location.href = r.auth_url;
+    } catch (e) {
+      setErr((e as Error).message + " (gmail_client_id/secret·maesil_agency_url 먼저 저장하세요)");
+    }
+  };
+
   const existing = (name: string) => secrets.find((s) => s.name === name);
 
   const currentUser = getUser();
@@ -450,10 +460,22 @@ export default function SettingsPage() {
                   placeholder={ex ? (card.kind === "config" ? "(저장됨 · 덮어쓰려면 입력)" : "••••••••  (저장됨 · 덮어쓰려면 입력)") : "키 입력"}
                 />
               </div>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
+              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                 <button className="btn primary" onClick={() => saveSecret(card)}>저장</button>
                 <button className="btn" onClick={() => testSecret(card)} disabled={!ex}>연결 테스트</button>
+                {card.name === "gmail_refresh_token" && (
+                  <button className="btn" onClick={reconnectGmailWatch} title="Google 동의로 새 refresh_token 발급 (만료 복구)">
+                    🔗 재연결
+                  </button>
+                )}
               </div>
+              {card.name === "gmail_refresh_token" && (
+                <div className="muted" style={{ marginTop: "0.4rem", fontSize: "0.78rem", lineHeight: 1.5 }}>
+                  ※ "연결 테스트"는 값 저장만 확인합니다(실제 검증 아님). 401 만료 시 <strong>재연결</strong>로 새 토큰을 받으세요.
+                  Google OAuth 클라이언트는 <strong>웹 애플리케이션</strong> 타입 + 리디렉트 URI에
+                  <code>{`{maesil_agency_url}/api/oauth/gmail-watch/callback`}</code> 등록 필요.
+                </div>
+              )}
               {testRes && (
                 <div className={`test-result show ${testRes.ok ? "success" : "error"}`}>
                   {testRes.ok ? "성공" : "실패"} — {testRes.msg}
