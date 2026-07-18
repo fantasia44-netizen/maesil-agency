@@ -19,7 +19,7 @@ from __future__ import annotations
 import base64
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 
 import httpx
@@ -56,6 +56,49 @@ def _get_access_token(client_id: str, client_secret: str, refresh_token: str) ->
     except Exception as e:
         logger.error("Gmail 토큰 갱신 실패: %s", e)
         return None
+
+
+def _emit_token_expired_alert(context: str) -> None:
+    """Gmail watcher 토큰 갱신 실패(401)를 위젯 알림으로 표면화.
+
+    토큰이 죽으면 반송·회신 자동 감시가 조용히 멈춰 반송이 쌓이므로,
+    운영자가 재인증을 인지하도록 alert_events에 기록한다.
+    - 6시간 쿨다운: 매 사이클(15분) 중복 발행 방지
+    - severity=warning: 위젯엔 뜨되 이메일 채널(보통 severity_min=error)로는
+      나가지 않아 순환 발송/스팸 위험 없음
+    """
+    try:
+        db = _db()
+        cooldown_since = (datetime.now(timezone.utc) - timedelta(hours=6)).isoformat()
+        existing = (
+            db.table("alert_events")
+            .select("id")
+            .eq("source", "gmail_watcher")
+            .eq("severity", "warning")
+            .gte("created_at", cooldown_since)
+            .limit(1)
+            .execute()
+        ).data or []
+        if existing:
+            return  # 쿨다운 내 이미 발행됨
+        db.table("alert_events").insert({
+            "program_name": "maesil-agency",
+            "severity": "warning",
+            "source": "gmail_watcher",
+            "title": "Gmail 반송감시 토큰 만료 — 재인증 필요",
+            "message": (
+                f"Gmail OAuth 토큰 갱신에 실패했습니다 ({context}, 401). "
+                "반송(bounce)·회신 자동 감시가 중단된 상태라, 죽은 주소로 팔로업이 "
+                "계속 나가고 반송이 쌓일 수 있습니다.\n"
+                "설정 → Gmail 재연결로 재인증하세요. "
+                "OAuth 앱이 '테스트' 모드면 refresh token이 7일마다 만료되니 "
+                "'프로덕션'으로 전환하면 재발을 막습니다."
+            ),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }).execute()
+        logger.warning("[gmail_watcher] 토큰 만료 알림 발행 (%s)", context)
+    except Exception as e:
+        logger.debug("[gmail_watcher] 토큰 만료 알림 발행 실패: %s", e)
 
 
 # ── Gmail 검색 ────────────────────────────────────────────────────────
@@ -286,6 +329,7 @@ def watch_bounces(tenant_id: str, limit: int = 20) -> dict:
 
     token = _get_access_token(client_id, client_secret, refresh_token)  # type: ignore[arg-type]
     if not token:
+        _emit_token_expired_alert("반송 감시")
         return {"ok": False, "error": "액세스 토큰 갱신 실패"}
 
     own = {a.lower() for a in [from_email, _get_secret("outreach_gmail_from") or ""] if a}
@@ -364,6 +408,7 @@ def watch_replies(tenant_id: str, limit: int = 30) -> dict:
 
     access_token = _get_access_token(client_id, client_secret, refresh_token)  # type: ignore[arg-type]
     if not access_token:
+        _emit_token_expired_alert("회신 감시")
         return {"ok": False, "error": "액세스 토큰 갱신 실패"}
 
     # emailed 상태 리드 조회
