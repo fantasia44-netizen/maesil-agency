@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiFetch } from "../../../lib/api";
+import { apiFetch, getUser } from "../../../lib/api";
 
 const GREEN = "#1A6F3C";
 
@@ -83,6 +83,22 @@ export default function CustomerOutreachSettings() {
     } catch (e) { flash(e instanceof Error ? e.message : "연결 시작 실패 (client_id/secret 먼저 저장)"); }
   }
 
+  // 콜드메일 발송 파이프라인 테스트 — 본인 주소로 샘플 1통 (실제 리드 안 건드림)
+  async function testSendMail() {
+    const dflt = getUser()?.email || "";
+    const to = (window.prompt("테스트 메일을 받을 주소 (본인 이메일 권장)", dflt) || "").trim();
+    if (!to) return;
+    flash("발송 중…");
+    try {
+      const r = await apiFetch<{ ok: boolean; to: string }>(
+        `/api/outreach/test-send?to=${encodeURIComponent(to)}`, { method: "POST" }, 30000);
+      flash(`✅ 발송 성공 → ${r.to} (메일함 확인)`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "발송 실패";
+      window.alert("❌ 콜드메일 발송 실패\n\n" + msg + "\n\n(invalid_grant/인증 실패면 영업발송 Gmail 재연결 필요)");
+    }
+  }
+
   async function savePlatformKeys() {
     try {
       await apiFetch("/api/outreach/platform-keys", {
@@ -149,9 +165,10 @@ export default function CustomerOutreachSettings() {
           <label style={label}>발신 주소 (예: 내이름 &lt;me@gmail.com&gt;)</label>
           <input style={input} value={gFrom} onChange={e => setGFrom(e.target.value)} placeholder="발신자 표시" />
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button style={btn(false)} onClick={saveGmailSecrets}>정보 저장</button>
           <button style={btn(true)} onClick={connectGmail}>🔗 Gmail 연결하기</button>
+          <button style={btn(false)} onClick={testSendMail} title="본인 주소로 샘플 1통 — 콜드메일 발송 정상 여부 즉시 확인">✉️ 테스트 발송</button>
         </div>
       </div>
 
