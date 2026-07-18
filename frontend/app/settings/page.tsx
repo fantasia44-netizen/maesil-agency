@@ -123,6 +123,7 @@ export default function SettingsPage() {
   const [inputs, setInputs] = useState<Record<string, string>>({});
   const [testResults, setTestResults] = useState<Record<string, { ok: boolean; msg: string }>>({});
   const [err, setErr] = useState<string | null>(null);
+  const [gmailWatchMsg, setGmailWatchMsg] = useState<string>("");
 
   // ── 유저 관리 상태 ──
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -393,11 +394,17 @@ export default function SettingsPage() {
 
   // 감시용 Gmail 재연결 — OAuth 흐름 시작 (gmail_refresh_token 재발급)
   const reconnectGmailWatch = async () => {
+    setGmailWatchMsg("연결 시작 중…");
     try {
       const r = await apiFetch<{ auth_url: string }>("/api/oauth/gmail-watch/start", {}, 15000);
-      window.location.href = r.auth_url;
+      if (!r?.auth_url) {
+        setGmailWatchMsg("실패: 응답에 auth_url이 없습니다.");
+        return;
+      }
+      setGmailWatchMsg("Google 동의 페이지로 이동합니다…");
+      window.location.assign(r.auth_url);
     } catch (e) {
-      setErr((e as Error).message + " (gmail_client_id/secret·maesil_agency_url 먼저 저장하세요)");
+      setGmailWatchMsg("재연결 실패: " + (e as Error).message);
     }
   };
 
@@ -469,6 +476,11 @@ export default function SettingsPage() {
                   </button>
                 )}
               </div>
+              {card.name === "gmail_refresh_token" && gmailWatchMsg && (
+                <div className={`test-result show ${gmailWatchMsg.startsWith("재연결 실패") || gmailWatchMsg.startsWith("실패") ? "error" : "success"}`}>
+                  {gmailWatchMsg}
+                </div>
+              )}
               {card.name === "gmail_refresh_token" && (
                 <div className="muted" style={{ marginTop: "0.4rem", fontSize: "0.78rem", lineHeight: 1.5 }}>
                   ※ "연결 테스트"는 값 저장만 확인합니다(실제 검증 아님). 401 만료 시 <strong>재연결</strong>로 새 토큰을 받으세요.
