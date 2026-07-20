@@ -39,24 +39,39 @@ def _bounds_kst(year: int, quarter: int) -> tuple[str, str]:
 
 def _zero() -> dict:
     return {"paid_count": 0, "amount": 0, "supply": 0, "tax": 0,
-            "refund_count": 0, "refund_amount": 0}
+            "refund_count": 0, "refund_amount": 0,
+            "excluded_count": 0, "excluded_amount": 0}
+
+
+def _is_real_revenue(row: dict) -> bool:
+    """부가세 과세 매출 = PG로 실제 돈이 들어온 결제.
+    관리자 수동 포인트지급(pg_provider 없음)·테스트결제(100원)는 매출 아님 → 제외."""
+    if (row.get("status") or "") != "paid":
+        return False
+    if (row.get("payment_type") or "") == "test_payment":
+        return False
+    return bool((row.get("pg_provider") or "").strip())
 
 
 def _aggregate_payments(sb, table: str, start: str, end: str) -> dict:
-    """paid_at 기준 분기 내 결제 집계. status=paid만 매출로, 환불은 별도 표기."""
+    """paid_at 기준 분기 결제 집계. 실PG 결제만 매출, 수동지급/테스트는 제외 카운트."""
     rows = (sb.table(table)
-            .select("amount, supply_amount, tax_amount, status, "
-                    "refund_status, refund_amount, paid_at")
+            .select("amount, supply_amount, tax_amount, status, refund_status, "
+                    "refund_amount, paid_at, pg_provider, payment_type")
             .gte("paid_at", start).lt("paid_at", end)
             .limit(20000).execute().data or [])
     agg = _zero()
     for r in rows:
         amt = int(r.get("amount") or 0)
-        if r.get("status") == "paid":
+        if _is_real_revenue(r):
             agg["paid_count"] += 1
             agg["amount"] += amt
             agg["supply"] += int(r.get("supply_amount") or 0)
             agg["tax"] += int(r.get("tax_amount") or 0)
+        elif (r.get("status") or "") == "paid":
+            # status=paid지만 실매출 아님(수동지급·테스트) → 제외 집계로 표시
+            agg["excluded_count"] += 1
+            agg["excluded_amount"] += amt
         refund = int(r.get("refund_amount") or 0)
         if refund > 0 or (r.get("refund_status") or "") in ("refunded", "partial"):
             agg["refund_count"] += 1

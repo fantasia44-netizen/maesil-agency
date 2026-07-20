@@ -32,7 +32,8 @@ const TX_KIND_LABEL: Record<string, string> = {
 };
 type SysAgg = {
   paid_count: number; amount: number; supply: number; tax: number;
-  refund_count: number; refund_amount: number; error?: string;
+  refund_count: number; refund_amount: number;
+  excluded_count: number; excluded_amount: number; error?: string;
 };
 type SystemSales = {
   period: { start: string; end_exclusive: string };
@@ -288,7 +289,15 @@ export default function FinancePage() {
                       </tr>
                     ) : (
                       <tr key={k} style={{ borderTop: "1px solid #f1f5f9" }}>
-                        <td style={{ padding: "5px 8px" }}>{label}</td>
+                        <td style={{ padding: "5px 8px" }}>
+                          {label}
+                          {s.excluded_count > 0 && (
+                            <span className="muted" style={{ fontSize: "0.72rem", marginLeft: 6 }}
+                              title="수동 포인트지급·테스트결제 등 실PG 결제가 아닌 건 (매출 제외)">
+                              · 제외 {s.excluded_count}건 {won(s.excluded_amount)}원
+                            </span>
+                          )}
+                        </td>
                         <td style={{ textAlign: "right" }}>{s.paid_count}</td>
                         <td style={{ textAlign: "right" }}>{won(s.amount)}</td>
                         <td style={{ textAlign: "right" }}>{won(s.supply)}</td>
