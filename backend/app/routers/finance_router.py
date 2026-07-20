@@ -116,6 +116,72 @@ async def upload_tax_invoice(
             "inserted": inserted, "skipped": skipped}
 
 
+_TX_KINDS = ("card_sales", "card_purchase", "cash_receipt", "bank")
+
+
+@router.post("/uploads/transactions")
+async def upload_transactions(
+    file: UploadFile = File(...),
+    kind: str = Form(...),
+    user: UserContext = Depends(_require_admin),
+) -> dict:
+    """카드매출/카드매입/현금영수증/은행내역 엑셀 업로드 (컬럼명 자동인식)."""
+    if kind not in _TX_KINDS:
+        raise HTTPException(400, f"kind는 {', '.join(_TX_KINDS)} 중 하나여야 합니다.")
+
+    content = await file.read()
+    if not content:
+        raise HTTPException(400, "빈 파일입니다.")
+
+    from app.services.finance_statements import parse_statement_excel
+    try:
+        parsed = parse_statement_excel(content, file.filename or "", kind)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    if not parsed:
+        raise HTTPException(400, "파싱된 거래가 없습니다. 파일 내용을 확인하세요.")
+
+    db = _db()
+
+    # 승인번호 있는 건만 중복 제외 (kind+approval_no 유니크)
+    approvals = [r["approval_no"] for r in parsed if r["approval_no"]]
+    existing: set[str] = set()
+    for i in range(0, len(approvals), 200):
+        resp = (db.table("finance_transactions").select("approval_no")
+                .eq("kind", kind).in_("approval_no", approvals[i:i + 200]).execute())
+        existing |= {r["approval_no"] for r in (resp.data or [])}
+    new_rows = [r for r in parsed
+                if not r["approval_no"] or r["approval_no"] not in existing]
+    skipped = len(parsed) - len(new_rows)
+
+    up = db.table("finance_uploads").insert({
+        "kind": kind,
+        "direction": "sales" if kind in ("card_sales", "cash_receipt")
+                     else ("purchase" if kind == "card_purchase" else None),
+        "filename": file.filename,
+        "row_count": len(parsed),
+        "inserted_count": len(new_rows),
+        "skipped_count": skipped,
+        "created_by": user.email,
+    }).execute()
+    upload_id = up.data[0]["id"] if up.data else None
+
+    inserted = 0
+    for i in range(0, len(new_rows), 200):
+        chunk = [{**r, "upload_id": upload_id} for r in new_rows[i:i + 200]]
+        try:
+            resp = db.table("finance_transactions").insert(chunk).execute()
+            inserted += len(resp.data or [])
+        except Exception as e:
+            logger.error("[finance] 거래 저장 실패 (chunk %d): %s", i, e)
+            raise HTTPException(500, f"저장 중 오류: {str(e)[:200]}")
+
+    logger.info("[finance] 거래 업로드 %s: 파싱 %d, 신규 %d, 중복 %d (%s)",
+                file.filename, len(parsed), inserted, skipped, kind)
+    return {"ok": True, "upload_id": upload_id, "parsed": len(parsed),
+            "inserted": inserted, "skipped": skipped}
+
+
 @router.get("/uploads")
 def list_uploads(limit: int = Query(30, le=100),
                  user: UserContext = Depends(_require_admin)) -> list[dict]:
@@ -127,12 +193,15 @@ def list_uploads(limit: int = Query(30, le=100),
 @router.delete("/uploads/{upload_id}")
 def delete_upload(upload_id: str,
                   user: UserContext = Depends(_require_admin)) -> dict:
-    """업로드 배치 롤백 — 해당 배치로 들어간 계산서를 삭제하고 이력 제거."""
+    """업로드 배치 롤백 — 해당 배치의 계산서/거래를 삭제하고 이력 제거."""
     db = _db()
     inv = (db.table("finance_tax_invoices").delete()
            .eq("upload_id", upload_id).execute())
+    tx = (db.table("finance_transactions").delete()
+          .eq("upload_id", upload_id).execute())
     db.table("finance_uploads").delete().eq("id", upload_id).execute()
-    return {"ok": True, "deleted_invoices": len(inv.data or [])}
+    return {"ok": True, "deleted_invoices": len(inv.data or []),
+            "deleted_transactions": len(tx.data or [])}
 
 
 # ── 계산서 목록/수정 ─────────────────────────────────────────────────
@@ -174,6 +243,40 @@ def patch_invoice(invoice_id: str, body: InvoicePatch,
     return {"ok": True}
 
 
+# ── 거래내역 (카드/현금영수증/은행) ──────────────────────────────────
+
+@router.get("/transactions")
+def list_transactions(
+    year: int = Query(...),
+    quarter: int = Query(...),
+    kind: Optional[str] = None,
+    limit: int = Query(500, le=2000),
+    user: UserContext = Depends(_require_admin),
+) -> list[dict]:
+    start, end = _quarter_bounds(year, quarter)
+    q = (_db().table("finance_transactions").select("*")
+         .gte("tx_date", start).lte("tx_date", end)
+         .order("tx_date", desc=True).limit(limit))
+    if kind in _TX_KINDS:
+        q = q.eq("kind", kind)
+    return q.execute().data or []
+
+
+@router.patch("/transactions/{tx_id}")
+def patch_transaction(tx_id: str, body: InvoicePatch,
+                      user: UserContext = Depends(_require_admin)) -> dict:
+    update = {k: v for k, v in body.model_dump().items() if v is not None}
+    if body.deductible is True and body.nondeduct_reason is None:
+        update["nondeduct_reason"] = None
+    if not update:
+        raise HTTPException(400, "변경할 값이 없습니다.")
+    resp = (_db().table("finance_transactions").update(update)
+            .eq("id", tx_id).execute())
+    if not resp.data:
+        raise HTTPException(404, "거래를 찾을 수 없습니다.")
+    return {"ok": True}
+
+
 # ── 부가세 집계 ──────────────────────────────────────────────────────
 
 @router.get("/vat-summary")
@@ -184,15 +287,22 @@ def vat_summary(
 ) -> dict:
     """분기 부가세 집계 (법인 일반과세).
 
-    매출세액(과세분) - 공제 매입세액 = 납부(환급)세액.
-    영세율은 과세표준 포함·세액 0, 면세는 참고(과세표준 제외).
-    ※ 세금계산서 기반 수치 — 카드매출·현금영수증 집계는 2단계에서 합산.
+    매출세액 = 세금계산서(과세) + 카드매출 + 현금영수증
+    매입세액 = 세금계산서(공제) + 사업용카드 매입(공제)
+    납부(환급)세액 = 매출세액 - 매입세액
+    영세율은 과세표준 포함·세액 0, 면세는 참고. 은행내역은 부가세 미포함(참고).
     """
     start, end = _quarter_bounds(year, quarter)
-    rows = (_db().table("finance_tax_invoices")
+    db = _db()
+
+    rows = (db.table("finance_tax_invoices")
             .select("direction, tax_type, deductible, supply_cost_total, tax_total")
             .gte("write_date", start).lte("write_date", end)
             .limit(10000).execute().data or [])
+    txs = (db.table("finance_transactions")
+           .select("kind, deductible, supply_amount, vat_amount, deposit, withdrawal")
+           .gte("tx_date", start).lte("tx_date", end)
+           .limit(20000).execute().data or [])
 
     def _zero():
         return {"count": 0, "supply": 0, "tax": 0}
@@ -216,9 +326,38 @@ def vat_summary(
         bucket["supply"] += supply
         bucket["tax"] += tax
 
-    sales_tax = sales["과세"]["tax"]                       # 매출세액
-    input_tax = purchase["공제"]["tax"]                    # 공제 매입세액
-    taxable_base = sales["과세"]["supply"] + sales["영세"]["supply"]  # 과세표준
+    # 카드/현금영수증/은행 집계
+    card_sales = _zero()
+    cash_receipt = _zero()
+    card_purchase = {"공제": _zero(), "불공제": _zero()}
+    bank = {"count": 0, "deposit": 0, "withdrawal": 0}
+
+    for t in txs:
+        supply = t.get("supply_amount") or 0
+        vat = t.get("vat_amount") or 0
+        k = t.get("kind")
+        if k == "card_sales":
+            b = card_sales
+        elif k == "cash_receipt":
+            b = cash_receipt
+        elif k == "card_purchase":
+            b = card_purchase["공제"] if t.get("deductible", True) else card_purchase["불공제"]
+        else:  # bank — 부가세 미포함, 입출금 참고
+            bank["count"] += 1
+            bank["deposit"] += t.get("deposit") or 0
+            bank["withdrawal"] += t.get("withdrawal") or 0
+            continue
+        b["count"] += 1
+        b["supply"] += supply
+        b["tax"] += vat
+
+    # 매출세액 = 계산서(과세) + 카드매출 + 현금영수증
+    sales_tax = sales["과세"]["tax"] + card_sales["tax"] + cash_receipt["tax"]
+    # 매입세액 = 계산서(공제) + 카드매입(공제)
+    input_tax = purchase["공제"]["tax"] + card_purchase["공제"]["tax"]
+    # 과세표준 = 계산서(과세+영세) + 카드매출 + 현금영수증 공급가액
+    taxable_base = (sales["과세"]["supply"] + sales["영세"]["supply"]
+                    + card_sales["supply"] + cash_receipt["supply"])
 
     return {
         "year": year,
@@ -226,9 +365,14 @@ def vat_summary(
         "label": f"{year}년 {_QUARTER_LABEL[quarter]} ({start} ~ {end})",
         "sales": sales,
         "purchase": purchase,
+        "card_sales": card_sales,
+        "cash_receipt": cash_receipt,
+        "card_purchase": card_purchase,
+        "bank": bank,
         "taxable_base": taxable_base,
         "sales_tax": sales_tax,
         "input_tax": input_tax,
         "payable_tax": sales_tax - input_tax,   # 양수=납부, 음수=환급
         "invoice_count": len(rows),
+        "transaction_count": len(txs),
     }

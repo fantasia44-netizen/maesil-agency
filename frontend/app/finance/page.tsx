@@ -14,8 +14,21 @@ type VatSummary = {
   year: number; quarter: number; label: string;
   sales: { 과세: Bucket; 영세: Bucket; 면세: Bucket };
   purchase: { 공제: Bucket; 불공제: Bucket; 면세: Bucket };
+  card_sales: Bucket; cash_receipt: Bucket;
+  card_purchase: { 공제: Bucket; 불공제: Bucket };
+  bank: { count: number; deposit: number; withdrawal: number };
   taxable_base: number; sales_tax: number; input_tax: number;
-  payable_tax: number; invoice_count: number;
+  payable_tax: number; invoice_count: number; transaction_count: number;
+};
+type Tx = {
+  id: string; kind: string; tx_date: string; counterparty: string;
+  supply_amount: number; vat_amount: number; total_amount: number;
+  deposit: number; withdrawal: number; deductible: boolean;
+  nondeduct_reason: string | null; vat_estimated: boolean;
+};
+const TX_KIND_LABEL: Record<string, string> = {
+  card_sales: "카드매출", card_purchase: "카드매입(사업용)",
+  cash_receipt: "현금영수증", bank: "은행내역",
 };
 type Invoice = {
   id: string; direction: "sales" | "purchase"; invoice_number: string;
@@ -41,24 +54,34 @@ export default function FinancePage() {
   const [dirFilter, setDirFilter] = useState<"sales" | "purchase">("sales");
   const [toast, setToast] = useState("");
 
-  // 업로드 폼
+  // 거래내역 (카드/현금영수증/은행)
+  const [txs, setTxs] = useState<Tx[]>([]);
+  const [txKind, setTxKind] = useState<string>("card_purchase");
+
+  // 업로드 폼 — 세금계산서
   const [upDir, setUpDir] = useState<"sales" | "purchase">("sales");
   const [upExempt, setUpExempt] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // 업로드 폼 — 카드/현금영수증/은행
+  const [txUpKind, setTxUpKind] = useState<string>("card_purchase");
+  const [txUploading, setTxUploading] = useState(false);
+  const txFileRef = useRef<HTMLInputElement>(null);
+
   const flash = (m: string) => { setToast(m); setTimeout(() => setToast(""), 3500); };
 
   const load = useCallback(async () => {
     try {
-      const [s, inv, ups] = await Promise.all([
+      const [s, inv, ups, tx] = await Promise.all([
         apiFetch<VatSummary>(`/api/finance/vat-summary?year=${year}&quarter=${quarter}`, {}, 20000),
         apiFetch<Invoice[]>(`/api/finance/tax-invoices?year=${year}&quarter=${quarter}&direction=${dirFilter}`, {}, 20000),
         apiFetch<Upload[]>(`/api/finance/uploads`, {}, 15000),
+        apiFetch<Tx[]>(`/api/finance/transactions?year=${year}&quarter=${quarter}&kind=${txKind}`, {}, 20000),
       ]);
-      setSummary(s); setInvoices(inv); setUploads(ups);
+      setSummary(s); setInvoices(inv); setUploads(ups); setTxs(tx);
     } catch (e) { flash(e instanceof Error ? e.message : "불러오기 실패"); }
-  }, [year, quarter, dirFilter]);
+  }, [year, quarter, dirFilter, txKind]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -83,6 +106,45 @@ export default function FinancePage() {
       load();
     } catch (e) { flash("❌ " + (e instanceof Error ? e.message : "업로드 실패")); }
     finally { setUploading(false); }
+  }
+
+  async function doTxUpload() {
+    const f = txFileRef.current?.files?.[0];
+    if (!f) { flash("파일을 선택하세요"); return; }
+    setTxUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", f);
+      fd.append("kind", txUpKind);
+      const res = await fetch(`${API}/api/finance/uploads/transactions`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${getToken()}` },
+        body: fd,
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body?.detail || `업로드 실패 (${res.status})`);
+      flash(`✅ 파싱 ${body.parsed}건 · 신규 ${body.inserted}건 · 중복 ${body.skipped}건`);
+      if (txFileRef.current) txFileRef.current.value = "";
+      setTxKind(txUpKind);
+      load();
+    } catch (e) { flash("❌ " + (e instanceof Error ? e.message : "업로드 실패")); }
+    finally { setTxUploading(false); }
+  }
+
+  async function toggleTxDeductible(t: Tx) {
+    const next = !t.deductible;
+    let reason: string | null = null;
+    if (!next) {
+      reason = prompt("불공제 사유 (예: 접대비, 사업 무관)") || null;
+      if (reason === null) return;
+    }
+    try {
+      await apiFetch(`/api/finance/transactions/${t.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ deductible: next, nondeduct_reason: reason }),
+      }, 15000);
+      load();
+    } catch (e) { flash(e instanceof Error ? e.message : "변경 실패"); }
   }
 
   async function rollbackUpload(id: string, filename: string) {
@@ -152,14 +214,16 @@ export default function FinancePage() {
             <div className="muted" style={{ fontSize: "0.78rem" }}>매출세액</div>
             <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>{won(summary.sales_tax)}원</div>
             <div className="muted" style={{ fontSize: "0.75rem", marginTop: 4 }}>
-              과세 {summary.sales.과세.count}건 · 영세 {summary.sales.영세.count}건
+              계산서 {won(summary.sales.과세.tax)} · 카드 {won(summary.card_sales.tax)} · 현금영수증 {won(summary.cash_receipt.tax)}
             </div>
           </div>
           <div className="card">
             <div className="muted" style={{ fontSize: "0.78rem" }}>공제 매입세액</div>
             <div style={{ fontSize: "1.25rem", fontWeight: 700 }}>{won(summary.input_tax)}원</div>
             <div className="muted" style={{ fontSize: "0.75rem", marginTop: 4 }}>
-              불공제 {summary.purchase.불공제.count}건 ({won(summary.purchase.불공제.tax)}원 제외)
+              계산서 {won(summary.purchase.공제.tax)} + 카드 {won(summary.card_purchase.공제.tax)}
+              {(summary.purchase.불공제.count + summary.card_purchase.불공제.count) > 0 &&
+                ` · 불공제 ${won(summary.purchase.불공제.tax + summary.card_purchase.불공제.tax)} 제외`}
             </div>
           </div>
           <div className="card" style={{ borderColor: payable >= 0 ? "#fca5a5" : "#86efac" }}>
@@ -171,10 +235,13 @@ export default function FinancePage() {
           </div>
         </div>
       )}
-      <p className="muted" style={{ fontSize: "0.78rem", marginTop: "-0.75rem" }}>
-        ※ 세금계산서 기준 집계입니다. 카드매출·현금영수증(인사이트/스튜디오 PG 매출 포함)은 2단계에서 합산 예정 —
-        그 전까지 신고 시 해당 분은 별도 확인하세요.
-      </p>
+      {summary && (
+        <p className="muted" style={{ fontSize: "0.78rem", marginTop: "-0.75rem" }}>
+          ※ 매출세액 = 세금계산서(과세) + 카드매출 + 현금영수증 · 매입세액 = 세금계산서(공제) + 사업용카드(공제).
+          은행내역은 부가세 미포함 참고자료
+          {summary.bank.count > 0 && ` (입금 ${won(summary.bank.deposit)} / 출금 ${won(summary.bank.withdrawal)}원)`}.
+        </p>
+      )}
 
       {/* 업로드 */}
       <div className="card" style={{ marginBottom: "1rem" }}>
@@ -199,6 +266,27 @@ export default function FinancePage() {
         </div>
       </div>
 
+      {/* 카드/현금영수증/은행 업로드 */}
+      <div className="card" style={{ marginBottom: "1rem" }}>
+        <div className="card-header"><div className="card-title">카드매출 · 카드매입 · 현금영수증 · 은행내역 업로드</div></div>
+        <p className="muted" style={{ fontSize: "0.8rem", margin: "0 0 10px" }}>
+          홈택스(사업용카드·현금영수증)·카드사·은행에서 받은 엑셀을 올리세요. 컬럼명(거래일자·가맹점·공급가액·부가세·합계·입금·출금)을
+          자동 인식합니다. 공급가액/부가세 컬럼이 없으면 합계에서 10% 역산(표시됨).
+        </p>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <select value={txUpKind} onChange={e => setTxUpKind(e.target.value)}>
+            <option value="card_purchase">카드매입 (사업용카드)</option>
+            <option value="card_sales">카드매출</option>
+            <option value="cash_receipt">현금영수증 (매출)</option>
+            <option value="bank">은행내역 (참고용)</option>
+          </select>
+          <input ref={txFileRef} type="file" accept=".xlsx,.xls" style={{ fontSize: "0.85rem" }} />
+          <button className="btn primary" onClick={doTxUpload} disabled={txUploading}>
+            {txUploading ? "업로드 중…" : "업로드"}
+          </button>
+        </div>
+      </div>
+
       {/* 업로드 이력 */}
       {uploads.length > 0 && (
         <div className="card" style={{ marginBottom: "1rem" }}>
@@ -211,7 +299,9 @@ export default function FinancePage() {
               {uploads.map(u => (
                 <tr key={u.id} style={{ borderTop: "1px solid #f1f5f9" }}>
                   <td style={{ padding: "5px 8px" }}>{u.filename}</td>
-                  <td>{u.direction === "sales" ? "매출" : "매입"}</td>
+                  <td>{u.kind === "tax_invoice"
+                        ? (u.direction === "sales" ? "계산서·매출" : "계산서·매입")
+                        : (TX_KIND_LABEL[u.kind] || u.kind)}</td>
                   <td>{u.row_count} / {u.inserted_count} / {u.skipped_count}</td>
                   <td className="muted">{new Date(u.created_at).toLocaleString("ko-KR")}</td>
                   <td><button className="btn" style={{ color: "#b91c1c", padding: "2px 8px", fontSize: "0.75rem" }}
@@ -262,6 +352,66 @@ export default function FinancePage() {
                           title={inv.nondeduct_reason || "클릭해서 공제/불공제 전환"}
                           onClick={() => toggleDeductible(inv)}>
                           {inv.deductible ? "공제" : `불공제${inv.nondeduct_reason ? `·${inv.nondeduct_reason}` : ""}`}
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* 거래내역 (카드/현금영수증/은행) */}
+      <div className="card" style={{ marginTop: "1rem" }}>
+        <div className="card-header">
+          <div className="card-title">거래내역</div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {Object.entries(TX_KIND_LABEL).map(([k, label]) => (
+              <button key={k} className={`btn ${txKind === k ? "primary" : ""}`}
+                onClick={() => setTxKind(k)}>{label}</button>
+            ))}
+          </div>
+        </div>
+        {txs.length === 0 ? (
+          <p className="muted">이 분기에 {TX_KIND_LABEL[txKind]} 내역이 없습니다.</p>
+        ) : (
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", fontSize: "0.82rem", borderCollapse: "collapse", whiteSpace: "nowrap" }}>
+              <thead><tr style={{ textAlign: "left", color: "#64748b" }}>
+                <th style={{ padding: "4px 8px" }}>일자</th>
+                <th>{txKind === "bank" ? "적요/거래처" : "가맹점/거래처"}</th>
+                {txKind === "bank" ? (<>
+                  <th style={{ textAlign: "right" }}>입금</th>
+                  <th style={{ textAlign: "right" }}>출금</th>
+                </>) : (<>
+                  <th style={{ textAlign: "right" }}>공급가액</th>
+                  <th style={{ textAlign: "right" }}>부가세</th>
+                  <th style={{ textAlign: "right" }}>합계</th>
+                </>)}
+                {txKind === "card_purchase" && <th>공제</th>}
+              </tr></thead>
+              <tbody>
+                {txs.map(t => (
+                  <tr key={t.id} style={{ borderTop: "1px solid #f1f5f9" }}>
+                    <td style={{ padding: "5px 8px" }}>{t.tx_date}</td>
+                    <td>{t.counterparty || "-"}{t.vat_estimated && <span className="muted" title="공급가액/부가세를 합계에서 역산"> *</span>}</td>
+                    {txKind === "bank" ? (<>
+                      <td style={{ textAlign: "right" }}>{t.deposit ? won(t.deposit) : ""}</td>
+                      <td style={{ textAlign: "right" }}>{t.withdrawal ? won(t.withdrawal) : ""}</td>
+                    </>) : (<>
+                      <td style={{ textAlign: "right" }}>{won(t.supply_amount)}</td>
+                      <td style={{ textAlign: "right" }}>{won(t.vat_amount)}</td>
+                      <td style={{ textAlign: "right" }}>{won(t.total_amount)}</td>
+                    </>)}
+                    {txKind === "card_purchase" && (
+                      <td>
+                        <button className="btn" style={{ padding: "1px 8px", fontSize: "0.72rem",
+                            color: t.deductible ? "#15803d" : "#b91c1c" }}
+                          title={t.nondeduct_reason || "클릭해서 공제/불공제 전환"}
+                          onClick={() => toggleTxDeductible(t)}>
+                          {t.deductible ? "공제" : `불공제${t.nondeduct_reason ? `·${t.nondeduct_reason}` : ""}`}
                         </button>
                       </td>
                     )}
