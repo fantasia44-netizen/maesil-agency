@@ -74,6 +74,11 @@ const KEY_CARDS: KeyCard[] = [
     hint: "Supabase 프로젝트 → Settings → API → Project URL (CS 에이전트 DB 접속용)" },
   { name: "maesil_insight_url", kind: "config", label: "maesil-insight 서비스 URL",
     hint: "예: https://maesil-insight.onrender.com (Tester 에이전트 하네스 API 호출용)" },
+  // ── 재무센터: 스튜디오 매출 자동 집계 ──
+  { name: "maesil_studio_supabase_url", kind: "config", label: "maesil-studio Supabase URL",
+    hint: "스튜디오 Supabase → Settings → API → Project URL (재무센터 매출 자동 집계용)" },
+  { name: "maesil_studio_service_role", kind: "supabase", label: "maesil-studio Service Role Key",
+    hint: "스튜디오 Supabase → Settings → API → service_role (재무센터 매출 자동 집계용)" },
   { name: "harness_api_token", kind: "other", label: "Harness API Token",
     hint: "maesil-insight의 HARNESS_API_TOKEN 환경변수 값 (Tester 에이전트용)" },
   { name: "maesil_agency_url", kind: "config", label: "maesil-agency 서비스 URL",

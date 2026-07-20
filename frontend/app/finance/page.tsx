@@ -30,6 +30,16 @@ const TX_KIND_LABEL: Record<string, string> = {
   card_sales: "카드매출", card_purchase: "카드매입(사업용)",
   cash_receipt: "현금영수증", bank: "은행내역",
 };
+type SysAgg = {
+  paid_count: number; amount: number; supply: number; tax: number;
+  refund_count: number; refund_amount: number; error?: string;
+};
+type SystemSales = {
+  period: { start: string; end_exclusive: string };
+  insight: SysAgg & { breakdown?: unknown };
+  studio: SysAgg;
+  total: SysAgg;
+};
 type Invoice = {
   id: string; direction: "sales" | "purchase"; invoice_number: string;
   write_date: string; tax_type: string;
@@ -71,6 +81,8 @@ export default function FinancePage() {
 
   const flash = (m: string) => { setToast(m); setTimeout(() => setToast(""), 3500); };
 
+  const [sysSales, setSysSales] = useState<SystemSales | null>(null);
+
   const load = useCallback(async () => {
     try {
       const [s, inv, ups, tx] = await Promise.all([
@@ -81,6 +93,11 @@ export default function FinancePage() {
       ]);
       setSummary(s); setInvoices(inv); setUploads(ups); setTxs(tx);
     } catch (e) { flash(e instanceof Error ? e.message : "불러오기 실패"); }
+    // 시스템 매출은 외부 DB 조회라 별도 로드 (실패해도 본 화면 유지)
+    try {
+      const ss = await apiFetch<SystemSales>(`/api/finance/system-sales?year=${year}&quarter=${quarter}`, {}, 30000);
+      setSysSales(ss);
+    } catch { setSysSales(null); }
   }, [year, quarter, dirFilter, txKind]);
 
   useEffect(() => { load(); }, [load]);
@@ -241,6 +258,88 @@ export default function FinancePage() {
           은행내역은 부가세 미포함 참고자료
           {summary.bank.count > 0 && ` (입금 ${won(summary.bank.deposit)} / 출금 ${won(summary.bank.withdrawal)}원)`}.
         </p>
+      )}
+
+      {/* 시스템 매출 대사 — 결제DB 자동 집계 vs 업로드 자료 */}
+      {summary && (
+        <div className="card" style={{ marginBottom: "1rem" }}>
+          <div className="card-header"><div className="card-title">시스템 매출 대사 (인사이트·스튜디오 결제 자동 집계)</div></div>
+          {!sysSales ? (
+            <p className="muted" style={{ fontSize: "0.82rem" }}>시스템 매출 조회 중이거나 실패했습니다.</p>
+          ) : (
+            <>
+              <table style={{ width: "100%", fontSize: "0.83rem", borderCollapse: "collapse" }}>
+                <thead><tr style={{ textAlign: "left", color: "#64748b" }}>
+                  <th style={{ padding: "4px 8px" }}>구분</th>
+                  <th style={{ textAlign: "right" }}>건수</th>
+                  <th style={{ textAlign: "right" }}>결제금액</th>
+                  <th style={{ textAlign: "right" }}>공급가액</th>
+                  <th style={{ textAlign: "right" }}>부가세</th>
+                  <th style={{ textAlign: "right" }}>환불</th>
+                </tr></thead>
+                <tbody>
+                  {(["insight", "studio"] as const).map(k => {
+                    const s = sysSales[k];
+                    const label = k === "insight" ? "매실인사이트" : "매실스튜디오";
+                    return s?.error ? (
+                      <tr key={k} style={{ borderTop: "1px solid #f1f5f9" }}>
+                        <td style={{ padding: "5px 8px" }}>{label}</td>
+                        <td colSpan={5} className="muted" style={{ fontSize: "0.78rem" }}>{s.error}</td>
+                      </tr>
+                    ) : (
+                      <tr key={k} style={{ borderTop: "1px solid #f1f5f9" }}>
+                        <td style={{ padding: "5px 8px" }}>{label}</td>
+                        <td style={{ textAlign: "right" }}>{s.paid_count}</td>
+                        <td style={{ textAlign: "right" }}>{won(s.amount)}</td>
+                        <td style={{ textAlign: "right" }}>{won(s.supply)}</td>
+                        <td style={{ textAlign: "right" }}>{won(s.tax)}</td>
+                        <td style={{ textAlign: "right" }}>{s.refund_amount ? `-${won(s.refund_amount)}` : "-"}</td>
+                      </tr>
+                    );
+                  })}
+                  <tr style={{ borderTop: "2px solid #e2e8f0", fontWeight: 700 }}>
+                    <td style={{ padding: "5px 8px" }}>시스템 합계 (A)</td>
+                    <td style={{ textAlign: "right" }}>{sysSales.total.paid_count}</td>
+                    <td style={{ textAlign: "right" }}>{won(sysSales.total.amount)}</td>
+                    <td style={{ textAlign: "right" }}>{won(sysSales.total.supply)}</td>
+                    <td style={{ textAlign: "right" }}>{won(sysSales.total.tax)}</td>
+                    <td style={{ textAlign: "right" }}>{sysSales.total.refund_amount ? `-${won(sysSales.total.refund_amount)}` : "-"}</td>
+                  </tr>
+                  {(() => {
+                    const uploadedTotal = summary.card_sales.supply + summary.card_sales.tax
+                      + summary.cash_receipt.supply + summary.cash_receipt.tax;
+                    const diff = sysSales.total.amount - uploadedTotal;
+                    return (
+                      <>
+                        <tr style={{ borderTop: "1px solid #f1f5f9" }}>
+                          <td style={{ padding: "5px 8px" }}>업로드 카드매출+현금영수증 (B)</td>
+                          <td style={{ textAlign: "right" }}>{summary.card_sales.count + summary.cash_receipt.count}</td>
+                          <td style={{ textAlign: "right" }}>{won(uploadedTotal)}</td>
+                          <td style={{ textAlign: "right" }}>{won(summary.card_sales.supply + summary.cash_receipt.supply)}</td>
+                          <td style={{ textAlign: "right" }}>{won(summary.card_sales.tax + summary.cash_receipt.tax)}</td>
+                          <td></td>
+                        </tr>
+                        <tr style={{ borderTop: "1px solid #f1f5f9", fontWeight: 700,
+                                     color: diff === 0 ? "#15803d" : "#b45309" }}>
+                          <td style={{ padding: "5px 8px" }}>차이 (A − B)</td>
+                          <td></td>
+                          <td style={{ textAlign: "right" }}>{diff === 0 ? "일치 ✓" : `${diff > 0 ? "+" : ""}${won(diff)}원`}</td>
+                          <td colSpan={3}></td>
+                        </tr>
+                      </>
+                    );
+                  })()}
+                </tbody>
+              </table>
+              <p className="muted" style={{ fontSize: "0.76rem", marginTop: 8, lineHeight: 1.6 }}>
+                A = 결제DB(운영의 진실) · B = 업로드한 PG정산/홈택스 카드매출 자료.
+                차이가 나면 정산 시차·환불·미업로드분을 확인하세요.
+                <strong> 신고 기준 숫자는 홈택스 '신고도움서비스' 카드매출</strong> — 온라인 PG만 쓰므로 여신금융협회 자료는 불필요.
+                세금계산서 매출({won(summary.sales.과세.supply + summary.sales.영세.supply + summary.sales.면세.supply)}원)은 별도 합산됩니다.
+              </p>
+            </>
+          )}
+        </div>
       )}
 
       {/* 업로드 */}

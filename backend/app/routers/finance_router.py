@@ -277,6 +277,25 @@ def patch_transaction(tx_id: str, body: InvoicePatch,
     return {"ok": True}
 
 
+# ── 시스템 매출 (인사이트·스튜디오 결제 DB 자동 집계) ────────────────
+
+@router.get("/system-sales")
+def system_sales(
+    year: int = Query(...),
+    quarter: int = Query(...),
+    user: UserContext = Depends(_require_admin),
+) -> dict:
+    """인사이트(payments+agency_payments)·스튜디오(payments) 분기 매출 자동 집계.
+
+    3자 대사용: 시스템 매출 ↔ 업로드 카드매출·현금영수증 ↔ 세금계산서 매출.
+    신고 기준 숫자는 홈택스 '신고도움서비스' 카드매출 — 차이나면 원인 추적.
+    """
+    if quarter not in (1, 2, 3, 4):
+        raise HTTPException(400, "quarter는 1~4 사이여야 합니다.")
+    from app.services.finance_system_sales import fetch_system_sales
+    return fetch_system_sales(year, quarter)
+
+
 # ── 부가세 집계 ──────────────────────────────────────────────────────
 
 @router.get("/vat-summary")
