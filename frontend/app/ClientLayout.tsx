@@ -97,7 +97,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
           {admin && <Link href="/cs">CS관리</Link>}
           {admin && <Link href="/warehouse">창고·물류</Link>}
-          {admin && <Link href="/accounting">회계</Link>}
+          {admin && <NavGroup label="재무" pathname={pathname}>
+            <Link href="/finance">재무센터</Link>
+            <Link href="/accounting">회계</Link>
+          </NavGroup>}
           {admin && <Link href="/briefing">브리핑</Link>}
           {admin && <Link href="/chat">대화</Link>}
           {admin && <Link href="/settings">설정</Link>}
