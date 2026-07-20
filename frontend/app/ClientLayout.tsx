@@ -2,46 +2,63 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getToken, getUser, isSuperAdmin, logout, type StoredUser } from "../lib/api";
 
 const PUBLIC_PATHS = ["/login", "/join", "/welcome", "/signup"];
 
 function NavGroup({ label, pathname, children }: { label: string; pathname: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  // 닫힘 유예 타이머 — 마우스가 라벨↔메뉴 사이를 지나거나 살짝 벗어나도 바로 안 닫히게
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const links = Array.isArray(children) ? children : [children];
   const active = links.some((c: any) => c?.props?.href && pathname.startsWith(c.props.href));
 
+  const show = () => {
+    if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
+    setOpen(true);
+  };
+  const hideSoon = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setOpen(false), 200);
+  };
+  useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
+  useEffect(() => { setOpen(false); }, [pathname]); // 이동하면 닫기
+
   return (
     <div style={{ position: "relative" }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={show}
+      onMouseLeave={hideSoon}
     >
-      <span style={{
-        fontSize: "0.9rem", color: active ? "#0f172a" : "#475569",
-        fontWeight: active ? 600 : 400, cursor: "default",
-        display: "flex", alignItems: "center", gap: 3,
-      }}>
+      <span
+        onClick={() => setOpen(o => !o)} // 클릭으로도 토글 (터치·저속 마우스 대응)
+        style={{
+          fontSize: "0.9rem", color: active ? "#0f172a" : "#475569",
+          fontWeight: active ? 600 : 400, cursor: "pointer",
+          display: "flex", alignItems: "center", gap: 3,
+        }}>
         {label}
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
           <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
         </svg>
       </span>
       {open && (
-        <div style={{
-          position: "absolute", top: "100%", left: 0, marginTop: 4,
-          background: "#fff", border: "1px solid #e2e8f0", borderRadius: 8,
-          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-          padding: "0.35rem 0", zIndex: 100, minWidth: 120, whiteSpace: "nowrap",
-        }}>
-          {links.map((child: any, i: number) => (
-            <div key={i} style={{ padding: "0 0.25rem" }}>
-              <div style={{ borderRadius: 6 }}
-                className={pathname.startsWith(child?.props?.href) ? "nav-dropdown-active" : "nav-dropdown-item"}>
-                {child}
+        // 바깥 래퍼가 라벨과의 6px 간격을 '호버 가능한 영역'으로 포함 — 틈에서 안 끊김
+        <div style={{ position: "absolute", top: "100%", left: 0, paddingTop: 6, zIndex: 100 }}>
+          <div style={{
+            background: "#fff", border: "1px solid #e2e8f0", borderRadius: 8,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+            padding: "0.35rem 0", minWidth: 120, whiteSpace: "nowrap",
+          }}>
+            {links.map((child: any, i: number) => (
+              <div key={i} style={{ padding: "0 0.25rem" }}>
+                <div style={{ borderRadius: 6 }}
+                  className={pathname.startsWith(child?.props?.href) ? "nav-dropdown-active" : "nav-dropdown-item"}>
+                  {child}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>
