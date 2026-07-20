@@ -43,39 +43,49 @@ def _zero() -> dict:
             "excluded_count": 0, "excluded_amount": 0}
 
 
+# 매출로 잡지 않는 결제 유형 (테스트·수동 포인트지급 등)
+_NON_REVENUE_TYPES = {"test_payment", "point_grant", "admin_grant", "manual", "free", "gift"}
+
+
 def _is_real_revenue(row: dict) -> bool:
-    """부가세 과세 매출 = PG로 실제 돈이 들어온 결제.
-    관리자 수동 포인트지급(pg_provider 없음)·테스트결제(100원)는 매출 아님 → 제외."""
+    """부가세 과세 매출 = status=paid 이면서 비매출 유형이 아닌 결제.
+    (기존 인사이트/스튜디오 매출 화면과 동일하게 status=paid 기준. pg_provider는
+    실데이터에서 비어있는 경우가 많아 조건으로 쓰지 않음.)"""
     if (row.get("status") or "") != "paid":
         return False
-    if (row.get("payment_type") or "") == "test_payment":
-        return False
-    return bool((row.get("pg_provider") or "").strip())
+    return (row.get("payment_type") or "") not in _NON_REVENUE_TYPES
 
 
 def _aggregate_payments(sb, table: str, start: str, end: str) -> dict:
-    """paid_at 기준 분기 결제 집계. 실PG 결제만 매출, 수동지급/테스트는 제외 카운트."""
+    """paid_at 기준 분기 결제 집계. 비매출 유형은 제외 집계로 분리.
+    by_type: 어떤 payment_type이 잡혔는지 진단용 (금액 이상 시 원인 파악)."""
     rows = (sb.table(table)
             .select("amount, supply_amount, tax_amount, status, refund_status, "
-                    "refund_amount, paid_at, pg_provider, payment_type")
+                    "refund_amount, paid_at, pg_provider, payment_type, order_name")
             .gte("paid_at", start).lt("paid_at", end)
             .limit(20000).execute().data or [])
     agg = _zero()
+    by_type: dict[str, dict] = {}
     for r in rows:
         amt = int(r.get("amount") or 0)
+        ptype = r.get("payment_type") or "(none)"
+        if (r.get("status") or "") == "paid":
+            bt = by_type.setdefault(ptype, {"count": 0, "amount": 0})
+            bt["count"] += 1
+            bt["amount"] += amt
         if _is_real_revenue(r):
             agg["paid_count"] += 1
             agg["amount"] += amt
             agg["supply"] += int(r.get("supply_amount") or 0)
             agg["tax"] += int(r.get("tax_amount") or 0)
         elif (r.get("status") or "") == "paid":
-            # status=paid지만 실매출 아님(수동지급·테스트) → 제외 집계로 표시
             agg["excluded_count"] += 1
             agg["excluded_amount"] += amt
         refund = int(r.get("refund_amount") or 0)
         if refund > 0 or (r.get("refund_status") or "") in ("refunded", "partial"):
             agg["refund_count"] += 1
             agg["refund_amount"] += refund
+    agg["by_type"] = by_type
     return agg
 
 
