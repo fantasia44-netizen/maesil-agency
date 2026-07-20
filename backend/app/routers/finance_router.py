@@ -35,6 +35,19 @@ def _db():
     return get_maesil_total_client().schema("agent_work")
 
 
+def _safe_select(query_builder) -> list:
+    """테이블 미존재(마이그레이션 미실행) 등에도 500 대신 [] 반환."""
+    try:
+        return query_builder.execute().data or []
+    except Exception as e:
+        msg = str(e).lower()
+        if any(s in msg for s in ("does not exist", "42p01", "pgrst205",
+                                  "could not find", "schema cache")):
+            logger.warning("[finance] 테이블 미존재로 빈 결과 반환 (SQL 059/060 실행 필요?): %s", e)
+            return []
+        raise
+
+
 def _require_admin(user: UserContext = Depends(get_current_user)) -> UserContext:
     require_admin(user)
     return user
@@ -220,7 +233,7 @@ def list_tax_invoices(
          .order("write_date", desc=True).limit(limit))
     if direction in ("sales", "purchase"):
         q = q.eq("direction", direction)
-    return q.execute().data or []
+    return _safe_select(q)
 
 
 class InvoicePatch(BaseModel):
@@ -259,7 +272,7 @@ def list_transactions(
          .order("tx_date", desc=True).limit(limit))
     if kind in _TX_KINDS:
         q = q.eq("kind", kind)
-    return q.execute().data or []
+    return _safe_select(q)
 
 
 @router.patch("/transactions/{tx_id}")
@@ -314,14 +327,12 @@ def vat_summary(
     start, end = _quarter_bounds(year, quarter)
     db = _db()
 
-    rows = (db.table("finance_tax_invoices")
+    rows = _safe_select(db.table("finance_tax_invoices")
             .select("direction, tax_type, deductible, supply_cost_total, tax_total")
-            .gte("write_date", start).lte("write_date", end)
-            .limit(10000).execute().data or [])
-    txs = (db.table("finance_transactions")
+            .gte("write_date", start).lte("write_date", end).limit(10000))
+    txs = _safe_select(db.table("finance_transactions")
            .select("kind, deductible, supply_amount, vat_amount, deposit, withdrawal")
-           .gte("tx_date", start).lte("tx_date", end)
-           .limit(20000).execute().data or [])
+           .gte("tx_date", start).lte("tx_date", end).limit(20000))
 
     def _zero():
         return {"count": 0, "supply": 0, "tax": 0}

@@ -37,14 +37,6 @@ def _bounds_kst(year: int, quarter: int) -> tuple[str, str]:
     return start, end
 
 
-def _client(url_secret: str, key_secret: str):
-    url = get_secret(url_secret) or ""
-    key = get_secret(key_secret) or ""
-    if not url or not key:
-        return None
-    return create_client(url, key)
-
-
 def _zero() -> dict:
     return {"paid_count": 0, "amount": 0, "supply": 0, "tax": 0,
             "refund_count": 0, "refund_amount": 0}
@@ -72,45 +64,57 @@ def _aggregate_payments(sb, table: str, start: str, end: str) -> dict:
     return agg
 
 
+def _collect_insight(start: str, end: str) -> dict:
+    """인사이트 payments + agency_payments 집계. 실패 시 {'error': ...}."""
+    url = get_secret("maesil_insight_supabase_url") or ""
+    key = get_secret("m_insight_service_role") or ""
+    if not url or not key:
+        return {"error": "maesil_insight_supabase_url / m_insight_service_role 미설정"}
+    try:
+        sb = create_client(url, key)
+        core = _aggregate_payments(sb, "payments", start, end)
+        try:  # 대행사 결제 — 테이블 없거나 실패해도 본 집계는 유지
+            agency = _aggregate_payments(sb, "agency_payments", start, end)
+        except Exception as e:
+            logger.warning("[finance] insight agency_payments 실패: %s", e)
+            agency = _zero()
+        merged = {k: core[k] + agency[k] for k in core}
+        return {**merged, "breakdown": {"payments": core, "agency_payments": agency}}
+    except Exception as e:
+        logger.error("[finance] insight 매출 집계 실패: %s", e)
+        return {"error": f"조회 실패: {str(e)[:180]}"}
+
+
+def _collect_studio(start: str, end: str) -> dict:
+    """스튜디오 payments 집계. 실패 시 {'error': ...}."""
+    url = get_secret("maesil_studio_supabase_url") or ""
+    key = get_secret("maesil_studio_service_role") or ""
+    if not url or not key:
+        return {"error": "maesil_studio_supabase_url / maesil_studio_service_role 미설정 (/settings에서 등록)"}
+    try:
+        sb = create_client(url, key)
+        return _aggregate_payments(sb, "payments", start, end)
+    except Exception as e:
+        logger.error("[finance] studio 매출 집계 실패: %s", e)
+        return {"error": f"조회 실패: {str(e)[:180]}"}
+
+
 def fetch_system_sales(year: int, quarter: int) -> dict:
-    """분기 시스템 매출 — 인사이트(일반+대행사) + 스튜디오. 시스템별 오류는 격리."""
+    """분기 시스템 매출 — 인사이트(일반+대행사) + 스튜디오. 시스템별 오류는 완전 격리
+    (한쪽 시크릿이 잘못돼도 500 없이 error 필드로 반환)."""
     start, end = _bounds_kst(year, quarter)
-    result: dict = {"period": {"start": start[:10], "end_exclusive": end[:10]}}
+    insight = _collect_insight(start, end)
+    studio = _collect_studio(start, end)
+
     total = _zero()
-
-    # ── 매실인사이트 ──
-    insight = _client("maesil_insight_supabase_url", "m_insight_service_role")
-    if insight is None:
-        result["insight"] = {"error": "maesil_insight_supabase_url / m_insight_service_role 미설정"}
-    else:
-        try:
-            core = _aggregate_payments(insight, "payments", start, end)
-            try:  # 대행사 결제 — 테이블 없거나 실패해도 본 집계는 유지
-                agency = _aggregate_payments(insight, "agency_payments", start, end)
-            except Exception as e:
-                logger.warning("[finance] insight agency_payments 집계 실패: %s", e)
-                agency = _zero()
-            merged = {k: core[k] + agency[k] for k in core}
-            result["insight"] = {**merged, "breakdown": {"payments": core, "agency_payments": agency}}
+    for agg in (insight, studio):
+        if "error" not in agg:
             for k in total:
-                total[k] += merged[k]
-        except Exception as e:
-            logger.error("[finance] insight 매출 집계 실패: %s", e)
-            result["insight"] = {"error": f"조회 실패: {str(e)[:150]}"}
+                total[k] += agg.get(k, 0)
 
-    # ── 매실스튜디오 ──
-    studio = _client("maesil_studio_supabase_url", "maesil_studio_service_role")
-    if studio is None:
-        result["studio"] = {"error": "maesil_studio_supabase_url / maesil_studio_service_role 미설정 (/settings에서 등록)"}
-    else:
-        try:
-            agg = _aggregate_payments(studio, "payments", start, end)
-            result["studio"] = agg
-            for k in total:
-                total[k] += agg[k]
-        except Exception as e:
-            logger.error("[finance] studio 매출 집계 실패: %s", e)
-            result["studio"] = {"error": f"조회 실패: {str(e)[:150]}"}
-
-    result["total"] = total
-    return result
+    return {
+        "period": {"start": start[:10], "end_exclusive": end[:10]},
+        "insight": insight,
+        "studio": studio,
+        "total": total,
+    }
