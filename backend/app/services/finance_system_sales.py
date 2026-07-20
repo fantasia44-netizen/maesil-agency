@@ -89,6 +89,23 @@ def _aggregate_payments(sb, table: str, start: str, end: str) -> dict:
     return agg
 
 
+_NUMERIC_KEYS = ("paid_count", "amount", "supply", "tax",
+                 "refund_count", "refund_amount", "excluded_count", "excluded_amount")
+
+
+def _merge_aggs(a: dict, b: dict) -> dict:
+    """두 집계 합산 — 숫자 필드는 더하고 by_type(dict)은 유형별 병합."""
+    out = {k: (a.get(k, 0) or 0) + (b.get(k, 0) or 0) for k in _NUMERIC_KEYS}
+    bt: dict[str, dict] = {}
+    for src in (a.get("by_type") or {}, b.get("by_type") or {}):
+        for t, v in src.items():
+            slot = bt.setdefault(t, {"count": 0, "amount": 0})
+            slot["count"] += v.get("count", 0)
+            slot["amount"] += v.get("amount", 0)
+    out["by_type"] = bt
+    return out
+
+
 def _collect_insight(start: str, end: str) -> dict:
     """인사이트 payments + agency_payments 집계. 실패 시 {'error': ...}."""
     url = get_secret("maesil_insight_supabase_url") or ""
@@ -103,8 +120,7 @@ def _collect_insight(start: str, end: str) -> dict:
         except Exception as e:
             logger.warning("[finance] insight agency_payments 실패: %s", e)
             agency = _zero()
-        merged = {k: core[k] + agency[k] for k in core}
-        return {**merged, "breakdown": {"payments": core, "agency_payments": agency}}
+        return _merge_aggs(core, agency)
     except Exception as e:
         logger.error("[finance] insight 매출 집계 실패: %s", e)
         return {"error": f"조회 실패: {str(e)[:180]}"}

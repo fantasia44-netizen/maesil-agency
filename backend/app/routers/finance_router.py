@@ -40,10 +40,13 @@ def _safe_select(query_builder) -> list:
     try:
         return query_builder.execute().data or []
     except Exception as e:
-        msg = str(e).lower()
-        if any(s in msg for s in ("does not exist", "42p01", "pgrst205",
-                                  "could not find", "schema cache")):
-            logger.warning("[finance] 테이블 미존재로 빈 결과 반환 (SQL 059/060 실행 필요?): %s", e)
+        # postgrest APIError는 str()에 코드가 안 담길 수 있어 여러 소스를 합쳐 검사
+        parts = [str(e), repr(e), str(getattr(e, "message", "")),
+                 str(getattr(e, "code", "")), str(getattr(e, "details", ""))]
+        blob = " ".join(parts).lower()
+        if any(s in blob for s in ("does not exist", "42p01", "pgrst205", "pgrst 205",
+                                   "could not find", "schema cache", "not find the table")):
+            logger.warning("[finance] 테이블 미존재로 빈 결과 반환 (SQL 059/060 실행 필요): %s", e)
             return []
         raise
 
