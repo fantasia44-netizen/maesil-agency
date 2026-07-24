@@ -416,11 +416,16 @@ export default function SettingsPage() {
   };
 
   // 지금 즉시 회신·반송 감시 1회 실행 (진단) — 스케줄러/플래그 무관
-  const runWatchNow = async () => {
+  // backfill=true 면 과거 전체 소급(반송 1년 창 + no_reply 리드까지 회신 복구)
+  const runWatchNow = async (backfill = false) => {
     setGmailRunBusy(true);
     setGmailRun(null);
     try {
-      const r = await apiFetch<any>("/api/oauth/gmail-watch/run", { method: "POST" }, 60000);
+      const r = await apiFetch<any>(
+        `/api/oauth/gmail-watch/run${backfill ? "?backfill=true" : ""}`,
+        { method: "POST" },
+        backfill ? 180000 : 60000,
+      );
       setGmailRun(r);
     } catch (e) {
       setGmailRun({ error: (e as Error).message });
@@ -497,9 +502,15 @@ export default function SettingsPage() {
                   </button>
                 )}
                 {card.name === "gmail_refresh_token" && (
-                  <button className="btn" onClick={runWatchNow} disabled={gmailRunBusy}
-                          title="스케줄러/ENABLE_GMAIL_WATCHER와 무관하게 지금 즉시 회신·반송 감시 1회 실행">
+                  <button className="btn" onClick={() => runWatchNow(false)} disabled={gmailRunBusy}
+                          title="스케줄러/ENABLE_GMAIL_WATCHER와 무관하게 지금 즉시 회신·반송 감시 1회 실행 (최근 창)">
                     {gmailRunBusy ? "실행 중…" : "▶ 지금 감시 실행"}
+                  </button>
+                )}
+                {card.name === "gmail_refresh_token" && (
+                  <button className="btn" onClick={() => runWatchNow(true)} disabled={gmailRunBusy}
+                          title="과거 전체 소급: 반송 1년 창 + no_reply로 넘어간 리드까지 회신 복구 (시간 소요)">
+                    {gmailRunBusy ? "실행 중…" : "🔁 전체 백필"}
                   </button>
                 )}
               </div>
@@ -530,7 +541,7 @@ export default function SettingsPage() {
                         <div style={{ fontWeight: 600 }}>⚠ 감시 계정 ≠ 발신 주소 — 이 수신함엔 회신이 없어 전부 놓칩니다. 발신 계정으로 재연결하세요.</div>
                       )}
                       <div>스케줄러 자동감시(ENABLE_GMAIL_WATCHER): <strong>{gmailRun.enable_gmail_watcher ? "ON" : "OFF (Render 환경변수 필요)"}</strong></div>
-                      <div style={{ marginTop: 4 }}>테넌트 {gmailRun.tenants_checked}곳 실행 결과:</div>
+                      <div style={{ marginTop: 4 }}>테넌트 {gmailRun.tenants_checked}곳 실행 결과{gmailRun.backfill ? " (🔁 전체 백필)" : ""}:</div>
                       {(gmailRun.results || []).map((r: any, i: number) => (
                         <div key={i} style={{ marginLeft: 8 }}>
                           · {r.tenant_id}: 회신 검사 {r.replies?.checked ?? "-"}건 / 감지 {r.replies?.found_replies ?? 0}건

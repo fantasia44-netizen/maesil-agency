@@ -98,12 +98,16 @@ def start(user: UserContext = Depends(get_current_user)) -> dict:
 
 
 @router.post("/run")
-def run_now(user: UserContext = Depends(get_current_user)) -> dict:
+def run_now(backfill: bool = False, user: UserContext = Depends(get_current_user)) -> dict:
     """지금 즉시 회신·반송 감시 1회 실행 (진단용, 관리자 전용).
 
     스케줄러(15분)나 ENABLE_GMAIL_WATCHER 플래그와 무관하게 강제 실행하고,
     감시 계정·발신주소 일치 여부·검색 결과(checked/found)를 그대로 반환한다.
     "받는 메일 감시가 지금 어디까지 되는지"를 즉시 실측하는 용도.
+
+    backfill=True: 과거 전체 소급 처리 — 반송은 최근 14일이 아닌 1년 창,
+      회신은 emailed뿐 아니라 no_reply 리드까지(감시가 죽어 있던 동안 팔로업이
+      no_reply로 넘겨버린 회신 복구) 대량(200건) 검사. idempotent.
     """
     if not user.is_super_admin:
         raise HTTPException(403, "관리자만 감시를 실행할 수 있습니다.")
@@ -128,19 +132,24 @@ def run_now(user: UserContext = Depends(get_current_user)) -> dict:
     if not tenants and user.tenant_id:
         tenants = [user.tenant_id]
 
+    rep_limit, rep_statuses, bo_limit, bo_days = (
+        (200, ["emailed", "no_reply"], 200, 365) if backfill else (30, ["emailed"], 20, 14)
+    )
+
     results = []
     for tid in tenants:
         try:
-            rep = watch_replies(tid, 30)
+            rep = watch_replies(tid, rep_limit, statuses=rep_statuses)
         except Exception as e:
             rep = {"ok": False, "error": str(e)[:200]}
         try:
-            bo = watch_bounces(tid, 20)
+            bo = watch_bounces(tid, bo_limit, days=bo_days)
         except Exception as e:
             bo = {"ok": False, "error": str(e)[:200]}
         results.append({"tenant_id": str(tid)[:8], "replies": rep, "bounces": bo})
 
     return {
+        "backfill": backfill,
         "enable_gmail_watcher": settings.enable_gmail_watcher,
         "watch_account": account,
         "from_email": bare_from or None,

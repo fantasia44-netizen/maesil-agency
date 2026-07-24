@@ -382,8 +382,10 @@ def _extract_failed_recipients(token: str, message_id: str, own_addrs: set[str])
     }
 
 
-def watch_bounces(tenant_id: str, limit: int = 20) -> dict:
+def watch_bounces(tenant_id: str, limit: int = 20, days: int = 14) -> dict:
     """발송 메일함의 반송(mailer-daemon) 감시 → 해당 리드 발송 중단.
+
+    days: 검색 창(일). 정기 감시는 14일, 과거 전체 백필은 크게(예: 365) 지정.
 
     도메인은 실재하지만 계정이 없는 주소(550 5.1.1, 예: monicafromkore@gmail.com)는
     발송 전 DNS 검증으로 못 잡음 — 반송을 감지해서 남은 팔로업(2~5차)이 같은 주소로
@@ -408,15 +410,27 @@ def watch_bounces(tenant_id: str, limit: int = 20) -> dict:
     # 표시명 포함 형식("매실 <x@y>")에서 주소만
     own = {a.split("<")[-1].rstrip(">").strip() for a in own}
 
+    q = f"from:(mailer-daemon OR postmaster) newer_than:{max(days, 1)}d"
+    msg_ids: list[str] = []
+    page_token = None
+    max_pages = 20  # 백필 안전 상한(≈ 20*500 = 10,000건)
     try:
-        r = httpx.get(
-            f"{_GMAIL_API_BASE}/users/me/messages",
-            params={"q": "from:(mailer-daemon OR postmaster) newer_than:14d", "maxResults": max(limit, 100)},
-            headers={"Authorization": f"Bearer {token}"},
-            timeout=15,
-        )
-        r.raise_for_status()
-        msg_ids = [m["id"] for m in r.json().get("messages", [])]
+        for _ in range(max_pages):
+            params = {"q": q, "maxResults": 500}
+            if page_token:
+                params["pageToken"] = page_token
+            r = httpx.get(
+                f"{_GMAIL_API_BASE}/users/me/messages",
+                params=params,
+                headers={"Authorization": f"Bearer {token}"},
+                timeout=15,
+            )
+            r.raise_for_status()
+            data = r.json()
+            msg_ids.extend(m["id"] for m in data.get("messages", []))
+            page_token = data.get("nextPageToken")
+            if not page_token or len(msg_ids) >= max(limit, 100) * 50:
+                break
     except Exception as e:
         return {"ok": False, "error": f"반송 검색 실패: {e}"}
 
@@ -465,10 +479,15 @@ def watch_bounces(tenant_id: str, limit: int = 20) -> dict:
 
 # ── 메인 감시 루프 ────────────────────────────────────────────────────
 
-def watch_replies(tenant_id: str, limit: int = 30) -> dict:
+def watch_replies(tenant_id: str, limit: int = 30, statuses: list[str] | None = None) -> dict:
     """
     emailed 리드 회신 감시(테넌트 스코프). 스케줄러에서 15분마다 호출.
+
+    statuses: 검사할 리드 상태. 정기 감시는 ["emailed"](기본). 과거 백필은
+      ["emailed", "no_reply"]로 확장 — watcher가 죽어 있던 동안 실제로 답장이
+      왔는데도 팔로업 로직이 no_reply로 넘겨버린 리드의 회신을 소급 복구한다.
     """
+    statuses = statuses or ["emailed"]
     client_id = _get_secret("gmail_client_id")
     client_secret = _get_secret("gmail_client_secret")
     refresh_token = _get_secret("gmail_refresh_token")
@@ -489,7 +508,7 @@ def watch_replies(tenant_id: str, limit: int = 30) -> dict:
             _db().table("outreach_leads")
             .select("id, handle_name, contact_email, platform_url, score, grade, emailed_at")
             .eq("tenant_id", tenant_id)
-            .eq("status", "emailed")
+            .in_("status", statuses)
             .is_("reply_type", "null")
             .order("emailed_at", desc=True)
             .limit(limit)
@@ -512,9 +531,12 @@ def watch_replies(tenant_id: str, limit: int = 30) -> dict:
 
         checked += 1
 
-        # Gmail 검색: 보낸 메일 스레드에 답장이 온 것
-        # from:(상대방 이메일) to:(내 이메일) — 가장 직접적
-        query = f"from:{to_addr} to:{from_email}"
+        # Gmail 검색: 리드가 보낸 메일(=회신) 탐색.
+        # to: 제약을 걸지 않는다 — 영업 메일이 maesil-insight 게이트웨이
+        # (noreply@maesil-insight.com)로 나가면 회신도 그쪽으로 오고, partner 메일함엔
+        # 전달(forward)되어 들어와 To 헤더가 partner가 아니다. from:{리드}만으로
+        # 어느 경로의 회신이든(직접/전달/다른 수신주소) 포착한다.
+        query = f"from:{to_addr}"
         thread_ids = _search_threads(access_token, query, max_results=5)
 
         if not thread_ids:
