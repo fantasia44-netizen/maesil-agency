@@ -522,6 +522,9 @@ export default function SettingsPage() {
                       {gmailRun.watch_account?.scopes && (
                         <div style={{ wordBreak: "break-all" }}>부여 스코프: <code style={{ fontSize: "0.72rem" }}>{gmailRun.watch_account.scopes}</code></div>
                       )}
+                      {gmailRun.watch_account?.detail && !gmailRun.watch_account?.ok && (
+                        <div style={{ wordBreak: "break-all", opacity: 0.85 }}>API 응답: <code style={{ fontSize: "0.72rem" }}>{gmailRun.watch_account.detail}</code></div>
+                      )}
                       <div>발신 주소: {gmailRun.from_email || "(gmail_from_email 미설정 → 회신 검색 skip됨)"}</div>
                       {gmailRun.account_matches_from === false && (
                         <div style={{ fontWeight: 600 }}>⚠ 감시 계정 ≠ 발신 주소 — 이 수신함엔 회신이 없어 전부 놓칩니다. 발신 계정으로 재연결하세요.</div>
