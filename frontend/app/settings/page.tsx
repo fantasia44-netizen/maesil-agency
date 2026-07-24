@@ -488,7 +488,7 @@ export default function SettingsPage() {
               )}
               {card.name === "gmail_refresh_token" && (
                 <div className="muted" style={{ marginTop: "0.4rem", fontSize: "0.78rem", lineHeight: 1.5 }}>
-                  ※ "연결 테스트"는 값 저장만 확인합니다(실제 검증 아님). 401 만료 시 <strong>재연결</strong>로 새 토큰을 받으세요.
+                  ※ "연결 테스트"는 실제 감시 계정을 검증합니다 — 토큰을 갱신해 <strong>어느 Gmail 계정</strong>인지, 발신 주소와 일치하는지 확인합니다(불일치·만료 시 실패로 표시). 401 만료 시 <strong>재연결</strong>로 새 토큰을 받으세요.
                   Google OAuth 클라이언트는 <strong>웹 애플리케이션</strong> 타입 + 리디렉트 URI에
                   <code>{`{maesil_agency_url}/api/oauth/gmail-watch/callback`}</code> 등록 필요.
                 </div>

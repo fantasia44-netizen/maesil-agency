@@ -75,6 +75,9 @@ def test_secret(name: str) -> dict:
     if name == "maesil_agency_url":
         return _test_supabase_url(name, value)  # HTTP 핑 재사용
 
+    if name == "gmail_refresh_token":
+        return _test_gmail_watch(name, value)
+
     # 나머지 — 저장 여부만 확인
     secrets_svc.mark_tested(name, ok=True, error=None)
     return {"ok": True, "note": "값 저장 확인 (연결 테스트 미지원 항목)"}
@@ -141,6 +144,77 @@ def _test_growth_token(name: str, value: str) -> dict:
         return {"ok": True, "note": "Growth Token 일치 확인"}
     secrets_svc.mark_tested(name, ok=False, error="token mismatch")
     raise HTTPException(status_code=400, detail="agency_growth_token이 서버 GROWTH_INTERNAL_TOKEN과 일치하지 않습니다.")
+
+
+def _test_gmail_watch(name: str, refresh_token: str) -> dict:
+    """감시용 Gmail 토큰 실검증.
+
+    지금까지 "연결 테스트"는 값 저장만 확인해서, 토큰이 살아있는지·어느 계정인지
+    아무도 검증하지 못했다(→ 엉뚱한 계정을 감시하며 회신을 다 놓쳐도 'OK'로 표기).
+    이 검증은 실제로 액세스 토큰을 갱신하고 users/me/profile 로 감시 계정 주소를
+    확인한 뒤, 발신 주소(gmail_from_email)와 일치하는지 대조한다.
+      - 401/갱신 실패 → 토큰 만료(재연결 필요)
+      - 계정 ≠ 발신주소 → 회신이 없는 수신함을 보고 있음(다 놓침의 직접 원인)
+    """
+    import httpx
+    client_id = secrets_svc.get_secret("gmail_client_id")
+    client_secret = secrets_svc.get_secret("gmail_client_secret")
+    if not (client_id and client_secret):
+        secrets_svc.mark_tested(name, ok=False, error="client_id/secret 미설정")
+        raise HTTPException(status_code=400, detail="gmail_client_id / gmail_client_secret을 먼저 저장하세요.")
+
+    try:
+        tr = httpx.post("https://oauth2.googleapis.com/token", data={
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "refresh_token": refresh_token,
+            "grant_type": "refresh_token",
+        }, timeout=10)
+        if tr.status_code != 200:
+            secrets_svc.mark_tested(name, ok=False, error=f"token refresh HTTP {tr.status_code}")
+            raise HTTPException(
+                status_code=400,
+                detail=(f"토큰 갱신 실패 (HTTP {tr.status_code}) — refresh_token이 만료됐을 수 있습니다. "
+                        "'재연결'로 새 토큰을 받으세요. (OAuth 앱이 '테스트' 모드면 7일마다 만료 → '프로덕션' 전환 권장)"),
+            )
+        access = tr.json().get("access_token")
+
+        pr = httpx.get(
+            "https://gmail.googleapis.com/gmail/v1/users/me/profile",
+            headers={"Authorization": f"Bearer {access}"},
+            timeout=10,
+        )
+        if pr.status_code != 200:
+            secrets_svc.mark_tested(name, ok=False, error=f"profile HTTP {pr.status_code}")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Gmail 프로필 조회 실패 (HTTP {pr.status_code}) — 동의화면 스코프에 gmail.readonly가 있는지 확인하세요.",
+            )
+        account = (pr.json().get("emailAddress") or "?").strip()
+
+        # 발신 주소(gmail_from_email)와 대조 — 표시명 포함 형식에서 주소만 추출
+        from_raw = (secrets_svc.get_secret("gmail_from_email") or "").strip()
+        bare_from = from_raw.split("<")[-1].rstrip(">").strip().lower()
+        if bare_from and bare_from != account.lower():
+            secrets_svc.mark_tested(name, ok=False, error=f"account {account} != from {bare_from}")
+            raise HTTPException(
+                status_code=400,
+                detail=(f"⚠ 감시 계정({account})이 발신 주소({bare_from})와 다릅니다. "
+                        "이 수신함엔 회신이 오지 않아 전부 놓칩니다 — 발신 계정으로 '재연결'하세요."),
+            )
+
+        secrets_svc.mark_tested(name, ok=True, error=None)
+        note = f"Gmail 감시 계정 = {account}"
+        if bare_from:
+            note += " (발신 주소와 일치) — 회신 감시 정상"
+        else:
+            note += " — 단, gmail_from_email 미설정이면 회신 검색이 skip됩니다"
+        return {"ok": True, "note": note}
+    except HTTPException:
+        raise
+    except Exception as e:
+        secrets_svc.mark_tested(name, ok=False, error=str(e)[:200])
+        raise HTTPException(status_code=400, detail=f"Gmail 감시 검증 실패: {e}")
 
 
 def _test_anthropic_key(name: str, key: str) -> dict:
