@@ -540,16 +540,25 @@ export default function SettingsPage() {
                       {gmailRun.account_matches_from === false && (
                         <div style={{ fontWeight: 600 }}>⚠ 감시 계정 ≠ 발신 주소 — 이 수신함엔 회신이 없어 전부 놓칩니다. 발신 계정으로 재연결하세요.</div>
                       )}
-                      <div>스케줄러 자동감시(ENABLE_GMAIL_WATCHER): <strong>{gmailRun.enable_gmail_watcher ? "ON" : "OFF (Render 환경변수 필요)"}</strong></div>
-                      <div style={{ marginTop: 4 }}>테넌트 {gmailRun.tenants_checked}곳 실행 결과{gmailRun.backfill ? " (🔁 전체 백필)" : ""}:</div>
-                      {(gmailRun.results || []).map((r: any, i: number) => (
-                        <div key={i} style={{ marginLeft: 8 }}>
-                          · {r.tenant_id}: 회신 검사 {r.replies?.checked ?? "-"}건 / 감지 {r.replies?.found_replies ?? 0}건
-                          {r.replies?.skipped ? ` (skip: ${r.replies.reason})` : ""}
-                          {r.replies?.error ? ` (에러: ${r.replies.error})` : ""}
-                          , 반송 {r.bounces?.bounces ?? 0}건/차단 {r.bounces?.blocked ?? 0}건
-                        </div>
-                      ))}
+                      {gmailRun.enable_gmail_watcher !== undefined && (
+                        <div>스케줄러 자동감시(ENABLE_GMAIL_WATCHER): <strong>{gmailRun.enable_gmail_watcher ? "ON" : "OFF (Render 환경변수 필요)"}</strong></div>
+                      )}
+                      {gmailRun.note && (
+                        <div style={{ marginTop: 4, fontWeight: 600 }}>{gmailRun.backfill ? "🔁 " : ""}{gmailRun.note}</div>
+                      )}
+                      {gmailRun.results && (
+                        <>
+                          <div style={{ marginTop: 4 }}>테넌트 {gmailRun.tenants_checked}곳 실행 결과:</div>
+                          {gmailRun.results.map((r: any, i: number) => (
+                            <div key={i} style={{ marginLeft: 8 }}>
+                              · {r.tenant_id}: 회신 검사 {r.replies?.checked ?? "-"}건 / 감지 {r.replies?.found_replies ?? 0}건
+                              {r.replies?.skipped ? ` (skip: ${r.replies.reason})` : ""}
+                              {r.replies?.error ? ` (에러: ${r.replies.error})` : ""}
+                              , 반송 {r.bounces?.bounces ?? 0}건/차단 {r.bounces?.blocked ?? 0}건
+                            </div>
+                          ))}
+                        </>
+                      )}
                     </>
                   )}
                 </div>

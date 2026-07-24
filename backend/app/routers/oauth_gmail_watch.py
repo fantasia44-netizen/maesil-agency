@@ -132,24 +132,54 @@ def run_now(backfill: bool = False, user: UserContext = Depends(get_current_user
     if not tenants and user.tenant_id:
         tenants = [user.tenant_id]
 
-    rep_limit, rep_statuses, bo_limit, bo_days = (
-        (200, ["emailed", "no_reply"], 200, 365) if backfill else (30, ["emailed"], 20, 14)
-    )
+    # 백필은 리드가 많아 동기 요청이 타임아웃 → 백그라운드 스레드로 끝까지 실행.
+    # (idempotent, 결과는 로그·아웃리치 페이지에 누적)
+    if backfill:
+        if not account.get("ok"):
+            return {  # 계정이 403/만료면 백필해도 전부 실패 → 먼저 알림
+                "backfill": True, "started": False,
+                "watch_account": account, "from_email": bare_from or None,
+                "note": "감시 계정 조회 실패 — 백필 중단. 먼저 계정/토큰을 고치세요.",
+            }
+        import threading
 
+        def _bg(tids: list) -> None:
+            for tid in tids:
+                try:
+                    r = watch_replies(tid, 200, statuses=["emailed", "no_reply"])
+                    logger.info("[backfill] replies tenant=%s → %s", str(tid)[:8], r)
+                except Exception as e:
+                    logger.warning("[backfill] replies 실패 tenant=%s: %s", str(tid)[:8], e)
+                try:
+                    b = watch_bounces(tid, 200, days=365)
+                    logger.info("[backfill] bounces tenant=%s → %s", str(tid)[:8], b)
+                except Exception as e:
+                    logger.warning("[backfill] bounces 실패 tenant=%s: %s", str(tid)[:8], e)
+
+        threading.Thread(target=_bg, args=(list(tenants),), daemon=True).start()
+        return {
+            "backfill": True, "started": True,
+            "watch_account": account, "from_email": bare_from or None,
+            "account_matches_from": account_matches_from,
+            "tenants_checked": len(tenants),
+            "note": "백그라운드에서 과거 전체 소급 처리 시작 — 몇 분 후 아웃리치 페이지/로그에서 결과 확인",
+        }
+
+    # 진단용 빠른 실행(최근 창)은 동기 — 결과 즉시 반환
     results = []
     for tid in tenants:
         try:
-            rep = watch_replies(tid, rep_limit, statuses=rep_statuses)
+            rep = watch_replies(tid, 30, statuses=["emailed"])
         except Exception as e:
             rep = {"ok": False, "error": str(e)[:200]}
         try:
-            bo = watch_bounces(tid, bo_limit, days=bo_days)
+            bo = watch_bounces(tid, 20, days=14)
         except Exception as e:
             bo = {"ok": False, "error": str(e)[:200]}
         results.append({"tenant_id": str(tid)[:8], "replies": rep, "bounces": bo})
 
     return {
-        "backfill": backfill,
+        "backfill": False,
         "enable_gmail_watcher": settings.enable_gmail_watcher,
         "watch_account": account,
         "from_email": bare_from or None,
