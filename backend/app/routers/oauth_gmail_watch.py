@@ -97,6 +97,59 @@ def start(user: UserContext = Depends(get_current_user)) -> dict:
     return {"auth_url": f"{_AUTH_URL}?{urlencode(params)}", "redirect_uri": redirect_uri}
 
 
+@router.post("/run")
+def run_now(user: UserContext = Depends(get_current_user)) -> dict:
+    """지금 즉시 회신·반송 감시 1회 실행 (진단용, 관리자 전용).
+
+    스케줄러(15분)나 ENABLE_GMAIL_WATCHER 플래그와 무관하게 강제 실행하고,
+    감시 계정·발신주소 일치 여부·검색 결과(checked/found)를 그대로 반환한다.
+    "받는 메일 감시가 지금 어디까지 되는지"를 즉시 실측하는 용도.
+    """
+    if not user.is_super_admin:
+        raise HTTPException(403, "관리자만 감시를 실행할 수 있습니다.")
+
+    from app.config import settings
+    from app.services.secrets import get_secret
+    from app.services.gmail_watcher import get_watch_account, watch_replies, watch_bounces
+
+    account = get_watch_account()
+    from_raw = (get_secret("gmail_from_email") or "").strip()
+    bare_from = from_raw.split("<")[-1].rstrip(">").strip().lower()
+    account_matches_from = None
+    if account.get("ok") and bare_from:
+        account_matches_from = (account.get("account") or "").lower() == bare_from
+
+    # 대상 테넌트 — 활성 영업 테넌트 전체, 없으면 호출자 본인 워크스페이스로 폴백
+    try:
+        from app.services.tenants import list_active_outreach_tenants
+        tenants = [t.get("id") for t in list_active_outreach_tenants() if t.get("id")]
+    except Exception:
+        tenants = []
+    if not tenants and user.tenant_id:
+        tenants = [user.tenant_id]
+
+    results = []
+    for tid in tenants:
+        try:
+            rep = watch_replies(tid, 30)
+        except Exception as e:
+            rep = {"ok": False, "error": str(e)[:200]}
+        try:
+            bo = watch_bounces(tid, 20)
+        except Exception as e:
+            bo = {"ok": False, "error": str(e)[:200]}
+        results.append({"tenant_id": str(tid)[:8], "replies": rep, "bounces": bo})
+
+    return {
+        "enable_gmail_watcher": settings.enable_gmail_watcher,
+        "watch_account": account,
+        "from_email": bare_from or None,
+        "account_matches_from": account_matches_from,
+        "tenants_checked": len(results),
+        "results": results,
+    }
+
+
 @router.get("/callback", response_class=HTMLResponse)
 def callback(code: str = "", state: str = "", error: str = "") -> HTMLResponse:
     """Google 동의 후 콜백(공개). state로 CSRF 검증 → 코드 교환 → gmail_refresh_token 저장."""

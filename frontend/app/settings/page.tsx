@@ -129,6 +129,8 @@ export default function SettingsPage() {
   const [testResults, setTestResults] = useState<Record<string, { ok: boolean; msg: string }>>({});
   const [err, setErr] = useState<string | null>(null);
   const [gmailWatchMsg, setGmailWatchMsg] = useState<string>("");
+  const [gmailRun, setGmailRun] = useState<any>(null);
+  const [gmailRunBusy, setGmailRunBusy] = useState<boolean>(false);
 
   // ── 유저 관리 상태 ──
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -413,6 +415,20 @@ export default function SettingsPage() {
     }
   };
 
+  // 지금 즉시 회신·반송 감시 1회 실행 (진단) — 스케줄러/플래그 무관
+  const runWatchNow = async () => {
+    setGmailRunBusy(true);
+    setGmailRun(null);
+    try {
+      const r = await apiFetch<any>("/api/oauth/gmail-watch/run", { method: "POST" }, 60000);
+      setGmailRun(r);
+    } catch (e) {
+      setGmailRun({ error: (e as Error).message });
+    } finally {
+      setGmailRunBusy(false);
+    }
+  };
+
   const existing = (name: string) => secrets.find((s) => s.name === name);
 
   const currentUser = getUser();
@@ -480,10 +496,42 @@ export default function SettingsPage() {
                     🔗 재연결
                   </button>
                 )}
+                {card.name === "gmail_refresh_token" && (
+                  <button className="btn" onClick={runWatchNow} disabled={gmailRunBusy}
+                          title="스케줄러/ENABLE_GMAIL_WATCHER와 무관하게 지금 즉시 회신·반송 감시 1회 실행">
+                    {gmailRunBusy ? "실행 중…" : "▶ 지금 감시 실행"}
+                  </button>
+                )}
               </div>
               {card.name === "gmail_refresh_token" && gmailWatchMsg && (
                 <div className={`test-result show ${gmailWatchMsg.startsWith("재연결 실패") || gmailWatchMsg.startsWith("실패") ? "error" : "success"}`}>
                   {gmailWatchMsg}
+                </div>
+              )}
+              {card.name === "gmail_refresh_token" && gmailRun && (
+                <div className={`test-result show ${gmailRun.error || gmailRun.account_matches_from === false || gmailRun.watch_account?.ok === false ? "error" : "success"}`}
+                     style={{ fontSize: "0.78rem", lineHeight: 1.6 }}>
+                  {gmailRun.error ? (
+                    <>실행 실패: {gmailRun.error}</>
+                  ) : (
+                    <>
+                      <div>감시 계정: <strong>{gmailRun.watch_account?.ok ? gmailRun.watch_account.account : `조회 실패 — ${gmailRun.watch_account?.error}`}</strong></div>
+                      <div>발신 주소: {gmailRun.from_email || "(gmail_from_email 미설정 → 회신 검색 skip됨)"}</div>
+                      {gmailRun.account_matches_from === false && (
+                        <div style={{ fontWeight: 600 }}>⚠ 감시 계정 ≠ 발신 주소 — 이 수신함엔 회신이 없어 전부 놓칩니다. 발신 계정으로 재연결하세요.</div>
+                      )}
+                      <div>스케줄러 자동감시(ENABLE_GMAIL_WATCHER): <strong>{gmailRun.enable_gmail_watcher ? "ON" : "OFF (Render 환경변수 필요)"}</strong></div>
+                      <div style={{ marginTop: 4 }}>테넌트 {gmailRun.tenants_checked}곳 실행 결과:</div>
+                      {(gmailRun.results || []).map((r: any, i: number) => (
+                        <div key={i} style={{ marginLeft: 8 }}>
+                          · {r.tenant_id}: 회신 검사 {r.replies?.checked ?? "-"}건 / 감지 {r.replies?.found_replies ?? 0}건
+                          {r.replies?.skipped ? ` (skip: ${r.replies.reason})` : ""}
+                          {r.replies?.error ? ` (에러: ${r.replies.error})` : ""}
+                          , 반송 {r.bounces?.bounces ?? 0}건/차단 {r.bounces?.blocked ?? 0}건
+                        </div>
+                      ))}
+                    </>
+                  )}
                 </div>
               )}
               {card.name === "gmail_refresh_token" && (

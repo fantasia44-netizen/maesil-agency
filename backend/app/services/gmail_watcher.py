@@ -101,6 +101,32 @@ def _emit_token_expired_alert(context: str) -> None:
         logger.debug("[gmail_watcher] 토큰 만료 알림 발행 실패: %s", e)
 
 
+def get_watch_account() -> dict:
+    """감시 토큰이 인증하는 Gmail 계정 확인 — 진단용. {ok, account?, error?}.
+
+    watch_replies 는 /users/me/* 를 호출하므로 'me' = gmail_refresh_token 의 소유 계정.
+    이 계정이 실제 회신이 도착하는 발신 메일함(= gmail_from_email)과 같아야 회신이 잡힌다.
+    """
+    client_id = _get_secret("gmail_client_id")
+    client_secret = _get_secret("gmail_client_secret")
+    refresh_token = _get_secret("gmail_refresh_token")
+    if not all([client_id, client_secret, refresh_token]):
+        return {"ok": False, "error": "Gmail 감시 시크릿 미설정 (client_id/secret/refresh_token)"}
+    token = _get_access_token(client_id, client_secret, refresh_token)  # type: ignore[arg-type]
+    if not token:
+        return {"ok": False, "error": "액세스 토큰 갱신 실패 — 토큰 만료/무효(재연결 필요)"}
+    try:
+        r = httpx.get(
+            f"{_GMAIL_API_BASE}/users/me/profile",
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=10,
+        )
+        r.raise_for_status()
+        return {"ok": True, "account": r.json().get("emailAddress")}
+    except Exception as e:
+        return {"ok": False, "error": f"프로필 조회 실패: {e}"}
+
+
 # ── Gmail 검색 ────────────────────────────────────────────────────────
 
 def _search_threads(token: str, query: str, max_results: int = 50) -> list[str]:
