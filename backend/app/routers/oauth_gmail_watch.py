@@ -144,17 +144,20 @@ def run_now(backfill: bool = False, user: UserContext = Depends(get_current_user
         import threading
 
         def _bg(tids: list) -> None:
+            # 결과는 warning 레벨로 — Render 로그(warning 이상)에 확실히 노출
+            logger.warning("[backfill] 시작: tenants=%d", len(tids))
             for tid in tids:
                 try:
                     r = watch_replies(tid, 200, statuses=["emailed", "no_reply"])
-                    logger.info("[backfill] replies tenant=%s → %s", str(tid)[:8], r)
+                    logger.warning("[backfill] replies tenant=%s → %s", str(tid)[:8], r)
                 except Exception as e:
                     logger.warning("[backfill] replies 실패 tenant=%s: %s", str(tid)[:8], e)
                 try:
                     b = watch_bounces(tid, 200, days=365)
-                    logger.info("[backfill] bounces tenant=%s → %s", str(tid)[:8], b)
+                    logger.warning("[backfill] bounces tenant=%s → %s", str(tid)[:8], b)
                 except Exception as e:
                     logger.warning("[backfill] bounces 실패 tenant=%s: %s", str(tid)[:8], e)
+            logger.warning("[backfill] 종료")
 
         threading.Thread(target=_bg, args=(list(tenants),), daemon=True).start()
         return {
