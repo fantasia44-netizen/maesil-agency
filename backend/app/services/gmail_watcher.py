@@ -353,10 +353,24 @@ def _extract_failed_recipients(token: str, message_id: str, own_addrs: set[str])
         headers = msg.get("payload", {}).get("headers", [])
         xfailed = _header_val(headers, "X-Failed-Recipients")
         if xfailed:
+            # 영구 실패는 이 헤더로 실패 수신자를 명시 → 신뢰
             found.update(m.group(0).lower() for m in _BOUNCE_EMAIL_RE.finditer(xfailed))
-        if not found:
+        else:
+            # 헤더 없음 → 본문 폴백. 단, 일시적 지연(자동 재시도 예정) DSN은 영구 반송이
+            # 아니므로 제외한다. 오탐하면 살아있는 주소를 send_failed로 죽이고, 이후 그
+            # 리드가 회신해도 watch_replies(status="emailed"만 조회)에 안 걸려 회신까지 놓친다.
+            #   지연:  "일시적인 문제…N시간 후에 다시 전송합니다" / 제목 "(Delay)"
+            #   영구:  "메일이 전송되지 않음…몇 분 후에 다시 전송해 보세요" / 제목 "(Failure)"
+            subject = _header_val(headers, "Subject").lower()
             body = _extract_text_from_payload(msg.get("payload", {}))[:4000]
-            found.update(m.group(0).lower() for m in _BOUNCE_EMAIL_RE.finditer(body))
+            is_delay = (
+                "delay" in subject
+                or "일시적" in body
+                or "다시 전송합니다" in body
+                or "will retry" in body.lower()
+            )
+            if not is_delay:
+                found.update(m.group(0).lower() for m in _BOUNCE_EMAIL_RE.finditer(body))
     except Exception as e:
         logger.debug("[bounce] 메시지 파싱 실패 [%s]: %s", message_id, e)
     # 자기 자신/데몬 주소 제외
