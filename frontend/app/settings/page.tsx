@@ -516,6 +516,12 @@ export default function SettingsPage() {
                   ) : (
                     <>
                       <div>감시 계정: <strong>{gmailRun.watch_account?.ok ? gmailRun.watch_account.account : `조회 실패 — ${gmailRun.watch_account?.error}`}</strong></div>
+                      {gmailRun.watch_account?.token_email && !gmailRun.watch_account?.ok && (
+                        <div>토큰 소유 계정: <strong>{gmailRun.watch_account.token_email}</strong></div>
+                      )}
+                      {gmailRun.watch_account?.scopes && (
+                        <div style={{ wordBreak: "break-all" }}>부여 스코프: <code style={{ fontSize: "0.72rem" }}>{gmailRun.watch_account.scopes}</code></div>
+                      )}
                       <div>발신 주소: {gmailRun.from_email || "(gmail_from_email 미설정 → 회신 검색 skip됨)"}</div>
                       {gmailRun.account_matches_from === false && (
                         <div style={{ fontWeight: 600 }}>⚠ 감시 계정 ≠ 발신 주소 — 이 수신함엔 회신이 없어 전부 놓칩니다. 발신 계정으로 재연결하세요.</div>

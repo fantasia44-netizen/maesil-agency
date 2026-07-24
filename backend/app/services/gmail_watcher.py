@@ -115,16 +115,47 @@ def get_watch_account() -> dict:
     token = _get_access_token(client_id, client_secret, refresh_token)  # type: ignore[arg-type]
     if not token:
         return {"ok": False, "error": "액세스 토큰 갱신 실패 — 토큰 만료/무효(재연결 필요)"}
+
+    # 토큰에 실제 부여된 스코프/계정 확인 (403 원인 판별: 스코프 부족 vs API 비활성)
+    scopes = None
+    token_email = None
+    try:
+        ti = httpx.get("https://oauth2.googleapis.com/tokeninfo",
+                       params={"access_token": token}, timeout=10)
+        if ti.status_code == 200:
+            j = ti.json()
+            scopes = j.get("scope")
+            token_email = j.get("email")
+    except Exception:
+        pass
+
     try:
         r = httpx.get(
             f"{_GMAIL_API_BASE}/users/me/profile",
             headers={"Authorization": f"Bearer {token}"},
             timeout=10,
         )
-        r.raise_for_status()
-        return {"ok": True, "account": r.json().get("emailAddress")}
+        if r.status_code == 200:
+            return {"ok": True, "account": r.json().get("emailAddress"),
+                    "scopes": scopes, "token_email": token_email}
+
+        has_gmail = bool(scopes and "gmail" in scopes)
+        body = (r.text or "")[:200].replace("\n", " ")
+        if not scopes:
+            hint = "부여 스코프 확인 불가"
+        elif not has_gmail:
+            hint = "이 토큰엔 gmail.readonly 스코프가 없음 → '재연결'로 gmail 권한 재동의 필요"
+        else:
+            hint = "gmail 스코프는 있으나 거부됨 → Google Cloud 프로젝트에서 Gmail API 활성화 필요"
+        return {
+            "ok": False,
+            "error": f"프로필 {r.status_code} — {hint}",
+            "scopes": scopes,
+            "token_email": token_email,
+            "detail": body,
+        }
     except Exception as e:
-        return {"ok": False, "error": f"프로필 조회 실패: {e}"}
+        return {"ok": False, "error": f"프로필 조회 실패: {e}", "scopes": scopes, "token_email": token_email}
 
 
 # ── Gmail 검색 ────────────────────────────────────────────────────────
