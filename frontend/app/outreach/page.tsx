@@ -403,9 +403,11 @@ export default function OutreachPage() {
   const triggerScan = async (platform?: string) => {
     setScanLoading(true);
     try {
-      const url = platform ? `/api/outreach/scan?platform=${platform}` : "/api/outreach/scan";
+      // 현재 주제(탭)를 따라 스캔 — partner=파트너 키워드, interview=인터뷰 키워드
+      const url = `/api/outreach/scan?campaign=${campaign}${platform ? `&platform=${platform}` : ""}`;
       await apiFetch(url, { method: "POST" }, 15000);
-      showToast(`스캔 시작됨${platform ? ` (${PLATFORM_LABEL[platform] ?? platform})` : ""} — 백그라운드 실행 중`);
+      const topicLabel = campaign === "interview" ? "인터뷰·출연" : "파트너 모집";
+      showToast(`${topicLabel} 스캔 시작됨${platform ? ` (${PLATFORM_LABEL[platform] ?? platform})` : ""} — 백그라운드 실행 중`);
     } catch (e: unknown) {
       showToast(e instanceof Error ? e.message : "스캔 시작 실패", false);
     } finally {
@@ -508,7 +510,7 @@ export default function OutreachPage() {
         </div>
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
           <button className="btn primary" onClick={() => triggerScan()} disabled={scanLoading} style={{ fontSize: "0.82rem", padding: "6px 14px" }}>
-            {scanLoading ? "스캔 중…" : "🔍 전체 스캔"}
+            {scanLoading ? "스캔 중…" : `🔍 전체 스캔 · ${campaign === "interview" ? "인터뷰·출연" : "파트너 모집"}`}
           </button>
           <button className="btn" onClick={() => triggerScan("youtube")} disabled={scanLoading} style={{ fontSize: "0.82rem", padding: "6px 12px" }}>
             ▶ YouTube
