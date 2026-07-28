@@ -182,8 +182,11 @@ _SCAM_PATTERNS = [
     r"\d+\s?년\s?만에.{0,10}억", r"\d{2,}\s?%\s?(잘\s?)?팔", r"건물\s?\d+\s?채",
     # AI 양산·자동화 부업/강의 (매실K 인터뷰와 무관한 스팸)
     r"자동화", r"무자본", r"돈\s?복사", r"파이프라인", r"방구석", r"클릭\s?(한|몇)\s?번",
-    r"ai로\s?(돈|수익|판매|팔|\d)", r"ai\s?부업", r"ai\s?자동", r"챗gpt.{0,4}(부업|수익|돈)",
-    r"쇼츠로?\s?(월|수익|돈|부업)", r"유튜브\s?(부업|자동|수익화)\s?강의",
+    r"ai로\s?(돈|수익|판매|팔|\d|글)", r"ai로\s?\d+\s?분", r"ai\s?부업", r"ai\s?자동",
+    r"챗gpt.{0,4}(부업|수익|돈)", r"쇼츠로?\s?(월|수익|돈|부업)",
+    r"유튜브\s?(부업|자동|수익화)\s?강의",
+    # 코인/한탕 낚시
+    r"코인으로.{0,12}(억|월|벌|날)", r"\d+\s?억\s?날리", r"복붙.{0,8}(억|월|벌)",
 ]
 _SCAM_RE = re.compile("|".join(_SCAM_PATTERNS), re.I)
 
@@ -289,6 +292,13 @@ def deep_verify_interview(tenant_id: str, limit: int = 25) -> dict:
                 if i < 2 and v.get("video_id"):
                     v["transcript"] = _fetch_transcript(v["video_id"])
                 videos.append(v)
+
+        # 최근 영상 제목에 낚시 신호가 명확하면 LLM 없이 제외 (돈벌쥐류)
+        vid_titles = " ".join(v.get("title", "") for v in videos)
+        if vid_titles and _looks_scam(vid_titles) and not _looks_invite(about, vid_titles):
+            _set_candidate(tenant_id, c["id"], False, "최근 영상 낚시성 자동 제외", now2)
+            dropped += 1
+            continue
 
         verdict = _judge_interview(tenant_id, c, videos, about=about)
         if not verdict:   # 판정 실패 → 상태 유지, 근거만 비움
