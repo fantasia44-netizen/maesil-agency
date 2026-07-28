@@ -181,16 +181,82 @@ def list_leads(
 
 @router.get("/campaign-counts")
 def campaign_counts(user: UserContext = Depends(get_current_user)) -> dict:
-    """캠페인별 리드 수 (탭 뱃지용). {partner: N, interview: M}."""
+    """캠페인별 리드 수 (탭 뱃지용). {partner, interview, interview_candidate}."""
     tid = _require_tid(user)
-    out = {"partner": 0, "interview": 0}
+    out = {"partner": 0, "interview": 0, "interview_candidate": 0}
     try:
         resp = _db().rpc("outreach_campaign_counts", {"p_tenant_id": tid}).execute()
         for r in resp.data or []:
             out[r.get("campaign") or "partner"] = r.get("cnt") or 0
     except Exception as e:
         logger.warning("[outreach] campaign-counts 실패 (SQL 061 미적용?): %s", e)
+    try:
+        cand = (_db().table("outreach_leads").select("id", count="exact")
+                .eq("tenant_id", tid).eq("interview_candidate", True).execute())
+        out["interview_candidate"] = cand.count or 0
+    except Exception:
+        pass
     return out
+
+
+@router.post("/leads/find-interview-candidates")
+def find_interview_candidates(
+    min_subscribers: int = 3000,
+    user: UserContext = Depends(get_current_user),
+) -> dict:
+    """기존 발굴 리드에서 인터뷰/출연 겸용 후보를 자동 표시.
+
+    기준: 셀러 시청자(is_seller_content) + 충분한 구독자(min_subscribers) +
+    경쟁툴 판매 안 함. campaign은 안 바꾸고 interview_candidate=true만 세팅 →
+    인터뷰 탭에 겸용으로 노출. (리드 이동 아님)
+    """
+    tid = _require_tid(user)
+    # 후보 조회 — 셀러 콘텐츠 + 도달 + 비경쟁
+    q = (_db().table("outreach_leads")
+         .select("id, handle_name, platform, subscriber_count, channel_type, "
+                 "content_summary, campaign, interview_candidate")
+         .eq("tenant_id", tid)
+         .eq("is_seller_content", True)
+         .gte("subscriber_count", min_subscribers)
+         .neq("sells_competing_tool", True)
+         .order("subscriber_count", desc=True)
+         .limit(2000))
+    rows = q.execute().data or []
+    to_flag = [r["id"] for r in rows if not r.get("interview_candidate")]
+
+    flagged = 0
+    for i in range(0, len(to_flag), 200):
+        chunk = to_flag[i:i + 200]
+        try:
+            resp = (_db().table("outreach_leads")
+                    .update({"interview_candidate": True})
+                    .eq("tenant_id", tid).in_("id", chunk).execute())
+            flagged += len(resp.data or [])
+        except Exception as e:
+            logger.error("[outreach] 인터뷰후보 표시 실패: %s", e)
+            raise HTTPException(500, f"저장 실패: {str(e)[:200]}")
+
+    logger.info("[outreach] 인터뷰 후보 발굴: 매칭 %d, 신규 표시 %d (구독≥%d)",
+                len(rows), flagged, min_subscribers)
+    return {"ok": True, "matched": len(rows), "newly_flagged": flagged,
+            "min_subscribers": min_subscribers}
+
+
+class InterviewFlag(BaseModel):
+    value: bool
+
+
+@router.patch("/leads/{lead_id}/interview-candidate")
+def set_interview_candidate(lead_id: str, body: InterviewFlag,
+                            user: UserContext = Depends(get_current_user)) -> dict:
+    """특정 리드의 인터뷰 겸용 표시 수동 토글."""
+    tid = _require_tid(user)
+    resp = (_db().table("outreach_leads")
+            .update({"interview_candidate": body.value})
+            .eq("tenant_id", tid).eq("id", lead_id).execute())
+    if not resp.data:
+        raise HTTPException(404, "리드를 찾을 수 없습니다.")
+    return {"ok": True, "interview_candidate": body.value}
 
 
 @router.get("/leads/{lead_id}")

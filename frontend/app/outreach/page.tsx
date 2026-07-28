@@ -36,6 +36,8 @@ type Lead = {
   score: number;
   grade: string;
   status: LeadStatus;
+  campaign?: string | null;
+  interview_candidate?: boolean;
   touch_count: number;
   last_touch_at: string | null;
   emailed_at: string | null;
@@ -200,7 +202,8 @@ export default function OutreachPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [mainTab, setMainTab] = useState<"leads" | "history" | "report">("leads");
   const [campaign, setCampaign] = useState<"partner" | "interview">("partner");
-  const [campCounts, setCampCounts] = useState<{ partner: number; interview: number }>({ partner: 0, interview: 0 });
+  const [campCounts, setCampCounts] = useState<{ partner: number; interview: number; interview_candidate: number }>({ partner: 0, interview: 0, interview_candidate: 0 });
+  const [findingCand, setFindingCand] = useState(false);
   const [touchLogs, setTouchLogs] = useState<TouchLog[]>([]);
 
   // UTC ISO → KST 날짜 문자열 (YYYY-MM-DD)
@@ -248,8 +251,21 @@ export default function OutreachPage() {
     } finally {
       setLoading(false);
     }
-    apiFetch<{ partner: number; interview: number }>("/api/outreach/campaign-counts", {}, 15000)
+    apiFetch<{ partner: number; interview: number; interview_candidate: number }>("/api/outreach/campaign-counts", {}, 15000)
       .then(setCampCounts).catch(() => {});
+  };
+
+  const findInterviewCandidates = async () => {
+    setFindingCand(true);
+    try {
+      const r = await apiFetch<{ matched: number; newly_flagged: number }>(
+        "/api/outreach/leads/find-interview-candidates?min_subscribers=3000",
+        { method: "POST" }, 30000);
+      setToast({ msg: `기존 발굴에서 인터뷰 후보 ${r.matched}건 (신규 ${r.newly_flagged}건 표시)`, ok: true });
+      loadAll();
+    } catch (e) {
+      setToast({ msg: e instanceof Error ? e.message : "후보 발굴 실패", ok: false });
+    } finally { setFindingCand(false); }
   };
 
   useEffect(() => { loadAll(); }, [campaign]);
@@ -559,8 +575,19 @@ export default function OutreachPage() {
           );
         })}
         {campaign === "interview" && (
-          <div style={{ display: "flex", alignItems: "center", fontSize: "0.76rem", color: "#64748b" }}>
-            ※ 이 목록은 <b style={{ margin: "0 3px" }}>자동 콜드발송 대상 아님</b> — 협업 제안은 수동
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <button onClick={findInterviewCandidates} disabled={findingCand}
+              style={{
+                padding: "8px 14px", borderRadius: 8, border: "1px solid #0f172a",
+                background: "#fff", color: "#0f172a", cursor: "pointer",
+                fontSize: "0.82rem", fontWeight: 600,
+              }}>
+              {findingCand ? "찾는 중…" : "🔍 기존 발굴에서 인터뷰 후보 찾기"}
+            </button>
+            <span style={{ fontSize: "0.74rem", color: "#64748b" }}>
+              셀러 시청자·구독 3천+ 채널을 겸용 후보로 표시 · <b>자동발송 대상 아님</b>(수동 제안)
+              {campCounts.interview_candidate > 0 && ` · 겸용 ${campCounts.interview_candidate}건`}
+            </span>
           </div>
         )}
       </div>
