@@ -157,10 +157,11 @@ def schedule_email_followups(tenant_id: str, lead_id: str) -> None:
 
 # ── 메인 파이프라인 ──────────────────────────────────────────────────
 
-def run_platform_scan(tenant_id: str, platform: str) -> dict:
+def run_platform_scan(tenant_id: str, platform: str, campaign: str = "partner") -> dict:
     """
     특정 플랫폼 스캔 실행(테넌트 스코프).
     platform: 'youtube' | 'naver_blog'
+    campaign: 'partner'(파트너 모집) | 'interview'(인터뷰/출연 채널) — 리드 태깅용.
     """
     from app.services.secrets import get_tenant_secret
     from app.services.tenant_config import load_config
@@ -279,6 +280,7 @@ def run_platform_scan(tenant_id: str, platform: str) -> dict:
             "grade": grade,
             "score_breakdown": breakdown,
             "status": status,
+            "campaign": campaign,
             "last_scanned_at": datetime.now(timezone.utc).isoformat(),
         }
 
@@ -328,15 +330,15 @@ def run_platform_scan(tenant_id: str, platform: str) -> dict:
     return result
 
 
-def run_all_platforms(tenant_id: str) -> dict:
+def run_all_platforms(tenant_id: str, campaign: str = "partner") -> dict:
     """모든 활성 플랫폼 순차 스캔(테넌트 스코프, 테넌트 키 보유 플랫폼만)."""
     from app.services.secrets import get_tenant_secret
     results = []
 
     if get_tenant_secret(tenant_id, "youtube_api_key"):
-        results.append(run_platform_scan(tenant_id, "youtube"))
+        results.append(run_platform_scan(tenant_id, "youtube", campaign=campaign))
     if get_tenant_secret(tenant_id, "naver_client_id"):
-        results.append(run_platform_scan(tenant_id, "naver_blog"))
+        results.append(run_platform_scan(tenant_id, "naver_blog", campaign=campaign))
 
     total_leads = sum(r.get("leads_upserted", 0) for r in results)
     logger.info("[pipeline] 전체 스캔 완료 — 총 리드 %d건", total_leads)

@@ -61,6 +61,7 @@ def _eligible_leads(tenant_id: str, cap: int, grades: list[str],
             _db().table("outreach_leads")
             .select("id, contact_email, handle_name, platform, grade, score")
             .eq("tenant_id", tenant_id)
+            .eq("campaign", "partner")   # 자동 콜드발송은 파트너 캠페인만 — 인터뷰 리드는 수동 협업제안
             .in_("platform", ["youtube", "naver_blog"])
             .in_("status", statuses)
             .in_("grade", grades)

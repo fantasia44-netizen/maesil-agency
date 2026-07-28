@@ -199,6 +199,8 @@ export default function OutreachPage() {
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [mainTab, setMainTab] = useState<"leads" | "history" | "report">("leads");
+  const [campaign, setCampaign] = useState<"partner" | "interview">("partner");
+  const [campCounts, setCampCounts] = useState<{ partner: number; interview: number }>({ partner: 0, interview: 0 });
   const [touchLogs, setTouchLogs] = useState<TouchLog[]>([]);
 
   // UTC ISO → KST 날짜 문자열 (YYYY-MM-DD)
@@ -236,7 +238,7 @@ export default function OutreachPage() {
     setErr(null);
     try {
       const [leadsData, statsData] = await Promise.all([
-        apiFetch<Lead[]>("/api/outreach/leads?limit=10000&min_score=0", {}, 60000),
+        apiFetch<Lead[]>(`/api/outreach/leads?limit=10000&min_score=0&campaign=${campaign}`, {}, 60000),
         apiFetch<ScanStats>("/api/outreach/scan/stats", {}, 15000),
       ]);
       setLeads(leadsData);
@@ -246,9 +248,11 @@ export default function OutreachPage() {
     } finally {
       setLoading(false);
     }
+    apiFetch<{ partner: number; interview: number }>("/api/outreach/campaign-counts", {}, 15000)
+      .then(setCampCounts).catch(() => {});
   };
 
-  useEffect(() => { loadAll(); }, []);
+  useEffect(() => { loadAll(); }, [campaign]);
   useEffect(() => { if (mainTab === "history") loadTouchLogs(); }, [mainTab]);
 
   const triggerRescore = async () => {
@@ -526,6 +530,40 @@ export default function OutreachPage() {
           {err}
         </div>
       )}
+
+      {/* 캠페인 스위처 — 파트너 모집 vs 인터뷰/출연 (타겟 분리) */}
+      <div style={{ display: "flex", gap: 8, marginBottom: "1.25rem", flexWrap: "wrap" }}>
+        {([
+          { key: "partner", label: "파트너 모집", icon: "🤝", desc: "강사·셀러 (기존)" },
+          { key: "interview", label: "인터뷰 · 출연", icon: "🎙️", desc: "매실K가 출연할 채널" },
+        ] as const).map(({ key, label, icon, desc }) => {
+          const active = campaign === key;
+          return (
+            <button key={key} onClick={() => setCampaign(key)}
+              style={{
+                display: "flex", alignItems: "center", gap: 8, padding: "10px 16px",
+                borderRadius: 10, cursor: "pointer", textAlign: "left",
+                border: active ? "1.5px solid #0f172a" : "1px solid #e2e8f0",
+                background: active ? "#0f172a" : "#fff",
+                color: active ? "#fff" : "#334155",
+              }}>
+              <span style={{ fontSize: "1.15rem" }}>{icon}</span>
+              <span>
+                <span style={{ fontWeight: 700, fontSize: "0.92rem" }}>{label}</span>
+                <span style={{ fontSize: "0.72rem", opacity: 0.8, marginLeft: 6 }}>
+                  {campCounts[key] ?? 0}건
+                </span>
+                <div style={{ fontSize: "0.68rem", opacity: 0.65 }}>{desc}</div>
+              </span>
+            </button>
+          );
+        })}
+        {campaign === "interview" && (
+          <div style={{ display: "flex", alignItems: "center", fontSize: "0.76rem", color: "#64748b" }}>
+            ※ 이 목록은 <b style={{ margin: "0 3px" }}>자동 콜드발송 대상 아님</b> — 협업 제안은 수동
+          </div>
+        )}
+      </div>
 
       {/* KPI 카드 */}
       {kpi && (

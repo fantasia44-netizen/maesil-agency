@@ -134,22 +134,24 @@ def list_leads(
     status: str | None = None,
     grade: str | None = None,
     channel_type: str | None = None,
+    campaign: str | None = "partner",
     min_score: int = 0,
     limit: int = 50,
     offset: int = 0,
     user: UserContext = Depends(get_current_user),
 ) -> list[dict]:
-    """리드 목록 (플랫폼·상태·등급·채널유형 필터) — RPC.
+    """리드 목록 (플랫폼·상태·등급·채널유형·캠페인 필터) — RPC.
 
-    PostgREST가 응답당 최대 1,000행으로 자르므로(RPC 포함) 1,000행 단위로
-    루프 조회해 limit까지 채움 — "발굴 1,293인데 목록은 1,000" 문제 수정.
+    campaign: 'partner'(기본, 파트너 모집) | 'interview'(인터뷰/출연) | 'all'(전체).
+    PostgREST가 응답당 최대 1,000행으로 자르므로 1,000행 단위로 루프 조회해 limit까지 채움.
     """
     tid = _require_tid(user)
+    p_campaign = None if campaign in (None, "all", "") else campaign
     page = 1000
     rows: list[dict] = []
     while len(rows) < limit:
         take = min(page, limit - len(rows))
-        resp = _db().rpc("list_outreach_leads", {
+        params = {
             "p_tenant_id":    tid,
             "p_min_score":    min_score,
             "p_limit":        take,
@@ -158,12 +160,37 @@ def list_leads(
             "p_status":       status,
             "p_grade":        grade,
             "p_channel_type": channel_type,
-        }).execute()
+            "p_campaign":     p_campaign,
+        }
+        try:
+            resp = _db().rpc("list_outreach_leads", params).execute()
+        except Exception as e:
+            # SQL 061 미적용(구 RPC) 시 캠페인 파라미터 제거 후 재시도 (배포 과도기 안전장치)
+            if "p_campaign" in str(e) or "list_outreach_leads" in str(e):
+                logger.warning("[outreach] 구 RPC 폴백 (SQL 061 미적용?): %s", e)
+                params.pop("p_campaign", None)
+                resp = _db().rpc("list_outreach_leads", params).execute()
+            else:
+                raise
         batch = resp.data or []
         rows.extend(batch)
         if len(batch) < take:
             break
     return rows
+
+
+@router.get("/campaign-counts")
+def campaign_counts(user: UserContext = Depends(get_current_user)) -> dict:
+    """캠페인별 리드 수 (탭 뱃지용). {partner: N, interview: M}."""
+    tid = _require_tid(user)
+    out = {"partner": 0, "interview": 0}
+    try:
+        resp = _db().rpc("outreach_campaign_counts", {"p_tenant_id": tid}).execute()
+        for r in resp.data or []:
+            out[r.get("campaign") or "partner"] = r.get("cnt") or 0
+    except Exception as e:
+        logger.warning("[outreach] campaign-counts 실패 (SQL 061 미적용?): %s", e)
+    return out
 
 
 @router.get("/leads/{lead_id}")
@@ -882,22 +909,29 @@ def import_official_agencies(
 @router.post("/scan")
 def trigger_scan(
     platform: str | None = None,
+    campaign: str = "partner",
     user: UserContext = Depends(get_current_user),
 ) -> dict:
-    """전체 or 특정 플랫폼 스캔 수동 트리거 (백그라운드)."""
+    """전체 or 특정 플랫폼 스캔 수동 트리거 (백그라운드).
+
+    campaign: 'partner'(파트너 모집) | 'interview'(인터뷰/출연 채널 수집).
+    수집된 새 리드에 해당 campaign 태그가 붙어 목록이 분리됨.
+    """
     import threading
     from app.services.outreach_pipeline import run_platform_scan, run_all_platforms
     tid = _require_tid(user)
+    camp = campaign if campaign in ("partner", "interview") else "partner"
 
     def _run():
         try:
-            result = run_platform_scan(tid, platform) if platform else run_all_platforms(tid)
-            logger.info("[manual-scan] 완료: %s", result)
+            result = (run_platform_scan(tid, platform, campaign=camp) if platform
+                      else run_all_platforms(tid, campaign=camp))
+            logger.info("[manual-scan] 완료 (%s): %s", camp, result)
         except Exception as e:
             logger.error("[manual-scan] 실패: %s", e)
 
     threading.Thread(target=_run, daemon=True).start()
-    return {"ok": True, "message": f"스캔 시작됨 ({platform or '전체'}, 백그라운드 실행)"}
+    return {"ok": True, "message": f"스캔 시작됨 ({platform or '전체'} · {camp}, 백그라운드)"}
 
 
 @router.post("/scan/debug")
