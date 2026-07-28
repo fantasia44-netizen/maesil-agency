@@ -19,4 +19,39 @@ ALTER TABLE agent_work.outreach_leads
 CREATE INDEX IF NOT EXISTS outreach_leads_dead_idx
     ON agent_work.outreach_leads (tenant_id, channel_dead);
 
+-- 목록 RPC: 날아간(삭제·정지) 채널은 모든 탭에서 제외
+CREATE OR REPLACE FUNCTION agent_work.list_outreach_leads(
+  p_tenant_id    uuid,
+  p_min_score    integer DEFAULT 0,
+  p_limit        integer DEFAULT 500,
+  p_offset       integer DEFAULT 0,
+  p_platform     text    DEFAULT NULL,
+  p_status       text    DEFAULT NULL,
+  p_grade        text    DEFAULT NULL,
+  p_channel_type text    DEFAULT NULL,
+  p_campaign     text    DEFAULT NULL
+)
+RETURNS SETOF agent_work.outreach_leads
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+AS $$
+  SELECT * FROM agent_work.outreach_leads
+  WHERE tenant_id = p_tenant_id
+    AND score >= p_min_score
+    AND channel_dead IS NOT TRUE          -- 날아간 채널 제외
+    AND (p_platform     IS NULL OR platform     = p_platform)
+    AND (p_status       IS NULL OR status       = p_status)
+    AND (p_grade        IS NULL OR grade        = p_grade)
+    AND (p_channel_type IS NULL OR channel_type = p_channel_type)
+    AND (
+      p_campaign IS NULL
+      OR campaign = p_campaign
+      OR (p_campaign = 'interview' AND interview_candidate = TRUE)
+    )
+  ORDER BY score DESC, id
+  LIMIT  p_limit
+  OFFSET p_offset;
+$$;
+
 NOTIFY pgrst, 'reload schema';
