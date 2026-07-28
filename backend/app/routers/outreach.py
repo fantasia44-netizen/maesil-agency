@@ -237,6 +237,7 @@ def find_interview_candidates(
          .eq("is_seller_content", True)
          .gte("subscriber_count", min_subscribers)
          .neq("sells_competing_tool", True)
+         .neq("channel_dead", True)                   # 날아간(삭제·정지) 채널 제외
          .gte("best_content_published_at", cutoff)   # 최근 활동 채널만 (죽은 채널 제외)
          .limit(3000))
     rows = q.execute().data or []
@@ -264,6 +265,25 @@ def find_interview_candidates(
                 len(match_ids), len(stale), min_subscribers)
     return {"ok": True, "candidates": len(match_ids), "cleared": len(stale),
             "scanned": len(rows), "min_subscribers": min_subscribers}
+
+
+@router.post("/leads/verify-channels")
+def verify_channels_endpoint(
+    campaign: str | None = None,
+    only_candidates: bool = False,
+    user: UserContext = Depends(get_current_user),
+) -> dict:
+    """유튜브 채널 생존 검증 → 삭제·정지된(날아간) 채널을 channel_dead 표시.
+
+    only_candidates=true: 인터뷰 후보만 검증 (범위 좁혀 빠르게).
+    살아있는 채널은 구독자 수도 최신화. channels.list 1유닛/50개라 저렴.
+    """
+    tid = _require_tid(user)
+    from app.services.outreach_verify import verify_channels
+    result = verify_channels(tid, campaign=campaign, only_candidates=only_candidates)
+    if not result.get("ok"):
+        raise HTTPException(400, result.get("error") or "검증 실패")
+    return result
 
 
 class InterviewFlag(BaseModel):

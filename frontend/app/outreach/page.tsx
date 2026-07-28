@@ -204,6 +204,7 @@ export default function OutreachPage() {
   const [campaign, setCampaign] = useState<"partner" | "interview">("partner");
   const [campCounts, setCampCounts] = useState<{ partner: number; interview: number; interview_candidate: number }>({ partner: 0, interview: 0, interview_candidate: 0 });
   const [findingCand, setFindingCand] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [touchLogs, setTouchLogs] = useState<TouchLog[]>([]);
 
   // UTC ISO → KST 날짜 문자열 (YYYY-MM-DD)
@@ -266,6 +267,19 @@ export default function OutreachPage() {
     } catch (e) {
       setToast({ msg: e instanceof Error ? e.message : "후보 발굴 실패", ok: false });
     } finally { setFindingCand(false); }
+  };
+
+  const verifyChannels = async () => {
+    setVerifying(true);
+    try {
+      const r = await apiFetch<{ checked: number; alive: number; dead: number }>(
+        "/api/outreach/leads/verify-channels?only_candidates=true",
+        { method: "POST" }, 120000);
+      setToast({ msg: `채널 검증: ${r.checked}개 중 날아간 채널 ${r.dead}개 제외 (생존 ${r.alive})`, ok: true });
+      loadAll();
+    } catch (e) {
+      setToast({ msg: e instanceof Error ? e.message : "채널 검증 실패", ok: false });
+    } finally { setVerifying(false); }
   };
 
   const toggleInterviewCand = async (lead: Lead, value: boolean) => {
@@ -597,6 +611,14 @@ export default function OutreachPage() {
                 fontSize: "0.82rem", fontWeight: 600,
               }}>
               {findingCand ? "찾는 중…" : "🔍 기존 발굴에서 인터뷰 후보 찾기"}
+            </button>
+            <button onClick={verifyChannels} disabled={verifying}
+              style={{
+                padding: "8px 14px", borderRadius: 8, border: "1px solid #b91c1c",
+                background: "#fff", color: "#b91c1c", cursor: "pointer",
+                fontSize: "0.82rem", fontWeight: 600,
+              }}>
+              {verifying ? "검증 중…" : "🩺 채널 생존 검증"}
             </button>
             <span style={{ fontSize: "0.74rem", color: "#64748b" }}>
               셀러 시청자·구독 3천+ 채널을 겸용 후보로 표시 · <b>자동발송 대상 아님</b>(수동 제안)
