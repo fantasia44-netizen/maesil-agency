@@ -216,15 +216,20 @@ def _looks_interview(row: dict) -> bool:
 @router.post("/leads/find-interview-candidates")
 def find_interview_candidates(
     min_subscribers: int = 3000,
+    active_months: int = 18,
     user: UserContext = Depends(get_current_user),
 ) -> dict:
     """기존 발굴 리드에서 인터뷰/출연 '겸용 후보'를 재계산(전체 리컴퓨트).
 
-    후보 = 셀러 시청자 + 구독≥N + 비경쟁 + (호스트형 채널유형 OR 인터뷰성 콘텐츠).
-    강사형(educator)·리뷰형은 '가르치는' 파트너 후보라 제외.
-    재실행 시 자동 기준으로 다시 계산됨(수동 토글도 재계산 — 큐레이션은 그 뒤에).
+    후보 = 셀러 시청자 + 구독≥N + 비경쟁 + 최근 active_months내 활동 +
+           (호스트형 채널유형 OR 인터뷰성 콘텐츠).
+    강사형(educator)·리뷰형·죽은 채널(오래 미업로드)은 제외.
+    ※ 메타데이터 한계상 AI제품판매 등 애매한 건 남을 수 있음 → 목록에서 수동 제외.
+    재실행 시 자동 기준으로 다시 계산됨.
     """
     tid = _require_tid(user)
+    from datetime import timedelta
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=active_months * 30)).isoformat()
     q = (_db().table("outreach_leads")
          .select("id, handle_name, channel_type, subscriber_count, "
                  "best_content_title, content_summary, interview_candidate")
@@ -232,6 +237,7 @@ def find_interview_candidates(
          .eq("is_seller_content", True)
          .gte("subscriber_count", min_subscribers)
          .neq("sells_competing_tool", True)
+         .gte("best_content_published_at", cutoff)   # 최근 활동 채널만 (죽은 채널 제외)
          .limit(3000))
     rows = q.execute().data or []
 

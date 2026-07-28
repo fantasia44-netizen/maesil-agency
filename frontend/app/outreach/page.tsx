@@ -268,6 +268,20 @@ export default function OutreachPage() {
     } finally { setFindingCand(false); }
   };
 
+  const toggleInterviewCand = async (lead: Lead, value: boolean) => {
+    // 낙관적 업데이트 (목록에서 즉시 반영)
+    setLeads(prev => prev.map(l => l.id === lead.id ? { ...l, interview_candidate: value } : l)
+                         .filter(l => campaign !== "interview" || l.campaign === "interview" || l.interview_candidate));
+    try {
+      await apiFetch(`/api/outreach/leads/${lead.id}/interview-candidate`,
+        { method: "PATCH", body: JSON.stringify({ value }) }, 10000);
+      setCampCounts(c => ({ ...c, interview_candidate: Math.max(0, c.interview_candidate + (value ? 1 : -1)) }));
+    } catch (e) {
+      setToast({ msg: e instanceof Error ? e.message : "변경 실패", ok: false });
+      loadAll();
+    }
+  };
+
   useEffect(() => { loadAll(); }, [campaign]);
   useEffect(() => { if (mainTab === "history") loadTouchLogs(); }, [mainTab]);
 
@@ -1025,6 +1039,16 @@ export default function OutreachPage() {
                         disabled={!!busy}
                         onClick={() => updateStatus(lead, "negotiating")}>
                         🤝 협의 중으로
+                      </button>
+                    )}
+
+                    {/* 인터뷰 탭: 겸용 후보 수동 제외 (AI제품판매 등 오분류 큐레이션) */}
+                    {campaign === "interview" && lead.interview_candidate && (
+                      <button className="btn"
+                        style={{ fontSize: "0.7rem", padding: "3px 8px", color: "#b91c1c", whiteSpace: "nowrap" }}
+                        title="이 채널을 인터뷰 후보에서 제외 (파트너 목록엔 그대로 남음)"
+                        onClick={() => toggleInterviewCand(lead, false)}>
+                        ✕ 인터뷰 제외
                       </button>
                     )}
 
