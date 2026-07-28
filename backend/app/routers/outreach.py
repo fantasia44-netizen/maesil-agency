@@ -179,6 +179,17 @@ def list_leads(
     return rows
 
 
+@router.get("/topics")
+def list_topics(user: UserContext = Depends(get_current_user)) -> dict:
+    """아웃리치 주제(브랜드) 목록 — 주제별 검색·수집이 분리됨.
+
+    [{campaign, label, brand}] (partner=인사이트 파트너 유입, interview=매실K 인터뷰).
+    """
+    _require_tid(user)
+    from app.services.outreach_topics import known_topics
+    return {"topics": known_topics()}
+
+
 @router.get("/campaign-counts")
 def campaign_counts(user: UserContext = Depends(get_current_user)) -> dict:
     """캠페인별 리드 수 (탭 뱃지용). {partner, interview, interview_candidate}."""

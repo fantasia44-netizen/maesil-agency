@@ -178,13 +178,10 @@ def run_platform_scan(tenant_id: str, platform: str, campaign: str = "partner") 
             get_tenant_secret(tenant_id, "youtube_api_key_2"),
             get_tenant_secret(tenant_id, "youtube_api_key_3"),
         ] if k]
-        from app.services.scanners.youtube_scanner import (
-            YouTubeScanner, analyze_items_haiku, INTERVIEW_KEYWORDS)
-        # 인터뷰 캠페인은 출연·대담·창업스토리 전용 키워드로 검색(파트너 키워드와 분리)
-        if campaign == "interview":
-            kw = getattr(cfg, "keywords_interview", None) or INTERVIEW_KEYWORDS
-        else:
-            kw = cfg.keywords_youtube
+        from app.services.scanners.youtube_scanner import YouTubeScanner, analyze_items_haiku
+        from app.services.outreach_topics import resolve_keywords
+        # 주제(campaign)별 전용 키워드로 검색 — 파트너/인터뷰 검색 완전 분리
+        kw = resolve_keywords(cfg, campaign, "youtube")
         scanner = YouTubeScanner(api_keys, kw)
         analyzer = lambda items: analyze_items_haiku(items, anthropic_key)
     elif platform == "naver_blog":
@@ -193,7 +190,9 @@ def run_platform_scan(tenant_id: str, platform: str, campaign: str = "partner") 
         if not client_id:
             return {"ok": False, "error": "naver_client_id 미설정"}
         from app.services.scanners.naver_blog_scanner import NaverBlogScanner, analyze_items_haiku
-        scanner = NaverBlogScanner(client_id, client_secret, cfg.keywords_naver)
+        from app.services.outreach_topics import resolve_keywords
+        kw = resolve_keywords(cfg, campaign, "naver")
+        scanner = NaverBlogScanner(client_id, client_secret, kw)
         analyzer = lambda items: analyze_items_haiku(items, anthropic_key)
     else:
         return {"ok": False, "error": f"미지원 플랫폼: {platform}"}
