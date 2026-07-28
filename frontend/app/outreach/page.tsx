@@ -287,10 +287,10 @@ export default function OutreachPage() {
   const deepVerify = async () => {
     setDeepVerifying(true);
     try {
-      const r = await apiFetch<{ checked: number; kept: number; dropped: number }>(
+      const r = await apiFetch<{ checked: number; kept: number; dropped: number; swept?: number }>(
         "/api/outreach/leads/deep-verify-interview?limit=25",
         { method: "POST" }, 300000);
-      setToast({ msg: `심층검증 ${r.checked}건: 인터뷰 아님 ${r.dropped}건 제외 (유지 ${r.kept}) · 반복 실행 시 나머지도 검증`, ok: true });
+      setToast({ msg: `키워드 스윕 ${r.swept ?? 0}건 즉시 제외 · 영상분석 ${r.checked}건 중 ${r.dropped}건 추가 제외(유지 ${r.kept}) · 반복 실행 시 나머지도 검증`, ok: true });
       loadAll();
     } catch (e) {
       setToast({ msg: e instanceof Error ? e.message : "심층 검증 실패", ok: false });

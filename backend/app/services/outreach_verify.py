@@ -112,12 +112,15 @@ _DEEP_PROMPT = """당신은 매실인사이트/매실K 섭외 담당자입니다
 - 창업 스토리·월매출·사업 경험을 대화 형식으로 다루는 채널
 - 셀러/이커머스 창업자를 실제로 초대해 이야기 나누는 커뮤니티·미디어형 채널
 
-## 반드시 제외 (is_interview=false)
-- 본인 강의만 파는 강사형(교육 콘텐츠·수업 홍보 중심)
-- AI로 생성한 영상으로 제품·부업 파는 스팸/양산형 채널
-- 드롭십·부업 과장 광고, "월 1000만원" 자동화 낚시성 채널
+## 반드시 제외 (is_interview=false) — 엄격하게
+- 본인 강의·클래스·전자책·유료커뮤니티를 파는 강사형(교육·수업 홍보 중심)
+- AI로 생성한 영상/쇼츠로 제품·부업·강의 파는 스팸/양산형 채널
+- 드롭십·부업 과장, "월 1000만원/연 7억/건물 몇 채" 등 자극적·허무맹랑한 수익 낚시
+- "하루 30분·무자본·자동화·클릭 한 번" 류의 과장 부업 채널
+- 유튜브 자동화/쇼츠 수익화 강의 채널
 - 단순 상품 리뷰·언박싱, 정보 나열형(진행자-게스트 대화 없음)
 - 최근 영상이 인터뷰와 무관하거나, 실체 없는 채널
+※ 조금이라도 강의판매·낚시성 색채가 강하면 false. 진짜 게스트 대담일 때만 true.
 
 ## 채널 정보
 채널명: {handle}
@@ -163,6 +166,49 @@ def _judge_interview(tenant_id: str, lead: dict, videos: list[dict]) -> dict:
         return {}
 
 
+import re
+
+# 자극성·AI강의·낚시성 패턴 — 명백한 건 LLM 없이 즉시 제외
+_SCAM_PATTERNS = [
+    r"월\s?\d{3,}만원", r"월\s?\d+\s?천만?\s?원", r"월\s?\d+\s?억", r"연\s?\d+\s?억",
+    r"하루\s?\d+\s?분", r"하루\s?\d+\s?시간.{0,6}\d", r"자동화", r"무자본", r"돈\s?복사",
+    r"파이프라인", r"방구석", r"클릭\s?(한|몇)\s?번", r"초보도\b", r"왕초보",
+    r"ai로\s?(월|돈|수익|판매|팔)", r"ai\s?부업", r"ai\s?자동", r"챗gpt.{0,4}(부업|수익|돈)",
+    r"쇼츠로?\s?(월|수익|돈|부업)", r"유튜브\s?(부업|자동|수익화)\s?강의",
+    r"건물\s?\d+\s?채", r"퇴사.{0,6}(월|억|수익)", r"무료\s?나눔", r"수익\s?인증",
+    r"n잡", r"디지털\s?노마드.{0,6}(월|수익|억)", r"부의\s?추월차선",
+]
+_SCAM_RE = re.compile("|".join(_SCAM_PATTERNS), re.I)
+
+
+def _looks_scam(*texts: str) -> bool:
+    blob = " ".join(t for t in texts if t)
+    return bool(_SCAM_RE.search(blob))
+
+
+def sweep_scam_candidates(tenant_id: str) -> int:
+    """전체 인터뷰 후보를 자극성·AI강의 키워드로 즉시 스윕 → 매칭은 후보 제외.
+
+    LLM/API 없이 DB만. 명백한 낚시성/AI강의 채널을 한 번에 정리.
+    """
+    rows = (_db().table("outreach_leads")
+            .select("id, handle_name, content_summary, best_content_title")
+            .eq("tenant_id", tenant_id)
+            .eq("interview_candidate", True).limit(5000).execute().data or [])
+    hit_ids = [r["id"] for r in rows if _looks_scam(
+        r.get("handle_name", ""), r.get("content_summary", ""),
+        r.get("best_content_title", ""))]
+    now = datetime.now(timezone.utc).isoformat()
+    for i in range(0, len(hit_ids), 200):
+        (_db().table("outreach_leads").update({
+            "interview_candidate": False,
+            "interview_verdict": "자극성·AI강의·낚시성 키워드 자동 제외",
+            "deep_verified_at": now,
+        }).eq("tenant_id", tenant_id).in_("id", hit_ids[i:i + 200]).execute())
+    logger.info("[deep-verify] 키워드 스윕: %d/%d 제외", len(hit_ids), len(rows))
+    return len(hit_ids)
+
+
 def deep_verify_interview(tenant_id: str, limit: int = 25) -> dict:
     """인터뷰 후보의 최근 영상 스크립트까지 읽고 Claude가 인터뷰 여부 재판정.
 
@@ -176,6 +222,9 @@ def deep_verify_interview(tenant_id: str, limit: int = 25) -> dict:
         return {"ok": False, "error": "youtube_api_key 미설정"}
     if not get_tenant_secret(tenant_id, "anthropic_api_key"):
         return {"ok": False, "error": "anthropic_api_key 미설정"}
+
+    # 0) 전체 후보 키워드 스윕(무료·전량) — 명백한 낚시성/AI강의 즉시 제외
+    swept = sweep_scam_candidates(tenant_id)
 
     from app.services.scanners.youtube_scanner import YouTubeScanner, _fetch_transcript
     api_keys = [k for k in (
@@ -192,7 +241,7 @@ def deep_verify_interview(tenant_id: str, limit: int = 25) -> dict:
             .order("deep_verified_at", desc=False, nullsfirst=True)
             .limit(limit).execute().data or [])
     if not rows:
-        return {"ok": True, "checked": 0, "kept": 0, "dropped": 0}
+        return {"ok": True, "checked": 0, "kept": 0, "dropped": 0, "swept": swept}
 
     now = datetime.now(timezone.utc).isoformat()
     kept = dropped = 0
@@ -223,5 +272,7 @@ def deep_verify_interview(tenant_id: str, limit: int = 25) -> dict:
         except Exception as e:
             logger.debug("[deep-verify] 저장 실패 %s: %s", lead.get("handle_name"), e)
 
-    logger.info("[deep-verify] 심층검증 %d건: 유지 %d, 제외 %d", len(rows), kept, dropped)
-    return {"ok": True, "checked": len(rows), "kept": kept, "dropped": dropped}
+    logger.info("[deep-verify] 심층검증 %d건: 유지 %d, 제외 %d (키워드스윕 %d)",
+                len(rows), kept, dropped, swept)
+    return {"ok": True, "checked": len(rows), "kept": kept,
+            "dropped": dropped, "swept": swept}
