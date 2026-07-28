@@ -258,10 +258,10 @@ export default function OutreachPage() {
   const findInterviewCandidates = async () => {
     setFindingCand(true);
     try {
-      const r = await apiFetch<{ matched: number; newly_flagged: number }>(
+      const r = await apiFetch<{ candidates: number; cleared: number }>(
         "/api/outreach/leads/find-interview-candidates?min_subscribers=3000",
         { method: "POST" }, 30000);
-      setToast({ msg: `기존 발굴에서 인터뷰 후보 ${r.matched}건 (신규 ${r.newly_flagged}건 표시)`, ok: true });
+      setToast({ msg: `인터뷰 후보 ${r.candidates}건 (강사형 제외${r.cleared ? ` · 잘못된 표시 ${r.cleared}건 해제` : ""})`, ok: true });
       loadAll();
     } catch (e) {
       setToast({ msg: e instanceof Error ? e.message : "후보 발굴 실패", ok: false });

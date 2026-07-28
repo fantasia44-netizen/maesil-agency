@@ -199,47 +199,65 @@ def campaign_counts(user: UserContext = Depends(get_current_user)) -> dict:
     return out
 
 
+# 인터뷰/출연 "호스트형" 채널 유형 — 게스트를 출연시키거나 사람·사례를 다룸.
+# educator(강사)·tool_expert·reviewer는 '가르치는' 파트너 후보라 제외.
+_INTERVIEW_HOST_TYPES = {"case_sharer", "community_admin", "influencer", "interviewer"}
+# 콘텐츠 텍스트에 이게 있으면 인터뷰/출연 성격 (channel_type 없어도 보조 판별)
+_INTERVIEW_KEYWORDS = ("인터뷰", "출연", "대담", "게스트", "사례", "스토리", "만나", "초대")
+
+
+def _looks_interview(row: dict) -> bool:
+    if (row.get("channel_type") or "") in _INTERVIEW_HOST_TYPES:
+        return True
+    text = f"{row.get('best_content_title') or ''} {row.get('content_summary') or ''}"
+    return any(k in text for k in _INTERVIEW_KEYWORDS)
+
+
 @router.post("/leads/find-interview-candidates")
 def find_interview_candidates(
     min_subscribers: int = 3000,
     user: UserContext = Depends(get_current_user),
 ) -> dict:
-    """기존 발굴 리드에서 인터뷰/출연 겸용 후보를 자동 표시.
+    """기존 발굴 리드에서 인터뷰/출연 '겸용 후보'를 재계산(전체 리컴퓨트).
 
-    기준: 셀러 시청자(is_seller_content) + 충분한 구독자(min_subscribers) +
-    경쟁툴 판매 안 함. campaign은 안 바꾸고 interview_candidate=true만 세팅 →
-    인터뷰 탭에 겸용으로 노출. (리드 이동 아님)
+    후보 = 셀러 시청자 + 구독≥N + 비경쟁 + (호스트형 채널유형 OR 인터뷰성 콘텐츠).
+    강사형(educator)·리뷰형은 '가르치는' 파트너 후보라 제외.
+    재실행 시 자동 기준으로 다시 계산됨(수동 토글도 재계산 — 큐레이션은 그 뒤에).
     """
     tid = _require_tid(user)
-    # 후보 조회 — 셀러 콘텐츠 + 도달 + 비경쟁
     q = (_db().table("outreach_leads")
-         .select("id, handle_name, platform, subscriber_count, channel_type, "
-                 "content_summary, campaign, interview_candidate")
+         .select("id, handle_name, channel_type, subscriber_count, "
+                 "best_content_title, content_summary, interview_candidate")
          .eq("tenant_id", tid)
          .eq("is_seller_content", True)
          .gte("subscriber_count", min_subscribers)
          .neq("sells_competing_tool", True)
-         .order("subscriber_count", desc=True)
-         .limit(2000))
+         .limit(3000))
     rows = q.execute().data or []
-    to_flag = [r["id"] for r in rows if not r.get("interview_candidate")]
 
-    flagged = 0
-    for i in range(0, len(to_flag), 200):
-        chunk = to_flag[i:i + 200]
-        try:
-            resp = (_db().table("outreach_leads")
-                    .update({"interview_candidate": True})
-                    .eq("tenant_id", tid).in_("id", chunk).execute())
-            flagged += len(resp.data or [])
-        except Exception as e:
-            logger.error("[outreach] 인터뷰후보 표시 실패: %s", e)
-            raise HTTPException(500, f"저장 실패: {str(e)[:200]}")
+    match_ids = {r["id"] for r in rows if _looks_interview(r)}
 
-    logger.info("[outreach] 인터뷰 후보 발굴: 매칭 %d, 신규 표시 %d (구독≥%d)",
-                len(rows), flagged, min_subscribers)
-    return {"ok": True, "matched": len(rows), "newly_flagged": flagged,
-            "min_subscribers": min_subscribers}
+    # 전체 리컴퓨트: 매칭은 true, 나머지는 false (이전 잘못된 표시 정리)
+    def _bulk(ids: list, val: bool):
+        for i in range(0, len(ids), 200):
+            (_db().table("outreach_leads").update({"interview_candidate": val})
+             .eq("tenant_id", tid).in_("id", ids[i:i + 200]).execute())
+
+    try:
+        # 현재 true인데 이제 매칭 아님 → false로
+        cur = (_db().table("outreach_leads").select("id")
+               .eq("tenant_id", tid).eq("interview_candidate", True).limit(5000).execute().data or [])
+        stale = [r["id"] for r in cur if r["id"] not in match_ids]
+        _bulk(stale, False)
+        _bulk(list(match_ids), True)
+    except Exception as e:
+        logger.error("[outreach] 인터뷰후보 재계산 실패: %s", e)
+        raise HTTPException(500, f"저장 실패: {str(e)[:200]}")
+
+    logger.info("[outreach] 인터뷰 후보 재계산: 후보 %d, 해제 %d (구독≥%d, 강사 제외)",
+                len(match_ids), len(stale), min_subscribers)
+    return {"ok": True, "candidates": len(match_ids), "cleared": len(stale),
+            "scanned": len(rows), "min_subscribers": min_subscribers}
 
 
 class InterviewFlag(BaseModel):
