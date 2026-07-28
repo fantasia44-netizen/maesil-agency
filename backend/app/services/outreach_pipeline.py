@@ -178,8 +178,14 @@ def run_platform_scan(tenant_id: str, platform: str, campaign: str = "partner") 
             get_tenant_secret(tenant_id, "youtube_api_key_2"),
             get_tenant_secret(tenant_id, "youtube_api_key_3"),
         ] if k]
-        from app.services.scanners.youtube_scanner import YouTubeScanner, analyze_items_haiku
-        scanner = YouTubeScanner(api_keys, cfg.keywords_youtube)
+        from app.services.scanners.youtube_scanner import (
+            YouTubeScanner, analyze_items_haiku, INTERVIEW_KEYWORDS)
+        # 인터뷰 캠페인은 출연·대담·창업스토리 전용 키워드로 검색(파트너 키워드와 분리)
+        if campaign == "interview":
+            kw = getattr(cfg, "keywords_interview", None) or INTERVIEW_KEYWORDS
+        else:
+            kw = cfg.keywords_youtube
+        scanner = YouTubeScanner(api_keys, kw)
         analyzer = lambda items: analyze_items_haiku(items, anthropic_key)
     elif platform == "naver_blog":
         client_id = get_tenant_secret(tenant_id, "naver_client_id")
