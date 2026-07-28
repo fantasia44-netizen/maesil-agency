@@ -286,6 +286,24 @@ def verify_channels_endpoint(
     return result
 
 
+@router.post("/leads/deep-verify-interview")
+def deep_verify_interview_endpoint(
+    limit: int = 25,
+    user: UserContext = Depends(get_current_user),
+) -> dict:
+    """인터뷰 후보의 최근 영상 스크립트까지 읽고 Claude가 인터뷰 여부 재판정.
+
+    강사·AI스팸·낚시성 채널을 후보에서 제외. 비용 때문에 limit로 제한
+    (미검증 후보 우선). 반복 실행하면 나머지도 순차 검증됨.
+    """
+    tid = _require_tid(user)
+    from app.services.outreach_verify import deep_verify_interview
+    result = deep_verify_interview(tid, limit=limit)
+    if not result.get("ok"):
+        raise HTTPException(400, result.get("error") or "심층 검증 실패")
+    return result
+
+
 class InterviewFlag(BaseModel):
     value: bool
 

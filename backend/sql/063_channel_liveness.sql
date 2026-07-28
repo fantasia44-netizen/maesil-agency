@@ -10,6 +10,12 @@ ALTER TABLE agent_work.outreach_leads
 ALTER TABLE agent_work.outreach_leads
     ADD COLUMN IF NOT EXISTS verified_at TIMESTAMPTZ;
 
+-- 심층 검증: 최근 영상 스크립트까지 읽고 Claude가 인터뷰 여부 판정한 근거
+ALTER TABLE agent_work.outreach_leads
+    ADD COLUMN IF NOT EXISTS interview_verdict TEXT;
+ALTER TABLE agent_work.outreach_leads
+    ADD COLUMN IF NOT EXISTS deep_verified_at TIMESTAMPTZ;
+
 CREATE INDEX IF NOT EXISTS outreach_leads_dead_idx
     ON agent_work.outreach_leads (tenant_id, channel_dead);
 

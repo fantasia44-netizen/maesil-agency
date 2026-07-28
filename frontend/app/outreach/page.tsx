@@ -38,6 +38,7 @@ type Lead = {
   status: LeadStatus;
   campaign?: string | null;
   interview_candidate?: boolean;
+  interview_verdict?: string | null;
   touch_count: number;
   last_touch_at: string | null;
   emailed_at: string | null;
@@ -205,6 +206,7 @@ export default function OutreachPage() {
   const [campCounts, setCampCounts] = useState<{ partner: number; interview: number; interview_candidate: number }>({ partner: 0, interview: 0, interview_candidate: 0 });
   const [findingCand, setFindingCand] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [deepVerifying, setDeepVerifying] = useState(false);
   const [touchLogs, setTouchLogs] = useState<TouchLog[]>([]);
 
   // UTC ISO → KST 날짜 문자열 (YYYY-MM-DD)
@@ -280,6 +282,19 @@ export default function OutreachPage() {
     } catch (e) {
       setToast({ msg: e instanceof Error ? e.message : "채널 검증 실패", ok: false });
     } finally { setVerifying(false); }
+  };
+
+  const deepVerify = async () => {
+    setDeepVerifying(true);
+    try {
+      const r = await apiFetch<{ checked: number; kept: number; dropped: number }>(
+        "/api/outreach/leads/deep-verify-interview?limit=25",
+        { method: "POST" }, 300000);
+      setToast({ msg: `심층검증 ${r.checked}건: 인터뷰 아님 ${r.dropped}건 제외 (유지 ${r.kept}) · 반복 실행 시 나머지도 검증`, ok: true });
+      loadAll();
+    } catch (e) {
+      setToast({ msg: e instanceof Error ? e.message : "심층 검증 실패", ok: false });
+    } finally { setDeepVerifying(false); }
   };
 
   const toggleInterviewCand = async (lead: Lead, value: boolean) => {
@@ -619,6 +634,14 @@ export default function OutreachPage() {
                 fontSize: "0.82rem", fontWeight: 600,
               }}>
               {verifying ? "검증 중…" : "🩺 채널 생존 검증"}
+            </button>
+            <button onClick={deepVerify} disabled={deepVerifying}
+              style={{
+                padding: "8px 14px", borderRadius: 8, border: "1px solid #7c3aed",
+                background: "#fff", color: "#7c3aed", cursor: "pointer",
+                fontSize: "0.82rem", fontWeight: 600,
+              }}>
+              {deepVerifying ? "영상 분석 중…" : "🎯 심층 검증 (영상 스크립트)"}
             </button>
             <span style={{ fontSize: "0.74rem", color: "#64748b" }}>
               셀러 시청자·구독 3천+ 채널을 겸용 후보로 표시 · <b>자동발송 대상 아님</b>(수동 제안)
@@ -1072,6 +1095,16 @@ export default function OutreachPage() {
                         onClick={() => toggleInterviewCand(lead, false)}>
                         ✕ 인터뷰 제외
                       </button>
+                    )}
+                    {campaign === "interview" && lead.interview_verdict && (
+                      <span title="심층 검증 판정 근거"
+                        style={{
+                          fontSize: "0.68rem", color: "#6d28d9", background: "#f5f3ff",
+                          border: "1px solid #ddd6fe", borderRadius: 6, padding: "3px 7px",
+                          maxWidth: 260, lineHeight: 1.3,
+                        }}>
+                        🎯 {lead.interview_verdict}
+                      </span>
                     )}
 
                     {/* 상세 페이지 */}
