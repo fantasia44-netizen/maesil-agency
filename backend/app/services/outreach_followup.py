@@ -407,6 +407,12 @@ def check_pending_followups(tenant_id: str, limit: int = 20) -> dict:
             _mark_touch(touch_id, "skipped")
             continue
 
+        # 콜드메일 자동발송 OFF(cold_drip_enabled=false)면 이메일 전 차수(1차 콜드드립+2~5차
+        # 팔로업) 발송 보류 — pending 유지(취소 아님)라 재개 시 이어서 발송. 토글 하나로
+        # 신규 예약·오늘 예약분·기존 팔로업까지 전부 즉시 정지. 인터뷰 campaign은 애초 대상 아님.
+        if channel == "email" and not cfg.cold_drip_enabled:
+            continue
+
         # 야간(테넌트 타임존 업무시간 외) 자동 이메일 발송 보류 — pending 유지, 다음 주기 처리
         if channel == "email":
             from app.services.outreach_suppression import is_quiet_hours
