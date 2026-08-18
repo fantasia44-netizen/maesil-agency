@@ -120,6 +120,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           </NavGroup>}
           {admin && <Link href="/briefing">브리핑</Link>}
           {admin && <Link href="/chat">대화</Link>}
+          {admin && <Link href="/gbl">GBL</Link>}
           {admin && <Link href="/settings">설정</Link>}
 
           {/* 고객(customer) */}
