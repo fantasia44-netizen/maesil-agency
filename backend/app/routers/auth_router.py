@@ -387,6 +387,96 @@ def gbl_signup(body: GblSignupRequest) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────────
+# GBL 비밀번호 재설정 (이메일 링크). gbl role 계정만 대상.
+# ─────────────────────────────────────────────────────────────────
+
+_pwreset_cooldown: dict[str, float] = {}   # email → 마지막 발송 시각(초)
+
+
+class GblPwResetRequest(BaseModel):
+    email: str
+
+
+class GblPwResetConfirm(BaseModel):
+    token: str
+    password: str
+
+
+@router.post("/gbl-password/request")
+def gbl_password_request(body: GblPwResetRequest) -> dict:
+    """재설정 메일 발송. 계정 존재 여부를 노출하지 않기 위해 항상 200."""
+    email = (body.email or "").lower().strip()
+    if not email or "@" not in email:
+        return {"ok": True}
+    # 같은 이메일 60초 1회 쿨다운(메일 스팸 방지)
+    now = time.monotonic()
+    if now - _pwreset_cooldown.get(email, 0.0) < 60:
+        return {"ok": True}
+
+    user = get_user_by_email(email)
+    if user and user.get("role") == "gbl" and user.get("is_active", True):
+        _pwreset_cooldown[email] = now
+        token = secrets.token_urlsafe(32)
+        valid_until = (datetime.now(timezone.utc) + timedelta(minutes=30)).isoformat()
+        try:
+            _snapshots_table().insert({
+                "agent_type": "system", "kind": "gbl_pwreset",
+                "payload": {"email": email, "token_hash": _hash_invite_token(token)},
+                "valid_until": valid_until, "created_at": _now(),
+            }).execute()
+            link = f"https://gbl.maesil.net/gbl/reset?token={token}"
+            html = (
+                "<p>GBL 데스노트 비밀번호 재설정 요청입니다.</p>"
+                "<p>아래 링크에서 새 비밀번호를 설정하세요 (30분 내 유효):</p>"
+                f'<p><a href="{link}">{link}</a></p>'
+                "<p>본인이 요청하지 않았다면 이 메일을 무시하세요.</p>"
+            )
+            from app.services.notify_client import send_email
+            send_email(to=email, subject="[GBL 데스노트] 비밀번호 재설정", html=html)
+        except Exception:
+            logger.exception("gbl 비밀번호 재설정 메일 실패")
+    return {"ok": True}
+
+
+@router.post("/gbl-password/confirm")
+def gbl_password_confirm(body: GblPwResetConfirm) -> dict:
+    """재설정 링크의 토큰으로 새 비밀번호 설정."""
+    if len(body.password or "") < 8:
+        raise HTTPException(400, "비밀번호는 8자 이상이어야 합니다.")
+    if not body.token or len(body.token) < 16:
+        raise HTTPException(400, "유효하지 않은 링크입니다.")
+
+    token_hash = _hash_invite_token(body.token)
+    resp = _snapshots_table().select("*").eq("kind", "gbl_pwreset").gt("valid_until", _now()).execute()
+    row = None
+    for r in (resp.data or []):
+        p = r.get("payload") or {}
+        if p.get("used_at"):
+            continue
+        if p.get("token_hash") and hmac.compare_digest(str(p["token_hash"]), token_hash):
+            row = r
+            break
+    if not row:
+        raise HTTPException(400, "만료되었거나 이미 사용된 링크입니다. 재설정을 다시 요청하세요.")
+
+    payload = dict(row.get("payload") or {})
+    user = get_user_by_email(payload.get("email") or "")
+    if not user or user.get("role") != "gbl":
+        raise HTTPException(400, "대상 계정을 찾을 수 없습니다.")
+
+    # 토큰 재사용 방지: 먼저 used 마킹
+    payload["used_at"] = _now()
+    past = datetime(2000, 1, 1, tzinfo=timezone.utc).isoformat()
+    _snapshots_table().update({"payload": payload, "valid_until": past}).eq("id", row["id"]).execute()
+
+    _users_table().update(
+        {"password_hash": hash_password(body.password), "updated_at": _now()}
+    ).eq("id", user["id"]).execute()
+    invalidate_revalidate_cache(user["id"])
+    return {"ok": True}
+
+
+# ─────────────────────────────────────────────────────────────────
 # 로그인
 # ─────────────────────────────────────────────────────────────────
 

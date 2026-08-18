@@ -173,6 +173,28 @@ export async function gblSignup(
   return user;
 }
 
+// ── GBL 비밀번호 재설정 ───────────────────────────────────────────────
+export async function gblPasswordRequest(email: string): Promise<void> {
+  // 항상 성공(계정 존재 노출 방지) — 네트워크 오류만 throw
+  await fetch(`${BASE}/api/auth/gbl-password/request`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function gblPasswordConfirm(token: string, password: string): Promise<void> {
+  const res = await fetch(`${BASE}/api/auth/gbl-password/confirm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, password }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "재설정 실패");
+  }
+}
+
 export function storeAuth(token: string, user: Partial<StoredUser>) {
   setToken(token);
   setUser({

@@ -72,7 +72,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p)) || pathname.startsWith("/gbl/login");
+    const gblPublic = ["/gbl/login", "/gbl/reset", "/gbl/privacy"].some(p => pathname.startsWith(p));
+    const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p)) || gblPublic;
     const token = getToken();
 
     if (!token && !isPublic) {
