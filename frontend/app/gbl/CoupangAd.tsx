@@ -24,7 +24,7 @@ export default function CoupangAd() {
         referrerPolicy="unsafe-url"
         style={{ maxWidth: 680, border: "none", display: "inline-block" }}
       />
-      <p style={{ fontSize: "0.62rem", color: "#cbd5e1", marginTop: 6, lineHeight: 1.5, maxWidth: 680, margin: "6px auto 0" }}>
+      <p style={{ fontSize: "0.72rem", color: "#e2e8f0", marginTop: 6, lineHeight: 1.5, maxWidth: 680, margin: "6px auto 0" }}>
         이 영역은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
       </p>
     </div>

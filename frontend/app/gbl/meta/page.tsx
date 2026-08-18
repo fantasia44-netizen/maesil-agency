@@ -182,6 +182,10 @@ export default function GblMeta() {
         )}
 
         {meta && meta.total > 0 && <><AdSlot /><CoupangAd /></>}
+
+        <div style={{ textAlign: "center", marginTop: 26, fontSize: "0.72rem", color: "#5f6f92" }}>
+          <Link href="/gbl/privacy" style={{ color: "#8ea0c4", textDecoration: "none" }}>개인정보처리방침</Link>
+        </div>
       </div>
     </div>
   );

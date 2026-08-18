@@ -30,15 +30,16 @@ export default function AdSlot({ slot }: { slot?: string }) {
   const isOwner = getUser()?.role === "super_admin";
 
   useEffect(() => {
-    if (!CLIENT || isOwner) return;
+    if (!CLIENT || !adSlot || isOwner) return;
     ensureScript(CLIENT);
     try {
       // @ts-expect-error adsbygoogle 전역
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch { /* 광고 차단 등 무시 */ }
-  }, [isOwner]);
+  }, [isOwner, adSlot]);
 
-  if (!CLIENT || isOwner) return null;
+  // client·slot 둘 다 있어야 렌더(slot 비면 깨진 빈 광고 방지)
+  if (!CLIENT || !adSlot || isOwner) return null;
 
   return (
     <div style={{ margin: "18px 0", textAlign: "center", minHeight: 60 }}>
