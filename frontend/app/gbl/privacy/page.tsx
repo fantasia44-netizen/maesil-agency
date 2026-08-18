@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 // 개인정보처리방침 — 공개 페이지 (AdSense·Play스토어 심사 필수).
-// ※ 운영자 연락처(CONTACT)는 실제 운영 이메일로 교체하세요.
+// 운영자 연락처(CONTACT) — 실제 수신되는 운영 창구(super_admin 계정, 확정 2026-08-18).
 const CONTACT = "support@maesil-insight.com";
 const EFFECTIVE = "2026-08-18";
 
