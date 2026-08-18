@@ -640,25 +640,32 @@ export default function GblPage() {
               </div>;
             }
             return (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {decks.map((d) => {
+              <div>
+                <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 8 }}>
+                  많이 만난 순 · {decks.length}종 덱
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {decks.map((d, idx) => {
                   const r = winRate(d.wins, d.losses);
                   const open = expandedDeck === d.key;
                   return (
                     <div key={d.key} style={{ border: "1px solid #eef2f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
                       <button onClick={() => setExpandedDeck(open ? null : d.key)}
                         style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "0.6rem 0.8rem", background: "none", border: "none", cursor: "pointer" }}>
+                        <span style={{ fontSize: "0.74rem", fontWeight: 800, color: idx < 3 ? "#7c3aed" : "#94a3b8", minWidth: 22, textAlign: "center" }}>#{idx + 1}</span>
                         <div style={{ display: "flex", gap: 2 }}>
                           {d.mons.map((mm, i) => mm.sp
                             ? <MonSprite key={i} mon={mm.sp} size={34} />
                             : <span key={i} style={{ fontSize: "0.7rem", color: "#94a3b8", alignSelf: "center", padding: "0 4px" }}>{mm.manual}</span>)}
                         </div>
                         <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                          <div style={{ fontSize: "0.82rem", fontWeight: 700 }}>
+                          <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>{d.matches.length}회</div>
+                          <div style={{ fontSize: "0.72rem", fontWeight: 600 }}>
                             <span style={{ color: "#15803d" }}>{d.wins}승</span> <span style={{ color: "#b91c1c" }}>{d.losses}패</span>
                             {d.draws > 0 && <span style={{ color: "#94a3b8" }}> {d.draws}무</span>}
+                            <span style={{ color: "#cbd5e1" }}> · </span>
+                            <span style={{ color: rateColor(r) }}>{r ?? "-"}%</span>
                           </div>
-                          <div style={{ fontSize: "0.72rem", fontWeight: 700, color: rateColor(r) }}>승률 {r ?? "-"}%</div>
                         </div>
                         <span style={{ fontSize: "0.7rem", color: "#cbd5e1" }}>{open ? "▲" : "▼"}</span>
                       </button>
@@ -671,6 +678,7 @@ export default function GblPage() {
                     </div>
                   );
                 })}
+                </div>
               </div>
             );
           })()}
