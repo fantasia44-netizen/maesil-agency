@@ -16,8 +16,11 @@ const LEAGUE_LABEL: Record<string, string> = { great: "슈퍼리그", ultra: "�
 const fmtDate = (s: string | null) =>
   s ? new Date(s).toLocaleDateString("ko-KR", { month: "short", day: "numeric" }) : "-";
 
+type DbStatus = { hub_configured: boolean; maesil_total: number | null; maesil_hub: number | null };
+
 export default function GblAdmin() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [db, setDb] = useState<DbStatus | null>(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -28,7 +31,23 @@ export default function GblAdmin() {
       setErr(e instanceof Error ? e.message : "불러오기 실패");
     }
   };
-  useEffect(() => { load(); }, []);
+  const loadDb = async () => {
+    try { setDb(await apiFetch<DbStatus>("/api/gbl/admin/db-status", {}, 20000)); }
+    catch { /* noop */ }
+  };
+  useEffect(() => { load(); loadDb(); }, []);
+
+  const migrate = async () => {
+    if (!window.confirm("maesil-total의 gbl_matches를 maesil-hub로 복사합니다 (id 유지, 재실행 안전). 계속할까요?")) return;
+    setBusy("migrate");
+    try {
+      const r = await apiFetch<{ copied: number; source: number }>("/api/gbl/admin/migrate-to-hub", { method: "POST" }, 60000);
+      window.alert(`이전 완료: ${r.copied}/${r.source}판`);
+      await loadDb(); await load();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "이전 실패");
+    } finally { setBusy(null); }
+  };
 
   const toggleActive = async (u: GblUser) => {
     setBusy(u.id);
@@ -70,6 +89,28 @@ export default function GblAdmin() {
       <p style={{ margin: "0 0 1.2rem", fontSize: "0.82rem", color: "#64748b" }}>gbl.maesil.net 가입 유저·기록 현황 (super_admin 전용)</p>
 
       {err && <div style={{ background: "#fef2f2", color: "#b91c1c", border: "1px solid #fecaca", borderRadius: 10, padding: "0.7rem 1rem", marginBottom: "1rem", fontSize: "0.85rem" }}>{err}</div>}
+
+      {db && (
+        <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "0.9rem 1rem", marginBottom: "1.2rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#0f172a" }}>🗄️ DB 상태</span>
+            <span style={{ fontSize: "0.74rem", padding: "2px 8px", borderRadius: 10, background: db.hub_configured ? "#dcfce7" : "#fee2e2", color: db.hub_configured ? "#15803d" : "#b91c1c", fontWeight: 600 }}>
+              {db.hub_configured ? "hub 연결됨" : "hub 미설정(폴백)"}
+            </span>
+            <span style={{ fontSize: "0.8rem", color: "#475569", marginLeft: 4 }}>
+              maesil-total <b>{db.maesil_total ?? "?"}</b>판 → maesil-hub <b style={{ color: "#7c3aed" }}>{db.maesil_hub ?? "?"}</b>판
+            </span>
+            <button onClick={migrate} disabled={!!busy || !db.hub_configured || !db.maesil_total}
+              style={{ marginLeft: "auto", fontSize: "0.78rem", fontWeight: 700, padding: "7px 14px", borderRadius: 9,
+                border: "none", cursor: busy || !db.hub_configured || !db.maesil_total ? "not-allowed" : "pointer",
+                background: busy || !db.hub_configured || !db.maesil_total ? "#cbd5e1" : "linear-gradient(90deg,#3b5bdb,#7c3aed)", color: "#fff" }}>
+              {busy === "migrate" ? "이전 중…" : "total → hub 데이터 이전"}
+            </button>
+          </div>
+          {db.hub_configured && db.maesil_hub === 0 && (db.maesil_total ?? 0) > 0 &&
+            <div style={{ fontSize: "0.74rem", color: "#b45309", marginTop: 6 }}>⚠️ hub가 비어있습니다. 위 버튼으로 {db.maesil_total}판을 옮기면 메타·기록이 채워집니다.</div>}
+        </div>
+      )}
 
       {!stats ? (
         <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem" }}>불러오는 중…</div>

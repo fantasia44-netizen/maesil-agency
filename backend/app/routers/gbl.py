@@ -289,3 +289,51 @@ def admin_delete_user(user_id: str, admin: UserContext = Depends(require_admin))
         raise HTTPException(500, "삭제 실패")
     invalidate_revalidate_cache(user_id)
     return {"ok": True}
+
+
+# ── DB 이전(maesil-total → maesil-hub) 유틸 ─────────────────────────────
+def _total_matches_db():
+    """소스: maesil-total agent_work.gbl_matches (이전용)."""
+    from app.db.maesil_total_client import get_maesil_total_client
+    return get_maesil_total_client().schema("agent_work")
+
+
+@router.get("/admin/db-status")
+def admin_db_status(admin: UserContext = Depends(require_admin)) -> dict:
+    """양쪽 DB의 gbl_matches 건수 조회."""
+    from app.db.maesil_total_client import hub_configured
+    def _count(tbl):
+        try:
+            return tbl.table("gbl_matches").select("id", count="exact").limit(1).execute().count or 0
+        except Exception:
+            return None
+    return {
+        "hub_configured": hub_configured(),
+        "maesil_total": _count(_total_matches_db()),
+        "maesil_hub": _count(_db()),
+    }
+
+
+@router.post("/admin/migrate-to-hub")
+def admin_migrate_to_hub(admin: UserContext = Depends(require_admin)) -> dict:
+    """maesil-total의 gbl_matches를 maesil-hub로 복사(id 유지, 재실행 안전)."""
+    from app.db.maesil_total_client import hub_configured
+    if not hub_configured():
+        raise HTTPException(400, "maesil-hub 미설정 — 옮길 대상 없음")
+    try:
+        rows = _total_matches_db().table("gbl_matches").select("*").limit(50000).execute().data or []
+    except Exception as e:
+        logger.error("gbl migrate 소스조회 실패: %s", e)
+        raise HTTPException(500, "소스(maesil-total) 조회 실패")
+    if not rows:
+        return {"copied": 0, "source": 0, "message": "이전할 데이터 없음"}
+    dest = _db()
+    copied = 0
+    try:
+        for i in range(0, len(rows), 100):
+            resp = dest.table("gbl_matches").upsert(rows[i:i + 100], on_conflict="id").execute()
+            copied += len(resp.data or [])
+    except Exception as e:
+        logger.error("gbl migrate 삽입 실패: %s", e)
+        raise HTTPException(500, f"hub 삽입 실패: {e}")
+    return {"copied": copied, "source": len(rows)}
