@@ -31,6 +31,7 @@ from app.auth import (
     hash_password,
     invalidate_revalidate_cache,
     require_admin,
+    rotate_session,
     verify_password,
 )
 from app.config import settings
@@ -379,6 +380,7 @@ def gbl_signup(body: GblSignupRequest) -> dict:
             raise HTTPException(409, "이미 사용 중인 이메일입니다.")
         raise HTTPException(500, "계정 생성 실패")
 
+    user["session_id"] = rotate_session(user["id"])  # 단일 세션
     token = create_token(user)
     return {
         "ok": True, "token": token, "email": user["email"], "role": user["role"],
@@ -472,6 +474,7 @@ def gbl_password_confirm(body: GblPwResetConfirm) -> dict:
     _users_table().update(
         {"password_hash": hash_password(body.password), "updated_at": _now()}
     ).eq("id", user["id"]).execute()
+    rotate_session(user["id"])  # 비번 변경 → 기존 모든 세션 무효화(재로그인 필요)
     invalidate_revalidate_cache(user["id"])
     return {"ok": True}
 
@@ -545,6 +548,7 @@ def gbl_google(body: GblGoogleRequest) -> dict:
         _users_table().update({"last_login_at": now}).eq("id", user["id"]).execute()
     except Exception:
         pass
+    user["session_id"] = rotate_session(user["id"])  # 단일 세션
     return {
         "ok": True, "token": create_token(user), "email": user["email"],
         "role": user["role"], "display_name": user.get("display_name"),
@@ -633,6 +637,7 @@ def gbl_kakao(body: GblKakaoRequest) -> dict:
         _users_table().update({"last_login_at": now}).eq("id", user["id"]).execute()
     except Exception:
         pass
+    user["session_id"] = rotate_session(user["id"])  # 단일 세션
     return {"ok": True, "token": create_token(user), "email": user["email"],
             "role": user["role"], "display_name": user.get("display_name")}
 
@@ -677,6 +682,7 @@ def login(body: LoginRequest, request: Request) -> LoginResponse:
     except Exception:
         pass
 
+    user["session_id"] = rotate_session(user["id"])  # 단일 세션(이전 로그인 무효화)
     token = create_token(user)
     return LoginResponse(
         token=token,

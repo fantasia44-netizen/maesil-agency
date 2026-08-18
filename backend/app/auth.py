@@ -18,6 +18,7 @@ from __future__ import annotations
 import os
 import threading
 import time
+import uuid
 from datetime import datetime, timedelta, timezone
 
 import jwt
@@ -99,9 +100,24 @@ def create_token(user_row: dict) -> str:
         "tenant_id":            str(user_row["tenant_id"])
                                 if user_row.get("tenant_id") else None,
         "display_name":         user_row.get("display_name"),
+        "sid":                  user_row.get("session_id"),  # 단일 세션 키(있을 때만)
         "exp": datetime.now(timezone.utc) + timedelta(days=JWT_EXPIRE_DAYS),
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def rotate_session(user_id: str) -> str:
+    """새 세션 ID를 발급해 users.session_id에 저장(마지막 로그인만 유효 → 단일 세션).
+    로그인/가입/소셜로그인/비번재설정 시 호출. 이전에 발급된 토큰(sid 불일치)은 무효화됨.
+    """
+    sid = uuid.uuid4().hex
+    try:
+        _users_table().update({"session_id": sid}).eq("id", user_id).execute()
+    except Exception:
+        # session_id 컬럼 미생성(마이그레이션 전) 등 → 단일세션 미적용, 로그인은 진행
+        return ""
+    invalidate_revalidate_cache(user_id)
+    return sid
 
 
 def decode_token(token: str) -> dict:
@@ -141,7 +157,7 @@ def _fresh_user_row(user_id: str) -> dict | None:
     try:
         resp = (
             _users_table()
-            .select("id, role, is_active, insight_operator_id, display_name, tenant_id")
+            .select("id, role, is_active, insight_operator_id, display_name, tenant_id, session_id")
             .eq("id", user_id)
             .limit(1)
             .execute()
@@ -187,6 +203,11 @@ def get_current_user(request: Request) -> UserContext:
         if not row.get("__db_error__"):
             if not row.get("is_active", True):
                 raise HTTPException(403, "비활성화된 계정입니다. 관리자에게 문의하세요.")
+            # 단일 세션 강제(gbl 전용): DB session_id가 있고 토큰 sid와 다르면 무효화.
+            # db_sid 없으면(마이그레이션 전/최초) 미적용 → 기존 세션 무중단.
+            db_sid = row.get("session_id")
+            if row.get("role") == "gbl" and db_sid and payload.get("sid") != db_sid:
+                raise HTTPException(401, "다른 기기에서 로그인되어 로그아웃되었습니다. 다시 로그인해주세요.")
             # DB의 현재 값으로 갱신(토큰 페이로드보다 우선)
             role = row.get("role", role)
             insight_operator_id = (
