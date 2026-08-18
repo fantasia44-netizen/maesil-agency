@@ -2,15 +2,25 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { apiFetch, logout } from "../../lib/api";
-import DATA from "./gbl_master.json";
+import DATA from "./gbl_data.json";
 import AdSlot from "./AdSlot";
 
 // ── 데이터셋 타입 ──────────────────────────────────────────────────────
 type Move = { ko: string; en: string; type: string; kind: string };
 type Mon = { id: string; dex: number; ko: string; en: string; types: string[]; shadow: boolean; fast: string[]; charged: string[] };
-type Dataset = { league: string; pokemon: Mon[]; moves: Record<string, Move> };
+type League = "great" | "ultra" | "master";
+type Dataset = { top_n: number; moves: Record<string, Move>; leagues: Record<League, { count: number; pokemon: Mon[] }> };
 const DS = DATA as unknown as Dataset;
-const MON_BY_ID: Record<string, Mon> = Object.fromEntries(DS.pokemon.map((m) => [m.id, m]));
+const MOVES = DS.moves;
+const LEAGUE_META: { key: League; label: string }[] = [
+  { key: "great", label: "그레이트" },
+  { key: "ultra", label: "울트라" },
+  { key: "master", label: "마스터" },
+];
+const LEAGUE_KEY = "gbl_league";
+// 모든 리그 union → 렌더용 조회맵 (기록은 어느 리그든 speciesId로 조회)
+const MON_BY_ID: Record<string, Mon> = {};
+for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON_BY_ID[m.id] = m;
 
 const sprite = (dex: number) =>
   `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dex}.png`;
@@ -39,7 +49,7 @@ const emptyTeam = (): TeamMon[] => [
 
 // ── 공용 소품 ──────────────────────────────────────────────────────────
 function MoveChip({ id }: { id: string }) {
-  const mv = DS.moves[id];
+  const mv = MOVES[id];
   if (!mv) return <span style={{ fontSize: "0.68rem", color: "#94a3b8" }}>{id}</span>;
   const c = TYPE_COLOR[mv.type] || "#64748b";
   return (
@@ -60,8 +70,8 @@ function MonSprite({ dex, size = 44 }: { dex: number; size?: number }) {
 }
 
 // ── 포켓몬 선택기 (배틀 후 기록용) ──────────────────────────────────────
-function PokemonPicker({ value, manual, onPick, onManual }: {
-  value: string | null; manual?: string | null;
+function PokemonPicker({ value, manual, pool, onPick, onManual }: {
+  value: string | null; manual?: string | null; pool: Mon[];
   onPick: (id: string | null) => void; onManual: (name: string) => void;
 }) {
   const [q, setQ] = useState("");
@@ -69,9 +79,9 @@ function PokemonPicker({ value, manual, onPick, onManual }: {
   const [manualMode, setManualMode] = useState(false);
   const results = useMemo(() => {
     const s = q.trim().toLowerCase();
-    if (!s) return DS.pokemon.slice(0, 40);
-    return DS.pokemon.filter((m) => m.ko.toLowerCase().includes(s) || m.en.toLowerCase().includes(s)).slice(0, 40);
-  }, [q]);
+    if (!s) return pool.slice(0, 40);
+    return pool.filter((m) => m.ko.toLowerCase().includes(s) || m.en.toLowerCase().includes(s)).slice(0, 40);
+  }, [q, pool]);
 
   const selected = value ? MON_BY_ID[value] : null;
 
@@ -141,7 +151,7 @@ function PokemonPicker({ value, manual, onPick, onManual }: {
 }
 
 // ── 기록 슬롯 (개체 + 기술 + 메모) ──────────────────────────────────────
-function TeamSlot({ idx, mon, onChange }: { idx: number; mon: TeamMon; onChange: (m: TeamMon) => void }) {
+function TeamSlot({ idx, mon, pool, onChange }: { idx: number; mon: TeamMon; pool: Mon[]; onChange: (m: TeamMon) => void }) {
   const species = mon.speciesId ? MON_BY_ID[mon.speciesId] : null;
   const toggleCharged = (id: string) => {
     const has = mon.charged.includes(id);
@@ -152,7 +162,7 @@ function TeamSlot({ idx, mon, onChange }: { idx: number; mon: TeamMon; onChange:
   return (
     <div style={{ border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem", background: "#fff" }}>
       <div style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 700, marginBottom: 6 }}>{idx + 1}번</div>
-      <PokemonPicker value={mon.speciesId} manual={mon.manual}
+      <PokemonPicker value={mon.speciesId} manual={mon.manual} pool={pool}
         onPick={(id) => onChange({ speciesId: id, manual: null, fast: null, charged: [], note: mon.note })}
         onManual={(name) => onChange({ ...mon, speciesId: null, manual: name })} />
 
@@ -163,7 +173,7 @@ function TeamSlot({ idx, mon, onChange }: { idx: number; mon: TeamMon; onChange:
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
               {species.fast.map((id) => {
                 const on = mon.fast === id;
-                const mv = DS.moves[id]; const c = TYPE_COLOR[mv?.type] || "#64748b";
+                const mv = MOVES[id]; const c = TYPE_COLOR[mv?.type] || "#64748b";
                 return (
                   <button key={id} onClick={() => onChange({ ...mon, fast: on ? null : id })}
                     style={{ fontSize: "0.75rem", fontWeight: 600, padding: "4px 9px", borderRadius: 8, cursor: "pointer",
@@ -179,7 +189,7 @@ function TeamSlot({ idx, mon, onChange }: { idx: number; mon: TeamMon; onChange:
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
               {species.charged.map((id) => {
                 const on = mon.charged.includes(id);
-                const mv = DS.moves[id]; const c = TYPE_COLOR[mv?.type] || "#64748b";
+                const mv = MOVES[id]; const c = TYPE_COLOR[mv?.type] || "#64748b";
                 return (
                   <button key={id} onClick={() => toggleCharged(id)}
                     style={{ fontSize: "0.75rem", fontWeight: 600, padding: "4px 9px", borderRadius: 8, cursor: "pointer",
@@ -248,7 +258,15 @@ export default function GblPage() {
   const [tab, setTab] = useState<"lookup" | "log">("lookup");
   const [query, setQuery] = useState("");
   const [toast, setToast] = useState("");
+  const [league, setLeague] = useState<League>("master");
   const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const v = (typeof window !== "undefined" ? localStorage.getItem(LEAGUE_KEY) : null) as League | null;
+    if (v && DS.leagues[v]) setLeague(v);
+  }, []);
+  const changeLeague = (l: League) => { setLeague(l); try { localStorage.setItem(LEAGUE_KEY, l); } catch { /* noop */ } };
+  const pickerMons = DS.leagues[league].pokemon;
 
   // 기록 폼
   const [oppName, setOppName] = useState("");
@@ -262,7 +280,7 @@ export default function GblPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const data = await apiFetch<Match[]>("/api/gbl/matches?league=master", {}, 15000);
+      const data = await apiFetch<Match[]>("/api/gbl/matches", {}, 15000);
       setMatches(Array.isArray(data) ? data : []);
     } catch (e) {
       flash(e instanceof Error ? e.message : "불러오기 실패");
@@ -274,7 +292,9 @@ export default function GblPage() {
   // 조회: 이름으로 그룹핑 (최근순 유지)
   const groups = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const filtered = q ? matches.filter((m) => m.opponent_name.toLowerCase().includes(q)) : matches;
+    const filtered = matches.filter((m) =>
+      (m.league || "master") === league &&
+      (!q || m.opponent_name.toLowerCase().includes(q)));
     const map = new Map<string, Match[]>();
     for (const m of filtered) {
       const k = m.opponent_name;
@@ -282,7 +302,11 @@ export default function GblPage() {
       map.get(k)!.push(m);
     }
     return [...map.entries()];
-  }, [matches, query]);
+  }, [matches, query, league]);
+
+  const leagueCount = useMemo(
+    () => matches.filter((m) => (m.league || "master") === league).length,
+    [matches, league]);
 
   const resetForm = () => { setOppName(""); setTeam(emptyTeam()); setMemo(""); setResult(null); };
 
@@ -291,7 +315,7 @@ export default function GblPage() {
     setSaving(true);
     try {
       const payload = {
-        opponent_name: oppName.trim(), league: "master", memo: memo || null, result,
+        opponent_name: oppName.trim(), league, memo: memo || null, result,
         team: team.filter((t) => t.speciesId || t.manual),
       };
       const created = await apiFetch<Match>("/api/gbl/matches", { method: "POST", body: JSON.stringify(payload) }, 15000);
@@ -320,12 +344,27 @@ export default function GblPage() {
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
         <span style={{ fontSize: "1.3rem" }}>📓</span>
         <h1 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800 }}>GBL 데스노트</h1>
-        <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>마스터리그 · {matches.length}판</span>
+        <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{leagueCount}판</span>
         <button onClick={logout}
           style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#94a3b8", background: "none",
             border: "1px solid #e2e8f0", borderRadius: 6, padding: "4px 10px", cursor: "pointer" }}>
           로그아웃
         </button>
+      </div>
+
+      {/* 리그 스위처 */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+        {LEAGUE_META.map(({ key, label }) => {
+          const on = league === key;
+          return (
+            <button key={key} onClick={() => changeLeague(key)}
+              style={{ flex: 1, padding: "8px", borderRadius: 9, cursor: "pointer", fontWeight: 700, fontSize: "0.84rem",
+                border: on ? "1.5px solid #3b5bdb" : "1px solid #e2e8f0",
+                background: on ? "#eef2ff" : "#fff", color: on ? "#3b5bdb" : "#64748b" }}>
+              {label}
+            </button>
+          );
+        })}
       </div>
 
       {/* 탭 */}
@@ -402,7 +441,7 @@ export default function GblPage() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {team.map((tm, i) => (
-              <TeamSlot key={i} idx={i} mon={tm}
+              <TeamSlot key={i} idx={i} mon={tm} pool={pickerMons}
                 onChange={(nm) => setTeam((prev) => prev.map((x, j) => (j === i ? nm : x)))} />
             ))}
           </div>
