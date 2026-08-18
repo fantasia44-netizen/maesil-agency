@@ -126,13 +126,18 @@ def delete_match(match_id: str, user: UserContext = Depends(get_current_user)) -
 
 # ── 공개 실측 메타 (로그인 불필요, 익명 집계) ──────────────────────────
 @router.get("/meta")
-def public_meta(league: str = "master", days: int = 30) -> dict:
+def public_meta(league: str = "master", days: int = 30,
+                start: str | None = None, end: str | None = None) -> dict:
     """전체 유저가 만난 상대 덱/포켓몬 집계. 개인 식별정보 없음(익명).
-    days>0이면 최근 N일, 0이면 전체."""
+    start/end(ISO) 주면 그 구간(시즌·커스텀), 없으면 days(최근 N일, 0=전체)."""
     db = _db()
     try:
         q = db.table("gbl_matches").select("team_json, result, played_at").eq("league", league)
-        if days and days > 0:
+        if start:
+            q = q.gte("played_at", start)
+        if end:
+            q = q.lt("played_at", end)
+        if not start and not end and days and days > 0:
             since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
             q = q.gte("played_at", since)
         rows = q.limit(20000).execute().data or []

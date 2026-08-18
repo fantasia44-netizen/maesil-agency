@@ -17,7 +17,13 @@ const spriteUrl = (m?: Mon) => m ? (m.sprite || `https://raw.githubusercontent.c
 const LEAGUES: { key: League; label: string }[] = [
   { key: "great", label: "슈퍼리그" }, { key: "ultra", label: "하이퍼리그" }, { key: "master", label: "마스터리그" },
 ];
-const PERIODS: { d: number; label: string }[] = [{ d: 7, label: "최근 7일" }, { d: 30, label: "최근 30일" }, { d: 0, label: "전체" }];
+// 기간/시즌 — 시즌은 날짜구간(start/end). 시즌명·날짜는 공식(새로운 발걸음 2026.6.2~9.8) 기준.
+const PERIODS: { key: string; label: string; days?: number; start?: string; end?: string }[] = [
+  { key: "7", label: "최근 7일", days: 7 },
+  { key: "30", label: "최근 30일", days: 30 },
+  { key: "s27", label: "시즌27 (새로운 발걸음)", start: "2026-06-02", end: "2026-09-09" },
+  { key: "all", label: "전체", days: 0 },
+];
 
 type MetaMon = { speciesId: string; count: number };
 type MetaDeck = { deck: string[]; count: number; wins: number; losses: number };
@@ -33,19 +39,23 @@ const rateColor = (r: number | null) => r == null ? "#94a3b8" : r >= 60 ? "#1580
 
 export default function GblMeta() {
   const [league, setLeague] = useState<League>("master");
-  const [days, setDays] = useState(30);
+  const [periodKey, setPeriodKey] = useState("30");
   const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let alive = true;
     setLoading(true);
-    apiFetch<Meta>(`/api/gbl/meta?league=${league}&days=${days}`, {}, 20000)
+    const p = PERIODS.find((x) => x.key === periodKey) || PERIODS[1];
+    const qs = new URLSearchParams({ league });
+    if (p.start && p.end) { qs.set("start", p.start); qs.set("end", p.end); }
+    else qs.set("days", String(p.days ?? 30));
+    apiFetch<Meta>(`/api/gbl/meta?${qs.toString()}`, {}, 20000)
       .then((d) => { if (alive) setMeta(d); })
       .catch(() => { if (alive) setMeta(null); })
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
-  }, [league, days]);
+  }, [league, periodKey]);
 
   const pill = (on: boolean): React.CSSProperties => ({
     padding: "7px 14px", borderRadius: 18, cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
@@ -68,7 +78,7 @@ export default function GblMeta() {
         {LEAGUES.map(({ key, label }) => <button key={key} style={pill(league === key)} onClick={() => setLeague(key)}>{label}</button>)}
       </div>
       <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
-        {PERIODS.map(({ d, label }) => <button key={d} style={pill(days === d)} onClick={() => setDays(d)}>{label}</button>)}
+        {PERIODS.map((p) => <button key={p.key} style={pill(periodKey === p.key)} onClick={() => setPeriodKey(p.key)}>{p.label}</button>)}
       </div>
 
       {loading ? (
