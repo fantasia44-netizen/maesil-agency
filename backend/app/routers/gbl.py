@@ -21,6 +21,14 @@ router = APIRouter(prefix="/api/gbl", tags=["gbl"])
 
 
 def _db():
+    """gbl_matches → maesil-hub(public 스키마). 미설정 시 maesil-total(agent_work) 폴백."""
+    from app.db.maesil_total_client import get_maesil_hub_client, hub_configured
+    client = get_maesil_hub_client()
+    return client if hub_configured() else client.schema("agent_work")
+
+
+def _users_db():
+    """users(인증) → maesil-total (에이전시 공유)."""
     from app.db.maesil_total_client import get_maesil_total_client
     return get_maesil_total_client().schema("agent_work")
 
@@ -175,7 +183,7 @@ def admin_stats(admin: UserContext = Depends(require_admin)) -> dict:
     """gbl 유저·기록 현황 대시보드용. super_admin 전용."""
     db = _db()
     try:
-        urows = (db.table("users")
+        urows = (_users_db().table("users")
                  .select("id, email, display_name, is_active, last_login_at, created_at")
                  .eq("role", "gbl").execute().data) or []
         mrows = (db.table("gbl_matches")
@@ -227,7 +235,7 @@ def admin_matches(league: str | None = None, q: str | None = None,
     umap: dict = {}
     if uids:
         try:
-            urows = db.table("users").select("id, email, display_name").in_("id", uids).execute().data or []
+            urows = _users_db().table("users").select("id, email, display_name").in_("id", uids).execute().data or []
             umap = {u["id"]: u for u in urows}
         except Exception:
             umap = {}
@@ -247,7 +255,7 @@ def admin_set_user(user_id: str, body: AdminUserAction,
                    admin: UserContext = Depends(require_admin)) -> dict:
     """gbl 유저 활성/비활성 (남용 대응). role='gbl'만 대상 — 에이전시 계정 보호."""
     try:
-        resp = (_db().table("users")
+        resp = (_users_db().table("users")
                 .update({"is_active": body.is_active,
                          "updated_at": datetime.now(timezone.utc).isoformat()})
                 .eq("id", user_id).eq("role", "gbl").execute())
@@ -265,7 +273,7 @@ def admin_delete_user(user_id: str, admin: UserContext = Depends(require_admin))
     """gbl 유저 영구 삭제(기록 포함). role='gbl'만 — 에이전시 계정 보호."""
     db = _db()
     try:
-        urow = (db.table("users").select("id, role").eq("id", user_id).limit(1).execute().data) or []
+        urow = (_users_db().table("users").select("id, role").eq("id", user_id).limit(1).execute().data) or []
     except Exception as e:
         logger.error("gbl admin delete 조회 실패 [%s]: %s", user_id, e)
         raise HTTPException(500, "삭제 실패")
@@ -275,7 +283,7 @@ def admin_delete_user(user_id: str, admin: UserContext = Depends(require_admin))
         raise HTTPException(403, "gbl 유저만 삭제할 수 있습니다.")
     try:
         db.table("gbl_matches").delete().eq("user_id", user_id).execute()
-        db.table("users").delete().eq("id", user_id).eq("role", "gbl").execute()
+        _users_db().table("users").delete().eq("id", user_id).eq("role", "gbl").execute()
     except Exception as e:
         logger.error("gbl admin delete 실패 [%s]: %s", user_id, e)
         raise HTTPException(500, "삭제 실패")

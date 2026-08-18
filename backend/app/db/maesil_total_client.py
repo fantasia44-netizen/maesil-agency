@@ -43,3 +43,26 @@ def get_maesil_total_client() -> Client:
     """
     options = ClientOptions(postgrest_client_timeout=_QUERY_TIMEOUT)
     return create_client(_SUPABASE_URL, _SUPABASE_KEY, options=options)
+
+
+# ── maesil-hub (GBL 전용 DB) ────────────────────────────────────────────
+# GBL 트래픽(기록·메타집계)을 사업 DB(maesil-total)에서 분리하기 위한 별도 프로젝트.
+# 미설정 시 maesil-total로 폴백 → env 설정 전까지 무중단 전환.
+_HUB_URL = os.environ.get("MAESIL_HUB_SUPABASE_URL", "").strip()
+_HUB_KEY = os.environ.get("MAESIL_HUB_SERVICE_ROLE_KEY", "").strip()
+if _HUB_URL and _HUB_KEY:
+    logger.info("[db] maesil-hub 사용: url=%.40s…", _HUB_URL)
+else:
+    logger.info("[db] maesil-hub 미설정 → maesil-total 폴백")
+
+
+def hub_configured() -> bool:
+    return bool(_HUB_URL and _HUB_KEY)
+
+
+def get_maesil_hub_client() -> Client:
+    """GBL 데이터용 클라이언트. hub env 있으면 hub, 없으면 maesil-total 폴백."""
+    if _HUB_URL and _HUB_KEY:
+        options = ClientOptions(postgrest_client_timeout=_QUERY_TIMEOUT)
+        return create_client(_HUB_URL, _HUB_KEY, options=options)
+    return get_maesil_total_client()
