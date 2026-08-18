@@ -82,8 +82,9 @@ export async function apiFetch<T = unknown>(
   if (res.status === 401) {
     clearToken();
     if (typeof window !== "undefined") {
-      const onGbl = window.location.pathname.startsWith("/gbl");
-      window.location.href = onGbl ? "/gbl/login" : "/login";
+      const p = window.location.pathname;
+      const onGblApp = p === "/gbl" || p.startsWith("/gbl/");   // /gbl-admin 등 제외
+      window.location.href = onGblApp ? "/gbl/login" : "/login";
     }
     throw new Error("인증이 필요합니다.");
   }

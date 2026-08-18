@@ -71,6 +71,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const [user, setUser] = useState<StoredUser | null>(null);
   const [ready, setReady] = useState(false);
 
+  // GBL '앱'(공개 서비스) 경로만 정밀 판정 — /gbl-admin 같은 에이전시 화면은 제외
+  const isGblApp = pathname === "/gbl" || pathname.startsWith("/gbl/");
+
   useEffect(() => {
     const gblPublic = ["/gbl/login", "/gbl/reset", "/gbl/privacy"].some(p => pathname.startsWith(p));
     const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p)) || gblPublic;
@@ -78,12 +81,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
     if (!token && !isPublic) {
       // GBL 앱 경로면 GBL 로그인으로, 그 외엔 에이전시 웰컴으로
-      router.replace(pathname.startsWith("/gbl") ? "/gbl/login" : "/welcome");
+      router.replace(isGblApp ? "/gbl/login" : "/welcome");
       return;
     }
     const u = getUser();
-    // gbl 유저는 에이전시 화면 접근 차단 — 항상 GBL로
-    if (token && u?.role === "gbl" && !pathname.startsWith("/gbl")) {
+    // gbl 유저는 에이전시 화면(관리자 포함) 접근 차단 — 항상 GBL 앱으로
+    if (token && u?.role === "gbl" && !isGblApp) {
       router.replace("/gbl");
       return;
     }
@@ -91,8 +94,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     setReady(true);
   }, [pathname]);
 
-  // 로그인 페이지 / GBL 전용 화면 — 에이전시 헤더 없이 자체 chrome로 렌더
-  if (PUBLIC_PATHS.some(p => pathname.startsWith(p)) || pathname.startsWith("/gbl")) {
+  // 로그인 페이지 / GBL 전용 앱 화면 — 에이전시 헤더 없이 자체 chrome로 렌더
+  if (PUBLIC_PATHS.some(p => pathname.startsWith(p)) || isGblApp) {
     return <>{children}</>;
   }
 
@@ -129,6 +132,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           {admin && <Link href="/briefing">브리핑</Link>}
           {admin && <Link href="/chat">대화</Link>}
           {admin && <Link href="/gbl">GBL</Link>}
+          {admin && <Link href="/gbl-admin">GBL관리</Link>}
           {admin && <Link href="/settings">설정</Link>}
 
           {/* 고객(customer) */}

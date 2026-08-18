@@ -8,12 +8,13 @@ gbl.py — 포켓몬 GO GBL 상대 대전 기록 (개인 도구, 유저 스코�
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from collections import Counter
+from datetime import datetime, timezone, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from app.auth import UserContext, get_current_user
+from app.auth import UserContext, get_current_user, require_admin, invalidate_revalidate_cache
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/gbl", tags=["gbl"])
@@ -121,3 +122,62 @@ def delete_match(match_id: str, user: UserContext = Depends(get_current_user)) -
     except Exception as e:
         logger.error("gbl delete 실패 [%s]: %s", match_id, e)
         raise HTTPException(500, "기록 삭제 실패")
+
+
+# ── 관리자(super_admin) 전용 — GBL 서비스 현황 ──────────────────────────
+@router.get("/admin/stats")
+def admin_stats(admin: UserContext = Depends(require_admin)) -> dict:
+    """gbl 유저·기록 현황 대시보드용. super_admin 전용."""
+    db = _db()
+    try:
+        urows = (db.table("users")
+                 .select("id, email, display_name, is_active, last_login_at, created_at")
+                 .eq("role", "gbl").execute().data) or []
+        mrows = (db.table("gbl_matches")
+                 .select("id, user_id, league, created_at").execute().data) or []
+    except Exception as e:
+        logger.error("gbl admin stats 실패: %s", e)
+        raise HTTPException(500, "현황 조회 실패")
+
+    per_user = Counter(m["user_id"] for m in mrows if m.get("user_id"))
+    by_league = Counter((m.get("league") or "master") for m in mrows)
+    wk = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+
+    users = [{
+        "id": u["id"], "email": u["email"], "display_name": u.get("display_name"),
+        "matches": per_user.get(u["id"], 0),
+        "last_login_at": u.get("last_login_at"), "created_at": u.get("created_at"),
+        "is_active": u.get("is_active", True),
+    } for u in urows]
+    users.sort(key=lambda x: x["matches"], reverse=True)
+
+    return {
+        "users_total": len(urows),
+        "new_7d": sum(1 for u in urows if (u.get("created_at") or "") >= wk),
+        "active_7d": sum(1 for u in urows if (u.get("last_login_at") or "") >= wk),
+        "matches_total": len(mrows),
+        "by_league": dict(by_league),
+        "users": users,
+    }
+
+
+class AdminUserAction(BaseModel):
+    is_active: bool
+
+
+@router.patch("/admin/users/{user_id}")
+def admin_set_user(user_id: str, body: AdminUserAction,
+                   admin: UserContext = Depends(require_admin)) -> dict:
+    """gbl 유저 활성/비활성 (남용 대응). role='gbl'만 대상 — 에이전시 계정 보호."""
+    try:
+        resp = (_db().table("users")
+                .update({"is_active": body.is_active,
+                         "updated_at": datetime.now(timezone.utc).isoformat()})
+                .eq("id", user_id).eq("role", "gbl").execute())
+    except Exception as e:
+        logger.error("gbl admin user 업데이트 실패 [%s]: %s", user_id, e)
+        raise HTTPException(500, "업데이트 실패")
+    if not resp.data:
+        raise HTTPException(404, "gbl 유저를 찾을 수 없습니다.")
+    invalidate_revalidate_cache(user_id)
+    return {"ok": True, "is_active": body.is_active}
