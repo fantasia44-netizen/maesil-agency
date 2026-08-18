@@ -6,6 +6,7 @@ import { apiFetch } from "../../../lib/api";
 import DATA from "../gbl_data.json";
 import AdSlot from "../AdSlot";
 import CoupangAd from "../CoupangAd";
+import { currentFormats, todayISO, type Format } from "../formats";
 
 type Mon = { id: string; dex: number; ko: string; en: string; types: string[]; shadow: boolean; sprite?: string };
 type League = "great" | "ultra" | "master";
@@ -14,10 +15,7 @@ const MON: Record<string, Mon> = {};
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
 const spriteUrl = (m?: Mon) => m ? (m.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${m.dex}.png`) : "";
 
-const LEAGUES: { key: League; label: string }[] = [
-  { key: "great", label: "슈퍼리그" }, { key: "ultra", label: "하이퍼리그" }, { key: "master", label: "마스터리그" },
-];
-// 기간/시즌 — 시즌은 날짜구간(start/end). 시즌명·날짜는 공식(새로운 발걸음 2026.6.2~9.8) 기준.
+// 기간/시즌 — 시즌은 날짜구간. 공식(새로운 발걸음 2026.6.2~9.8) 기준.
 const PERIODS: { key: string; label: string; days?: number; start?: string; end?: string }[] = [
   { key: "7", label: "최근 7일", days: 7 },
   { key: "30", label: "최근 30일", days: 30 },
@@ -38,10 +36,14 @@ const rate = (w: number, l: number) => (w + l > 0 ? Math.round((w / (w + l)) * 1
 const rateColor = (r: number | null) => r == null ? "#94a3b8" : r >= 60 ? "#15803d" : r >= 45 ? "#c2410c" : "#b91c1c";
 
 export default function GblMeta() {
-  const [league, setLeague] = useState<League>("master");
+  const [league, setLeague] = useState<string>("master");
+  const [formats, setFormats] = useState<Format[]>(() => currentFormats("2000-01-01"));  // SSR: 코어만
   const [periodKey, setPeriodKey] = useState("30");
+  const [view, setView] = useState<"mon" | "deck">("mon");
   const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => { setFormats(currentFormats(todayISO())); }, []);
 
   useEffect(() => {
     let alive = true;
@@ -57,13 +59,13 @@ export default function GblMeta() {
     return () => { alive = false; };
   }, [league, periodKey]);
 
-  const pill = (on: boolean): React.CSSProperties => ({
-    padding: "7px 14px", borderRadius: 18, cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
-    border: on ? "1.5px solid #3b5bdb" : "1px solid #e2e8f0", background: on ? "#eef2ff" : "#fff", color: on ? "#3b5bdb" : "#64748b",
-  });
-
   const maxMon = useMemo(() => meta?.top_mons?.[0]?.count || 1, [meta]);
-  const maxDeck = useMemo(() => meta?.top_decks?.[0]?.count || 1, [meta]);
+
+  const pill = (on: boolean, cup = false): React.CSSProperties => ({
+    padding: "7px 14px", borderRadius: 18, cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
+    border: on ? `1.5px solid ${cup ? "#7c3aed" : "#3b5bdb"}` : "1px solid #e2e8f0",
+    background: on ? (cup ? "#faf5ff" : "#eef2ff") : "#fff", color: on ? (cup ? "#7c3aed" : "#3b5bdb") : "#64748b",
+  });
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto", padding: "1.4rem 1rem 4rem" }}>
@@ -76,7 +78,7 @@ export default function GblMeta() {
       </p>
 
       <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-        {LEAGUES.map(({ key, label }) => <button key={key} style={pill(league === key)} onClick={() => setLeague(key)}>{label}</button>)}
+        {formats.map((f) => <button key={f.key} style={pill(league === f.key, f.cup)} title={f.note || ""} onClick={() => setLeague(f.key)}>{f.label}</button>)}
       </div>
       <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
         {PERIODS.map((p) => <button key={p.key} style={pill(periodKey === p.key)} onClick={() => setPeriodKey(p.key)}>{p.label}</button>)}
@@ -90,58 +92,60 @@ export default function GblMeta() {
         </div>
       ) : (
         <>
-          <div style={{ fontSize: "0.82rem", color: "#64748b", marginBottom: 16 }}>
-            집계 대전 <b style={{ color: "#0f172a" }}>{meta.total.toLocaleString()}</b>판
+          {/* 포켓몬 / 덱 탭 */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+            {([["mon", "🔥 포켓몬 픽업률"], ["deck", "🏆 덱별 승률"]] as const).map(([k, label]) => (
+              <button key={k} onClick={() => setView(k)}
+                style={{ flex: 1, padding: "9px", borderRadius: 10, cursor: "pointer", fontWeight: 700, fontSize: "0.86rem",
+                  border: view === k ? "1.5px solid #0f172a" : "1px solid #e2e8f0",
+                  background: view === k ? "#0f172a" : "#fff", color: view === k ? "#fff" : "#334155" }}>{label}</button>
+            ))}
           </div>
 
-          {/* 픽업률 */}
-          <h2 style={{ fontSize: "1rem", fontWeight: 800, margin: "0 0 10px" }}>🔥 픽업률 TOP (많이 만난 포켓몬)</h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 26 }}>
-            {meta.top_mons.slice(0, 20).map((mm, i) => {
-              const m = MON[mm.speciesId];
-              const pct = Math.round((mm.count / meta.total) * 100);
-              return (
-                <div key={mm.speciesId} style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: "1px solid #eef2f0", borderRadius: 10, padding: "5px 10px" }}>
-                  <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#7c3aed" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
-                  <Sprite id={mm.speciesId} size={30} />
-                  <span style={{ fontSize: "0.86rem", fontWeight: 600, minWidth: 90 }}>
-                    {m?.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{m?.ko || mm.speciesId}
-                  </span>
-                  <div style={{ flex: 1, height: 8, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
-                    <div style={{ width: `${Math.round((mm.count / maxMon) * 100)}%`, height: "100%", background: "#3b5bdb" }} />
+          {view === "mon" ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {meta.top_mons.slice(0, 25).map((mm, i) => {
+                const m = MON[mm.speciesId];
+                const pct = Math.round((mm.count / meta.total) * 100);
+                return (
+                  <div key={mm.speciesId} style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: "1px solid #eef2f0", borderRadius: 10, padding: "5px 10px" }}>
+                    <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#7c3aed" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
+                    <Sprite id={mm.speciesId} size={30} />
+                    <span style={{ fontSize: "0.86rem", fontWeight: 600, minWidth: 90 }}>
+                      {m?.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{m?.ko || mm.speciesId}
+                    </span>
+                    <div style={{ flex: 1, height: 8, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                      <div style={{ width: `${Math.round((mm.count / maxMon) * 100)}%`, height: "100%", background: "#3b5bdb" }} />
+                    </div>
+                    <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#3b5bdb", minWidth: 38, textAlign: "right" }}>{pct}%</span>
                   </div>
-                  <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#3b5bdb", minWidth: 38, textAlign: "right" }}>{pct}%</span>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 2 }}>이 덱을 만났을 때 커뮤니티가 이긴 비율</div>
+              {meta.top_decks.slice(0, 25).map((d, i) => {
+                const r = rate(d.wins, d.losses);
+                const names = d.deck.map((id) => MON[id]?.ko || id).join(" · ");
+                return (
+                  <div key={i} style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 10, padding: "7px 10px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#7c3aed" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
+                      <div style={{ display: "flex", gap: 2 }}>{d.deck.map((id) => <Sprite key={id} id={id} size={32} />)}</div>
+                      <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                        <div style={{ fontSize: "1rem", fontWeight: 800, color: rateColor(r) }}>{r ?? "-"}%</div>
+                        <div style={{ fontSize: "0.64rem", color: "#cbd5e1" }}>승률</div>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: "#475569", marginTop: 5, lineHeight: 1.4 }}>{names}</div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           <AdSlot />
-
-          {/* 덱 픽업률 */}
-          <h2 style={{ fontSize: "1rem", fontWeight: 800, margin: "8px 0 10px" }}>🏆 덱 픽업률 TOP (많이 만난 파티)</h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {meta.top_decks.slice(0, 20).map((d, i) => {
-              const r = rate(d.wins, d.losses);
-              const pct = Math.round((d.count / meta.total) * 100);
-              return (
-                <div key={i} style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 10, padding: "7px 10px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#7c3aed" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
-                    <div style={{ display: "flex", gap: 2 }}>{d.deck.map((id) => <Sprite key={id} id={id} size={30} />)}</div>
-                    <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                      <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#7c3aed" }}>{pct}%</div>
-                      <div style={{ fontSize: "0.66rem", color: "#94a3b8" }}>{d.count}회 · 상대승률 <span style={{ color: rateColor(r) }}>{r ?? "-"}%</span></div>
-                    </div>
-                  </div>
-                  <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
-                    <div style={{ width: `${Math.round((d.count / maxDeck) * 100)}%`, height: "100%", background: "#7c3aed" }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
           <CoupangAd />
         </>
       )}

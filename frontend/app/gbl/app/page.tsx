@@ -5,6 +5,7 @@ import { apiFetch, logout, getUser } from "../../../lib/api";
 import DATA from "../gbl_data.json";
 import AdSlot from "../AdSlot";
 import CoupangAd from "../CoupangAd";
+import { currentFormats, FORMAT_BY_KEY, filterPool, todayISO, type Format } from "../formats";
 
 // ── 데이터셋 타입 ──────────────────────────────────────────────────────
 type Move = { ko: string; en: string; type: string; kind: string };
@@ -13,11 +14,6 @@ type League = "great" | "ultra" | "master";
 type Dataset = { top_n: number; moves: Record<string, Move>; leagues: Record<League, { count: number; pokemon: Mon[] }> };
 const DS = DATA as unknown as Dataset;
 const MOVES = DS.moves;
-const LEAGUE_META: { key: League; label: string }[] = [
-  { key: "great", label: "슈퍼리그" },
-  { key: "ultra", label: "하이퍼리그" },
-  { key: "master", label: "마스터리그" },
-];
 const LEAGUE_KEY = "gbl_league";
 // 모든 리그 union → 렌더용 조회맵 (기록은 어느 리그든 speciesId로 조회)
 const MON_BY_ID: Record<string, Mon> = {};
@@ -270,7 +266,8 @@ export default function GblPage() {
   const [tab, setTab] = useState<"lookup" | "log" | "stats">("lookup");
   const [query, setQuery] = useState("");
   const [toast, setToast] = useState("");
-  const [league, setLeague] = useState<League>("master");
+  const [league, setLeague] = useState<string>("master");
+  const [formats, setFormats] = useState<Format[]>(currentFormats("2000-01-01"));  // SSR: 코어만
   const [scope, setScope] = useState<"mine" | "all">("mine");   // super_admin 전체검색
   const [allMatches, setAllMatches] = useState<Match[]>([]);
   const [isOwner, setIsOwner] = useState(false);
@@ -282,14 +279,16 @@ export default function GblPage() {
 
   useEffect(() => {
     setIsOwner(getUser()?.role === "super_admin");
-    const v = (typeof window !== "undefined" ? localStorage.getItem(LEAGUE_KEY) : null) as League | null;
-    if (v && DS.leagues[v]) setLeague(v);
+    setFormats(currentFormats(todayISO()));
+    const v = typeof window !== "undefined" ? localStorage.getItem(LEAGUE_KEY) : null;
+    if (v && FORMAT_BY_KEY[v]) setLeague(v);
     const s = typeof window !== "undefined" ? localStorage.getItem("gbl_sort") : null;
     if (s === "name" || s === "recent") setSort(s);
   }, []);
   const changeSort = (s: "recent" | "name") => { setSort(s); try { localStorage.setItem("gbl_sort", s); } catch { /* noop */ } };
-  const changeLeague = (l: League) => { setLeague(l); try { localStorage.setItem(LEAGUE_KEY, l); } catch { /* noop */ } };
-  const pickerMons = DS.leagues[league].pokemon;
+  const changeLeague = (l: string) => { setLeague(l); try { localStorage.setItem(LEAGUE_KEY, l); } catch { /* noop */ } };
+  const fmt = FORMAT_BY_KEY[league];
+  const pickerMons = filterPool(DS.leagues[(fmt?.base ?? "master") as League].pokemon, fmt);
 
   // 기록 폼
   const [oppName, setOppName] = useState("");
@@ -445,16 +444,16 @@ export default function GblPage() {
         </button>
       </div>
 
-      {/* 리그 스위처 */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
-        {LEAGUE_META.map(({ key, label }) => {
-          const on = league === key;
+      {/* 리그/컵 스위처 (코어 3리그 + 오늘 진행 중인 컵) */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
+        {formats.map((f) => {
+          const on = league === f.key;
           return (
-            <button key={key} onClick={() => changeLeague(key)}
-              style={{ flex: 1, padding: "8px", borderRadius: 9, cursor: "pointer", fontWeight: 700, fontSize: "0.84rem",
-                border: on ? "1.5px solid #3b5bdb" : "1px solid #e2e8f0",
-                background: on ? "#eef2ff" : "#fff", color: on ? "#3b5bdb" : "#64748b" }}>
-              {label}
+            <button key={f.key} onClick={() => changeLeague(f.key)} title={f.note || ""}
+              style={{ flex: "1 1 70px", minWidth: 70, padding: "8px", borderRadius: 9, cursor: "pointer", fontWeight: 700, fontSize: "0.82rem",
+                border: on ? `1.5px solid ${f.cup ? "#7c3aed" : "#3b5bdb"}` : "1px solid #e2e8f0",
+                background: on ? (f.cup ? "#faf5ff" : "#eef2ff") : "#fff", color: on ? (f.cup ? "#7c3aed" : "#3b5bdb") : "#64748b" }}>
+              {f.label}
             </button>
           );
         })}
