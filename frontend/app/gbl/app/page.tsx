@@ -329,13 +329,14 @@ export default function GblPage() {
     const filtered = src.filter((m) =>
       (m.league || "master") === league &&
       (!q || m.opponent_name.toLowerCase().includes(q)));
-    const map = new Map<string, Match[]>();
+    // 대소문자·앞뒤공백 무시로 그룹핑("Any"="any"="ANY " 동일 상대). 표시는 처음 본 원본 표기.
+    const map = new Map<string, { name: string; ms: Match[] }>();
     for (const m of filtered) {
-      const k = m.opponent_name;
-      if (!map.has(k)) map.set(k, []);
-      map.get(k)!.push(m);
+      const k = m.opponent_name.trim().toLowerCase();
+      if (!map.has(k)) map.set(k, { name: m.opponent_name.trim(), ms: [] });
+      map.get(k)!.ms.push(m);
     }
-    const entries = [...map.entries()];
+    const entries = [...map.values()].map((v) => [v.name, v.ms] as [string, Match[]]);
     if (sort === "name") {
       entries.sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase()));
     } else {
