@@ -274,13 +274,17 @@ export default function GblPage() {
   const [allMatches, setAllMatches] = useState<Match[]>([]);
   const [isOwner, setIsOwner] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [sort, setSort] = useState<"recent" | "name">("recent");  // 조회 정렬
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setIsOwner(getUser()?.role === "super_admin");
     const v = (typeof window !== "undefined" ? localStorage.getItem(LEAGUE_KEY) : null) as League | null;
     if (v && DS.leagues[v]) setLeague(v);
+    const s = typeof window !== "undefined" ? localStorage.getItem("gbl_sort") : null;
+    if (s === "name" || s === "recent") setSort(s);
   }, []);
+  const changeSort = (s: "recent" | "name") => { setSort(s); try { localStorage.setItem("gbl_sort", s); } catch { /* noop */ } };
   const changeLeague = (l: League) => { setLeague(l); try { localStorage.setItem(LEAGUE_KEY, l); } catch { /* noop */ } };
   const pickerMons = DS.leagues[league].pokemon;
 
@@ -328,8 +332,16 @@ export default function GblPage() {
       if (!map.has(k)) map.set(k, []);
       map.get(k)!.push(m);
     }
-    return [...map.entries()];
-  }, [matches, allMatches, scope, query, league]);
+    const entries = [...map.entries()];
+    if (sort === "name") {
+      entries.sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase()));
+    } else {
+      // 배틀순: 그룹 내 최신 대전 시각 내림차순
+      const latest = (ms: Match[]) => Math.max(...ms.map((m) => new Date(m.played_at).getTime()));
+      entries.sort((a, b) => latest(b[1]) - latest(a[1]));
+    }
+    return entries;
+  }, [matches, allMatches, scope, query, league, sort]);
 
   const leagueCount = useMemo(
     () => (scope === "all" ? allMatches : matches).filter((m) => (m.league || "master") === league).length,
@@ -450,7 +462,18 @@ export default function GblPage() {
             placeholder="상대 트레이너 이름 몇 글자…"
             autoComplete="off" autoCapitalize="off" spellCheck={false}
             style={{ width: "100%", padding: "13px 16px", border: "2px solid #0f172a", borderRadius: 12,
-              fontSize: "1.05rem", fontWeight: 600, boxSizing: "border-box", marginBottom: 14, outline: "none" }} />
+              fontSize: "1.05rem", fontWeight: 600, boxSizing: "border-box", marginBottom: 10, outline: "none" }} />
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginBottom: 12 }}>
+            {([["recent", "🕒 배틀순"], ["name", "🔤 이름순"]] as const).map(([k, label]) => {
+              const on = sort === k;
+              return (
+                <button key={k} onClick={() => changeSort(k)}
+                  style={{ padding: "4px 12px", borderRadius: 14, cursor: "pointer", fontSize: "0.74rem", fontWeight: 600,
+                    border: on ? "1px solid #0f172a" : "1px solid #e2e8f0",
+                    background: on ? "#0f172a" : "#fff", color: on ? "#fff" : "#64748b" }}>{label}</button>
+              );
+            })}
+          </div>
           {loading ? (
             <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem" }}>불러오는 중…</div>
           ) : groups.length === 0 ? (
