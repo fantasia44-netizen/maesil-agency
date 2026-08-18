@@ -255,6 +255,8 @@ export function storeAuth(token: string, user: Partial<StoredUser>) {
 export function logout() {
   clearToken();
   if (typeof window !== "undefined") {
-    window.location.href = "/login";
+    const p = window.location.pathname;
+    const onGbl = p === "/gbl" || p.startsWith("/gbl/");   // /gbl-admin(오너) 제외
+    window.location.href = onGbl ? "/gbl/login" : "/login";
   }
 }
