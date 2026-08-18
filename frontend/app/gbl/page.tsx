@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { apiFetch, logout } from "../../lib/api";
+import { apiFetch, logout, getUser } from "../../lib/api";
 import DATA from "./gbl_data.json";
 import AdSlot from "./AdSlot";
 
@@ -39,6 +39,7 @@ type Match = {
   id: string; league: string; opponent_name: string;
   team_json: TeamMon[]; memo: string | null; result: string | null;
   played_at: string; created_at: string;
+  user_email?: string | null; user_display_name?: string | null;  // 전체검색(admin) 시 작성자
 };
 
 const emptyTeam = (): TeamMon[] => [
@@ -213,7 +214,9 @@ function TeamSlot({ idx, mon, pool, onChange }: { idx: number; mon: TeamMon; poo
 }
 
 // ── 조회 카드 ──────────────────────────────────────────────────────────
-function MatchCard({ m, onDelete }: { m: Match; onDelete: (id: string) => void }) {
+function MatchCard({ m, onEdit, onDelete, readOnly }: {
+  m: Match; onEdit?: (m: Match) => void; onDelete: (id: string) => void; readOnly?: boolean;
+}) {
   const d = new Date(m.played_at);
   const dstr = d.toLocaleString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
   const resBadge = m.result === "win"
@@ -224,7 +227,15 @@ function MatchCard({ m, onDelete }: { m: Match; onDelete: (id: string) => void }
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
         <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{dstr}</span>
         {resBadge && <span style={{ fontSize: "0.72rem", fontWeight: 700, padding: "1px 8px", borderRadius: 8, color: resBadge.c, background: resBadge.bg }}>{resBadge.t}</span>}
-        <button onClick={() => onDelete(m.id)} style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#cbd5e1", background: "none", border: "none", cursor: "pointer" }}>삭제</button>
+        {m.user_display_name && (
+          <span style={{ fontSize: "0.66rem", color: "#7c3aed", background: "#faf5ff", padding: "1px 7px", borderRadius: 8 }}>🧑 {m.user_display_name}</span>
+        )}
+        {!readOnly && (
+          <span style={{ marginLeft: "auto", display: "flex", gap: 12 }}>
+            {onEdit && <button onClick={() => onEdit(m)} style={{ fontSize: "0.72rem", color: "#3b5bdb", background: "none", border: "none", cursor: "pointer" }}>수정</button>}
+            <button onClick={() => onDelete(m.id)} style={{ fontSize: "0.72rem", color: "#cbd5e1", background: "none", border: "none", cursor: "pointer" }}>삭제</button>
+          </span>
+        )}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8 }}>
         {m.team_json.map((tm, i) => {
@@ -259,9 +270,14 @@ export default function GblPage() {
   const [query, setQuery] = useState("");
   const [toast, setToast] = useState("");
   const [league, setLeague] = useState<League>("master");
+  const [scope, setScope] = useState<"mine" | "all">("mine");   // super_admin 전체검색
+  const [allMatches, setAllMatches] = useState<Match[]>([]);
+  const [isOwner, setIsOwner] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    setIsOwner(getUser()?.role === "super_admin");
     const v = (typeof window !== "undefined" ? localStorage.getItem(LEAGUE_KEY) : null) as League | null;
     if (v && DS.leagues[v]) setLeague(v);
   }, []);
@@ -286,13 +302,24 @@ export default function GblPage() {
       flash(e instanceof Error ? e.message : "불러오기 실패");
     } finally { setLoading(false); }
   };
+  const loadAll = async () => {
+    try {
+      const data = await apiFetch<Match[]>("/api/gbl/admin/matches", {}, 20000);
+      setAllMatches(Array.isArray(data) ? data : []);
+    } catch (e) { flash(e instanceof Error ? e.message : "전체 기록 로드 실패"); }
+  };
+  const changeScope = (s: "mine" | "all") => {
+    setScope(s);
+    if (s === "all" && allMatches.length === 0) loadAll();
+  };
   useEffect(() => { load(); }, []);
   useEffect(() => { if (tab === "lookup") searchRef.current?.focus(); }, [tab]);
 
-  // 조회: 이름으로 그룹핑 (최근순 유지)
+  // 조회: 이름으로 그룹핑 (최근순 유지). scope=all이면 전체 유저 기록.
   const groups = useMemo(() => {
+    const src = scope === "all" ? allMatches : matches;
     const q = query.trim().toLowerCase();
-    const filtered = matches.filter((m) =>
+    const filtered = src.filter((m) =>
       (m.league || "master") === league &&
       (!q || m.opponent_name.toLowerCase().includes(q)));
     const map = new Map<string, Match[]>();
@@ -302,27 +329,49 @@ export default function GblPage() {
       map.get(k)!.push(m);
     }
     return [...map.entries()];
-  }, [matches, query, league]);
+  }, [matches, allMatches, scope, query, league]);
 
   const leagueCount = useMemo(
-    () => matches.filter((m) => (m.league || "master") === league).length,
-    [matches, league]);
+    () => (scope === "all" ? allMatches : matches).filter((m) => (m.league || "master") === league).length,
+    [matches, allMatches, scope, league]);
 
-  const resetForm = () => { setOppName(""); setTeam(emptyTeam()); setMemo(""); setResult(null); };
+  const resetForm = () => { setOppName(""); setTeam(emptyTeam()); setMemo(""); setResult(null); setEditingId(null); };
+
+  const startEdit = (m: Match) => {
+    setEditingId(m.id);
+    setOppName(m.opponent_name);
+    const t: TeamMon[] = (m.team_json || []).map((x) => ({
+      speciesId: x.speciesId ?? null, manual: x.manual ?? null,
+      fast: x.fast ?? null, charged: x.charged || [], note: x.note ?? null,
+    }));
+    while (t.length < 3) t.push({ speciesId: null, charged: [] });
+    setTeam(t.slice(0, 3));
+    setMemo(m.memo || "");
+    setResult(m.result);
+    if (m.league && DS.leagues[m.league as League]) changeLeague(m.league as League);
+    setTab("log");
+  };
 
   const save = async () => {
     if (!oppName.trim()) { flash("상대 이름을 입력하세요."); return; }
     setSaving(true);
     try {
-      const payload = {
-        opponent_name: oppName.trim(), league, memo: memo || null, result,
+      const body = {
+        opponent_name: oppName.trim(), memo: memo || null, result,
         team: team.filter((t) => t.speciesId || t.manual),
       };
-      const created = await apiFetch<Match>("/api/gbl/matches", { method: "POST", body: JSON.stringify(payload) }, 15000);
-      setMatches((prev) => [created, ...prev]);
-      flash("✅ 기록 저장됨");
-      resetForm();
+      if (editingId) {
+        const updated = await apiFetch<Match>(`/api/gbl/matches/${editingId}`, { method: "PATCH", body: JSON.stringify(body) }, 15000);
+        setMatches((prev) => prev.map((m) => m.id === editingId ? updated : m));
+        flash("✅ 수정됨");
+      } else {
+        const created = await apiFetch<Match>("/api/gbl/matches", { method: "POST", body: JSON.stringify({ ...body, league }) }, 15000);
+        setMatches((prev) => [created, ...prev]);
+        flash("✅ 기록 저장됨");
+      }
       setQuery(oppName.trim());
+      resetForm();
+      setScope("mine");
       setTab("lookup");
     } catch (e) {
       flash(e instanceof Error ? e.message : "저장 실패");
@@ -382,6 +431,21 @@ export default function GblPage() {
       {/* ── 조회 ── */}
       {tab === "lookup" && (
         <div>
+          {isOwner && (
+            <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+              {([["mine", "내 기록"], ["all", "🌐 전체 유저"]] as const).map(([k, label]) => {
+                const on = scope === k;
+                return (
+                  <button key={k} onClick={() => changeScope(k)}
+                    style={{ flex: 1, padding: "7px", borderRadius: 8, cursor: "pointer", fontWeight: 700, fontSize: "0.8rem",
+                      border: on ? "1.5px solid #7c3aed" : "1px solid #e2e8f0",
+                      background: on ? "#faf5ff" : "#fff", color: on ? "#7c3aed" : "#64748b" }}>
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
           <input ref={searchRef} value={query} onChange={(e) => setQuery(e.target.value)}
             placeholder="상대 트레이너 이름 몇 글자…"
             autoComplete="off" autoCapitalize="off" spellCheck={false}
@@ -410,7 +474,11 @@ export default function GblPage() {
                       )}
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      {ms.map((m) => <MatchCard key={m.id} m={m} onDelete={del} />)}
+                      {ms.map((m) => (
+                        <MatchCard key={m.id} m={m} onDelete={del}
+                          onEdit={scope === "all" ? undefined : startEdit}
+                          readOnly={scope === "all"} />
+                      ))}
                     </div>
                   </div>
                 );
@@ -420,9 +488,14 @@ export default function GblPage() {
         </div>
       )}
 
-      {/* ── 배틀 후 기록 ── */}
+      {/* ── 배틀 후 기록 / 수정 ── */}
       {tab === "log" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {editingId && (
+            <div style={{ fontSize: "0.8rem", color: "#3b5bdb", background: "#eef2ff", borderRadius: 8, padding: "8px 12px", fontWeight: 600 }}>
+              ✏️ 기록 수정 중 — 잘못 입력한 내용을 고치고 &quot;수정 저장&quot;을 누르세요.
+            </div>
+          )}
           <div>
             <label style={{ fontSize: "0.78rem", fontWeight: 700, color: "#374151" }}>상대 트레이너 이름</label>
             <input value={oppName} onChange={(e) => setOppName(e.target.value)} placeholder="예: PikaMaster99"
@@ -454,10 +527,13 @@ export default function GblPage() {
           </div>
 
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={resetForm} style={{ padding: "12px 18px", borderRadius: 10, border: "1px solid #e2e8f0", background: "#fff", color: "#64748b", cursor: "pointer", fontWeight: 600 }}>초기화</button>
+            <button onClick={() => { resetForm(); if (editingId) setTab("lookup"); }}
+              style={{ padding: "12px 18px", borderRadius: 10, border: "1px solid #e2e8f0", background: "#fff", color: "#64748b", cursor: "pointer", fontWeight: 600 }}>
+              {editingId ? "취소" : "초기화"}
+            </button>
             <button onClick={save} disabled={saving}
-              style={{ flex: 1, padding: "12px", borderRadius: 10, border: "none", background: "#1A6F3C", color: "#fff", cursor: "pointer", fontWeight: 800, fontSize: "0.95rem" }}>
-              {saving ? "저장 중…" : "기록 저장"}
+              style={{ flex: 1, padding: "12px", borderRadius: 10, border: "none", background: editingId ? "#3b5bdb" : "#1A6F3C", color: "#fff", cursor: "pointer", fontWeight: 800, fontSize: "0.95rem" }}>
+              {saving ? "저장 중…" : editingId ? "수정 저장" : "기록 저장"}
             </button>
           </div>
         </div>

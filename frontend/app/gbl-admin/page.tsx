@@ -42,6 +42,21 @@ export default function GblAdmin() {
     } finally { setBusy(null); }
   };
 
+  const removeUser = async (u: GblUser) => {
+    if (!window.confirm(`'${u.display_name || u.email}' 계정과 기록 ${u.matches}판을 영구 삭제합니다. 되돌릴 수 없습니다. 계속할까요?`)) return;
+    setBusy(u.id);
+    try {
+      await apiFetch(`/api/gbl/admin/users/${u.id}`, { method: "DELETE" }, 15000);
+      setStats((s) => s ? {
+        ...s, users: s.users.filter((x) => x.id !== u.id),
+        users_total: Math.max(0, s.users_total - 1),
+        matches_total: Math.max(0, s.matches_total - u.matches),
+      } : s);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "삭제 실패");
+    } finally { setBusy(null); }
+  };
+
   const card: React.CSSProperties = { background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "1rem", textAlign: "center" };
   const th: React.CSSProperties = { textAlign: "left", fontSize: "0.72rem", color: "#94a3b8", fontWeight: 600, padding: "8px 10px", borderBottom: "1px solid #eef2f0" };
   const td: React.CSSProperties = { fontSize: "0.82rem", padding: "9px 10px", borderBottom: "1px solid #f5f7f6" };
@@ -118,12 +133,17 @@ export default function GblAdmin() {
                           {u.is_active ? "활성" : "정지"}
                         </span>
                       </td>
-                      <td style={{ ...td, textAlign: "right" }}>
+                      <td style={{ ...td, textAlign: "right", whiteSpace: "nowrap" }}>
                         <button onClick={() => toggleActive(u)} disabled={busy === u.id}
                           style={{ fontSize: "0.74rem", padding: "4px 10px", borderRadius: 7, cursor: "pointer",
-                            border: `1px solid ${u.is_active ? "#fecaca" : "#bbf7d0"}`,
-                            background: "#fff", color: u.is_active ? "#b91c1c" : "#15803d" }}>
+                            border: `1px solid ${u.is_active ? "#fed7aa" : "#bbf7d0"}`,
+                            background: "#fff", color: u.is_active ? "#c2410c" : "#15803d" }}>
                           {busy === u.id ? "…" : u.is_active ? "정지" : "복구"}
+                        </button>
+                        <button onClick={() => removeUser(u)} disabled={busy === u.id}
+                          style={{ marginLeft: 6, fontSize: "0.74rem", padding: "4px 10px", borderRadius: 7, cursor: "pointer",
+                            border: "1px solid #fecaca", background: "#fff", color: "#b91c1c" }}>
+                          삭제
                         </button>
                       </td>
                     </tr>

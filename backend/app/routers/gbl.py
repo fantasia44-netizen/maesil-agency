@@ -161,6 +161,38 @@ def admin_stats(admin: UserContext = Depends(require_admin)) -> dict:
     }
 
 
+@router.get("/admin/matches")
+def admin_matches(league: str | None = None, q: str | None = None,
+                  admin: UserContext = Depends(require_admin)) -> list[dict]:
+    """전체 유저 기록 검색(super_admin). 각 기록에 작성자(email/닉네임) 부착.
+    내 기록 + 모든 gbl 유저 기록을 합쳐 상대 이름으로 통합 조회하는 용도."""
+    db = _db()
+    try:
+        query = db.table("gbl_matches").select("*").order("played_at", desc=True).limit(3000)
+        if league:
+            query = query.eq("league", league)
+        if q and q.strip():
+            query = query.ilike("opponent_name", f"%{q.strip()}%")
+        rows = query.execute().data or []
+    except Exception as e:
+        logger.error("gbl admin matches 실패: %s", e)
+        raise HTTPException(500, "기록 조회 실패")
+
+    uids = list({r["user_id"] for r in rows if r.get("user_id")})
+    umap: dict = {}
+    if uids:
+        try:
+            urows = db.table("users").select("id, email, display_name").in_("id", uids).execute().data or []
+            umap = {u["id"]: u for u in urows}
+        except Exception:
+            umap = {}
+    for r in rows:
+        u = umap.get(r.get("user_id")) or {}
+        r["user_email"] = u.get("email")
+        r["user_display_name"] = u.get("display_name")
+    return rows
+
+
 class AdminUserAction(BaseModel):
     is_active: bool
 
@@ -181,3 +213,26 @@ def admin_set_user(user_id: str, body: AdminUserAction,
         raise HTTPException(404, "gbl 유저를 찾을 수 없습니다.")
     invalidate_revalidate_cache(user_id)
     return {"ok": True, "is_active": body.is_active}
+
+
+@router.delete("/admin/users/{user_id}")
+def admin_delete_user(user_id: str, admin: UserContext = Depends(require_admin)) -> dict:
+    """gbl 유저 영구 삭제(기록 포함). role='gbl'만 — 에이전시 계정 보호."""
+    db = _db()
+    try:
+        urow = (db.table("users").select("id, role").eq("id", user_id).limit(1).execute().data) or []
+    except Exception as e:
+        logger.error("gbl admin delete 조회 실패 [%s]: %s", user_id, e)
+        raise HTTPException(500, "삭제 실패")
+    if not urow:
+        raise HTTPException(404, "유저를 찾을 수 없습니다.")
+    if urow[0].get("role") != "gbl":
+        raise HTTPException(403, "gbl 유저만 삭제할 수 있습니다.")
+    try:
+        db.table("gbl_matches").delete().eq("user_id", user_id).execute()
+        db.table("users").delete().eq("id", user_id).eq("role", "gbl").execute()
+    except Exception as e:
+        logger.error("gbl admin delete 실패 [%s]: %s", user_id, e)
+        raise HTTPException(500, "삭제 실패")
+    invalidate_revalidate_cache(user_id)
+    return {"ok": True}
