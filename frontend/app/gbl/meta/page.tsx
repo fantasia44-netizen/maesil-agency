@@ -63,6 +63,7 @@ export default function GblMeta() {
   });
 
   const maxMon = useMemo(() => meta?.top_mons?.[0]?.count || 1, [meta]);
+  const maxDeck = useMemo(() => meta?.top_decks?.[0]?.count || 1, [meta]);
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto", padding: "1.4rem 1rem 4rem" }}>
@@ -117,18 +118,24 @@ export default function GblMeta() {
 
           <AdSlot />
 
-          {/* 덱 순위 */}
-          <h2 style={{ fontSize: "1rem", fontWeight: 800, margin: "8px 0 10px" }}>🏆 많이 만난 덱 TOP</h2>
+          {/* 덱 픽업률 */}
+          <h2 style={{ fontSize: "1rem", fontWeight: 800, margin: "8px 0 10px" }}>🏆 덱 픽업률 TOP (많이 만난 파티)</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {meta.top_decks.slice(0, 20).map((d, i) => {
               const r = rate(d.wins, d.losses);
+              const pct = Math.round((d.count / meta.total) * 100);
               return (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: "1px solid #eef2f0", borderRadius: 10, padding: "6px 10px" }}>
-                  <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#7c3aed" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
-                  <div style={{ display: "flex", gap: 2 }}>{d.deck.map((id) => <Sprite key={id} id={id} size={30} />)}</div>
-                  <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                    <div style={{ fontSize: "0.88rem", fontWeight: 800 }}>{d.count}회</div>
-                    <div style={{ fontSize: "0.7rem", color: rateColor(r) }}>상대 승률 {r ?? "-"}%</div>
+                <div key={i} style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 10, padding: "7px 10px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#7c3aed" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
+                    <div style={{ display: "flex", gap: 2 }}>{d.deck.map((id) => <Sprite key={id} id={id} size={30} />)}</div>
+                    <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                      <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#7c3aed" }}>{pct}%</div>
+                      <div style={{ fontSize: "0.66rem", color: "#94a3b8" }}>{d.count}회 · 상대승률 <span style={{ color: rateColor(r) }}>{r ?? "-"}%</span></div>
+                    </div>
+                  </div>
+                  <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, marginTop: 6, overflow: "hidden" }}>
+                    <div style={{ width: `${Math.round((d.count / maxDeck) * 100)}%`, height: "100%", background: "#7c3aed" }} />
                   </div>
                 </div>
               );
