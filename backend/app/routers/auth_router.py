@@ -552,6 +552,92 @@ def gbl_google(body: GblGoogleRequest) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────────
+# GBL 카카오 로그인 (OAuth code 교환). 신규→gbl 계정 자동 생성.
+# ─────────────────────────────────────────────────────────────────
+
+class GblKakaoRequest(BaseModel):
+    code: str
+    redirect_uri: str
+
+
+@router.post("/gbl-kakao")
+def gbl_kakao(body: GblKakaoRequest) -> dict:
+    import os
+    rest_key = os.environ.get("KAKAO_REST_KEY", "").strip()
+    if not rest_key:
+        raise HTTPException(503, "카카오 로그인이 설정되지 않았습니다. (KAKAO_REST_KEY 미설정)")
+    code = (body.code or "").strip()
+    if not code:
+        raise HTTPException(400, "카카오 인증 코드가 없습니다.")
+
+    import httpx
+    # 1) code → access_token
+    data = {"grant_type": "authorization_code", "client_id": rest_key,
+            "redirect_uri": body.redirect_uri, "code": code}
+    secret = os.environ.get("KAKAO_CLIENT_SECRET", "").strip()
+    if secret:
+        data["client_secret"] = secret
+    try:
+        tok = httpx.post("https://kauth.kakao.com/oauth/token", data=data, timeout=15)
+    except Exception:
+        raise HTTPException(502, "카카오 서버 연결 실패")
+    if tok.status_code != 200:
+        raise HTTPException(401, "카카오 인증 실패(코드 만료/불일치)")
+    access = tok.json().get("access_token")
+    if not access:
+        raise HTTPException(401, "카카오 토큰을 받지 못했습니다.")
+
+    # 2) 프로필
+    try:
+        me = httpx.get("https://kapi.kakao.com/v2/user/me",
+                       headers={"Authorization": f"Bearer {access}"}, timeout=15)
+    except Exception:
+        raise HTTPException(502, "카카오 서버 연결 실패")
+    if me.status_code != 200:
+        raise HTTPException(401, "카카오 사용자 조회 실패")
+    info = me.json()
+    kid = info.get("id")
+    if not kid:
+        raise HTTPException(401, "카카오 사용자 정보를 가져올 수 없습니다.")
+    account = info.get("kakao_account") or {}
+    profile = account.get("profile") or {}
+    nickname = profile.get("nickname") or f"카카오{kid}"
+    email = (account.get("email") or "").lower().strip()
+    login_email = email or f"kakao_{kid}@kakao.gbl"   # 이메일 미동의 시 합성 키
+
+    now = _now()
+    user = get_user_by_email(login_email)
+    if user:
+        if user.get("role") != "gbl":
+            raise HTTPException(403, "이 계정은 다른 서비스 계정입니다.")
+        if not user.get("is_active", True):
+            raise HTTPException(403, "비활성화된 계정입니다.")
+    else:
+        try:
+            u = _users_table().insert({
+                "email": login_email,
+                "password_hash": hash_password(secrets.token_urlsafe(24)),
+                "role": "gbl", "display_name": nickname, "is_active": True,
+                "created_at": now, "updated_at": now,
+            }).execute()
+            user = (u.data or [None])[0]
+        except Exception as e:
+            if "duplicate" in str(e).lower() or "unique" in str(e).lower():
+                user = get_user_by_email(login_email)
+            else:
+                raise HTTPException(500, "계정 생성 실패")
+    if not user:
+        raise HTTPException(500, "로그인 실패")
+
+    try:
+        _users_table().update({"last_login_at": now}).eq("id", user["id"]).execute()
+    except Exception:
+        pass
+    return {"ok": True, "token": create_token(user), "email": user["email"],
+            "role": user["role"], "display_name": user.get("display_name")}
+
+
+# ─────────────────────────────────────────────────────────────────
 # 로그인
 # ─────────────────────────────────────────────────────────────────
 

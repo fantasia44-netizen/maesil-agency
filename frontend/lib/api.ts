@@ -219,6 +219,29 @@ export async function gblGoogle(credential: string): Promise<StoredUser> {
   return user;
 }
 
+// ── GBL 카카오 로그인 ─────────────────────────────────────────────────
+export async function gblKakao(code: string, redirectUri: string): Promise<StoredUser> {
+  const res = await fetch(`${BASE}/api/auth/gbl-kakao`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code, redirect_uri: redirectUri }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "카카오 로그인 실패");
+  }
+  const data = await res.json();
+  setToken(data.token);
+  const user: StoredUser = {
+    email: data.email,
+    role: data.role,
+    display_name: data.display_name ?? null,
+    insight_operator_id: null,
+  };
+  setUser(user);
+  return user;
+}
+
 export function storeAuth(token: string, user: Partial<StoredUser>) {
   setToken(token);
   setUser({

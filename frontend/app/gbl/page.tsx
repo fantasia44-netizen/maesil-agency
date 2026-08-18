@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getUser } from "../../lib/api";
+import { getUser, logout } from "../../lib/api";
 
 export default function GblLanding() {
   const [authed, setAuthed] = useState(false);
@@ -54,6 +54,9 @@ export default function GblLanding() {
 
         <p style={{ textAlign: "center", fontSize: "0.72rem", color: "#5f6f92" }}>
           무료 · <Link href="/gbl/privacy" style={{ color: "#8ea0c4" }}>개인정보처리방침</Link>
+          {authed && (
+            <> · <button onClick={logout} style={{ background: "none", border: "none", color: "#8ea0c4", cursor: "pointer", fontSize: "0.72rem", padding: 0 }}>로그아웃</button></>
+          )}
         </p>
       </div>
     </div>

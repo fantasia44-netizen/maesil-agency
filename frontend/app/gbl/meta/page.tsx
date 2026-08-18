@@ -32,8 +32,6 @@ function Sprite({ id, size = 30 }: { id: string; size?: number }) {
   return <img src={spriteUrl(m)} alt={m?.ko || id} width={size} height={size}
     style={{ imageRendering: "pixelated" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }} />;
 }
-const rate = (w: number, l: number) => (w + l > 0 ? Math.round((w / (w + l)) * 100) : null);
-const rateColor = (r: number | null) => r == null ? "#94a3b8" : r >= 60 ? "#15803d" : r >= 45 ? "#c2410c" : "#b91c1c";
 
 export default function GblMeta() {
   const [league, setLeague] = useState<string>("master");
@@ -60,6 +58,7 @@ export default function GblMeta() {
   }, [league, periodKey]);
 
   const maxMon = useMemo(() => meta?.top_mons?.[0]?.count || 1, [meta]);
+  const maxDeck = useMemo(() => meta?.top_decks?.[0]?.count || 1, [meta]);
 
   const pill = (on: boolean, cup = false): React.CSSProperties => ({
     padding: "7px 14px", borderRadius: 18, cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
@@ -94,7 +93,7 @@ export default function GblMeta() {
         <>
           {/* 포켓몬 / 덱 탭 */}
           <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-            {([["mon", "🔥 포켓몬 픽업률"], ["deck", "🏆 덱별 승률"]] as const).map(([k, label]) => (
+            {([["mon", "🔥 포켓몬 픽업률"], ["deck", "🏆 덱 픽업률"]] as const).map(([k, label]) => (
               <button key={k} onClick={() => setView(k)}
                 style={{ flex: 1, padding: "9px", borderRadius: 10, cursor: "pointer", fontWeight: 700, fontSize: "0.86rem",
                   border: view === k ? "1.5px solid #0f172a" : "1px solid #e2e8f0",
@@ -124,21 +123,21 @@ export default function GblMeta() {
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 2 }}>이 덱을 만났을 때 커뮤니티가 이긴 비율</div>
+              <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 2 }}>전체 대전 중 이 덱(파티)을 만난 비율</div>
               {meta.top_decks.slice(0, 25).map((d, i) => {
-                const r = rate(d.wins, d.losses);
+                const pct = Math.round((d.count / meta.total) * 100);
                 const names = d.deck.map((id) => MON[id]?.ko || id).join(" · ");
                 return (
                   <div key={i} style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 10, padding: "7px 10px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#7c3aed" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
                       <div style={{ display: "flex", gap: 2 }}>{d.deck.map((id) => <Sprite key={id} id={id} size={32} />)}</div>
-                      <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                        <div style={{ fontSize: "1rem", fontWeight: 800, color: rateColor(r) }}>{r ?? "-"}%</div>
-                        <div style={{ fontSize: "0.64rem", color: "#cbd5e1" }}>승률</div>
-                      </div>
+                      <span style={{ marginLeft: "auto", fontSize: "1rem", fontWeight: 800, color: "#7c3aed" }}>{pct}%</span>
                     </div>
-                    <div style={{ fontSize: "0.72rem", color: "#475569", marginTop: 5, lineHeight: 1.4 }}>{names}</div>
+                    <div style={{ height: 6, background: "#f1f5f9", borderRadius: 3, margin: "6px 0 4px", overflow: "hidden" }}>
+                      <div style={{ width: `${Math.round((d.count / maxDeck) * 100)}%`, height: "100%", background: "#7c3aed" }} />
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: "#475569", lineHeight: 1.4 }}>{names}</div>
                   </div>
                 );
               })}
