@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { apiFetch, logout, getUser } from "../../lib/api";
 import DATA from "./gbl_data.json";
 import AdSlot from "./AdSlot";
+import CoupangAd from "./CoupangAd";
 
 // ── 데이터셋 타입 ──────────────────────────────────────────────────────
 type Move = { ko: string; en: string; type: string; kind: string };
@@ -685,8 +686,9 @@ export default function GblPage() {
         </div>
       )}
 
-      {/* 하단 광고 (AdSense — env 설정 시에만 노출) */}
+      {/* 하단 광고 (AdSense·쿠팡 — env 설정 시에만 노출) */}
       <AdSlot />
+      <CoupangAd />
     </div>
   );
 }
