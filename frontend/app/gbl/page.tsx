@@ -115,10 +115,6 @@ export default function GblLanding() {
           무료 · <Link href="/gbl/privacy" style={{ color: "#8ea0c4" }}>개인정보처리방침</Link>
           {authed && <> · <button onClick={logout} style={{ background: "none", border: "none", color: "#8ea0c4", cursor: "pointer", fontSize: "0.72rem", padding: 0 }}>로그아웃</button></>}
         </p>
-        <p style={{ textAlign: "center", fontSize: "0.64rem", color: "#465170", lineHeight: 1.6, marginTop: 14, maxWidth: 560, marginLeft: "auto", marginRight: "auto" }}>
-          GBL Note는 비공식 팬 서비스입니다. Pokémon, Pokémon GO 및 관련 상표는 각 권리자의
-          소유이며, GBL Note는 해당 권리자와 제휴하거나 공식적으로 승인된 서비스가 아닙니다.
-        </p>
       </div>
     </div>
   );
