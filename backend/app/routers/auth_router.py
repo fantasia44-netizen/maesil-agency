@@ -477,6 +477,81 @@ def gbl_password_confirm(body: GblPwResetConfirm) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────────
+# GBL 구글 로그인 (Google Identity Services). 신규→gbl 계정 자동 생성.
+# ─────────────────────────────────────────────────────────────────
+
+class GblGoogleRequest(BaseModel):
+    credential: str   # 프론트 GIS가 준 Google ID 토큰
+
+
+@router.post("/gbl-google")
+def gbl_google(body: GblGoogleRequest) -> dict:
+    import os
+    client_id = os.environ.get("GOOGLE_OAUTH_CLIENT_ID", "").strip()
+    if not client_id:
+        raise HTTPException(503, "구글 로그인이 설정되지 않았습니다. (GOOGLE_OAUTH_CLIENT_ID 미설정)")
+    cred = (body.credential or "").strip()
+    if not cred:
+        raise HTTPException(400, "구글 인증 정보가 없습니다.")
+
+    # 구글 ID 토큰 검증 — tokeninfo 엔드포인트(서명·만료 검증 포함, 라이브러리 불필요)
+    try:
+        import httpx
+        r = httpx.get("https://oauth2.googleapis.com/tokeninfo",
+                      params={"id_token": cred}, timeout=15)
+    except Exception:
+        raise HTTPException(502, "구글 인증 서버 연결 실패")
+    if r.status_code != 200:
+        raise HTTPException(401, "유효하지 않은 구글 토큰입니다.")
+    info = r.json()
+    if info.get("aud") != client_id:
+        raise HTTPException(401, "구글 클라이언트가 일치하지 않습니다.")
+    if str(info.get("email_verified", "")).lower() not in ("true", "1"):
+        raise HTTPException(401, "이메일이 확인되지 않은 구글 계정입니다.")
+    email = (info.get("email") or "").lower().strip()
+    if not email:
+        raise HTTPException(401, "구글 계정 이메일을 가져올 수 없습니다.")
+    name = info.get("name") or info.get("given_name") or email.split("@")[0]
+
+    now = _now()
+    user = get_user_by_email(email)
+    if user:
+        # 기존 계정이 gbl이 아니면 gbl 앱 로그인 거부(에이전시 계정 보호)
+        if user.get("role") != "gbl":
+            raise HTTPException(403, "이 이메일은 다른 서비스 계정입니다.")
+        if not user.get("is_active", True):
+            raise HTTPException(403, "비활성화된 계정입니다.")
+    else:
+        # 신규 → gbl 계정 생성 (구글 전용, 비밀번호는 임의값)
+        try:
+            u = _users_table().insert({
+                "email": email,
+                "password_hash": hash_password(secrets.token_urlsafe(24)),
+                "role": "gbl",
+                "display_name": name,
+                "is_active": True,
+                "created_at": now, "updated_at": now,
+            }).execute()
+            user = (u.data or [None])[0]
+        except Exception as e:
+            if "duplicate" in str(e).lower() or "unique" in str(e).lower():
+                user = get_user_by_email(email)
+            else:
+                raise HTTPException(500, "계정 생성 실패")
+    if not user:
+        raise HTTPException(500, "로그인 실패")
+
+    try:
+        _users_table().update({"last_login_at": now}).eq("id", user["id"]).execute()
+    except Exception:
+        pass
+    return {
+        "ok": True, "token": create_token(user), "email": user["email"],
+        "role": user["role"], "display_name": user.get("display_name"),
+    }
+
+
+# ─────────────────────────────────────────────────────────────────
 # 로그인
 # ─────────────────────────────────────────────────────────────────
 

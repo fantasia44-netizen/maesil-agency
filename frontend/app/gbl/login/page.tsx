@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { login, gblSignup, gblPasswordRequest } from "../../../lib/api";
+import GoogleButton from "../GoogleButton";
 
 type Mode = "login" | "signup" | "forgot";
 
@@ -99,6 +100,12 @@ export default function GblLogin() {
           )
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <GoogleButton onError={setErr} />
+            <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "2px 0" }}>
+              <div style={{ flex: 1, height: 1, background: "#2a3550" }} />
+              <span style={{ fontSize: "0.72rem", color: "#5f6f92" }}>또는 이메일로</span>
+              <div style={{ flex: 1, height: 1, background: "#2a3550" }} />
+            </div>
             {mode === "signup" && (
               <input style={input} placeholder="닉네임 (선택)" value={name}
                 onChange={(e) => setName(e.target.value)} autoComplete="nickname" />

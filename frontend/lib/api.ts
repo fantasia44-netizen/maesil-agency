@@ -195,6 +195,29 @@ export async function gblPasswordConfirm(token: string, password: string): Promi
   }
 }
 
+// ── GBL 구글 로그인 ───────────────────────────────────────────────────
+export async function gblGoogle(credential: string): Promise<StoredUser> {
+  const res = await fetch(`${BASE}/api/auth/gbl-google`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ credential }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "구글 로그인 실패");
+  }
+  const data = await res.json();
+  setToken(data.token);
+  const user: StoredUser = {
+    email: data.email,
+    role: data.role,
+    display_name: data.display_name ?? null,
+    insight_operator_id: null,
+  };
+  setUser(user);
+  return user;
+}
+
 export function storeAuth(token: string, user: Partial<StoredUser>) {
   setToken(token);
   setUser({
