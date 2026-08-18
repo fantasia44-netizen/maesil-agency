@@ -149,6 +149,11 @@ export default function GblMeta() {
           <CoupangAd />
         </>
       )}
+
+      <p style={{ textAlign: "center", fontSize: "0.66rem", color: "#94a3b8", lineHeight: 1.6, marginTop: 28 }}>
+        GBL Note는 비공식 팬 서비스입니다. Pokémon, Pokémon GO 및 관련 상표는 각 권리자의
+        소유이며, GBL Note는 해당 권리자와 제휴하거나 공식적으로 승인된 서비스가 아닙니다.
+      </p>
     </div>
   );
 }
