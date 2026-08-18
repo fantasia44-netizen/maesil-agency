@@ -10,9 +10,11 @@ export function middleware(req: NextRequest) {
   if (!host.startsWith("gbl.")) return NextResponse.next();
 
   const { pathname } = req.nextUrl;
-  // GBL 경로·정적 리소스·파일은 통과
+  // GBL '앱' 경로(/gbl, /gbl/*)·정적 리소스·파일만 통과.
+  // /gbl-admin 같은 에이전시 화면은 공개 도메인에서 통과시키지 않음 → /gbl로 리다이렉트.
+  const isGblApp = pathname === "/gbl" || pathname.startsWith("/gbl/");
   if (
-    pathname.startsWith("/gbl") ||
+    isGblApp ||
     pathname.startsWith("/_next") ||
     pathname === "/favicon.ico" ||
     pathname.includes(".")
