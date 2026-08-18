@@ -669,6 +669,9 @@ export default function GblPage() {
                         </div>
                         <span style={{ fontSize: "0.7rem", color: "#cbd5e1" }}>{open ? "▲" : "▼"}</span>
                       </button>
+                      <div style={{ fontSize: "0.7rem", color: "#475569", padding: "0 0.8rem 0.55rem 2.4rem", lineHeight: 1.4 }}>
+                        {d.mons.map((mm) => mm.sp?.ko || mm.manual || "?").join(" · ")}
+                      </div>
                       {open && (
                         <div style={{ padding: "0 0.7rem 0.7rem", display: "flex", flexDirection: "column", gap: 8 }}>
                           <div style={{ fontSize: "0.72rem", color: "#94a3b8" }}>복기 — {d.matches.length}판</div>
