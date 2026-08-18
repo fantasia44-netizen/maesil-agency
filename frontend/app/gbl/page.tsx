@@ -13,54 +13,84 @@ const spriteUrl = (m?: Mon) => m ? (m.sprite || `https://raw.githubusercontent.c
 
 type Teaser = { total: number; top_mons: { speciesId: string; count: number }[] };
 
+const FEATURES: { ic: string; t: string; d: string; c: string }[] = [
+  { ic: "🔍", t: "상대 기록", d: "다음 만남을 5초 안에 확인", c: "#4f8cff" },
+  { ic: "⚔️", t: "내 전적", d: "리그별 승패와 상세 통계", c: "#a855f7" },
+  { ic: "🏆", t: "배틀 순위", d: "포켓몬 순위·티어 확인", c: "#f5c451" },
+  { ic: "📊", t: "실전 픽업률", d: "실제 만난 기반 포켓몬 통계", c: "#34d399" },
+  { ic: "👥", t: "실전 덱 통계", d: "조합별 덱 픽업 TOP", c: "#f472b6" },
+];
+
 export default function GblLanding() {
   const [authed, setAuthed] = useState(false);
   const [teaser, setTeaser] = useState<Teaser | null>(null);
 
   useEffect(() => { setAuthed(!!getUser()); }, []);
   useEffect(() => {
-    apiFetch<Teaser>("/api/gbl/meta?league=master&days=30", {}, 15000)
-      .then(setTeaser).catch(() => setTeaser(null));
+    apiFetch<Teaser>("/api/gbl/meta?league=master&days=30", {}, 15000).then(setTeaser).catch(() => setTeaser(null));
   }, []);
 
   const primaryBtn: React.CSSProperties = {
-    display: "block", textAlign: "center", padding: "15px", borderRadius: 12,
-    fontWeight: 800, fontSize: "1rem", textDecoration: "none", background: "#3b5bdb", color: "#fff",
+    flex: 1, textAlign: "center", padding: "15px", borderRadius: 12, fontWeight: 800, fontSize: "1rem",
+    textDecoration: "none", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)", color: "#fff",
+    boxShadow: "0 6px 20px rgba(80,90,220,.35)",
   };
   const ghostBtn: React.CSSProperties = {
-    display: "block", textAlign: "center", padding: "15px", borderRadius: 12,
-    fontWeight: 800, fontSize: "1rem", textDecoration: "none",
-    background: "transparent", color: "#c7d2fe", border: "1px solid #2a3550",
+    flex: 1, textAlign: "center", padding: "15px", borderRadius: 12, fontWeight: 800, fontSize: "1rem",
+    textDecoration: "none", background: "rgba(255,255,255,.04)", color: "#c7d2fe", border: "1px solid #2a3550",
   };
 
   return (
-    <div style={{ minHeight: "100dvh", background: "linear-gradient(160deg,#0b1020,#131c33)", padding: "2rem 1.4rem 3rem" }}>
-      <div style={{ width: "100%", maxWidth: 440, margin: "0 auto" }}>
-        {/* 히어로 (원본 CSS — 공식 이미지 없음) */}
-        <div style={{ textAlign: "center", marginBottom: 24, paddingTop: "1.5rem" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-            <span style={{ fontSize: "1.4rem", opacity: 0.9 }}>🔵</span>
-            <span style={{ fontSize: "0.9rem", fontWeight: 900, color: "#6c7a99", letterSpacing: 2 }}>VS</span>
-            <span style={{ fontSize: "1.4rem", opacity: 0.9 }}>🔴</span>
-          </div>
-          <div style={{ fontSize: "3rem", lineHeight: 1 }}>📓</div>
-          <h1 style={{ margin: "10px 0 8px", fontSize: "2.1rem", fontWeight: 900, color: "#fff", letterSpacing: "-1px" }}>GBL Note</h1>
-          <p style={{ margin: 0, fontSize: "0.95rem", color: "#8ea0c4", lineHeight: 1.65 }}>
-            포켓몬GO 배틀리그 상대를 기록하고,<br />다시 만나면 <b style={{ color: "#fff" }}>5초 안에 저격</b>.
+    <div style={{
+      minHeight: "100dvh",
+      background: "radial-gradient(1000px 500px at 50% -10%, #1a2a5c 0%, transparent 60%), linear-gradient(180deg,#070b18,#0b1226)",
+      padding: "2rem 1.2rem 3rem",
+    }}>
+      <div style={{ width: "100%", maxWidth: 900, margin: "0 auto" }}>
+        {/* 헤더 */}
+        <div style={{ textAlign: "center", paddingTop: "1.2rem", marginBottom: 28 }}>
+          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 700, color: "#9db4ff",
+            border: "1px solid #2f4a8a", borderRadius: 20, padding: "4px 12px", marginBottom: 16 }}>
+            🇰🇷 한국어판 · 실제 유저 데이터 기반
+          </span>
+          <h1 style={{
+            margin: "0 0 10px", fontSize: "clamp(2.6rem, 12vw, 4.5rem)", fontWeight: 900, letterSpacing: "-2px", lineHeight: 1,
+            background: "linear-gradient(92deg,#ffffff 0%,#8db4ff 55%,#b57cff 100%)",
+            WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent",
+          }}>GBL NOTE</h1>
+          <p style={{ margin: "0 0 6px", fontSize: "clamp(1.1rem,4.5vw,1.5rem)", fontWeight: 800, color: "#fff" }}>
+            기록하면, <span style={{ color: "#6c8cff" }}>다음 배틀</span>이 보인다.
+          </p>
+          <p style={{ margin: 0, fontSize: "0.86rem", color: "#8ea0c4" }}>
+            상대 기록 · 내 전적 · 배틀 순위 · 실전 픽업률 · 실전 덱 통계
           </p>
         </div>
 
         {/* CTA */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
+        <div style={{ display: "flex", gap: 10, maxWidth: 480, margin: "0 auto 28px", flexWrap: "wrap" }}>
           <Link href={authed ? "/gbl/app" : "/gbl/login"} style={primaryBtn}>📝 내 기록 시작하기</Link>
-          <Link href="/gbl/meta" style={ghostBtn}>🌐 전체 실측 메타 보기 (무료)</Link>
+          <Link href="/gbl/meta" style={ghostBtn}>🌐 실측 메타 (무료)</Link>
         </div>
 
-        {/* 라이브 메타 미리보기 */}
+        {/* 기능 카드 (이미지 스타일) */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 28 }}>
+          {FEATURES.map((f) => (
+            <div key={f.t} style={{ background: "rgba(255,255,255,.03)", border: "1px solid #1e2b4a",
+              borderRadius: 14, padding: "1.1rem 1rem", textAlign: "center" }}>
+              <div style={{ width: 46, height: 46, margin: "0 auto 10px", borderRadius: 12,
+                background: f.c + "22", display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "1.4rem", boxShadow: `0 0 18px ${f.c}33` }}>{f.ic}</div>
+              <div style={{ fontWeight: 800, fontSize: "0.92rem", color: f.c, marginBottom: 4 }}>{f.t}</div>
+              <div style={{ fontSize: "0.74rem", color: "#8ea0c4", lineHeight: 1.5 }}>{f.d}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* 라이브 메타 미리보기 (실측 데이터) */}
         {teaser && teaser.total > 0 && (
-          <div style={{ background: "#0f1628", border: "1px solid #22304f", borderRadius: 14, padding: "1rem 1.1rem", marginBottom: 24 }}>
+          <div style={{ maxWidth: 480, margin: "0 auto 28px", background: "rgba(255,255,255,.03)", border: "1px solid #1e2b4a", borderRadius: 14, padding: "1rem 1.1rem" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-              <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#e2e8f0" }}>🔥 지금 마스터리그에서 제일 많이 만나는</span>
+              <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#e2e8f0" }}>🔥 지금 마스터리그 픽업률 TOP</span>
               <Link href="/gbl/meta" style={{ fontSize: "0.72rem", color: "#8ea0c4", textDecoration: "none" }}>더보기 →</Link>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
@@ -81,31 +111,11 @@ export default function GblLanding() {
           </div>
         )}
 
-        {/* 특징 */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
-          {[
-            ["🎯", "상대 덱 기록·즉시 조회", "만났던 상대를 이름으로 5초 안에 다시 확인"],
-            ["📊", "내 승률·약점 덱 분석", "덱별 전적으로 어떤 상대에 지는지 복기"],
-            ["🌐", "실측 메타 (시뮬 아님)", "수천 명이 실제로 만난 덱·픽업률을 집계"],
-            ["🔒", "내 덱은 비밀", "기록은 '상대' 데이터만 — 내 전략은 공개 안 됨"],
-          ].map(([ic, t, d]) => (
-            <div key={t} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-              <span style={{ fontSize: "1.3rem" }}>{ic}</span>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: "0.9rem", color: "#e2e8f0" }}>{t}</div>
-                <div style={{ fontSize: "0.78rem", color: "#8ea0c4", lineHeight: 1.5 }}>{d}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-
         <p style={{ textAlign: "center", fontSize: "0.72rem", color: "#5f6f92" }}>
           무료 · <Link href="/gbl/privacy" style={{ color: "#8ea0c4" }}>개인정보처리방침</Link>
-          {authed && (
-            <> · <button onClick={logout} style={{ background: "none", border: "none", color: "#8ea0c4", cursor: "pointer", fontSize: "0.72rem", padding: 0 }}>로그아웃</button></>
-          )}
+          {authed && <> · <button onClick={logout} style={{ background: "none", border: "none", color: "#8ea0c4", cursor: "pointer", fontSize: "0.72rem", padding: 0 }}>로그아웃</button></>}
         </p>
-        <p style={{ textAlign: "center", fontSize: "0.64rem", color: "#465170", lineHeight: 1.6, marginTop: 14 }}>
+        <p style={{ textAlign: "center", fontSize: "0.64rem", color: "#465170", lineHeight: 1.6, marginTop: 14, maxWidth: 560, marginLeft: "auto", marginRight: "auto" }}>
           GBL Note는 비공식 팬 서비스입니다. Pokémon, Pokémon GO 및 관련 상표는 각 권리자의
           소유이며, GBL Note는 해당 권리자와 제휴하거나 공식적으로 승인된 서비스가 아닙니다.
         </p>
