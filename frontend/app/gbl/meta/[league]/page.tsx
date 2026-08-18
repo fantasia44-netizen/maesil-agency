@@ -1,17 +1,24 @@
-// 마스터리그 실측 메타 — 서버렌더(ISR) SEO 페이지.
+// 리그별 실측 메타 — 서버렌더(ISR) SEO 페이지 (master/great/ultra 공용).
 // "use client" 아님 → 백엔드를 서버에서 호출해 데이터를 HTML에 박아 크롤러가 읽게 함.
-// 인터랙션(기간·리그 필터)은 인터랙티브 페이지(/gbl/meta)로 유도.
+// 기간·커스텀리그 필터는 인터랙티브 페이지(/gbl/meta)로 유도.
 import Link from "next/link";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import DATA from "../../gbl_data.json";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 
 export const revalidate = 3600; // 1시간마다 정적 재생성(크롤 가능 + 재집계 캐싱)
 
-const LEAGUE = "master";
-const LEAGUE_KO = "마스터리그";
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+
+// 리그 설정(한글명 = 포켓몬 GO 표기: Great=슈퍼, Ultra=하이퍼, Master=마스터)
+const LEAGUES: Record<string, { ko: string; short: string }> = {
+  master: { ko: "마스터리그", short: "마스터" },
+  great: { ko: "슈퍼리그", short: "슈퍼" },
+  ultra: { ko: "하이퍼리그", short: "하이퍼" },
+};
+const LEAGUE_KEYS = Object.keys(LEAGUES);
 
 type Mon = { id: string; dex: number; ko: string; shadow: boolean; sprite?: string };
 const DS = DATA as unknown as { leagues: Record<string, { pokemon: Mon[] }> };
@@ -25,9 +32,9 @@ type MetaMon = { speciesId: string; count: number };
 type MetaDeck = { deck: string[]; count: number };
 type Meta = { total: number; top_mons: MetaMon[]; top_decks: MetaDeck[] };
 
-async function getMeta(): Promise<Meta | null> {
+async function getMeta(league: string): Promise<Meta | null> {
   try {
-    const res = await fetch(`${BASE}/api/gbl/meta?league=${LEAGUE}&days=30`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${BASE}/api/gbl/meta?league=${league}&days=30`, { next: { revalidate: 3600 } });
     if (!res.ok) return null;
     return (await res.json()) as Meta;
   } catch {
@@ -35,22 +42,31 @@ async function getMeta(): Promise<Meta | null> {
   }
 }
 
-export const metadata: Metadata = {
-  title: "포켓몬고 마스터리그 실측 픽률 · 인기 덱 TOP | GBL Note",
-  description:
-    "포켓몬 GO 마스터리그(GBL)에서 한국 유저들이 실제로 만난 상대 기반 실측 픽률과 인기 덱 순위. 시뮬레이션이 아닌 실전 데이터, 최근 30일 기준으로 지금 뭘 제일 많이 만나는지 확인하세요.",
-  keywords: ["포켓몬고 마스터리그", "마스터리그 순위", "마스터리그 조합", "포켓몬고 GBL", "마스터리그 티어", "실전 픽률", "인기 덱"],
-  alternates: { canonical: "/gbl/meta/master" },
-  openGraph: {
-    title: "포켓몬고 마스터리그 실측 메타 — 실전 픽률·인기 덱 TOP",
-    description: "한국 유저 실측 기반 마스터리그 픽률·덱 순위 (최근 30일)",
-    url: "/gbl/meta/master",
-    images: ["/gbl-og.png"],
-    type: "website",
-  },
-};
+export function generateStaticParams() {
+  return LEAGUE_KEYS.map((league) => ({ league }));
+}
 
-// ── 라이트 테마 팔레트 (인터랙티브 메타와 통일) ──
+export function generateMetadata({ params }: { params: { league: string } }): Metadata {
+  const lg = LEAGUES[params.league];
+  if (!lg) return { title: "GBL Note" };
+  const title = `포켓몬고 ${lg.ko} 실측 픽률 · 인기 덱 TOP | GBL Note`;
+  const description = `포켓몬 GO ${lg.ko}(GBL)에서 한국 유저들이 실제로 만난 상대 기반 실측 픽률과 인기 덱 순위. 시뮬레이션이 아닌 실전 데이터, 최근 30일 기준으로 지금 뭘 제일 많이 만나는지 확인하세요.`;
+  return {
+    title,
+    description,
+    keywords: [`포켓몬고 ${lg.ko}`, `${lg.ko} 순위`, `${lg.ko} 조합`, "포켓몬고 GBL", `${lg.ko} 티어`, "실전 픽률", "인기 덱"],
+    alternates: { canonical: `/gbl/meta/${params.league}` },
+    openGraph: {
+      title: `포켓몬고 ${lg.ko} 실측 메타 — 실전 픽률·인기 덱 TOP`,
+      description: `한국 유저 실측 기반 ${lg.ko} 픽률·덱 순위 (최근 30일)`,
+      url: `/gbl/meta/${params.league}`,
+      images: ["/gbl-og.png"],
+      type: "website",
+    },
+  };
+}
+
+// ── 라이트 테마 팔레트 ──
 const CARD = "#ffffff";
 const BORDER = "#e3e8f2";
 
@@ -60,8 +76,11 @@ function Sprite({ id, size = 30 }: { id: string; size?: number }) {
   return <img src={spriteUrl(m)} alt={m?.ko || id} width={size} height={size} style={{ imageRendering: "pixelated" }} />;
 }
 
-export default async function MasterMetaPage() {
-  const meta = await getMeta();
+export default async function LeagueMetaPage({ params }: { params: { league: string } }) {
+  const lg = LEAGUES[params.league];
+  if (!lg) notFound();
+
+  const meta = await getMeta(params.league);
   const total = meta?.total ?? 0;
   const mons = (meta?.top_mons ?? []).slice(0, 24);
   const decks = (meta?.top_decks ?? []).slice(0, 15);
@@ -84,15 +103,29 @@ export default async function MasterMetaPage() {
           <Link href="/gbl/app" style={{ marginLeft: "auto", fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>📝 내 기록 →</Link>
         </div>
 
+        {/* 리그 내부링크(SEO 크로스링크) */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
+          {LEAGUE_KEYS.map((k) => {
+            const on = k === params.league;
+            return (
+              <Link key={k} href={`/gbl/meta/${k}`}
+                style={{ padding: "6px 13px", borderRadius: 16, fontSize: "0.8rem", fontWeight: 700, textDecoration: "none",
+                  border: `1px solid ${on ? "#4f8cff" : BORDER}`, background: on ? "rgba(79,140,255,.16)" : CARD, color: on ? "#3b5bdb" : "#64748b" }}>
+                {LEAGUES[k].short}리그
+              </Link>
+            );
+          })}
+        </div>
+
         <h1 style={{ margin: "0.2rem 0", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>
-          포켓몬고 마스터리그 실측 픽률 · 인기 덱
+          포켓몬고 {lg.ko} 실측 픽률 · 인기 덱
         </h1>
         <p style={{ margin: "0.4rem 0 0.2rem", fontSize: "0.9rem", color: "#475569", lineHeight: 1.7 }}>
-          시뮬레이션이 아닌, 한국 유저들이 <b style={{ color: "#334155" }}>실제로 만난 상대</b>를 집계한 마스터리그(GBL) 실전 메타입니다.
-          지금 마스터리그에서 어떤 포켓몬과 덱(파티)을 가장 많이 만나는지 <b style={{ color: "#334155" }}>실측 픽률</b>로 확인하세요. 최근 30일 기준.
+          시뮬레이션이 아닌, 한국 유저들이 <b style={{ color: "#334155" }}>실제로 만난 상대</b>를 집계한 {lg.ko}(GBL) 실전 메타입니다.
+          지금 {lg.ko}에서 어떤 포켓몬과 덱(파티)을 가장 많이 만나는지 <b style={{ color: "#334155" }}>실측 픽률</b>로 확인하세요. 최근 30일 기준.
         </p>
         <p style={{ margin: "0.5rem 0 0", fontSize: "0.78rem", color: "#94a3b8" }}>
-          기간·다른 리그(슈퍼/하이퍼)·시즌 필터는{" "}
+          기간·시즌 컵 필터는{" "}
           <Link href="/gbl/meta" style={{ color: "#3b5bdb", fontWeight: 600 }}>인터랙티브 메타</Link>에서 볼 수 있습니다.
         </p>
 
@@ -102,7 +135,7 @@ export default async function MasterMetaPage() {
           </div>
         ) : (
           <>
-            <h2 style={h2}>🔥 마스터리그 포켓몬 실측 픽률 TOP</h2>
+            <h2 style={h2}>🔥 {lg.ko} 포켓몬 실측 픽률 TOP</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {mons.map((mm, i) => {
                 const pct = Math.round((mm.count / total) * 100);
@@ -125,7 +158,7 @@ export default async function MasterMetaPage() {
 
             <AdSlot />
 
-            <h2 style={h2}>🏆 마스터리그 인기 덱(파티) 픽률 TOP</h2>
+            <h2 style={h2}>🏆 {lg.ko} 인기 덱(파티) 픽률 TOP</h2>
             <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 6 }}>전체 대전 중 이 덱(파티)을 만난 비율</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {decks.map((d, i) => {
@@ -155,7 +188,7 @@ export default async function MasterMetaPage() {
           <h2 style={{ fontSize: "0.95rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>GBL Note란?</h2>
           <p style={{ margin: 0, fontSize: "0.82rem", color: "#475569", lineHeight: 1.7 }}>
             GBL Note는 포켓몬 GO 배틀리그(GBL)에서 만난 상대를 기록하고, 다시 만나면 상대의 과거 파티·기술을 5초 안에 확인하는 도구입니다.
-            여기 실측 메타는 사용자들의 기록을 개인정보를 제거한 익명 통계로 집계한 것으로, 실제 한국 서버에서 유행하는 마스터리그 조합을 반영합니다.{" "}
+            여기 실측 메타는 사용자들의 기록을 개인정보를 제거한 익명 통계로 집계한 것으로, 실제 한국 서버에서 유행하는 {lg.ko} 조합을 반영합니다.{" "}
             <Link href="/gbl/login" style={{ color: "#3b5bdb", fontWeight: 600 }}>무료로 시작하기 →</Link>
           </p>
         </div>

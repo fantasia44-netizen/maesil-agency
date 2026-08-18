@@ -67,9 +67,20 @@ export default function GblLanding() {
         </div>
 
         {/* CTA */}
-        <div style={{ display: "flex", gap: 10, maxWidth: 480, margin: "0 auto 28px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 10, maxWidth: 480, margin: "0 auto 14px", flexWrap: "wrap" }}>
           <Link href={authed ? "/gbl/app" : "/gbl/login"} style={primaryBtn}>📝 내 기록 시작하기</Link>
           <Link href="/gbl/meta" style={ghostBtn}>🌐 실측 메타 (무료)</Link>
+        </div>
+
+        {/* 리그별 실측 메타 바로가기 (SEO 내부링크) */}
+        <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 28 }}>
+          {([["master", "마스터리그"], ["great", "슈퍼리그"], ["ultra", "하이퍼리그"]] as const).map(([k, label]) => (
+            <Link key={k} href={`/gbl/meta/${k}`}
+              style={{ fontSize: "0.8rem", fontWeight: 700, color: "#3b5bdb", textDecoration: "none",
+                padding: "6px 13px", border: "1px solid #d3ddf5", borderRadius: 16, background: "#fff" }}>
+              {label} 실측
+            </Link>
+          ))}
         </div>
 
         {/* 기능 카드 (이미지 스타일) */}
