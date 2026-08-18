@@ -65,7 +65,7 @@ export default function GblAdmin() {
     <div style={{ maxWidth: 960, margin: "0 auto", padding: "1.5rem 1rem 4rem" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
         <span style={{ fontSize: "1.2rem" }}>📓</span>
-        <h1 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 800 }}>GBL 데스노트 — 관리</h1>
+        <h1 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 800 }}>GBL Note — 관리</h1>
       </div>
       <p style={{ margin: "0 0 1.2rem", fontSize: "0.82rem", color: "#64748b" }}>gbl.maesil.net 가입 유저·기록 현황 (super_admin 전용)</p>
 

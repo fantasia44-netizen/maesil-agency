@@ -404,7 +404,7 @@ export default function GblPage() {
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
         <span style={{ fontSize: "1.3rem" }}>📓</span>
-        <h1 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800 }}>GBL 데스노트</h1>
+        <h1 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800 }}>GBL Note</h1>
         <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{leagueCount}판</span>
         <button onClick={logout}
           style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#94a3b8", background: "none",

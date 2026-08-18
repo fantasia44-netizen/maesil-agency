@@ -426,13 +426,13 @@ def gbl_password_request(body: GblPwResetRequest) -> dict:
             }).execute()
             link = f"https://gbl.maesil.net/gbl/reset?token={token}"
             html = (
-                "<p>GBL 데스노트 비밀번호 재설정 요청입니다.</p>"
+                "<p>GBL Note 비밀번호 재설정 요청입니다.</p>"
                 "<p>아래 링크에서 새 비밀번호를 설정하세요 (30분 내 유효):</p>"
                 f'<p><a href="{link}">{link}</a></p>'
                 "<p>본인이 요청하지 않았다면 이 메일을 무시하세요.</p>"
             )
             from app.services.notify_client import send_email
-            send_email(to=email, subject="[GBL 데스노트] 비밀번호 재설정", html=html)
+            send_email(to=email, subject="[GBL Note] 비밀번호 재설정", html=html)
         except Exception:
             logger.exception("gbl 비밀번호 재설정 메일 실패")
     return {"ok": True}

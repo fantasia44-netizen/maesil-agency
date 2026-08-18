@@ -15,13 +15,13 @@ export default function GblPrivacy() {
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "2rem 1.1rem 4rem", background: "#fff", color: "#0f172a" }}>
       <div style={{ marginBottom: 6 }}>
-        <Link href="/gbl/login" style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>← GBL 데스노트</Link>
+        <Link href="/gbl/login" style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>← GBL Note</Link>
       </div>
       <h1 style={{ fontSize: "1.5rem", fontWeight: 900, margin: "0.3rem 0 0.2rem" }}>개인정보처리방침</h1>
       <p style={{ ...p, color: "#94a3b8", fontSize: "0.8rem" }}>시행일: {EFFECTIVE}</p>
 
       <p style={p}>
-        GBL 데스노트(이하 "서비스")는 이용자의 개인정보를 중요하게 생각하며, 아래와 같이 수집·이용·보관합니다.
+        GBL Note(이하 "서비스")는 이용자의 개인정보를 중요하게 생각하며, 아래와 같이 수집·이용·보관합니다.
         본 방침은 서비스(gbl.maesil.net) 이용자에게 적용됩니다.
       </p>
 

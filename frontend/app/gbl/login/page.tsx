@@ -56,7 +56,7 @@ export default function GblLogin() {
         <div style={{ textAlign: "center", marginBottom: 26 }}>
           <div style={{ fontSize: "2.4rem" }}>📓</div>
           <h1 style={{ margin: "6px 0 4px", fontSize: "1.5rem", fontWeight: 900, color: "#fff", letterSpacing: "-0.5px" }}>
-            GBL 데스노트
+            GBL Note
           </h1>
           <p style={{ margin: 0, fontSize: "0.83rem", color: "#8ea0c4" }}>
             포켓몬GO 배틀리그를 기억하는 노트 — 다시 만난 상대, 5초 안에 저격.

@@ -1,0 +1,18 @@
+{
+  "name": "GBL Note",
+  "short_name": "GBL Note",
+  "description": "포켓몬GO 배틀리그 상대를 기록하고 다시 만나면 5초 안에 저격",
+  "start_url": "/gbl",
+  "scope": "/gbl",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020",
+  "lang": "ko",
+  "categories": ["games", "utilities"],
+  "icons": [
+    { "src": "/icons/gbl-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/gbl-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/gbl-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
