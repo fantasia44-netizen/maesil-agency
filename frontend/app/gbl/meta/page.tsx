@@ -29,16 +29,40 @@ type Meta = { total: number; wins: number; losses: number; top_mons: MetaMon[]; 
 const CARD = "#ffffff";
 const BORDER = "#e3e8f2";
 
+const PAGE_SIZE = 20;
+
 function Sprite({ id, size = 30 }: { id: string; size?: number }) {
   const m = MON[id];
   return <img src={spriteUrl(m)} alt={m?.ko || id} width={size} height={size}
     style={{ imageRendering: "pixelated" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }} />;
 }
 
-function MonList({ meta, maxMon }: { meta: Meta; maxMon: number }) {
+function Pager({ page, pages, onPage }: { page: number; pages: number; onPage: (p: number) => void }) {
+  if (pages <= 1) return null;
+  const btn = (disabled: boolean): React.CSSProperties => ({
+    padding: "6px 14px", borderRadius: 8, border: "1px solid #e3e8f2",
+    background: disabled ? "#f1f5f9" : "#fff", color: disabled ? "#cbd5e1" : "#3b5bdb",
+    fontWeight: 700, fontSize: "0.8rem", cursor: disabled ? "default" : "pointer",
+  });
   return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginTop: 12 }}>
+      <button style={btn(page === 0)} disabled={page === 0} onClick={() => onPage(page - 1)}>← 이전</button>
+      <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 600 }}>{page + 1} / {pages}</span>
+      <button style={btn(page >= pages - 1)} disabled={page >= pages - 1} onClick={() => onPage(page + 1)}>다음 →</button>
+    </div>
+  );
+}
+
+function MonList({ meta, maxMon }: { meta: Meta; maxMon: number }) {
+  const [page, setPage] = useState(0);
+  useEffect(() => { setPage(0); }, [meta]);
+  const pages = Math.ceil(meta.top_mons.length / PAGE_SIZE);
+  const start = page * PAGE_SIZE;
+  return (
+    <>
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      {meta.top_mons.slice(0, 25).map((mm, i) => {
+      {meta.top_mons.slice(start, start + PAGE_SIZE).map((mm, idx) => {
+        const i = start + idx;
         const m = MON[mm.speciesId];
         const pct = Math.round((mm.count / meta.total) * 100);
         return (
@@ -56,14 +80,22 @@ function MonList({ meta, maxMon }: { meta: Meta; maxMon: number }) {
         );
       })}
     </div>
+    <Pager page={page} pages={pages} onPage={setPage} />
+    </>
   );
 }
 
 function DeckList({ meta, maxDeck }: { meta: Meta; maxDeck: number }) {
+  const [page, setPage] = useState(0);
+  useEffect(() => { setPage(0); }, [meta]);
+  const pages = Math.ceil(meta.top_decks.length / PAGE_SIZE);
+  const start = page * PAGE_SIZE;
   return (
+    <>
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 2 }}>전체 대전 중 이 덱(파티)을 만난 비율</div>
-      {meta.top_decks.slice(0, 25).map((d, i) => {
+      {meta.top_decks.slice(start, start + PAGE_SIZE).map((d, idx) => {
+        const i = start + idx;
         const pct = Math.round((d.count / meta.total) * 100);
         const names = d.deck.map((id) => MON[id]?.ko || id).join(" · ");
         return (
@@ -81,6 +113,8 @@ function DeckList({ meta, maxDeck }: { meta: Meta; maxDeck: number }) {
         );
       })}
     </div>
+    <Pager page={page} pages={pages} onPage={setPage} />
+    </>
   );
 }
 
