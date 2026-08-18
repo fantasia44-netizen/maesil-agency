@@ -266,7 +266,7 @@ function MatchCard({ m, onEdit, onDelete, readOnly }: {
 export default function GblPage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"lookup" | "log">("lookup");
+  const [tab, setTab] = useState<"lookup" | "log" | "stats">("lookup");
   const [query, setQuery] = useState("");
   const [toast, setToast] = useState("");
   const [league, setLeague] = useState<League>("master");
@@ -275,6 +275,8 @@ export default function GblPage() {
   const [isOwner, setIsOwner] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [sort, setSort] = useState<"recent" | "name">("recent");  // 조회 정렬
+  const [deckFilter, setDeckFilter] = useState<"all" | "won" | "lost">("all");
+  const [expandedDeck, setExpandedDeck] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -346,6 +348,35 @@ export default function GblPage() {
   const leagueCount = useMemo(
     () => (scope === "all" ? allMatches : matches).filter((m) => (m.league || "master") === league).length,
     [matches, allMatches, scope, league]);
+
+  // 전적: 내 기록(선택 리그) 기준 승률 + 상대 덱별 전적
+  type DeckMon = { sp?: Mon; manual?: string };
+  type Deck = { key: string; mons: DeckMon[]; wins: number; losses: number; draws: number; matches: Match[] };
+  const stats = useMemo(() => {
+    const src = matches.filter((m) => (m.league || "master") === league);
+    let wins = 0, losses = 0, draws = 0;
+    const deckMap = new Map<string, Deck>();
+    for (const m of src) {
+      if (m.result === "win") wins++; else if (m.result === "loss") losses++; else draws++;
+      const parts = (m.team_json || [])
+        .map((t) => t.speciesId ? t.speciesId : (t.manual ? "m:" + t.manual : ""))
+        .filter(Boolean);
+      const key = parts.slice().sort().join("|") || "(미입력)";
+      if (!deckMap.has(key)) {
+        const mons: DeckMon[] = (m.team_json || []).map((t) =>
+          t.speciesId ? { sp: MON_BY_ID[t.speciesId] } : { manual: t.manual || "?" });
+        deckMap.set(key, { key, mons, wins: 0, losses: 0, draws: 0, matches: [] });
+      }
+      const d = deckMap.get(key)!;
+      if (m.result === "win") d.wins++; else if (m.result === "loss") d.losses++; else d.draws++;
+      d.matches.push(m);
+    }
+    const decks = [...deckMap.values()].sort((a, b) => b.matches.length - a.matches.length);
+    return { total: src.length, wins, losses, draws, decks };
+  }, [matches, league]);
+
+  const winRate = (w: number, l: number) => (w + l > 0 ? Math.round((w / (w + l)) * 100) : null);
+  const rateColor = (r: number | null) => r == null ? "#94a3b8" : r >= 60 ? "#15803d" : r >= 45 ? "#c2410c" : "#b91c1c";
 
   const resetForm = () => { setOppName(""); setTeam(emptyTeam()); setMemo(""); setResult(null); setEditingId(null); };
 
@@ -430,9 +461,9 @@ export default function GblPage() {
 
       {/* 탭 */}
       <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-        {([["lookup", "🔍 조회"], ["log", "✏️ 배틀 후 기록"]] as const).map(([k, label]) => (
+        {([["lookup", "🔍 조회"], ["log", "✏️ 기록"], ["stats", "📊 전적"]] as const).map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
-            style={{ flex: 1, padding: "10px", borderRadius: 10, cursor: "pointer", fontWeight: 700, fontSize: "0.9rem",
+            style={{ flex: 1, padding: "10px", borderRadius: 10, cursor: "pointer", fontWeight: 700, fontSize: "0.88rem",
               border: tab === k ? "1.5px solid #0f172a" : "1px solid #e2e8f0",
               background: tab === k ? "#0f172a" : "#fff", color: tab === k ? "#fff" : "#334155" }}>
             {label}
@@ -559,6 +590,90 @@ export default function GblPage() {
               {saving ? "저장 중…" : editingId ? "수정 저장" : "기록 저장"}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* ── 전적 ── */}
+      {tab === "stats" && (
+        <div>
+          {/* 승률 카드 */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+            <div style={{ flex: 1, textAlign: "center", background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem 0.4rem" }}>
+              <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "#0f172a" }}>{stats.total}</div>
+              <div style={{ fontSize: "0.72rem", color: "#64748b" }}>총 판수</div>
+            </div>
+            <div style={{ flex: 1.3, textAlign: "center", background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem 0.4rem" }}>
+              <div style={{ fontSize: "1.1rem", fontWeight: 800 }}>
+                <span style={{ color: "#15803d" }}>{stats.wins}승</span>{" "}
+                <span style={{ color: "#b91c1c" }}>{stats.losses}패</span>
+                {stats.draws > 0 && <span style={{ color: "#94a3b8" }}> {stats.draws}무</span>}
+              </div>
+              <div style={{ fontSize: "0.72rem", color: "#64748b" }}>전적</div>
+            </div>
+            <div style={{ flex: 1, textAlign: "center", background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem 0.4rem" }}>
+              <div style={{ fontSize: "1.5rem", fontWeight: 800, color: rateColor(winRate(stats.wins, stats.losses)) }}>
+                {winRate(stats.wins, stats.losses) ?? "-"}%
+              </div>
+              <div style={{ fontSize: "0.72rem", color: "#64748b" }}>승률</div>
+            </div>
+          </div>
+
+          {/* 덱 필터 */}
+          <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+            {([["all", "전체 덱"], ["won", "🟢 이긴 덱"], ["lost", "🔴 진 덱"]] as const).map(([k, label]) => {
+              const on = deckFilter === k;
+              return (
+                <button key={k} onClick={() => setDeckFilter(k)}
+                  style={{ flex: 1, padding: "7px", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: "0.78rem",
+                    border: on ? "1.5px solid #0f172a" : "1px solid #e2e8f0",
+                    background: on ? "#0f172a" : "#fff", color: on ? "#fff" : "#64748b" }}>{label}</button>
+              );
+            })}
+          </div>
+
+          {(() => {
+            const decks = stats.decks.filter((d) =>
+              deckFilter === "all" ? true : deckFilter === "won" ? d.wins > d.losses : d.losses > d.wins);
+            if (decks.length === 0) {
+              return <div style={{ textAlign: "center", color: "#94a3b8", padding: "2.5rem", fontSize: "0.9rem" }}>
+                {stats.total === 0 ? "아직 기록이 없습니다." : "해당하는 덱이 없습니다."}
+              </div>;
+            }
+            return (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {decks.map((d) => {
+                  const r = winRate(d.wins, d.losses);
+                  const open = expandedDeck === d.key;
+                  return (
+                    <div key={d.key} style={{ border: "1px solid #eef2f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+                      <button onClick={() => setExpandedDeck(open ? null : d.key)}
+                        style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "0.6rem 0.8rem", background: "none", border: "none", cursor: "pointer" }}>
+                        <div style={{ display: "flex", gap: 2 }}>
+                          {d.mons.map((mm, i) => mm.sp
+                            ? <MonSprite key={i} mon={mm.sp} size={34} />
+                            : <span key={i} style={{ fontSize: "0.7rem", color: "#94a3b8", alignSelf: "center", padding: "0 4px" }}>{mm.manual}</span>)}
+                        </div>
+                        <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                          <div style={{ fontSize: "0.82rem", fontWeight: 700 }}>
+                            <span style={{ color: "#15803d" }}>{d.wins}승</span> <span style={{ color: "#b91c1c" }}>{d.losses}패</span>
+                            {d.draws > 0 && <span style={{ color: "#94a3b8" }}> {d.draws}무</span>}
+                          </div>
+                          <div style={{ fontSize: "0.72rem", fontWeight: 700, color: rateColor(r) }}>승률 {r ?? "-"}%</div>
+                        </div>
+                        <span style={{ fontSize: "0.7rem", color: "#cbd5e1" }}>{open ? "▲" : "▼"}</span>
+                      </button>
+                      {open && (
+                        <div style={{ padding: "0 0.7rem 0.7rem", display: "flex", flexDirection: "column", gap: 8 }}>
+                          <div style={{ fontSize: "0.72rem", color: "#94a3b8" }}>복기 — {d.matches.length}판</div>
+                          {d.matches.map((m) => <MatchCard key={m.id} m={m} onEdit={startEdit} onDelete={del} />)}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       )}
 
