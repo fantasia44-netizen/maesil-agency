@@ -428,7 +428,7 @@ export default function GblPage() {
   };
 
   return (
-    <div className="gbl-app" style={{ minHeight: "100dvh", padding: "1rem 0.9rem 4rem",
+    <div className="gbl-app" style={{ minHeight: "100dvh", padding: "1rem 0.9rem 4rem", color: "#e2e8f0",
       background: "radial-gradient(1000px 500px at 50% -10%, #1a2a5c 0%, transparent 60%), linear-gradient(180deg,#070b18,#0b1226)" }}>
       <style>{`.gbl-app input,.gbl-app textarea{background:#0f1628;color:#e2e8f0}.gbl-app ::placeholder{color:#5f6f92}`}</style>
       <div style={{ maxWidth: 760, margin: "0 auto" }}>
@@ -529,7 +529,7 @@ export default function GblPage() {
                 return (
                   <div key={name}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
-                      <span style={{ fontWeight: 800, fontSize: "1rem" }}>{name}</span>
+                      <span style={{ fontWeight: 800, fontSize: "1rem", color: "#fff" }}>{name}</span>
                       <span style={{ fontSize: "0.74rem", color: "#8ea0c4" }}>{ms.length}판</span>
                       {(w > 0 || l > 0) && (
                         <span style={{ fontSize: "0.74rem", color: "#8ea0c4" }}>
