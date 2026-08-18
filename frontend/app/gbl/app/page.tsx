@@ -49,8 +49,8 @@ const emptyTeam = (): TeamMon[] => [
 // ── 공용 소품 ──────────────────────────────────────────────────────────
 function MoveChip({ id }: { id: string }) {
   const mv = MOVES[id];
-  if (!mv) return <span style={{ fontSize: "0.68rem", color: "#7c8bb5" }}>{id}</span>;
-  const c = TYPE_COLOR[mv.type] || "#8ea0c4";
+  if (!mv) return <span style={{ fontSize: "0.68rem", color: "#94a3b8" }}>{id}</span>;
+  const c = TYPE_COLOR[mv.type] || "#64748b";
   return (
     <span style={{
       fontSize: "0.68rem", fontWeight: 600, padding: "1px 7px", borderRadius: 10,
@@ -89,9 +89,9 @@ function PokemonPicker({ value, manual, pool, onPick, onManual }: {
       <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
         <input autoFocus value={manual || ""} placeholder="직접 입력 (목록에 없는 개체)"
           onChange={(e) => onManual(e.target.value)}
-          style={{ flex: 1, padding: "8px 10px", border: "1px solid #2a3550", borderRadius: 8, fontSize: "0.9rem" }} />
+          style={{ flex: 1, padding: "8px 10px", border: "1px solid #dbe2ee", borderRadius: 8, fontSize: "0.9rem" }} />
         <button onClick={() => { setManualMode(false); onManual(""); }}
-          style={{ fontSize: "0.75rem", color: "#8ea0c4", background: "none", border: "1px solid #2a3550", borderRadius: 8, padding: "6px 10px", cursor: "pointer" }}>목록</button>
+          style={{ fontSize: "0.75rem", color: "#64748b", background: "none", border: "1px solid #dbe2ee", borderRadius: 8, padding: "6px 10px", cursor: "pointer" }}>목록</button>
       </div>
     );
   }
@@ -119,17 +119,17 @@ function PokemonPicker({ value, manual, pool, onPick, onManual }: {
       <input value={q} placeholder="포켓몬 검색 (한글)"
         onFocus={() => setOpen(true)}
         onChange={(e) => { setQ(e.target.value); setOpen(true); }}
-        style={{ width: "100%", padding: "8px 10px", border: "1px solid #2a3550", borderRadius: 8, fontSize: "0.9rem", boxSizing: "border-box" }} />
+        style={{ width: "100%", padding: "8px 10px", border: "1px solid #dbe2ee", borderRadius: 8, fontSize: "0.9rem", boxSizing: "border-box" }} />
       {open && (
         <div style={{
           position: "absolute", top: "100%", left: 0, right: 0, zIndex: 20, marginTop: 4,
-          maxHeight: 260, overflowY: "auto", background: "rgba(255,255,255,.03)", border: "1px solid #2a3550",
+          maxHeight: 260, overflowY: "auto", background: "#ffffff", border: "1px solid #dbe2ee",
           borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,.12)",
         }}>
           {results.map((m) => (
             <button key={m.id} onClick={() => { onPick(m.id); setOpen(false); setQ(""); }}
               style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "6px 10px",
-                background: "none", border: "none", borderBottom: "1px solid rgba(255,255,255,.07)", cursor: "pointer", textAlign: "left" }}>
+                background: "none", border: "none", borderBottom: "1px solid #e5eaf3", cursor: "pointer", textAlign: "left" }}>
               <MonSprite mon={m} size={32} />
               <span style={{ fontSize: "0.88rem", fontWeight: 600 }}>
                 {m.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{m.ko}
@@ -140,7 +140,7 @@ function PokemonPicker({ value, manual, pool, onPick, onManual }: {
             </button>
           ))}
           <button onClick={() => { setManualMode(true); setOpen(false); }}
-            style={{ width: "100%", padding: "8px 10px", background: "rgba(255,255,255,.03)", border: "none", cursor: "pointer", fontSize: "0.8rem", color: "#8ea0c4" }}>
+            style={{ width: "100%", padding: "8px 10px", background: "#ffffff", border: "none", cursor: "pointer", fontSize: "0.8rem", color: "#64748b" }}>
             + 목록에 없어요 (직접 입력)
           </button>
         </div>
@@ -159,8 +159,8 @@ function TeamSlot({ idx, mon, pool, onChange }: { idx: number; mon: TeamMon; poo
     onChange({ ...mon, charged: next });
   };
   return (
-    <div style={{ border: "1px solid #1e2b4a", borderRadius: 12, padding: "0.8rem", background: "rgba(255,255,255,.03)" }}>
-      <div style={{ fontSize: "0.72rem", color: "#7c8bb5", fontWeight: 700, marginBottom: 6 }}>{idx + 1}번</div>
+    <div style={{ border: "1px solid #e3e8f2", borderRadius: 12, padding: "0.8rem", background: "#ffffff" }}>
+      <div style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 700, marginBottom: 6 }}>{idx + 1}번</div>
       <PokemonPicker value={mon.speciesId} manual={mon.manual} pool={pool}
         onPick={(id) => onChange({ speciesId: id, manual: null, fast: null, charged: [], note: mon.note })}
         onManual={(name) => onChange({ ...mon, speciesId: null, manual: name })} />
@@ -168,15 +168,15 @@ function TeamSlot({ idx, mon, pool, onChange }: { idx: number; mon: TeamMon; poo
       {species && (
         <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
           <div>
-            <div style={{ fontSize: "0.7rem", color: "#8ea0c4", marginBottom: 3 }}>빠른 기술</div>
+            <div style={{ fontSize: "0.7rem", color: "#64748b", marginBottom: 3 }}>빠른 기술</div>
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
               {species.fast.map((id) => {
                 const on = mon.fast === id;
-                const mv = MOVES[id]; const c = TYPE_COLOR[mv?.type] || "#8ea0c4";
+                const mv = MOVES[id]; const c = TYPE_COLOR[mv?.type] || "#64748b";
                 return (
                   <button key={id} onClick={() => onChange({ ...mon, fast: on ? null : id })}
                     style={{ fontSize: "0.75rem", fontWeight: 600, padding: "4px 9px", borderRadius: 8, cursor: "pointer",
-                      background: on ? c : "rgba(255,255,255,.07)", color: on ? "#fff" : "#8ea0c4", border: `1px solid ${on ? c : "#2a3550"}` }}>
+                      background: on ? c : "#e5eaf3", color: on ? "#fff" : "#64748b", border: `1px solid ${on ? c : "#dbe2ee"}` }}>
                     {mv?.ko || id}
                   </button>
                 );
@@ -184,15 +184,15 @@ function TeamSlot({ idx, mon, pool, onChange }: { idx: number; mon: TeamMon; poo
             </div>
           </div>
           <div>
-            <div style={{ fontSize: "0.7rem", color: "#8ea0c4", marginBottom: 3 }}>차지 기술 (최대 2)</div>
+            <div style={{ fontSize: "0.7rem", color: "#64748b", marginBottom: 3 }}>차지 기술 (최대 2)</div>
             <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
               {species.charged.map((id) => {
                 const on = mon.charged.includes(id);
-                const mv = MOVES[id]; const c = TYPE_COLOR[mv?.type] || "#8ea0c4";
+                const mv = MOVES[id]; const c = TYPE_COLOR[mv?.type] || "#64748b";
                 return (
                   <button key={id} onClick={() => toggleCharged(id)}
                     style={{ fontSize: "0.75rem", fontWeight: 600, padding: "4px 9px", borderRadius: 8, cursor: "pointer",
-                      background: on ? c : "rgba(255,255,255,.07)", color: on ? "#fff" : "#8ea0c4", border: `1px solid ${on ? c : "#2a3550"}` }}>
+                      background: on ? c : "#e5eaf3", color: on ? "#fff" : "#64748b", border: `1px solid ${on ? c : "#dbe2ee"}` }}>
                     {mv?.ko || id}
                   </button>
                 );
@@ -205,7 +205,7 @@ function TeamSlot({ idx, mon, pool, onChange }: { idx: number; mon: TeamMon; poo
       {(species || mon.manual) && (
         <input value={mon.note || ""} placeholder="개체 메모 (예: 3타에 지진, 실드 씀)"
           onChange={(e) => onChange({ ...mon, note: e.target.value })}
-          style={{ marginTop: 8, width: "100%", padding: "7px 10px", border: "1px solid #2a3550", borderRadius: 8, fontSize: "0.85rem", boxSizing: "border-box" }} />
+          style={{ marginTop: 8, width: "100%", padding: "7px 10px", border: "1px solid #dbe2ee", borderRadius: 8, fontSize: "0.85rem", boxSizing: "border-box" }} />
       )}
     </div>
   );
@@ -218,12 +218,12 @@ function MatchCard({ m, onEdit, onDelete, readOnly }: {
   const d = new Date(m.played_at);
   const dstr = d.toLocaleString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
   const resBadge = m.result === "win"
-    ? { t: "승", c: "#4ade80", bg: "rgba(34,197,94,.14)" }
-    : m.result === "loss" ? { t: "패", c: "#f87171", bg: "rgba(239,68,68,.14)" } : null;
+    ? { t: "승", c: "#16a34a", bg: "rgba(34,197,94,.14)" }
+    : m.result === "loss" ? { t: "패", c: "#dc2626", bg: "rgba(239,68,68,.14)" } : null;
   return (
-    <div style={{ border: "1px solid #1e2b4a", borderRadius: 12, padding: "0.75rem 0.9rem", background: "rgba(255,255,255,.03)" }}>
+    <div style={{ border: "1px solid #e3e8f2", borderRadius: 12, padding: "0.75rem 0.9rem", background: "#ffffff" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-        <span style={{ fontSize: "0.72rem", color: "#7c8bb5" }}>{dstr}</span>
+        <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{dstr}</span>
         {resBadge && <span style={{ fontSize: "0.72rem", fontWeight: 700, padding: "1px 8px", borderRadius: 8, color: resBadge.c, background: resBadge.bg }}>{resBadge.t}</span>}
         {m.user_display_name && (
           <span style={{ fontSize: "0.66rem", color: "#7c3aed", background: "rgba(124,58,237,.15)", padding: "1px 7px", borderRadius: 8 }}>🧑 {m.user_display_name}</span>
@@ -231,7 +231,7 @@ function MatchCard({ m, onEdit, onDelete, readOnly }: {
         {!readOnly && (
           <span style={{ marginLeft: "auto", display: "flex", gap: 12 }}>
             {onEdit && <button onClick={() => onEdit(m)} style={{ fontSize: "0.72rem", color: "#3b5bdb", background: "none", border: "none", cursor: "pointer" }}>수정</button>}
-            <button onClick={() => onDelete(m.id)} style={{ fontSize: "0.72rem", color: "#5f6f92", background: "none", border: "none", cursor: "pointer" }}>삭제</button>
+            <button onClick={() => onDelete(m.id)} style={{ fontSize: "0.72rem", color: "#94a3b8", background: "none", border: "none", cursor: "pointer" }}>삭제</button>
           </span>
         )}
       </div>
@@ -239,7 +239,7 @@ function MatchCard({ m, onEdit, onDelete, readOnly }: {
         {m.team_json.map((tm, i) => {
           const sp = tm.speciesId ? MON_BY_ID[tm.speciesId] : null;
           return (
-            <div key={i} style={{ background: "rgba(255,255,255,.03)", borderRadius: 10, padding: "6px 8px" }}>
+            <div key={i} style={{ background: "#ffffff", borderRadius: 10, padding: "6px 8px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 {sp ? <MonSprite mon={sp} size={34} /> : <span style={{ width: 34, textAlign: "center" }}>❔</span>}
                 <span style={{ fontWeight: 700, fontSize: "0.85rem" }}>
@@ -250,12 +250,12 @@ function MatchCard({ m, onEdit, onDelete, readOnly }: {
                 {tm.fast && <MoveChip id={tm.fast} />}
                 {tm.charged.map((cid) => <MoveChip key={cid} id={cid} />)}
               </div>
-              {tm.note && <div style={{ fontSize: "0.72rem", color: "#8ea0c4", marginTop: 4 }}>{tm.note}</div>}
+              {tm.note && <div style={{ fontSize: "0.72rem", color: "#64748b", marginTop: 4 }}>{tm.note}</div>}
             </div>
           );
         })}
       </div>
-      {m.memo && <div style={{ marginTop: 8, fontSize: "0.8rem", color: "#e2e8f0", background: "rgba(255,214,120,.09)", borderRadius: 8, padding: "6px 10px", lineHeight: 1.5 }}>📝 {m.memo}</div>}
+      {m.memo && <div style={{ marginTop: 8, fontSize: "0.8rem", color: "#0f172a", background: "#fff7e0", borderRadius: 8, padding: "6px 10px", lineHeight: 1.5 }}>📝 {m.memo}</div>}
     </div>
   );
 }
@@ -378,7 +378,7 @@ export default function GblPage() {
   }, [matches, league]);
 
   const winRate = (w: number, l: number) => (w + l > 0 ? Math.round((w / (w + l)) * 100) : null);
-  const rateColor = (r: number | null) => r == null ? "#7c8bb5" : r >= 60 ? "#4ade80" : r >= 45 ? "#c2410c" : "#f87171";
+  const rateColor = (r: number | null) => r == null ? "#94a3b8" : r >= 60 ? "#16a34a" : r >= 45 ? "#c2410c" : "#dc2626";
 
   const resetForm = () => { setOppName(""); setTeam(emptyTeam()); setMemo(""); setResult(null); setEditingId(null); };
 
@@ -429,9 +429,9 @@ export default function GblPage() {
   };
 
   return (
-    <div className="gbl-app" style={{ minHeight: "100dvh", padding: "1rem 0.9rem 4rem", color: "#e2e8f0",
-      background: "radial-gradient(1000px 500px at 50% -10%, #1a2a5c 0%, transparent 60%), linear-gradient(180deg,#070b18,#0b1226)" }}>
-      <style>{`.gbl-app input,.gbl-app textarea{background:#0f1628;color:#e2e8f0}.gbl-app ::placeholder{color:#5f6f92}`}</style>
+    <div className="gbl-app" style={{ minHeight: "100dvh", padding: "1rem 0.9rem 4rem", color: "#0f172a",
+      background: "radial-gradient(1000px 500px at 50% -10%, #dbe4ff 0%, transparent 60%), linear-gradient(180deg,#f7f9fd,#eef2fb)" }}>
+      <style>{`.gbl-app input,.gbl-app textarea{background:#ffffff;color:#0f172a}.gbl-app ::placeholder{color:#94a3b8}`}</style>
       <div style={{ maxWidth: 760, margin: "0 auto" }}>
       {toast && (
         <div style={{ position: "fixed", top: 14, right: 14, zIndex: 9999, background: "#0f172a", color: "#fff",
@@ -441,16 +441,16 @@ export default function GblPage() {
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
         <Link href="/gbl" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
           <span style={{ fontSize: "1.3rem" }}>📓</span>
-          <h1 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800, color: "#fff" }}>GBL Note</h1>
+          <h1 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800, color: "#0f172a" }}>GBL Note</h1>
         </Link>
-        <span style={{ fontSize: "0.72rem", color: "#7c8bb5" }}>{leagueCount}판</span>
+        <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{leagueCount}판</span>
         <Link href="/gbl/meta"
           style={{ marginLeft: "auto", fontSize: "0.74rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>
           🌐 전체 메타
         </Link>
         <button onClick={logout}
-          style={{ fontSize: "0.72rem", color: "#7c8bb5", background: "none",
-            border: "1px solid #2a3550", borderRadius: 6, padding: "4px 10px", cursor: "pointer" }}>
+          style={{ fontSize: "0.72rem", color: "#94a3b8", background: "none",
+            border: "1px solid #dbe2ee", borderRadius: 6, padding: "4px 10px", cursor: "pointer" }}>
           로그아웃
         </button>
       </div>
@@ -462,8 +462,8 @@ export default function GblPage() {
           return (
             <button key={f.key} onClick={() => changeLeague(f.key)} title={f.note || ""}
               style={{ flex: "1 1 70px", minWidth: 70, padding: "8px", borderRadius: 9, cursor: "pointer", fontWeight: 700, fontSize: "0.82rem",
-                border: on ? `1.5px solid ${f.cup ? "#7c3aed" : "#3b5bdb"}` : "1px solid #2a3550",
-                background: on ? (f.cup ? "rgba(124,58,237,.15)" : "rgba(79,140,255,.16)") : "rgba(255,255,255,.05)", color: on ? (f.cup ? "#7c3aed" : "#3b5bdb") : "#8ea0c4" }}>
+                border: on ? `1.5px solid ${f.cup ? "#7c3aed" : "#3b5bdb"}` : "1px solid #dbe2ee",
+                background: on ? (f.cup ? "rgba(124,58,237,.15)" : "rgba(79,140,255,.16)") : "#eef2f8", color: on ? (f.cup ? "#7c3aed" : "#3b5bdb") : "#64748b" }}>
               {f.label}
             </button>
           );
@@ -475,8 +475,8 @@ export default function GblPage() {
         {([["lookup", "🔍 조회"], ["log", "✏️ 기록"], ["stats", "📊 전적"]] as const).map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: 1, padding: "10px", borderRadius: 10, cursor: "pointer", fontWeight: 700, fontSize: "0.88rem",
-              border: tab === k ? "1.5px solid #4f8cff" : "1px solid #2a3550",
-              background: tab === k ? "#3b5bdb" : "rgba(255,255,255,.05)", color: tab === k ? "#fff" : "#334155" }}>
+              border: tab === k ? "1.5px solid #4f8cff" : "1px solid #dbe2ee",
+              background: tab === k ? "#3b5bdb" : "#eef2f8", color: tab === k ? "#fff" : "#334155" }}>
             {label}
           </button>
         ))}
@@ -492,8 +492,8 @@ export default function GblPage() {
                 return (
                   <button key={k} onClick={() => changeScope(k)}
                     style={{ flex: 1, padding: "7px", borderRadius: 8, cursor: "pointer", fontWeight: 700, fontSize: "0.8rem",
-                      border: on ? "1.5px solid #7c3aed" : "1px solid #2a3550",
-                      background: on ? "rgba(124,58,237,.22)" : "rgba(255,255,255,.05)", color: on ? "#7c3aed" : "#8ea0c4" }}>
+                      border: on ? "1.5px solid #7c3aed" : "1px solid #dbe2ee",
+                      background: on ? "rgba(124,58,237,.22)" : "#eef2f8", color: on ? "#7c3aed" : "#64748b" }}>
                     {label}
                   </button>
                 );
@@ -511,15 +511,15 @@ export default function GblPage() {
               return (
                 <button key={k} onClick={() => changeSort(k)}
                   style={{ padding: "4px 12px", borderRadius: 14, cursor: "pointer", fontSize: "0.74rem", fontWeight: 600,
-                    border: on ? "1px solid #4f8cff" : "1px solid #2a3550",
-                    background: on ? "#3b5bdb" : "rgba(255,255,255,.05)", color: on ? "#fff" : "#8ea0c4" }}>{label}</button>
+                    border: on ? "1px solid #4f8cff" : "1px solid #dbe2ee",
+                    background: on ? "#3b5bdb" : "#eef2f8", color: on ? "#fff" : "#64748b" }}>{label}</button>
               );
             })}
           </div>
           {loading ? (
-            <div style={{ textAlign: "center", color: "#7c8bb5", padding: "3rem" }}>불러오는 중…</div>
+            <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem" }}>불러오는 중…</div>
           ) : groups.length === 0 ? (
-            <div style={{ textAlign: "center", color: "#7c8bb5", padding: "2.5rem", fontSize: "0.9rem" }}>
+            <div style={{ textAlign: "center", color: "#94a3b8", padding: "2.5rem", fontSize: "0.9rem" }}>
               {query ? "일치하는 상대 기록이 없습니다." : "아직 기록이 없습니다. '배틀 후 기록'으로 첫 상대를 남겨보세요."}
             </div>
           ) : (
@@ -530,11 +530,11 @@ export default function GblPage() {
                 return (
                   <div key={name}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
-                      <span style={{ fontWeight: 800, fontSize: "1rem", color: "#fff" }}>{name}</span>
-                      <span style={{ fontSize: "0.74rem", color: "#8ea0c4" }}>{ms.length}판</span>
+                      <span style={{ fontWeight: 800, fontSize: "1rem", color: "#0f172a" }}>{name}</span>
+                      <span style={{ fontSize: "0.74rem", color: "#64748b" }}>{ms.length}판</span>
                       {(w > 0 || l > 0) && (
-                        <span style={{ fontSize: "0.74rem", color: "#8ea0c4" }}>
-                          <b style={{ color: "#4ade80" }}>{w}승</b> <b style={{ color: "#f87171" }}>{l}패</b>
+                        <span style={{ fontSize: "0.74rem", color: "#64748b" }}>
+                          <b style={{ color: "#16a34a" }}>{w}승</b> <b style={{ color: "#dc2626" }}>{l}패</b>
                         </span>
                       )}
                     </div>
@@ -562,18 +562,18 @@ export default function GblPage() {
             </div>
           )}
           <div>
-            <label style={{ fontSize: "0.78rem", fontWeight: 700, color: "#e2e8f0" }}>상대 트레이너 이름</label>
+            <label style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a" }}>상대 트레이너 이름</label>
             <input value={oppName} onChange={(e) => setOppName(e.target.value)} placeholder="예: PikaMaster99"
               autoComplete="off" autoCapitalize="off" spellCheck={false}
-              style={{ width: "100%", marginTop: 5, padding: "11px 14px", border: "1px solid #2a3550", borderRadius: 10, fontSize: "1rem", boxSizing: "border-box" }} />
+              style={{ width: "100%", marginTop: 5, padding: "11px 14px", border: "1px solid #dbe2ee", borderRadius: 10, fontSize: "1rem", boxSizing: "border-box" }} />
           </div>
 
           <div style={{ display: "flex", gap: 8 }}>
             {([["win", "승"], ["loss", "패"], [null, "미정"]] as const).map(([v, label]) => (
               <button key={String(v)} onClick={() => setResult(v)}
                 style={{ flex: 1, padding: "9px", borderRadius: 9, cursor: "pointer", fontWeight: 700, fontSize: "0.88rem",
-                  border: result === v ? "1.5px solid #4f8cff" : "1px solid #2a3550",
-                  background: result === v ? "#3b5bdb" : "rgba(255,255,255,.05)", color: result === v ? "#fff" : "#8ea0c4" }}>{label}</button>
+                  border: result === v ? "1.5px solid #4f8cff" : "1px solid #dbe2ee",
+                  background: result === v ? "#3b5bdb" : "#eef2f8", color: result === v ? "#fff" : "#64748b" }}>{label}</button>
             ))}
           </div>
 
@@ -585,15 +585,15 @@ export default function GblPage() {
           </div>
 
           <div>
-            <label style={{ fontSize: "0.78rem", fontWeight: 700, color: "#e2e8f0" }}>전체 메모 (턴/실드 등)</label>
+            <label style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a" }}>전체 메모 (턴/실드 등)</label>
             <textarea value={memo} onChange={(e) => setMemo(e.target.value)}
               placeholder="예: 리드 메타그로스, 2실드 쓰고 지진 유도. 백에 김렉이/토게키스."
-              style={{ width: "100%", marginTop: 5, minHeight: 70, padding: "10px 14px", border: "1px solid #2a3550", borderRadius: 10, fontSize: "0.9rem", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.5 }} />
+              style={{ width: "100%", marginTop: 5, minHeight: 70, padding: "10px 14px", border: "1px solid #dbe2ee", borderRadius: 10, fontSize: "0.9rem", boxSizing: "border-box", fontFamily: "inherit", lineHeight: 1.5 }} />
           </div>
 
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={() => { resetForm(); if (editingId) setTab("lookup"); }}
-              style={{ padding: "12px 18px", borderRadius: 10, border: "1px solid #2a3550", background: "rgba(255,255,255,.03)", color: "#8ea0c4", cursor: "pointer", fontWeight: 600 }}>
+              style={{ padding: "12px 18px", borderRadius: 10, border: "1px solid #dbe2ee", background: "#ffffff", color: "#64748b", cursor: "pointer", fontWeight: 600 }}>
               {editingId ? "취소" : "초기화"}
             </button>
             <button onClick={save} disabled={saving}
@@ -609,23 +609,23 @@ export default function GblPage() {
         <div>
           {/* 승률 카드 */}
           <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-            <div style={{ flex: 1, textAlign: "center", background: "rgba(255,255,255,.03)", border: "1px solid #1e2b4a", borderRadius: 12, padding: "0.9rem 0.4rem" }}>
-              <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "#e2e8f0" }}>{stats.total}</div>
-              <div style={{ fontSize: "0.72rem", color: "#8ea0c4" }}>총 판수</div>
+            <div style={{ flex: 1, textAlign: "center", background: "#ffffff", border: "1px solid #e3e8f2", borderRadius: 12, padding: "0.9rem 0.4rem" }}>
+              <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "#0f172a" }}>{stats.total}</div>
+              <div style={{ fontSize: "0.72rem", color: "#64748b" }}>총 판수</div>
             </div>
-            <div style={{ flex: 1.3, textAlign: "center", background: "rgba(255,255,255,.03)", border: "1px solid #1e2b4a", borderRadius: 12, padding: "0.9rem 0.4rem" }}>
+            <div style={{ flex: 1.3, textAlign: "center", background: "#ffffff", border: "1px solid #e3e8f2", borderRadius: 12, padding: "0.9rem 0.4rem" }}>
               <div style={{ fontSize: "1.1rem", fontWeight: 800 }}>
-                <span style={{ color: "#4ade80" }}>{stats.wins}승</span>{" "}
-                <span style={{ color: "#f87171" }}>{stats.losses}패</span>
-                {stats.draws > 0 && <span style={{ color: "#7c8bb5" }}> {stats.draws}무</span>}
+                <span style={{ color: "#16a34a" }}>{stats.wins}승</span>{" "}
+                <span style={{ color: "#dc2626" }}>{stats.losses}패</span>
+                {stats.draws > 0 && <span style={{ color: "#94a3b8" }}> {stats.draws}무</span>}
               </div>
-              <div style={{ fontSize: "0.72rem", color: "#8ea0c4" }}>전적</div>
+              <div style={{ fontSize: "0.72rem", color: "#64748b" }}>전적</div>
             </div>
-            <div style={{ flex: 1, textAlign: "center", background: "rgba(255,255,255,.03)", border: "1px solid #1e2b4a", borderRadius: 12, padding: "0.9rem 0.4rem" }}>
+            <div style={{ flex: 1, textAlign: "center", background: "#ffffff", border: "1px solid #e3e8f2", borderRadius: 12, padding: "0.9rem 0.4rem" }}>
               <div style={{ fontSize: "1.5rem", fontWeight: 800, color: rateColor(winRate(stats.wins, stats.losses)) }}>
                 {winRate(stats.wins, stats.losses) ?? "-"}%
               </div>
-              <div style={{ fontSize: "0.72rem", color: "#8ea0c4" }}>승률</div>
+              <div style={{ fontSize: "0.72rem", color: "#64748b" }}>승률</div>
             </div>
           </div>
 
@@ -636,8 +636,8 @@ export default function GblPage() {
               return (
                 <button key={k} onClick={() => setDeckFilter(k)}
                   style={{ flex: 1, padding: "7px", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: "0.78rem",
-                    border: on ? "1.5px solid #4f8cff" : "1px solid #2a3550",
-                    background: on ? "#3b5bdb" : "rgba(255,255,255,.05)", color: on ? "#fff" : "#8ea0c4" }}>{label}</button>
+                    border: on ? "1.5px solid #4f8cff" : "1px solid #dbe2ee",
+                    background: on ? "#3b5bdb" : "#eef2f8", color: on ? "#fff" : "#64748b" }}>{label}</button>
               );
             })}
           </div>
@@ -646,13 +646,13 @@ export default function GblPage() {
             const decks = stats.decks.filter((d) =>
               deckFilter === "all" ? true : deckFilter === "won" ? d.wins > d.losses : d.losses > d.wins);
             if (decks.length === 0) {
-              return <div style={{ textAlign: "center", color: "#7c8bb5", padding: "2.5rem", fontSize: "0.9rem" }}>
+              return <div style={{ textAlign: "center", color: "#94a3b8", padding: "2.5rem", fontSize: "0.9rem" }}>
                 {stats.total === 0 ? "아직 기록이 없습니다." : "해당하는 덱이 없습니다."}
               </div>;
             }
             return (
               <div>
-                <div style={{ fontSize: "0.72rem", color: "#7c8bb5", marginBottom: 8 }}>
+                <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 8 }}>
                   많이 만난 순 · {decks.length}종 덱
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -660,32 +660,32 @@ export default function GblPage() {
                   const r = winRate(d.wins, d.losses);
                   const open = expandedDeck === d.key;
                   return (
-                    <div key={d.key} style={{ border: "1px solid #1e2b4a", borderRadius: 12, background: "rgba(255,255,255,.03)", overflow: "hidden" }}>
+                    <div key={d.key} style={{ border: "1px solid #e3e8f2", borderRadius: 12, background: "#ffffff", overflow: "hidden" }}>
                       <button onClick={() => setExpandedDeck(open ? null : d.key)}
                         style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "0.6rem 0.8rem", background: "none", border: "none", cursor: "pointer" }}>
-                        <span style={{ fontSize: "0.74rem", fontWeight: 800, color: idx < 3 ? "#7c3aed" : "#7c8bb5", minWidth: 22, textAlign: "center" }}>#{idx + 1}</span>
+                        <span style={{ fontSize: "0.74rem", fontWeight: 800, color: idx < 3 ? "#7c3aed" : "#94a3b8", minWidth: 22, textAlign: "center" }}>#{idx + 1}</span>
                         <div style={{ display: "flex", gap: 2 }}>
                           {d.mons.map((mm, i) => mm.sp
                             ? <MonSprite key={i} mon={mm.sp} size={34} />
-                            : <span key={i} style={{ fontSize: "0.7rem", color: "#7c8bb5", alignSelf: "center", padding: "0 4px" }}>{mm.manual}</span>)}
+                            : <span key={i} style={{ fontSize: "0.7rem", color: "#94a3b8", alignSelf: "center", padding: "0 4px" }}>{mm.manual}</span>)}
                         </div>
                         <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                          <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#e2e8f0" }}>{d.matches.length}회</div>
+                          <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>{d.matches.length}회</div>
                           <div style={{ fontSize: "0.72rem", fontWeight: 600 }}>
-                            <span style={{ color: "#4ade80" }}>{d.wins}승</span> <span style={{ color: "#f87171" }}>{d.losses}패</span>
-                            {d.draws > 0 && <span style={{ color: "#7c8bb5" }}> {d.draws}무</span>}
-                            <span style={{ color: "#5f6f92" }}> · </span>
+                            <span style={{ color: "#16a34a" }}>{d.wins}승</span> <span style={{ color: "#dc2626" }}>{d.losses}패</span>
+                            {d.draws > 0 && <span style={{ color: "#94a3b8" }}> {d.draws}무</span>}
+                            <span style={{ color: "#94a3b8" }}> · </span>
                             <span style={{ color: rateColor(r) }}>{r ?? "-"}%</span>
                           </div>
                         </div>
-                        <span style={{ fontSize: "0.7rem", color: "#5f6f92" }}>{open ? "▲" : "▼"}</span>
+                        <span style={{ fontSize: "0.7rem", color: "#94a3b8" }}>{open ? "▲" : "▼"}</span>
                       </button>
-                      <div style={{ fontSize: "0.7rem", color: "#8ea0c4", padding: "0 0.8rem 0.55rem 2.4rem", lineHeight: 1.4 }}>
+                      <div style={{ fontSize: "0.7rem", color: "#64748b", padding: "0 0.8rem 0.55rem 2.4rem", lineHeight: 1.4 }}>
                         {d.mons.map((mm) => mm.sp?.ko || mm.manual || "?").join(" · ")}
                       </div>
                       {open && (
                         <div style={{ padding: "0 0.7rem 0.7rem", display: "flex", flexDirection: "column", gap: 8 }}>
-                          <div style={{ fontSize: "0.72rem", color: "#7c8bb5" }}>복기 — {d.matches.length}판</div>
+                          <div style={{ fontSize: "0.72rem", color: "#94a3b8" }}>복기 — {d.matches.length}판</div>
                           {d.matches.map((m) => <MatchCard key={m.id} m={m} onEdit={startEdit} onDelete={del} />)}
                         </div>
                       )}

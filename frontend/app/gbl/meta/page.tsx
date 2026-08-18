@@ -26,8 +26,8 @@ type MetaMon = { speciesId: string; count: number };
 type MetaDeck = { deck: string[]; count: number; wins: number; losses: number };
 type Meta = { total: number; wins: number; losses: number; top_mons: MetaMon[]; top_decks: MetaDeck[] };
 
-const CARD = "rgba(255,255,255,.03)";
-const BORDER = "#1e2b4a";
+const CARD = "#ffffff";
+const BORDER = "#e3e8f2";
 
 function Sprite({ id, size = 30 }: { id: string; size?: number }) {
   const m = MON[id];
@@ -43,15 +43,15 @@ function MonList({ meta, maxMon }: { meta: Meta; maxMon: number }) {
         const pct = Math.round((mm.count / meta.total) * 100);
         return (
           <div key={mm.speciesId} style={{ display: "flex", alignItems: "center", gap: 8, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "5px 10px" }}>
-            <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#a855f7" : "#7c8bb5", minWidth: 22 }}>#{i + 1}</span>
+            <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#a855f7" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
             <Sprite id={mm.speciesId} size={30} />
-            <span style={{ fontSize: "0.86rem", fontWeight: 600, minWidth: 88, color: "#e2e8f0" }}>
-              {m?.shadow && <span style={{ color: "#c4a6ff" }}>그림자 </span>}{m?.ko || mm.speciesId}
+            <span style={{ fontSize: "0.86rem", fontWeight: 600, minWidth: 88, color: "#0f172a" }}>
+              {m?.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{m?.ko || mm.speciesId}
             </span>
-            <div style={{ flex: 1, height: 8, background: "rgba(255,255,255,.06)", borderRadius: 4, overflow: "hidden" }}>
+            <div style={{ flex: 1, height: 8, background: "#e5eaf3", borderRadius: 4, overflow: "hidden" }}>
               <div style={{ width: `${Math.round((mm.count / maxMon) * 100)}%`, height: "100%", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)" }} />
             </div>
-            <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#6c8cff", minWidth: 38, textAlign: "right" }}>{pct}%</span>
+            <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#3b5bdb", minWidth: 38, textAlign: "right" }}>{pct}%</span>
           </div>
         );
       })}
@@ -62,21 +62,21 @@ function MonList({ meta, maxMon }: { meta: Meta; maxMon: number }) {
 function DeckList({ meta, maxDeck }: { meta: Meta; maxDeck: number }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <div style={{ fontSize: "0.72rem", color: "#5f6f92", marginBottom: 2 }}>전체 대전 중 이 덱(파티)을 만난 비율</div>
+      <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 2 }}>전체 대전 중 이 덱(파티)을 만난 비율</div>
       {meta.top_decks.slice(0, 25).map((d, i) => {
         const pct = Math.round((d.count / meta.total) * 100);
         const names = d.deck.map((id) => MON[id]?.ko || id).join(" · ");
         return (
           <div key={i} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "7px 10px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#a855f7" : "#7c8bb5", minWidth: 22 }}>#{i + 1}</span>
+              <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#a855f7" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
               <div style={{ display: "flex", gap: 2 }}>{d.deck.map((id) => <Sprite key={id} id={id} size={32} />)}</div>
               <span style={{ marginLeft: "auto", fontSize: "1rem", fontWeight: 800, color: "#a855f7" }}>{pct}%</span>
             </div>
-            <div style={{ height: 6, background: "rgba(255,255,255,.06)", borderRadius: 3, margin: "6px 0 4px", overflow: "hidden" }}>
+            <div style={{ height: 6, background: "#e5eaf3", borderRadius: 3, margin: "6px 0 4px", overflow: "hidden" }}>
               <div style={{ width: `${Math.round((d.count / maxDeck) * 100)}%`, height: "100%", background: "linear-gradient(90deg,#7c3aed,#a855f7)" }} />
             </div>
-            <div style={{ fontSize: "0.72rem", color: "#8ea0c4", lineHeight: 1.4 }}>{names}</div>
+            <div style={{ fontSize: "0.72rem", color: "#64748b", lineHeight: 1.4 }}>{names}</div>
           </div>
         );
       })}
@@ -121,24 +121,24 @@ export default function GblMeta() {
     padding: "7px 14px", borderRadius: 18, cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
     border: `1px solid ${on ? (cup ? "#7c3aed" : "#4f8cff") : BORDER}`,
     background: on ? (cup ? "rgba(124,58,237,.18)" : "rgba(79,140,255,.16)") : CARD,
-    color: on ? (cup ? "#c4a6ff" : "#9db4ff") : "#8ea0c4",
+    color: on ? (cup ? "#7c3aed" : "#3b5bdb") : "#64748b",
   });
-  const h2: React.CSSProperties = { fontSize: "1rem", fontWeight: 800, margin: "0 0 10px", color: "#e2e8f0" };
+  const h2: React.CSSProperties = { fontSize: "1rem", fontWeight: 800, margin: "0 0 10px", color: "#0f172a" };
 
   return (
     <div style={{
       minHeight: "100dvh",
-      background: "radial-gradient(1000px 500px at 50% -10%, #1a2a5c 0%, transparent 60%), linear-gradient(180deg,#070b18,#0b1226)",
+      background: "radial-gradient(1000px 500px at 50% -10%, #dbe4ff 0%, transparent 60%), linear-gradient(180deg,#f7f9fd,#eef2fb)",
       padding: "1.4rem 1rem 4rem",
     }}>
       <div style={{ maxWidth: wide ? 1040 : 760, margin: "0 auto" }}>
         <div style={{ marginBottom: 6, display: "flex", alignItems: "center" }}>
-          <Link href="/gbl" style={{ fontSize: "0.82rem", color: "#8db4ff", textDecoration: "none" }}>← GBL Note</Link>
-          <Link href="/gbl/app" style={{ marginLeft: "auto", fontSize: "0.82rem", color: "#8db4ff", textDecoration: "none", fontWeight: 700 }}>📝 내 기록 →</Link>
+          <Link href="/gbl" style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>← GBL Note</Link>
+          <Link href="/gbl/app" style={{ marginLeft: "auto", fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>📝 내 기록 →</Link>
         </div>
-        <h1 style={{ margin: "0.2rem 0 0.2rem", fontSize: "1.4rem", fontWeight: 900, color: "#fff" }}>실측 GBL 메타</h1>
-        <p style={{ margin: "0 0 1rem", fontSize: "0.84rem", color: "#8ea0c4", lineHeight: 1.6 }}>
-          시뮬레이션이 아닌, 유저들이 <b style={{ color: "#c7d2fe" }}>실제로 만난 상대</b> 데이터 집계. 지금 리그에서 뭘 제일 많이 만나는지.
+        <h1 style={{ margin: "0.2rem 0 0.2rem", fontSize: "1.4rem", fontWeight: 900, color: "#0f172a" }}>실측 GBL 메타</h1>
+        <p style={{ margin: "0 0 1rem", fontSize: "0.84rem", color: "#64748b", lineHeight: 1.6 }}>
+          시뮬레이션이 아닌, 유저들이 <b style={{ color: "#334155" }}>실제로 만난 상대</b> 데이터 집계. 지금 리그에서 뭘 제일 많이 만나는지.
         </p>
 
         <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
@@ -149,9 +149,9 @@ export default function GblMeta() {
         </div>
 
         {loading ? (
-          <div style={{ textAlign: "center", color: "#5f6f92", padding: "3rem" }}>불러오는 중…</div>
+          <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem" }}>불러오는 중…</div>
         ) : !meta || meta.total === 0 ? (
-          <div style={{ textAlign: "center", color: "#5f6f92", padding: "2.5rem", fontSize: "0.9rem" }}>
+          <div style={{ textAlign: "center", color: "#94a3b8", padding: "2.5rem", fontSize: "0.9rem" }}>
             이 조건의 집계 데이터가 아직 부족합니다. 기록이 쌓이면 채워집니다.
           </div>
         ) : wide ? (
@@ -174,7 +174,7 @@ export default function GblMeta() {
                 <button key={k} onClick={() => setView(k)}
                   style={{ flex: 1, padding: "9px", borderRadius: 10, cursor: "pointer", fontWeight: 700, fontSize: "0.86rem",
                     border: `1px solid ${view === k ? "#4f8cff" : BORDER}`,
-                    background: view === k ? "rgba(79,140,255,.16)" : CARD, color: view === k ? "#9db4ff" : "#8ea0c4" }}>{label}</button>
+                    background: view === k ? "rgba(79,140,255,.16)" : CARD, color: view === k ? "#3b5bdb" : "#64748b" }}>{label}</button>
               ))}
             </div>
             {view === "mon" ? <MonList meta={meta} maxMon={maxMon} /> : <DeckList meta={meta} maxDeck={maxDeck} />}
@@ -183,8 +183,8 @@ export default function GblMeta() {
 
         {meta && meta.total > 0 && <><AdSlot /><CoupangAd /></>}
 
-        <div style={{ textAlign: "center", marginTop: 26, fontSize: "0.72rem", color: "#5f6f92" }}>
-          <Link href="/gbl/privacy" style={{ color: "#8ea0c4", textDecoration: "none" }}>개인정보처리방침</Link>
+        <div style={{ textAlign: "center", marginTop: 26, fontSize: "0.72rem", color: "#94a3b8" }}>
+          <Link href="/gbl/privacy" style={{ color: "#64748b", textDecoration: "none" }}>개인정보처리방침</Link>
         </div>
       </div>
     </div>

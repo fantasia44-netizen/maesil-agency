@@ -35,21 +35,21 @@ export default function GblReset() {
   };
 
   const input: React.CSSProperties = {
-    width: "100%", padding: "13px 15px", border: "1px solid #2a3550", borderRadius: 10,
-    fontSize: "1rem", boxSizing: "border-box", background: "#0f1628", color: "#e2e8f0", outline: "none",
+    width: "100%", padding: "13px 15px", border: "1px solid #dbe2ee", borderRadius: 10,
+    fontSize: "1rem", boxSizing: "border-box", background: "#ffffff", color: "#0f172a", outline: "none",
   };
 
   return (
     <div style={{ minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center",
-      background: "linear-gradient(160deg,#0b1020,#131c33)", padding: "1.5rem" }}>
+      background: "linear-gradient(160deg,#f7f9fd,#eef2fb)", padding: "1.5rem" }}>
       <div style={{ width: "100%", maxWidth: 380 }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <div style={{ fontSize: "2.2rem" }}>🔑</div>
-          <h1 style={{ margin: "6px 0 4px", fontSize: "1.35rem", fontWeight: 900, color: "#fff" }}>비밀번호 재설정</h1>
+          <h1 style={{ margin: "6px 0 4px", fontSize: "1.35rem", fontWeight: 900, color: "#0f172a" }}>비밀번호 재설정</h1>
         </div>
 
         {done ? (
-          <p style={{ textAlign: "center", color: "#86efac", fontSize: "0.95rem" }}>
+          <p style={{ textAlign: "center", color: "#16a34a", fontSize: "0.95rem" }}>
             ✅ 변경됐습니다. 로그인 화면으로 이동합니다…
           </p>
         ) : (
@@ -59,7 +59,7 @@ export default function GblReset() {
             <input style={input} type="password" placeholder="새 비밀번호 확인" value={pw2}
               onChange={(e) => setPw2(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
               autoComplete="new-password" />
-            {err && <div style={{ color: "#fca5a5", fontSize: "0.82rem" }}>{err}</div>}
+            {err && <div style={{ color: "#dc2626", fontSize: "0.82rem" }}>{err}</div>}
             <button onClick={submit} disabled={busy}
               style={{ padding: "13px", borderRadius: 10, border: "none", background: "#3b5bdb", color: "#fff",
                 cursor: "pointer", fontWeight: 800, fontSize: "0.98rem", marginTop: 4 }}>
