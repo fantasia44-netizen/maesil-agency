@@ -58,7 +58,7 @@ export default function GblLogin() {
             GBL 데스노트
           </h1>
           <p style={{ margin: 0, fontSize: "0.83rem", color: "#8ea0c4" }}>
-            마스터리그 상대를 기록하고, 다시 만나면 5초 안에 저격.
+            포켓몬GO 배틀리그를 기억하는 노트 — 다시 만난 상대, 5초 안에 저격.
           </p>
         </div>
 

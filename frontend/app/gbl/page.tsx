@@ -7,15 +7,15 @@ import AdSlot from "./AdSlot";
 
 // ── 데이터셋 타입 ──────────────────────────────────────────────────────
 type Move = { ko: string; en: string; type: string; kind: string };
-type Mon = { id: string; dex: number; ko: string; en: string; types: string[]; shadow: boolean; fast: string[]; charged: string[] };
+type Mon = { id: string; dex: number; ko: string; en: string; types: string[]; shadow: boolean; fast: string[]; charged: string[]; sprite?: string };
 type League = "great" | "ultra" | "master";
 type Dataset = { top_n: number; moves: Record<string, Move>; leagues: Record<League, { count: number; pokemon: Mon[] }> };
 const DS = DATA as unknown as Dataset;
 const MOVES = DS.moves;
 const LEAGUE_META: { key: League; label: string }[] = [
-  { key: "great", label: "그레이트" },
-  { key: "ultra", label: "울트라" },
-  { key: "master", label: "마스터" },
+  { key: "great", label: "슈퍼리그" },
+  { key: "ultra", label: "하이퍼리그" },
+  { key: "master", label: "마스터리그" },
 ];
 const LEAGUE_KEY = "gbl_league";
 // 모든 리그 union → 렌더용 조회맵 (기록은 어느 리그든 speciesId로 조회)
@@ -60,9 +60,9 @@ function MoveChip({ id }: { id: string }) {
   );
 }
 
-function MonSprite({ dex, size = 44 }: { dex: number; size?: number }) {
+function MonSprite({ mon, size = 44 }: { mon: Mon; size?: number }) {
   return (
-    <img src={sprite(dex)} alt="" width={size} height={size}
+    <img src={mon.sprite || sprite(mon.dex)} alt="" width={size} height={size}
       loading="lazy"
       style={{ imageRendering: "pixelated", flexShrink: 0 }}
       onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }} />
@@ -100,7 +100,7 @@ function PokemonPicker({ value, manual, pool, onPick, onManual }: {
   if (selected) {
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <MonSprite dex={selected.dex} size={40} />
+        <MonSprite mon={selected} size={40} />
         <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>
           {selected.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{selected.ko}
         </span>
@@ -131,7 +131,7 @@ function PokemonPicker({ value, manual, pool, onPick, onManual }: {
             <button key={m.id} onClick={() => { onPick(m.id); setOpen(false); setQ(""); }}
               style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "6px 10px",
                 background: "none", border: "none", borderBottom: "1px solid #f1f5f9", cursor: "pointer", textAlign: "left" }}>
-              <MonSprite dex={m.dex} size={32} />
+              <MonSprite mon={m} size={32} />
               <span style={{ fontSize: "0.88rem", fontWeight: 600 }}>
                 {m.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{m.ko}
               </span>
@@ -232,7 +232,7 @@ function MatchCard({ m, onDelete }: { m: Match; onDelete: (id: string) => void }
           return (
             <div key={i} style={{ background: "#f8fafc", borderRadius: 10, padding: "6px 8px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                {sp ? <MonSprite dex={sp.dex} size={34} /> : <span style={{ width: 34, textAlign: "center" }}>❔</span>}
+                {sp ? <MonSprite mon={sp} size={34} /> : <span style={{ width: 34, textAlign: "center" }}>❔</span>}
                 <span style={{ fontWeight: 700, fontSize: "0.85rem" }}>
                   {sp ? (<>{sp.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{sp.ko}</>) : (tm.manual || "?")}
                 </span>
