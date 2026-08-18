@@ -1,0 +1,133 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { apiFetch } from "../../../lib/api";
+import DATA from "../gbl_data.json";
+import AdSlot from "../AdSlot";
+import CoupangAd from "../CoupangAd";
+
+type Mon = { id: string; dex: number; ko: string; en: string; types: string[]; shadow: boolean; sprite?: string };
+type League = "great" | "ultra" | "master";
+const DS = DATA as unknown as { leagues: Record<League, { pokemon: Mon[] }> };
+const MON: Record<string, Mon> = {};
+for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
+const spriteUrl = (m?: Mon) => m ? (m.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${m.dex}.png`) : "";
+
+const LEAGUES: { key: League; label: string }[] = [
+  { key: "great", label: "슈퍼리그" }, { key: "ultra", label: "하이퍼리그" }, { key: "master", label: "마스터리그" },
+];
+const PERIODS: { d: number; label: string }[] = [{ d: 7, label: "최근 7일" }, { d: 30, label: "최근 30일" }, { d: 0, label: "전체" }];
+
+type MetaMon = { speciesId: string; count: number };
+type MetaDeck = { deck: string[]; count: number; wins: number; losses: number };
+type Meta = { total: number; wins: number; losses: number; top_mons: MetaMon[]; top_decks: MetaDeck[] };
+
+function Sprite({ id, size = 30 }: { id: string; size?: number }) {
+  const m = MON[id];
+  return <img src={spriteUrl(m)} alt={m?.ko || id} width={size} height={size}
+    style={{ imageRendering: "pixelated" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }} />;
+}
+const rate = (w: number, l: number) => (w + l > 0 ? Math.round((w / (w + l)) * 100) : null);
+const rateColor = (r: number | null) => r == null ? "#94a3b8" : r >= 60 ? "#15803d" : r >= 45 ? "#c2410c" : "#b91c1c";
+
+export default function GblMeta() {
+  const [league, setLeague] = useState<League>("master");
+  const [days, setDays] = useState(30);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    apiFetch<Meta>(`/api/gbl/meta?league=${league}&days=${days}`, {}, 20000)
+      .then((d) => { if (alive) setMeta(d); })
+      .catch(() => { if (alive) setMeta(null); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [league, days]);
+
+  const pill = (on: boolean): React.CSSProperties => ({
+    padding: "7px 14px", borderRadius: 18, cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
+    border: on ? "1.5px solid #3b5bdb" : "1px solid #e2e8f0", background: on ? "#eef2ff" : "#fff", color: on ? "#3b5bdb" : "#64748b",
+  });
+
+  const maxMon = useMemo(() => meta?.top_mons?.[0]?.count || 1, [meta]);
+
+  return (
+    <div style={{ maxWidth: 760, margin: "0 auto", padding: "1.4rem 1rem 4rem" }}>
+      <div style={{ marginBottom: 6 }}>
+        <Link href="/gbl" style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>← GBL Note</Link>
+      </div>
+      <h1 style={{ margin: "0.2rem 0 0.2rem", fontSize: "1.4rem", fontWeight: 900 }}>실측 GBL 메타</h1>
+      <p style={{ margin: "0 0 1rem", fontSize: "0.84rem", color: "#64748b", lineHeight: 1.6 }}>
+        시뮬레이션이 아닌, 유저들이 <b>실제로 만난 상대</b> 데이터 집계. 지금 리그에서 뭘 제일 많이 만나는지.
+      </p>
+
+      <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
+        {LEAGUES.map(({ key, label }) => <button key={key} style={pill(league === key)} onClick={() => setLeague(key)}>{label}</button>)}
+      </div>
+      <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
+        {PERIODS.map(({ d, label }) => <button key={d} style={pill(days === d)} onClick={() => setDays(d)}>{label}</button>)}
+      </div>
+
+      {loading ? (
+        <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem" }}>불러오는 중…</div>
+      ) : !meta || meta.total === 0 ? (
+        <div style={{ textAlign: "center", color: "#94a3b8", padding: "2.5rem", fontSize: "0.9rem" }}>
+          이 조건의 집계 데이터가 아직 부족합니다. 기록이 쌓이면 채워집니다.
+        </div>
+      ) : (
+        <>
+          <div style={{ fontSize: "0.82rem", color: "#64748b", marginBottom: 16 }}>
+            집계 대전 <b style={{ color: "#0f172a" }}>{meta.total.toLocaleString()}</b>판
+          </div>
+
+          {/* 픽업률 */}
+          <h2 style={{ fontSize: "1rem", fontWeight: 800, margin: "0 0 10px" }}>🔥 픽업률 TOP (많이 만난 포켓몬)</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 26 }}>
+            {meta.top_mons.slice(0, 20).map((mm, i) => {
+              const m = MON[mm.speciesId];
+              const pct = Math.round((mm.count / meta.total) * 100);
+              return (
+                <div key={mm.speciesId} style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: "1px solid #eef2f0", borderRadius: 10, padding: "5px 10px" }}>
+                  <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#7c3aed" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
+                  <Sprite id={mm.speciesId} size={30} />
+                  <span style={{ fontSize: "0.86rem", fontWeight: 600, minWidth: 90 }}>
+                    {m?.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{m?.ko || mm.speciesId}
+                  </span>
+                  <div style={{ flex: 1, height: 8, background: "#f1f5f9", borderRadius: 4, overflow: "hidden" }}>
+                    <div style={{ width: `${Math.round((mm.count / maxMon) * 100)}%`, height: "100%", background: "#3b5bdb" }} />
+                  </div>
+                  <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#3b5bdb", minWidth: 38, textAlign: "right" }}>{pct}%</span>
+                </div>
+              );
+            })}
+          </div>
+
+          <AdSlot />
+
+          {/* 덱 순위 */}
+          <h2 style={{ fontSize: "1rem", fontWeight: 800, margin: "8px 0 10px" }}>🏆 많이 만난 덱 TOP</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {meta.top_decks.slice(0, 20).map((d, i) => {
+              const r = rate(d.wins, d.losses);
+              return (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: "1px solid #eef2f0", borderRadius: 10, padding: "6px 10px" }}>
+                  <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#7c3aed" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
+                  <div style={{ display: "flex", gap: 2 }}>{d.deck.map((id) => <Sprite key={id} id={id} size={30} />)}</div>
+                  <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                    <div style={{ fontSize: "0.88rem", fontWeight: 800 }}>{d.count}회</div>
+                    <div style={{ fontSize: "0.7rem", color: rateColor(r) }}>상대 승률 {r ?? "-"}%</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <CoupangAd />
+        </>
+      )}
+    </div>
+  );
+}

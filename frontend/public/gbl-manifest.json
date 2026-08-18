@@ -2,7 +2,7 @@
   "name": "GBL Note",
   "short_name": "GBL Note",
   "description": "포켓몬GO 배틀리그 상대를 기록하고 다시 만나면 5초 안에 저격",
-  "start_url": "/gbl",
+  "start_url": "/gbl/app",
   "scope": "/gbl",
   "display": "standalone",
   "orientation": "portrait",

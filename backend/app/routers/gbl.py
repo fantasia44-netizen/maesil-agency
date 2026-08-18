@@ -124,6 +124,46 @@ def delete_match(match_id: str, user: UserContext = Depends(get_current_user)) -
         raise HTTPException(500, "기록 삭제 실패")
 
 
+# ── 공개 실측 메타 (로그인 불필요, 익명 집계) ──────────────────────────
+@router.get("/meta")
+def public_meta(league: str = "master", days: int = 30) -> dict:
+    """전체 유저가 만난 상대 덱/포켓몬 집계. 개인 식별정보 없음(익명).
+    days>0이면 최근 N일, 0이면 전체."""
+    db = _db()
+    try:
+        q = db.table("gbl_matches").select("team_json, result, played_at").eq("league", league)
+        if days and days > 0:
+            since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+            q = q.gte("played_at", since)
+        rows = q.limit(20000).execute().data or []
+    except Exception as e:
+        logger.error("gbl meta 실패: %s", e)
+        raise HTTPException(500, "메타 조회 실패")
+
+    total = len(rows)
+    wins = sum(1 for r in rows if r.get("result") == "win")
+    losses = sum(1 for r in rows if r.get("result") == "loss")
+    mon_count: Counter = Counter()
+    deck_count: Counter = Counter()
+    deck_wl: dict = {}
+    for r in rows:
+        ids = [t.get("speciesId") for t in (r.get("team_json") or []) if t.get("speciesId")]
+        for sid in ids:
+            mon_count[sid] += 1
+        key = "|".join(sorted(ids)) if ids else ""
+        if key:
+            deck_count[key] += 1
+            wl = deck_wl.setdefault(key, [0, 0])
+            if r.get("result") == "win": wl[0] += 1
+            elif r.get("result") == "loss": wl[1] += 1
+    top_mons = [{"speciesId": s, "count": c} for s, c in mon_count.most_common(30)]
+    top_decks = [{"deck": k.split("|"), "count": c,
+                  "wins": deck_wl.get(k, [0, 0])[0], "losses": deck_wl.get(k, [0, 0])[1]}
+                 for k, c in deck_count.most_common(30)]
+    return {"league": league, "days": days, "total": total, "wins": wins, "losses": losses,
+            "top_mons": top_mons, "top_decks": top_decks}
+
+
 # ── 관리자(super_admin) 전용 — GBL 서비스 현황 ──────────────────────────
 @router.get("/admin/stats")
 def admin_stats(admin: UserContext = Depends(require_admin)) -> dict:

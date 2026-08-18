@@ -42,7 +42,7 @@ export default function GoogleButton({ onError }: { onError?: (msg: string) => v
         callback: async (resp: any) => {
           try {
             await gblGoogle(resp.credential);
-            router.push("/gbl");
+            router.push("/gbl/app");
           } catch (e) {
             onError?.(e instanceof Error ? e.message : "구글 로그인 실패");
           }

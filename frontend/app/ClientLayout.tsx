@@ -71,31 +71,31 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const [user, setUser] = useState<StoredUser | null>(null);
   const [ready, setReady] = useState(false);
 
-  // GBL '앱'(공개 서비스) 경로만 정밀 판정 — /gbl-admin 같은 에이전시 화면은 제외
-  const isGblApp = pathname === "/gbl" || pathname.startsWith("/gbl/");
+  // GBL 섹션(랜딩·로그인·메타·앱) = 에이전시 헤더 없이 렌더. /gbl-admin은 제외(에이전시).
+  const isGblSection = pathname === "/gbl" || pathname.startsWith("/gbl/");
+  const gblNeedsAuth = pathname === "/gbl/app" || pathname.startsWith("/gbl/app/");
 
   useEffect(() => {
-    const gblPublic = ["/gbl/login", "/gbl/reset", "/gbl/privacy"].some(p => pathname.startsWith(p));
-    const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p)) || gblPublic;
+    // 공개: 에이전시 공개경로 + GBL 섹션 중 로그인 불필요(랜딩·로그인·메타·개인정보)
+    const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p)) || (isGblSection && !gblNeedsAuth);
     const token = getToken();
 
     if (!token && !isPublic) {
-      // GBL 앱 경로면 GBL 로그인으로, 그 외엔 에이전시 웰컴으로
-      router.replace(isGblApp ? "/gbl/login" : "/welcome");
+      router.replace(gblNeedsAuth ? "/gbl/login" : "/welcome");
       return;
     }
     const u = getUser();
     // gbl 유저는 에이전시 화면(관리자 포함) 접근 차단 — 항상 GBL 앱으로
-    if (token && u?.role === "gbl" && !isGblApp) {
-      router.replace("/gbl");
+    if (token && u?.role === "gbl" && !isGblSection) {
+      router.replace("/gbl/app");
       return;
     }
     setUser(u);
     setReady(true);
   }, [pathname]);
 
-  // 로그인 페이지 / GBL 전용 앱 화면 — 에이전시 헤더 없이 자체 chrome로 렌더
-  if (PUBLIC_PATHS.some(p => pathname.startsWith(p)) || isGblApp) {
+  // 로그인/랜딩/메타/앱 — GBL 섹션은 에이전시 헤더 없이 자체 chrome로 렌더
+  if (PUBLIC_PATHS.some(p => pathname.startsWith(p)) || isGblSection) {
     return <>{children}</>;
   }
 

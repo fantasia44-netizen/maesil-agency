@@ -33,7 +33,7 @@ export default function GblLogin() {
     try {
       if (mode === "login") await login(email.trim(), pw);
       else await gblSignup(email.trim(), pw, name.trim() || undefined);
-      router.push("/gbl");
+      router.push("/gbl/app");
     } catch (e) {
       setErr(e instanceof Error ? e.message : "실패했습니다.");
     } finally { setBusy(false); }
