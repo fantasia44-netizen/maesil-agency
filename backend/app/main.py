@@ -219,6 +219,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# ── gbl 유저 샌드박스 ──────────────────────────────────────────────────
+# 공개 가입(role='gbl')은 /api/gbl·/api/auth 외 모든 API 접근 차단(서버측 방어).
+# 프론트 라우팅과 무관하게 토큰 role로 게이트 → chat/cs 등 무(無)admin/tenant
+# 게이트 라우터에 gbl 유저가 접근하는 것을 원천 차단.
+_GBL_ALLOWED = ("/api/gbl", "/api/auth")
+
+
+@app.middleware("http")
+async def _gbl_sandbox(request, call_next):
+    path = request.url.path
+    if path.startswith("/api/") and not path.startswith(_GBL_ALLOWED):
+        auth = request.headers.get("authorization", "")
+        if auth.lower().startswith("bearer "):
+            try:
+                from app.auth import decode_token
+                if decode_token(auth.split(" ", 1)[1].strip()).get("role") == "gbl":
+                    from starlette.responses import JSONResponse
+                    return JSONResponse({"detail": "이 계정은 GBL 앱 전용입니다."}, status_code=403)
+            except Exception:
+                pass  # 토큰 오류는 각 라우트 인증이 처리
+    return await call_next(request)
+
 app.include_router(health.router)
 app.include_router(auth_router.router)
 app.include_router(secrets_router.router)

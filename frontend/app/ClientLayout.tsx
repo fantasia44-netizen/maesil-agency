@@ -72,19 +72,26 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p));
+    const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p)) || pathname.startsWith("/gbl/login");
     const token = getToken();
 
     if (!token && !isPublic) {
-      router.replace("/welcome");
+      // GBL 앱 경로면 GBL 로그인으로, 그 외엔 에이전시 웰컴으로
+      router.replace(pathname.startsWith("/gbl") ? "/gbl/login" : "/welcome");
       return;
     }
-    setUser(getUser());
+    const u = getUser();
+    // gbl 유저는 에이전시 화면 접근 차단 — 항상 GBL로
+    if (token && u?.role === "gbl" && !pathname.startsWith("/gbl")) {
+      router.replace("/gbl");
+      return;
+    }
+    setUser(u);
     setReady(true);
   }, [pathname]);
 
-  // 로그인 페이지 — 헤더 없이 렌더
-  if (PUBLIC_PATHS.some(p => pathname.startsWith(p))) {
+  // 로그인 페이지 / GBL 전용 화면 — 에이전시 헤더 없이 자체 chrome로 렌더
+  if (PUBLIC_PATHS.some(p => pathname.startsWith(p)) || pathname.startsWith("/gbl")) {
     return <>{children}</>;
   }
 

@@ -26,7 +26,7 @@ export function hasToken(): boolean {
 // ── 유저 정보 ────────────────────────────────────────────────────────
 export type StoredUser = {
   email: string;
-  role: "super_admin" | "customer";
+  role: "super_admin" | "customer" | "gbl";
   display_name: string | null;
   insight_operator_id: string | null;
   tenant_id?: string | null;
@@ -78,11 +78,12 @@ export async function apiFetch<T = unknown>(
     clearTimeout(timer);
   }
 
-  // 401 → 로그인 페이지로
+  // 401 → 로그인 페이지로 (GBL 경로면 GBL 로그인으로 분기)
   if (res.status === 401) {
     clearToken();
     if (typeof window !== "undefined") {
-      window.location.href = "/login";
+      const onGbl = window.location.pathname.startsWith("/gbl");
+      window.location.href = onGbl ? "/gbl/login" : "/login";
     }
     throw new Error("인증이 필요합니다.");
   }
@@ -140,6 +141,33 @@ export async function signup(
     display_name: data.display_name,
     insight_operator_id: data.insight_operator_id ?? null,
     tenant_id: data.tenant_id ?? null,
+  };
+  setUser(user);
+  return user;
+}
+
+// ── GBL 앱 전용 가입 ─────────────────────────────────────────────────
+export async function gblSignup(
+  email: string,
+  password: string,
+  display_name?: string,
+): Promise<StoredUser> {
+  const res = await fetch(`${BASE}/api/auth/gbl-signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, display_name: display_name || undefined }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "가입 실패");
+  }
+  const data = await res.json();
+  setToken(data.token);
+  const user: StoredUser = {
+    email: data.email,
+    role: data.role,
+    display_name: data.display_name ?? null,
+    insight_operator_id: null,
   };
   setUser(user);
   return user;

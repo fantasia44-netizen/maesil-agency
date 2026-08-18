@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { apiFetch } from "../../lib/api";
+import { apiFetch, logout } from "../../lib/api";
 import DATA from "./gbl_master.json";
+import AdSlot from "./AdSlot";
 
 // ── 데이터셋 타입 ──────────────────────────────────────────────────────
 type Move = { ko: string; en: string; type: string; kind: string };
@@ -317,8 +318,14 @@ export default function GblPage() {
       )}
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-        <h1 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800 }}>GBL 상대 노트</h1>
-        <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>마스터리그 · {matches.length}판 기록</span>
+        <span style={{ fontSize: "1.3rem" }}>📓</span>
+        <h1 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800 }}>GBL 데스노트</h1>
+        <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>마스터리그 · {matches.length}판</span>
+        <button onClick={logout}
+          style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#94a3b8", background: "none",
+            border: "1px solid #e2e8f0", borderRadius: 6, padding: "4px 10px", cursor: "pointer" }}>
+          로그아웃
+        </button>
       </div>
 
       {/* 탭 */}
@@ -416,6 +423,9 @@ export default function GblPage() {
           </div>
         </div>
       )}
+
+      {/* 하단 광고 (AdSense — env 설정 시에만 노출) */}
+      <AdSlot />
     </div>
   );
 }

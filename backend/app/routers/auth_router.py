@@ -339,6 +339,54 @@ def signup(body: SignupRequest) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────────
+# GBL 앱 공개 가입 (에이전시와 분리, tenant 없음)
+# ─────────────────────────────────────────────────────────────────
+
+class GblSignupRequest(BaseModel):
+    email: str
+    password: str
+    display_name: str | None = None
+
+
+@router.post("/gbl-signup")
+def gbl_signup(body: GblSignupRequest) -> dict:
+    """포켓몬GO GBL 앱 셀프 가입 — role='gbl' 유저 생성 후 자동 로그인.
+    에이전시 워크스페이스(tenant)와 완전 분리 — GBL 기능만 접근 가능."""
+    email = (body.email or "").lower().strip()
+    if not email or "@" not in email:
+        raise HTTPException(400, "올바른 이메일을 입력하세요.")
+    if len(body.password or "") < 8:
+        raise HTTPException(400, "비밀번호는 8자 이상이어야 합니다.")
+    if get_user_by_email(email):
+        raise HTTPException(409, "이미 사용 중인 이메일입니다.")
+
+    now = _now()
+    try:
+        u_resp = _users_table().insert({
+            "email": email,
+            "password_hash": hash_password(body.password),
+            "role": "gbl",
+            "display_name": (body.display_name or email.split("@")[0]),
+            "is_active": True,
+            "created_at": now, "updated_at": now,
+        }).execute()
+        user = (u_resp.data or [None])[0]
+        if not user:
+            raise RuntimeError("user insert returned no row")
+    except Exception as e:
+        msg = str(e)
+        if "duplicate" in msg.lower() or "unique" in msg.lower():
+            raise HTTPException(409, "이미 사용 중인 이메일입니다.")
+        raise HTTPException(500, "계정 생성 실패")
+
+    token = create_token(user)
+    return {
+        "ok": True, "token": token, "email": user["email"], "role": user["role"],
+        "display_name": user.get("display_name"),
+    }
+
+
+# ─────────────────────────────────────────────────────────────────
 # 로그인
 # ─────────────────────────────────────────────────────────────────
 
