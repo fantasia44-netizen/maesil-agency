@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 // gbl.maesil.net 공개 SEO 사이트맵. 검색엔진이 리그별 실측 메타를 발견하도록.
-const BASE = "https://gbl.maesil.net";
+const BASE = "https://gblnote.com";
 const LEAGUES = ["master", "great", "ultra"];
 
 export default function sitemap(): MetadataRoute.Sitemap {

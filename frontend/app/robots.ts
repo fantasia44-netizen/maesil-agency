@@ -4,7 +4,7 @@ import type { MetadataRoute } from "next";
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: { userAgent: "*", allow: "/" },
-    sitemap: "https://gbl.maesil.net/sitemap.xml",
-    host: "https://gbl.maesil.net",
+    sitemap: "https://gblnote.com/sitemap.xml",
+    host: "https://gblnote.com",
   };
 }

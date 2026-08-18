@@ -7,7 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 // ClientLayout이 GBL 전용 chrome로 렌더된다(리라이트면 pathname이 "/"로 남아 깨짐).
 export function middleware(req: NextRequest) {
   const host = (req.headers.get("host") || "").toLowerCase();
-  if (!host.startsWith("gbl.")) return NextResponse.next();
+  // GBL 전용 호스트: gbl.maesil.net(서브도메인) + 전용 도메인 gblnote.com(www 포함)
+  const isGblHost = host.startsWith("gbl.") || host === "gblnote.com" || host === "www.gblnote.com";
+  if (!isGblHost) return NextResponse.next();
 
   const { pathname } = req.nextUrl;
   // GBL '앱' 경로(/gbl, /gbl/*)·정적 리소스·파일만 통과.
