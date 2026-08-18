@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { apiFetch, logout, getUser } from "../../../lib/api";
 import DATA from "../gbl_data.json";
 import AdSlot from "../AdSlot";
@@ -437,8 +438,12 @@ export default function GblPage() {
         <span style={{ fontSize: "1.3rem" }}>📓</span>
         <h1 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800 }}>GBL Note</h1>
         <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{leagueCount}판</span>
+        <Link href="/gbl/meta"
+          style={{ marginLeft: "auto", fontSize: "0.74rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>
+          🌐 전체 메타
+        </Link>
         <button onClick={logout}
-          style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#94a3b8", background: "none",
+          style={{ fontSize: "0.72rem", color: "#94a3b8", background: "none",
             border: "1px solid #e2e8f0", borderRadius: 6, padding: "4px 10px", cursor: "pointer" }}>
           로그아웃
         </button>
