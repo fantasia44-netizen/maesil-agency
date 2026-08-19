@@ -30,7 +30,8 @@ const spriteUrl = (m?: Mon) =>
 const nameOf = (id: string) => MON[id]?.ko || id;
 const moveKo = (id: string) => MOVES[id]?.ko || id;
 
-type Detail = { id: string; score: number; tier: string; moveset: string[]; counters: string[]; wins: string[]; stats: Record<string, number> };
+type Opp = { id: string; r: number };
+type Detail = { id: string; score: number; tier: string; moveset: string[]; counters: Opp[]; wins: Opp[]; scores: number[]; stats: Record<string, number> };
 const DET = DETAIL as unknown as Record<string, Detail[]>;
 const findDetail = (league: string, id: string) => (DET[league] || []).find((d) => d.id === id);
 
@@ -119,18 +120,22 @@ function MoveChip({ id }: { id: string }) {
   );
 }
 
-// 카운터/매치업 상대 카드(상세로 링크)
-function OppRow({ league, id }: { league: string; id: string }) {
+// 카운터/매치업 상대 카드(상세로 링크). rating = 이 페이지 주인공 기준 배틀 레이팅(500=대등).
+function OppRow({ league, id, rating }: { league: string; id: string; rating: number }) {
   const m = MON[id];
   const types = m?.types || [];
   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
+  const rc = rating >= 500 ? "#16a34a" : "#dc2626";
   return (
     <Link href={`/gbl/pokemon/${league}/${id}`} style={{ textDecoration: "none",
       display: "flex", alignItems: "center", gap: 8, background: `linear-gradient(100deg, ${c1}20, #ffffff 80%)`,
       border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "6px 10px" }}>
       <Sprite id={id} size={32} />
       <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#0f172a" }}>{nameOf(id)}</span>
-      <span style={{ marginLeft: "auto" }}><TypeBadges types={types} /></span>
+      <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ fontSize: "0.72rem", fontWeight: 800, color: rc, background: rc + "1a", padding: "1px 7px", borderRadius: 8 }} title="배틀 레이팅 (500=대등, 높을수록 이 포켓몬이 유리)">{rating}</span>
+        <TypeBadges types={types} />
+      </span>
     </Link>
   );
 }
@@ -216,6 +221,27 @@ export default async function PokemonDetail({ params }: { params: { league: stri
           </>
         )}
 
+        {/* 역할 점수 */}
+        {d.scores && d.scores.length === 6 && (
+          <>
+            <h2 style={h2}>역할 점수</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 7, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "11px 12px" }}>
+              {["선봉", "마무리", "교체", "차지", "공격", "일관성"].map((lb, i) => (
+                <div key={lb} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: "0.74rem", color: "#64748b", minWidth: 34 }}>{lb}</span>
+                  <div style={{ flex: 1, height: 8, background: "#e5eaf3", borderRadius: 4, overflow: "hidden" }}>
+                    <div style={{ width: `${Math.min(100, d.scores[i])}%`, height: "100%", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)" }} />
+                  </div>
+                  <span style={{ fontSize: "0.74rem", fontWeight: 700, color: "#0f172a", minWidth: 38, textAlign: "right" }}>{d.scores[i]}</span>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontSize: "0.72rem", color: "#94a3b8", marginTop: 6, lineHeight: 1.6 }}>
+              선봉=초반 유리 · 마무리=후반 뒷심 · 교체=스왑 대응 · 차지=차지기술 압박 · 공격=딜링 · 일관성=상성 안정성 (0~100)
+            </p>
+          </>
+        )}
+
         <AdSlot />
 
         {/* 카운터 */}
@@ -223,7 +249,7 @@ export default async function PokemonDetail({ params }: { params: { league: stri
         <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>{name}를 상대로 유리한 포켓몬입니다. {name}를 자주 만난다면 아래를 준비하세요.</p>
         {d.counters.length ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {d.counters.map((cid) => <OppRow key={cid} league={params.league} id={cid} />)}
+            {d.counters.map((c) => <OppRow key={c.id} league={params.league} id={c.id} rating={c.r} />)}
           </div>
         ) : <p style={{ fontSize: "0.82rem", color: "#94a3b8" }}>데이터 없음</p>}
 
@@ -232,7 +258,7 @@ export default async function PokemonDetail({ params }: { params: { league: stri
         <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>{name}로 유리하게 상대할 수 있는 포켓몬입니다.</p>
         {d.wins.length ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {d.wins.map((wid) => <OppRow key={wid} league={params.league} id={wid} />)}
+            {d.wins.map((w) => <OppRow key={w.id} league={params.league} id={w.id} rating={w.r} />)}
           </div>
         ) : <p style={{ fontSize: "0.82rem", color: "#94a3b8" }}>데이터 없음</p>}
 

@@ -53,8 +53,11 @@ def main() -> None:
                 "score": round(r.get("score", 0)),
                 "tier": tier_of(r.get("score", 0), mx),
                 "moveset": r.get("moveset", []),
-                "counters": [c["opponent"] for c in (r.get("counters") or [])[:5]],
-                "wins": [c["opponent"] for c in (r.get("matchups") or [])[:5]],
+                # 매치업 레이팅(500=대등, >500 우세, <500 열세)
+                "counters": [{"id": c["opponent"], "r": c["rating"]} for c in (r.get("counters") or [])[:5]],
+                "wins": [{"id": c["opponent"], "r": c["rating"]} for c in (r.get("matchups") or [])[:5]],
+                # 역할 점수 [선봉, 마무리, 교체, 차지, 공격, 일관성] (PvPoke scores 순서)
+                "scores": [round(x, 1) for x in (r.get("scores") or [])],
                 "stats": {k: round(v) for k, v in (r.get("stats") or {}).items()
                           if k in ("atk", "def", "hp", "product")},
             })
@@ -63,7 +66,8 @@ def main() -> None:
         print(f"{league}: {len(mons)}종  tier분포={dict(Counter(m['tier'] for m in mons))}")
 
     missing = {sid for lg in out.values() for m in lg
-               for sid in m["counters"] + m["wins"] + [m["id"]] if sid not in ko}
+               for sid in [c["id"] for c in m["counters"]] + [c["id"] for c in m["wins"]] + [m["id"]]
+               if sid not in ko}
     if missing:
         print(f"⚠️ 한글명 없는 speciesId {len(missing)}개(영문 폴백): {list(missing)[:8]}")
     else:
