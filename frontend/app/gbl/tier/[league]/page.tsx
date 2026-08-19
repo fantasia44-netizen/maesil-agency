@@ -19,7 +19,7 @@ const LEAGUES: Record<string, { ko: string; short: string }> = {
 };
 const LEAGUE_KEYS = Object.keys(LEAGUES);
 
-type Mon = { id: string; dex: number; ko: string; shadow: boolean; sprite?: string };
+type Mon = { id: string; dex: number; ko: string; types: string[]; shadow: boolean; sprite?: string };
 type Move = { ko: string; en: string; type: string; kind: string };
 const DS = DATA as unknown as { moves: Record<string, Move>; leagues: Record<string, { pokemon: Mon[] }> };
 const MON: Record<string, Mon> = {};
@@ -40,6 +40,11 @@ const TYPE_COLOR: Record<string, string> = {
   dark: "#4b4243", steel: "#5a8a9c", fairy: "#d76ad7",
 };
 const TIER_COLOR: Record<string, string> = { S: "#dc2626", A: "#ea580c", B: "#ca8a04", C: "#16a34a", D: "#64748b" };
+const TYPE_KO: Record<string, string> = {
+  normal: "노말", fire: "불꽃", water: "물", electric: "전기", grass: "풀", ice: "얼음",
+  fighting: "격투", poison: "독", ground: "땅", flying: "비행", psychic: "에스퍼", bug: "벌레",
+  rock: "바위", ghost: "고스트", dragon: "드래곤", dark: "악", steel: "강철", fairy: "페어리",
+};
 
 type Meta = { total: number; top_mons: { speciesId: string; count: number }[] };
 async function getPickRates(league: string): Promise<Record<string, number>> {
@@ -162,12 +167,20 @@ export default async function TierPage({ params }: { params: { league: string } 
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {byTier[t].map((d) => {
                   const pr = pick[d.id];
+                  const types = MON[d.id]?.types || [];
+                  const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
+                  const c2 = TYPE_COLOR[types[1]] || c1;
                   return (
-                    <div key={d.id} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "8px 10px" }}>
+                    <div key={d.id} style={{ background: `linear-gradient(100deg, ${c1}26 0%, ${c2}18 42%, #ffffff 88%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <Sprite id={d.id} size={36} />
                         <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a" }}>
                           {MON[d.id]?.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{nameOf(d.id)}
+                        </span>
+                        <span style={{ display: "flex", gap: 3 }}>
+                          {types.map((t2) => (
+                            <span key={t2} style={{ fontSize: "0.62rem", fontWeight: 700, color: "#fff", background: TYPE_COLOR[t2] || "#94a3b8", padding: "1px 6px", borderRadius: 6 }}>{TYPE_KO[t2] || t2}</span>
+                          ))}
                         </span>
                         <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
                           {pr != null && (
