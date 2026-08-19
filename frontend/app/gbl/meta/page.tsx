@@ -217,7 +217,26 @@ export default function GblMeta() {
 
         {meta && meta.total > 0 && <><AdSlot /><CoupangAd /></>}
 
-        <div style={{ textAlign: "center", marginTop: 26, fontSize: "0.72rem", color: "#94a3b8" }}>
+        {/* 크롤 가능한 리그별 상세 링크(서버렌더 SEO 페이지로 연결) */}
+        <div style={{ marginTop: 26, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.9rem 1rem" }}>
+          <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>리그별 상세 페이지</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {[["master", "마스터"], ["great", "슈퍼"], ["ultra", "하이퍼"]].map(([k, lb]) => (
+              <span key={k} style={{ display: "flex", gap: 6 }}>
+                <Link href={`/gbl/meta/${k}`} style={{ fontSize: "0.78rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 600 }}>{lb}리그 실측</Link>
+                <span style={{ color: "#cbd5e1" }}>·</span>
+                <Link href={`/gbl/tier/${k}`} style={{ fontSize: "0.78rem", color: "#7c3aed", textDecoration: "none", fontWeight: 600 }}>티어표</Link>
+              </span>
+            ))}
+          </div>
+          <div style={{ marginTop: 8, fontSize: "0.76rem" }}>
+            <Link href="/gbl/guide" style={{ color: "#64748b", textDecoration: "none" }}>📖 GBL 가이드</Link>
+          </div>
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: 20, fontSize: "0.72rem", color: "#94a3b8" }}>
+          <Link href="/gbl/about" style={{ color: "#64748b", textDecoration: "none" }}>소개</Link> ·{" "}
+          <Link href="/gbl/contact" style={{ color: "#64748b", textDecoration: "none" }}>문의</Link> ·{" "}
           <Link href="/gbl/privacy" style={{ color: "#64748b", textDecoration: "none" }}>개인정보처리방침</Link>
         </div>
       </div>
