@@ -83,12 +83,21 @@ export default function GblLanding() {
             </Link>
           ))}
         </div>
-        <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 28 }}>
+        <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 10 }}>
           {([["master", "마스터"], ["great", "슈퍼"], ["ultra", "하이퍼"]] as const).map(([k, label]) => (
             <Link key={k} href={`/gbl/tier/${k}`}
               style={{ fontSize: "0.8rem", fontWeight: 700, color: "#7c3aed", textDecoration: "none",
                 padding: "6px 13px", border: "1px solid #e0d3f5", borderRadius: 16, background: "#fff" }}>
               🏆 {label} 티어표
+            </Link>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 28 }}>
+          {([["master", "마스터"], ["great", "슈퍼"], ["ultra", "하이퍼"]] as const).map(([k, label]) => (
+            <Link key={k} href={`/gbl/cmp/${k}`}
+              style={{ fontSize: "0.8rem", fontWeight: 700, color: "#ea580c", textDecoration: "none",
+                padding: "6px 13px", border: "1px solid #f5ddc3", borderRadius: 16, background: "#fff" }}>
+              ⚡ {label} CMP 우선권
             </Link>
           ))}
         </div>
