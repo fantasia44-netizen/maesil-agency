@@ -171,7 +171,7 @@ export default async function TierPage({ params }: { params: { league: string } 
                   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
                   const c2 = TYPE_COLOR[types[1]] || c1;
                   return (
-                    <div key={d.id} style={{ background: `linear-gradient(100deg, ${c1}26 0%, ${c2}18 42%, #ffffff 88%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
+                    <Link key={d.id} href={`/gbl/pokemon/${params.league}/${d.id}`} style={{ textDecoration: "none", color: "inherit", display: "block", background: `linear-gradient(100deg, ${c1}26 0%, ${c2}18 42%, #ffffff 88%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <Sprite id={d.id} size={36} />
                         <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a" }}>
@@ -192,7 +192,7 @@ export default async function TierPage({ params }: { params: { league: string } 
                       <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6, paddingLeft: 44 }}>
                         {d.moveset.map((mid) => <MoveChip key={mid} id={mid} />)}
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
