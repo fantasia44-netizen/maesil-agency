@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AdSlot from "../../AdSlot";
+import CoupangAd from "../../CoupangAd";
 
 export const revalidate = 86400;
 
@@ -110,6 +111,8 @@ export default function GuidePage({ params }: { params: { slug: string } }) {
             </section>
           ))}
         </article>
+
+        <CoupangAd />
 
         <div style={{ marginTop: 24, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
           <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a", marginBottom: 8 }}>다른 가이드</div>

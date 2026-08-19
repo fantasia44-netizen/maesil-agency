@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getUser, logout, apiFetch } from "../../lib/api";
 import DATA from "./gbl_data.json";
+import CoupangAd from "./CoupangAd";
 
 type Mon = { id: string; dex: number; ko: string; sprite?: string };
 const DS = DATA as unknown as { leagues: Record<string, { pokemon: Mon[] }> };
@@ -130,6 +131,8 @@ export default function GblLanding() {
             </div>
           </div>
         )}
+
+        <CoupangAd />
 
         <p style={{ textAlign: "center", fontSize: "0.75rem", color: "#94a3b8", lineHeight: 2 }}>
           <Link href="/gbl/guide" style={{ color: "#64748b" }}>가이드</Link> ·{" "}
