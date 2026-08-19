@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import DETAIL from "./gbl/gbl_detail.json";
+import { GUIDES } from "./gbl/guide/[slug]/page";
 
 // gbl.maesil.net 공개 SEO 사이트맵. 검색엔진이 리그별 실측 메타·티어·포켓몬 상세를 발견하도록.
 const BASE = "https://gblnote.com";
@@ -33,6 +34,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     })),
     ...pokemon,
+    { url: `${BASE}/gbl/guide`, lastModified, changeFrequency: "weekly", priority: 0.7 },
+    ...Object.keys(GUIDES).map((slug) => ({
+      url: `${BASE}/gbl/guide/${slug}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
+    { url: `${BASE}/gbl/about`, lastModified, changeFrequency: "monthly", priority: 0.4 },
+    { url: `${BASE}/gbl/contact`, lastModified, changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/gbl/login`, lastModified, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/gbl/privacy`, lastModified, changeFrequency: "yearly", priority: 0.3 },
   ];

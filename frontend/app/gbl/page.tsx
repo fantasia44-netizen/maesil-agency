@@ -131,9 +131,12 @@ export default function GblLanding() {
           </div>
         )}
 
-        <p style={{ textAlign: "center", fontSize: "0.72rem", color: "#94a3b8" }}>
-          무료 · <Link href="/gbl/privacy" style={{ color: "#64748b" }}>개인정보처리방침</Link>
-          {authed && <> · <button onClick={logout} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "0.72rem", padding: 0 }}>로그아웃</button></>}
+        <p style={{ textAlign: "center", fontSize: "0.75rem", color: "#94a3b8", lineHeight: 2 }}>
+          <Link href="/gbl/guide" style={{ color: "#64748b" }}>가이드</Link> ·{" "}
+          <Link href="/gbl/about" style={{ color: "#64748b" }}>소개</Link> ·{" "}
+          <Link href="/gbl/contact" style={{ color: "#64748b" }}>문의</Link> ·{" "}
+          <Link href="/gbl/privacy" style={{ color: "#64748b" }}>개인정보처리방침</Link>
+          {authed && <> · <button onClick={logout} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "0.75rem", padding: 0 }}>로그아웃</button></>}
         </p>
       </div>
     </div>
