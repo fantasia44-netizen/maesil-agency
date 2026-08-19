@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import GblPwa from "./GblPwa";
+
+// AdSense 클라이언트(ca-pub-…). Render env NEXT_PUBLIC_ADSENSE_CLIENT 설정 시 연결 코드 노출.
+const ADS_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
 
 // /gbl/* 전용 메타데이터 — PWA 매니페스트·앱 아이콘·iOS 설치 + OG 공유 이미지.
 export const metadata: Metadata = {
@@ -24,6 +28,8 @@ export const metadata: Metadata = {
     description: "상대 기록 · 실전 픽업률 · 덱 통계. 한국 유저 실제 데이터 기반.",
     images: ["/gbl-og.png"],
   },
+  // AdSense 사이트 소유권 확인용 메타태그(env 있을 때만)
+  ...(ADS_CLIENT ? { other: { "google-adsense-account": ADS_CLIENT } } : {}),
 };
 
 export const viewport: Viewport = {
@@ -36,6 +42,16 @@ export default function GblLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <GblPwa />
+      {ADS_CLIENT && (
+        <Script
+          id="adsbygoogle-loader"
+          async
+          strategy="afterInteractive"
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS_CLIENT}`}
+          crossOrigin="anonymous"
+          data-adsense="1"
+        />
+      )}
       {children}
     </>
   );
