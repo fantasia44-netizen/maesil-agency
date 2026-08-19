@@ -276,6 +276,7 @@ export default function GblPage() {
   const [sort, setSort] = useState<"recent" | "name">("recent");  // 조회 정렬
   const [deckFilter, setDeckFilter] = useState<"all" | "won" | "lost">("all");
   const [expandedDeck, setExpandedDeck] = useState<string | null>(null);
+  const [statsPeriod, setStatsPeriod] = useState<"7" | "30" | "all">("all");  // 전적 기간
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -354,12 +355,26 @@ export default function GblPage() {
   // 전적: 내 기록(선택 리그) 기준 승률 + 상대 덱별 전적
   type DeckMon = { sp?: Mon; manual?: string };
   type Deck = { key: string; mons: DeckMon[]; wins: number; losses: number; draws: number; matches: Match[] };
+  type DayStat = { date: string; wins: number; losses: number; draws: number; total: number };
   const stats = useMemo(() => {
-    const src = matches.filter((m) => (m.league || "master") === league);
+    let src = matches.filter((m) => (m.league || "master") === league);
+    if (statsPeriod !== "all") {
+      const since = Date.now() - Number(statsPeriod) * 86400000;
+      src = src.filter((m) => new Date(m.played_at).getTime() >= since);
+    }
     let wins = 0, losses = 0, draws = 0;
     const deckMap = new Map<string, Deck>();
+    const dayMap = new Map<string, DayStat>();
     for (const m of src) {
       if (m.result === "win") wins++; else if (m.result === "loss") losses++; else draws++;
+      // 일자별 집계 (로컬 KST 날짜 기준)
+      const dt = new Date(m.played_at);
+      const dkey = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+      if (!dayMap.has(dkey)) dayMap.set(dkey, { date: dkey, wins: 0, losses: 0, draws: 0, total: 0 });
+      const dd = dayMap.get(dkey)!;
+      if (m.result === "win") dd.wins++; else if (m.result === "loss") dd.losses++; else dd.draws++;
+      dd.total++;
+      // 덱별 집계
       const parts = (m.team_json || [])
         .map((t) => t.speciesId ? t.speciesId : (t.manual ? "m:" + t.manual : ""))
         .filter(Boolean);
@@ -374,8 +389,9 @@ export default function GblPage() {
       d.matches.push(m);
     }
     const decks = [...deckMap.values()].sort((a, b) => b.matches.length - a.matches.length);
-    return { total: src.length, wins, losses, draws, decks };
-  }, [matches, league]);
+    const days = [...dayMap.values()].sort((a, b) => b.date.localeCompare(a.date));
+    return { total: src.length, wins, losses, draws, decks, days };
+  }, [matches, league, statsPeriod]);
 
   const winRate = (w: number, l: number) => (w + l > 0 ? Math.round((w / (w + l)) * 100) : null);
   const rateColor = (r: number | null) => r == null ? "#94a3b8" : r >= 60 ? "#16a34a" : r >= 45 ? "#c2410c" : "#dc2626";
@@ -607,6 +623,19 @@ export default function GblPage() {
       {/* ── 전적 ── */}
       {tab === "stats" && (
         <div>
+          {/* 기간 필터 */}
+          <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+            {([["7", "최근 7일"], ["30", "최근 30일"], ["all", "전체"]] as const).map(([k, label]) => {
+              const on = statsPeriod === k;
+              return (
+                <button key={k} onClick={() => setStatsPeriod(k)}
+                  style={{ flex: 1, padding: "7px", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: "0.78rem",
+                    border: on ? "1.5px solid #4f8cff" : "1px solid #dbe2ee",
+                    background: on ? "#3b5bdb" : "#eef2f8", color: on ? "#fff" : "#64748b" }}>{label}</button>
+              );
+            })}
+          </div>
+
           {/* 승률 카드 */}
           <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
             <div style={{ flex: 1, textAlign: "center", background: "#ffffff", border: "1px solid #e3e8f2", borderRadius: 12, padding: "0.9rem 0.4rem" }}>
@@ -628,6 +657,30 @@ export default function GblPage() {
               <div style={{ fontSize: "0.72rem", color: "#64748b" }}>승률</div>
             </div>
           </div>
+
+          {/* 일자별 전적 */}
+          {stats.days.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 8 }}>📅 일자별 전적</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {stats.days.map((d) => {
+                  const r = winRate(d.wins, d.losses);
+                  const [, mo, da] = d.date.split("-");
+                  return (
+                    <div key={d.date} style={{ display: "flex", alignItems: "center", gap: 8, background: "#ffffff", border: "1px solid #e3e8f2", borderRadius: 10, padding: "7px 12px" }}>
+                      <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#0f172a", minWidth: 46 }}>{mo}.{da}</span>
+                      <span style={{ fontSize: "0.72rem", color: "#64748b" }}>{d.total}판</span>
+                      <span style={{ fontSize: "0.78rem", fontWeight: 600, marginLeft: "auto" }}>
+                        <span style={{ color: "#16a34a" }}>{d.wins}승</span> <span style={{ color: "#dc2626" }}>{d.losses}패</span>
+                        {d.draws > 0 && <span style={{ color: "#94a3b8" }}> {d.draws}무</span>}
+                      </span>
+                      <span style={{ fontSize: "0.84rem", fontWeight: 800, color: rateColor(r), minWidth: 42, textAlign: "right" }}>{r ?? "-"}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* 덱 필터 */}
           <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
