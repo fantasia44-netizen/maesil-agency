@@ -30,6 +30,42 @@ export const CUP_FORMATS: Format[] = [
   { key: "cup_summer", label: "서머컵", base: "great", cup: true, start: "2026-06-30", end: "2026-07-08", allowTypes: ["normal", "fire", "water", "grass", "electric", "bug"], note: "슈퍼" },
 ];
 
+// GBL 공식 리그 로테이션 일정(주차별로 열리는 리그·컵). 시즌 진행에 따라 갱신.
+// end 는 제외(그날부터 다음 주차). 공식 발표 기준.
+export type SchedulePeriod = {
+  start: string;
+  end: string;
+  items: { label: string; base: "great" | "ultra" | "master" | "cup" }[];
+  note?: string;
+};
+export const LEAGUE_SCHEDULE: SchedulePeriod[] = [
+  {
+    start: "2026-08-19", end: "2026-08-26",
+    items: [
+      { label: "슈퍼리그", base: "great" },
+      { label: "스크롤컵 (슈퍼리그)", base: "cup" },
+    ],
+  },
+  {
+    start: "2026-08-26", end: "2026-09-02",
+    items: [
+      { label: "슈퍼리그", base: "great" },
+      { label: "하이퍼리그", base: "ultra" },
+      { label: "마스터리그", base: "master" },
+    ],
+    note: "배틀 승리 시 별의모래 4배 (세트 종료 리워드 제외)",
+  },
+  {
+    start: "2026-09-02", end: "2026-09-09",
+    items: [
+      { label: "슈퍼리그: 메가", base: "great" },
+      { label: "하이퍼리그: 메가", base: "ultra" },
+      { label: "마스터리그: 메가", base: "master" },
+    ],
+    note: "별의모래 4배 (세트 종료 리워드 제외)",
+  },
+];
+
 export const ALL_FORMATS = [...CORE_FORMATS, ...CUP_FORMATS];
 export const FORMAT_BY_KEY: Record<string, Format> = Object.fromEntries(ALL_FORMATS.map((f) => [f.key, f]));
 
