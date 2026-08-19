@@ -277,6 +277,8 @@ export default function GblPage() {
   const [deckFilter, setDeckFilter] = useState<"all" | "won" | "lost">("all");
   const [expandedDeck, setExpandedDeck] = useState<string | null>(null);
   const [statsPeriod, setStatsPeriod] = useState<"7" | "30" | "all">("all");  // 전적 기간
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);        // 달력 선택 날짜
+  const [calYM, setCalYM] = useState<{ y: number; m: number } | null>(null);  // 달력 표시 연·월(m:1-12)
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -392,6 +394,28 @@ export default function GblPage() {
     const days = [...dayMap.values()].sort((a, b) => b.date.localeCompare(a.date));
     return { total: src.length, wins, losses, draws, decks, days };
   }, [matches, league, statsPeriod]);
+
+  // 달력용: 날짜(YYYY-MM-DD) → 그날의 대전들 (리그 기준, 전체 기간)
+  const dayMatches = useMemo(() => {
+    const map = new Map<string, Match[]>();
+    for (const m of matches) {
+      if ((m.league || "master") !== league) continue;
+      const dt = new Date(m.played_at);
+      const key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(m);
+    }
+    return map;
+  }, [matches, league]);
+
+  // 최신 기록 달을 기본 표시 (리그·데이터 바뀌면 갱신)
+  useEffect(() => {
+    const keys = [...dayMatches.keys()].sort();
+    if (keys.length === 0) { setCalYM(null); setSelectedDay(null); return; }
+    const [y, m] = keys[keys.length - 1].split("-").map(Number);
+    setCalYM({ y, m });
+    setSelectedDay(null);
+  }, [dayMatches]);
 
   const winRate = (w: number, l: number) => (w + l > 0 ? Math.round((w / (w + l)) * 100) : null);
   const rateColor = (r: number | null) => r == null ? "#94a3b8" : r >= 60 ? "#16a34a" : r >= 45 ? "#c2410c" : "#dc2626";
@@ -658,16 +682,96 @@ export default function GblPage() {
             </div>
           </div>
 
-          {/* 일자별 전적 */}
+          {/* 📅 달력 (일자별) */}
+          {calYM && (
+            <div style={{ marginBottom: 16, background: "#ffffff", border: "1px solid #e3e8f2", borderRadius: 12, padding: "0.9rem" }}>
+              {(() => {
+                const { y, m } = calYM;
+                const firstWd = new Date(y, m - 1, 1).getDay();
+                const dim = new Date(y, m, 0).getDate();
+                const dkey = (d: number) => `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+                const prev = () => { setSelectedDay(null); setCalYM(m === 1 ? { y: y - 1, m: 12 } : { y, m: m - 1 }); };
+                const next = () => { setSelectedDay(null); setCalYM(m === 12 ? { y: y + 1, m: 1 } : { y, m: m + 1 }); };
+                const cells: (number | null)[] = [];
+                for (let i = 0; i < firstWd; i++) cells.push(null);
+                for (let d = 1; d <= dim; d++) cells.push(d);
+                const navBtn: React.CSSProperties = { background: "#eef2f8", border: "1px solid #dbe2ee", borderRadius: 8, width: 30, height: 30, cursor: "pointer", color: "#3b5bdb", fontWeight: 800, fontSize: "1rem" };
+                return (
+                  <>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, marginBottom: 10 }}>
+                      <button onClick={prev} style={navBtn}>‹</button>
+                      <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a", minWidth: 96, textAlign: "center" }}>{y}년 {m}월</span>
+                      <button onClick={next} style={navBtn}>›</button>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 4 }}>
+                      {["일", "월", "화", "수", "목", "금", "토"].map((w, i) => (
+                        <div key={w} style={{ textAlign: "center", fontSize: "0.68rem", fontWeight: 700, color: i === 0 ? "#dc2626" : i === 6 ? "#3b5bdb" : "#94a3b8", padding: "2px 0" }}>{w}</div>
+                      ))}
+                      {cells.map((d, i) => {
+                        if (d == null) return <div key={"e" + i} />;
+                        const k = dkey(d);
+                        const ms = dayMatches.get(k);
+                        if (!ms) return <div key={k} style={{ textAlign: "center", fontSize: "0.78rem", color: "#cbd5e1", padding: "7px 0" }}>{d}</div>;
+                        const w = ms.filter((x) => x.result === "win").length;
+                        const l = ms.filter((x) => x.result === "loss").length;
+                        const r = winRate(w, l);
+                        const bg = r == null ? "#e8eeff" : r >= 60 ? "#dcfce7" : r >= 45 ? "#fef3c7" : "#fee2e2";
+                        const col = r == null ? "#3b5bdb" : r >= 60 ? "#16a34a" : r >= 45 ? "#ca8a04" : "#dc2626";
+                        const sel = selectedDay === k;
+                        return (
+                          <button key={k} onClick={() => setSelectedDay(sel ? null : k)}
+                            style={{ background: bg, border: sel ? "2px solid #3b5bdb" : "2px solid transparent", borderRadius: 8, padding: "4px 0 3px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", lineHeight: 1.1 }}>
+                            <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a" }}>{d}</span>
+                            <span style={{ fontSize: "0.6rem", fontWeight: 800, color: col }}>{w}-{l}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div style={{ fontSize: "0.66rem", color: "#94a3b8", marginTop: 8, textAlign: "center", lineHeight: 1.5 }}>
+                      색 = 그날 승률(초록 좋음·노랑 보통·빨강 나쁨) · 숫자 = 승-패 · <b style={{ color: "#64748b" }}>날짜 클릭 → 그날 상대</b>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* 선택한 날 상대 목록 */}
+          {selectedDay && dayMatches.get(selectedDay) && (() => {
+            const ms = dayMatches.get(selectedDay)!;
+            const w = ms.filter((x) => x.result === "win").length;
+            const l = ms.filter((x) => x.result === "loss").length;
+            const [, mm, dd] = selectedDay.split("-");
+            return (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a" }}>{Number(mm)}.{Number(dd)} 전적</span>
+                  <span style={{ fontSize: "0.78rem", color: "#64748b" }}>{ms.length}판 · <b style={{ color: "#16a34a" }}>{w}승</b> <b style={{ color: "#dc2626" }}>{l}패</b></span>
+                  <button onClick={() => setSelectedDay(null)} style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#94a3b8", background: "none", border: "none", cursor: "pointer" }}>닫기 ✕</button>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {ms.slice().sort((a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime())
+                    .map((m) => <MatchCard key={m.id} m={m} onDelete={del} onEdit={startEdit} />)}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* 일자별 승률표 */}
           {stats.days.length > 0 && (
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 8 }}>📅 일자별 전적</div>
+              <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 8 }}>
+                📊 일자별 승률{statsPeriod === "all" ? "" : ` (${statsPeriod === "7" ? "최근 7일" : "최근 30일"})`}
+              </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {stats.days.map((d) => {
                   const r = winRate(d.wins, d.losses);
-                  const [, mo, da] = d.date.split("-");
+                  const [yy, mo, da] = d.date.split("-");
+                  const sel = selectedDay === d.date;
                   return (
-                    <div key={d.date} style={{ display: "flex", alignItems: "center", gap: 8, background: "#ffffff", border: "1px solid #e3e8f2", borderRadius: 10, padding: "7px 12px" }}>
+                    <button key={d.date} onClick={() => { setCalYM({ y: Number(yy), m: Number(mo) }); setSelectedDay(sel ? null : d.date); }}
+                      style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left", cursor: "pointer",
+                        background: sel ? "#eef3ff" : "#ffffff", border: sel ? "1.5px solid #3b5bdb" : "1px solid #e3e8f2", borderRadius: 10, padding: "7px 12px" }}>
                       <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#0f172a", minWidth: 46 }}>{mo}.{da}</span>
                       <span style={{ fontSize: "0.72rem", color: "#64748b" }}>{d.total}판</span>
                       <span style={{ fontSize: "0.78rem", fontWeight: 600, marginLeft: "auto" }}>
@@ -675,7 +779,7 @@ export default function GblPage() {
                         {d.draws > 0 && <span style={{ color: "#94a3b8" }}> {d.draws}무</span>}
                       </span>
                       <span style={{ fontSize: "0.84rem", fontWeight: 800, color: rateColor(r), minWidth: 42, textAlign: "right" }}>{r ?? "-"}%</span>
-                    </div>
+                    </button>
                   );
                 })}
               </div>

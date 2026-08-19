@@ -128,6 +128,9 @@ export default async function LeagueMetaPage({ params }: { params: { league: str
           기간·시즌 컵 필터는{" "}
           <Link href="/gbl/meta" style={{ color: "#3b5bdb", fontWeight: 600 }}>인터랙티브 메타</Link>에서 볼 수 있습니다.
         </p>
+        <p style={{ margin: "0.5rem 0 0", fontSize: "0.84rem" }}>
+          🏆 <Link href={`/gbl/tier/${params.league}`} style={{ color: "#3b5bdb", fontWeight: 700 }}>{lg.ko} 티어표 · 추천 기술배치 보기 →</Link>
+        </p>
 
         {!hasData ? (
           <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem 1rem", fontSize: "0.92rem" }}>

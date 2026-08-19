@@ -15,6 +15,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily" as const,
       priority: 0.9,
     })),
+    ...LEAGUES.map((l) => ({
+      url: `${BASE}/gbl/tier/${l}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
     { url: `${BASE}/gbl/login`, lastModified, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/gbl/privacy`, lastModified, changeFrequency: "yearly", priority: 0.3 },
   ];

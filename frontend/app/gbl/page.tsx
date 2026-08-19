@@ -72,13 +72,22 @@ export default function GblLanding() {
           <Link href="/gbl/meta" style={ghostBtn}>🌐 실측 메타 (무료)</Link>
         </div>
 
-        {/* 리그별 실측 메타 바로가기 (SEO 내부링크) */}
-        <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 28 }}>
+        {/* 리그별 실측/티어 바로가기 (SEO 내부링크) */}
+        <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 10 }}>
           {([["master", "마스터리그"], ["great", "슈퍼리그"], ["ultra", "하이퍼리그"]] as const).map(([k, label]) => (
             <Link key={k} href={`/gbl/meta/${k}`}
               style={{ fontSize: "0.8rem", fontWeight: 700, color: "#3b5bdb", textDecoration: "none",
                 padding: "6px 13px", border: "1px solid #d3ddf5", borderRadius: 16, background: "#fff" }}>
-              {label} 실측
+              📊 {label} 실측
+            </Link>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 28 }}>
+          {([["master", "마스터"], ["great", "슈퍼"], ["ultra", "하이퍼"]] as const).map(([k, label]) => (
+            <Link key={k} href={`/gbl/tier/${k}`}
+              style={{ fontSize: "0.8rem", fontWeight: 700, color: "#7c3aed", textDecoration: "none",
+                padding: "6px 13px", border: "1px solid #e0d3f5", borderRadius: 16, background: "#fff" }}>
+              🏆 {label} 티어표
             </Link>
           ))}
         </div>
