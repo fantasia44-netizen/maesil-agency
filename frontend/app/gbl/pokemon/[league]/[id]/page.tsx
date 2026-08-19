@@ -31,7 +31,8 @@ const nameOf = (id: string) => MON[id]?.ko || id;
 const moveKo = (id: string) => MOVES[id]?.ko || id;
 
 type Opp = { id: string; r: number };
-type Detail = { id: string; score: number; tier: string; moveset: string[]; counters: Opp[]; wins: Opp[]; scores: number[]; stats: Record<string, number> };
+type Mv = { fast: { id: string; gain: number; turns: number }; charged: { id: string; energy: number; count: number }[] };
+type Detail = { id: string; score: number; tier: string; moveset: string[]; mv: Mv | null; counters: Opp[]; wins: Opp[]; scores: number[]; stats: Record<string, number> };
 const DET = DETAIL as unknown as Record<string, Detail[]>;
 const findDetail = (league: string, id: string) => (DET[league] || []).find((d) => d.id === id);
 
@@ -140,6 +141,17 @@ function OppRow({ league, id, rating }: { league: string; id: string; rating: nu
   );
 }
 
+// CMP 비교 행(공격 종족값 표시)
+function CmpRow({ league, d, color }: { league: string; d: Detail; color: string }) {
+  return (
+    <Link href={`/gbl/pokemon/${league}/${d.id}`} style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 6, background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "4px 8px" }}>
+      <Sprite id={d.id} size={26} />
+      <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameOf(d.id)}</span>
+      <span style={{ marginLeft: "auto", fontSize: "0.72rem", fontWeight: 800, color }}>{d.stats.atk}</span>
+    </Link>
+  );
+}
+
 export default async function PokemonDetail({ params }: { params: { league: string; id: string } }) {
   const lg = LEAGUES[params.league];
   const d = findDetail(params.league, params.id);
@@ -152,6 +164,12 @@ export default async function PokemonDetail({ params }: { params: { league: stri
   const name = nameOf(d.id);
   const pick = await getPickRates(params.league);
   const pr = pick[d.id];
+
+  // CMP(공격력 우선권): 이 리그 상위종을 공격력순 정렬 → 내 위/아래 이웃(가까운 상대가 실전 관건)
+  const byAtk = (DET[params.league] || []).filter((x) => x.stats && x.stats.atk).sort((a, b) => (b.stats.atk || 0) - (a.stats.atk || 0));
+  const atkIdx = byAtk.findIndex((x) => x.id === d.id);
+  const cmpWins = atkIdx >= 0 ? byAtk.slice(atkIdx + 1, atkIdx + 6) : [];        // 공격력 낮음 → 내가 CMP 우선
+  const cmpLoses = atkIdx >= 0 ? byAtk.slice(Math.max(0, atkIdx - 5), atkIdx) : []; // 공격력 높음 → 상대가 먼저
 
   const wrap: React.CSSProperties = {
     minHeight: "100dvh",
@@ -203,11 +221,57 @@ export default async function PokemonDetail({ params }: { params: { league: stri
           )}
         </div>
 
-        {/* 추천 기술배치 */}
-        <h2 style={h2}>추천 기술배치</h2>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "10px 12px" }}>
-          {d.moveset.map((mid) => <MoveChip key={mid} id={mid} />)}
+        {/* 추천 기술배치 + 스킬 타수 */}
+        <h2 style={h2}>추천 기술배치 · 스킬 타수</h2>
+        <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "11px 12px" }}>
+          {d.mv ? (
+            <>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <span style={{ fontSize: "0.72rem", color: "#94a3b8", minWidth: 52 }}>빠른 기술</span>
+                <MoveChip id={d.mv.fast.id} />
+                <span style={{ fontSize: "0.72rem", color: "#64748b" }}>{d.mv.fast.turns}턴 · 에너지 +{d.mv.fast.gain}</span>
+              </div>
+              <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 5 }}>차지 기술 — 빠른 기술 몇 번에 발동되는지(타수)</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                {d.mv.charged.map((c) => (
+                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <MoveChip id={c.id} />
+                    <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{c.energy} 에너지</span>
+                    <span style={{ marginLeft: "auto", fontSize: "0.95rem", fontWeight: 800, color: "#3b5bdb" }}>{c.count}타</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{d.moveset.map((mid) => <MoveChip key={mid} id={mid} />)}</div>
+          )}
         </div>
+
+        {/* CMP 우선권 (공격력 순서) */}
+        {atkIdx >= 0 && (
+          <>
+            <h2 style={h2}>⚡ CMP 우선권 — 같은 턴 차지 시 누가 먼저</h2>
+            <p style={{ margin: "0 0 8px", fontSize: "0.82rem", color: "#475569", lineHeight: 1.7 }}>
+              공격력 <b style={{ color: "#0f172a" }}>{d.stats.atk}</b> · 이 리그 공격력 <b>{atkIdx + 1}위</b> / {byAtk.length}종.
+              상대와 <b>동시에 차지 기술</b>을 쏘면 공격력이 높은 쪽이 <b>먼저 발동</b>해 이깁니다(CMP 우선권).
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div>
+                <div style={{ fontSize: "0.76rem", fontWeight: 700, color: "#16a34a", marginBottom: 6 }}>✅ 내가 먼저 (이 상대 이김)</div>
+                {cmpWins.length ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>{cmpWins.map((x) => <CmpRow key={x.id} league={params.league} d={x} color="#16a34a" />)}</div>
+                ) : <p style={{ fontSize: "0.78rem", color: "#94a3b8" }}>공격력 최하위권</p>}
+              </div>
+              <div>
+                <div style={{ fontSize: "0.76rem", fontWeight: 700, color: "#dc2626", marginBottom: 6 }}>⚠️ 상대가 먼저 (내가 밀림)</div>
+                {cmpLoses.length ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>{cmpLoses.map((x) => <CmpRow key={x.id} league={params.league} d={x} color="#dc2626" />)}</div>
+                ) : <p style={{ fontSize: "0.78rem", color: "#94a3b8" }}>이 리그 공격력 1위</p>}
+              </div>
+            </div>
+            <p style={{ marginTop: 8, fontSize: "0.72rem", color: "#94a3b8", lineHeight: 1.6 }}>공격력이 가까운 상대만 표시 — 실전에서 CMP가 실제로 갈리는 구간입니다. 숫자 = 공격 종족값.</p>
+          </>
+        )}
 
         {/* 종족값 */}
         {d.stats && (d.stats.atk || d.stats.def || d.stats.hp) && (

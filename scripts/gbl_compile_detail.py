@@ -11,6 +11,7 @@ frontend/app/gbl/gbl_detail.json 을 생성한다. 한글명은 기존 gbl_data.
 데이터 출처(합법): PvPoke는 오픈소스 게임데이터. 9db 등 상업 사이트 콘텐츠는 사용 안 함.
 """
 import json
+import math
 import os
 import urllib.request
 
@@ -18,8 +19,30 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GBL = os.path.join(REPO, "frontend", "app", "gbl")
 
 PVPOKE = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/rankings/all/overall"
+GAMEMASTER = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.json"
 FILES = {"great": "rankings-1500.json", "ultra": "rankings-2500.json", "master": "rankings-10000.json"}
 TOP_N = 100  # 리그별 상위 N종만(얇은 페이지 양산 방지)
+
+
+def move_mechanics() -> dict:
+    """moveId → {gain: 에너지획득, energy: 차지비용, turns: 턴수}."""
+    gm = fetch(GAMEMASTER)
+    return {m["moveId"]: {"gain": m.get("energyGain", 0), "energy": m.get("energy", 0), "turns": m.get("turns", 1)}
+            for m in gm.get("moves", [])}
+
+
+def moveset_detail(moveset: list, MV: dict) -> dict | None:
+    """추천 기술배치 → 빠른기술(획득·턴) + 차지별 타수(= ceil(비용/획득))."""
+    if not moveset:
+        return None
+    f = MV.get(moveset[0], {})
+    gain = f.get("gain", 0)
+    charged = []
+    for cid in moveset[1:]:
+        c = MV.get(cid, {})
+        cnt = math.ceil(c["energy"] / gain) if gain and c.get("energy") else 0
+        charged.append({"id": cid, "energy": c.get("energy", 0), "count": cnt})
+    return {"fast": {"id": moveset[0], "gain": gain, "turns": f.get("turns", 1)}, "charged": charged}
 
 
 def fetch(url: str) -> list:
@@ -41,6 +64,7 @@ def tier_of(score: float, mx: float) -> str:
 def main() -> None:
     data = json.load(open(os.path.join(GBL, "gbl_data.json"), encoding="utf-8"))
     ko = {m["id"]: m["ko"] for lg in data["leagues"].values() for m in lg["pokemon"]}
+    MV = move_mechanics()
 
     out = {}
     for league, fn in FILES.items():
@@ -53,6 +77,7 @@ def main() -> None:
                 "score": round(r.get("score", 0)),
                 "tier": tier_of(r.get("score", 0), mx),
                 "moveset": r.get("moveset", []),
+                "mv": moveset_detail(r.get("moveset", []), MV),  # 빠른기술 획득·턴 + 차지별 타수
                 # 매치업 레이팅(500=대등, >500 우세, <500 열세)
                 "counters": [{"id": c["opponent"], "r": c["rating"]} for c in (r.get("counters") or [])[:5]],
                 "wins": [{"id": c["opponent"], "r": c["rating"]} for c in (r.get("matchups") or [])[:5]],
