@@ -52,5 +52,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/gbl/contact`, lastModified, changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/gbl/login`, lastModified, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/gbl/privacy`, lastModified, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE}/gbl/terms`, lastModified, changeFrequency: "yearly", priority: 0.3 },
   ];
 }
