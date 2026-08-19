@@ -6,6 +6,8 @@ import GblPwa from "./GblPwa";
 const ADS_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
 // Google Analytics 4 측정 ID(G-…). NEXT_PUBLIC_GA_ID 설정 시 방문자 분석 활성.
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "";
+// 네이버 서치어드바이저 소유권 확인 값. NEXT_PUBLIC_NAVER_VERIFY 설정 시 메타태그 노출.
+const NAVER_VERIFY = process.env.NEXT_PUBLIC_NAVER_VERIFY || "";
 
 // /gbl/* 전용 메타데이터 — PWA 매니페스트·앱 아이콘·iOS 설치 + OG 공유 이미지.
 export const metadata: Metadata = {
@@ -30,8 +32,11 @@ export const metadata: Metadata = {
     description: "상대 기록 · 실전 픽업률 · 덱 통계. 한국 유저 실제 데이터 기반.",
     images: ["/gbl-og.png"],
   },
-  // AdSense 사이트 소유권 확인용 메타태그(env 있을 때만)
-  ...(ADS_CLIENT ? { other: { "google-adsense-account": ADS_CLIENT } } : {}),
+  // 검색엔진/애드센스 소유권 확인 메타태그(env 있는 것만)
+  other: {
+    ...(ADS_CLIENT ? { "google-adsense-account": ADS_CLIENT } : {}),
+    ...(NAVER_VERIFY ? { "naver-site-verification": NAVER_VERIFY } : {}),
+  },
 };
 
 export const viewport: Viewport = {
