@@ -40,6 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     })),
     ...pokemon,
+    { url: `${BASE}/gbl/schedule`, lastModified, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE}/gbl/guide`, lastModified, changeFrequency: "weekly", priority: 0.7 },
     ...Object.keys(GUIDES).map((slug) => ({
       url: `${BASE}/gbl/guide/${slug}`,

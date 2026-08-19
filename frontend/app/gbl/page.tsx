@@ -144,6 +144,7 @@ export default function GblLanding() {
         <CoupangAd />
 
         <p style={{ textAlign: "center", fontSize: "0.75rem", color: "#94a3b8", lineHeight: 2 }}>
+          <Link href="/gbl/schedule" style={{ color: "#64748b" }}>시즌 일정</Link> ·{" "}
           <Link href="/gbl/guide" style={{ color: "#64748b" }}>가이드</Link> ·{" "}
           <Link href="/gbl/about" style={{ color: "#64748b" }}>소개</Link> ·{" "}
           <Link href="/gbl/contact" style={{ color: "#64748b" }}>문의</Link> ·{" "}
