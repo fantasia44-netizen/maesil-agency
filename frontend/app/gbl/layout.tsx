@@ -4,6 +4,8 @@ import GblPwa from "./GblPwa";
 
 // AdSense 클라이언트(ca-pub-…). Render env NEXT_PUBLIC_ADSENSE_CLIENT 설정 시 연결 코드 노출.
 const ADS_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
+// Google Analytics 4 측정 ID(G-…). NEXT_PUBLIC_GA_ID 설정 시 방문자 분석 활성.
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "";
 
 // /gbl/* 전용 메타데이터 — PWA 매니페스트·앱 아이콘·iOS 설치 + OG 공유 이미지.
 export const metadata: Metadata = {
@@ -51,6 +53,17 @@ export default function GblLayout({ children }: { children: React.ReactNode }) {
           crossOrigin="anonymous"
           data-adsense="1"
         />
+      )}
+      {GA_ID && (
+        <>
+          <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
+          <Script id="ga4-init" strategy="afterInteractive">{`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}');
+          `}</Script>
+        </>
       )}
       {children}
     </>
