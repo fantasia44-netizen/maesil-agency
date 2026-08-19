@@ -123,9 +123,10 @@ export default async function TierPage({ params }: { params: { league: string } 
   return (
     <div style={wrap}>
       <div style={{ maxWidth: 780, margin: "0 auto" }}>
-        <div style={{ marginBottom: 6, display: "flex", alignItems: "center" }}>
+        <div style={{ marginBottom: 6, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <Link href="/gbl" style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>← GBL Note</Link>
-          <Link href={`/gbl/meta/${params.league}`} style={{ marginLeft: "auto", fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>📊 실측 메타 →</Link>
+          <Link href={`/gbl/cmp/${params.league}`} style={{ marginLeft: "auto", fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>⚡ CMP 순위</Link>
+          <Link href={`/gbl/meta/${params.league}`} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>📊 실측 메타 →</Link>
         </div>
 
         {/* 리그 크로스링크 */}

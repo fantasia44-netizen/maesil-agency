@@ -33,6 +33,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),
+    ...LEAGUES.map((l) => ({
+      url: `${BASE}/gbl/cmp/${l}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
     ...pokemon,
     { url: `${BASE}/gbl/guide`, lastModified, changeFrequency: "weekly", priority: 0.7 },
     ...Object.keys(GUIDES).map((slug) => ({

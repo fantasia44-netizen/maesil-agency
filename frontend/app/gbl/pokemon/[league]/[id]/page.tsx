@@ -31,7 +31,7 @@ const nameOf = (id: string) => MON[id]?.ko || id;
 const moveKo = (id: string) => MOVES[id]?.ko || id;
 
 type Opp = { id: string; r: number };
-type Mv = { fast: { id: string; gain: number; turns: number }; charged: { id: string; energy: number; count: number }[] };
+type Mv = { fast: { id: string; gain: number; turns: number }; charged: { id: string; energy: number; counts: number[] }[] };
 type Detail = { id: string; score: number; tier: string; moveset: string[]; mv: Mv | null; counters: Opp[]; wins: Opp[]; scores: number[]; stats: Record<string, number> };
 const DET = DETAIL as unknown as Record<string, Detail[]>;
 const findDetail = (league: string, id: string) => (DET[league] || []).find((d) => d.id === id);
@@ -231,13 +231,19 @@ export default async function PokemonDetail({ params }: { params: { league: stri
                 <MoveChip id={d.mv.fast.id} />
                 <span style={{ fontSize: "0.72rem", color: "#64748b" }}>{d.mv.fast.turns}턴 · 에너지 +{d.mv.fast.gain}</span>
               </div>
-              <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 5 }}>차지 기술 — 빠른 기술 몇 번에 발동되는지(타수)</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+              <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 5 }}>차지 기술 — 연속 발동 시 타수(에너지 이월 반영)</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {d.mv.charged.map((c) => (
-                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                     <MoveChip id={c.id} />
                     <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{c.energy} 에너지</span>
-                    <span style={{ marginLeft: "auto", fontSize: "0.95rem", fontWeight: 800, color: "#3b5bdb" }}>{c.count}타</span>
+                    <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 3 }}>
+                      {c.counts.map((n, i) => (
+                        <span key={i} style={{ fontSize: "0.82rem", fontWeight: 800, color: i === 0 ? "#3b5bdb" : "#64748b",
+                          background: i === 0 ? "#e8eeff" : "#f1f5f9", borderRadius: 6, padding: "1px 7px" }}>{n}</span>
+                      ))}
+                      <span style={{ fontSize: "0.72rem", color: "#94a3b8", marginLeft: 2 }}>타</span>
+                    </span>
                   </div>
                 ))}
               </div>
@@ -269,7 +275,10 @@ export default async function PokemonDetail({ params }: { params: { league: stri
                 ) : <p style={{ fontSize: "0.78rem", color: "#94a3b8" }}>이 리그 공격력 1위</p>}
               </div>
             </div>
-            <p style={{ marginTop: 8, fontSize: "0.72rem", color: "#94a3b8", lineHeight: 1.6 }}>공격력이 가까운 상대만 표시 — 실전에서 CMP가 실제로 갈리는 구간입니다. 숫자 = 공격 종족값.</p>
+            <p style={{ marginTop: 8, fontSize: "0.72rem", color: "#94a3b8", lineHeight: 1.6 }}>
+              공격력이 가까운 상대만 표시 — 실전에서 CMP가 실제로 갈리는 구간입니다. 숫자 = 공격 종족값.{" "}
+              <Link href={`/gbl/cmp/${params.league}`} style={{ color: "#3b5bdb", fontWeight: 600 }}>전체 우선권 순위 →</Link>
+            </p>
           </>
         )}
 

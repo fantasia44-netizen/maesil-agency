@@ -31,8 +31,22 @@ def move_mechanics() -> dict:
             for m in gm.get("moves", [])}
 
 
+def taus_seq(cost: int, gain: int, n: int = 5) -> list:
+    """연속 발동 시 타수 시퀀스(에너지 이월 반영). 예: 7,6,7,6,7.
+    첫 발동은 0에너지에서, 이후엔 남은 에너지에서 시작해 필요한 빠른기술 수를 계산."""
+    if not gain or not cost:
+        return []
+    energy, seq = 0, []
+    for _ in range(n):
+        need = cost - energy
+        t = math.ceil(need / gain) if need > 0 else 0
+        energy += t * gain - cost   # 발동 후 남는 에너지 이월
+        seq.append(t)
+    return seq
+
+
 def moveset_detail(moveset: list, MV: dict) -> dict | None:
-    """추천 기술배치 → 빠른기술(획득·턴) + 차지별 타수(= ceil(비용/획득))."""
+    """추천 기술배치 → 빠른기술(획득·턴) + 차지별 연속 타수 시퀀스."""
     if not moveset:
         return None
     f = MV.get(moveset[0], {})
@@ -40,8 +54,7 @@ def moveset_detail(moveset: list, MV: dict) -> dict | None:
     charged = []
     for cid in moveset[1:]:
         c = MV.get(cid, {})
-        cnt = math.ceil(c["energy"] / gain) if gain and c.get("energy") else 0
-        charged.append({"id": cid, "energy": c.get("energy", 0), "count": cnt})
+        charged.append({"id": cid, "energy": c.get("energy", 0), "counts": taus_seq(c.get("energy", 0), gain)})
     return {"fast": {"id": moveset[0], "gain": gain, "turns": f.get("turns", 1)}, "charged": charged}
 
 
