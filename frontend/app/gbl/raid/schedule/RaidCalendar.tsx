@@ -40,6 +40,9 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
   const [y0, m0] = today.split("-").map(Number);
   const [cur, setCur] = useState({ y: y0, m: m0 }); // m: 1-12
   const [sel, setSel] = useState<string | null>(today);
+  const [cardImage, setCardImage] = useState<string | null>(null);
+  const [cardFile, setCardFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
 
   // 특정 날짜에 걸리는 이벤트
   const eventsOn = (dayKey: string): CalEvent[] => {
@@ -49,6 +52,86 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
       if (e.kind === "rotation") return t >= new Date(dayKeyOf(e.start) + "T00:00:00").getTime() && t < en;
       return dayKeyOf(e.start) === dayKey || (t >= s && t <= en);
     });
+  };
+
+  // 달력을 이미지로 그려 저장/공유 (출처 gblnote.com). PokeAPI 스프라이트(CORS 허용)로 캔버스 오염 방지.
+  const buildImage = async () => {
+    setBusy(true);
+    try {
+      const daysN = new Date(cur.y, cur.m, 0).getDate();
+      const startPad = new Date(cur.y, cur.m - 1, 1).getDay();
+      const info: { d: number; dexMain?: string; mega: boolean; shadow: boolean; rd: boolean; rh: boolean }[] = [];
+      const dexSet = new Set<string>();
+      for (let d = 1; d <= daysN; d++) {
+        const dk = ymd(new Date(cur.y, cur.m - 1, d));
+        const evs = eventsOn(dk);
+        const rots = evs.filter((e) => e.kind === "rotation");
+        const main = (rots.find((e) => e.variant === "star") || rots.find((e) => e.variant === "mega") || rots.find((e) => e.variant === "shadow"))?.bosses[0];
+        if (main?.dex) dexSet.add(main.dex);
+        info.push({ d, dexMain: main?.dex, mega: rots.some((e) => e.variant === "mega"), shadow: rots.some((e) => e.variant === "shadow"), rd: evs.some((e) => e.kind === "day"), rh: evs.some((e) => e.kind === "hour") });
+      }
+      const imgs: Record<string, HTMLImageElement> = {};
+      await Promise.all([...dexSet].map((dex) => new Promise<void>((res) => {
+        const im = new Image(); im.crossOrigin = "anonymous";
+        im.onload = () => { imgs[dex] = im; res(); }; im.onerror = () => res();
+        im.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dex}.png`;
+      })));
+
+      const W = 1080, gx = 40, gw = W - 80, cw = gw / 7, gyTop = 210, rowH = 176;
+      const rows = Math.ceil((startPad + daysN) / 7);
+      const H = gyTop + rowH * rows + 130;
+      const c = document.createElement("canvas"); c.width = W; c.height = H;
+      const ctx = c.getContext("2d"); if (!ctx) { setBusy(false); return; }
+      ctx.fillStyle = "#fbf7f3"; ctx.fillRect(0, 0, W, H);
+      // 헤더
+      ctx.textAlign = "left"; ctx.fillStyle = "#0f172a"; ctx.font = "900 74px system-ui, sans-serif";
+      ctx.fillText(`포켓몬고 ${cur.m}월 레이드`, 44, 108);
+      ctx.textAlign = "right"; ctx.fillStyle = "#f97316"; ctx.font = "800 42px system-ui, sans-serif";
+      ctx.fillText(`${cur.y}`, W - 44, 104);
+      // 요일
+      ctx.textAlign = "center"; ctx.font = "800 34px system-ui, sans-serif";
+      WD.forEach((w, i) => { ctx.fillStyle = i === 0 ? "#dc2626" : i === 6 ? "#3b5bdb" : "#64748b"; ctx.fillText(w, gx + cw * i + cw / 2, 178); });
+      // 그리드
+      for (let idx = startPad; idx < startPad + daysN; idx++) {
+        const col = idx % 7, row = Math.floor(idx / 7);
+        const cx = gx + cw * col, cy = gyTop + rowH * row;
+        const it = info[idx - startPad];
+        ctx.fillStyle = "#ffffff"; ctx.strokeStyle = "#e8e2da"; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.roundRect(cx + 4, cy + 4, cw - 8, rowH - 8, 12); ctx.fill(); ctx.stroke();
+        ctx.textAlign = "left"; ctx.font = "700 28px system-ui, sans-serif";
+        ctx.fillStyle = col === 0 ? "#dc2626" : col === 6 ? "#3b5bdb" : "#94a3b8";
+        ctx.fillText(String(it.d), cx + 16, cy + 40);
+        const im = it.dexMain ? imgs[it.dexMain] : null;
+        if (im) { const s = 96; ctx.drawImage(im, cx + cw / 2 - s / 2, cy + 40, s, s); }
+        let ind = ""; if (it.mega) ind += "🔷"; if (it.shadow) ind += "🌑"; if (it.rd) ind += "🎉"; if (it.rh) ind += "⏰";
+        if (ind) { ctx.textAlign = "center"; ctx.font = "26px system-ui, sans-serif"; ctx.fillStyle = "#334155"; ctx.fillText(ind, cx + cw / 2, cy + rowH - 16); }
+      }
+      // 워터마크/출처
+      const fy = gyTop + rowH * rows;
+      ctx.textAlign = "center"; ctx.fillStyle = "#ea580c"; ctx.font = "900 44px system-ui, sans-serif";
+      ctx.fillText("gblnote.com", W / 2, fy + 58);
+      ctx.fillStyle = "#94a3b8"; ctx.font = "500 28px system-ui, sans-serif";
+      ctx.fillText("포켓몬고 레이드 일정·티어·CP · GBL Note", W / 2, fy + 98);
+
+      setCardImage(c.toDataURL("image/png"));
+      setCardFile(null);
+      c.toBlob((b) => { if (b) setCardFile(new File([b], `gbl-raid-${cur.m}월.png`, { type: "image/png" })); }, "image/png");
+    } finally { setBusy(false); }
+  };
+
+  const saveCard = () => { if (!cardImage) return; const a = document.createElement("a"); a.href = cardImage; a.download = `gbl-raid-${cur.m}월.png`; a.click(); };
+  const shareCard = async () => {
+    if (!cardImage) return;
+    const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
+    try {
+      let file = cardFile;
+      if (!file) { const blob = await (await fetch(cardImage)).blob(); file = new File([blob], `gbl-raid-${cur.m}월.png`, { type: "image/png" }); }
+      if (file && typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: `포켓몬고 ${cur.m}월 레이드 일정`, text: "gblnote.com" });
+        return;
+      }
+      saveCard();
+    } catch (e) { if (e instanceof DOMException && e.name === "AbortError") return; saveCard(); }
   };
 
   // 달력 그리드
@@ -165,6 +248,28 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
               <div style={{ fontSize: "0.7rem", color: "#94a3b8" }}>보스를 누르면 100% CP·약점 딜러를 볼 수 있어요.</div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* 달력 이미지 저장·공유 (홍보) */}
+      <button onClick={buildImage} disabled={busy}
+        style={{ width: "100%", marginTop: 14, padding: "11px", borderRadius: 10, border: "none", cursor: busy ? "default" : "pointer", fontWeight: 800, fontSize: "0.9rem", background: busy ? "#cbd5e1" : "linear-gradient(90deg,#ea580c,#db2777)", color: "#fff" }}>
+        {busy ? "이미지 생성 중…" : `📅 ${cur.m}월 달력 이미지 저장·공유`}
+      </button>
+
+      {/* 미리보기 모달 */}
+      {cardImage && (
+        <div onClick={() => setCardImage(null)}
+          style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,.72)", zIndex: 10000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 16, gap: 12 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={cardImage} alt="레이드 달력" onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: "100%", maxHeight: "72vh", borderRadius: 12, boxShadow: "0 10px 40px rgba(0,0,0,.4)" }} />
+          <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", gap: 10 }}>
+            <button onClick={shareCard} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: "linear-gradient(90deg,#ea580c,#db2777)", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>📤 공유</button>
+            <button onClick={saveCard} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: "#334155", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>💾 저장</button>
+            <button onClick={() => setCardImage(null)} style={{ padding: "11px 16px", borderRadius: 10, border: "none", background: "rgba(255,255,255,.15)", color: "#e2e8f0", cursor: "pointer", fontSize: "0.9rem" }}>닫기</button>
+          </div>
+          <div style={{ fontSize: "0.74rem", color: "#cbd5e1" }}>이미지를 길게 눌러 저장하거나 캡처해도 됩니다</div>
         </div>
       )}
     </div>
