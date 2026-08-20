@@ -31,7 +31,7 @@ const spriteUrl = (m?: Mon) =>
 const nameOf = (id: string) => MON[id]?.ko || id;
 const moveKo = (id: string) => MOVES[id]?.ko || id;
 
-type Detail = { id: string; score: number; tier: string; moveset: string[]; counters: string[]; wins: string[]; stats: Record<string, number> };
+type Detail = { id: string; score: number; tier: string; moveset: string[]; counters: string[]; wins: string[]; stats: Record<string, number>; ko?: string; dex?: number; types?: string[] };
 const DET = DETAIL as unknown as Record<string, Detail[]>;
 
 const TYPE_COLOR: Record<string, string> = {
@@ -170,16 +170,17 @@ export default async function TierPage({ params }: { params: { league: string } 
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {byTier[t].map((d) => {
                   const pr = pick[d.id];
-                  const types = MON[d.id]?.types || [];
+                  const types = (d.types && d.types.length) ? d.types : (MON[d.id]?.types || []);
+                  const dex = d.dex || MON[d.id]?.dex;
+                  const dispName = d.ko || ((MON[d.id]?.shadow ? "그림자 " : "") + nameOf(d.id));
                   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
                   const c2 = TYPE_COLOR[types[1]] || c1;
                   return (
                     <Link key={d.id} href={`/gbl/pokemon/${params.league}/${d.id}`} style={{ textDecoration: "none", color: "inherit", display: "block", background: `linear-gradient(100deg, ${c1}26 0%, ${c2}18 42%, #ffffff 88%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <Sprite id={d.id} size={36} />
-                        <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a" }}>
-                          {MON[d.id]?.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{nameOf(d.id)}
-                        </span>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={dex ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dex}.png` : ""} alt={dispName} width={36} height={36} style={{ imageRendering: "pixelated" }} />
+                        <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a" }}>{dispName}</span>
                         <span style={{ display: "flex", gap: 3 }}>
                           {types.map((t2) => (
                             <span key={t2} style={{ fontSize: "0.62rem", fontWeight: 700, color: "#fff", background: TYPE_COLOR[t2] || "#94a3b8", padding: "1px 6px", borderRadius: 6 }}>{TYPE_KO[t2] || t2}</span>
@@ -212,8 +213,8 @@ export default async function TierPage({ params }: { params: { league: string } 
             buttonLabel="📸 티어표 이미지 저장·공유"
             filename={`gbl-${params.league}-tier.png`}
             items={list.slice(0, 12).map((d) => ({
-              dex: String(MON[d.id]?.dex || ""),
-              name: (MON[d.id]?.shadow ? "그림자 " : "") + nameOf(d.id),
+              dex: String(d.dex || MON[d.id]?.dex || ""),
+              name: d.ko || ((MON[d.id]?.shadow ? "그림자 " : "") + nameOf(d.id)),
               main: String(d.score),
               sub: pick[d.id] != null ? `실측 ${pick[d.id]}%` : `${d.tier}티어`,
             }))}

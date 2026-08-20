@@ -74,10 +74,37 @@ def tier_of(score: float, mx: float) -> str:
     return "D"
 
 
+_REG = [("_alolan", "알로라 "), ("_galarian", "가라르 "), ("_hisuian", "히스이 "), ("_paldean", "팔데아 ")]
+
+
+def disp_ko(sid: str, sp: dict, pdko: dict) -> tuple:
+    """speciesId → (한글표시명, dex, types[]). gbl_data에 없는 신규/폼 포함용."""
+    p = sp.get(sid, {})
+    dex = p.get("dex")
+    base = pdko.get(str(dex)) if dex else None
+    if not base:
+        return None, dex, [t for t in (p.get("types") or []) if t and t != "none"]
+    reg = next((k for suf, k in _REG if suf in sid), "")
+    if "_mega_x" in sid: name = "메가 " + base + " X"
+    elif "_mega_y" in sid: name = "메가 " + base + " Y"
+    elif "_mega" in sid: name = "메가 " + reg + base
+    elif "_primal" in sid: name = "원시 " + base
+    elif "_white" in sid: name = "화이트 " + base
+    elif "_black" in sid: name = "블랙 " + base
+    else: name = reg + base
+    if "_origin" in sid: name += " (오리진)"
+    elif "_therian" in sid: name += " (영물폼)"
+    if "_shadow" in sid or sid.endswith("_shadow"): name = "그림자 " + name
+    types = [t for t in (p.get("types") or []) if t and t != "none"]
+    return name, dex, types
+
+
 def main() -> None:
     data = json.load(open(os.path.join(GBL, "gbl_data.json"), encoding="utf-8"))
     ko = {m["id"]: m["ko"] for lg in data["leagues"].values() for m in lg["pokemon"]}
     MV = move_mechanics()
+    sp = {p["speciesId"]: p for p in fetch(GAMEMASTER)["pokemon"]}  # 한글명·dex·타입 소스
+    pdko = json.load(open(os.path.join(GBL, "pokedex_ko.json"), encoding="utf-8"))
 
     out = {}
     for league, fn in FILES.items():
@@ -85,8 +112,10 @@ def main() -> None:
         mx = max(r.get("score", 0) for r in ranks)
         mons = []
         for r in ranks:
+            dko, ddex, dtypes = disp_ko(r["speciesId"], sp, pdko)
             mons.append({
                 "id": r["speciesId"],
+                "ko": dko, "dex": ddex, "types": dtypes,  # 자체 내장(gbl_data 미커버 대비)
                 "score": round(r.get("score", 0)),
                 "tier": tier_of(r.get("score", 0), mx),
                 "moveset": r.get("moveset", []),

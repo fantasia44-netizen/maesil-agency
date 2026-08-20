@@ -32,7 +32,7 @@ const moveKo = (id: string) => MOVES[id]?.ko || id;
 
 type Opp = { id: string; r: number };
 type Mv = { fast: { id: string; gain: number; turns: number }; charged: { id: string; energy: number; counts: number[] }[] };
-type Detail = { id: string; score: number; tier: string; moveset: string[]; mv: Mv | null; counters: Opp[]; wins: Opp[]; scores: number[]; stats: Record<string, number> };
+type Detail = { id: string; score: number; tier: string; moveset: string[]; mv: Mv | null; counters: Opp[]; wins: Opp[]; scores: number[]; stats: Record<string, number>; ko?: string; dex?: number; types?: string[] };
 const DET = DETAIL as unknown as Record<string, Detail[]>;
 const findDetail = (league: string, id: string) => (DET[league] || []).find((d) => d.id === id);
 
@@ -74,7 +74,7 @@ export function generateMetadata({ params }: { params: { league: string; id: str
   const lg = LEAGUES[params.league];
   const d = findDetail(params.league, params.id);
   if (!lg || !d) return { title: "GBL Note" };
-  const name = nameOf(d.id);
+  const name = d.ko || nameOf(d.id);
   const title = `${name} ${lg.ko} 카운터·추천 기술배치 | GBL Note`;
   const description = `포켓몬 GO ${lg.ko}에서 ${name}의 추천 기술배치, 카운터(약점 상대), 잘 잡는 상대, 종족값과 한국 유저 실측 픽률. ${name} 대비법을 확인하세요.`;
   return {
@@ -158,10 +158,11 @@ export default async function PokemonDetail({ params }: { params: { league: stri
   if (!lg || !d) notFound();
 
   const m = MON[d.id];
-  const types = m?.types || [];
+  const types = (d.types && d.types.length) ? d.types : (m?.types || []);
+  const hdex = d.dex || m?.dex;
   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
   const c2 = TYPE_COLOR[types[1]] || c1;
-  const name = nameOf(d.id);
+  const name = d.ko || nameOf(d.id);
   const pick = await getPickRates(params.league);
   const pr = pick[d.id];
 
@@ -199,7 +200,8 @@ export default async function PokemonDetail({ params }: { params: { league: stri
         {/* 헤더 */}
         <div style={{ background: `linear-gradient(110deg, ${c1}2e, ${c2}20 45%, #ffffff 92%)`, border: `1px solid ${BORDER}`, borderLeft: `5px solid ${c1}`, borderRadius: 14, padding: "1rem 1.1rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <Sprite id={d.id} size={64} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={hdex ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${hdex}.png` : ""} alt={name} width={64} height={64} style={{ imageRendering: "pixelated" }} />
             <div>
               <h1 style={{ margin: 0, fontSize: "1.4rem", fontWeight: 900, color: "#0f172a" }}>
                 {m?.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{name}

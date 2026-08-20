@@ -25,7 +25,7 @@ const spriteUrl = (m?: Mon) =>
   m ? (m.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${m.dex}.png`) : "";
 const nameOf = (id: string) => MON[id]?.ko || id;
 
-type Detail = { id: string; tier: string; stats: Record<string, number> };
+type Detail = { id: string; tier: string; stats: Record<string, number>; ko?: string; dex?: number; types?: string[] };
 const DET = DETAIL as unknown as Record<string, Detail[]>;
 
 const TYPE_COLOR: Record<string, string> = {
@@ -128,7 +128,9 @@ export default function CmpPage({ params }: { params: { league: string } }) {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 5, marginTop: 14 }}>
             {list.map((d, i) => {
-              const types = MON[d.id]?.types || [];
+              const types = (d.types && d.types.length) ? d.types : (MON[d.id]?.types || []);
+              const dex = d.dex || MON[d.id]?.dex;
+              const dispName = d.ko || ((MON[d.id]?.shadow ? "그림자 " : "") + nameOf(d.id));
               const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
               const atk = d.stats.atk || 0;
               const w = maxAtk > minAtk ? Math.round(((atk - minAtk) / (maxAtk - minAtk)) * 100) : 100;
@@ -137,10 +139,9 @@ export default function CmpPage({ params }: { params: { league: string } }) {
                   style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: 8,
                     background: `linear-gradient(100deg, ${c1}1f, #ffffff 82%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "6px 10px" }}>
                   <span style={{ fontSize: "0.76rem", fontWeight: 800, color: i < 3 ? "#dc2626" : "#94a3b8", minWidth: 24 }}>#{i + 1}</span>
-                  <Sprite id={d.id} size={32} />
-                  <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a", minWidth: 84 }}>
-                    {MON[d.id]?.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{nameOf(d.id)}
-                  </span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={dex ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dex}.png` : ""} alt={dispName} width={32} height={32} style={{ imageRendering: "pixelated" }} />
+                  <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a", minWidth: 84 }}>{dispName}</span>
                   <span style={{ display: "flex", gap: 3 }}>
                     {types.map((t) => (
                       <span key={t} style={{ fontSize: "0.6rem", fontWeight: 700, color: "#fff", background: TYPE_COLOR[t] || "#94a3b8", padding: "1px 6px", borderRadius: 6 }}>{TYPE_KO[t] || t}</span>
