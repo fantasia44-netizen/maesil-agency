@@ -12,14 +12,14 @@ const NAVER_VERIFY = process.env.NEXT_PUBLIC_NAVER_VERIFY || "";
 // /gbl/* 전용 메타데이터 — PWA 매니페스트·앱 아이콘·iOS 설치 + OG 공유 이미지.
 export const metadata: Metadata = {
   metadataBase: new URL("https://gblnote.com"),
-  title: "GBL Note — 포켓몬GO 배틀리그 실측 메타",
-  description: "상대 기록 · 내 전적 · 실전 픽업률 · 덱 통계. 한국 유저 실제 데이터 기반 GBL 노트.",
+  title: "GBL Note — 포켓몬GO 레이드·배틀·티어·CP 올인원 (한국어)",
+  description: "포켓몬 GO 레이드 딜러 티어·보스 100% CP·레이드 일정, 배틀리그 티어·실측 메타, 내 전적 기록까지. 포켓몬고 한국어 종합 정보·도구.",
   manifest: "/gbl-manifest.json",
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "GBL Note" },
   icons: { apple: "/icons/apple-touch-icon.png", icon: "/icons/gbl-192.png" },
   openGraph: {
-    title: "GBL Note — 포켓몬GO 배틀리그 실측 메타",
-    description: "상대 기록 · 실전 픽업률 · 덱 통계. 한국 유저 실제 데이터 기반.",
+    title: "GBL Note — 포켓몬GO 올인원 한국어판",
+    description: "레이드 딜러·보스 CP·레이드 일정 + 배틀 티어·실측 메타 + 내 전적. 포켓몬고 종합툴.",
     url: "https://gblnote.com",
     siteName: "GBL Note",
     images: [{ url: "/gbl-og.png", width: 1200, height: 630, alt: "GBL Note" }],
@@ -28,8 +28,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "GBL Note — 포켓몬GO 배틀리그 실측 메타",
-    description: "상대 기록 · 실전 픽업률 · 덱 통계. 한국 유저 실제 데이터 기반.",
+    title: "GBL Note — 포켓몬GO 올인원 한국어판",
+    description: "레이드 딜러·보스 CP·일정 + 배틀 티어·실측 메타 + 내 전적. 포켓몬고 종합툴.",
     images: ["/gbl-og.png"],
   },
   // 검색엔진/애드센스 소유권 확인 메타태그(env 있는 것만)
