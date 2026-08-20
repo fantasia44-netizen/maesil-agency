@@ -66,3 +66,9 @@ def get_maesil_hub_client() -> Client:
         options = ClientOptions(postgrest_client_timeout=_QUERY_TIMEOUT)
         return create_client(_HUB_URL, _HUB_KEY, options=options)
     return get_maesil_total_client()
+
+
+def hub_storage_base() -> str:
+    """GBL 스프라이트가 올라간 Supabase Storage 공개 URL 베이스."""
+    base = (_HUB_URL or _SUPABASE_URL).rstrip("/")
+    return f"{base}/storage/v1/object/public"

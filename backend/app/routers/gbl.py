@@ -592,3 +592,82 @@ def board_delete(post_id: int, user: UserContext = Depends(get_current_user)) ->
         logger.error("gbl post 삭제 실패 [%s]: %s", post_id, e)
         raise HTTPException(500, "삭제 실패")
     return {"ok": True}
+
+
+# ── 스프라이트 → Supabase Storage 동기화(관리자) ──────────────────────
+_SPRITE_BUCKET = "gbl-sprites"
+_JSDELIVR = "https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon"
+_sprite_sync_running = False
+
+
+def _sprite_sync_worker() -> None:
+    """PokeAPI 원본 스프라이트를 Storage에 업로드(레포 밖으로 이전 → 배포 경량화).
+    기본 1~1025 + 모든 폼 10001~10277 + 각 이로치까지 통째로 → 이후 어떤 폼도 존재 보장."""
+    global _sprite_sync_running
+    import httpx
+    from app.db.maesil_total_client import get_maesil_hub_client
+    _sprite_sync_running = True
+    up = 0
+    miss = 0
+    try:
+        storage = get_maesil_hub_client().storage
+        try:
+            storage.create_bucket(_SPRITE_BUCKET, options={"public": True})
+            logger.warning("[sprites] 버킷 생성: %s", _SPRITE_BUCKET)
+        except Exception as e:
+            logger.warning("[sprites] 버킷 존재/생성스킵: %s", str(e)[:120])
+        bucket = storage.from_(_SPRITE_BUCKET)
+
+        targets: list[tuple[str, str]] = []
+        for d in list(range(1, 1026)) + list(range(10001, 10278)):
+            targets.append((f"{_JSDELIVR}/{d}.png", f"{d}.png"))
+            targets.append((f"{_JSDELIVR}/shiny/{d}.png", f"shiny/{d}.png"))
+
+        logger.warning("[sprites] 동기화 시작: 대상 %d", len(targets))
+        with httpx.Client(timeout=20, follow_redirects=True) as hc:
+            for url, path in targets:
+                try:
+                    r = hc.get(url)
+                    if r.status_code != 200:
+                        miss += 1
+                        continue
+                    bucket.upload(path, r.content,
+                                  {"content-type": "image/png", "upsert": "true"})
+                    up += 1
+                    if up % 200 == 0:
+                        logger.warning("[sprites] 업로드 %d…", up)
+                except Exception as e:
+                    logger.debug("[sprites] %s 실패: %s", path, str(e)[:80])
+    except Exception as e:
+        logger.error("[sprites] 동기화 오류: %s", e)
+    finally:
+        _sprite_sync_running = False
+        logger.warning("[sprites] 동기화 종료: 업로드 %d, 미존재 %d", up, miss)
+
+
+@router.post("/admin/sprites-sync")
+def sprites_sync(admin: UserContext = Depends(require_admin)) -> dict:
+    """스프라이트 전체를 Supabase Storage(gbl-sprites)로 업로드(백그라운드, idempotent)."""
+    global _sprite_sync_running
+    from app.db.maesil_total_client import hub_storage_base
+    base = f"{hub_storage_base()}/{_SPRITE_BUCKET}"
+    if _sprite_sync_running:
+        return {"started": False, "running": True, "sprite_base": base, "note": "이미 진행 중"}
+    import threading
+    threading.Thread(target=_sprite_sync_worker, daemon=True).start()
+    return {"started": True, "sprite_base": base,
+            "note": "백그라운드 업로드 시작(수 분 소요). 완료 후 프론트 NEXT_PUBLIC_SPRITE_BASE=sprite_base 설정."}
+
+
+@router.get("/admin/sprites-status")
+def sprites_status(admin: UserContext = Depends(require_admin)) -> dict:
+    """샘플 스프라이트(25.png) 존재로 스토리지 반영 확인 + 베이스 URL 반환."""
+    import httpx
+    from app.db.maesil_total_client import hub_storage_base
+    base = f"{hub_storage_base()}/{_SPRITE_BUCKET}"
+    ok = False
+    try:
+        ok = httpx.get(f"{base}/25.png", timeout=8).status_code == 200
+    except Exception:
+        ok = False
+    return {"running": _sprite_sync_running, "sample_ok": ok, "sprite_base": base}
