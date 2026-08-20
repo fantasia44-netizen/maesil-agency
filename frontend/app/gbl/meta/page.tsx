@@ -13,7 +13,7 @@ type League = "great" | "ultra" | "master";
 const DS = DATA as unknown as { leagues: Record<League, { pokemon: Mon[] }> };
 const MON: Record<string, Mon> = {};
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
-const spriteUrl = (m?: Mon) => m ? (m.sprite || `/gbl/sprites/${m.dex}.png`) : "";
+const spriteUrl = (m?: Mon) => m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
 
 const PERIODS: { key: string; label: string; days?: number; start?: string; end?: string }[] = [
   { key: "7", label: "최근 7일", days: 7 },

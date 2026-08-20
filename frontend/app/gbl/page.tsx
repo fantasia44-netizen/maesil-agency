@@ -10,7 +10,7 @@ type Mon = { id: string; dex: number; ko: string; sprite?: string };
 const DS = DATA as unknown as { leagues: Record<string, { pokemon: Mon[] }> };
 const MON: Record<string, Mon> = {};
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
-const spriteUrl = (m?: Mon) => m ? (m.sprite || `/gbl/sprites/${m.dex}.png`) : "";
+const spriteUrl = (m?: Mon) => m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
 
 type Teaser = { total: number; top_mons: { speciesId: string; count: number }[] };
 type Card = { ic: string; t: string; d: string; href: string; c: string; tag?: string };

@@ -76,7 +76,7 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
       await Promise.all([...dexSet].map((dex) => new Promise<void>((res) => {
         const im = new Image(); im.crossOrigin = "anonymous";
         im.onload = () => { imgs[dex] = im; res(); }; im.onerror = () => res();
-        im.src = `/gbl/sprites/${dex}.png`;
+        im.src = `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png`;
       })));
 
       const W = 1080, gx = 40, gw = W - 80, cw = gw / 7, gyTop = 210, rowH = 176;

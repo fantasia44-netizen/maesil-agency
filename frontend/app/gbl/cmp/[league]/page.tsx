@@ -8,7 +8,7 @@ import DETAIL from "../../gbl_detail.json";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 
-export const revalidate = 3600;
+export const revalidate = 600;
 
 const LEAGUES: Record<string, { ko: string; short: string }> = {
   master: { ko: "마스터리그", short: "마스터" },
@@ -22,7 +22,7 @@ const DS = DATA as unknown as { leagues: Record<string, { pokemon: Mon[] }> };
 const MON: Record<string, Mon> = {};
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
 const spriteUrl = (m?: Mon) =>
-  m ? (m.sprite || `/gbl/sprites/${m.dex}.png`) : "";
+  m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
 const nameOf = (id: string) => MON[id]?.ko || id;
 
 type Detail = { id: string; tier: string; stats: Record<string, number>; ko?: string; dex?: number; types?: string[] };
@@ -140,7 +140,7 @@ export default function CmpPage({ params }: { params: { league: string } }) {
                     background: `linear-gradient(100deg, ${c1}1f, #ffffff 82%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "6px 10px" }}>
                   <span style={{ fontSize: "0.76rem", fontWeight: 800, color: i < 3 ? "#dc2626" : "#94a3b8", minWidth: 24 }}>#{i + 1}</span>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={dex ? `/gbl/sprites/${dex}.png` : ""} alt={dispName} width={32} height={32} style={{ imageRendering: "pixelated" }} />
+                  <img src={dex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png` : ""} alt={dispName} width={32} height={32} style={{ imageRendering: "pixelated" }} />
                   <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a", minWidth: 84 }}>{dispName}</span>
                   <span style={{ display: "flex", gap: 3 }}>
                     {types.map((t) => (

@@ -9,7 +9,7 @@ import CoupangAd from "../../CoupangAd";
 import ListShare from "../../ListShare";
 import { monSprite } from "../../sprite";
 
-export const revalidate = 3600;
+export const revalidate = 600;
 
 type Row = {
   name: string; dex: number; shadow: boolean; mega: string; primal: boolean; legacy: boolean; upcoming: boolean;

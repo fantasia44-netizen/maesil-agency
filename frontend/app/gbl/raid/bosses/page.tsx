@@ -8,7 +8,7 @@ import CpTable from "./CpTable";
 import ListShare from "../../ListShare";
 import { pokeSprite, shinySprite, formDex } from "../../sprite";
 
-export const revalidate = 21600; // 6시간마다 갱신(보스 로테이션 반영)
+export const revalidate = 600; // 6시간마다 갱신(보스 로테이션 반영)
 
 const KO = POKEDEX as Record<string, string>;
 const STATS = STATSJSON as Record<string, { a: number; d: number; s: number }>;

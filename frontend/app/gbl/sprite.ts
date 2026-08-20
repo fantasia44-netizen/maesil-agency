@@ -5,26 +5,56 @@
 // (데이터 출처 표기 LeekDuck/ScrapedDuck은 그대로 유지 — 데이터와 이미지는 별개 이슈.)
 export function pokeSprite(dex: string | number): string {
   const n = Number(dex);
-  return n > 0 ? `/gbl/sprites/${n}.png` : "";
+  return n > 0 ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${n}.png` : "";
 }
 
-// 이로치(shiny) 스프라이트 — /public/gbl/sprites/shiny/{dex}.png
+// 이로치(shiny) 스프라이트 — /publichttps://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/shiny/{dex}.png
 export function shinySprite(dex: string | number): string {
   const n = Number(dex);
-  return n > 0 ? `/gbl/sprites/shiny/${n}.png` : "";
+  return n > 0 ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/shiny/${n}.png` : "";
 }
 
-// 특수 폼(기본 dex와 스프라이트가 다른 종). 레이드 데이터에 폼 필드가 없어 한글 이름으로 식별.
-// 매칭 오탐 방지 위해 반드시 (기본 dex + 키워드) 둘 다 확인.
+// ── 폼 스프라이트 매핑 ────────────────────────────────────────────────
+// 레이드 데이터엔 폼 필드가 없어 한글 이름으로 식별. 번호는 PvP 번들(검증됨) +
+// 표준 PokeAPI 폼 dex. 실존하지 않는 메가(데이터상 가짜)는 매핑 없음 → 기본형 유지.
+const MEGA: Record<number, number> = { // 실존 메가만(base dex → 메가 스프라이트 dex)
+  3: 10033, 9: 10036, 15: 10090, 18: 10091, 65: 10037, 80: 10071, 94: 10038,
+  115: 10039, 127: 10040, 130: 10041, 142: 10042, 181: 10045, 208: 10072,
+  212: 10046, 214: 10047, 229: 10048, 248: 10049, 254: 10065, 257: 10050,
+  260: 10064, 282: 10051, 302: 10066, 303: 10052, 306: 10053, 308: 10054,
+  310: 10055, 319: 10070, 323: 10087, 334: 10067, 354: 10056, 359: 10057,
+  362: 10074, 373: 10089, 376: 10076, 380: 10062, 381: 10063, 384: 10079,
+  428: 10088, 445: 10058, 448: 10059, 460: 10060, 475: 10068, 531: 10069, 719: 10075,
+};
+const MEGA_XY: Record<number, [number, number]> = { 6: [10034, 10035], 150: [10043, 10044] };
+const PRIMAL: Record<number, number> = { 382: 10077, 383: 10078 };
+const THERIAN: Record<number, number> = { 641: 10019, 642: 10020, 645: 10021, 905: 10249 };
+const ORIGIN: Record<number, number> = { 487: 10007, 483: 10245, 484: 10246 };
+const REGIONAL: Record<number, number> = { // 알로라/가라르/히스이 (base dex → 지역폼 dex)
+  28: 10102, 38: 10104, 76: 10101, 89: 10112, 103: 10114, 105: 10115,   // 알로라
+  110: 10167, 144: 10169, 145: 10170, 146: 10171, 222: 10173, 555: 10230, 618: 10180, // 가라르
+  157: 10233, 713: 10243,                                                // 히스이
+};
+const SPECIAL: Array<[number, RegExp, number]> = [ // [baseDex, 이름키워드, 폼 dex]
+  [888, /검왕|검의왕/, 10188], [889, /방패왕|방패의왕/, 10189],
+  [646, /블랙/, 10022], [646, /화이트/, 10023],
+  [800, /새벽|새날/, 10156], [800, /황혼|황갈|갈기/, 10155],
+];
+
+// 특수 폼 → 올바른 스프라이트 dex (한글 이름 기반, 실존 폼만; 없으면 기본 dex 유지)
 export function formDex(name: string, dex: string | number): number {
   const d = Number(dex);
   const n = (name || "").replace(/[\s()]/g, "");
-  if (d === 888 && (n.includes("검왕") || n.includes("검의왕"))) return 10188;   // 자시안 검왕(Crowned Sword)
-  if (d === 889 && (n.includes("방패왕") || n.includes("방패의왕"))) return 10189; // 자마젠타 방패왕(Crowned Shield)
-  if (d === 646 && n.includes("블랙")) return 10022;                              // 블랙 큐레무
-  if (d === 646 && n.includes("화이트")) return 10023;                            // 화이트 큐레무
-  if (d === 800 && (n.includes("새벽") || n.includes("새날"))) return 10156;       // 네크로즈마 새벽의 날개(Dawn Wings)
-  if (d === 800 && (n.includes("황혼") || n.includes("황갈") || n.includes("갈기"))) return 10155; // 황혼의 갈기(Dusk Mane)
+  for (const [bd, re, fd] of SPECIAL) if (d === bd && re.test(n)) return fd;
+  if (n.includes("메가")) {
+    if (/X$|X\b/.test((name || "").trim()) && MEGA_XY[d]) return MEGA_XY[d][0];
+    if (/Y$|Y\b/.test((name || "").trim()) && MEGA_XY[d]) return MEGA_XY[d][1];
+    if (MEGA[d]) return MEGA[d];   // 실존 메가만; 가짜 메가는 기본형
+  }
+  if (n.includes("원시") && PRIMAL[d]) return PRIMAL[d];
+  if (n.includes("영물") && THERIAN[d]) return THERIAN[d];
+  if (n.includes("오리진") && ORIGIN[d]) return ORIGIN[d];
+  if (/알로라|가라르|히스이|팔데아/.test(n) && REGIONAL[d]) return REGIONAL[d];
   return d;
 }
 

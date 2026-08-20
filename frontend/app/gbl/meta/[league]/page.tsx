@@ -8,7 +8,7 @@ import DATA from "../../gbl_data.json";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 
-export const revalidate = 3600; // 1시간마다 정적 재생성(크롤 가능 + 재집계 캐싱)
+export const revalidate = 600; // 1시간마다 정적 재생성(크롤 가능 + 재집계 캐싱)
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
@@ -25,7 +25,7 @@ const DS = DATA as unknown as { leagues: Record<string, { pokemon: Mon[] }> };
 const MON: Record<string, Mon> = {};
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
 const spriteUrl = (m?: Mon) =>
-  m ? (m.sprite || `/gbl/sprites/${m.dex}.png`) : "";
+  m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
 const nameOf = (id: string) => MON[id]?.ko || id;
 
 type MetaMon = { speciesId: string; count: number };

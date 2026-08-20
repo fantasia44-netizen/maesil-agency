@@ -8,7 +8,7 @@ export function loadSprites(dexes: string[]): Promise<Record<string, HTMLImageEl
       im.crossOrigin = "anonymous";
       im.onload = () => { imgs[dex] = im; res(); };
       im.onerror = () => res();
-      im.src = `/gbl/sprites/${dex}.png`;
+      im.src = `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png`;
     })),
   ).then(() => imgs);
 }

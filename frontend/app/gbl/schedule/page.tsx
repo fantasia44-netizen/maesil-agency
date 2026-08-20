@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { LEAGUE_SCHEDULE, todayISO, type SchedulePeriod } from "../formats";
 
-export const revalidate = 3600;
+export const revalidate = 600;
 
 const SEASON = { num: 27, name: "새로운 발걸음", start: "2026-06-02", end: "2026-09-09" };
 

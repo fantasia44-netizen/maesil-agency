@@ -7,7 +7,7 @@ import NAME_EN_KO from "../../name_en_ko.json";
 import RaidCalendar, { type CalEvent, type CalBoss } from "./RaidCalendar";
 import { monSprite } from "../../sprite";
 
-export const revalidate = 21600; // 6시간
+export const revalidate = 600; // 6시간
 
 const KO = POKEDEX as Record<string, string>;
 const EN_KO = NAME_EN_KO as Record<string, string>;

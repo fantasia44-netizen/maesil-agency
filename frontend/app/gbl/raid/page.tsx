@@ -5,7 +5,7 @@ import RAIDS from "../gbl_raids.json";
 import AdSlot from "../AdSlot";
 import { monSprite } from "../sprite";
 
-export const revalidate = 3600;
+export const revalidate = 600;
 
 type Row = { name: string; dex: number; dps: number; mega: string; shadow: boolean };
 type RaidData = { meta: { generated: string; typeKo: Record<string, string> }; types: Record<string, Row[]> };
