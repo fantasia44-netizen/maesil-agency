@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import RAIDS from "../gbl_raids.json";
 import AdSlot from "../AdSlot";
+import { monSprite } from "../sprite";
 
 export const revalidate = 3600;
 
@@ -18,8 +19,6 @@ const TYPE_COLOR: Record<string, string> = {
   dark: "#4b4243", steel: "#5a8a9c", fairy: "#d76ad7",
 };
 const TYPE_KO = RD.meta.typeKo;
-const spriteUrl = (dex: number) =>
-  `/gbl/sprites/${dex}.png`;
 
 export const metadata: Metadata = {
   title: "포켓몬고 레이드 딜러 티어표 · 속성별 어택커 DPS 순위 | GBL Note",
@@ -95,7 +94,7 @@ export default function RaidHubPage() {
                 style={{ textDecoration: "none", color: "inherit", background: `linear-gradient(120deg, ${c}1f, ${CARD} 70%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c}`, borderRadius: 11, padding: "10px 11px", display: "flex", alignItems: "center", gap: 9 }}>
                 {top && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={spriteUrl(top.dex)} alt={top.name} width={40} height={40} style={{ imageRendering: "pixelated" }} />
+                  <img src={monSprite(top.name, top.dex)} alt={top.name} width={40} height={40} style={{ imageRendering: "pixelated" }} />
                 )}
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: "0.95rem", fontWeight: 800, color: c }}>{TYPE_KO[t]}</div>

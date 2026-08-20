@@ -7,6 +7,7 @@ import RAIDS from "../../gbl_raids.json";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 import ListShare from "../../ListShare";
+import { monSprite } from "../../sprite";
 
 export const revalidate = 3600;
 
@@ -29,8 +30,6 @@ const TYPE_COLOR: Record<string, string> = {
   dark: "#4b4243", steel: "#5a8a9c", fairy: "#d76ad7",
 };
 const TYPE_KO = RD.meta.typeKo;
-const spriteUrl = (dex: number) =>
-  `/gbl/sprites/${dex}.png`;
 
 // rel%(속성 1위 대비)로 레이드 티어 배지
 const RAID_TIER = (rel: number) => (rel >= 95 ? "S" : rel >= 88 ? "A" : rel >= 80 ? "B" : rel >= 72 ? "C" : "D");
@@ -144,7 +143,7 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
                     <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "#94a3b8", width: 22, textAlign: "center" }}>{i + 1}</span>
                     <span style={{ fontSize: "0.9rem", fontWeight: 900, color: "#fff", background: TIER_COLOR[tier], minWidth: 24, height: 24, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center" }}>{tier}</span>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={spriteUrl(r.dex)} alt={r.name} width={38} height={38} style={{ imageRendering: "pixelated" }} />
+                    <img src={monSprite(r.name, r.dex)} alt={r.name} width={38} height={38} style={{ imageRendering: "pixelated" }} />
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
                         <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a" }}>{r.name}</span>

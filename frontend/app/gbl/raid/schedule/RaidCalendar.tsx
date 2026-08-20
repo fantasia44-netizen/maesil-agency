@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { track } from "../../../../lib/track";
-import { pokeSprite } from "../../sprite";
+import { monSprite } from "../../sprite";
 
 export type CalBoss = { ko: string; dex: string; image: string; shiny: boolean };
 export type RotVariant = "star" | "shadow" | "mega";
@@ -209,7 +209,7 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
               <span style={{ fontSize: "0.66rem", fontWeight: isToday ? 800 : 600, color: isToday ? "#ea580c" : "#94a3b8", lineHeight: 1.2 }}>{day}</span>
               {main ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={main.image} alt="" width={26} height={26} style={{ objectFit: "contain", marginTop: -1 }} />
+                <img src={monSprite(main.ko, main.dex)} alt="" width={26} height={26} style={{ imageRendering: "pixelated", objectFit: "contain", marginTop: -1 }} />
               ) : <span style={{ height: 26 }} />}
               <span style={{ display: "flex", gap: 2, alignItems: "center", height: 10, lineHeight: 1 }}>
                 {mega && <span style={{ fontSize: "0.52rem" }}>🔷</span>}
@@ -251,7 +251,7 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
                         {e.bosses.map((b, bi) => (
                           <Link key={bi} href={`/gbl/raid/bosses#b${b.dex}`} style={{ display: "flex", alignItems: "center", gap: 5, textDecoration: "none" }}>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={pokeSprite(b.dex)} alt={b.ko} width={34} height={34} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                            <img src={monSprite(b.ko, b.dex)} alt={b.ko} width={34} height={34} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
                             <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#3b5bdb" }}>{b.ko}{b.shiny ? " ✨" : ""}</span>
                           </Link>
                         ))}
@@ -277,7 +277,7 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
                 <Link key={i} href={`/gbl/raid/bosses#b${m.b.dex}`}
                   style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "6px 10px" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={m.b.image} alt={m.b.ko} width={34} height={34} style={{ objectFit: "contain" }} />
+                  <img src={monSprite(m.b.ko, m.b.dex)} alt={m.b.ko} width={34} height={34} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
                   <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a" }}>{m.b.ko}{m.b.shiny ? " ✨" : ""}</span>
                   {rs && <span style={{ fontSize: "0.6rem", fontWeight: 800, color: rs.c, background: rs.bg, border: `1px solid ${rs.c}44`, borderRadius: 6, padding: "1px 7px" }}>{rs.icon} {rs.label}</span>}
                   <span style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#3b5bdb", fontWeight: 600, whiteSpace: "nowrap" }}>CP·딜러 →</span>

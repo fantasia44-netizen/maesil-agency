@@ -6,7 +6,7 @@ import POKEDEX from "../../pokedex_ko.json";
 import STATSJSON from "../../pokedex_stats.json";
 import CpTable from "./CpTable";
 import ListShare from "../../ListShare";
-import { pokeSprite } from "../../sprite";
+import { monSprite } from "../../sprite";
 
 export const revalidate = 21600; // 6시간마다 갱신(보스 로테이션 반영)
 
@@ -185,7 +185,7 @@ export default async function BossesPage() {
                       <div key={`${b.name}-${i}`} id={`b${dexOf(b.image)}`} style={{ scrollMarginTop: 12, background: CARD, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 12, padding: "10px 12px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={pokeSprite(dexOf(b.image))} alt={bossKo(b)} width={46} height={46} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                          <img src={monSprite(bossKo(b), dexOf(b.image))} alt={bossKo(b)} width={46} height={46} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                               <span style={{ fontSize: "0.98rem", fontWeight: 800, color: "#0f172a" }}>{bossKo(b)}</span>

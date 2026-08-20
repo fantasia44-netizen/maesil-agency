@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import POKEDEX from "../../pokedex_ko.json";
 import NAME_EN_KO from "../../name_en_ko.json";
 import RaidCalendar, { type CalEvent, type CalBoss } from "./RaidCalendar";
-import { pokeSprite } from "../../sprite";
+import { monSprite } from "../../sprite";
 
 export const revalidate = 21600; // 6시간
 
@@ -145,7 +145,7 @@ export default async function RaidSchedulePage() {
                           {e.bosses.map((b, bi) => (
                             <Link key={bi} href={`/gbl/raid/bosses#b${b.dex}`} style={{ display: "flex", alignItems: "center", gap: 5, textDecoration: "none" }}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={pokeSprite(b.dex)} alt={b.ko} width={36} height={36} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                              <img src={monSprite(b.ko, b.dex)} alt={b.ko} width={36} height={36} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
                               <span style={{ fontSize: "0.84rem", fontWeight: 700, color: "#3b5bdb" }}>{b.ko}{b.shiny ? " ✨" : ""}</span>
                             </Link>
                           ))}
