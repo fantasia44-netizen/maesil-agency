@@ -211,6 +211,29 @@ function TeamSlot({ idx, mon, pool, onChange }: { idx: number; mon: TeamMon; poo
   );
 }
 
+// ── 레이팅 추이 그래프 ──────────────────────────────────────────────────
+type RatingEntry = { id: string; league: string; profile: string | null; rating: number; recorded_at: string };
+function RatingGraph({ data }: { data: RatingEntry[] }) {
+  const W = 600, H = 170, pad = 26;
+  const vals = data.map((d) => d.rating);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const range = max - min || 1;
+  const n = data.length;
+  const x = (i: number) => pad + (n === 1 ? (W - 2 * pad) / 2 : (i / (n - 1)) * (W - 2 * pad));
+  const y = (v: number) => pad + (1 - (v - min) / range) * (H - 2 * pad);
+  const pts = data.map((d, i) => `${x(i)},${y(d.rating)}`).join(" ");
+  const last = data[data.length - 1];
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ background: "#fff", border: "1px solid #e3e8f2", borderRadius: 10, display: "block" }}>
+      <text x={4} y={y(max) + 4} fontSize="13" fill="#94a3b8">{max}</text>
+      <text x={4} y={y(min) + 4} fontSize="13" fill="#94a3b8">{min}</text>
+      <polyline points={pts} fill="none" stroke="#3b5bdb" strokeWidth="2.5" strokeLinejoin="round" />
+      {data.map((d, i) => <circle key={d.id} cx={x(i)} cy={y(d.rating)} r={i === n - 1 ? 5 : 3} fill={i === n - 1 ? "#7c3aed" : "#3b5bdb"} />)}
+      <text x={x(n - 1)} y={y(last.rating) - 10} fontSize="15" fontWeight="800" fill="#7c3aed" textAnchor="middle">{last.rating}</text>
+    </svg>
+  );
+}
+
 // ── 조회 카드 ──────────────────────────────────────────────────────────
 function MatchCard({ m, onEdit, onDelete, readOnly }: {
   m: Match; onEdit?: (m: Match) => void; onDelete: (id: string) => void; readOnly?: boolean;
@@ -279,6 +302,10 @@ export default function GblPage() {
   const [statsPeriod, setStatsPeriod] = useState<"7" | "30" | "all">("all");  // 전적 기간
   const [selectedDay, setSelectedDay] = useState<string | null>(null);        // 달력 선택 날짜
   const [calYM, setCalYM] = useState<{ y: number; m: number } | null>(null);  // 달력 표시 연·월(m:1-12)
+  const [ratings, setRatings] = useState<RatingEntry[]>([]);                   // 레이팅 기록
+  const [ratingProfile, setRatingProfile] = useState("기본");                  // 선택 계정(본계/부계)
+  const [ratingInput, setRatingInput] = useState("");
+  const [extraProfiles, setExtraProfiles] = useState<string[]>([]);            // 추가했지만 아직 기록 전 계정
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -322,8 +349,46 @@ export default function GblPage() {
     setScope(s);
     if (s === "all" && allMatches.length === 0) loadAll();
   };
+
+  // ── 레이팅 기록(계정별) ──
+  const loadRatings = async () => {
+    try {
+      const data = await apiFetch<RatingEntry[]>(`/api/gbl/ratings?league=${league}`, {}, 15000);
+      setRatings(Array.isArray(data) ? data : []);
+    } catch { /* 테이블 미생성 등 → 무시 */ }
+  };
+  const recordRating = async () => {
+    const v = parseInt(ratingInput, 10);
+    if (!v || v < 100 || v > 6000) { flash("점수를 정확히 입력하세요"); return; }
+    try {
+      await apiFetch("/api/gbl/ratings", { method: "POST",
+        body: JSON.stringify({ rating: v, league, profile: ratingProfile === "기본" ? null : ratingProfile }) }, 15000);
+      setRatingInput(""); flash("📈 레이팅 기록됨"); loadRatings();
+    } catch (e) { flash(e instanceof Error ? e.message : "저장 실패"); }
+  };
+  const deleteRating = async (id: string) => {
+    try { await apiFetch(`/api/gbl/ratings/${id}`, { method: "DELETE" }, 10000); loadRatings(); } catch { /* noop */ }
+  };
+  const addRatingProfile = () => {
+    const t = (window.prompt("계정 이름 (예: 부계1)") || "").trim();
+    if (!t || t === "기본") return;
+    setExtraProfiles((p) => p.includes(t) ? p : [...p, t]);
+    setRatingProfile(t);
+  };
+
   useEffect(() => { load(); }, []);
+  useEffect(() => { loadRatings(); }, [league]);   // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (tab === "lookup") searchRef.current?.focus(); }, [tab]);
+
+  // 레이팅: 선택 계정 필터 + 계정 목록
+  const ratingProfileList = useMemo(() => {
+    const set = new Set<string>(["기본", ...extraProfiles]);
+    for (const r of ratings) set.add(r.profile || "기본");
+    return [...set];
+  }, [ratings, extraProfiles]);
+  const profileRatings = useMemo(
+    () => ratings.filter((r) => (r.profile || "기본") === ratingProfile),
+    [ratings, ratingProfile]);
 
   // 조회: 이름으로 그룹핑 (최근순 유지). scope=all이면 전체 유저 기록.
   const groups = useMemo(() => {
@@ -747,6 +812,55 @@ export default function GblPage() {
                 style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid #dbe2ee", cursor: "pointer", fontWeight: 700, fontSize: "0.85rem", background: "#eef2f8", color: "#3b5bdb" }}>💾 저장</button>
             </div>
           )}
+
+          {/* 📈 레이팅 추이 (계정별) */}
+          <div style={{ marginBottom: 16, background: "#ffffff", border: "1px solid #e3e8f2", borderRadius: 12, padding: "0.9rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
+              <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "#0f172a" }}>📈 레이팅 추이</span>
+              <span style={{ fontSize: "0.68rem", color: "#94a3b8" }}>{FORMAT_BY_KEY[league]?.label || league}</span>
+            </div>
+            <div style={{ display: "flex", gap: 5, marginBottom: 8, flexWrap: "wrap" }}>
+              {ratingProfileList.map((pf) => (
+                <button key={pf} onClick={() => setRatingProfile(pf)}
+                  style={{ fontSize: "0.74rem", fontWeight: 600, padding: "4px 11px", borderRadius: 14, cursor: "pointer",
+                    border: `1px solid ${pf === ratingProfile ? "#4f8cff" : "#dbe2ee"}`,
+                    background: pf === ratingProfile ? "#3b5bdb" : "#eef2f8", color: pf === ratingProfile ? "#fff" : "#64748b" }}>{pf}</button>
+              ))}
+              <button onClick={addRatingProfile} style={{ fontSize: "0.74rem", fontWeight: 600, padding: "4px 11px", borderRadius: 14, cursor: "pointer", border: "1px dashed #cbd5e1", background: "#fff", color: "#94a3b8" }}>+ 계정</button>
+            </div>
+            <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+              <input type="number" inputMode="numeric" value={ratingInput} onChange={(e) => setRatingInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") recordRating(); }}
+                placeholder={`${ratingProfile} 현재 점수`}
+                style={{ flex: 1, padding: "9px 12px", border: "1px solid #dbe2ee", borderRadius: 8, fontSize: "0.9rem", boxSizing: "border-box" }} />
+              <button onClick={recordRating} style={{ padding: "9px 16px", borderRadius: 8, border: "none", background: "#3b5bdb", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: "0.85rem" }}>기록</button>
+            </div>
+            {profileRatings.length > 0 && (() => {
+              const lastR = profileRatings[profileRatings.length - 1].rating;
+              const delta = lastR - profileRatings[0].rating;
+              return (
+                <div style={{ fontSize: "0.82rem", color: "#475569", marginBottom: 8 }}>
+                  현재 <b style={{ color: "#0f172a", fontSize: "1.05rem" }}>{lastR}</b>
+                  {profileRatings.length > 1 && <span style={{ marginLeft: 8, fontWeight: 700, color: delta >= 0 ? "#16a34a" : "#dc2626" }}>{delta >= 0 ? `▲ +${delta}` : `▼ ${delta}`}</span>}
+                  <span style={{ color: "#94a3b8", marginLeft: 8 }}>· {profileRatings.length}회</span>
+                </div>
+              );
+            })()}
+            {profileRatings.length >= 2 ? (
+              <RatingGraph data={profileRatings} />
+            ) : (
+              <div style={{ fontSize: "0.76rem", color: "#94a3b8", textAlign: "center", padding: "0.8rem 0" }}>2번 이상 기록하면 추이 그래프가 나옵니다.</div>
+            )}
+            {profileRatings.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 8 }}>
+                {profileRatings.slice().reverse().slice(0, 10).map((r) => (
+                  <span key={r.id} style={{ fontSize: "0.7rem", color: "#64748b", background: "#f1f5f9", borderRadius: 8, padding: "2px 8px" }}>
+                    {r.rating}<button onClick={() => deleteRating(r.id)} style={{ marginLeft: 4, background: "none", border: "none", color: "#cbd5e1", cursor: "pointer", padding: 0 }}>✕</button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* 📅 달력 (일자별) */}
           {calYM && (

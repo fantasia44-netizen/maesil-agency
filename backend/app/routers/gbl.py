@@ -132,6 +132,51 @@ def delete_match(match_id: str, user: UserContext = Depends(get_current_user)) -
         raise HTTPException(500, "기록 삭제 실패")
 
 
+# ── 레이팅 기록 (유저 스코프, 계정별 profile — 다계정 대응) ──────────────
+class RatingIn(BaseModel):
+    rating: int
+    league: str = "master"
+    profile: str | None = None   # 본계/부계 라벨(없으면 기본)
+
+
+@router.get("/ratings")
+def list_ratings(league: str | None = None,
+                 user: UserContext = Depends(get_current_user)) -> list[dict]:
+    """내 레이팅 기록(오래된→최신). 프론트에서 계정(profile)별로 그룹핑/그래프."""
+    q = (_db().table("gbl_ratings").select("*")
+         .eq("user_id", user.id).order("recorded_at", desc=False).limit(2000))
+    if league:
+        q = q.eq("league", league)
+    try:
+        return q.execute().data or []
+    except Exception as e:
+        logger.error("gbl ratings list 실패 [%s]: %s", user.id, e)
+        raise HTTPException(500, "레이팅 조회 실패")
+
+
+@router.post("/ratings")
+def create_rating(body: RatingIn, user: UserContext = Depends(get_current_user)) -> dict:
+    if body.rating < 0 or body.rating > 6000:
+        raise HTTPException(400, "레이팅 값이 올바르지 않습니다.")
+    prof = (body.profile or "").strip() or None
+    row = {"user_id": user.id, "league": body.league or "master", "profile": prof, "rating": body.rating}
+    try:
+        return (_db().table("gbl_ratings").insert(row).execute().data or [row])[0]
+    except Exception as e:
+        logger.error("gbl rating 저장 실패 [%s]: %s", user.id, e)
+        raise HTTPException(500, "레이팅 저장 실패")
+
+
+@router.delete("/ratings/{rating_id}")
+def delete_rating(rating_id: str, user: UserContext = Depends(get_current_user)) -> dict:
+    try:
+        _db().table("gbl_ratings").delete().eq("user_id", user.id).eq("id", rating_id).execute()
+        return {"ok": True}
+    except Exception as e:
+        logger.error("gbl rating 삭제 실패 [%s]: %s", rating_id, e)
+        raise HTTPException(500, "레이팅 삭제 실패")
+
+
 # ── 공개 실측 메타 (로그인 불필요, 익명 집계) ──────────────────────────
 @router.get("/meta")
 def public_meta(league: str = "master", days: int = 30,
