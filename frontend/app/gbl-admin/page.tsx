@@ -28,12 +28,26 @@ type Traffic = {
 
 type DbStatus = { hub_configured: boolean; maesil_total: number | null; maesil_hub: number | null };
 
+type BoardPost = { id: number; board: string; author: string; title: string; answered: boolean; reply_count: number; created_at: string };
+
 export default function GblAdmin() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [db, setDb] = useState<DbStatus | null>(null);
   const [traffic, setTraffic] = useState<Traffic | null>(null);
+  const [inquiries, setInquiries] = useState<BoardPost[]>([]);
+  const [chats, setChats] = useState<BoardPost[]>([]);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
+
+  const loadBoard = async () => {
+    try {
+      const [inq, ch] = await Promise.all([
+        apiFetch<BoardPost[]>("/api/gbl/board?board=inquiry&limit=50", {}, 15000),
+        apiFetch<BoardPost[]>("/api/gbl/board?board=chat&limit=20", {}, 15000),
+      ]);
+      setInquiries(inq); setChats(ch);
+    } catch { /* SQL 069 미실행 등 */ }
+  };
 
   const loadTraffic = async () => {
     try { setTraffic(await apiFetch<Traffic>("/api/gbl/admin/traffic?days=30", {}, 20000)); }
@@ -51,7 +65,7 @@ export default function GblAdmin() {
     try { setDb(await apiFetch<DbStatus>("/api/gbl/admin/db-status", {}, 20000)); }
     catch { /* noop */ }
   };
-  useEffect(() => { load(); loadDb(); loadTraffic(); }, []);
+  useEffect(() => { load(); loadDb(); loadTraffic(); loadBoard(); }, []);
 
   const migrate = async () => {
     if (!window.confirm("maesil-total의 gbl_matches를 maesil-hub로 복사합니다 (id 유지, 재실행 안전). 계속할까요?")) return;
@@ -95,6 +109,7 @@ export default function GblAdmin() {
   const card: React.CSSProperties = { background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "1rem", textAlign: "center" };
   const th: React.CSSProperties = { textAlign: "left", fontSize: "0.72rem", color: "#94a3b8", fontWeight: 600, padding: "8px 10px", borderBottom: "1px solid #eef2f0" };
   const td: React.CSSProperties = { fontSize: "0.82rem", padding: "9px 10px", borderBottom: "1px solid #f5f7f6" };
+  const pendingCount = inquiries.filter((p) => !p.answered).length;
 
   return (
     <div style={{ maxWidth: 960, margin: "0 auto", padding: "1.5rem 1rem 4rem" }}>
@@ -105,6 +120,32 @@ export default function GblAdmin() {
       <p style={{ margin: "0 0 1.2rem", fontSize: "0.82rem", color: "#64748b" }}>gbl.maesil.net 가입 유저·기록 현황 (super_admin 전용)</p>
 
       {err && <div style={{ background: "#fef2f2", color: "#b91c1c", border: "1px solid #fecaca", borderRadius: 10, padding: "0.7rem 1rem", marginBottom: "1rem", fontSize: "0.85rem" }}>{err}</div>}
+
+      {/* 게시판 · 문의 */}
+      <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "1rem", marginBottom: "1.2rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+          <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>💬 게시판 · 문의</span>
+          {pendingCount > 0 && <span style={{ fontSize: "0.72rem", fontWeight: 800, color: "#b45309", background: "#fef3c7", borderRadius: 20, padding: "2px 10px" }}>답변대기 {pendingCount}</span>}
+          <a href="/gbl/board?board=inquiry" target="_blank" rel="noreferrer" style={{ marginLeft: "auto", fontSize: "0.76rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>게시판 열기 →</a>
+        </div>
+        <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 4 }}>운영자 문의 (최신순 · 클릭하면 게시판에서 답변)</div>
+        {inquiries.length === 0 ? (
+          <div style={{ fontSize: "0.8rem", color: "#94a3b8", padding: "6px 0" }}>문의 없음 (또는 SQL 069 미실행)</div>
+        ) : inquiries.slice(0, 10).map((p) => (
+          <a key={p.id} href={`/gbl/board?board=inquiry&post=${p.id}`} target="_blank" rel="noreferrer"
+             style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 0", borderTop: "1px solid #f5f7f6", textDecoration: "none" }}>
+            <span style={{ fontSize: "0.62rem", fontWeight: 800, padding: "1px 7px", borderRadius: 20, background: p.answered ? "#dcfce7" : "#fef3c7", color: p.answered ? "#16a34a" : "#b45309" }}>{p.answered ? "완료" : "대기"}</span>
+            <span style={{ flex: 1, fontSize: "0.84rem", color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</span>
+            {p.reply_count > 0 && <span style={{ fontSize: "0.72rem", color: "#3b5bdb", fontWeight: 700 }}>💬{p.reply_count}</span>}
+            <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{p.author} · {fmtDate(p.created_at)}</span>
+          </a>
+        ))}
+        {chats.length > 0 && (
+          <div style={{ marginTop: 10, fontSize: "0.76rem", color: "#64748b" }}>
+            잡담방 글 {chats.length}개 · <a href="/gbl/board?board=chat" target="_blank" rel="noreferrer" style={{ color: "#3b5bdb", textDecoration: "none" }}>보기 →</a>
+          </div>
+        )}
+      </div>
 
       {/* 방문 통계(자체 집계) */}
       {!traffic ? (

@@ -441,3 +441,144 @@ def admin_migrate_to_hub(admin: UserContext = Depends(require_admin)) -> dict:
         logger.error("gbl migrate 삽입 실패: %s", e)
         raise HTTPException(500, f"hub 삽입 실패: {e}")
     return {"copied": copied, "source": len(rows)}
+
+
+# ── 게시판(회원 전용: 잡담방 + 운영자 문의) ──────────────────────────────
+_BOARDS = ("chat", "inquiry")
+
+
+class PostIn(BaseModel):
+    board: str = "chat"
+    title: str
+    body: str
+
+
+class ReplyIn(BaseModel):
+    body: str
+
+
+def _attach_authors(rows: list[dict], viewer_id: str | None = None) -> None:
+    """작성자 표시명 부착(닉네임 → 이메일 앞부분 → '익명') + 본인글 여부(mine).
+    user_id(원문 uuid)는 프라이버시상 응답에서 제거."""
+    uids = list({str(r["user_id"]) for r in rows if r.get("user_id")})
+    umap: dict = {}
+    if uids:
+        try:
+            urows = _users_db().table("users").select("id, email, display_name").in_("id", uids).execute().data or []
+            umap = {str(u["id"]): u for u in urows}
+        except Exception:
+            umap = {}
+    for r in rows:
+        uid = str(r.get("user_id"))
+        u = umap.get(uid) or {}
+        r["author"] = u.get("display_name") or (u.get("email") or "").split("@")[0] or "익명"
+        r["mine"] = bool(viewer_id and uid == str(viewer_id))
+        r.pop("user_id", None)
+
+
+@router.get("/board")
+def board_list(board: str = "chat", limit: int = 50,
+               user: UserContext = Depends(get_current_user)) -> list[dict]:
+    """회원 전용 게시판 목록. board=chat(잡담방)|inquiry(운영자 문의)."""
+    if board not in _BOARDS:
+        raise HTTPException(400, "잘못된 게시판입니다.")
+    try:
+        rows = (_db().table("gbl_posts").select("*")
+                .eq("board", board).order("created_at", desc=True)
+                .limit(min(max(limit, 1), 100)).execute().data) or []
+    except Exception as e:
+        logger.error("gbl board list 실패: %s", e)
+        raise HTTPException(500, "게시판 조회 실패")
+    _attach_authors(rows, user.id)
+    return rows
+
+
+@router.get("/board/{post_id}")
+def board_get(post_id: int, user: UserContext = Depends(get_current_user)) -> dict:
+    """글 상세 + 댓글."""
+    db = _db()
+    try:
+        prow = (db.table("gbl_posts").select("*").eq("id", post_id).limit(1).execute().data) or []
+        if not prow:
+            raise HTTPException(404, "글을 찾을 수 없습니다.")
+        replies = (db.table("gbl_post_replies").select("*")
+                   .eq("post_id", post_id).order("created_at").execute().data) or []
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("gbl post 조회 실패 [%s]: %s", post_id, e)
+        raise HTTPException(500, "글 조회 실패")
+    post = prow[0]
+    _attach_authors([post], user.id)
+    _attach_authors(replies, user.id)
+    post["replies"] = replies
+    return post
+
+
+@router.post("/board")
+def board_create(body: PostIn, user: UserContext = Depends(get_current_user)) -> dict:
+    """글 작성(로그인 필수). 회원 전용이라 별도 캡차 없이 스팸/봇 차단."""
+    if body.board not in _BOARDS:
+        raise HTTPException(400, "잘못된 게시판입니다.")
+    title = (body.title or "").strip()
+    text = (body.body or "").strip()
+    if not title or not text:
+        raise HTTPException(400, "제목과 내용을 입력하세요.")
+    try:
+        row = (_db().table("gbl_posts").insert({
+            "board": body.board, "user_id": str(user.id),
+            "title": title[:200], "body": text[:5000],
+        }).execute().data)[0]
+    except Exception as e:
+        logger.error("gbl post 작성 실패: %s", e)
+        raise HTTPException(500, "글 작성 실패")
+    _attach_authors([row], user.id)
+    return row
+
+
+@router.post("/board/{post_id}/reply")
+def board_reply(post_id: int, body: ReplyIn, user: UserContext = Depends(get_current_user)) -> dict:
+    """댓글/답변 작성. super_admin이면 is_admin=true(운영자 답변) + inquiry는 answered=true."""
+    text = (body.body or "").strip()
+    if not text:
+        raise HTTPException(400, "내용을 입력하세요.")
+    db = _db()
+    try:
+        prow = (db.table("gbl_posts").select("id, board").eq("id", post_id).limit(1).execute().data) or []
+        if not prow:
+            raise HTTPException(404, "글을 찾을 수 없습니다.")
+        is_admin = bool(user.is_super_admin)
+        rep = (db.table("gbl_post_replies").insert({
+            "post_id": post_id, "user_id": str(user.id),
+            "is_admin": is_admin, "body": text[:5000],
+        }).execute().data)[0]
+        cnt = (db.table("gbl_post_replies").select("id", count="exact")
+               .eq("post_id", post_id).execute().count) or 0
+        patch: dict = {"reply_count": cnt, "updated_at": datetime.now(timezone.utc).isoformat()}
+        if is_admin and prow[0].get("board") == "inquiry":
+            patch["answered"] = True
+        db.table("gbl_posts").update(patch).eq("id", post_id).execute()
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("gbl reply 실패 [%s]: %s", post_id, e)
+        raise HTTPException(500, "댓글 작성 실패")
+    _attach_authors([rep], user.id)
+    return rep
+
+
+@router.delete("/board/{post_id}")
+def board_delete(post_id: int, user: UserContext = Depends(get_current_user)) -> dict:
+    """본인 글 또는 운영자만 삭제(댓글 CASCADE)."""
+    db = _db()
+    prow = (db.table("gbl_posts").select("user_id").eq("id", post_id).limit(1).execute().data) or []
+    if not prow:
+        raise HTTPException(404, "글을 찾을 수 없습니다.")
+    if str(prow[0]["user_id"]) != str(user.id) and not user.is_super_admin:
+        raise HTTPException(403, "본인 글만 삭제할 수 있습니다.")
+    try:
+        db.table("gbl_posts").delete().eq("id", post_id).execute()
+    except Exception as e:
+        logger.error("gbl post 삭제 실패 [%s]: %s", post_id, e)
+        raise HTTPException(500, "삭제 실패")
+    return {"ok": True}

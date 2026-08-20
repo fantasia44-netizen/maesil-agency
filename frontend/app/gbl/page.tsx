@@ -96,6 +96,15 @@ export default function GblLanding() {
           {PVP.map((h) => <HubCard key={h.t} h={h} />)}
         </div>
 
+        {/* 커뮤니티 */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "0 0 10px" }}>
+          <span style={{ fontSize: "1.1rem", fontWeight: 900, color: "#0891b2" }}>💬 커뮤니티</span>
+          <span style={{ fontSize: "0.74rem", color: "#94a3b8" }}>회원 잡담방 · 운영자 문의</span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 10, marginBottom: 24 }}>
+          <HubCard h={{ ic: "💬", t: "게시판", d: "잡담방 · 운영자에게 문의 (회원 전용)", href: "/gbl/board", c: "#0891b2" }} />
+        </div>
+
         {/* 라이브 실측 미리보기 */}
         {teaser && teaser.total > 0 && (
           <div style={{ maxWidth: 480, margin: "0 auto 24px", background: "#ffffff", border: "1px solid #e3e8f2", borderRadius: 14, padding: "1rem 1.1rem" }}>
@@ -127,6 +136,8 @@ export default function GblLanding() {
           <Link href="/gbl/raid" style={{ color: "#64748b" }}>레이드 딜러</Link> ·{" "}
           <Link href="/gbl/raid/schedule" style={{ color: "#64748b" }}>레이드 일정</Link> ·{" "}
           <Link href="/gbl/schedule" style={{ color: "#64748b" }}>시즌 일정</Link> ·{" "}
+          <Link href="/gbl/board" style={{ color: "#64748b" }}>게시판</Link> ·{" "}
+          <Link href="/gbl/contact" style={{ color: "#64748b" }}>문의</Link> ·{" "}
           <Link href="/gbl/guide" style={{ color: "#64748b" }}>가이드</Link> ·{" "}
           <Link href="/gbl/about" style={{ color: "#64748b" }}>소개</Link> ·{" "}
           <Link href="/gbl/privacy" style={{ color: "#64748b" }}>개인정보처리방침</Link> ·{" "}
