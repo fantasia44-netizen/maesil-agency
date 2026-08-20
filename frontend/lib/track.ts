@@ -1,4 +1,5 @@
 // GBL 자체 방문/이벤트 트래킹(익명). 방문자/세션 토큰은 로컬 저장, PII 없음.
+import { getUser } from "./api";
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
 function tok(key: string, store: Storage): string {
@@ -11,6 +12,7 @@ function tok(key: string, store: Storage): string {
 
 export function track(event: "pageview" | "share" | "download", path?: string) {
   if (typeof window === "undefined") return;
+  if (getUser()?.role === "super_admin") return; // 관리자(오너) 본인 방문은 통계 제외
   let ref = "";
   if (event === "pageview" && document.referrer) {
     try { const h = new URL(document.referrer).host; if (h && h !== location.host) ref = h; } catch { /* noop */ }
