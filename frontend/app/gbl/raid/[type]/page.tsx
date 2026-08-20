@@ -158,14 +158,19 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
                         ); })()}
                       </div>
                     </div>
-                    <div style={{ textAlign: "right", minWidth: 84 }}>
-                      <div style={{ fontSize: "1.05rem", fontWeight: 900, color: "#0f172a", lineHeight: 1 }}>{r.er.toFixed(1)}</div>
-                      <div style={{ fontSize: "0.58rem", color: "#94a3b8", marginTop: 2 }}>종합 · 딜 {r.dps.toFixed(1)} · 총딜 {r.tdo}</div>
+                    <div style={{ textAlign: "right", minWidth: 62 }}>
+                      <div style={{ fontSize: "1.2rem", fontWeight: 900, color: c, lineHeight: 1 }}>{r.er.toFixed(1)}</div>
+                      <div style={{ fontSize: "0.55rem", color: "#94a3b8", fontWeight: 700, letterSpacing: 0.2, marginTop: 1 }}>종합점수</div>
                     </div>
                   </div>
-                  {/* rel% 바 */}
-                  <div style={{ marginTop: 6, height: 5, background: "#eef2f8", borderRadius: 3, overflow: "hidden" }}>
-                    <div style={{ width: `${r.rel}%`, height: "100%", background: c, borderRadius: 3 }} />
+                  {/* rel% 바 + DPS/TDO 상세 수치 */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 7 }}>
+                    <div style={{ flex: 1, height: 6, background: "#eef2f8", borderRadius: 3, overflow: "hidden" }}>
+                      <div style={{ width: `${r.rel}%`, height: "100%", background: c, borderRadius: 3 }} />
+                    </div>
+                    <span style={{ fontSize: "0.66rem", color: "#64748b", whiteSpace: "nowrap" }}>
+                      딜 <b style={{ color: "#334155" }}>{r.dps.toFixed(1)}</b> · 총딜 <b style={{ color: "#334155" }}>{r.tdo.toLocaleString()}</b>
+                    </span>
                   </div>
                 </div>
               );
