@@ -10,7 +10,7 @@ import CoupangAd from "../../CoupangAd";
 export const revalidate = 3600;
 
 type Row = {
-  name: string; dex: number; shadow: boolean; variant: string; mega: string;
+  name: string; dex: number; shadow: boolean; mega: string; primal: boolean; legacy: boolean; upcoming: boolean;
   fast: string; charged: string; fastKo: string; chargedKo: string;
   dps: number; bulk: number; rel: number; atk: number; def: number; hp: number;
 };
@@ -63,13 +63,19 @@ export function generateMetadata({ params }: { params: { type: string } }): Meta
 const CARD = "#ffffff";
 const BORDER = "#e3e8f2";
 
+function Badge({ text, bg }: { text: string; bg: string }) {
+  return <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#fff", background: bg, padding: "1px 6px", borderRadius: 6, whiteSpace: "nowrap" }}>{text}</span>;
+}
+
 function VariantBadge({ r }: { r: Row }) {
-  if (r.mega) {
-    const label = r.mega === "X" || r.mega === "Y" ? `메가 ${r.mega}` : "메가";
-    return <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#fff", background: "linear-gradient(90deg,#7c3aed,#db2777)", padding: "1px 6px", borderRadius: 6 }}>{label}</span>;
-  }
-  if (r.shadow) return <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#fff", background: "#4b0082", padding: "1px 6px", borderRadius: 6 }}>섀도우</span>;
-  return null;
+  return (
+    <>
+      {r.primal && <Badge text="원시" bg="linear-gradient(90deg,#c2410c,#dc2626)" />}
+      {r.mega && <Badge text={r.mega === "X" || r.mega === "Y" ? `메가 ${r.mega}` : "메가"} bg="linear-gradient(90deg,#7c3aed,#db2777)" />}
+      {r.shadow && <Badge text="섀도우" bg="#4b0082" />}
+      {r.upcoming && <Badge text="출시예정" bg="#0891b2" />}
+    </>
+  );
 }
 
 export default function RaidTypePage({ params }: { params: { type: string } }) {
@@ -118,6 +124,9 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
         <p style={{ margin: "0.5rem 0 0", fontSize: "0.76rem", color: "#94a3b8" }}>
           DPS = 중립 대상 기준 초당 데미지(레벨40·STAB 반영). 내구 = 유효체력×방어 지수. 상성이 잘 맞는 상대에겐 실제 딜이 1.6배가 됩니다.
         </p>
+        <p style={{ margin: "0.35rem 0 0", fontSize: "0.72rem", color: "#94a3b8" }}>
+          데이터 기준일 <b style={{ color: "#64748b" }}>{RD.meta.generated}</b> · <span style={{ color: "#d97706", fontWeight: 700 }}>레거시*</span> = 전용·이벤트 한정 기술 · <span style={{ color: "#0891b2", fontWeight: 700 }}>출시예정</span> = 아직 미출시
+        </p>
 
         {rows.length === 0 ? (
           <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem 1rem" }}>데이터 준비 중입니다.</div>
@@ -139,7 +148,7 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
                       </div>
                       <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 3 }}>
                         <span style={{ fontSize: "0.66rem", fontWeight: 600, padding: "1px 6px", borderRadius: 9, background: "#eef2f8", color: "#64748b", whiteSpace: "nowrap" }}>{r.fastKo}</span>
-                        <span style={{ fontSize: "0.66rem", fontWeight: 600, padding: "1px 6px", borderRadius: 9, background: c + "22", color: c, border: `1px solid ${c}55`, whiteSpace: "nowrap" }}>{r.chargedKo}</span>
+                        <span style={{ fontSize: "0.66rem", fontWeight: 600, padding: "1px 6px", borderRadius: 9, background: c + "22", color: c, border: `1px solid ${c}55`, whiteSpace: "nowrap" }}>{r.chargedKo}{r.legacy && <span style={{ color: "#d97706" }}>*</span>}</span>
                       </div>
                     </div>
                     <div style={{ textAlign: "right", minWidth: 74 }}>
