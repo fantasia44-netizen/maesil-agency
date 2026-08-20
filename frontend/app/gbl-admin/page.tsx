@@ -148,6 +148,35 @@ export default function GblAdmin() {
               </div>
             </div>
           )}
+          {traffic.daily.length > 0 && (
+            <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem", marginBottom: 12, overflowX: "auto" }}>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>
+                일별 방문객·조회 <span style={{ fontSize: "0.7rem", color: "#94a3b8", fontWeight: 500 }}>(자체 집계 · 최신순)</span>
+              </div>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.76rem" }}>
+                <thead>
+                  <tr style={{ color: "#94a3b8" }}>
+                    <th style={{ textAlign: "left", fontWeight: 600, padding: "4px 6px" }}>날짜</th>
+                    <th style={{ textAlign: "right", fontWeight: 600, padding: "4px 6px" }}>방문객</th>
+                    <th style={{ textAlign: "right", fontWeight: 600, padding: "4px 6px" }}>조회</th>
+                    <th style={{ textAlign: "right", fontWeight: 600, padding: "4px 6px" }}>세션</th>
+                    <th style={{ textAlign: "right", fontWeight: 600, padding: "4px 6px" }}>조회/방문</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...traffic.daily].reverse().map((d) => (
+                    <tr key={d.day} style={{ borderTop: "1px solid #f1f5f9" }}>
+                      <td style={{ textAlign: "left", padding: "4px 6px", color: "#475569" }}>{d.day.slice(5)}</td>
+                      <td style={{ textAlign: "right", padding: "4px 6px", fontWeight: 700, color: "#0f172a" }}>{d.uniques}</td>
+                      <td style={{ textAlign: "right", padding: "4px 6px", fontWeight: 700, color: "#3b5bdb" }}>{d.pageviews}</td>
+                      <td style={{ textAlign: "right", padding: "4px 6px", color: "#7c3aed" }}>{d.sessions}</td>
+                      <td style={{ textAlign: "right", padding: "4px 6px", color: "#64748b" }}>{d.uniques ? (d.pageviews / d.uniques).toFixed(1) : "-"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>
             <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem" }}>
               <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>상위 페이지 (7일)</div>
