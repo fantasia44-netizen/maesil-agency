@@ -3,10 +3,29 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import POKEDEX from "../../pokedex_ko.json";
+import STATSJSON from "../../pokedex_stats.json";
 
 export const revalidate = 21600; // 6시간마다 갱신(보스 로테이션 반영)
 
 const KO = POKEDEX as Record<string, string>;
+const STATS = STATSJSON as Record<string, { a: number; d: number; s: number }>;
+
+// 레이드 포획 레벨: 일반 L20(CPM 0.5974), 날씨부스트 L25(0.667934)
+const CPM_L20 = 0.5974, CPM_L25 = 0.667934;
+function cpAt(st: { a: number; d: number; s: number }, iv: [number, number, number], cpm: number): number {
+  return Math.max(10, Math.floor((st.a + iv[0]) * Math.sqrt(st.d + iv[1]) * Math.sqrt(st.s + iv[2]) * cpm * cpm / 10));
+}
+// 표시할 대표 개체값(잡을 때 확인용). 레이드 최소 개체값은 10/10/10.
+const IV_ROWS: { iv: [number, number, number]; label: string; hundo?: boolean }[] = [
+  { iv: [15, 15, 15], label: "100%", hundo: true },
+  { iv: [15, 15, 14], label: "98%" },
+  { iv: [14, 14, 14], label: "93%" },
+  { iv: [10, 10, 10], label: "최소" },
+];
+function dexOf(image: string): string {
+  const m = image.match(/\/pm(\d+)\./) || image.match(/pokemon_icon_(\d+)_/);
+  return m ? String(Number(m[1])) : "";
+}
 
 const TYPE_COLOR: Record<string, string> = {
   normal: "#9fa19f", fire: "#e62829", water: "#2980ef", electric: "#d9a900", grass: "#3fa129",
@@ -74,8 +93,7 @@ async function getBosses(): Promise<Boss[]> {
 }
 
 function bossKo(b: Boss): string {
-  const m = b.image.match(/\/pm(\d+)\./);
-  const dex = m ? m[1] : "";
+  const dex = dexOf(b.image);
   const form = (b.image.match(/\.f([A-Z_0-9]+)\./)?.[1] || "");
   let base = KO[dex] || b.name;
   if (/HISUIAN/.test(form)) base = "히스이 " + base;
@@ -92,8 +110,8 @@ function bossKo(b: Boss): string {
 
 export const metadata: Metadata = {
   title: "포켓몬고 현재 레이드 보스 · 100% CP 표 | GBL Note",
-  description: "지금 열리는 포켓몬 GO 5성·메가 레이드 보스 목록. 전설·메가 보스의 100% 개체값 CP(일반/날씨부스트)와 약점 속성, 추천 딜러까지 한눈에. 자동 업데이트.",
-  keywords: ["포켓몬고 레이드 보스", "현재 레이드", "100% CP", "레이드 CP표", "5성 레이드", "메가 레이드", "레이드 약점"],
+  description: "지금 열리는 포켓몬 GO 5성·메가 레이드 보스 목록. 보스별 개체값(IV)별 포획 CP표 — 100개체(15/15/15) CP를 일반·날씨부스트 기준으로 확인. 약점 속성·추천 딜러까지. 자동 업데이트.",
+  keywords: ["포켓몬고 레이드 보스", "100 CP", "100개체 CP", "레이드 CP표", "개체값 CP", "15 15 15 CP", "5성 레이드", "메가 레이드", "포켓몬고 꿀박"],
   alternates: { canonical: "/gbl/raid/bosses" },
   openGraph: { title: "포켓몬고 현재 레이드 보스 · 100% CP", description: "5성·메가·3성 보스 100% CP + 약점 딜러", url: "/gbl/raid/bosses", images: ["/gbl-og.png"], type: "website" },
 };
@@ -140,7 +158,8 @@ export default async function BossesPage() {
           <b style={{ color: "#334155" }}> 약점 속성</b>을 누르면 그 속성 <b style={{ color: "#334155" }}>추천 딜러 티어표</b>로 이동합니다.
         </p>
         <p style={{ margin: "0.4rem 0 0", fontSize: "0.74rem", color: "#94a3b8" }}>
-          5성·메가 레이드만 표시(1·3성 제외). 날씨부스트 = 해당 날씨일 때 레벨25로 등장(더 높은 CP). ✨ = 색이 다른 개체(샤이니) 가능. 자동 업데이트.
+          5성·메가 레이드만 표시(1·3성 제외). 각 보스 아래 <b style={{ color: "#64748b" }}>개체값별 포획 CP표</b>로 100개체(15/15/15)인지 확인하세요.
+          날씨부스트 = 해당 날씨일 때 레벨25로 등장(더 높은 CP). 메가·원시 레이드는 <b style={{ color: "#64748b" }}>기본폼을 포획</b>합니다(표는 잡는 CP). ✨ = 샤이니 가능. 자동 업데이트.
         </p>
 
         {visibleTiers.length === 0 ? (
@@ -159,6 +178,9 @@ export default async function BossesPage() {
                     const types = b.types.map((t) => t.name);
                     const weak = weaknesses(types).slice(0, 4);
                     const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
+                    const st = STATS[dexOf(b.image)];
+                    // 계산 100%가 피드값과 일치할 때만 IV표 노출(지역폼 등 종족값 불일치 방지)
+                    const cpOk = !!st && Math.abs(cpAt(st, [15, 15, 15], CPM_L20) - b.combatPower.normal.max) <= 2;
                     return (
                       <div key={`${b.name}-${i}`} style={{ background: CARD, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 12, padding: "10px 12px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -180,6 +202,33 @@ export default async function BossesPage() {
                             </div>
                           </div>
                         </div>
+                        {cpOk && st && (
+                          <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px dashed ${BORDER}` }}>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                              <div style={{ display: "flex", fontSize: "0.66rem", color: "#94a3b8", fontWeight: 700 }}>
+                                <span style={{ flex: 1.4 }}>잡을 때 CP (개체값)</span>
+                                <span style={{ flex: 1, textAlign: "right" }}>일반 L20</span>
+                                <span style={{ flex: 1, textAlign: "right" }}>날씨 L25</span>
+                              </div>
+                              {IV_ROWS.map((r) => {
+                                const col = r.hundo ? "#c2410c" : "#334155";
+                                const fw = r.hundo ? 800 : 600;
+                                return (
+                                  <div key={r.label} style={{ display: "flex", fontSize: "0.74rem", alignItems: "baseline" }}>
+                                    <span style={{ flex: 1.4, fontWeight: fw, color: r.hundo ? "#c2410c" : "#475569" }}>
+                                      {r.hundo ? "💯 " : ""}{r.label} <span style={{ color: "#94a3b8", fontWeight: 400, fontSize: "0.66rem" }}>{r.iv.join("/")}</span>
+                                    </span>
+                                    <span style={{ flex: 1, textAlign: "right", fontWeight: fw, color: col }}>{cpAt(st, r.iv, CPM_L20).toLocaleString()}</span>
+                                    <span style={{ flex: 1, textAlign: "right", fontWeight: fw, color: col }}>{cpAt(st, r.iv, CPM_L25).toLocaleString()}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            <div style={{ fontSize: "0.68rem", color: "#64748b", marginTop: 6 }}>
+                              잡은 CP가 <b style={{ color: "#c2410c" }}>{cpAt(st, [15, 15, 15], CPM_L20).toLocaleString()}</b>(날씨 <b style={{ color: "#c2410c" }}>{cpAt(st, [15, 15, 15], CPM_L25).toLocaleString()}</b>)이면 <b style={{ color: "#c2410c" }}>100개체(15/15/15)</b>!
+                            </div>
+                          </div>
+                        )}
                         {weak.length > 0 && (
                           <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", marginTop: 8, paddingTop: 8, borderTop: `1px dashed ${BORDER}` }}>
                             <span style={{ fontSize: "0.7rem", color: "#94a3b8", fontWeight: 600 }}>약점 딜러 →</span>
