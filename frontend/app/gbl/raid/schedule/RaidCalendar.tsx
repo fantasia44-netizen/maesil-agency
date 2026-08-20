@@ -94,20 +94,31 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
           const day = Number(dk.split("-")[2]);
           const hasHour = evs.some((e) => e.kind === "hour");
           const hasDay = evs.some((e) => e.kind === "day");
-          const rotVars = Array.from(new Set(evs.filter((e) => e.kind === "rotation" && e.variant).map((e) => e.variant))) as RotVariant[];
+          const rots = evs.filter((e) => e.kind === "rotation");
+          const star = rots.find((e) => e.variant === "star");
+          const mega = rots.find((e) => e.variant === "mega");
+          const shadow = rots.find((e) => e.variant === "shadow");
+          const main = (star || mega || shadow)?.bosses[0];
+          const inRot = rots.length > 0;
           return (
             <button key={i} onClick={() => setSel(dk)}
               style={{
-                minHeight: 48, borderRadius: 8, cursor: "pointer", padding: "3px 0 2px", position: "relative",
+                minHeight: 58, borderRadius: 8, cursor: "pointer", padding: "2px 0", position: "relative", overflow: "hidden",
                 border: isSel ? "2px solid #ea580c" : `1px solid ${isToday ? "#fdba74" : BORDER}`,
-                background: rotVars.length ? "#fffaf5" : CARD,
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+                background: inRot ? "#fffaf5" : CARD,
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 0,
               }}>
-              <span style={{ fontSize: "0.78rem", fontWeight: isToday ? 800 : 600, color: isToday ? "#ea580c" : "#334155" }}>{day}</span>
-              <span style={{ display: "flex", gap: 2, height: 6, alignItems: "center" }}>
-                {rotVars.map((v) => <span key={v} style={{ width: 6, height: 6, borderRadius: "50%", background: ROT[v].c }} />)}
+              <span style={{ fontSize: "0.66rem", fontWeight: isToday ? 800 : 600, color: isToday ? "#ea580c" : "#94a3b8", lineHeight: 1.2 }}>{day}</span>
+              {main ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={main.image} alt="" width={26} height={26} style={{ objectFit: "contain", marginTop: -1 }} />
+              ) : <span style={{ height: 26 }} />}
+              <span style={{ display: "flex", gap: 2, alignItems: "center", height: 10, lineHeight: 1 }}>
+                {mega && <span style={{ fontSize: "0.52rem" }}>🔷</span>}
+                {shadow && <span style={{ fontSize: "0.52rem" }}>🌑</span>}
+                {hasDay && <span style={{ fontSize: "0.52rem" }}>🎉</span>}
+                {hasHour && <span style={{ fontSize: "0.52rem" }}>⏰</span>}
               </span>
-              <span style={{ fontSize: "0.58rem", lineHeight: 1, height: 8 }}>{hasDay ? "🎉" : ""}{hasHour ? "⏰" : ""}</span>
             </button>
           );
         })}
@@ -115,12 +126,7 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
 
       {/* 범례 */}
       <div style={{ display: "flex", gap: 10, marginTop: 8, fontSize: "0.66rem", color: "#94a3b8", flexWrap: "wrap", alignItems: "center" }}>
-        {(Object.keys(ROT) as RotVariant[]).map((v) => (
-          <span key={v} style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
-            <span style={{ width: 7, height: 7, borderRadius: "50%", background: ROT[v].c }} />{ROT[v].label}
-          </span>
-        ))}
-        <span>🎉 레이드 데이</span><span>⏰ 레이드 아워</span>
+        <span>🖼️ 날짜 그림 = 5성 전설</span><span>🔷 메가</span><span>🌑 그림자</span><span>🎉 레이드 데이</span><span>⏰ 레이드 아워</span>
       </div>
 
       {/* 선택한 날 상세 */}
