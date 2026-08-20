@@ -310,6 +310,7 @@ export default function GblPage() {
   const [ratingInput, setRatingInput] = useState("");
   const [extraProfiles, setExtraProfiles] = useState<string[]>([]);            // 추가했지만 아직 기록 전 계정
   const [cardImage, setCardImage] = useState<string | null>(null);            // 전적 카드 미리보기(dataURL)
+  const [cardFile, setCardFile] = useState<File | null>(null);                // 공유용 파일(미리 준비 → iOS 공유창 유지)
   const [nickname, setNickname] = useState<string>("");                        // 내 닉네임(display_name)
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -608,6 +609,9 @@ export default function GblPage() {
     ctx.fillText(new Date().toLocaleDateString("ko-KR"), cx, 1054);
 
     setCardImage(c.toDataURL("image/png"));   // 미리보기 모달에 표시
+    // 공유용 파일을 미리 만들어 둠 → 공유 클릭 시 async 없이 즉시 호출(iOS 공유창 유지)
+    setCardFile(null);
+    c.toBlob((blob) => { if (blob) setCardFile(new File([blob], "gbl-record.png", { type: "image/png" })); }, "image/png");
   };
 
   // 카드 저장(다운로드)
@@ -617,19 +621,29 @@ export default function GblPage() {
     a.href = cardImage; a.download = "gbl-record.png"; a.click();
     flash("💾 저장됨");
   };
-  // 카드 공유(모바일 공유창 / 미지원 시 저장)
+  // 카드 공유(모바일 네이티브 공유창: 카톡·메일·SNS / 미지원 시 저장 안내)
   const shareCard = async () => {
     if (!cardImage) return;
+    const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
+    // 미리 만들어 둔 파일 사용(없으면 즉석 생성) — iOS는 async 지연 시 공유창이 막히므로 파일이 준비된 경우 곧바로 호출
+    let file = cardFile;
     try {
-      const blob = await (await fetch(cardImage)).blob();
-      const file = new File([blob], "gbl-record.png", { type: "image/png" });
-      const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
-      if (typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: "내 GBL 전적", text: "gblnote.com" });
+      if (!file) {
+        const blob = await (await fetch(cardImage)).blob();
+        file = new File([blob], "gbl-record.png", { type: "image/png" });
+      }
+      if (file && typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: "내 GBL 전적", text: "내 포켓몬GO 배틀 전적 · gblnote.com" });
         return;
       }
+      // PC·일부 인앱브라우저는 이미지 공유 미지원 → 저장 후 직접 첨부 안내
       saveCard();
-    } catch { /* 취소 등 무시 */ }
+      flash("이 브라우저는 바로 공유가 안 돼요. 저장된 이미지를 카톡·메일에 첨부하세요");
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") return;  // 사용자가 공유창 닫음
+      saveCard();
+      flash("공유 대신 저장했어요 — 이미지를 첨부해 공유하세요");
+    }
   };
 
   const resetForm = () => { setOppName(""); setTeam(emptyTeam()); setMemo(""); setResult(null); setEditingId(null); };
