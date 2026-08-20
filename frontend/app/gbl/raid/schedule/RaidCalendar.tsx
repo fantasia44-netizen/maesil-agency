@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { track } from "../../../../lib/track";
-import { monSprite } from "../../sprite";
+import { monSprite, formDex } from "../../sprite";
 
 export type CalBoss = { ko: string; dex: string; image: string; shiny: boolean };
 export type RotVariant = "star" | "shadow" | "mega";
@@ -69,8 +69,9 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
         const evs = eventsOn(dk);
         const rots = evs.filter((e) => e.kind === "rotation");
         const main = (rots.find((e) => e.variant === "star") || rots.find((e) => e.variant === "mega") || rots.find((e) => e.variant === "shadow"))?.bosses[0];
-        if (main?.dex) dexSet.add(main.dex);
-        info.push({ d, dexMain: main?.dex, mega: rots.some((e) => e.variant === "mega"), shadow: rots.some((e) => e.variant === "shadow"), rd: evs.some((e) => e.kind === "day"), rh: evs.some((e) => e.kind === "hour") });
+        const mdex = main?.dex ? String(formDex(main.ko, Number(main.dex))) : undefined;   // 폼 반영
+        if (mdex) dexSet.add(mdex);
+        info.push({ d, dexMain: mdex, mega: rots.some((e) => e.variant === "mega"), shadow: rots.some((e) => e.variant === "shadow"), rd: evs.some((e) => e.kind === "day"), rh: evs.some((e) => e.kind === "hour") });
       }
       const imgs: Record<string, HTMLImageElement> = {};
       await Promise.all([...dexSet].map((dex) => new Promise<void>((res) => {

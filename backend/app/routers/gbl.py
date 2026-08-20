@@ -531,12 +531,13 @@ def board_create(body: PostIn, user: UserContext = Depends(get_current_user)) ->
     text = (body.body or "").strip()
     if not title or not text:
         raise HTTPException(400, "제목과 내용을 입력하세요.")
+    payload = {
+        "board": body.board, "user_id": str(user.id),
+        "title": title[:200], "body": text[:5000],
+        "is_private": bool(body.is_private) and body.board == "inquiry",
+    }
     try:
-        row = (_db().table("gbl_posts").insert({
-            "board": body.board, "user_id": str(user.id),
-            "title": title[:200], "body": text[:5000],
-            "is_private": bool(body.is_private) and body.board == "inquiry",
-        }).execute().data)[0]
+        row = (_db().table("gbl_posts").insert(payload).execute().data or [payload])[0]
     except Exception as e:
         logger.error("gbl post 작성 실패: %s", e)
         raise HTTPException(500, "글 작성 실패")
@@ -558,10 +559,8 @@ def board_reply(post_id: int, body: ReplyIn, user: UserContext = Depends(get_cur
         if prow[0].get("is_private") and not user.is_super_admin and str(prow[0].get("user_id")) != str(user.id):
             raise HTTPException(403, "비공개 글에는 댓글을 달 수 없습니다.")
         is_admin = bool(user.is_super_admin)
-        rep = (db.table("gbl_post_replies").insert({
-            "post_id": post_id, "user_id": str(user.id),
-            "is_admin": is_admin, "body": text[:5000],
-        }).execute().data)[0]
+        rpayload = {"post_id": post_id, "user_id": str(user.id), "is_admin": is_admin, "body": text[:5000]}
+        rep = (db.table("gbl_post_replies").insert(rpayload).execute().data or [rpayload])[0]
         cnt = (db.table("gbl_post_replies").select("id", count="exact")
                .eq("post_id", post_id).execute().count) or 0
         patch: dict = {"reply_count": cnt, "updated_at": datetime.now(timezone.utc).isoformat()}

@@ -213,7 +213,7 @@ export default async function TierPage({ params }: { params: { league: string } 
             buttonLabel="📸 티어표 이미지 저장·공유"
             filename={`gbl-${params.league}-tier.png`}
             items={list.slice(0, 12).map((d) => ({
-              dex: String(d.dex || MON[d.id]?.dex || ""),
+              dex: (MON[d.id]?.sprite?.match(/(\d+)\.png/)?.[1]) || String(d.dex || MON[d.id]?.dex || ""),
               name: d.ko || ((MON[d.id]?.shadow ? "그림자 " : "") + nameOf(d.id)),
               main: String(d.score),
               sub: pick[d.id] != null ? `실측 ${pick[d.id]}%` : `${d.tier}티어`,

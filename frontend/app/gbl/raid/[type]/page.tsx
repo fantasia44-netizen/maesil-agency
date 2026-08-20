@@ -7,7 +7,7 @@ import RAIDS from "../../gbl_raids.json";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 import ListShare from "../../ListShare";
-import { monSprite } from "../../sprite";
+import { monSprite, formDex } from "../../sprite";
 
 export const revalidate = 600;
 
@@ -190,7 +190,7 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
             buttonLabel="📸 티어표 이미지 저장·공유"
             filename={`gbl-raid-${type}.png`}
             items={rows.slice(0, 12).map((r) => ({
-              dex: String(r.dex),
+              dex: String(formDex(r.name, r.dex)),
               name: r.name,
               main: r.er.toFixed(1),
               sub: `딜 ${r.dps.toFixed(1)}`,

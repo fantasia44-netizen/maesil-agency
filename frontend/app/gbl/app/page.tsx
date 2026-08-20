@@ -458,7 +458,8 @@ export default function GblPage() {
       });
     } else if (statsPeriod === "season") {
       const s = new Date(SEASON.start + "T00:00:00").getTime();
-      src = src.filter((m) => new Date(m.played_at).getTime() >= s);
+      const e = new Date(SEASON.end + "T23:59:59").getTime();
+      src = src.filter((m) => { const t = new Date(m.played_at).getTime(); return t >= s && t <= e; });
     } else if (statsPeriod !== "all") {
       const since = Date.now() - Number(statsPeriod) * 86400000;
       src = src.filter((m) => new Date(m.played_at).getTime() >= since);

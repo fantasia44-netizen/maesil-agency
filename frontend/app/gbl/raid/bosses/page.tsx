@@ -132,8 +132,9 @@ export default async function BossesPage() {
   const visibleTiers = Object.keys(byTier).filter((t) => !HIDE_TIERS.has(t))
     .sort((a, b) => (TIER_ORDER.indexOf(a) < 0 ? 99 : TIER_ORDER.indexOf(a)) - (TIER_ORDER.indexOf(b) < 0 ? 99 : TIER_ORDER.indexOf(b)));
   const shareItems = visibleTiers.flatMap((t) => byTier[t]).map((b) => ({
-    dex: dexOf(b.image), name: bossKo(b),
-    main: String(b.combatPower.normal.max), sub: `날씨 ${b.combatPower.boosted.max}`,
+    dex: String(formDex(bossKo(b), dexOf(b.image))), name: bossKo(b),
+    main: b.combatPower?.normal?.max != null ? String(b.combatPower.normal.max) : "",
+    sub: b.combatPower?.boosted?.max != null ? `날씨 ${b.combatPower.boosted.max}` : "",
   }));
 
   const wrap: React.CSSProperties = {
@@ -175,14 +176,14 @@ export default async function BossesPage() {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {byTier[tier].map((b, i) => {
-                    const types = b.types.map((t) => t.name);
+                    const types = (b.types || []).map((t) => t.name);
                     const weak = weaknesses(types).slice(0, 4);
                     const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
                     const st = STATS[dexOf(b.image)];
                     // 계산 100%가 피드값과 일치할 때만 IV표 노출(지역폼 등 종족값 불일치 방지)
                     const cpOk = !!st && Math.abs(cpAt(st, [15, 15, 15], CPM_L20) - b.combatPower.normal.max) <= 2;
                     return (
-                      <div key={`${b.name}-${i}`} id={`b${dexOf(b.image)}`} style={{ scrollMarginTop: 12, background: CARD, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 12, padding: "10px 12px" }}>
+                      <div key={`${b.name}-${i}`} id={`b${dexOf(b.image) || `${b.name}-${i}`}`} style={{ scrollMarginTop: 12, background: CARD, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 12, padding: "10px 12px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                           {(() => {
                             const fdex = formDex(bossKo(b), dexOf(b.image));
@@ -210,10 +211,12 @@ export default async function BossesPage() {
                                 ))}
                               </span>
                             </div>
-                            <div style={{ fontSize: "0.78rem", color: "#334155", marginTop: 3 }}>
-                              <b style={{ color: "#0f172a" }}>100% {b.combatPower.normal.max}</b>
-                              <span style={{ color: "#94a3b8" }}> · 날씨 {b.combatPower.boosted.max}</span>
-                            </div>
+                            {b.combatPower?.normal?.max != null && (
+                              <div style={{ fontSize: "0.78rem", color: "#334155", marginTop: 3 }}>
+                                <b style={{ color: "#0f172a" }}>100% {b.combatPower.normal.max}</b>
+                                {b.combatPower.boosted?.max != null && <span style={{ color: "#94a3b8" }}> · 날씨 {b.combatPower.boosted.max}</span>}
+                              </div>
+                            )}
                           </div>
                         </div>
                         {cpOk && st && (

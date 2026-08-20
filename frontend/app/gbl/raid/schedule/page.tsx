@@ -95,8 +95,9 @@ export default async function RaidSchedulePage() {
 
   // 아젠다(기간 목록)는 현재+예정만
   const rotations = calEvents.filter((e) => e.kind === "rotation" && new Date(e.end).getTime() > now).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
-  const d = new Date();
-  const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  // KST(UTC+9) 벽시계 날짜 — 서버가 UTC라도 한국 '오늘'이 맞도록(새벽 0~9시 하루 밀림 방지)
+  const d = new Date(Date.now() + 9 * 3600 * 1000);
+  const today = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
 
   const wrap: React.CSSProperties = {
     minHeight: "100dvh",
