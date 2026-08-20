@@ -11,7 +11,7 @@ import logging
 from collections import Counter
 from datetime import datetime, timezone, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.auth import UserContext, get_current_user, require_admin, invalidate_revalidate_cache
@@ -256,6 +256,65 @@ def admin_stats(admin: UserContext = Depends(require_admin)) -> dict:
         "matches_total": len(mrows),
         "by_league": dict(by_league),
         "users": users,
+    }
+
+
+# ── 자체 방문 통계(1st-party analytics) ──────────────────────────
+_BOT_UA = ("bot", "crawler", "spider", "slurp", "bingpreview", "facebookexternalhit",
+           "embedly", "quora link preview", "yeti", "headless", "python-requests", "curl")
+
+
+class TrackIn(BaseModel):
+    visitor: str | None = None
+    session: str | None = None
+    path: str | None = None
+    ref: str | None = None
+    event: str | None = None  # pageview(기본) | share | download
+
+
+@router.post("/track", status_code=204)
+def track(body: TrackIn, request: Request):
+    """방문/이벤트 1건 기록(비로그인 포함, 익명). 봇은 UA로 스킵. fire-and-forget."""
+    ua = (request.headers.get("user-agent") or "").lower()
+    if not ua or any(b in ua for b in _BOT_UA):
+        return
+    ev = (body.event or "pageview")
+    if ev not in ("pageview", "share", "download"):
+        ev = "pageview"
+    try:
+        _db().table("gbl_visits").insert({
+            "event": ev,
+            "visitor": (body.visitor or "")[:40] or None,
+            "session": (body.session or "")[:40] or None,
+            "path": (body.path or "")[:200] or None,
+            "ref": (body.ref or "")[:200] or None,
+        }).execute()
+    except Exception as e:  # 통계 실패가 페이지를 막지 않도록
+        logger.warning("gbl track 실패: %s", e)
+    return
+
+
+@router.get("/admin/traffic")
+def admin_traffic(days: int = 30, admin: UserContext = Depends(require_admin)) -> dict:
+    """방문/순방문자/세션/체류/이탈/유입 통계. super_admin 전용."""
+    db = _db()
+    days = max(1, min(days, 90))
+    try:
+        daily = db.rpc("gbl_traffic_daily", {"days": days}).execute().data or []
+        summ = db.rpc("gbl_traffic_summary", {"days": days}).execute().data or []
+        active = db.rpc("gbl_traffic_active", {}).execute().data or []
+        paths = db.rpc("gbl_traffic_paths", {"days": 7, "lim": 15}).execute().data or []
+        refs = db.rpc("gbl_traffic_refs", {"days": 7, "lim": 15}).execute().data or []
+    except Exception as e:
+        logger.error("gbl traffic 실패: %s", e)
+        raise HTTPException(500, "트래픽 조회 실패 (SQL 068 실행 여부 확인)")
+    return {
+        "days": days,
+        "daily": daily,
+        "summary": (summ[0] if summ else {}),
+        "active": (active[0] if active else {}),
+        "paths": paths,
+        "refs": refs,
     }
 
 

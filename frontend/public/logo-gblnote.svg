@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 150" role="img" aria-label="GBL Note 로고">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b5bdb"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 아이콘 타일 -->
+  <rect x="12" y="25" width="100" height="100" rx="26" fill="url(#grad)"/>
+  <!-- 속도계 게이지(배틀/데이터) -->
+  <path d="M 36 86 A 26 26 0 0 1 88 86" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity="0.95"/>
+  <g stroke="#ffffff" stroke-width="3.4" stroke-linecap="round" opacity="0.65">
+    <line x1="40" y1="72" x2="45" y2="76"/>
+    <line x1="62" y1="60" x2="62" y2="66"/>
+    <line x1="84" y1="72" x2="79" y2="76"/>
+  </g>
+  <!-- 바늘 -->
+  <line x1="62" y1="86" x2="80" y2="63" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="62" cy="86" r="6.5" fill="#ffffff"/>
+
+  <!-- 워드마크 -->
+  <text x="132" y="90" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="58" letter-spacing="-1" fill="#0f172a">GBL</text>
+  <text x="278" y="90" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="58" letter-spacing="-1" fill="url(#grad)">NOTE</text>
+  <text x="134" y="120" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-weight="600" font-size="19" letter-spacing="0.5" fill="#64748b">포켓몬GO 올인원 · 한국어판</text>
+</svg>

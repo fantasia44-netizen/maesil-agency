@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import DETAIL from "./gbl/gbl_detail.json";
 import RAIDS from "./gbl/gbl_raids.json";
-import { GUIDES } from "./gbl/guide/[slug]/page";
+import { GUIDES } from "./gbl/guide/guides";
 
 // gbl.maesil.net 공개 SEO 사이트맵. 검색엔진이 리그별 실측 메타·티어·포켓몬 상세를 발견하도록.
 const BASE = "https://gblnote.com";

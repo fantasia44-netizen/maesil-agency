@@ -202,7 +202,7 @@ export default async function BossesPage() {
                           </div>
                         </div>
                         {cpOk && st && (
-                          <CpTable stats={st} hundoL20={cpAt(st, [15, 15, 15], CPM_L20)} hundoL25={cpAt(st, [15, 15, 15], CPM_L25)} />
+                          <CpTable stats={st} hundoL20={cpAt(st, [15, 15, 15], CPM_L20)} hundoL25={cpAt(st, [15, 15, 15], CPM_L25)} name={bossKo(b)} accent={c1} />
                         )}
                         {weak.length > 0 && (
                           <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", marginTop: 8, paddingTop: 8, borderTop: `1px dashed ${BORDER}` }}>

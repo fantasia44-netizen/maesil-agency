@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import GblPwa from "./GblPwa";
+import Tracker from "./Tracker";
 
 // AdSense 클라이언트(ca-pub-…). Render env NEXT_PUBLIC_ADSENSE_CLIENT 설정 시 연결 코드 노출.
 const ADS_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
@@ -49,6 +50,7 @@ export default function GblLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <GblPwa />
+      <Tracker />
       {ADS_CLIENT && (
         <Script
           id="adsbygoogle-loader"

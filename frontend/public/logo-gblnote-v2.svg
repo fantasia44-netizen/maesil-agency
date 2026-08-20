@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 160" role="img" aria-label="GBL Note 로고">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f6ef2"/>
+      <stop offset="0.55" stop-color="#5b3fe0"/>
+      <stop offset="1" stop-color="#8b3ff0"/>
+    </linearGradient>
+    <linearGradient id="wm" x1="0" y1="0" x2="1" y2="0.2">
+      <stop offset="0" stop-color="#3b5bdb"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <radialGradient id="hi" cx="0.3" cy="0.22" r="0.9">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="2.4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 아이콘 타일 -->
+  <rect x="12" y="16" width="128" height="128" rx="34" fill="url(#tile)"/>
+  <rect x="12" y="16" width="128" height="128" rx="34" fill="url(#hi)"/>
+  <rect x="13.5" y="17.5" width="125" height="125" rx="32.5" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="1.5"/>
+
+  <!-- 게이지 링(3/4) + 눈금 -->
+  <g stroke="#ffffff" stroke-linecap="round" filter="url(#glow)">
+    <path d="M 44 112 A 46 46 0 1 1 108 112" fill="none" stroke-width="8" opacity="0.95"/>
+  </g>
+  <g stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" opacity="0.55">
+    <line x1="35" y1="72" x2="42" y2="76"/>
+    <line x1="49" y1="52" x2="54" y2="58"/>
+    <line x1="76" y1="45" x2="76" y2="53"/>
+    <line x1="103" y1="52" x2="98" y2="58"/>
+    <line x1="117" y1="72" x2="110" y2="76"/>
+  </g>
+
+  <!-- 데이터 막대(메타/티어) -->
+  <g fill="#ffffff">
+    <rect x="56" y="92" width="10" height="18" rx="3" opacity="0.7"/>
+    <rect x="71" y="82" width="10" height="28" rx="3" opacity="0.85"/>
+    <rect x="86" y="74" width="10" height="36" rx="3"/>
+  </g>
+
+  <!-- 바늘 -->
+  <line x1="76" y1="104" x2="102" y2="60" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round" filter="url(#glow)"/>
+  <circle cx="76" cy="104" r="8" fill="#ffffff"/>
+  <circle cx="76" cy="104" r="3.6" fill="#6b46e5"/>
+
+  <!-- 워드마크 -->
+  <text x="160" y="92" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="62" letter-spacing="-2" fill="#0f172a">GBL</text>
+  <text x="312" y="92" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="62" letter-spacing="-2" fill="url(#wm)">NOTE</text>
+  <g>
+    <rect x="162" y="106" width="250" height="26" rx="13" fill="#eef2ff"/>
+    <text x="176" y="124" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-weight="700" font-size="16" letter-spacing="0.4" fill="#4f46e5">포켓몬GO 올인원 · 한국어판</text>
+  </g>
+</svg>

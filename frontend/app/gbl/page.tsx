@@ -75,13 +75,13 @@ export default function GblLanding() {
           <p style={{ margin: "0 0 4px", fontSize: "clamp(0.95rem,4.5vw,1.25rem)", fontWeight: 800, color: "#0f172a" }}>
             포켓몬GO <span style={{ color: "#3b5bdb" }}>올인원</span> 한국어판
           </p>
-          <p style={{ margin: 0, fontSize: "0.84rem", color: "#64748b" }}>레이드 · 배틀리그 · 티어 · CP · 내 전적, 포고인의 성지</p>
+          <p style={{ margin: 0, fontSize: "0.84rem", color: "#64748b" }}>레이드 · 배틀리그 · 티어 · CP · 내 전적까지 한 곳에서</p>
         </div>
 
         {/* 레이드 파밍러 */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "0 0 10px" }}>
-          <span style={{ fontSize: "1.1rem", fontWeight: 900, color: "#ea580c" }}>🔥 레이드 파밍러</span>
-          <span style={{ fontSize: "0.74rem", color: "#94a3b8" }}>보스·딜러·일정·CP</span>
+          <span style={{ fontSize: "1.1rem", fontWeight: 900, color: "#ea580c" }}>🔥 레이드러</span>
+          <span style={{ fontSize: "0.74rem", color: "#94a3b8" }}>속성별 딜러 티어·보스·일정·CP</span>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 10, marginBottom: 24 }}>
           {RAID.map((h) => <HubCard key={h.t} h={h} />)}

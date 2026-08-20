@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { loadSprites, saveDataUrl, shareDataUrl, drawLogo } from "./raid/raidShareUtil";
+import { loadSprites, saveDataUrl, shareDataUrl } from "./raid/raidShareUtil";
+import { track } from "../../lib/track";
 
 export type ShareItem = { dex: string; name: string; main: string; sub?: string; note?: string };
 
@@ -19,7 +20,7 @@ export default function ListShare({
     setBusy(true);
     try {
       const imgs = await loadSprites(items.map((i) => i.dex));
-      const W = 1080, rowH = 96, headH = 188, footH = 186;
+      const W = 1080, rowH = 96, headH = 188, footH = 168;
       const H = headH + rowH * items.length + footH;
       const c = document.createElement("canvas"); c.width = W; c.height = H;
       const ctx = c.getContext("2d"); if (!ctx) { setBusy(false); return; }
@@ -46,12 +47,13 @@ export default function ListShare({
         ctx.fillText(it.main, W - 44, y + rowH / 2 - (it.sub ? 10 : -12));
         if (it.sub) { ctx.fillStyle = "#8ea6ff"; ctx.font = "600 28px system-ui, sans-serif"; ctx.fillText(it.sub, W - 44, y + rowH / 2 + 30); }
       });
-      // 푸터(로고 아이콘 + 주소)
+      // 푸터(출처/주소)
       const fy = headH + rowH * items.length;
-      drawLogo(ctx, W / 2, fy + 52, 64, "#7c9dff");
       ctx.textAlign = "center";
-      ctx.fillStyle = "#ffffff"; ctx.font = "800 44px system-ui, sans-serif";
-      ctx.fillText(url, W / 2, fy + 138);
+      ctx.fillStyle = accent; ctx.font = "900 62px system-ui, sans-serif";
+      ctx.fillText("gblnote.com", W / 2, fy + 94);
+      ctx.fillStyle = "#93a4cf"; ctx.font = "600 30px system-ui, sans-serif";
+      ctx.fillText("포켓몬GO 올인원 · GBL Note", W / 2, fy + 138);
 
       setImg(c.toDataURL("image/png"));
       setFile(null);
@@ -70,8 +72,8 @@ export default function ListShare({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={img} alt="공유 이미지" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "100%", maxHeight: "72vh", borderRadius: 12, boxShadow: "0 10px 40px rgba(0,0,0,.4)" }} />
           <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", gap: 10 }}>
-            <button onClick={() => shareDataUrl(img, file, filename, title, `${title} · ${url}`)} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: `linear-gradient(90deg,${accent},#7c3aed)`, color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>📤 공유</button>
-            <button onClick={() => saveDataUrl(img, filename)} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: "#334155", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>💾 저장</button>
+            <button onClick={() => { track("share", path); shareDataUrl(img, file, filename, title, `${title} · ${url}`); }} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: `linear-gradient(90deg,${accent},#7c3aed)`, color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>📤 공유</button>
+            <button onClick={() => { track("download", path); saveDataUrl(img, filename); }} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: "#334155", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>💾 저장</button>
             <button onClick={() => setImg(null)} style={{ padding: "11px 16px", borderRadius: 10, border: "none", background: "rgba(255,255,255,.15)", color: "#e2e8f0", cursor: "pointer", fontSize: "0.9rem" }}>닫기</button>
           </div>
           <div style={{ fontSize: "0.74rem", color: "#cbd5e1" }}>이미지를 길게 눌러 저장하거나 캡처해도 됩니다</div>

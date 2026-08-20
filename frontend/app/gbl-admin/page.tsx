@@ -15,14 +15,30 @@ type Stats = {
 const LEAGUE_LABEL: Record<string, string> = { great: "슈퍼리그", ultra: "하이퍼리그", master: "마스터리그" };
 const fmtDate = (s: string | null) =>
   s ? new Date(s).toLocaleDateString("ko-KR", { month: "short", day: "numeric" }) : "-";
+const fmtDwell = (s: number) => { const t = Math.round(s || 0); return t >= 60 ? `${Math.floor(t / 60)}분 ${t % 60}초` : `${t}초`; };
+
+type Traffic = {
+  days: number;
+  daily: { day: string; pageviews: number; uniques: number; sessions: number }[];
+  summary: { pageviews: number; uniques: number; sessions: number; avg_dwell: number; bounce_rate: number; shares: number; downloads: number };
+  active: { active_30m: number; pv_30m: number };
+  paths: { path: string; views: number }[];
+  refs: { ref: string; views: number }[];
+};
 
 type DbStatus = { hub_configured: boolean; maesil_total: number | null; maesil_hub: number | null };
 
 export default function GblAdmin() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [db, setDb] = useState<DbStatus | null>(null);
+  const [traffic, setTraffic] = useState<Traffic | null>(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
+
+  const loadTraffic = async () => {
+    try { setTraffic(await apiFetch<Traffic>("/api/gbl/admin/traffic?days=30", {}, 20000)); }
+    catch { /* SQL 068 미실행 등 */ }
+  };
 
   const load = async () => {
     try {
@@ -35,7 +51,7 @@ export default function GblAdmin() {
     try { setDb(await apiFetch<DbStatus>("/api/gbl/admin/db-status", {}, 20000)); }
     catch { /* noop */ }
   };
-  useEffect(() => { load(); loadDb(); }, []);
+  useEffect(() => { load(); loadDb(); loadTraffic(); }, []);
 
   const migrate = async () => {
     if (!window.confirm("maesil-total의 gbl_matches를 maesil-hub로 복사합니다 (id 유지, 재실행 안전). 계속할까요?")) return;
@@ -89,6 +105,73 @@ export default function GblAdmin() {
       <p style={{ margin: "0 0 1.2rem", fontSize: "0.82rem", color: "#64748b" }}>gbl.maesil.net 가입 유저·기록 현황 (super_admin 전용)</p>
 
       {err && <div style={{ background: "#fef2f2", color: "#b91c1c", border: "1px solid #fecaca", borderRadius: 10, padding: "0.7rem 1rem", marginBottom: "1rem", fontSize: "0.85rem" }}>{err}</div>}
+
+      {/* 방문 통계(자체 집계) */}
+      {!traffic ? (
+        <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 10, padding: "0.7rem 1rem", marginBottom: "1.2rem", fontSize: "0.8rem", color: "#92400e" }}>
+          📈 방문 통계는 <b>SQL 068</b>(gbl_visits) 실행 후 집계됩니다. maesil-hub에서 실행해 주세요.
+        </div>
+      ) : (
+        <div style={{ marginBottom: "1.4rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+            <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>📈 방문 통계 <span style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 600 }}>(자체 집계 · 최근 {traffic.days}일)</span></span>
+            <span style={{ marginLeft: "auto", fontSize: "0.78rem", fontWeight: 800, color: "#16a34a", background: "#dcfce7", borderRadius: 12, padding: "3px 12px" }}>🟢 실시간 활성 {traffic.active?.active_30m ?? 0}명 <span style={{ fontWeight: 500, color: "#4d7c53" }}>(30분)</span></span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(104px,1fr))", gap: 8, marginBottom: 12 }}>
+            {[
+              { l: "페이지뷰", v: traffic.summary?.pageviews ?? 0, c: "#3b5bdb" },
+              { l: "순방문자", v: traffic.summary?.uniques ?? 0, c: "#0f172a" },
+              { l: "세션", v: traffic.summary?.sessions ?? 0, c: "#7c3aed" },
+              { l: "평균 체류", v: fmtDwell(traffic.summary?.avg_dwell ?? 0), c: "#059669" },
+              { l: "이탈률", v: `${Math.round((traffic.summary?.bounce_rate ?? 0) * 100)}%`, c: "#c2410c" },
+              { l: "공유", v: traffic.summary?.shares ?? 0, c: "#db2777" },
+              { l: "다운로드", v: traffic.summary?.downloads ?? 0, c: "#0891b2" },
+            ].map((k) => (
+              <div key={k.l} style={{ ...card, padding: "0.75rem 0.4rem" }}>
+                <div style={{ fontSize: "1.3rem", fontWeight: 800, color: k.c }}>{k.v}</div>
+                <div style={{ fontSize: "0.7rem", color: "#64748b" }}>{k.l}</div>
+              </div>
+            ))}
+          </div>
+          {traffic.daily.length > 0 && (
+            <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem", marginBottom: 12 }}>
+              <div style={{ fontSize: "0.76rem", color: "#64748b", marginBottom: 8 }}>일별 페이지뷰</div>
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 100 }}>
+                {(() => { const mx = Math.max(...traffic.daily.map((d) => d.pageviews), 1); return traffic.daily.map((d) => (
+                  <div key={d.day} title={`${d.day} · PV ${d.pageviews} · 순 ${d.uniques} · 세션 ${d.sessions}`} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%" }}>
+                    <div style={{ width: "72%", minWidth: 3, margin: "0 auto", height: `${Math.round(d.pageviews / mx * 100)}%`, background: "linear-gradient(180deg,#3b5bdb,#7c3aed)", borderRadius: "3px 3px 0 0" }} />
+                  </div>
+                )); })()}
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.62rem", color: "#94a3b8", marginTop: 4 }}>
+                <span>{traffic.daily[0]?.day.slice(5)}</span><span>{traffic.daily[traffic.daily.length - 1]?.day.slice(5)}</span>
+              </div>
+            </div>
+          )}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>
+            <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem" }}>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>상위 페이지 (7일)</div>
+              {traffic.paths.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음</div> : traffic.paths.slice(0, 8).map((p, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, fontSize: "0.76rem", padding: "3px 0" }}>
+                  <span style={{ color: "#94a3b8", minWidth: 14 }}>{i + 1}</span>
+                  <span style={{ flex: 1, color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.path}</span>
+                  <span style={{ fontWeight: 700, color: "#3b5bdb" }}>{p.views}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem" }}>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>유입 경로 (7일)</div>
+              {traffic.refs.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음</div> : traffic.refs.slice(0, 8).map((r, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, fontSize: "0.76rem", padding: "3px 0" }}>
+                  <span style={{ color: "#94a3b8", minWidth: 14 }}>{i + 1}</span>
+                  <span style={{ flex: 1, color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.ref}</span>
+                  <span style={{ fontWeight: 700, color: "#7c3aed" }}>{r.views}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {db && (
         <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "0.9rem 1rem", marginBottom: "1.2rem" }}>

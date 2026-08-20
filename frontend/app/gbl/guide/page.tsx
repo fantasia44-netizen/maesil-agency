@@ -1,7 +1,7 @@
 // GBL 가이드 목록 — 서버렌더 SEO.
 import Link from "next/link";
 import type { Metadata } from "next";
-import { GUIDES } from "./[slug]/page";
+import { GUIDES } from "./guides";
 
 export const metadata: Metadata = {
   title: "포켓몬고 GBL 가이드 — 입문·리그·IV·파티 | GBL Note",
