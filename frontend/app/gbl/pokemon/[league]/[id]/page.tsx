@@ -26,7 +26,7 @@ const MON: Record<string, Mon> = {};
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
 const MOVES = DS.moves;
 const spriteUrl = (m?: Mon) =>
-  m ? (m.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${m.dex}.png`) : "";
+  m ? (m.sprite || `/gbl/sprites/${m.dex}.png`) : "";
 const nameOf = (id: string) => MON[id]?.ko || id;
 const moveKo = (id: string) => MOVES[id]?.ko || id;
 
@@ -187,7 +187,7 @@ export default async function PokemonDetail({ params }: { params: { league: stri
         <div style={{ background: `linear-gradient(110deg, ${c1}2e, ${c2}20 45%, #ffffff 92%)`, border: `1px solid ${BORDER}`, borderLeft: `5px solid ${c1}`, borderRadius: 14, padding: "1rem 1.1rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={hdex ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${hdex}.png` : ""} alt={name} width={64} height={64} style={{ imageRendering: "pixelated" }} />
+            <img src={hdex ? `/gbl/sprites/${hdex}.png` : ""} alt={name} width={64} height={64} style={{ imageRendering: "pixelated" }} />
             <div>
               <h1 style={{ margin: 0, fontSize: "1.4rem", fontWeight: 900, color: "#0f172a" }}>
                 {m?.shadow && <span style={{ color: "#7c3aed" }}>그림자 </span>}{name}

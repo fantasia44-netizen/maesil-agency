@@ -30,7 +30,7 @@ const TYPE_COLOR: Record<string, string> = {
 };
 const TYPE_KO = RD.meta.typeKo;
 const spriteUrl = (dex: number) =>
-  `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dex}.png`;
+  `/gbl/sprites/${dex}.png`;
 
 // rel%(속성 1위 대비)로 레이드 티어 배지
 const RAID_TIER = (rel: number) => (rel >= 95 ? "S" : rel >= 88 ? "A" : rel >= 80 ? "B" : rel >= 72 ? "C" : "D");

@@ -19,7 +19,7 @@ const TYPE_COLOR: Record<string, string> = {
 };
 const TYPE_KO = RD.meta.typeKo;
 const spriteUrl = (dex: number) =>
-  `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dex}.png`;
+  `/gbl/sprites/${dex}.png`;
 
 export const metadata: Metadata = {
   title: "포켓몬고 레이드 딜러 티어표 · 속성별 어택커 DPS 순위 | GBL Note",

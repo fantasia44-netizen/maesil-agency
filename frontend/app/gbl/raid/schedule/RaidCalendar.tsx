@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { track } from "../../../../lib/track";
+import { pokeSprite } from "../../sprite";
 
 export type CalBoss = { ko: string; dex: string; image: string; shiny: boolean };
 export type RotVariant = "star" | "shadow" | "mega";
@@ -75,7 +76,7 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
       await Promise.all([...dexSet].map((dex) => new Promise<void>((res) => {
         const im = new Image(); im.crossOrigin = "anonymous";
         im.onload = () => { imgs[dex] = im; res(); }; im.onerror = () => res();
-        im.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dex}.png`;
+        im.src = `/gbl/sprites/${dex}.png`;
       })));
 
       const W = 1080, gx = 40, gw = W - 80, cw = gw / 7, gyTop = 210, rowH = 176;
@@ -250,7 +251,7 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
                         {e.bosses.map((b, bi) => (
                           <Link key={bi} href={`/gbl/raid/bosses#b${b.dex}`} style={{ display: "flex", alignItems: "center", gap: 5, textDecoration: "none" }}>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={b.image} alt={b.ko} width={34} height={34} style={{ objectFit: "contain" }} />
+                            <img src={pokeSprite(b.dex)} alt={b.ko} width={34} height={34} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
                             <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#3b5bdb" }}>{b.ko}{b.shiny ? " ✨" : ""}</span>
                           </Link>
                         ))}

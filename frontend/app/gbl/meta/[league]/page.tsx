@@ -25,7 +25,7 @@ const DS = DATA as unknown as { leagues: Record<string, { pokemon: Mon[] }> };
 const MON: Record<string, Mon> = {};
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
 const spriteUrl = (m?: Mon) =>
-  m ? (m.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${m.dex}.png`) : "";
+  m ? (m.sprite || `/gbl/sprites/${m.dex}.png`) : "";
 const nameOf = (id: string) => MON[id]?.ko || id;
 
 type MetaMon = { speciesId: string; count: number };

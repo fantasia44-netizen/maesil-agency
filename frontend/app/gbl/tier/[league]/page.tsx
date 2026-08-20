@@ -27,7 +27,7 @@ const MON: Record<string, Mon> = {};
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
 const MOVES = DS.moves;
 const spriteUrl = (m?: Mon) =>
-  m ? (m.sprite || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${m.dex}.png`) : "";
+  m ? (m.sprite || `/gbl/sprites/${m.dex}.png`) : "";
 const nameOf = (id: string) => MON[id]?.ko || id;
 const moveKo = (id: string) => MOVES[id]?.ko || id;
 
@@ -179,7 +179,7 @@ export default async function TierPage({ params }: { params: { league: string } 
                     <Link key={d.id} href={`/gbl/pokemon/${params.league}/${d.id}`} style={{ textDecoration: "none", color: "inherit", display: "block", background: `linear-gradient(100deg, ${c1}26 0%, ${c2}18 42%, #ffffff 88%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={dex ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dex}.png` : ""} alt={dispName} width={36} height={36} style={{ imageRendering: "pixelated" }} />
+                        <img src={dex ? `/gbl/sprites/${dex}.png` : ""} alt={dispName} width={36} height={36} style={{ imageRendering: "pixelated" }} />
                         <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a" }}>{dispName}</span>
                         <span style={{ display: "flex", gap: 3 }}>
                           {types.map((t2) => (

@@ -8,7 +8,7 @@ export function loadSprites(dexes: string[]): Promise<Record<string, HTMLImageEl
       im.crossOrigin = "anonymous";
       im.onload = () => { imgs[dex] = im; res(); };
       im.onerror = () => res();
-      im.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dex}.png`;
+      im.src = `/gbl/sprites/${dex}.png`;
     })),
   ).then(() => imgs);
 }
