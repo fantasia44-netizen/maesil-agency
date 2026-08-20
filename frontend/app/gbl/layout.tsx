@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: "포켓몬 GO 레이드 딜러 티어·보스 100% CP·레이드 일정, 배틀리그 티어·실측 메타, 내 전적 기록까지. 포켓몬고 한국어 종합 정보·도구.",
   manifest: "/gbl-manifest.json",
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "GBL Note" },
-  icons: { apple: "/icons/apple-touch-icon.png", icon: "/icons/gbl-192.png" },
+  icons: { apple: "/gbl-icon.png", icon: "/gbl-icon.png", shortcut: "/gbl-icon.png" },
   openGraph: {
     title: "GBL Note — 포켓몬GO 올인원 한국어판",
     description: "레이드 딜러·보스 CP·레이드 일정 + 배틀 티어·실측 메타 + 내 전적. 포켓몬고 종합툴.",

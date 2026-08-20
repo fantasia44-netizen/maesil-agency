@@ -722,7 +722,8 @@ export default function GblPage() {
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
         <Link href="/gbl" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-          <span style={{ fontSize: "1.3rem" }}>📓</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/gbl-icon.png" alt="" width={26} height={26} />
           <h1 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800, color: "#0f172a" }}>GBL Note</h1>
         </Link>
         <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{leagueCount}판</span>
