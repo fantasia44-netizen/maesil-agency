@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { drawLogo } from "../raidShareUtil";
 
 export type CalBoss = { ko: string; dex: string; image: string; shiny: boolean };
 export type RotVariant = "star" | "shadow" | "mega";
@@ -79,7 +80,7 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
 
       const W = 1080, gx = 40, gw = W - 80, cw = gw / 7, gyTop = 210, rowH = 176;
       const rows = Math.ceil((startPad + daysN) / 7);
-      const H = gyTop + rowH * rows + 130;
+      const H = gyTop + rowH * rows + 176;
       const c = document.createElement("canvas"); c.width = W; c.height = H;
       const ctx = c.getContext("2d"); if (!ctx) { setBusy(false); return; }
       ctx.fillStyle = "#fbf7f3"; ctx.fillRect(0, 0, W, H);
@@ -106,12 +107,11 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
         let ind = ""; if (it.mega) ind += "🔷"; if (it.shadow) ind += "🌑"; if (it.rd) ind += "🎉"; if (it.rh) ind += "⏰";
         if (ind) { ctx.textAlign = "center"; ctx.font = "26px system-ui, sans-serif"; ctx.fillStyle = "#334155"; ctx.fillText(ind, cx + cw / 2, cy + rowH - 16); }
       }
-      // 워터마크/출처
+      // 워터마크(로고 아이콘 + 주소)
       const fy = gyTop + rowH * rows;
+      drawLogo(ctx, W / 2, fy + 52, 62, "#ea580c");
       ctx.textAlign = "center"; ctx.fillStyle = "#ea580c"; ctx.font = "900 44px system-ui, sans-serif";
-      ctx.fillText("gblnote.com", W / 2, fy + 58);
-      ctx.fillStyle = "#94a3b8"; ctx.font = "500 28px system-ui, sans-serif";
-      ctx.fillText("포켓몬고 레이드 일정·티어·CP · GBL Note", W / 2, fy + 98);
+      ctx.fillText("gblnote.com/gbl/raid/schedule", W / 2, fy + 132);
 
       setCardImage(c.toDataURL("image/png"));
       setCardFile(null);

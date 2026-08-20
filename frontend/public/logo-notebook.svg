@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img" aria-label="GBL Note 로고">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b5bdb"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="pin" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#4f8cff"/>
+      <stop offset="1" stop-color="#6d3fe6"/>
+    </linearGradient>
+    <clipPath id="cover"><rect x="96" y="62" width="210" height="272" rx="26"/></clipPath>
+    <clipPath id="head"><circle cx="200" cy="176" r="56"/></clipPath>
+  </defs>
+
+  <!-- 책 뒷장(두께감) -->
+  <rect x="108" y="74" width="210" height="272" rx="26" fill="#c9d4f0"/>
+  <rect x="102" y="68" width="210" height="272" rx="26" fill="#e2e8f6"/>
+
+  <!-- 우측 인덱스 탭 -->
+  <rect x="296" y="104" width="30" height="46" rx="9" fill="#4f8cff"/>
+  <rect x="296" y="164" width="30" height="46" rx="9" fill="#6d5aed"/>
+  <rect x="296" y="224" width="30" height="46" rx="9" fill="#9333ea"/>
+
+  <!-- 책 표지 -->
+  <rect x="96" y="62" width="210" height="272" rx="26" fill="#ffffff" stroke="url(#grad)" stroke-width="7"/>
+
+  <!-- 지도 배경(표지 안) -->
+  <g clip-path="url(#cover)" stroke="#dbe4f2" stroke-width="6" fill="none" stroke-linecap="round">
+    <path d="M 96 130 Q 180 110 306 150"/>
+    <path d="M 96 250 Q 200 230 306 270"/>
+    <path d="M 150 62 L 190 334"/>
+    <path d="M 250 62 L 226 334"/>
+    <circle cx="200" cy="176" r="150" stroke-width="5" opacity="0.6"/>
+  </g>
+
+  <!-- 몬스터볼 위치핀 -->
+  <path d="M 200 268 C 165 220 144 202 144 176 A 56 56 0 1 1 256 176 C 256 202 235 220 200 268 Z" fill="url(#pin)" stroke="#ffffff" stroke-width="6"/>
+  <g clip-path="url(#head)">
+    <rect x="140" y="168" width="120" height="16" fill="#ffffff"/>
+  </g>
+  <circle cx="200" cy="176" r="20" fill="#ffffff"/>
+  <circle cx="200" cy="176" r="12" fill="url(#pin)"/>
+  <circle cx="200" cy="176" r="4.5" fill="#ffffff"/>
+
+  <!-- 하단 책갈피 리본 -->
+  <path d="M 182 330 h 36 v 52 l -18 -14 l -18 14 Z" fill="#7c3aed"/>
+
+  <!-- 워드마크 -->
+  <text x="200" y="452" text-anchor="middle" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="72" letter-spacing="1">
+    <tspan fill="#0f172a">GBL</tspan><tspan fill="url(#grad)"> NOTE</tspan>
+  </text>
+</svg>

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { loadSprites, saveDataUrl, shareDataUrl } from "./raid/raidShareUtil";
+import { loadSprites, saveDataUrl, shareDataUrl, drawLogo } from "./raid/raidShareUtil";
 
 export type ShareItem = { dex: string; name: string; main: string; sub?: string; note?: string };
 
@@ -19,7 +19,7 @@ export default function ListShare({
     setBusy(true);
     try {
       const imgs = await loadSprites(items.map((i) => i.dex));
-      const W = 1080, rowH = 96, headH = 188, footH = 150;
+      const W = 1080, rowH = 96, headH = 188, footH = 186;
       const H = headH + rowH * items.length + footH;
       const c = document.createElement("canvas"); c.width = W; c.height = H;
       const ctx = c.getContext("2d"); if (!ctx) { setBusy(false); return; }
@@ -46,13 +46,12 @@ export default function ListShare({
         ctx.fillText(it.main, W - 44, y + rowH / 2 - (it.sub ? 10 : -12));
         if (it.sub) { ctx.fillStyle = "#8ea6ff"; ctx.font = "600 28px system-ui, sans-serif"; ctx.fillText(it.sub, W - 44, y + rowH / 2 + 30); }
       });
-      // 푸터(출처+링크)
+      // 푸터(로고 아이콘 + 주소)
       const fy = headH + rowH * items.length;
+      drawLogo(ctx, W / 2, fy + 52, 64, "#7c9dff");
       ctx.textAlign = "center";
-      ctx.fillStyle = accent; ctx.font = "900 52px system-ui, sans-serif";
-      ctx.fillText("gblnote.com", W / 2, fy + 66);
-      ctx.fillStyle = "#93a4cf"; ctx.font = "600 32px system-ui, sans-serif";
-      ctx.fillText(url, W / 2, fy + 112);
+      ctx.fillStyle = "#ffffff"; ctx.font = "800 44px system-ui, sans-serif";
+      ctx.fillText(url, W / 2, fy + 138);
 
       setImg(c.toDataURL("image/png"));
       setFile(null);
