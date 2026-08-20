@@ -710,6 +710,28 @@ def me(user: UserContext = Depends(get_current_user)) -> dict:
     }
 
 
+class MeUpdate(BaseModel):
+    display_name: str
+
+
+@router.patch("/me")
+def update_me(body: MeUpdate, user: UserContext = Depends(get_current_user)) -> dict:
+    """본인 닉네임(display_name) 변경."""
+    name = (body.display_name or "").strip()
+    if not name or len(name) > 20:
+        raise HTTPException(400, "닉네임은 1~20자여야 합니다.")
+    try:
+        _users_table().update(
+            {"display_name": name, "updated_at": datetime.now(timezone.utc).isoformat()}
+        ).eq("id", user.id).execute()
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error("닉네임 변경 실패 [%s]: %s", user.id, e)
+        raise HTTPException(500, "닉네임 변경 실패")
+    invalidate_revalidate_cache(user.id)
+    return {"ok": True, "display_name": name}
+
+
 # ─────────────────────────────────────────────────────────────────
 # 최초 super_admin 계정 생성 (users 테이블이 완전히 비어 있을 때만)
 # ─────────────────────────────────────────────────────────────────

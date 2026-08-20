@@ -96,6 +96,18 @@ export async function apiFetch<T = unknown>(
   return (await res.json()) as T;
 }
 
+// 본인 닉네임(display_name) 변경 + localStorage 갱신
+export async function updateNickname(name: string): Promise<string> {
+  const data = await apiFetch<{ ok: boolean; display_name: string }>(
+    "/api/auth/me",
+    { method: "PATCH", body: JSON.stringify({ display_name: name }) },
+    15000,
+  );
+  const u = getUser();
+  if (u) setUser({ ...u, display_name: data.display_name });
+  return data.display_name;
+}
+
 // ── 로그인 ───────────────────────────────────────────────────────────
 export async function login(email: string, password: string): Promise<StoredUser> {
   const res = await fetch(`${BASE}/api/auth/login`, {

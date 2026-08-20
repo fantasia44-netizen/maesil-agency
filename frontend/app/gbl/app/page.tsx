@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { apiFetch, logout, getUser } from "../../../lib/api";
+import { apiFetch, logout, getUser, updateNickname } from "../../../lib/api";
 import DATA from "../gbl_data.json";
 import AdSlot from "../AdSlot";
 import CoupangAd from "../CoupangAd";
@@ -16,6 +16,9 @@ type Dataset = { top_n: number; moves: Record<string, Move>; leagues: Record<Lea
 const DS = DATA as unknown as Dataset;
 const MOVES = DS.moves;
 const LEAGUE_KEY = "gbl_league";
+// 현재 시즌(전적 카드/시즌 필터용). 새 시즌 시작 시 갱신.
+const SEASON = { num: 27, start: "2026-06-02", end: "2026-09-09" };
+const PERIOD_LABEL: Record<string, string> = { today: "오늘", "7": "최근 7일", "30": "최근 30일", season: `시즌${SEASON.num}`, all: "전체" };
 // 모든 리그 union → 렌더용 조회맵 (기록은 어느 리그든 speciesId로 조회)
 const MON_BY_ID: Record<string, Mon> = {};
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON_BY_ID[m.id] = m;
@@ -299,7 +302,7 @@ export default function GblPage() {
   const [sort, setSort] = useState<"recent" | "name">("recent");  // 조회 정렬
   const [deckFilter, setDeckFilter] = useState<"all" | "won" | "lost">("all");
   const [expandedDeck, setExpandedDeck] = useState<string | null>(null);
-  const [statsPeriod, setStatsPeriod] = useState<"7" | "30" | "all">("all");  // 전적 기간
+  const [statsPeriod, setStatsPeriod] = useState<"today" | "7" | "30" | "season" | "all">("all");  // 전적 기간
   const [selectedDay, setSelectedDay] = useState<string | null>(null);        // 달력 선택 날짜
   const [calYM, setCalYM] = useState<{ y: number; m: number } | null>(null);  // 달력 표시 연·월(m:1-12)
   const [ratings, setRatings] = useState<RatingEntry[]>([]);                   // 레이팅 기록
@@ -307,10 +310,12 @@ export default function GblPage() {
   const [ratingInput, setRatingInput] = useState("");
   const [extraProfiles, setExtraProfiles] = useState<string[]>([]);            // 추가했지만 아직 기록 전 계정
   const [cardImage, setCardImage] = useState<string | null>(null);            // 전적 카드 미리보기(dataURL)
+  const [nickname, setNickname] = useState<string>("");                        // 내 닉네임(display_name)
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setIsOwner(getUser()?.role === "super_admin");
+    setNickname((getUser()?.display_name || "").trim());
     setFormats(currentFormats(todayISO()));
     const v = typeof window !== "undefined" ? localStorage.getItem(LEAGUE_KEY) : null;
     if (v && FORMAT_BY_KEY[v]) setLeague(v);
@@ -330,6 +335,23 @@ export default function GblPage() {
   const [saving, setSaving] = useState(false);
 
   const flash = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
+
+  // 닉네임 수정(전적 카드·자랑에 표시됨)
+  const editNickname = async () => {
+    const next = window.prompt("닉네임 (전적 카드·자랑하기에 표시됩니다)", nickname);
+    if (next == null) return;
+    const v = next.trim();
+    if (!v) { flash("닉네임을 입력하세요"); return; }
+    if (v.length > 20) { flash("닉네임은 20자 이내여야 합니다"); return; }
+    if (v === nickname) return;
+    try {
+      const saved = await updateNickname(v);
+      setNickname(saved);
+      flash("닉네임이 변경되었습니다");
+    } catch (e) {
+      flash("변경 실패: " + (e instanceof Error ? e.message : "오류"));
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -426,7 +448,17 @@ export default function GblPage() {
   type DayStat = { date: string; wins: number; losses: number; draws: number; total: number };
   const stats = useMemo(() => {
     let src = matches.filter((m) => (m.league || "master") === league);
-    if (statsPeriod !== "all") {
+    if (statsPeriod === "today") {
+      const n = new Date();
+      const tk = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+      src = src.filter((m) => {
+        const d = new Date(m.played_at);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}` === tk;
+      });
+    } else if (statsPeriod === "season") {
+      const s = new Date(SEASON.start + "T00:00:00").getTime();
+      src = src.filter((m) => new Date(m.played_at).getTime() >= s);
+    } else if (statsPeriod !== "all") {
       const since = Date.now() - Number(statsPeriod) * 86400000;
       src = src.filter((m) => new Date(m.played_at).getTime() >= since);
     }
@@ -502,17 +534,26 @@ export default function GblPage() {
     rg.addColorStop(0, "rgba(96,112,255,0.30)"); rg.addColorStop(1, "rgba(96,112,255,0)");
     ctx.fillStyle = rg; ctx.fillRect(0, 0, S, S);
     ctx.textAlign = "center";
-    // 로고
-    ctx.fillStyle = "#a9c1ff"; ctx.font = "800 50px system-ui, sans-serif";
-    ctx.fillText("📓 GBL NOTE", cx, 128);
     const lgLabel = FORMAT_BY_KEY[league]?.label || league;
-    const perLabel = statsPeriod === "all" ? "전체" : statsPeriod === "7" ? "최근 7일" : "최근 30일";
-    ctx.fillStyle = "#c7d2fe"; ctx.font = "500 40px system-ui, sans-serif";
-    ctx.fillText(`${lgLabel} · ${perLabel}`, cx, 190);
+    const perLabel = PERIOD_LABEL[statsPeriod];
+    const nick = nickname.trim();
+    const curRating = profileRatings.length ? profileRatings[profileRatings.length - 1].rating : null;
+    // 상단: 닉네임(있으면 주인공) + 브랜드/리그/기간
+    if (nick) {
+      ctx.fillStyle = "#ffffff"; ctx.font = "800 62px system-ui, sans-serif";
+      ctx.fillText(nick.length > 14 ? nick.slice(0, 14) + "…" : nick, cx, 110);
+      ctx.fillStyle = "#8ea6ff"; ctx.font = "700 34px system-ui, sans-serif";
+      ctx.fillText(`📓 GBL NOTE · ${lgLabel} · ${perLabel}`, cx, 164);
+    } else {
+      ctx.fillStyle = "#a9c1ff"; ctx.font = "800 50px system-ui, sans-serif";
+      ctx.fillText("📓 GBL NOTE", cx, 120);
+      ctx.fillStyle = "#c7d2fe"; ctx.font = "500 40px system-ui, sans-serif";
+      ctx.fillText(`${lgLabel} · ${perLabel}`, cx, 182);
+    }
     // 원형 승률 게이지
     const wr = winRate(stats.wins, stats.losses);
     const frac = (wr ?? 0) / 100;
-    const cy = 510, R = 205;
+    const cy = 500, R = 200;
     ctx.lineCap = "round"; ctx.lineWidth = 42;
     ctx.strokeStyle = "rgba(255,255,255,0.10)";
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
@@ -524,7 +565,7 @@ export default function GblPage() {
     ctx.fillStyle = "#94a3b8"; ctx.font = "600 42px system-ui, sans-serif";
     ctx.fillText("승률", cx, cy + 118);
     // 승/패 바
-    const bw = 700, bh = 30, bx = cx - bw / 2, by = 812;
+    const bw = 700, bh = 30, bx = cx - bw / 2, by = 800;
     const rr = (x0: number, y0: number, w: number, h: number, r: number) => { ctx.beginPath(); ctx.roundRect(x0, y0, w, h, r); };
     rr(bx, by, bw, bh, 15); ctx.fillStyle = "rgba(255,255,255,0.10)"; ctx.fill();
     ctx.save(); rr(bx, by, bw, bh, 15); ctx.clip();
@@ -544,13 +585,27 @@ export default function GblPage() {
     const totalW = widths.reduce((a, b) => a + b, 0) + gap * (parts.length - 1);
     let x = cx - totalW / 2;
     ctx.textAlign = "left";
-    parts.forEach((p, i) => { ctx.fillStyle = p.c; ctx.fillText(p.t, x, 918); x += widths[i] + gap; });
+    parts.forEach((p, i) => { ctx.fillStyle = p.c; ctx.fillText(p.t, x, 900); x += widths[i] + gap; });
     ctx.textAlign = "center";
+    // 현재 레이팅(계정별, 있으면)
+    if (curRating != null) {
+      const rLabel = ratingProfile !== "기본" ? `${ratingProfile} 레이팅 ` : "레이팅 ";
+      const rVal = String(curRating);
+      ctx.font = "700 46px system-ui, sans-serif";
+      const lw = ctx.measureText(rLabel).width;
+      ctx.font = "800 54px system-ui, sans-serif";
+      const vw = ctx.measureText(rVal).width;
+      let rx = cx - (lw + vw) / 2;
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#94a3b8"; ctx.font = "700 46px system-ui, sans-serif"; ctx.fillText(rLabel, rx, 968); rx += lw;
+      ctx.fillStyle = "#fde047"; ctx.font = "800 54px system-ui, sans-serif"; ctx.fillText(rVal, rx, 968);
+      ctx.textAlign = "center";
+    }
     // 푸터
-    ctx.fillStyle = "#7c9dff"; ctx.font = "800 42px system-ui, sans-serif";
-    ctx.fillText("gblnote.com", cx, 1004);
-    ctx.fillStyle = "#5f6f92"; ctx.font = "400 30px system-ui, sans-serif";
-    ctx.fillText(new Date().toLocaleDateString("ko-KR"), cx, 1048);
+    ctx.fillStyle = "#7c9dff"; ctx.font = "800 40px system-ui, sans-serif";
+    ctx.fillText("gblnote.com", cx, 1018);
+    ctx.fillStyle = "#5f6f92"; ctx.font = "400 28px system-ui, sans-serif";
+    ctx.fillText(new Date().toLocaleDateString("ko-KR"), cx, 1054);
 
     setCardImage(c.toDataURL("image/png"));   // 미리보기 모달에 표시
   };
@@ -657,6 +712,13 @@ export default function GblPage() {
           <h1 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800, color: "#0f172a" }}>GBL Note</h1>
         </Link>
         <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{leagueCount}판</span>
+        <button onClick={editNickname} title="닉네임 수정 (전적 카드에 표시)"
+          style={{ fontSize: "0.72rem", fontWeight: 700, color: nickname ? "#3b5bdb" : "#94a3b8",
+            background: nickname ? "rgba(59,91,219,.09)" : "none", border: "1px solid #dbe2ee",
+            borderRadius: 6, padding: "4px 9px", cursor: "pointer", maxWidth: 130, overflow: "hidden",
+            textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          👤 {nickname || "닉네임 설정"} ✎
+        </button>
         <Link href="/gbl/meta"
           style={{ marginLeft: "auto", fontSize: "0.74rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>
           🌐 전체 메타
@@ -821,12 +883,12 @@ export default function GblPage() {
       {tab === "stats" && (
         <div>
           {/* 기간 필터 */}
-          <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
-            {([["7", "최근 7일"], ["30", "최근 30일"], ["all", "전체"]] as const).map(([k, label]) => {
+          <div style={{ display: "flex", gap: 5, marginBottom: 12 }}>
+            {([["today", "오늘"], ["7", "7일"], ["30", "30일"], ["season", "시즌"], ["all", "전체"]] as const).map(([k, label]) => {
               const on = statsPeriod === k;
               return (
                 <button key={k} onClick={() => setStatsPeriod(k)}
-                  style={{ flex: 1, padding: "7px", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: "0.78rem",
+                  style={{ flex: 1, padding: "7px 2px", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: "0.76rem",
                     border: on ? "1.5px solid #4f8cff" : "1px solid #dbe2ee",
                     background: on ? "#3b5bdb" : "#eef2f8", color: on ? "#fff" : "#64748b" }}>{label}</button>
               );
@@ -989,7 +1051,7 @@ export default function GblPage() {
           {stats.days.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 8 }}>
-                📊 일자별 승률{statsPeriod === "all" ? "" : ` (${statsPeriod === "7" ? "최근 7일" : "최근 30일"})`}
+                📊 일자별 승률{statsPeriod === "all" ? "" : ` (${PERIOD_LABEL[statsPeriod]})`}
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {stats.days.map((d) => {
