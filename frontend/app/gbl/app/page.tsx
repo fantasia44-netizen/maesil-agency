@@ -420,6 +420,62 @@ export default function GblPage() {
   const winRate = (w: number, l: number) => (w + l > 0 ? Math.round((w / (w + l)) * 100) : null);
   const rateColor = (r: number | null) => r == null ? "#94a3b8" : r >= 60 ? "#16a34a" : r >= 45 ? "#c2410c" : "#dc2626";
 
+  // 전적 카드 이미지 생성(캔버스) → 저장/공유. 브랜딩 포함(공유 시 홍보).
+  const shareStatsCard = (download: boolean) => {
+    const W = 1080, H = 720;
+    const c = document.createElement("canvas");
+    c.width = W; c.height = H;
+    const ctx = c.getContext("2d");
+    if (!ctx) return;
+    const g = ctx.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, "#0b1226"); g.addColorStop(1, "#3a2a6b");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#8db4ff"; ctx.font = "700 40px system-ui, sans-serif";
+    ctx.fillText("📓 GBL NOTE", W / 2, 100);
+    const lgLabel = FORMAT_BY_KEY[league]?.label || league;
+    const perLabel = statsPeriod === "all" ? "전체" : statsPeriod === "7" ? "최근 7일" : "최근 30일";
+    ctx.fillStyle = "#c7d2fe"; ctx.font = "500 32px system-ui, sans-serif";
+    ctx.fillText(`${lgLabel} · ${perLabel}`, W / 2, 158);
+    const wr = winRate(stats.wins, stats.losses);
+    ctx.fillStyle = "#ffffff"; ctx.font = "800 200px system-ui, sans-serif";
+    ctx.fillText(wr == null ? "-%" : `${wr}%`, W / 2, 420);
+    ctx.fillStyle = "#94a3b8"; ctx.font = "600 34px system-ui, sans-serif";
+    ctx.fillText("승률", W / 2, 468);
+    // 판수 · 승 · 패 (색상)
+    ctx.font = "700 50px system-ui, sans-serif";
+    const parts = [
+      { t: `${stats.total}판`, c: "#e2e8f0" },
+      { t: `${stats.wins}승`, c: "#4ade80" },
+      { t: `${stats.losses}패`, c: "#f87171" },
+    ];
+    const gap = 44;
+    const widths = parts.map((p) => ctx.measureText(p.t).width);
+    const totalW = widths.reduce((a, b) => a + b, 0) + gap * (parts.length - 1);
+    let x = W / 2 - totalW / 2;
+    ctx.textAlign = "left";
+    parts.forEach((p, i) => { ctx.fillStyle = p.c; ctx.fillText(p.t, x, 560); x += widths[i] + gap; });
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#6c8cff"; ctx.font = "700 34px system-ui, sans-serif";
+    ctx.fillText("gblnote.com", W / 2, 662);
+    ctx.fillStyle = "#5f6f92"; ctx.font = "400 26px system-ui, sans-serif";
+    ctx.fillText(new Date().toLocaleDateString("ko-KR"), W / 2, 700);
+
+    c.toBlob(async (blob) => {
+      if (!blob) return;
+      const file = new File([blob], "gbl-record.png", { type: "image/png" });
+      const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
+      if (!download && typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], title: "내 GBL 전적" }); return; } catch { /* 취소 → 저장 폴백 */ }
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = "gbl-record.png"; a.click();
+      URL.revokeObjectURL(url);
+      flash("💾 전적 카드 저장됨");
+    }, "image/png");
+  };
+
   const resetForm = () => { setOppName(""); setTeam(emptyTeam()); setMemo(""); setResult(null); setEditingId(null); };
 
   const startEdit = (m: Match) => {
@@ -681,6 +737,16 @@ export default function GblPage() {
               <div style={{ fontSize: "0.72rem", color: "#64748b" }}>승률</div>
             </div>
           </div>
+
+          {/* 전적 카드 자랑/공유 */}
+          {stats.total > 0 && (
+            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+              <button onClick={() => shareStatsCard(false)}
+                style={{ flex: 1, padding: "10px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 700, fontSize: "0.85rem", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)", color: "#fff" }}>📸 전적 카드 자랑하기</button>
+              <button onClick={() => shareStatsCard(true)}
+                style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid #dbe2ee", cursor: "pointer", fontWeight: 700, fontSize: "0.85rem", background: "#eef2f8", color: "#3b5bdb" }}>💾 저장</button>
+            </div>
+          )}
 
           {/* 📅 달력 (일자별) */}
           {calYM && (
