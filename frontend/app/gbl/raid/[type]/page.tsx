@@ -12,7 +12,7 @@ export const revalidate = 3600;
 type Row = {
   name: string; dex: number; shadow: boolean; mega: string; primal: boolean; legacy: boolean; upcoming: boolean;
   fast: string; charged: string; fastKo: string; chargedKo: string; fastType: string; chargedType: string;
-  dps: number; bulk: number; rel: number; atk: number; def: number; hp: number;
+  dps: number; tdo: number; er: number; rel: number; atk: number; def: number; hp: number;
 };
 type RaidData = {
   meta: { level: number; cpm: number; targetDef: number; generated: string; typeKo: Record<string, string> };
@@ -122,10 +122,13 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
           <b style={{ color: "#334155" }}> 메가진화·섀도우 포함</b>, 각 포켓몬의 추천 기술배치와 내구(생존)까지 함께 확인하세요.
         </p>
         <p style={{ margin: "0.5rem 0 0", fontSize: "0.76rem", color: "#94a3b8" }}>
-          DPS = {ko}약점 대상 기준 초당 데미지(레벨40·STAB·약점 1.6배 반영, 빠른기술도 속성 일치 시 우대). 내구 = 유효체력×방어 지수.
+          <b style={{ color: "#334155" }}>종합점수</b>(큰 숫자)로 순위 = <b style={{ color: "#334155" }}>딜(DPS)</b>과 <b style={{ color: "#334155" }}>총딜(TDO·버티며 넣는 총 데미지)</b>을 결합한 균형 지표. {ko}약점 대상·레벨40·STAB·약점 1.6배 반영(빠른기술도 속성 일치 시 우대).
         </p>
         <p style={{ margin: "0.35rem 0 0", fontSize: "0.72rem", color: "#94a3b8" }}>
           데이터 기준일 <b style={{ color: "#64748b" }}>{RD.meta.generated}</b> · <span style={{ color: "#d97706", fontWeight: 700 }}>레거시*</span> = 전용·이벤트 한정 기술 · <span style={{ color: "#0891b2", fontWeight: 700 }}>출시예정</span> = 아직 미출시
+        </p>
+        <p style={{ margin: "0.3rem 0 0", fontSize: "0.7rem", color: "#b0b8c4" }}>
+          ※ 수치·순위는 공개 게임데이터 기반 자체 계산으로, 계산 방식(대상 보스·레벨·회피 등)에 따라 포켓배틀러 등 다른 사이트와 다를 수 있으며 오차가 있을 수 있습니다. 참고용으로 봐주세요.
         </p>
 
         {rows.length === 0 ? (
@@ -155,9 +158,9 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
                         ); })()}
                       </div>
                     </div>
-                    <div style={{ textAlign: "right", minWidth: 74 }}>
-                      <div style={{ fontSize: "1rem", fontWeight: 900, color: "#0f172a", lineHeight: 1 }}>{r.dps.toFixed(2)}</div>
-                      <div style={{ fontSize: "0.6rem", color: "#94a3b8", marginTop: 1 }}>DPS · 내구 {r.bulk}</div>
+                    <div style={{ textAlign: "right", minWidth: 84 }}>
+                      <div style={{ fontSize: "1.05rem", fontWeight: 900, color: "#0f172a", lineHeight: 1 }}>{r.er.toFixed(1)}</div>
+                      <div style={{ fontSize: "0.58rem", color: "#94a3b8", marginTop: 2 }}>종합 · 딜 {r.dps.toFixed(1)} · 총딜 {r.tdo}</div>
                     </div>
                   </div>
                   {/* rel% 바 */}
@@ -173,11 +176,12 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
         <AdSlot />
 
         <div style={{ marginTop: 24, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
-          <h2 style={{ fontSize: "0.95rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>DPS·내구는 어떻게 계산했나요?</h2>
+          <h2 style={{ fontSize: "0.95rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>종합점수는 어떻게 계산했나요?</h2>
           <p style={{ margin: 0, fontSize: "0.82rem", color: "#475569", lineHeight: 1.7 }}>
-            공개 게임 데이터(종족값·기술 위력/시전시간/에너지)로 표준 PvE 공식을 적용해 산출했습니다. 레벨40 기준, 이 속성에 <b>약점인 대상</b>을 때릴 때의
-            초당 데미지(DPS)로, STAB과 약점 1.6배를 반영합니다(빠른기술도 속성이 맞으면 우대). 체력×방어 기반 내구 지수도 함께 표시합니다.
-            포켓배틀러 등과 세부 수치는 다를 수 있으나 순위 경향은 일치합니다.{" "}
+            공개 게임 데이터(종족값·기술 위력/시전시간/에너지)로 표준 PvE 공식을 적용했습니다. 이 속성에 <b>약점인 대상</b>을 레벨40으로 때릴 때 기준입니다.
+            <b> 딜(DPS)</b>은 STAB·약점 1.6배 반영 초당 데미지, <b>총딜(TDO)</b>은 버티는 시간(체력·방어)까지 반영한 기절 전 총 데미지,
+            <b> 종합점수</b>는 이 둘을 결합한 균형 지표(딜³×총딜)로 순위를 매깁니다(포켓배틀러 Overall 방식).
+            계산 방식에 따라 다른 사이트와 수치가 다를 수 있으니 참고용으로 봐주세요.{" "}
             <Link href="/gbl/raid" style={{ color: "#3b5bdb", fontWeight: 600 }}>다른 속성 티어표 →</Link>
           </p>
         </div>

@@ -41,6 +41,8 @@ TARGET_DEF = 180.0
 SHADOW_ATK = 1.2
 SHADOW_DEF = 0.8333333
 TOP_PER_TYPE = 30
+# TDO(총 딜량) 모델: 버티는시간 = 체력×방어/BOSS_K (가상 5성 보스 피격 가정). TDO = DPS × 버티는시간.
+BOSS_K = 950.0
 
 # PvPoke released=False 지만 출시 예정으로 포함할 폼(사용자 승인). "출시예정" 배지 표시.
 # 칼로스 스타터 메가 3종 — 2026-10 출시예정
@@ -193,7 +195,7 @@ def main():
         atk = (bs["atk"] + 15) * CPM40 * (SHADOW_ATK if shadow else 1.0)
         deff = (bs["def"] + 15) * CPM40 * (SHADOW_DEF if shadow else 1.0)
         hp = (bs["hp"] + 15) * CPM40
-        bulk = round(hp * deff / 100)
+        survive = hp * deff / BOSS_K   # 버티는 시간(초) 지수
         name, mega, primal = form_label(sid, dex, ko, shadow)
 
         # 속성별 최고 조합
@@ -229,8 +231,11 @@ def main():
                 by_type[bt] = {"dps": best[0], "fast": best[1], "charged": cid, "legacy": legacy}
 
         for bt, v in by_type.items():
+            dps = v["dps"]
+            tdo = dps * survive                      # 총 딜량 = DPS × 버티는시간
+            er = (dps ** 3 * tdo) ** 0.25            # 종합점수(ER): 딜³×총딜량, 포켓배틀러 Overall식
             rows.append({
-                "type": bt, "dps": round(v["dps"], 2), "bulk": bulk,
+                "type": bt, "dps": round(dps, 1), "tdo": round(tdo), "er": round(er, 1),
                 "name": name, "dex": dex, "shadow": shadow, "mega": mega, "primal": primal,
                 "legacy": v["legacy"], "upcoming": upcoming, "fast": v["fast"], "charged": v["charged"],
                 "atk": round(atk), "def": round(deff), "hp": round(hp),
@@ -239,7 +244,7 @@ def main():
     # 속성별 그룹 + DPS정렬 + 이름중복제거 + 상위N + 상대%
     out_types = {}
     for tp in TYPES:
-        grp = sorted([r for r in rows if r["type"] == tp], key=lambda r: r["dps"], reverse=True)
+        grp = sorted([r for r in rows if r["type"] == tp], key=lambda r: r["er"], reverse=True)
         uniq, names = [], set()
         for r in grp:
             if r["name"] in names:
@@ -247,9 +252,9 @@ def main():
             names.add(r["name"])
             uniq.append(r)
         top = uniq[:TOP_PER_TYPE]
-        mx = top[0]["dps"] if top else 1
+        mx = top[0]["er"] if top else 1
         for r in top:
-            r["rel"] = round(r["dps"] / mx * 100, 1)
+            r["rel"] = round(r["er"] / mx * 100, 1)  # 종합점수(ER) 기준 상대%
             f = pve(r["fast"], MV, True) or {}
             c = pve(r["charged"], MV, False) or {}
             r["fastKo"] = f.get("ko", pretty(r["fast"]))
