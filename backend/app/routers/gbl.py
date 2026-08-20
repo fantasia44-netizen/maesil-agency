@@ -451,6 +451,7 @@ class PostIn(BaseModel):
     board: str = "chat"
     title: str
     body: str
+    is_private: bool = False   # inquiry 전용: 비공개(작성자+운영자만 열람)
 
 
 class ReplyIn(BaseModel):
@@ -483,9 +484,13 @@ def board_list(board: str = "chat", limit: int = 50,
     if board not in _BOARDS:
         raise HTTPException(400, "잘못된 게시판입니다.")
     try:
-        rows = (_db().table("gbl_posts").select("*")
-                .eq("board", board).order("created_at", desc=True)
-                .limit(min(max(limit, 1), 100)).execute().data) or []
+        q = (_db().table("gbl_posts").select("*")
+             .eq("board", board).order("created_at", desc=True)
+             .limit(min(max(limit, 1), 100)))
+        # 비공개 문의: 작성자 본인 또는 운영자만 목록에 노출
+        if not user.is_super_admin:
+            q = q.or_(f"is_private.eq.false,user_id.eq.{user.id}")
+        rows = q.execute().data or []
     except Exception as e:
         logger.error("gbl board list 실패: %s", e)
         raise HTTPException(500, "게시판 조회 실패")
@@ -509,6 +514,8 @@ def board_get(post_id: int, user: UserContext = Depends(get_current_user)) -> di
         logger.error("gbl post 조회 실패 [%s]: %s", post_id, e)
         raise HTTPException(500, "글 조회 실패")
     post = prow[0]
+    if post.get("is_private") and not user.is_super_admin and str(post.get("user_id")) != str(user.id):
+        raise HTTPException(403, "비공개 글입니다. 작성자와 운영자만 볼 수 있습니다.")
     _attach_authors([post], user.id)
     _attach_authors(replies, user.id)
     post["replies"] = replies
@@ -528,6 +535,7 @@ def board_create(body: PostIn, user: UserContext = Depends(get_current_user)) ->
         row = (_db().table("gbl_posts").insert({
             "board": body.board, "user_id": str(user.id),
             "title": title[:200], "body": text[:5000],
+            "is_private": bool(body.is_private) and body.board == "inquiry",
         }).execute().data)[0]
     except Exception as e:
         logger.error("gbl post 작성 실패: %s", e)
@@ -544,9 +552,11 @@ def board_reply(post_id: int, body: ReplyIn, user: UserContext = Depends(get_cur
         raise HTTPException(400, "내용을 입력하세요.")
     db = _db()
     try:
-        prow = (db.table("gbl_posts").select("id, board").eq("id", post_id).limit(1).execute().data) or []
+        prow = (db.table("gbl_posts").select("id, board, is_private, user_id").eq("id", post_id).limit(1).execute().data) or []
         if not prow:
             raise HTTPException(404, "글을 찾을 수 없습니다.")
+        if prow[0].get("is_private") and not user.is_super_admin and str(prow[0].get("user_id")) != str(user.id):
+            raise HTTPException(403, "비공개 글에는 댓글을 달 수 없습니다.")
         is_admin = bool(user.is_super_admin)
         rep = (db.table("gbl_post_replies").insert({
             "post_id": post_id, "user_id": str(user.id),

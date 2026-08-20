@@ -9,7 +9,7 @@ type Board = "chat" | "inquiry";
 type Reply = { id: number; author: string; is_admin: boolean; body: string; created_at: string; mine: boolean };
 type Post = {
   id: number; board: Board; author: string; title: string; body: string;
-  answered: boolean; reply_count: number; created_at: string; mine: boolean; replies?: Reply[];
+  answered: boolean; is_private: boolean; reply_count: number; created_at: string; mine: boolean; replies?: Reply[];
 };
 
 const BOARDS: { key: Board; label: string; hint: string }[] = [
@@ -36,6 +36,7 @@ export default function GblBoard() {
   const [writing, setWriting] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
   const [reply, setReply] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -74,8 +75,8 @@ export default function GblBoard() {
     if (!title.trim() || !body.trim()) { setErr("제목과 내용을 입력하세요."); return; }
     setBusy(true); setErr("");
     try {
-      await apiFetch(`/api/gbl/board`, { method: "POST", body: JSON.stringify({ board, title, body }) }, 15000);
-      setTitle(""); setBody(""); setWriting(false);
+      await apiFetch(`/api/gbl/board`, { method: "POST", body: JSON.stringify({ board, title, body, is_private: board === "inquiry" ? isPrivate : false }) }, 15000);
+      setTitle(""); setBody(""); setIsPrivate(false); setWriting(false);
       await loadList(board);
     } catch (e) { setErr(e instanceof Error ? e.message : "작성 실패"); }
     finally { setBusy(false); }
@@ -140,6 +141,7 @@ export default function GblBoard() {
                 {sel.answered ? "답변완료" : "답변대기"}
               </span>
             )}
+            {sel.is_private && <span title="비공개" style={{ fontSize: "0.95rem" }}>🔒</span>}
             <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800, color: "#0f172a", flex: 1 }}>{sel.title}</h2>
           </div>
           <div style={{ fontSize: "0.74rem", color: "#94a3b8", marginBottom: 10 }}>{sel.author} · {fmt(sel.created_at)}</div>
@@ -192,6 +194,12 @@ export default function GblBoard() {
         <div style={{ ...card, marginBottom: 14 }}>
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목" style={{ ...input, marginBottom: 8 }} maxLength={200} />
           <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder={board === "inquiry" ? "문의 내용 (기기·상황·캡처 설명을 적어주시면 빠르게 답변드립니다)" : "내용"} rows={5} style={{ ...input, resize: "vertical" }} maxLength={5000} />
+          {board === "inquiry" && (
+            <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, fontSize: "0.85rem", color: "#475569", cursor: "pointer" }}>
+              <input type="checkbox" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} style={{ width: 16, height: 16 }} />
+              🔒 비공개로 문의 — 나와 운영자만 볼 수 있어요
+            </label>
+          )}
           {err && <div style={{ color: "#dc2626", fontSize: "0.8rem", marginTop: 6 }}>{err}</div>}
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 10 }}>
             <button onClick={() => { setWriting(false); setErr(""); }} style={{ ...btn("#e2e8f0"), color: "#475569" }}>취소</button>
@@ -218,6 +226,7 @@ export default function GblBoard() {
                     {p.answered ? "답변완료" : "답변대기"}
                   </span>
                 )}
+                {p.is_private && <span title="비공개" style={{ fontSize: "0.82rem" }}>🔒</span>}
                 <span style={{ flex: 1, fontWeight: 700, color: "#0f172a", fontSize: "0.95rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</span>
                 {p.reply_count > 0 && <span style={{ fontSize: "0.76rem", color: ACCENT, fontWeight: 700 }}>💬 {p.reply_count}</span>}
               </div>

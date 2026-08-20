@@ -9,10 +9,13 @@ CREATE TABLE IF NOT EXISTS public.gbl_posts (
     title       text NOT NULL,
     body        text NOT NULL,
     answered    boolean NOT NULL DEFAULT false,    -- inquiry: 운영자 답변 완료 여부
+    is_private  boolean NOT NULL DEFAULT false,    -- inquiry: 비공개(작성자+운영자만)
     reply_count integer NOT NULL DEFAULT 0,
     created_at  timestamptz NOT NULL DEFAULT now(),
     updated_at  timestamptz NOT NULL DEFAULT now()
 );
+-- 이미 069를 실행한 설치본에도 컬럼 보강 (재실행 안전)
+ALTER TABLE public.gbl_posts ADD COLUMN IF NOT EXISTS is_private boolean NOT NULL DEFAULT false;
 CREATE INDEX IF NOT EXISTS idx_gbl_posts_board ON public.gbl_posts (board, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_gbl_posts_user  ON public.gbl_posts (user_id);
 

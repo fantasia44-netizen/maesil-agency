@@ -28,7 +28,7 @@ type Traffic = {
 
 type DbStatus = { hub_configured: boolean; maesil_total: number | null; maesil_hub: number | null };
 
-type BoardPost = { id: number; board: string; author: string; title: string; answered: boolean; reply_count: number; created_at: string };
+type BoardPost = { id: number; board: string; author: string; title: string; answered: boolean; is_private: boolean; reply_count: number; created_at: string };
 
 export default function GblAdmin() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -135,6 +135,7 @@ export default function GblAdmin() {
           <a key={p.id} href={`/gbl/board?board=inquiry&post=${p.id}`} target="_blank" rel="noreferrer"
              style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 0", borderTop: "1px solid #f5f7f6", textDecoration: "none" }}>
             <span style={{ fontSize: "0.62rem", fontWeight: 800, padding: "1px 7px", borderRadius: 20, background: p.answered ? "#dcfce7" : "#fef3c7", color: p.answered ? "#16a34a" : "#b45309" }}>{p.answered ? "완료" : "대기"}</span>
+            {p.is_private && <span title="비공개" style={{ fontSize: "0.78rem" }}>🔒</span>}
             <span style={{ flex: 1, fontSize: "0.84rem", color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</span>
             {p.reply_count > 0 && <span style={{ fontSize: "0.72rem", color: "#3b5bdb", fontWeight: 700 }}>💬{p.reply_count}</span>}
             <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{p.author} · {fmtDate(p.created_at)}</span>
