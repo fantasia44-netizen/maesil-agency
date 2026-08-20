@@ -141,17 +141,6 @@ function OppRow({ league, id, rating }: { league: string; id: string; rating: nu
   );
 }
 
-// CMP 비교 행(공격 종족값 표시)
-function CmpRow({ league, d, color }: { league: string; d: Detail; color: string }) {
-  return (
-    <Link href={`/gbl/pokemon/${league}/${d.id}`} style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 6, background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 8, padding: "4px 8px" }}>
-      <Sprite id={d.id} size={26} />
-      <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameOf(d.id)}</span>
-      <span style={{ marginLeft: "auto", fontSize: "0.72rem", fontWeight: 800, color }}>{d.stats.atk}</span>
-    </Link>
-  );
-}
-
 export default async function PokemonDetail({ params }: { params: { league: string; id: string } }) {
   const lg = LEAGUES[params.league];
   const d = findDetail(params.league, params.id);
@@ -167,10 +156,6 @@ export default async function PokemonDetail({ params }: { params: { league: stri
   const pr = pick[d.id];
 
   // CMP(공격력 우선권): 이 리그 상위종을 공격력순 정렬 → 내 위/아래 이웃(가까운 상대가 실전 관건)
-  const byAtk = (DET[params.league] || []).filter((x) => x.stats && x.stats.atk).sort((a, b) => (b.stats.atk || 0) - (a.stats.atk || 0));
-  const atkIdx = byAtk.findIndex((x) => x.id === d.id);
-  const cmpWins = atkIdx >= 0 ? byAtk.slice(atkIdx + 1, atkIdx + 6) : [];        // 공격력 낮음 → 내가 CMP 우선
-  const cmpLoses = atkIdx >= 0 ? byAtk.slice(Math.max(0, atkIdx - 5), atkIdx) : []; // 공격력 높음 → 상대가 먼저
 
   const wrap: React.CSSProperties = {
     minHeight: "100dvh",
@@ -255,34 +240,23 @@ export default async function PokemonDetail({ params }: { params: { league: stri
           )}
         </div>
 
-        {/* CMP 우선권 (공격력 순서) */}
-        {atkIdx >= 0 && (
-          <>
-            <h2 style={h2}>⚡ CMP 우선권 — 같은 턴 차지 시 누가 먼저</h2>
-            <p style={{ margin: "0 0 8px", fontSize: "0.82rem", color: "#475569", lineHeight: 1.7 }}>
-              공격력 <b style={{ color: "#0f172a" }}>{d.stats.atk}</b> · 이 리그 공격력 <b>{atkIdx + 1}위</b> / {byAtk.length}종.
-              상대와 <b>동시에 차지 기술</b>을 쏘면 공격력이 높은 쪽이 <b>먼저 발동</b>해 이깁니다(CMP 우선권).
-            </p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: "0.76rem", fontWeight: 700, color: "#16a34a", marginBottom: 6 }}>✅ 내가 먼저 (이 상대 이김)</div>
-                {cmpWins.length ? (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>{cmpWins.map((x) => <CmpRow key={x.id} league={params.league} d={x} color="#16a34a" />)}</div>
-                ) : <p style={{ fontSize: "0.78rem", color: "#94a3b8" }}>공격력 최하위권</p>}
-              </div>
-              <div>
-                <div style={{ fontSize: "0.76rem", fontWeight: 700, color: "#dc2626", marginBottom: 6 }}>⚠️ 상대가 먼저 (내가 밀림)</div>
-                {cmpLoses.length ? (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>{cmpLoses.map((x) => <CmpRow key={x.id} league={params.league} d={x} color="#dc2626" />)}</div>
-                ) : <p style={{ fontSize: "0.78rem", color: "#94a3b8" }}>이 리그 공격력 1위</p>}
-              </div>
-            </div>
-            <p style={{ marginTop: 8, fontSize: "0.72rem", color: "#94a3b8", lineHeight: 1.6 }}>
-              공격력이 가까운 상대만 표시 — 실전에서 CMP가 실제로 갈리는 구간입니다. 숫자 = 공격 종족값.{" "}
-              <Link href={`/gbl/cmp/${params.league}`} style={{ color: "#3b5bdb", fontWeight: 600 }}>전체 우선권 순위 →</Link>
-            </p>
-          </>
-        )}
+        {/* 카운터 (이 포켓몬에게 강한 상대) — 상단 배치 */}
+        <h2 style={h2}>🛡️ {name} 카운터 (이 포켓몬에게 강한 상대)</h2>
+        <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>{name}를 상대로 유리한 포켓몬입니다. {name}를 자주 만난다면 아래를 준비하세요.</p>
+        {d.counters.length ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {d.counters.map((c) => <OppRow key={c.id} league={params.league} id={c.id} rating={c.r} />)}
+          </div>
+        ) : <p style={{ fontSize: "0.82rem", color: "#94a3b8" }}>데이터 없음</p>}
+
+        {/* 잘 잡는 상대 */}
+        <h2 style={h2}>⚔️ {name}가 잘 잡는 상대</h2>
+        <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>{name}로 유리하게 상대할 수 있는 포켓몬입니다.</p>
+        {d.wins.length ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {d.wins.map((w) => <OppRow key={w.id} league={params.league} id={w.id} rating={w.r} />)}
+          </div>
+        ) : <p style={{ fontSize: "0.82rem", color: "#94a3b8" }}>데이터 없음</p>}
 
         {/* 종족값 */}
         {d.stats && (d.stats.atk || d.stats.def || d.stats.hp) && (
@@ -318,24 +292,6 @@ export default async function PokemonDetail({ params }: { params: { league: stri
         )}
 
         <AdSlot />
-
-        {/* 카운터 */}
-        <h2 style={h2}>🛡️ {name} 카운터 (이 포켓몬에게 강한 상대)</h2>
-        <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>{name}를 상대로 유리한 포켓몬입니다. {name}를 자주 만난다면 아래를 준비하세요.</p>
-        {d.counters.length ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {d.counters.map((c) => <OppRow key={c.id} league={params.league} id={c.id} rating={c.r} />)}
-          </div>
-        ) : <p style={{ fontSize: "0.82rem", color: "#94a3b8" }}>데이터 없음</p>}
-
-        {/* 잘 잡는 상대 */}
-        <h2 style={h2}>⚔️ {name}가 잘 잡는 상대</h2>
-        <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>{name}로 유리하게 상대할 수 있는 포켓몬입니다.</p>
-        {d.wins.length ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {d.wins.map((w) => <OppRow key={w.id} league={params.league} id={w.id} rating={w.r} />)}
-          </div>
-        ) : <p style={{ fontSize: "0.82rem", color: "#94a3b8" }}>데이터 없음</p>}
 
         {/* 설명 */}
         <div style={{ marginTop: 22, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
