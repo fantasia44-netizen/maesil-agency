@@ -29,6 +29,10 @@ const spriteUrl = (m?: Mon) =>
   m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
 const nameOf = (id: string) => MON[id]?.ko || id;
 const moveKo = (id: string) => MOVES[id]?.ko || id;
+// 한글 조사 자동 선택(받침 유무). 이름이 자음으로 끝나면(자시안) 은/을, 모음이면(가이오가) 는/를.
+const hasBatchim = (w: string) => { const c = (w || "").trim().slice(-1).charCodeAt(0); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 !== 0; };
+const eunNeun = (w: string) => (hasBatchim(w) ? "은" : "는");
+const eulReul = (w: string) => (hasBatchim(w) ? "을" : "를");
 
 type Opp = { id: string; r: number };
 type Mv = { fast: { id: string; gain: number; turns: number }; charged: { id: string; energy: number; counts: number[] }[] };
@@ -242,8 +246,8 @@ export default async function PokemonDetail({ params }: { params: { league: stri
         </div>
 
         {/* 카운터 (이 포켓몬에게 강한 상대) — 상단 배치 */}
-        <h2 style={h2}>🛡️ {name} 카운터 (이 포켓몬에게 강한 상대)</h2>
-        <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>{name}를 상대로 유리한 포켓몬입니다. {name}를 자주 만난다면 아래를 준비하세요.</p>
+        <h2 style={h2}>🛡️ 이 포켓몬이 불리한 포켓몬 (카운터)</h2>
+        <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>이 포켓몬을 상대로 유리한 포켓몬입니다. 자주 만난다면 아래를 준비하세요.</p>
         {d.counters.length ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {d.counters.map((c) => <OppRow key={c.id} league={params.league} id={c.id} rating={c.r} />)}
@@ -251,8 +255,8 @@ export default async function PokemonDetail({ params }: { params: { league: stri
         ) : <p style={{ fontSize: "0.82rem", color: "#94a3b8" }}>데이터 없음</p>}
 
         {/* 잘 잡는 상대 */}
-        <h2 style={h2}>⚔️ {name}가 잘 잡는 상대</h2>
-        <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>{name}로 유리하게 상대할 수 있는 포켓몬입니다.</p>
+        <h2 style={h2}>⚔️ 이 포켓몬이 유리한 포켓몬</h2>
+        <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>이 포켓몬으로 유리하게 상대할 수 있는 포켓몬입니다.</p>
         {d.wins.length ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {d.wins.map((w) => <OppRow key={w.id} league={params.league} id={w.id} rating={w.r} />)}
@@ -297,8 +301,8 @@ export default async function PokemonDetail({ params }: { params: { league: stri
         {/* 설명 */}
         <div style={{ marginTop: 22, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
           <p style={{ margin: 0, fontSize: "0.82rem", color: "#475569", lineHeight: 1.75 }}>
-            {name}는 {lg.ko}에서 <b style={{ color: "#334155" }}>{d.tier}티어</b> 포켓몬입니다. 추천 기술배치는 공개 전투 시뮬레이션(PvPoke) 기준이며, 카운터·잘 잡는 상대는 시뮬 매치업 결과를 바탕으로 정리했습니다.
-            실측 픽률은 GBL Note 사용자들이 실제로 만난 상대를 익명 집계한 값으로, 한국 서버에서 {name}를 얼마나 자주 만나는지 보여줍니다.{" "}
+            {name}{eunNeun(name)} {lg.ko}에서 <b style={{ color: "#334155" }}>{d.tier}티어</b> 포켓몬입니다. 추천 기술배치는 공개 전투 시뮬레이션(PvPoke) 기준이며, 카운터·잘 잡는 상대는 시뮬 매치업 결과를 바탕으로 정리했습니다.
+            실측 픽률은 GBL Note 사용자들이 실제로 만난 상대를 익명 집계한 값으로, 한국 서버에서 {name}{eulReul(name)} 얼마나 자주 만나는지 보여줍니다.{" "}
             <Link href="/gbl/login" style={{ color: "#3b5bdb", fontWeight: 600 }}>내 전적 기록하기 →</Link>
           </p>
         </div>
