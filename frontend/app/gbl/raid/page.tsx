@@ -61,6 +61,19 @@ export default function RaidHubPage() {
           잡으려는 레이드 보스의 <b style={{ color: "#334155" }}>약점 속성</b>을 고르면, 그 타입 딜러 순위와 추천 기술배치가 나옵니다. 메가진화·섀도우 포함.
         </p>
 
+        <Link href="/gbl/raid/bosses" style={{
+          display: "flex", alignItems: "center", gap: 10, marginTop: 14, textDecoration: "none",
+          padding: "12px 15px", borderRadius: 12, background: "linear-gradient(100deg,#fff1e6,#ffe3ef)",
+          border: "1px solid #ffd0a8",
+        }}>
+          <span style={{ fontSize: "1.5rem" }}>🗓️</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: "0.92rem", fontWeight: 800, color: "#c2410c" }}>지금 열리는 레이드 보스 · 100% CP</div>
+            <div style={{ fontSize: "0.76rem", color: "#9a3412" }}>현재 5성·메가 보스와 100% 개체 CP, 약점 딜러까지</div>
+          </div>
+          <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#ea580c" }}>→</span>
+        </Link>
+
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(158px, 1fr))", gap: 8, marginTop: 16 }}>
           {TYPES.map((t) => {
             const c = TYPE_COLOR[t] || "#64748b";
