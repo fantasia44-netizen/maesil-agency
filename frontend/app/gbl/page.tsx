@@ -144,6 +144,9 @@ export default function GblLanding() {
           <Link href="/gbl/terms" style={{ color: "#64748b" }}>이용약관</Link>
           {authed && <> · <button onClick={logout} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "0.75rem", padding: 0 }}>로그아웃</button></>}
         </p>
+        <p style={{ textAlign: "center", fontSize: "0.68rem", color: "#b6bfcc", lineHeight: 1.7, margin: "4px 0 0" }}>
+          팬이 만든 비공식 도구 · Niantic·The Pokémon Company·Nintendo와 무관 · &lsquo;포켓몬&rsquo; 관련 명칭·이미지 권리는 각 권리자에게 있습니다.
+        </p>
       </div>
     </div>
   );

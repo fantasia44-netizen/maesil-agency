@@ -46,8 +46,9 @@ export default function About() {
 
         <h2 style={H2}>이용 안내</h2>
         <p style={P}>
-          기록 기능은 무료이며, 서비스 운영을 위해 광고가 포함될 수 있습니다. GBL Note는 팬이 만든 비영리성 도구로,
-          Niantic 및 The Pokémon Company와 제휴 관계가 아닙니다. 문의는{" "}
+          기록 기능은 무료이며, 서비스 운영을 위해 광고가 포함될 수 있습니다. GBL Note는 팬이 만든 <b>비공식</b> 도구이며,
+          Niantic · The Pokémon Company · Nintendo와 제휴하거나 이들의 공식 서비스가 아닙니다.
+          &lsquo;포켓몬(Pokémon)&rsquo; 및 관련 명칭·이미지의 모든 권리는 각 권리자에게 있습니다. 문의는{" "}
           <Link href="/gbl/contact" style={{ color: "#3b5bdb", fontWeight: 600 }}>문의 페이지</Link>를 이용해 주세요.
         </p>
 
