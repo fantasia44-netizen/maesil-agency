@@ -130,6 +130,14 @@ def main() -> None:
                           for k, v in (r.get("stats") or {}).items()
                           if k in ("atk", "def", "hp", "product")},
             })
+        # 섀도우는 종족값(및 CMP 공격 스탯)이 일반폼과 동일해야 함(섀도우 배수는 데미지에만 적용).
+        # PvPoke가 IV 최적화를 따로 해 미세차가 생기므로 base 폼 스탯으로 통일.
+        by_id = {m["id"]: m for m in mons}
+        for m in mons:
+            if m["id"].endswith("_shadow"):
+                base = by_id.get(m["id"][:-7])
+                if base and base.get("stats"):
+                    m["stats"] = dict(base["stats"])
         out[league] = mons
         from collections import Counter
         print(f"{league}: {len(mons)}종  tier분포={dict(Counter(m['tier'] for m in mons))}")
