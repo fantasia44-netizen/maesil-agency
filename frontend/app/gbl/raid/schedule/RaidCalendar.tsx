@@ -151,6 +151,18 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
   const CARD = "#ffffff", BORDER = "#e3e8f2";
   const selEvents = sel ? eventsOn(sel) : [];
 
+  // 표시 중인 월에 걸치는 로테이션 보스 목록(설명용)
+  const mStart = new Date(cur.y, cur.m - 1, 1).getTime(), mEnd = new Date(cur.y, cur.m, 1).getTime();
+  const monthBosses: { b: CalBoss; variant?: RotVariant }[] = [];
+  const seenB = new Set<string>();
+  for (const e of events) {
+    if (e.kind !== "rotation") continue;
+    if (new Date(e.start).getTime() >= mEnd || new Date(e.end).getTime() <= mStart) continue;
+    for (const b of e.bosses) if (!seenB.has(b.ko)) { seenB.add(b.ko); monthBosses.push({ b, variant: e.variant }); }
+  }
+  const vOrder: Record<string, number> = { star: 0, mega: 1, shadow: 2 };
+  monthBosses.sort((a, b) => (vOrder[a.variant || "star"] ?? 9) - (vOrder[b.variant || "star"] ?? 9));
+
   return (
     <div>
       {/* 월 네비 */}
@@ -248,6 +260,28 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
               <div style={{ fontSize: "0.7rem", color: "#94a3b8" }}>보스를 누르면 100% CP·약점 딜러를 볼 수 있어요.</div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* 이달 등장 보스 설명 */}
+      {monthBosses.length > 0 && (
+        <div style={{ marginTop: 16 }}>
+          <div style={{ fontSize: "0.84rem", fontWeight: 800, color: "#0f172a", marginBottom: 8 }}>📋 {cur.m}월 등장 보스</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {monthBosses.map((m, i) => {
+              const rs = m.variant ? ROT[m.variant] : null;
+              return (
+                <Link key={i} href={`/gbl/raid/bosses#b${m.b.dex}`}
+                  style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "6px 10px" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={m.b.image} alt={m.b.ko} width={34} height={34} style={{ objectFit: "contain" }} />
+                  <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a" }}>{m.b.ko}{m.b.shiny ? " ✨" : ""}</span>
+                  {rs && <span style={{ fontSize: "0.6rem", fontWeight: 800, color: rs.c, background: rs.bg, border: `1px solid ${rs.c}44`, borderRadius: 6, padding: "1px 7px" }}>{rs.icon} {rs.label}</span>}
+                  <span style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#3b5bdb", fontWeight: 600, whiteSpace: "nowrap" }}>CP·딜러 →</span>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       )}
 

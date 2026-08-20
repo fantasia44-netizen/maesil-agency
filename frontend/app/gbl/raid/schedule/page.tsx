@@ -83,16 +83,17 @@ const CARD = "#ffffff", BORDER = "#e3e8f2";
 export default async function RaidSchedulePage() {
   const events = await getEvents();
   const now = Date.now();
-  const alive = (e: EventItem) => new Date(e.end).getTime() > now;
 
-  const calEvents: CalEvent[] = events.filter(alive).flatMap((e): CalEvent[] => {
+  // 달력엔 과거 이벤트도 포함(빈 날짜 채우기). 피드에 남아있는 범위까지.
+  const calEvents: CalEvent[] = events.flatMap((e): CalEvent[] => {
     if (e.eventType === "raid-battles") { const r = rotInfo(e.name); return [{ kind: "rotation", variant: r.variant, title: r.title, start: e.start, end: e.end, bosses: bossesOf(e) }]; }
     if (e.eventType === "raid-hour") return [{ kind: "hour", title: koEventName(e.name), start: e.start, end: e.end, bosses: [] }];
     if (e.eventType === "raid-day") return [{ kind: "day", title: koEventName(e.name), start: e.start, end: e.end, bosses: [] }];
     return [];
   });
 
-  const rotations = calEvents.filter((e) => e.kind === "rotation").sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+  // 아젠다(기간 목록)는 현재+예정만
+  const rotations = calEvents.filter((e) => e.kind === "rotation" && new Date(e.end).getTime() > now).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
   const d = new Date();
   const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
