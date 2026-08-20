@@ -733,9 +733,13 @@ export default function GblPage() {
             textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           👤 {nickname || "닉네임 설정"} ✎
         </button>
+        <Link href="/gbl/raid"
+          style={{ marginLeft: "auto", fontSize: "0.74rem", color: "#ea580c", textDecoration: "none", fontWeight: 700 }}>
+          🔥 레이드
+        </Link>
         <Link href="/gbl/meta"
-          style={{ marginLeft: "auto", fontSize: "0.74rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>
-          🌐 전체 메타
+          style={{ fontSize: "0.74rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>
+          🌐 메타
         </Link>
         <button onClick={logout}
           style={{ fontSize: "0.72rem", color: "#94a3b8", background: "none",

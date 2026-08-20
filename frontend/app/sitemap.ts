@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
 import DETAIL from "./gbl/gbl_detail.json";
+import RAIDS from "./gbl/gbl_raids.json";
 import { GUIDES } from "./gbl/guide/[slug]/page";
 
 // gbl.maesil.net 공개 SEO 사이트맵. 검색엔진이 리그별 실측 메타·티어·포켓몬 상세를 발견하도록.
 const BASE = "https://gblnote.com";
 const LEAGUES = ["master", "great", "ultra"];
+const RAID_TYPES = Object.keys((RAIDS as unknown as { types: Record<string, unknown> }).types);
 const POKE_TOP = 20; // 리그별 상위 N종 포켓몬 상세만 사이트맵에(신규도메인 자연스러운 규모)
 const DET = DETAIL as unknown as Record<string, { id: string }[]>;
 
@@ -40,6 +42,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     })),
     ...pokemon,
+    { url: `${BASE}/gbl/raid`, lastModified, changeFrequency: "weekly", priority: 0.9 },
+    ...RAID_TYPES.map((t) => ({
+      url: `${BASE}/gbl/raid/${t}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
     { url: `${BASE}/gbl/schedule`, lastModified, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE}/gbl/guide`, lastModified, changeFrequency: "weekly", priority: 0.7 },
     ...Object.keys(GUIDES).map((slug) => ({

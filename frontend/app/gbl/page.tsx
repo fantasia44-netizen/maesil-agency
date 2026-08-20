@@ -102,6 +102,21 @@ export default function GblLanding() {
           ))}
         </div>
 
+        {/* 레이드 파밍 유저용 진입 배너 */}
+        <Link href="/gbl/raid" style={{
+          display: "flex", alignItems: "center", gap: 12, maxWidth: 640, margin: "0 auto 28px",
+          textDecoration: "none", padding: "14px 16px", borderRadius: 14,
+          background: "linear-gradient(100deg,#fff4e6,#ffe8f0)", border: "1px solid #ffd8a8",
+          boxShadow: "0 4px 16px rgba(234,88,12,.12)",
+        }}>
+          <span style={{ fontSize: "1.8rem" }}>🔥</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: "0.95rem", fontWeight: 900, color: "#c2410c" }}>레이드 하러 오셨나요?</div>
+            <div style={{ fontSize: "0.78rem", color: "#9a3412", lineHeight: 1.5 }}>속성별 최강 딜러 티어표 · 추천 기술배치 (메가·섀도우 포함)</div>
+          </div>
+          <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#ea580c", whiteSpace: "nowrap" }}>보러가기 →</span>
+        </Link>
+
         {/* 기능 카드 (이미지 스타일) */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 28 }}>
           {FEATURES.map((f) => (
@@ -144,6 +159,7 @@ export default function GblLanding() {
         <CoupangAd />
 
         <p style={{ textAlign: "center", fontSize: "0.75rem", color: "#94a3b8", lineHeight: 2 }}>
+          <Link href="/gbl/raid" style={{ color: "#64748b" }}>레이드 딜러</Link> ·{" "}
           <Link href="/gbl/schedule" style={{ color: "#64748b" }}>시즌 일정</Link> ·{" "}
           <Link href="/gbl/guide" style={{ color: "#64748b" }}>가이드</Link> ·{" "}
           <Link href="/gbl/about" style={{ color: "#64748b" }}>소개</Link> ·{" "}
