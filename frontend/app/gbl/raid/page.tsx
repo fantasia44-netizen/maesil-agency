@@ -93,8 +93,11 @@ export default function RaidHubPage() {
               <Link key={t} href={`/gbl/raid/${t}`}
                 style={{ textDecoration: "none", color: "inherit", background: `linear-gradient(120deg, ${c}1f, ${CARD} 70%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c}`, borderRadius: 11, padding: "10px 11px", display: "flex", alignItems: "center", gap: 9 }}>
                 {top && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={monSprite(top.name, top.dex)} alt={top.name} width={40} height={40} style={{ imageRendering: "pixelated" }} />
+                  <span style={{ width: 40, height: 40, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                    ...(top.shadow ? { background: "radial-gradient(circle, #7c3aed55 0%, transparent 68%)", borderRadius: "50%" } : {}) }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={monSprite(top.name, top.dex)} alt={top.name} width={40} height={40} style={{ imageRendering: "pixelated" }} />
+                  </span>
                 )}
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: "0.95rem", fontWeight: 800, color: c }}>{TYPE_KO[t]}</div>

@@ -6,7 +6,7 @@ import POKEDEX from "../../pokedex_ko.json";
 import STATSJSON from "../../pokedex_stats.json";
 import CpTable from "./CpTable";
 import ListShare from "../../ListShare";
-import { monSprite } from "../../sprite";
+import { pokeSprite, shinySprite, formDex } from "../../sprite";
 
 export const revalidate = 21600; // 6시간마다 갱신(보스 로테이션 반영)
 
@@ -184,8 +184,22 @@ export default async function BossesPage() {
                     return (
                       <div key={`${b.name}-${i}`} id={`b${dexOf(b.image)}`} style={{ scrollMarginTop: 12, background: CARD, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 12, padding: "10px 12px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={monSprite(bossKo(b), dexOf(b.image))} alt={bossKo(b)} width={46} height={46} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                          {(() => {
+                            const fdex = formDex(bossKo(b), dexOf(b.image));
+                            const isShadow = /^Shadow /.test(b.name);
+                            return (
+                              <div style={{ position: "relative", width: 46, height: 46, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                                ...(isShadow ? { background: "radial-gradient(circle, #7c3aed55 0%, transparent 68%)", borderRadius: "50%" } : {}) }}>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={pokeSprite(fdex)} alt={bossKo(b)} width={46} height={46} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                                {b.canBeShiny && (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img src={shinySprite(fdex)} alt="색이 다른 개체(이로치) 가능" title="색이 다른 개체(이로치) 가능" width={20} height={20}
+                                    style={{ position: "absolute", right: -3, bottom: -3, imageRendering: "pixelated", background: "#fff", borderRadius: "50%", boxShadow: "0 0 0 1.5px #fbbf24", padding: 1 }} />
+                                )}
+                              </div>
+                            );
+                          })()}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                               <span style={{ fontSize: "0.98rem", fontWeight: 800, color: "#0f172a" }}>{bossKo(b)}</span>

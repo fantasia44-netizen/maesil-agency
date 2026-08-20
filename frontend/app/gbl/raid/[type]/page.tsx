@@ -142,8 +142,11 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
                   <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
                     <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "#94a3b8", width: 22, textAlign: "center" }}>{i + 1}</span>
                     <span style={{ fontSize: "0.9rem", fontWeight: 900, color: "#fff", background: TIER_COLOR[tier], minWidth: 24, height: 24, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center" }}>{tier}</span>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={monSprite(r.name, r.dex)} alt={r.name} width={38} height={38} style={{ imageRendering: "pixelated" }} />
+                    <span style={{ width: 38, height: 38, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                      ...(r.shadow ? { background: "radial-gradient(circle, #7c3aed55 0%, transparent 68%)", borderRadius: "50%" } : {}) }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={monSprite(r.name, r.dex)} alt={r.name} width={38} height={38} style={{ imageRendering: "pixelated" }} />
+                    </span>
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
                         <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a" }}>{r.name}</span>
