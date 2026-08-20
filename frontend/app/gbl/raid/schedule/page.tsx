@@ -49,7 +49,7 @@ function koEventName(name: string): string {
     suffix = { "super mega raid day": "슈퍼 메가 레이드 데이", "mega raid day": "메가 레이드 데이", "raid hour": "레이드 아워", "raid day": "레이드 데이" }[m[1].toLowerCase()] || m[1];
     s = s.slice(0, m.index).trim();
   }
-  const mons = s ? s.split(/,\s*|\s+and\s+/).filter(Boolean).map(koMon).join("·") : "";
+  const mons = s ? s.split(/,\s*and\s+|,\s*|\s+and\s+/).filter(Boolean).map(koMon).join("·") : "";
   return (mons ? mons + " " : "") + suffix;
 }
 function rotInfo(name: string): { title: string; variant: "star" | "shadow" | "mega" } {
