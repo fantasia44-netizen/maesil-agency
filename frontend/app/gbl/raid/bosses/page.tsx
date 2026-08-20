@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import POKEDEX from "../../pokedex_ko.json";
 import STATSJSON from "../../pokedex_stats.json";
+import CpTable from "./CpTable";
 
 export const revalidate = 21600; // 6시간마다 갱신(보스 로테이션 반영)
 
@@ -15,13 +16,6 @@ const CPM_L20 = 0.5974, CPM_L25 = 0.667934;
 function cpAt(st: { a: number; d: number; s: number }, iv: [number, number, number], cpm: number): number {
   return Math.max(10, Math.floor((st.a + iv[0]) * Math.sqrt(st.d + iv[1]) * Math.sqrt(st.s + iv[2]) * cpm * cpm / 10));
 }
-// 표시할 대표 개체값(잡을 때 확인용). 레이드 최소 개체값은 10/10/10.
-const IV_ROWS: { iv: [number, number, number]; label: string; hundo?: boolean }[] = [
-  { iv: [15, 15, 15], label: "100%", hundo: true },
-  { iv: [15, 15, 14], label: "98%" },
-  { iv: [14, 14, 14], label: "93%" },
-  { iv: [10, 10, 10], label: "최소" },
-];
 function dexOf(image: string): string {
   const m = image.match(/\/pm(\d+)\./) || image.match(/pokemon_icon_(\d+)_/);
   return m ? String(Number(m[1])) : "";
@@ -182,7 +176,7 @@ export default async function BossesPage() {
                     // 계산 100%가 피드값과 일치할 때만 IV표 노출(지역폼 등 종족값 불일치 방지)
                     const cpOk = !!st && Math.abs(cpAt(st, [15, 15, 15], CPM_L20) - b.combatPower.normal.max) <= 2;
                     return (
-                      <div key={`${b.name}-${i}`} style={{ background: CARD, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 12, padding: "10px 12px" }}>
+                      <div key={`${b.name}-${i}`} id={`b${dexOf(b.image)}`} style={{ scrollMarginTop: 12, background: CARD, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 12, padding: "10px 12px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={b.image} alt={bossKo(b)} width={46} height={46} style={{ objectFit: "contain" }} />
@@ -203,31 +197,7 @@ export default async function BossesPage() {
                           </div>
                         </div>
                         {cpOk && st && (
-                          <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px dashed ${BORDER}` }}>
-                            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                              <div style={{ display: "flex", fontSize: "0.66rem", color: "#94a3b8", fontWeight: 700 }}>
-                                <span style={{ flex: 1.4 }}>잡을 때 CP (개체값)</span>
-                                <span style={{ flex: 1, textAlign: "right" }}>일반 L20</span>
-                                <span style={{ flex: 1, textAlign: "right" }}>날씨 L25</span>
-                              </div>
-                              {IV_ROWS.map((r) => {
-                                const col = r.hundo ? "#c2410c" : "#334155";
-                                const fw = r.hundo ? 800 : 600;
-                                return (
-                                  <div key={r.label} style={{ display: "flex", fontSize: "0.74rem", alignItems: "baseline" }}>
-                                    <span style={{ flex: 1.4, fontWeight: fw, color: r.hundo ? "#c2410c" : "#475569" }}>
-                                      {r.hundo ? "💯 " : ""}{r.label} <span style={{ color: "#94a3b8", fontWeight: 400, fontSize: "0.66rem" }}>{r.iv.join("/")}</span>
-                                    </span>
-                                    <span style={{ flex: 1, textAlign: "right", fontWeight: fw, color: col }}>{cpAt(st, r.iv, CPM_L20).toLocaleString()}</span>
-                                    <span style={{ flex: 1, textAlign: "right", fontWeight: fw, color: col }}>{cpAt(st, r.iv, CPM_L25).toLocaleString()}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                            <div style={{ fontSize: "0.68rem", color: "#64748b", marginTop: 6 }}>
-                              잡은 CP가 <b style={{ color: "#c2410c" }}>{cpAt(st, [15, 15, 15], CPM_L20).toLocaleString()}</b>(날씨 <b style={{ color: "#c2410c" }}>{cpAt(st, [15, 15, 15], CPM_L25).toLocaleString()}</b>)이면 <b style={{ color: "#c2410c" }}>100개체(15/15/15)</b>!
-                            </div>
-                          </div>
+                          <CpTable stats={st} hundoL20={cpAt(st, [15, 15, 15], CPM_L20)} hundoL25={cpAt(st, [15, 15, 15], CPM_L25)} />
                         )}
                         {weak.length > 0 && (
                           <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", marginTop: 8, paddingTop: 8, borderTop: `1px dashed ${BORDER}` }}>
