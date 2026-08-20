@@ -306,6 +306,7 @@ export default function GblPage() {
   const [ratingProfile, setRatingProfile] = useState("기본");                  // 선택 계정(본계/부계)
   const [ratingInput, setRatingInput] = useState("");
   const [extraProfiles, setExtraProfiles] = useState<string[]>([]);            // 추가했지만 아직 기록 전 계정
+  const [cardImage, setCardImage] = useState<string | null>(null);            // 전적 카드 미리보기(dataURL)
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -485,8 +486,8 @@ export default function GblPage() {
   const winRate = (w: number, l: number) => (w + l > 0 ? Math.round((w / (w + l)) * 100) : null);
   const rateColor = (r: number | null) => r == null ? "#94a3b8" : r >= 60 ? "#16a34a" : r >= 45 ? "#c2410c" : "#dc2626";
 
-  // 전적 카드 이미지 생성(캔버스) → 저장/공유. 브랜딩 포함(공유 시 홍보).
-  const shareStatsCard = (download: boolean) => {
+  // 전적 카드 이미지 생성(캔버스) → 화면에 미리보기(모달). 브랜딩 포함(공유 시 홍보).
+  const openStatsCard = () => {
     const S = 1080;
     const c = document.createElement("canvas");
     c.width = S; c.height = S;
@@ -551,19 +552,29 @@ export default function GblPage() {
     ctx.fillStyle = "#5f6f92"; ctx.font = "400 30px system-ui, sans-serif";
     ctx.fillText(new Date().toLocaleDateString("ko-KR"), cx, 1048);
 
-    c.toBlob(async (blob) => {
-      if (!blob) return;
+    setCardImage(c.toDataURL("image/png"));   // 미리보기 모달에 표시
+  };
+
+  // 카드 저장(다운로드)
+  const saveCard = () => {
+    if (!cardImage) return;
+    const a = document.createElement("a");
+    a.href = cardImage; a.download = "gbl-record.png"; a.click();
+    flash("💾 저장됨");
+  };
+  // 카드 공유(모바일 공유창 / 미지원 시 저장)
+  const shareCard = async () => {
+    if (!cardImage) return;
+    try {
+      const blob = await (await fetch(cardImage)).blob();
       const file = new File([blob], "gbl-record.png", { type: "image/png" });
       const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
-      if (!download && typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
-        try { await navigator.share({ files: [file], title: "내 GBL 전적" }); return; } catch { /* 취소 → 저장 폴백 */ }
+      if (typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: "내 GBL 전적", text: "gblnote.com" });
+        return;
       }
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url; a.download = "gbl-record.png"; a.click();
-      URL.revokeObjectURL(url);
-      flash("💾 전적 카드 저장됨");
-    }, "image/png");
+      saveCard();
+    } catch { /* 취소 등 무시 */ }
   };
 
   const resetForm = () => { setOppName(""); setTeam(emptyTeam()); setMemo(""); setResult(null); setEditingId(null); };
@@ -622,6 +633,22 @@ export default function GblPage() {
       {toast && (
         <div style={{ position: "fixed", top: 14, right: 14, zIndex: 9999, background: "#0f172a", color: "#fff",
           padding: "9px 16px", borderRadius: 8, fontSize: "0.83rem" }}>{toast}</div>
+      )}
+
+      {/* 전적 카드 미리보기 모달 */}
+      {cardImage && (
+        <div onClick={() => setCardImage(null)}
+          style={{ position: "fixed", inset: 0, zIndex: 10000, background: "rgba(0,0,0,.72)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "1.2rem", gap: 14 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={cardImage} alt="전적 카드" onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: "min(90vw, 440px)", width: "100%", borderRadius: 14, boxShadow: "0 12px 40px rgba(0,0,0,.5)" }} />
+          <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", gap: 8 }}>
+            <button onClick={shareCard} style={{ padding: "11px 22px", borderRadius: 10, border: "none", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem" }}>📤 공유</button>
+            <button onClick={saveCard} style={{ padding: "11px 22px", borderRadius: 10, border: "1px solid rgba(255,255,255,.3)", background: "rgba(255,255,255,.12)", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem" }}>💾 저장</button>
+            <button onClick={() => setCardImage(null)} style={{ padding: "11px 16px", borderRadius: 10, border: "none", background: "rgba(255,255,255,.12)", color: "#cbd5e1", cursor: "pointer", fontSize: "0.9rem" }}>닫기</button>
+          </div>
+          <div style={{ fontSize: "0.72rem", color: "#cbd5e1" }}>이미지를 길게 눌러 저장하거나 캡처해도 됩니다</div>
+        </div>
       )}
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
@@ -830,12 +857,8 @@ export default function GblPage() {
 
           {/* 전적 카드 자랑/공유 */}
           {stats.total > 0 && (
-            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-              <button onClick={() => shareStatsCard(false)}
-                style={{ flex: 1, padding: "10px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 700, fontSize: "0.85rem", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)", color: "#fff" }}>📸 전적 카드 자랑하기</button>
-              <button onClick={() => shareStatsCard(true)}
-                style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid #dbe2ee", cursor: "pointer", fontWeight: 700, fontSize: "0.85rem", background: "#eef2f8", color: "#3b5bdb" }}>💾 저장</button>
-            </div>
+            <button onClick={openStatsCard}
+              style={{ width: "100%", marginBottom: 16, padding: "11px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 700, fontSize: "0.9rem", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)", color: "#fff" }}>📸 전적 카드 만들기 · 자랑하기</button>
           )}
 
           {/* 📈 레이팅 추이 (계정별) */}
