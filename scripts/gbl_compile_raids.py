@@ -141,7 +141,7 @@ def form_label(sid: str, dex: int, ko: dict, shadow: bool):
     elif "_dusk_mane" in sid:
         name += " (황혼의갈기)"
     elif "_dawn_wings" in sid:
-        name += " (여명의날개)"
+        name += " (새벽의날개)"
     elif "_ultra" in sid:
         name += " (울트라)"
     elif "_shadow_rider" in sid:
