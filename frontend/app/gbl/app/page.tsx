@@ -487,44 +487,69 @@ export default function GblPage() {
 
   // 전적 카드 이미지 생성(캔버스) → 저장/공유. 브랜딩 포함(공유 시 홍보).
   const shareStatsCard = (download: boolean) => {
-    const W = 1080, H = 720;
+    const S = 1080;
     const c = document.createElement("canvas");
-    c.width = W; c.height = H;
+    c.width = S; c.height = S;
     const ctx = c.getContext("2d");
     if (!ctx) return;
-    const g = ctx.createLinearGradient(0, 0, W, H);
-    g.addColorStop(0, "#0b1226"); g.addColorStop(1, "#3a2a6b");
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    const cx = S / 2;
+    // 배경 그라데이션 + 상단 글로우
+    const g = ctx.createLinearGradient(0, 0, S, S);
+    g.addColorStop(0, "#0a1024"); g.addColorStop(0.55, "#14183a"); g.addColorStop(1, "#3a2467");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+    const rg = ctx.createRadialGradient(cx, 140, 40, cx, 140, 640);
+    rg.addColorStop(0, "rgba(96,112,255,0.30)"); rg.addColorStop(1, "rgba(96,112,255,0)");
+    ctx.fillStyle = rg; ctx.fillRect(0, 0, S, S);
     ctx.textAlign = "center";
-    ctx.fillStyle = "#8db4ff"; ctx.font = "700 40px system-ui, sans-serif";
-    ctx.fillText("📓 GBL NOTE", W / 2, 100);
+    // 로고
+    ctx.fillStyle = "#a9c1ff"; ctx.font = "800 50px system-ui, sans-serif";
+    ctx.fillText("📓 GBL NOTE", cx, 128);
     const lgLabel = FORMAT_BY_KEY[league]?.label || league;
     const perLabel = statsPeriod === "all" ? "전체" : statsPeriod === "7" ? "최근 7일" : "최근 30일";
-    ctx.fillStyle = "#c7d2fe"; ctx.font = "500 32px system-ui, sans-serif";
-    ctx.fillText(`${lgLabel} · ${perLabel}`, W / 2, 158);
+    ctx.fillStyle = "#c7d2fe"; ctx.font = "500 40px system-ui, sans-serif";
+    ctx.fillText(`${lgLabel} · ${perLabel}`, cx, 190);
+    // 원형 승률 게이지
     const wr = winRate(stats.wins, stats.losses);
-    ctx.fillStyle = "#ffffff"; ctx.font = "800 200px system-ui, sans-serif";
-    ctx.fillText(wr == null ? "-%" : `${wr}%`, W / 2, 420);
-    ctx.fillStyle = "#94a3b8"; ctx.font = "600 34px system-ui, sans-serif";
-    ctx.fillText("승률", W / 2, 468);
-    // 판수 · 승 · 패 (색상)
-    ctx.font = "700 50px system-ui, sans-serif";
+    const frac = (wr ?? 0) / 100;
+    const cy = 510, R = 205;
+    ctx.lineCap = "round"; ctx.lineWidth = 42;
+    ctx.strokeStyle = "rgba(255,255,255,0.10)";
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+    const arcCol = wr == null ? "#94a3b8" : wr >= 60 ? "#4ade80" : wr >= 45 ? "#fbbf24" : "#f87171";
+    ctx.strokeStyle = arcCol;
+    ctx.beginPath(); ctx.arc(cx, cy, R, -Math.PI / 2, -Math.PI / 2 + frac * Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = "#ffffff"; ctx.font = "800 158px system-ui, sans-serif";
+    ctx.fillText(wr == null ? "-%" : `${wr}%`, cx, cy + 46);
+    ctx.fillStyle = "#94a3b8"; ctx.font = "600 42px system-ui, sans-serif";
+    ctx.fillText("승률", cx, cy + 118);
+    // 승/패 바
+    const bw = 700, bh = 30, bx = cx - bw / 2, by = 812;
+    const rr = (x0: number, y0: number, w: number, h: number, r: number) => { ctx.beginPath(); ctx.roundRect(x0, y0, w, h, r); };
+    rr(bx, by, bw, bh, 15); ctx.fillStyle = "rgba(255,255,255,0.10)"; ctx.fill();
+    ctx.save(); rr(bx, by, bw, bh, 15); ctx.clip();
+    const ww = bw * frac;
+    ctx.fillStyle = "#22c55e"; ctx.fillRect(bx, by, ww, bh);
+    ctx.fillStyle = "#ef4444"; ctx.fillRect(bx + ww, by, bw - ww, bh);
+    ctx.restore();
+    // 판수 · 승 · 패
+    ctx.font = "700 56px system-ui, sans-serif";
     const parts = [
       { t: `${stats.total}판`, c: "#e2e8f0" },
       { t: `${stats.wins}승`, c: "#4ade80" },
       { t: `${stats.losses}패`, c: "#f87171" },
     ];
-    const gap = 44;
+    const gap = 50;
     const widths = parts.map((p) => ctx.measureText(p.t).width);
     const totalW = widths.reduce((a, b) => a + b, 0) + gap * (parts.length - 1);
-    let x = W / 2 - totalW / 2;
+    let x = cx - totalW / 2;
     ctx.textAlign = "left";
-    parts.forEach((p, i) => { ctx.fillStyle = p.c; ctx.fillText(p.t, x, 560); x += widths[i] + gap; });
+    parts.forEach((p, i) => { ctx.fillStyle = p.c; ctx.fillText(p.t, x, 918); x += widths[i] + gap; });
     ctx.textAlign = "center";
-    ctx.fillStyle = "#6c8cff"; ctx.font = "700 34px system-ui, sans-serif";
-    ctx.fillText("gblnote.com", W / 2, 662);
-    ctx.fillStyle = "#5f6f92"; ctx.font = "400 26px system-ui, sans-serif";
-    ctx.fillText(new Date().toLocaleDateString("ko-KR"), W / 2, 700);
+    // 푸터
+    ctx.fillStyle = "#7c9dff"; ctx.font = "800 42px system-ui, sans-serif";
+    ctx.fillText("gblnote.com", cx, 1004);
+    ctx.fillStyle = "#5f6f92"; ctx.font = "400 30px system-ui, sans-serif";
+    ctx.fillText(new Date().toLocaleDateString("ko-KR"), cx, 1048);
 
     c.toBlob(async (blob) => {
       if (!blob) return;
