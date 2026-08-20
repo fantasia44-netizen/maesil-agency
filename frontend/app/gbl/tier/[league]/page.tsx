@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import DATA from "../../gbl_data.json";
 import DETAIL from "../../gbl_detail.json";
 import AdSlot from "../../AdSlot";
+import ListShare from "../../ListShare";
 import CoupangAd from "../../CoupangAd";
 
 export const revalidate = 3600;
@@ -200,6 +201,23 @@ export default async function TierPage({ params }: { params: { league: string } 
               </div>
             </div>
           ))
+        )}
+
+        {list.length > 0 && (
+          <ListShare
+            title={`${lg.ko} 티어 TOP`}
+            subtitle="이론 티어 + 한국 유저 실측 픽률"
+            path={`/gbl/tier/${params.league}`}
+            accent="#7c3aed"
+            buttonLabel="📸 티어표 이미지 저장·공유"
+            filename={`gbl-${params.league}-tier.png`}
+            items={list.slice(0, 12).map((d) => ({
+              dex: String(MON[d.id]?.dex || ""),
+              name: (MON[d.id]?.shadow ? "그림자 " : "") + nameOf(d.id),
+              main: String(d.score),
+              sub: pick[d.id] != null ? `실측 ${pick[d.id]}%` : `${d.tier}티어`,
+            }))}
+          />
         )}
 
         <AdSlot />

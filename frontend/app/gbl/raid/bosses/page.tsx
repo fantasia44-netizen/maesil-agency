@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import POKEDEX from "../../pokedex_ko.json";
 import STATSJSON from "../../pokedex_stats.json";
 import CpTable from "./CpTable";
+import ListShare from "../../ListShare";
 
 export const revalidate = 21600; // 6시간마다 갱신(보스 로테이션 반영)
 
@@ -129,6 +130,10 @@ export default async function BossesPage() {
   for (const b of bosses) (byTier[b.tier] || (byTier[b.tier] = [])).push(b);
   const visibleTiers = Object.keys(byTier).filter((t) => !HIDE_TIERS.has(t))
     .sort((a, b) => (TIER_ORDER.indexOf(a) < 0 ? 99 : TIER_ORDER.indexOf(a)) - (TIER_ORDER.indexOf(b) < 0 ? 99 : TIER_ORDER.indexOf(b)));
+  const shareItems = visibleTiers.flatMap((t) => byTier[t]).map((b) => ({
+    dex: dexOf(b.image), name: bossKo(b),
+    main: String(b.combatPower.normal.max), sub: `날씨 ${b.combatPower.boosted.max}`,
+  }));
 
   const wrap: React.CSSProperties = {
     minHeight: "100dvh",
@@ -220,6 +225,18 @@ export default async function BossesPage() {
               </div>
             );
           })
+        )}
+
+        {shareItems.length > 0 && (
+          <ListShare
+            title="이달 레이드 보스 100% CP"
+            subtitle="잡을 때 이 CP면 100개체(15/15/15) · 날씨=부스트"
+            path="/gbl/raid/bosses"
+            accent="#ea580c"
+            buttonLabel="📸 보스 CP표 이미지 저장·공유"
+            filename="gbl-raid-bosses.png"
+            items={shareItems}
+          />
         )}
 
         <div style={{ marginTop: 24, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>

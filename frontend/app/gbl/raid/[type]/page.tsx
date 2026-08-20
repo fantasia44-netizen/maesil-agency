@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import RAIDS from "../../gbl_raids.json";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
+import ListShare from "../../ListShare";
 
 export const revalidate = 3600;
 
@@ -176,6 +177,24 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
               );
             })}
           </div>
+        )}
+
+        {rows.length > 0 && (
+          <ListShare
+            title={`${ko}타입 레이드 딜러 TOP`}
+            subtitle="종합점수(딜+총딜) 순위 · 메가·섀도우 포함"
+            path={`/gbl/raid/${type}`}
+            accent={c}
+            buttonLabel="📸 티어표 이미지 저장·공유"
+            filename={`gbl-raid-${type}.png`}
+            items={rows.slice(0, 12).map((r) => ({
+              dex: String(r.dex),
+              name: r.name,
+              main: r.er.toFixed(1),
+              sub: `딜 ${r.dps.toFixed(1)}`,
+              note: r.legacy ? "*" : undefined,
+            }))}
+          />
         )}
 
         <AdSlot />
