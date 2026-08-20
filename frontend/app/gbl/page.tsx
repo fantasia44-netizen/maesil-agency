@@ -80,7 +80,7 @@ export default function GblLanding() {
 
         {/* 레이드 파밍러 */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "0 0 10px" }}>
-          <span style={{ fontSize: "1.1rem", fontWeight: 900, color: "#ea580c" }}>🔥 레이드러</span>
+          <span style={{ fontSize: "1.1rem", fontWeight: 900, color: "#ea580c" }}>🔥 레이드 (PvE)</span>
           <span style={{ fontSize: "0.74rem", color: "#94a3b8" }}>속성별 딜러 티어·보스·일정·CP</span>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 10, marginBottom: 24 }}>
