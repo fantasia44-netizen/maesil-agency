@@ -178,7 +178,8 @@ export default async function PokemonDetail({ params }: { params: { league: stri
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
         <div style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <Link href="/gbl" style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>← GBL Note</Link>
-          <Link href={`/gbl/tier/${params.league}`} style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>🏆 {lg.short}리그 티어표</Link>
+          <Link href={`/gbl/tier/${params.league}`} style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>🏆 티어표</Link>
+          <Link href={`/gbl/cmp/${params.league}`} style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>⚡ CMP 순위</Link>
           <Link href={`/gbl/meta/${params.league}`} style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>📊 실측 메타</Link>
         </div>
 
