@@ -94,7 +94,7 @@ export default function RaidHubPage() {
                 style={{ textDecoration: "none", color: "inherit", background: `linear-gradient(120deg, ${c}1f, ${CARD} 70%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c}`, borderRadius: 11, padding: "10px 11px", display: "flex", alignItems: "center", gap: 9 }}>
                 {top && (
                   <span style={{ width: 40, height: 40, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
-                    ...(top.shadow ? { background: "radial-gradient(circle, #7c3aed55 0%, transparent 68%)", borderRadius: "50%" } : {}) }}>
+                    ...(top.shadow ? { background: "radial-gradient(circle, #a855f7ee 0%, #7c3aed99 42%, transparent 72%)", borderRadius: "50%" } : {}) }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={monSprite(top.name, top.dex)} alt={top.name} width={40} height={40} style={{ imageRendering: "pixelated" }} />
                   </span>

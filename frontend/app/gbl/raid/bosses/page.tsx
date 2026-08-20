@@ -189,7 +189,7 @@ export default async function BossesPage() {
                             const isShadow = /^Shadow /.test(b.name);
                             return (
                               <div style={{ position: "relative", width: 46, height: 46, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
-                                ...(isShadow ? { background: "radial-gradient(circle, #7c3aed55 0%, transparent 68%)", borderRadius: "50%" } : {}) }}>
+                                ...(isShadow ? { background: "radial-gradient(circle, #a855f7ee 0%, #7c3aed99 42%, transparent 72%)", borderRadius: "50%" } : {}) }}>
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={pokeSprite(fdex)} alt={bossKo(b)} width={46} height={46} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
                                 {b.canBeShiny && (
