@@ -11,7 +11,7 @@ export const revalidate = 3600;
 
 type Row = {
   name: string; dex: number; shadow: boolean; mega: string; primal: boolean; legacy: boolean; upcoming: boolean;
-  fast: string; charged: string; fastKo: string; chargedKo: string;
+  fast: string; charged: string; fastKo: string; chargedKo: string; fastType: string; chargedType: string;
   dps: number; bulk: number; rel: number; atk: number; def: number; hp: number;
 };
 type RaidData = {
@@ -122,7 +122,7 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
           <b style={{ color: "#334155" }}> 메가진화·섀도우 포함</b>, 각 포켓몬의 추천 기술배치와 내구(생존)까지 함께 확인하세요.
         </p>
         <p style={{ margin: "0.5rem 0 0", fontSize: "0.76rem", color: "#94a3b8" }}>
-          DPS = 중립 대상 기준 초당 데미지(레벨40·STAB 반영). 내구 = 유효체력×방어 지수. 상성이 잘 맞는 상대에겐 실제 딜이 1.6배가 됩니다.
+          DPS = {ko}약점 대상 기준 초당 데미지(레벨40·STAB·약점 1.6배 반영, 빠른기술도 속성 일치 시 우대). 내구 = 유효체력×방어 지수.
         </p>
         <p style={{ margin: "0.35rem 0 0", fontSize: "0.72rem", color: "#94a3b8" }}>
           데이터 기준일 <b style={{ color: "#64748b" }}>{RD.meta.generated}</b> · <span style={{ color: "#d97706", fontWeight: 700 }}>레거시*</span> = 전용·이벤트 한정 기술 · <span style={{ color: "#0891b2", fontWeight: 700 }}>출시예정</span> = 아직 미출시
@@ -147,8 +147,12 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
                         <VariantBadge r={r} />
                       </div>
                       <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 3 }}>
-                        <span style={{ fontSize: "0.66rem", fontWeight: 600, padding: "1px 6px", borderRadius: 9, background: "#eef2f8", color: "#64748b", whiteSpace: "nowrap" }}>{r.fastKo}</span>
-                        <span style={{ fontSize: "0.66rem", fontWeight: 600, padding: "1px 6px", borderRadius: 9, background: c + "22", color: c, border: `1px solid ${c}55`, whiteSpace: "nowrap" }}>{r.chargedKo}{r.legacy && <span style={{ color: "#d97706" }}>*</span>}</span>
+                        {(() => { const fc = TYPE_COLOR[r.fastType] || "#64748b"; return (
+                          <span style={{ fontSize: "0.66rem", fontWeight: 600, padding: "1px 6px", borderRadius: 9, background: fc + "22", color: fc, border: `1px solid ${fc}55`, whiteSpace: "nowrap" }}>{r.fastKo}</span>
+                        ); })()}
+                        {(() => { const cc = TYPE_COLOR[r.chargedType] || c; return (
+                          <span style={{ fontSize: "0.66rem", fontWeight: 600, padding: "1px 6px", borderRadius: 9, background: cc + "22", color: cc, border: `1px solid ${cc}55`, whiteSpace: "nowrap" }}>{r.chargedKo}{r.legacy && <span style={{ color: "#d97706" }}>*</span>}</span>
+                        ); })()}
                       </div>
                     </div>
                     <div style={{ textAlign: "right", minWidth: 74 }}>
@@ -171,9 +175,9 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
         <div style={{ marginTop: 24, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
           <h2 style={{ fontSize: "0.95rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>DPS·내구는 어떻게 계산했나요?</h2>
           <p style={{ margin: 0, fontSize: "0.82rem", color: "#475569", lineHeight: 1.7 }}>
-            공개 게임 데이터(종족값·기술 위력/시전시간/에너지)로 표준 PvE 공식을 적용해 산출했습니다. 레벨40·중립 대상 기준의 초당 데미지(DPS)와,
-            체력×방어 기반 내구 지수입니다. 포켓배틀러 등과 세부 수치는 다를 수 있으나 순위 경향은 일치합니다.
-            같은 속성끼리의 비교용이며, 상성이 맞는 레이드에서는 실제 딜이 더 높습니다.{" "}
+            공개 게임 데이터(종족값·기술 위력/시전시간/에너지)로 표준 PvE 공식을 적용해 산출했습니다. 레벨40 기준, 이 속성에 <b>약점인 대상</b>을 때릴 때의
+            초당 데미지(DPS)로, STAB과 약점 1.6배를 반영합니다(빠른기술도 속성이 맞으면 우대). 체력×방어 기반 내구 지수도 함께 표시합니다.
+            포켓배틀러 등과 세부 수치는 다를 수 있으나 순위 경향은 일치합니다.{" "}
             <Link href="/gbl/raid" style={{ color: "#3b5bdb", fontWeight: 600 }}>다른 속성 티어표 →</Link>
           </p>
         </div>

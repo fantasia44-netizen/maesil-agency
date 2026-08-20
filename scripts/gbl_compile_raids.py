@@ -106,8 +106,8 @@ def pve(mid: str, MV: dict, is_fast: bool):
     return MV.get(aid)
 
 
-def dmg(power: float, atk: float, stab: float) -> int:
-    return math.floor(0.5 * power * (atk / TARGET_DEF) * stab) + 1
+def dmg(power: float, atk: float, stab: float, eff: float = 1.0) -> int:
+    return math.floor(0.5 * power * (atk / TARGET_DEF) * stab * eff) + 1
 
 
 REG = [("_alolan", "알로라 "), ("_galarian", "가라르 "), ("_hisuian", "히스이 "), ("_paldean", "팔데아 ")]
@@ -186,9 +186,10 @@ def main():
                 missing.add(cid); continue
             if c["energy"] >= 0 or c["dur"] <= 0:
                 continue
+            bt = c["type"]  # 역할(공격) 속성 = 차지기술 타입. 이 속성 약점 대상 기준으로 계산.
             e_c = -c["energy"]
-            c_stab = 1.2 if c["type"] in ptypes else 1.0
-            c_dmg = dmg(c["power"], atk, c_stab)
+            c_stab = 1.2 if bt in ptypes else 1.0
+            c_dmg = dmg(c["power"], atk, c_stab, 1.6)  # 차지=역할속성 → 약점 1.6
             best = None
             for fid in fasts:
                 f = pve(fid, MV, True)
@@ -197,14 +198,14 @@ def main():
                 if f["energy"] <= 0 or f["dur"] <= 0:
                     continue
                 f_stab = 1.2 if f["type"] in ptypes else 1.0
-                f_dmg = dmg(f["power"], atk, f_stab)
+                f_eff = 1.6 if f["type"] == bt else 1.0  # 빠른기술이 역할속성이면 약점 1.6 (전기역할=전기 빠른기술 우대)
+                f_dmg = dmg(f["power"], atk, f_stab, f_eff)
                 n = math.ceil(e_c / f["energy"])
                 dps = (n * f_dmg + c_dmg) / (n * f["dur"] + c["dur"])
                 if best is None or dps > best[0]:
                     best = (dps, fid)
             if best is None:
                 continue
-            bt = c["type"]
             legacy = (cid in elite) or (best[1] in elite)
             if bt not in by_type or best[0] > by_type[bt]["dps"]:
                 by_type[bt] = {"dps": best[0], "fast": best[1], "charged": cid, "legacy": legacy}
@@ -235,6 +236,8 @@ def main():
             c = pve(r["charged"], MV, False) or {}
             r["fastKo"] = f.get("ko", pretty(r["fast"]))
             r["chargedKo"] = c.get("ko", pretty(r["charged"]))
+            r["fastType"] = f.get("type", "")
+            r["chargedType"] = c.get("type", "")
         out_types[tp] = top
 
     out = {

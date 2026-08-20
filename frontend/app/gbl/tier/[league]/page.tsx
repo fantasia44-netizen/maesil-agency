@@ -107,7 +107,7 @@ export default async function TierPage({ params }: { params: { league: string } 
   const lg = LEAGUES[params.league];
   if (!lg) notFound();
 
-  const list = DET[params.league] || [];
+  const list = (DET[params.league] || []).slice(0, 100);  // 티어표는 상위 100종(CMP·조회는 200종까지)
   const pick = await getPickRates(params.league);
   const TIERS = ["S", "A", "B", "C", "D"];
   const byTier: Record<string, Detail[]> = {};

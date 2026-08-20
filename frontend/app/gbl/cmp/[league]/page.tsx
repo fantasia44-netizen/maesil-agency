@@ -119,7 +119,7 @@ export default function CmpPage({ params }: { params: { league: string } }) {
           아래는 {lg.ko} 주요 포켓몬을 공격력 순으로 정렬한 우선권 순위표입니다. 위에 있을수록 CMP 싸움에서 유리합니다.
         </p>
         <p style={{ margin: "0.5rem 0 0", fontSize: "0.78rem", color: "#94a3b8" }}>
-          숫자 = 공격 종족값 · 각 포켓몬을 누르면 상세(기술·타수·카운터)로 이동.
+          숫자 = 유효 공격력(소수점 1자리까지가 실제 CMP 판정 기준 — 0.1만 높아도 먼저 발동). 같은 값은 실제로도 동점(랜덤). 각 포켓몬을 누르면 상세로 이동.
         </p>
 
         {list.length === 0 ? (
@@ -149,7 +149,7 @@ export default function CmpPage({ params }: { params: { league: string } }) {
                   <div style={{ flex: 1, height: 7, background: "#e5eaf3", borderRadius: 4, overflow: "hidden", marginLeft: 4, minWidth: 40 }}>
                     <div style={{ width: `${w}%`, height: "100%", background: "linear-gradient(90deg,#ef4444,#f59e0b)" }} />
                   </div>
-                  <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "#0f172a", minWidth: 38, textAlign: "right" }}>{atk}</span>
+                  <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "#0f172a", minWidth: 46, textAlign: "right" }}>{atk.toFixed(1)}</span>
                 </Link>
               );
             })}

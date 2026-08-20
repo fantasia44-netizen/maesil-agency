@@ -21,7 +21,7 @@ GBL = os.path.join(REPO, "frontend", "app", "gbl")
 PVPOKE = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/rankings/all/overall"
 GAMEMASTER = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.json"
 FILES = {"great": "rankings-1500.json", "ultra": "rankings-2500.json", "master": "rankings-10000.json"}
-TOP_N = 100  # 리그별 상위 N종만(얇은 페이지 양산 방지)
+TOP_N = 200  # 리그별 상위 N종(CMP·조회 커버리지: 썬더·성원숭 등 100~200위권 포함)
 
 
 def move_mechanics() -> dict:
@@ -96,7 +96,9 @@ def main() -> None:
                 "wins": [{"id": c["opponent"], "r": c["rating"]} for c in (r.get("matchups") or [])[:5]],
                 # 역할 점수 [선봉, 마무리, 교체, 차지, 공격, 일관성] (PvPoke scores 순서)
                 "scores": [round(x, 1) for x in (r.get("scores") or [])],
-                "stats": {k: round(v) for k, v in (r.get("stats") or {}).items()
+                # atk는 CMP 우선권 판정용이라 소수1자리 유지(정수 반올림 시 동점 왜곡)
+                "stats": {k: (round(v, 1) if k == "atk" else round(v))
+                          for k, v in (r.get("stats") or {}).items()
                           if k in ("atk", "def", "hp", "product")},
             })
         out[league] = mons
@@ -107,7 +109,7 @@ def main() -> None:
                for sid in [c["id"] for c in m["counters"]] + [c["id"] for c in m["wins"]] + [m["id"]]
                if sid not in ko}
     if missing:
-        print(f"⚠️ 한글명 없는 speciesId {len(missing)}개(영문 폴백): {list(missing)[:8]}")
+        print(f"[warn] 한글명 없는 speciesId {len(missing)}개(영문 폴백): {list(missing)[:8]}")
     else:
         print("한글명 매핑 100% (누락 0)")
 
