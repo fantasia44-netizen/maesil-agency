@@ -48,6 +48,18 @@ BOSS_K = 950.0
 # 칼로스 스타터 메가 3종 — 2026-10 출시예정
 INCLUDE_UPCOMING = {"greninja_mega", "delphox_mega", "chesnaught_mega"}
 
+# 전설 전용/시그니처 기술 — PvPoke eliteMoves에 없어도 * 레거시(특수기) 마킹. 참고사이트 관례와 일치.
+EXTRA_LEGACY = {
+    "ICE_BURN", "FREEZE_SHOCK",            # 화이트/블랙 큐레무
+    "ORIGIN_PULSE", "PRECIPICE_BLADES",    # 원시 가이오가/그란돈
+    "ROAR_OF_TIME", "SPACIAL_REND",        # 오리진 디아루가/펄기아
+    "SUNSTEEL_STRIKE", "MOONGEIST_BEAM",   # 네크로즈마 황혼/새벽
+    "AEROBLAST", "SACRED_FIRE",            # 루기아 / 칠색조
+    "FUSION_FLARE", "FUSION_BOLT",         # 레시라무/제크로무(크로스플레임/썬더)
+    "GLAIVE_RUSH",                          # 드닐레이브(드래곤)
+    "BEHEMOTH_BLADE", "BEHEMOTH_BASH",     # 자시안(거수참)/자마젠타(거수탄)
+}
+
 TYPES = ["normal", "fire", "water", "electric", "grass", "ice", "fighting", "poison",
          "ground", "flying", "psychic", "bug", "rock", "ghost", "dragon", "dark", "steel", "fairy"]
 TYPE_KO = {"normal": "노말", "fire": "불꽃", "water": "물", "electric": "전기", "grass": "풀",
@@ -155,7 +167,7 @@ def form_label(sid: str, dex: int, ko: dict, shadow: bool):
     elif "_rapid_strike" in sid:
         name += " (연격)"           # 우라오스 연격
     elif "_crowned" in sid:
-        name += " (크라운)"          # 자시안/자마젠타
+        name += " (방패왕)" if "zamazenta" in sid else " (검왕)"   # 자마젠타/자시안
     if shadow:
         name = "섀도우 " + name
     return name, mega, primal
@@ -226,7 +238,7 @@ def main():
                     best = (dps, fid)
             if best is None:
                 continue
-            legacy = (cid in elite) or (best[1] in elite)
+            legacy = (cid in elite) or (best[1] in elite) or (cid in EXTRA_LEGACY) or (best[1] in EXTRA_LEGACY)
             if bt not in by_type or best[0] > by_type[bt]["dps"]:
                 by_type[bt] = {"dps": best[0], "fast": best[1], "charged": cid, "legacy": legacy}
 

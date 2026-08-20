@@ -44,6 +44,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...pokemon,
     { url: `${BASE}/gbl/raid`, lastModified, changeFrequency: "weekly", priority: 0.9 },
     { url: `${BASE}/gbl/raid/bosses`, lastModified, changeFrequency: "daily", priority: 0.8 },
+    { url: `${BASE}/gbl/raid/schedule`, lastModified, changeFrequency: "daily", priority: 0.8 },
     ...RAID_TYPES.map((t) => ({
       url: `${BASE}/gbl/raid/${t}`,
       lastModified,
