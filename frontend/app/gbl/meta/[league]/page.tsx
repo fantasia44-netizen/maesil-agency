@@ -100,7 +100,8 @@ export default async function LeagueMetaPage({ params }: { params: { league: str
       <div style={{ maxWidth: 780, margin: "0 auto" }}>
         <div style={{ marginBottom: 6, display: "flex", alignItems: "center" }}>
           <Link href="/gbl" style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>← GBL Note</Link>
-          <Link href="/gbl/app" style={{ marginLeft: "auto", fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>📝 내 기록 →</Link>
+          <Link href="/gbl/raid" style={{ marginLeft: "auto", fontSize: "0.82rem", color: "#ea580c", textDecoration: "none", fontWeight: 700 }}>🔥 레이드 딜러</Link>
+          <Link href="/gbl/app" style={{ marginLeft: 12, fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>📝 내 기록 →</Link>
         </div>
 
         {/* 리그 내부링크(SEO 크로스링크) */}

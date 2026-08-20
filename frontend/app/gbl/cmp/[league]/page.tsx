@@ -96,6 +96,7 @@ export default function CmpPage({ params }: { params: { league: string } }) {
           <Link href="/gbl" style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>← GBL Note</Link>
           <Link href={`/gbl/tier/${params.league}`} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>🏆 티어표</Link>
           <Link href={`/gbl/meta/${params.league}`} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>📊 실측 메타</Link>
+          <Link href="/gbl/raid" style={{ fontSize: "0.82rem", color: "#ea580c", textDecoration: "none", fontWeight: 700 }}>🔥 레이드 딜러</Link>
         </div>
 
         <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>

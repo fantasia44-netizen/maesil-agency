@@ -127,15 +127,33 @@ def form_label(sid: str, dex: int, ko: dict, shadow: bool):
         mega = "Y"; name = "메가 " + base + " Y"
     elif "_mega" in sid:
         mega = "M"; name = "메가 " + region + base
+    elif "_black" in sid:
+        name = "블랙 " + base       # 블랙큐레무
+    elif "_white" in sid:
+        name = "화이트 " + base     # 화이트큐레무
     else:
         name = region + base
-    # 폼 접미
+    # 폼 접미 (다형태 전설/폼 구분 — 안 하면 dedup에 뭉쳐 사라짐)
     if "_origin" in sid:
         name += " (오리진)"
     elif "_therian" in sid:
         name += " (영물폼)"
-    elif "_hero" in sid:
-        name += " (마이티폼)"
+    elif "_dusk_mane" in sid:
+        name += " (황혼의갈기)"
+    elif "_dawn_wings" in sid:
+        name += " (여명의날개)"
+    elif "_ultra" in sid:
+        name += " (울트라)"
+    elif "_shadow_rider" in sid:
+        name += " (흑마)"           # 버드렉스 흑마
+    elif "_ice_rider" in sid or sid.endswith("_ice"):
+        name += " (백마)"           # 버드렉스 백마
+    elif "_single_strike" in sid:
+        name += " (일격)"           # 우라오스 일격
+    elif "_rapid_strike" in sid:
+        name += " (연격)"           # 우라오스 연격
+    elif "_crowned" in sid:
+        name += " (크라운)"          # 자시안/자마젠타
     if shadow:
         name = "섀도우 " + name
     return name, mega, primal
