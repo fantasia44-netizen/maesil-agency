@@ -142,6 +142,25 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
     return [];
   });
 
+  // 과거 로테이션 백필 — LeekDuck 피드는 지난 이벤트를 버려 8월 초가 비어, 아카이브 기준 5성 라인 보충.
+  // (미래·현행분은 피드가 제공. 새 달로 넘어가면 다른 연도라 노출 안 됨)
+  const PAST_RAIDS: { variant: "star" | "mega" | "shadow"; start: string; end: string; bosses: { en: string; dex: string; shiny: boolean }[] }[] = [
+    // 8/1~8/4: 7월 로테이션 꼬리
+    { variant: "star", start: "2026-07-29T06:00:00.000", end: "2026-08-04T22:00:00.000", bosses: [{ en: "Kyurem", dex: "646", shiny: true }] },
+    { variant: "mega", start: "2026-07-29T06:00:00.000", end: "2026-08-04T22:00:00.000", bosses: [{ en: "Mega Aggron", dex: "306", shiny: true }] },
+    { variant: "shadow", start: "2026-07-01T06:00:00.000", end: "2026-08-04T22:00:00.000", bosses: [{ en: "Palkia", dex: "484", shiny: true }] },
+    // 8/5~8/18: 5성 (레이크 트리오 → 그란돈)
+    { variant: "star", start: "2026-08-05T06:00:00.000", end: "2026-08-11T22:00:00.000", bosses: [{ en: "Uxie", dex: "480", shiny: true }, { en: "Mesprit", dex: "481", shiny: true }, { en: "Azelf", dex: "482", shiny: true }] },
+    { variant: "star", start: "2026-08-12T06:00:00.000", end: "2026-08-18T22:00:00.000", bosses: [{ en: "Groudon", dex: "383", shiny: true }] },
+    // 8/5~8/18: 메가 (번치코 → 한바이트)
+    { variant: "mega", start: "2026-08-05T06:00:00.000", end: "2026-08-11T22:00:00.000", bosses: [{ en: "Mega Blaziken", dex: "257", shiny: true }] },
+    { variant: "mega", start: "2026-08-12T06:00:00.000", end: "2026-08-18T22:00:00.000", bosses: [{ en: "Mega Garchomp", dex: "445", shiny: true }] },
+  ];
+  for (const r of PAST_RAIDS) {
+    calEvents.push({ kind: "rotation", variant: r.variant, title: rotInfo(r.variant === "mega" ? "Mega Raid" : r.variant === "shadow" ? "Shadow Raid" : "", t).title, start: r.start, end: r.end,
+      bosses: r.bosses.map((b) => ({ ko: koMon(b.en), name: monLocal(lang, b.en, t), dex: b.dex, image: "", shiny: b.shiny })) });
+  }
+
   // KST(UTC+9) 벽시계 날짜 — 서버가 UTC라도 한국 '오늘'이 맞도록(새벽 0~9시 하루 밀림 방지)
   const d = new Date(Date.now() + 9 * 3600 * 1000);
   const today = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
