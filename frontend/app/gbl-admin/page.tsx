@@ -25,16 +25,74 @@ type Traffic = {
   paths: { path: string; views: number }[];
   refs: { ref: string; views: number }[];
   shares?: { label: string; shares: number; downloads: number; total: number }[];
+  langs?: { lang: string; pageviews: number; uniques: number; sessions: number }[];
 };
 
 type DbStatus = { hub_configured: boolean; maesil_total: number | null; maesil_hub: number | null };
 
 type BoardPost = { id: number; board: string; author: string; title: string; answered: boolean; is_private: boolean; reply_count: number; created_at: string };
 
+type DailyRow = { day: string; pageviews: number; uniques: number; new_visitors: number; sessions: number };
+const CHART_SERIES: { key: keyof DailyRow; label: string; color: string }[] = [
+  { key: "pageviews", label: "페이지뷰", color: "#3b5bdb" },
+  { key: "uniques", label: "전체방문자", color: "#0f172a" },
+  { key: "new_visitors", label: "신규방문자", color: "#16a34a" },
+  { key: "sessions", label: "세션", color: "#7c3aed" },
+];
+
+// 일별 방문 추이 — PV·방문자·신규·세션 통합 라인차트. 범례 클릭=표시/숨김(숨기면 축 자동 재조정).
+function TrafficChart({ daily }: { daily: DailyRow[] }) {
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
+  const toggle = (k: string) => setHidden((h) => { const n = new Set(h); if (n.has(k)) n.delete(k); else n.add(k); return n; });
+  const visible = CHART_SERIES.filter((s) => !hidden.has(s.key));
+  const maxY = Math.max(1, ...daily.flatMap((d) => visible.map((s) => d[s.key] as number)));
+  const W = 680, H = 210, PL = 42, PR = 14, PT = 16, PB = 26, ticks = 4;
+  const n = daily.length;
+  const X = (i: number) => PL + (n <= 1 ? (W - PL - PR) / 2 : (i / (n - 1)) * (W - PL - PR));
+  const Y = (v: number) => PT + (1 - v / maxY) * (H - PT - PB);
+  const showLabels = n <= 14;
+  const xIdx = [...new Set([0, Math.floor((n - 1) / 2), n - 1])].filter((v) => v >= 0);
+  return (
+    <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem", marginBottom: 12 }}>
+      <div style={{ display: "flex", gap: 10, marginBottom: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a" }}>📈 일별 방문 추이</span>
+        {CHART_SERIES.map((s) => { const off = hidden.has(s.key); return (
+          <button key={s.key} onClick={() => toggle(s.key)} style={{ display: "flex", alignItems: "center", gap: 4, border: "none", background: "none", cursor: "pointer", fontSize: "0.72rem", color: off ? "#cbd5e1" : "#475569", fontWeight: 600, textDecoration: off ? "line-through" : "none", padding: 0 }}>
+            <span style={{ width: 10, height: 10, borderRadius: "50%", background: off ? "#e2e8f0" : s.color }} />{s.label}
+          </button>
+        ); })}
+      </div>
+      <div style={{ overflowX: "auto" }}>
+        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", minWidth: n > 20 ? 520 : undefined, height: "auto", display: "block" }}>
+          {Array.from({ length: ticks + 1 }).map((_, i) => { const v = Math.round(maxY * (1 - i / ticks)); const y = PT + (i / ticks) * (H - PT - PB); return (
+            <g key={i}>
+              <line x1={PL} y1={y} x2={W - PR} y2={y} stroke="#f1f5f9" strokeWidth={1} />
+              <text x={PL - 6} y={y + 3} textAnchor="end" fontSize={9} fill="#94a3b8">{v.toLocaleString()}</text>
+            </g>
+          ); })}
+          {xIdx.map((i) => <text key={i} x={X(i)} y={H - 8} textAnchor="middle" fontSize={9} fill="#94a3b8">{daily[i]?.day.slice(5)}</text>)}
+          {visible.map((s) => (
+            <polyline key={s.key} points={daily.map((d, i) => `${X(i)},${Y(d[s.key] as number)}`).join(" ")} fill="none" stroke={s.color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+          ))}
+          {visible.map((s) => daily.map((d, i) => { const v = d[s.key] as number; return (
+            <g key={s.key + i}>
+              <circle cx={X(i)} cy={Y(v)} r={2.6} fill={s.color}><title>{`${d.day} · ${s.label} ${v}`}</title></circle>
+              {showLabels && <text x={X(i)} y={Y(v) - 6} textAnchor="middle" fontSize={8.5} fontWeight={700} fill={s.color}>{v}</text>}
+            </g>
+          ); }))}
+          <text x={PL - 6} y={PT - 4} textAnchor="end" fontSize={8} fill="#cbd5e1">(명/회)</text>
+        </svg>
+      </div>
+      <div style={{ fontSize: "0.62rem", color: "#94a3b8", marginTop: 4, textAlign: "right" }}>날짜(KST) · 범례 클릭으로 표시/숨김 · 점에 마우스=값</div>
+    </div>
+  );
+}
+
 export default function GblAdmin() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [db, setDb] = useState<DbStatus | null>(null);
   const [traffic, setTraffic] = useState<Traffic | null>(null);
+  const [period, setPeriod] = useState(30);
   const [inquiries, setInquiries] = useState<BoardPost[]>([]);
   const [chats, setChats] = useState<BoardPost[]>([]);
   const [err, setErr] = useState("");
@@ -50,10 +108,11 @@ export default function GblAdmin() {
     } catch { /* SQL 069 미실행 등 */ }
   };
 
-  const loadTraffic = async () => {
-    try { setTraffic(await apiFetch<Traffic>("/api/gbl/admin/traffic?days=30", {}, 20000)); }
+  const loadTraffic = async (days = 30) => {
+    try { setTraffic(await apiFetch<Traffic>(`/api/gbl/admin/traffic?days=${days}`, {}, 20000)); }
     catch { /* SQL 068 미실행 등 */ }
   };
+  const changePeriod = (days: number) => { setPeriod(days); loadTraffic(days); };
 
   const load = async () => {
     try {
@@ -157,7 +216,17 @@ export default function GblAdmin() {
       ) : (
         <div style={{ marginBottom: "1.4rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
-            <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>📈 방문 통계 <span style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 600 }}>(자체 집계 · 최근 {traffic.days}일)</span></span>
+            <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>📈 방문 통계 <span style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 600 }}>(자체 집계)</span></span>
+            {/* 기간 선택기 */}
+            <span style={{ display: "flex", gap: 4, background: "#f1f5f9", borderRadius: 8, padding: 3 }}>
+              {[7, 30, 60].map((d) => (
+                <button key={d} onClick={() => changePeriod(d)}
+                  style={{ border: "none", cursor: "pointer", fontSize: "0.72rem", fontWeight: 700, borderRadius: 6, padding: "3px 10px",
+                    background: period === d ? "#3b5bdb" : "transparent", color: period === d ? "#fff" : "#64748b" }}>
+                  {d}일
+                </button>
+              ))}
+            </span>
             <span style={{ marginLeft: "auto", fontSize: "0.78rem", fontWeight: 800, color: "#16a34a", background: "#dcfce7", borderRadius: 12, padding: "3px 12px" }}>🟢 실시간 활성 {traffic.active?.active_30m ?? 0}명 <span style={{ fontWeight: 500, color: "#4d7c53" }}>(30분)</span></span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(104px,1fr))", gap: 8, marginBottom: 12 }}>
@@ -177,53 +246,7 @@ export default function GblAdmin() {
               </div>
             ))}
           </div>
-          {traffic.daily.length > 0 && (() => {
-            const mxPv = Math.max(...traffic.daily.map((d) => d.pageviews), 1);
-            const mxU = Math.max(...traffic.daily.map((d) => d.uniques), 1);
-            const axis = (
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.62rem", color: "#94a3b8", marginTop: 4 }}>
-                <span>{traffic.daily[0]?.day.slice(5)}</span><span>{traffic.daily[traffic.daily.length - 1]?.day.slice(5)} (KST)</span>
-              </div>
-            );
-            return (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 10, marginBottom: 12 }}>
-                {/* 일별 페이지뷰 */}
-                <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem" }}>
-                  <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>📈 일별 페이지뷰 (PV)</div>
-                  <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 90 }}>
-                    {traffic.daily.map((d) => (
-                      <div key={d.day} title={`${d.day} · PV ${d.pageviews}`} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%" }}>
-                        <div style={{ width: "72%", minWidth: 3, margin: "0 auto", height: `${Math.round(d.pageviews / mxPv * 100)}%`, background: "linear-gradient(180deg,#3b5bdb,#7c3aed)", borderRadius: "3px 3px 0 0" }} />
-                      </div>
-                    ))}
-                  </div>
-                  {axis}
-                </div>
-                {/* 일별 방문자 (신규/재방문) */}
-                <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a" }}>👥 일별 방문자</span>
-                    <span style={{ fontSize: "0.64rem", color: "#16a34a" }}>● 신규</span>
-                    <span style={{ fontSize: "0.64rem", color: "#94a3b8" }}>● 재방문</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 90 }}>
-                    {traffic.daily.map((d) => {
-                      const ret = Math.max(0, d.uniques - d.new_visitors);
-                      return (
-                        <div key={d.day} title={`${d.day} · 방문자 ${d.uniques} (신규 ${d.new_visitors} · 재방문 ${ret})`} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%" }}>
-                          <div style={{ width: "72%", minWidth: 3, margin: "0 auto", height: `${Math.round(d.uniques / mxU * 100)}%`, display: "flex", flexDirection: "column", borderRadius: "3px 3px 0 0", overflow: "hidden" }}>
-                            <div style={{ flex: ret, background: "#cbd5e1" }} />
-                            <div style={{ flex: d.new_visitors, background: "#16a34a" }} />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {axis}
-                </div>
-              </div>
-            );
-          })()}
+          {traffic.daily.length > 0 && <TrafficChart daily={traffic.daily} />}
           {traffic.daily.length > 0 && (
             <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem", marginBottom: 12, overflowX: "auto" }}>
               <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>
@@ -274,6 +297,40 @@ export default function GblAdmin() {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* 언어별 유입 (경로 프리픽스 /en·/ja 기준) */}
+          <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem", marginTop: 10 }}>
+            <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>
+              🌐 언어별 유입 ({traffic.days}일) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 공개 페이지뷰</span>
+            </div>
+            {!traffic.langs || traffic.langs.length === 0 ? (
+              <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음 (SQL 072 실행 여부 확인)</div>
+            ) : (() => {
+              const LABEL: Record<string, string> = { ko: "🇰🇷 한국어", en: "🇺🇸 English", ja: "🇯🇵 日本語" };
+              const COLOR: Record<string, string> = { ko: "#3b5bdb", en: "#0891b2", ja: "#db2777" };
+              const totalPv = traffic.langs.reduce((a, l) => a + l.pageviews, 0) || 1;
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {traffic.langs.map((l) => {
+                    const pct = Math.round((l.pageviews / totalPv) * 100);
+                    const c = COLOR[l.lang] || "#64748b";
+                    return (
+                      <div key={l.lang} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.78rem" }}>
+                        <span style={{ minWidth: 92, fontWeight: 700, color: "#0f172a" }}>{LABEL[l.lang] || l.lang}</span>
+                        <div style={{ flex: 1, height: 12, background: "#eef2f8", borderRadius: 6, overflow: "hidden" }}>
+                          <div style={{ width: `${pct}%`, height: "100%", background: c, borderRadius: 6 }} />
+                        </div>
+                        <span style={{ fontWeight: 800, color: c, minWidth: 40, textAlign: "right" }}>{pct}%</span>
+                        <span style={{ color: "#64748b", minWidth: 128, textAlign: "right", fontSize: "0.72rem" }}>
+                          PV {l.pageviews.toLocaleString()} · 방문 {l.uniques.toLocaleString()}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
 
           {/* 카드 유형별 공유·다운로드 — 어떤 콘텐츠가 바이럴을 주도하는지 */}

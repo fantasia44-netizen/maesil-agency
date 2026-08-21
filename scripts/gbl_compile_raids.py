@@ -30,11 +30,14 @@ import urllib.request
 from datetime import datetime, timezone
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-GBL = os.path.join(REPO, "frontend", "app", "gbl")
+GBL = os.path.join(REPO, "frontend", "app", "[lang]", "gbl")
 
 PVPOKE_GM = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.json"
 PVE_GM = "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/latest.json"
+# 다국어 i18n (pokemon_name_XXXX / move_name_XXXX 병렬 키). ko/en/ja 동일 구조.
 KO_URL = "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Texts/Latest%20APK/JSON/i18n_korean.json"
+EN_URL = "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Texts/Latest%20APK/JSON/i18n_english.json"
+JA_URL = "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Texts/Latest%20APK/JSON/i18n_japanese.json"
 
 CPM40 = 0.7903001
 TARGET_DEF = 180.0
@@ -82,8 +85,17 @@ def pretty(mid: str) -> str:
     return " ".join(w.capitalize() for w in re.sub(r"_FAST$", "", mid or "").split("_"))
 
 
-def load_pve_moves(gm: list, ko: dict) -> dict:
-    """PokeMiners 무브 템플릿 → movementId → {type,power,dur,energy,ko}. (PvE 수치)"""
+def _move_name(names: dict, num: str | None, mid: str) -> str:
+    """i18n 맵에서 기술명(패딩/무패딩 키 시도), 없으면 영문 pretty 폴백."""
+    if num:
+        v = names.get(f"move_name_{num}") or names.get(f"move_name_{int(num)}")
+        if v:
+            return v
+    return pretty(mid)
+
+
+def load_pve_moves(gm: list, ko: dict, en: dict, ja: dict) -> dict:
+    """PokeMiners 무브 템플릿 → movementId → {type,power,dur,energy,ko,en,ja}. (PvE 수치)"""
     out = {}
     for t in gm:
         ms = t.get("data", {}).get("moveSettings")
@@ -94,13 +106,14 @@ def load_pve_moves(gm: list, ko: dict) -> dict:
             continue
         m = re.match(r"V(\d+)_MOVE_", t.get("templateId", ""))
         num = m.group(1) if m else None
-        ko_name = ko.get(f"move_name_{num}") if num else None
         out[mid] = {
             "type": ptype(ms.get("pokemonType")),
             "power": float(ms.get("power") or 0),
             "dur": float(ms.get("durationMs") or 0) / 1000.0,
             "energy": float(ms.get("energyDelta") or 0),
-            "ko": ko_name or pretty(mid),
+            "ko": _move_name(ko, num, mid),
+            "en": _move_name(en, num, mid),
+            "ja": _move_name(ja, num, mid),
         }
     return out
 
@@ -124,53 +137,70 @@ def dmg(power: float, atk: float, stab: float, eff: float = 1.0) -> int:
     return math.floor(0.5 * power * (atk / TARGET_DEF) * stab * eff) + 1
 
 
-REG = [("_alolan", "알로라 "), ("_galarian", "가라르 "), ("_hisuian", "히스이 "), ("_paldean", "팔데아 ")]
+# 언어별 폼 접두/접미. "ko"는 기존 form_label과 바이트 동일(하위호환), "en"/"ja"는 대응 표기.
+RAID_AFFIX = {
+    "ko": {"reg": {"_alolan": "알로라 ", "_galarian": "가라르 ", "_hisuian": "히스이 ", "_paldean": "팔데아 "},
+           "primal": "원시 ", "mega": "메가 ", "megaX": " X", "megaY": " Y",
+           "black": "블랙 ", "white": "화이트 ", "shadow": "섀도우 ",
+           "suf": {"_origin": " (오리진)", "_therian": " (영물폼)", "_dusk_mane": " (황혼의갈기)",
+                   "_dawn_wings": " (새벽의날개)", "_ultra": " (울트라)", "_shadow_rider": " (흑마)",
+                   "_single_strike": " (일격)", "_rapid_strike": " (연격)"},
+           "ice": " (백마)", "crownShield": " (방패왕)", "crownSword": " (검왕)"},
+    "en": {"reg": {"_alolan": "Alolan ", "_galarian": "Galarian ", "_hisuian": "Hisuian ", "_paldean": "Paldean "},
+           "primal": "Primal ", "mega": "Mega ", "megaX": " X", "megaY": " Y",
+           "black": "Black ", "white": "White ", "shadow": "Shadow ",
+           "suf": {"_origin": " (Origin)", "_therian": " (Therian)", "_dusk_mane": " (Dusk Mane)",
+                   "_dawn_wings": " (Dawn Wings)", "_ultra": " (Ultra)", "_shadow_rider": " (Shadow Rider)",
+                   "_single_strike": " (Single Strike)", "_rapid_strike": " (Rapid Strike)"},
+           "ice": " (Ice Rider)", "crownShield": " (Crowned Shield)", "crownSword": " (Crowned Sword)"},
+    "ja": {"reg": {"_alolan": "アローラ", "_galarian": "ガラル", "_hisuian": "ヒスイ", "_paldean": "パルデア"},
+           "primal": "ゲンシ", "mega": "メガ", "megaX": "X", "megaY": "Y",
+           "black": "ブラック", "white": "ホワイト", "shadow": "シャドウ",
+           "suf": {"_origin": "（オリジンフォルム）", "_therian": "（れいじゅうフォルム）", "_dusk_mane": "（たそがれのたてがみ）",
+                   "_dawn_wings": "（あかつきのつばさ）", "_ultra": "（ウルトラ）", "_shadow_rider": "（こくばじょうのすがた）",
+                   "_single_strike": "（いちげきのかた）", "_rapid_strike": "（れんげきのかた）"},
+           "ice": "（はくばじょうのすがた）", "crownShield": "（たてのおう）", "crownSword": "（けんのおう）"},
+}
 
 
-def form_label(sid: str, dex: int, ko: dict, shadow: bool):
-    """speciesId + dex → (한글명, mega코드'', 'X','Y','M', primal불린)."""
-    base = ko.get(f"pokemon_name_{dex:04d}") or ko.get(f"pokemon_name_{dex}") or f"#{dex}"
-    region = next((k for suf, k in REG if suf in sid), "")
-    mega, primal = "", False
-    if "_primal" in sid:
-        primal = True
-        name = "원시 " + base
-    elif "_mega_x" in sid:
-        mega = "X"; name = "메가 " + base + " X"
-    elif "_mega_y" in sid:
-        mega = "Y"; name = "메가 " + base + " Y"
-    elif "_mega" in sid:
-        mega = "M"; name = "메가 " + region + base
-    elif "_black" in sid:
-        name = "블랙 " + base       # 블랙큐레무
-    elif "_white" in sid:
-        name = "화이트 " + base     # 화이트큐레무
-    else:
-        name = region + base
+def _raid_name(sid: str, base: str, aff: dict, shadow: bool) -> str:
+    region = next((v for suf, v in aff["reg"].items() if suf in sid), "")
+    if "_primal" in sid: name = aff["primal"] + base
+    elif "_mega_x" in sid: name = aff["mega"] + base + aff["megaX"]
+    elif "_mega_y" in sid: name = aff["mega"] + base + aff["megaY"]
+    elif "_mega" in sid: name = aff["mega"] + region + base
+    elif "_black" in sid: name = aff["black"] + base
+    elif "_white" in sid: name = aff["white"] + base
+    else: name = region + base
     # 폼 접미 (다형태 전설/폼 구분 — 안 하면 dedup에 뭉쳐 사라짐)
-    if "_origin" in sid:
-        name += " (오리진)"
-    elif "_therian" in sid:
-        name += " (영물폼)"
-    elif "_dusk_mane" in sid:
-        name += " (황혼의갈기)"
-    elif "_dawn_wings" in sid:
-        name += " (새벽의날개)"
-    elif "_ultra" in sid:
-        name += " (울트라)"
-    elif "_shadow_rider" in sid:
-        name += " (흑마)"           # 버드렉스 흑마
-    elif "_ice_rider" in sid or sid.endswith("_ice"):
-        name += " (백마)"           # 버드렉스 백마
-    elif "_single_strike" in sid:
-        name += " (일격)"           # 우라오스 일격
-    elif "_rapid_strike" in sid:
-        name += " (연격)"           # 우라오스 연격
-    elif "_crowned" in sid:
-        name += " (방패왕)" if "zamazenta" in sid else " (검왕)"   # 자마젠타/자시안
+    if "_origin" in sid: name += aff["suf"]["_origin"]
+    elif "_therian" in sid: name += aff["suf"]["_therian"]
+    elif "_dusk_mane" in sid: name += aff["suf"]["_dusk_mane"]
+    elif "_dawn_wings" in sid: name += aff["suf"]["_dawn_wings"]
+    elif "_ultra" in sid: name += aff["suf"]["_ultra"]
+    elif "_shadow_rider" in sid: name += aff["suf"]["_shadow_rider"]
+    elif "_ice_rider" in sid or sid.endswith("_ice"): name += aff["ice"]
+    elif "_single_strike" in sid: name += aff["suf"]["_single_strike"]
+    elif "_rapid_strike" in sid: name += aff["suf"]["_rapid_strike"]
+    elif "_crowned" in sid: name += aff["crownShield"] if "zamazenta" in sid else aff["crownSword"]
     if shadow:
-        name = "섀도우 " + name
-    return name, mega, primal
+        name = aff["shadow"] + name
+    return name
+
+
+def form_label(sid: str, dex: int, names: dict, shadow: bool):
+    """speciesId + dex → ({ko,en,ja}, mega코드'', 'X','Y','M', primal불린)."""
+    mega, primal = "", False
+    if "_primal" in sid: primal = True
+    elif "_mega_x" in sid: mega = "X"
+    elif "_mega_y" in sid: mega = "Y"
+    elif "_mega" in sid: mega = "M"
+    out = {}
+    for lang in ("ko", "en", "ja"):
+        src = names[lang]
+        base = src.get(f"pokemon_name_{dex:04d}") or src.get(f"pokemon_name_{dex}") or f"#{dex}"
+        out[lang] = _raid_name(sid, base, RAID_AFFIX[lang], shadow)
+    return out, mega, primal
 
 
 def main():
@@ -178,12 +208,17 @@ def main():
     pvp = fetch(PVPOKE_GM)["pokemon"]
     print("fetching PokeMiners GM (PvE move stats)…")
     gm = fetch(PVE_GM)
-    print("fetching korean i18n…")
-    ko_raw = fetch(KO_URL)
-    arr = ko_raw.get("data") if isinstance(ko_raw, dict) else ko_raw
-    ko = {arr[i]: arr[i + 1] for i in range(0, len(arr) - 1, 2)}
-    MV = load_pve_moves(gm, ko)
-    print(f"  pvpoke pokemon={len(pvp)}  pve moves={len(MV)}  ko keys={len(ko)}")
+    print("fetching i18n (ko/en/ja)…")
+
+    def i18n(url):
+        raw = fetch(url)
+        a = raw.get("data") if isinstance(raw, dict) else raw
+        return {a[i]: a[i + 1] for i in range(0, len(a) - 1, 2)}
+
+    ko, en, ja = i18n(KO_URL), i18n(EN_URL), i18n(JA_URL)
+    names = {"ko": ko, "en": en, "ja": ja}
+    MV = load_pve_moves(gm, ko, en, ja)
+    print(f"  pvpoke pokemon={len(pvp)}  pve moves={len(MV)}  i18n keys ko={len(ko)} en={len(en)} ja={len(ja)}")
 
     rows = []
     missing = set()
@@ -200,6 +235,7 @@ def main():
         dex = int(p["dex"])
         shadow = "shadow" in tags or sid.endswith("_shadow")
         ptypes = {t for t in (p.get("types") or []) if t and t != "none"}
+        types_list = [t for t in (p.get("types") or []) if t and t != "none"]  # 종족 타입(순서유지, 필러 제거) — 공유이미지 타입뱃지용
         fasts = p.get("fastMoves") or []
         chargeds = p.get("chargedMoves") or []
         elite = set(p.get("eliteMoves") or [])
@@ -208,7 +244,7 @@ def main():
         deff = (bs["def"] + 15) * CPM40 * (SHADOW_DEF if shadow else 1.0)
         hp = (bs["hp"] + 15) * CPM40
         survive = hp * deff / BOSS_K   # 버티는 시간(초) 지수
-        name, mega, primal = form_label(sid, dex, ko, shadow)
+        nm, mega, primal = form_label(sid, dex, names, shadow)
 
         # 속성별 최고 조합
         by_type = {}
@@ -248,7 +284,8 @@ def main():
             er = (dps ** 3 * tdo) ** 0.25            # 종합점수(ER): 딜³×총딜량, 포켓배틀러 Overall식
             rows.append({
                 "type": bt, "dps": round(dps, 1), "tdo": round(tdo), "er": round(er, 1),
-                "name": name, "dex": dex, "shadow": shadow, "mega": mega, "primal": primal,
+                "name": nm["ko"], "nameEn": nm["en"], "nameJa": nm["ja"],
+                "dex": dex, "shadow": shadow, "mega": mega, "primal": primal, "types": types_list,
                 "legacy": v["legacy"], "upcoming": upcoming, "fast": v["fast"], "charged": v["charged"],
                 "atk": round(atk), "def": round(deff), "hp": round(hp),
             })
@@ -271,6 +308,10 @@ def main():
             c = pve(r["charged"], MV, False) or {}
             r["fastKo"] = f.get("ko", pretty(r["fast"]))
             r["chargedKo"] = c.get("ko", pretty(r["charged"]))
+            r["fastEn"] = f.get("en", pretty(r["fast"]))
+            r["chargedEn"] = c.get("en", pretty(r["charged"]))
+            r["fastJa"] = f.get("ja", pretty(r["fast"]))
+            r["chargedJa"] = c.get("ja", pretty(r["charged"]))
             r["fastType"] = f.get("type", "")
             r["chargedType"] = c.get("type", "")
         out_types[tp] = top

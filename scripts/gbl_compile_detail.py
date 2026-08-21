@@ -16,10 +16,16 @@ import os
 import urllib.request
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-GBL = os.path.join(REPO, "frontend", "app", "gbl")
+GBL = os.path.join(REPO, "frontend", "app", "[lang]", "gbl")
 
 PVPOKE = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/rankings/all/overall"
 GAMEMASTER = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.json"
+# PokeMiners 다국어 i18n (pokemon_name_XXXX / move_name_XXXX 병렬 키 구조)
+I18N = {
+    "ko": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Texts/Latest%20APK/JSON/i18n_korean.json",
+    "en": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Texts/Latest%20APK/JSON/i18n_english.json",
+    "ja": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Texts/Latest%20APK/JSON/i18n_japanese.json",
+}
 FILES = {"great": "rankings-1500.json", "ultra": "rankings-2500.json", "master": "rankings-10000.json"}
 TOP_N = 200  # 리그별 상위 N종(CMP·조회 커버리지: 썬더·성원숭 등 100~200위권 포함)
 
@@ -74,29 +80,68 @@ def tier_of(score: float, mx: float) -> str:
     return "D"
 
 
-_REG = [("_alolan", "알로라 "), ("_galarian", "가라르 "), ("_hisuian", "히스이 "), ("_paldean", "팔데아 ")]
+# 언어별 폼 접두/접미 표기. "ko"는 기존 disp_ko와 바이트 동일(하위호환), "en"/"ja"는 대응 표기.
+_AFFIX = {
+    "ko": {"reg": {"_alolan": "알로라 ", "_galarian": "가라르 ", "_hisuian": "히스이 ", "_paldean": "팔데아 "},
+           "mega": "메가 ", "megaX": " X", "megaY": " Y", "primal": "원시 ",
+           "white": "화이트 ", "black": "블랙 ", "shadow": "그림자 ",
+           "origin": " (오리진)", "therian": " (영물폼)"},
+    "en": {"reg": {"_alolan": "Alolan ", "_galarian": "Galarian ", "_hisuian": "Hisuian ", "_paldean": "Paldean "},
+           "mega": "Mega ", "megaX": " X", "megaY": " Y", "primal": "Primal ",
+           "white": "White ", "black": "Black ", "shadow": "Shadow ",
+           "origin": " (Origin)", "therian": " (Therian)"},
+    "ja": {"reg": {"_alolan": "アローラ", "_galarian": "ガラル", "_hisuian": "ヒスイ", "_paldean": "パルデア"},
+           "mega": "メガ", "megaX": "X", "megaY": "Y", "primal": "ゲンシ",
+           "white": "ホワイト", "black": "ブラック", "shadow": "シャドウ",
+           "origin": "（オリジンフォルム）", "therian": "（れいじゅうフォルム）"},
+}
 
 
-def disp_ko(sid: str, sp: dict, pdko: dict) -> tuple:
-    """speciesId → (한글표시명, dex, types[]). gbl_data에 없는 신규/폼 포함용."""
+def i18n_map(url: str) -> dict:
+    """PokeMiners i18n(교차배열) → {key: value}."""
+    raw = fetch(url)
+    arr = raw.get("data") if isinstance(raw, dict) else raw
+    return {arr[i]: arr[i + 1] for i in range(0, len(arr) - 1, 2)}
+
+
+def _dex_name(names: dict, dex) -> str | None:
+    """i18n 맵에서 dex 표시명(패딩/무패딩 키 모두 시도)."""
+    if dex is None:
+        return None
+    return names.get(f"pokemon_name_{int(dex):04d}") or names.get(f"pokemon_name_{int(dex)}")
+
+
+def _disp(sid: str, base: str | None, aff: dict) -> str | None:
+    """base 표시명 + 폼 접두/접미. base 없으면 None."""
+    if not base:
+        return None
+    reg = next((v for suf, v in aff["reg"].items() if suf in sid), "")
+    if "_mega_x" in sid: name = aff["mega"] + base + aff["megaX"]
+    elif "_mega_y" in sid: name = aff["mega"] + base + aff["megaY"]
+    elif "_mega" in sid: name = aff["mega"] + reg + base
+    elif "_primal" in sid: name = aff["primal"] + base
+    elif "_white" in sid: name = aff["white"] + base
+    elif "_black" in sid: name = aff["black"] + base
+    else: name = reg + base
+    if "_origin" in sid: name += aff["origin"]
+    elif "_therian" in sid: name += aff["therian"]
+    if "_shadow" in sid or sid.endswith("_shadow"): name = aff["shadow"] + name
+    return name
+
+
+def disp_names(sid: str, sp: dict, pdko: dict, names: dict) -> tuple:
+    """speciesId → (ko, en, ja, dex, types[]). 언어별 base를 각 소스에서 조회.
+    ko는 하위호환 위해 기존과 동일하게 pokedex_ko.json만 사용(바이트 동일 보장)."""
     p = sp.get(sid, {})
     dex = p.get("dex")
-    base = pdko.get(str(dex)) if dex else None
-    if not base:
-        return None, dex, [t for t in (p.get("types") or []) if t and t != "none"]
-    reg = next((k for suf, k in _REG if suf in sid), "")
-    if "_mega_x" in sid: name = "메가 " + base + " X"
-    elif "_mega_y" in sid: name = "메가 " + base + " Y"
-    elif "_mega" in sid: name = "메가 " + reg + base
-    elif "_primal" in sid: name = "원시 " + base
-    elif "_white" in sid: name = "화이트 " + base
-    elif "_black" in sid: name = "블랙 " + base
-    else: name = reg + base
-    if "_origin" in sid: name += " (오리진)"
-    elif "_therian" in sid: name += " (영물폼)"
-    if "_shadow" in sid or sid.endswith("_shadow"): name = "그림자 " + name
+    base_ko = pdko.get(str(dex)) if dex is not None else None
+    base_en = _dex_name(names["en"], dex)
+    base_ja = _dex_name(names["ja"], dex)
     types = [t for t in (p.get("types") or []) if t and t != "none"]
-    return name, dex, types
+    return (_disp(sid, base_ko, _AFFIX["ko"]),
+            _disp(sid, base_en, _AFFIX["en"]),
+            _disp(sid, base_ja, _AFFIX["ja"]),
+            dex, types)
 
 
 def main() -> None:
@@ -105,6 +150,8 @@ def main() -> None:
     MV = move_mechanics()
     sp = {p["speciesId"]: p for p in fetch(GAMEMASTER)["pokemon"]}  # 한글명·dex·타입 소스
     pdko = json.load(open(os.path.join(GBL, "pokedex_ko.json"), encoding="utf-8"))
+    names = {lang: i18n_map(url) for lang, url in I18N.items()}  # ko/en/ja 다국어 i18n
+    print(f"i18n keys: ko={len(names['ko'])} en={len(names['en'])} ja={len(names['ja'])}")
 
     out = {}
     for league, fn in FILES.items():
@@ -112,10 +159,10 @@ def main() -> None:
         mx = max(r.get("score", 0) for r in ranks)
         mons = []
         for r in ranks:
-            dko, ddex, dtypes = disp_ko(r["speciesId"], sp, pdko)
+            dko, den, dja, ddex, dtypes = disp_names(r["speciesId"], sp, pdko, names)
             mons.append({
                 "id": r["speciesId"],
-                "ko": dko, "dex": ddex, "types": dtypes,  # 자체 내장(gbl_data 미커버 대비)
+                "ko": dko, "en": den, "ja": dja, "dex": ddex, "types": dtypes,  # 자체 내장(gbl_data 미커버 대비)
                 "score": round(r.get("score", 0)),
                 "tier": tier_of(r.get("score", 0), mx),
                 "moveset": r.get("moveset", []),
@@ -153,6 +200,21 @@ def main() -> None:
     dest = os.path.join(GBL, "gbl_detail.json")
     json.dump(out, open(dest, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"saved {dest} ({os.path.getsize(dest)} bytes)")
+
+    # 다국어 dex→이름 맵 (신규 파일, pokedex_ko.json은 하위호환 위해 그대로 유지)
+    pdnames, miss_en, miss_ja = {}, [], []
+    for k in pdko:
+        dex = int(k)
+        en = _dex_name(names["en"], dex)
+        ja = _dex_name(names["ja"], dex)
+        if not en: miss_en.append(k)
+        if not ja: miss_ja.append(k)
+        pdnames[k] = {"ko": pdko[k], "en": en, "ja": ja}
+    ndest = os.path.join(GBL, "pokedex_names.json")
+    json.dump(pdnames, open(ndest, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    print(f"saved {ndest} ({len(pdnames)} dex, {os.path.getsize(ndest)} bytes)")
+    if miss_en: print(f"[warn] EN 이름 없는 dex {len(miss_en)}개: {miss_en[:12]}")
+    if miss_ja: print(f"[warn] JA 이름 없는 dex {len(miss_ja)}개: {miss_ja[:12]}")
 
 
 if __name__ == "__main__":

@@ -4,8 +4,15 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getToken, getUser, isSuperAdmin, logout, type StoredUser } from "../lib/api";
+import { isLocale } from "../lib/i18n";
 
 const PUBLIC_PATHS = ["/login", "/join", "/welcome", "/signup"];
+
+// 로케일 프리픽스(/en, /ja) 제거한 경로 — 섹션/인증 판정을 로케일 무관하게.
+function stripLocale(pathname: string): string {
+  const seg = pathname.split("/")[1];
+  return isLocale(seg) && seg !== "ko" ? pathname.slice(seg.length + 1) || "/" : pathname;
+}
 
 function NavGroup({ label, pathname, children }: { label: string; pathname: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -72,8 +79,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const [ready, setReady] = useState(false);
 
   // GBL 섹션(랜딩·로그인·메타·앱) = 에이전시 헤더 없이 렌더. /gbl-admin은 제외(에이전시).
-  const isGblSection = pathname === "/gbl" || pathname.startsWith("/gbl/");
-  const gblNeedsAuth = pathname === "/gbl/app" || pathname.startsWith("/gbl/app/");
+  // 로케일 프리픽스(/en/gbl…, /ja/gbl…)도 GBL 섹션으로 인식.
+  const corePath = stripLocale(pathname);
+  // 현재 로케일 프리픽스(/en·/ja, ko는 "") — 리다이렉트 시 언어판 유지용
+  const localePfx = (() => { const s = pathname.split("/")[1]; return isLocale(s) && s !== "ko" ? `/${s}` : ""; })();
+  const isGblSection = corePath === "/gbl" || corePath.startsWith("/gbl/");
+  // GBL 회원전용(앱·갤러리·게시판)은 리다이렉트 대신 각 페이지가 자체 회원가입 게이트를 렌더 → 여기선 항상 공개 처리
+  const gblNeedsAuth = false;
 
   useEffect(() => {
     // 공개: 에이전시 공개경로 + GBL 섹션 중 로그인 불필요(랜딩·로그인·메타·개인정보)
@@ -81,13 +93,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     const token = getToken();
 
     if (!token && !isPublic) {
-      router.replace(gblNeedsAuth ? "/gbl/login" : "/welcome");
+      router.replace("/welcome");
       return;
     }
     const u = getUser();
-    // gbl 유저는 에이전시 화면(관리자 포함) 접근 차단 — 항상 GBL 앱으로
+    // gbl 유저는 에이전시 화면(관리자 포함) 접근 차단 — 항상 GBL 앱으로(현재 언어판 유지)
     if (token && u?.role === "gbl" && !isGblSection) {
-      router.replace("/gbl/app");
+      router.replace(`${localePfx}/gbl/app`);
       return;
     }
     setUser(u);

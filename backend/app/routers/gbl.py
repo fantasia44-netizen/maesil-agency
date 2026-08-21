@@ -335,6 +335,11 @@ def admin_traffic(days: int = 30, admin: UserContext = Depends(require_admin)) -
     except Exception as e:
         logger.warning("gbl traffic shares 실패(068 재실행 필요): %s", e)
         shares = []
+    try:
+        langs = db.rpc("gbl_traffic_langs", {"days": days}).execute().data or []
+    except Exception as e:
+        logger.warning("gbl traffic langs 실패(072 실행 필요): %s", e)
+        langs = []
     return {
         "days": days,
         "daily": daily,
@@ -343,6 +348,7 @@ def admin_traffic(days: int = 30, admin: UserContext = Depends(require_admin)) -
         "paths": paths,
         "refs": refs,
         "shares": shares,
+        "langs": langs,
     }
 
 
@@ -407,8 +413,8 @@ def create_gallery(body: GalleryIn, user: UserContext = Depends(get_current_user
 
 
 @router.get("/gallery")
-def list_gallery(limit: int = 60) -> list[dict]:
-    """자랑 갤러리 목록(공개). 최신순."""
+def list_gallery(limit: int = 60, user: UserContext = Depends(get_current_user)) -> list[dict]:
+    """자랑 갤러리 목록(회원전용). 최신순."""
     try:
         rows = (_db().table("gbl_gallery").select("*")
                 .order("created_at", desc=True).limit(min(max(limit, 1), 100)).execute().data) or []
@@ -573,8 +579,12 @@ def admin_migrate_to_hub(admin: UserContext = Depends(require_admin)) -> dict:
 _BOARDS = ("chat", "inquiry")
 
 
+_LANGS = ("ko", "en", "ja")
+
+
 class PostIn(BaseModel):
     board: str = "chat"
+    lang: str = "ko"           # 언어 게시판(작성 시 URL 로케일). 회원여부와 독립.
     title: str
     body: str
     is_private: bool = False   # inquiry 전용: 비공개(작성자+운영자만 열람)
@@ -604,14 +614,16 @@ def _attach_authors(rows: list[dict], viewer_id: str | None = None) -> None:
 
 
 @router.get("/board")
-def board_list(board: str = "chat", limit: int = 50,
+def board_list(board: str = "chat", lang: str = "ko", limit: int = 50,
                user: UserContext = Depends(get_current_user)) -> list[dict]:
-    """회원 전용 게시판 목록. board=chat(잡담방)|inquiry(운영자 문의)."""
+    """회원 전용 게시판 목록. board=chat(잡담방)|inquiry(운영자 문의). lang=언어 게시판(ko/en/ja)."""
     if board not in _BOARDS:
         raise HTTPException(400, "잘못된 게시판입니다.")
+    if lang not in _LANGS:
+        lang = "ko"
     try:
         q = (_db().table("gbl_posts").select("*")
-             .eq("board", board).order("created_at", desc=True)
+             .eq("board", board).eq("lang", lang).order("created_at", desc=True)
              .limit(min(max(limit, 1), 100)))
         # 비공개 문의: 작성자 본인 또는 운영자만 목록에 노출
         if not user.is_super_admin:
@@ -658,7 +670,8 @@ def board_create(body: PostIn, user: UserContext = Depends(get_current_user)) ->
     if not title or not text:
         raise HTTPException(400, "제목과 내용을 입력하세요.")
     payload = {
-        "board": body.board, "user_id": str(user.id),
+        "board": body.board, "lang": body.lang if body.lang in _LANGS else "ko",
+        "user_id": str(user.id),
         "title": title[:200], "body": text[:5000],
         "is_private": bool(body.is_private) and body.board == "inquiry",
     }

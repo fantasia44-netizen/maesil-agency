@@ -1,35 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// 호스트 기반 라우팅.
-// gbl.maesil.net(또는 gbl.* 서브도메인)으로 들어오면 GBL 앱만 노출하고
-// 에이전시 경로(루트 포함)는 /gbl 로 보낸다. 그 외 호스트(에이전시 도메인)는 그대로.
-// 리다이렉트(리라이트 아님)를 쓰는 이유: 클라이언트 usePathname()이 /gbl* 로 잡혀야
-// ClientLayout이 GBL 전용 chrome로 렌더된다(리라이트면 pathname이 "/"로 남아 깨짐).
+// 호스트 기반 라우팅 + GBL 다국어(i18n) 로케일 라우팅.
+// - 라우트 트리는 app/[lang]/gbl/* (lang=ko|en|ja).
+// - 기본 로케일 ko는 프리픽스 없이 /gbl/* 로 노출 → 내부적으로 /ko/gbl/* 로 rewrite(URL 유지).
+// - en/ja는 /en/gbl/*, /ja/gbl/* 로 그대로 노출.
+// - gbl 경로 처리는 호스트 무관(로컬 dev + gblnote.com 모두 동작). 루트→/gbl 리다이렉트만 GBL 호스트 한정.
 export function middleware(req: NextRequest) {
-  const host = (req.headers.get("host") || "").toLowerCase();
-  // GBL 전용 호스트: gbl.maesil.net(서브도메인) + 전용 도메인 gblnote.com(www 포함)
-  const isGblHost = host.startsWith("gbl.") || host === "gblnote.com" || host === "www.gblnote.com";
-  if (!isGblHost) return NextResponse.next();
-
   const { pathname } = req.nextUrl;
-  // GBL '앱' 경로(/gbl, /gbl/*)·정적 리소스·파일만 통과.
-  // /gbl-admin 같은 에이전시 화면은 공개 도메인에서 통과시키지 않음 → /gbl로 리다이렉트.
-  const isGblApp = pathname === "/gbl" || pathname.startsWith("/gbl/");
-  if (
-    isGblApp ||
-    pathname.startsWith("/_next") ||
-    pathname === "/favicon.ico" ||
-    pathname.includes(".")
-  ) {
-    return NextResponse.next();
+
+  // 정적 리소스·파일은 통과
+  if (pathname.startsWith("/_next") || pathname.includes(".")) return NextResponse.next();
+
+  const seg1 = pathname.split("/")[1];
+
+  // /ko/gbl/* → 301 리다이렉트로 프리픽스 제거(기본 로케일 정규 URL = /gbl/*)
+  if (seg1 === "ko") {
+    const url = req.nextUrl.clone();
+    url.pathname = pathname.slice(3) || "/gbl";
+    return NextResponse.redirect(url, 301);
   }
 
-  // gbl 서브도메인에서 그 외(루트·에이전시 경로)는 GBL 앱으로.
-  // 301(영구) — 도메인 루트가 /gbl로 영구 이전됨을 검색엔진(네이버 Yeti/구글)에 알려
-  // /gbl을 대표(canonical)로 색인·링크가치 전달되게 함. 기본 307(임시)이면 색인이 지연됨.
-  const url = req.nextUrl.clone();
-  url.pathname = "/gbl";
-  return NextResponse.redirect(url, 301);
+  // /en/*, /ja/* — gbl 경로면 통과, 아니면 해당 로케일 gbl 랜딩으로
+  if (seg1 === "en" || seg1 === "ja") {
+    const rest = pathname.slice(seg1.length + 1);
+    if (rest === "/gbl" || rest.startsWith("/gbl/")) return NextResponse.next();
+    const url = req.nextUrl.clone();
+    url.pathname = `/${seg1}/gbl`;
+    return NextResponse.redirect(url, 301);
+  }
+
+  // /gbl/* (ko 기본, 프리픽스 없음) → 내부 rewrite /ko/gbl/* (URL은 /gbl/* 유지)
+  if (pathname === "/gbl" || pathname.startsWith("/gbl/")) {
+    const url = req.nextUrl.clone();
+    url.pathname = `/ko${pathname}`;
+    return NextResponse.rewrite(url);
+  }
+
+  // 그 외 — GBL 전용 호스트에서는 루트·에이전시 경로를 /gbl로 301(영구). 그 외 호스트는 통과.
+  const host = (req.headers.get("host") || "").toLowerCase();
+  const isGblHost = host.startsWith("gbl.") || host === "gblnote.com" || host === "www.gblnote.com";
+  if (isGblHost) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/gbl";
+    return NextResponse.redirect(url, 301);
+  }
+  return NextResponse.next();
 }
 
 export const config = {
