@@ -232,10 +232,10 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
           background: "linear-gradient(135deg,#c2410c 0%,#db2777 55%,#7c3aed 100%)", boxShadow: "0 10px 24px -14px rgba(219,39,119,.5)" }}>
           <div style={{ fontSize: "0.76rem", fontWeight: 900, color: "#fff", marginBottom: 7, letterSpacing: "-0.2px" }}>{t.liveNowH}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {liveRots.flatMap((e) => {
+            {liveRots.flatMap((e, ei) => {
               const rs = e.variant ? ROT[e.variant] : null;
               return e.bosses.map((b, bi) => (
-                <button key={e.start + bi} onClick={() => setCpBoss(b)} style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left", background: "rgba(255,255,255,.14)", border: "1px solid rgba(255,255,255,.26)", borderRadius: 11, padding: "4px 10px 4px 4px", cursor: "pointer" }}>
+                <button key={`${ei}-${bi}`} onClick={() => setCpBoss(b)} style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left", background: "rgba(255,255,255,.14)", border: "1px solid rgba(255,255,255,.26)", borderRadius: 11, padding: "4px 10px 4px 4px", cursor: "pointer" }}>
                   <span style={{ width: 34, height: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,.92)", borderRadius: 8 }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={monSprite(b.ko, b.dex)} alt={b.name} width={28} height={28} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
