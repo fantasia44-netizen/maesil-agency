@@ -24,7 +24,7 @@ export type ScheduleDict = {
   selDateTitle: string;
   noSpecial: string; bossTapHint: string;
   monthBossesH: string; cpTableArrow: string;
-  rotationH: string; live: string; upcoming: string;
+  rotationH: string; live: string; upcoming: string; liveNowH: string; endsWord: string;
   saveBtn: string; building: string;
   share: string; save: string; close: string;
   imgTitle: string; imgFooter: string; imgShareTitle: string; imgFile: string;
@@ -56,7 +56,7 @@ const ko: ScheduleDict = {
   selDateTitle: "{m}월 {d}일 ({w}) 레이드",
   noSpecial: "이 날 특별 레이드 일정이 없습니다.", bossTapHint: "보스를 누르면 100% CP·약점 딜러를 볼 수 있어요.",
   monthBossesH: "📋 {m}월 등장 보스", cpTableArrow: "CP표 →",
-  rotationH: "🔥 보스 로테이션 기간", live: "진행 중", upcoming: "예정",
+  rotationH: "🔥 보스 로테이션 기간", live: "진행 중", upcoming: "예정", liveNowH: "🔥 지금 열리는 레이드", endsWord: "종료",
   saveBtn: "📅 {m}월 달력 이미지 저장·공유", building: "이미지 생성 중…",
   share: "📤 공유", save: "💾 저장", close: "닫기",
   imgTitle: "포켓몬고 {m}월 레이드", imgFooter: "포켓몬GO 레이드 일정", imgShareTitle: "포켓몬고 {m}월 레이드 일정", imgFile: "gbl-raid-{m}월.png",
@@ -90,7 +90,7 @@ const en: ScheduleDict = {
   selDateTitle: "{month} {d} ({w}) raids",
   noSpecial: "No special raids scheduled on this day.", bossTapHint: "Tap a boss to see its 100% CP and weakness attackers.",
   monthBossesH: "📋 Bosses in {month}", cpTableArrow: "CP table →",
-  rotationH: "🔥 Boss rotation periods", live: "Live", upcoming: "Upcoming",
+  rotationH: "🔥 Boss rotation periods", live: "Live", upcoming: "Upcoming", liveNowH: "🔥 Live raids now", endsWord: "ends",
   saveBtn: "📅 Save/Share {month} calendar image", building: "Generating image…",
   share: "📤 Share", save: "💾 Save", close: "Close",
   imgTitle: "Pokémon GO {month} Raids", imgFooter: "Pokémon GO raid schedule", imgShareTitle: "Pokémon GO {month} raid schedule", imgFile: "gbl-raid-{m}.png",
@@ -124,7 +124,7 @@ const ja: ScheduleDict = {
   selDateTitle: "{m}月{d}日 ({w}) レイド",
   noSpecial: "この日は特別なレイド日程がありません。", bossTapHint: "ボスを押すと100% CP・弱点アタッカーを確認できます。",
   monthBossesH: "📋 {m}月 登場ボス", cpTableArrow: "CP表 →",
-  rotationH: "🔥 ボスローテーション期間", live: "開催中", upcoming: "予定",
+  rotationH: "🔥 ボスローテーション期間", live: "開催中", upcoming: "予定", liveNowH: "🔥 今開催中のレイド", endsWord: "終了",
   saveBtn: "📅 {m}月 カレンダー画像を保存・共有", building: "画像生成中…",
   share: "📤 共有", save: "💾 保存", close: "閉じる",
   imgTitle: "ポケモンGO {m}月 レイド", imgFooter: "ポケモンGO レイド日程", imgShareTitle: "ポケモンGO {m}月 レイド日程", imgFile: "gbl-raid-{m}.png",

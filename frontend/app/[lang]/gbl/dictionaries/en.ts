@@ -25,6 +25,7 @@ const en: Dict = {
       tier: { t: "Battle League Tiers", d: "Great/Ultra/Master tiers + recommended moves" },
       meta: { t: "Encounter Meta", d: "Top pick rates of opponents actually faced in battle" },
       cmp: { t: "CMP Priority", d: "Charged move priority (attack) ranking" },
+      season: { t: "Season Schedule", d: "League rotation · leagues & cups open this week" },
       record: { t: "My Battle Log", d: "Log opponents · win/loss stats · shareable card", tag: "Members" },
       gallery: { t: "Brag Gallery", d: "Show off 100% IV, legendaries, stat cards", tag: "Members" },
       board: { t: "Board", d: "Members' free chat board", tag: "Members" },

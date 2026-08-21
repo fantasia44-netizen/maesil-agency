@@ -36,12 +36,13 @@ export function middleware(req: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
-  // 그 외 — GBL 전용 호스트에서는 루트·에이전시 경로를 /gbl로 301(영구). 그 외 호스트는 통과.
+  // 그 외 — GBL 전용 호스트: 구 루트 URL(/raid, /tier/... 등)을 /gbl 하위 해당 페이지로 301(SEO 보존).
+  // 루트(/)만 랜딩 /gbl 으로. 그 외 호스트는 통과.
   const host = (req.headers.get("host") || "").toLowerCase();
   const isGblHost = host.startsWith("gbl.") || host === "gblnote.com" || host === "www.gblnote.com";
   if (isGblHost) {
     const url = req.nextUrl.clone();
-    url.pathname = "/gbl";
+    url.pathname = pathname === "/" ? "/gbl" : `/gbl${pathname}`;
     return NextResponse.redirect(url, 301);
   }
   return NextResponse.next();

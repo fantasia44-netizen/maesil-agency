@@ -310,7 +310,16 @@
       "Bash(curl -s \"http://localhost:3000/ja/gbl/pokemon/master/marshadow\" -o /tmp/ms.html -w \"HTTP %{http_code}\\\\n\")",
       "Bash(curl -s \"http://localhost:3000/gbl\")",
       "Bash(curl -s \"http://localhost:3000/en/gbl\")",
-      "Bash(curl -s \"http://localhost:3000/ja/gbl\")"
+      "Bash(curl -s \"http://localhost:3000/ja/gbl\")",
+      "Bash(curl -s \"http://localhost:3000/en/gbl/schedule\")",
+      "Bash(curl -s \"http://localhost:3000/ja/gbl/schedule\")",
+      "Bash(curl -s \"http://localhost:3000/gbl/schedule\")",
+      "Bash(node -e \"const t=new Date\\(Date.now\\(\\)+9*3600*1000\\).toISOString\\(\\).slice\\(0,10\\); const e=Date.parse\\('2026-09-09'\\), n=Date.parse\\(t\\); console.log\\('KST today:',t,'| daysLeft:',Math.max\\(0,Math.ceil\\(\\(e-n\\)/86400000\\)\\),'| ended:',n>=e\\);\")",
+      "Bash(node -e \"const R=require\\('./app/[lang]/gbl/gbl_raids.json'\\); console.log\\('타입:', Object.keys\\(R.types\\).join\\(','\\)\\); const g=R.types.dark[0]; console.log\\('dark 1위 샘플:', JSON.stringify\\({name:g.name,nameEn:g.nameEn,dps:g.dps,er:g.er,fastKo:g.fastKo,chargedKo:g.chargedKo,dex:g.dex}\\)\\)\")",
+      "Bash(curl -s \"http://localhost:3000/gbl/raid/schedule\" -o /tmp/rs.html -w \"HTTP %{http_code}\\\\n\")",
+      "Bash(curl -s \"http://localhost:3000/gbl/raid/schedule\")",
+      "Bash(curl -s \"http://localhost:3000/gbl/schedule\" -o /dev/null -w \"HTTP %{http_code}\\\\n\")",
+      "Bash(curl -s \"http://localhost:3000/gbl/raid/schedule\" -o /dev/null -w \"raid schedule HTTP %{http_code}\\\\n\")"
     ]
   }
 }

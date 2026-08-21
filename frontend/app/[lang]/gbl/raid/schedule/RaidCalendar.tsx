@@ -165,6 +165,33 @@ export default function RaidCalendar({ events, today, t }: { events: CalEvent[];
   for (let d = 1; d <= daysInMonth; d++) cells.push(ymd(new Date(cur.y, cur.m - 1, d)));
   while (cells.length % 7 !== 0) cells.push(null);
 
+  // 주(week) 단위로 쪼개고, 각 주에 걸치는 로테이션을 가로 밴드로(변형별 고정 레인 → 주 넘어가도 연속감)
+  const weeks: (string | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+  const vOrd: Record<string, number> = { star: 0, mega: 1, shadow: 2 };
+  const dayShift = (dk: string, delta: number) => ymd(new Date(new Date(dk + "T12:00:00").getTime() + delta * 86400000));
+  type Band = { e: CalEvent; sc: number; ec: number; lane: number; startsHere: boolean; endsHere: boolean };
+  const bandsOfWeek = (wk: (string | null)[]): Band[] => {
+    const raw: Band[] = [];
+    for (const e of events) {
+      if (e.kind !== "rotation") continue;
+      let sc = -1, ec = -1;
+      wk.forEach((dk, col) => { if (dk && eventsOn(dk).includes(e)) { if (sc < 0) sc = col; ec = col; } });
+      if (sc < 0) continue;
+      const first = wk[sc]!, last = wk[ec]!;
+      raw.push({
+        e, sc, ec, lane: 0,
+        startsHere: !eventsOn(dayShift(first, -1)).includes(e),   // 전날이 이벤트에 없으면 = 진짜 시작
+        endsHere: !eventsOn(dayShift(last, 1)).includes(e),        // 다음날이 없으면 = 진짜 끝
+      });
+    }
+    // 변형 순서(5성→메가→그림자) 유지하되 레인은 주별로 컴팩트(빈 레인 없음 → 높이 낭비 방지)
+    raw.sort((a, b) => (vOrd[a.e.variant || "star"] ?? 9) - (vOrd[b.e.variant || "star"] ?? 9));
+    raw.forEach((b, i) => { b.lane = i; });
+    return raw;
+  };
+  const DNUM_H = 20, BAND_H = 26;
+
   const shift = (delta: number) => {
     const d = new Date(cur.y, cur.m - 1 + delta, 1);
     setCur({ y: d.getFullYear(), m: d.getMonth() + 1 });
@@ -191,13 +218,42 @@ export default function RaidCalendar({ events, today, t }: { events: CalEvent[];
   const rotations = events.filter((e) => e.kind === "rotation")
     .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
+  const liveRots = rotations.filter((e) => nowTs >= new Date(e.start).getTime() && nowTs < new Date(e.end).getTime());
+
   return (
     <div>
+      {/* 지금 열리는 레이드 — 히어로 */}
+      {liveRots.length > 0 && (
+        <div style={{ marginBottom: 12, borderRadius: 14, padding: "9px 12px 10px",
+          background: "linear-gradient(135deg,#c2410c 0%,#db2777 55%,#7c3aed 100%)", boxShadow: "0 10px 24px -14px rgba(219,39,119,.5)" }}>
+          <div style={{ fontSize: "0.76rem", fontWeight: 900, color: "#fff", marginBottom: 7, letterSpacing: "-0.2px" }}>{t.liveNowH}</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {liveRots.flatMap((e) => {
+              const rs = e.variant ? ROT[e.variant] : null;
+              return e.bosses.map((b, bi) => (
+                <button key={e.start + bi} onClick={() => setCpBoss(b)} style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left", background: "rgba(255,255,255,.14)", border: "1px solid rgba(255,255,255,.26)", borderRadius: 11, padding: "4px 10px 4px 4px", cursor: "pointer" }}>
+                  <span style={{ width: 34, height: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,.92)", borderRadius: 8 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={monSprite(b.ko, b.dex)} alt={b.name} width={28} height={28} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                  </span>
+                  {rs && <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#fff", background: "rgba(255,255,255,.22)", borderRadius: 999, padding: "2px 7px", flexShrink: 0 }}>{rs.icon}</span>}
+                  <span style={{ fontSize: "0.86rem", fontWeight: 800, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{b.name}{b.shiny ? " ✨" : ""}</span>
+                  <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 7, flexShrink: 0 }}>
+                    <span style={{ fontSize: "0.64rem", fontWeight: 700, color: "rgba(255,255,255,.8)" }}>~{fmtD(e.end)} {t.endsWord}</span>
+                    <span style={{ fontSize: "0.62rem", fontWeight: 800, color: "rgba(255,255,255,.9)" }}>{t.cpTableArrow}</span>
+                  </span>
+                </button>
+              ));
+            })}
+          </div>
+        </div>
+      )}
+
       {/* 월 네비 */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-        <button onClick={() => shift(-1)} style={{ border: `1px solid ${BORDER}`, background: CARD, borderRadius: 8, padding: "4px 12px", cursor: "pointer", fontSize: "0.9rem", color: "#475569" }}>‹</button>
-        <span style={{ fontSize: "1rem", fontWeight: 800, color: "#0f172a" }}>{tpl(t.navMonth, { y: cur.y, m: cur.m, month: monthName(cur.m) })}</span>
-        <button onClick={() => shift(1)} style={{ border: `1px solid ${BORDER}`, background: CARD, borderRadius: 8, padding: "4px 12px", cursor: "pointer", fontSize: "0.9rem", color: "#475569" }}>›</button>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+        <button onClick={() => shift(-1)} aria-label="prev" style={{ border: `1px solid ${BORDER}`, background: CARD, borderRadius: "50%", width: 36, height: 36, cursor: "pointer", fontSize: "1.1rem", color: "#ea580c", fontWeight: 800, lineHeight: 1, boxShadow: "0 2px 6px -3px rgba(15,23,42,.15)" }}>‹</button>
+        <span style={{ fontSize: "1.18rem", fontWeight: 900, color: "#0f172a", letterSpacing: "-0.3px" }}>{tpl(t.navMonth, { y: cur.y, m: cur.m, month: monthName(cur.m) })}</span>
+        <button onClick={() => shift(1)} aria-label="next" style={{ border: `1px solid ${BORDER}`, background: CARD, borderRadius: "50%", width: 36, height: 36, cursor: "pointer", fontSize: "1.1rem", color: "#ea580c", fontWeight: 800, lineHeight: 1, boxShadow: "0 2px 6px -3px rgba(15,23,42,.15)" }}>›</button>
       </div>
 
       {/* 요일 헤더 */}
@@ -207,42 +263,74 @@ export default function RaidCalendar({ events, today, t }: { events: CalEvent[];
         ))}
       </div>
 
-      {/* 날짜 그리드 */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 4 }}>
-        {cells.map((dk, i) => {
-          if (!dk) return <div key={i} />;
-          const evs = eventsOn(dk);
-          const isToday = dk === today;
-          const isSel = dk === sel;
-          const day = Number(dk.split("-")[2]);
-          const hasHour = evs.some((e) => e.kind === "hour");
-          const hasDay = evs.some((e) => e.kind === "day");
-          const rots = evs.filter((e) => e.kind === "rotation");
-          const star = rots.find((e) => e.variant === "star");
-          const mega = rots.find((e) => e.variant === "mega");
-          const shadow = rots.find((e) => e.variant === "shadow");
-          const main = (star || mega || shadow)?.bosses[0];
-          const inRot = rots.length > 0;
+      {/* 날짜 그리드 — 주 단위 + 가로 이벤트 밴드 */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        {weeks.map((wk, wi) => {
+          const bands = bandsOfWeek(wk);
+          const rowH = Math.max(46, DNUM_H + bands.length * BAND_H + 5);
           return (
-            <button key={i} onClick={() => setSel(dk)}
-              style={{
-                minHeight: 58, borderRadius: 8, cursor: "pointer", padding: "2px 0", position: "relative", overflow: "hidden",
-                border: isSel ? "2px solid #ea580c" : `1px solid ${isToday ? "#fdba74" : BORDER}`,
-                background: inRot ? "#fffaf5" : CARD,
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 0,
-              }}>
-              <span style={{ fontSize: "0.66rem", fontWeight: isToday ? 800 : 600, color: isToday ? "#ea580c" : "#94a3b8", lineHeight: 1.2 }}>{day}</span>
-              {main ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={monSprite(main.ko, main.dex)} alt="" width={26} height={26} style={{ imageRendering: "pixelated", objectFit: "contain", marginTop: -1 }} />
-              ) : <span style={{ height: 26 }} />}
-              <span style={{ display: "flex", gap: 2, alignItems: "center", height: 10, lineHeight: 1 }}>
-                {mega && <span style={{ fontSize: "0.52rem" }}>🔷</span>}
-                {shadow && <span style={{ fontSize: "0.52rem" }}>🌑</span>}
-                {hasDay && <span style={{ fontSize: "0.52rem" }}>🎉</span>}
-                {hasHour && <span style={{ fontSize: "0.52rem" }}>⏰</span>}
-              </span>
-            </button>
+            <div key={wi} style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 4 }}>
+              {/* 날짜 칸 */}
+              {wk.map((dk, col) => {
+                if (!dk) return <div key={col} style={{ minHeight: rowH, borderRadius: 11, background: "rgba(0,0,0,.015)" }} />;
+                const evs = eventsOn(dk);
+                const isToday = dk === today, isSel = dk === sel;
+                const day = Number(dk.split("-")[2]);
+                const hasHour = evs.some((e) => e.kind === "hour");
+                const hasDay = evs.some((e) => e.kind === "day");
+                const wdow = new Date(dk + "T12:00:00").getDay();
+                const clickable = hasHour || hasDay;   // 아워·데이 있는 날만 클릭(상세 표시). 나머진 정적.
+                return (
+                  <div key={col} onClick={clickable ? () => setSel(dk) : undefined}
+                    style={{
+                      minHeight: rowH, borderRadius: 11, cursor: clickable ? "pointer" : "default", padding: 0, position: "relative", overflow: "hidden",
+                      border: isSel && clickable ? "2px solid #ea580c" : isToday ? "1.5px solid #fb923c" : `1px solid ${BORDER}`,
+                      background: isToday ? "linear-gradient(180deg,#fff7ed,#ffffff 60%)" : CARD,
+                      boxShadow: isSel && clickable ? "0 6px 16px -8px rgba(234,88,12,.5)" : "none",
+                    }}>
+                    {isToday ? (
+                      <span style={{ position: "absolute", top: 3, left: 5, zIndex: 4, display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 17, height: 17, padding: "0 3px", borderRadius: 999, background: "#ea580c", color: "#fff", fontSize: "0.64rem", fontWeight: 900, lineHeight: 1, boxShadow: "0 1px 4px rgba(234,88,12,.5)" }}>{day}</span>
+                    ) : (
+                      <span style={{ position: "absolute", top: 5, left: 7, zIndex: 3, fontSize: "0.66rem", fontWeight: 700, lineHeight: 1,
+                        color: wdow === 0 ? "#f87171" : wdow === 6 ? "#93c5fd" : "#94a3b8" }}>{day}</span>
+                    )}
+                    {(hasDay || hasHour) && (
+                      <span style={{ position: "absolute", top: 3, right: 5, zIndex: 5, display: "flex", gap: 2, lineHeight: 1 }}>
+                        {hasDay && <span style={{ fontSize: "0.74rem" }}>🎉</span>}
+                        {hasHour && <span style={{ fontSize: "0.74rem" }}>⏰</span>}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+              {/* 가로 로테이션 밴드 (레인별) */}
+              {bands.map((b, bi) => {
+                const rot = ROT[b.e.variant || "star"];
+                const boss = b.e.bosses[0];
+                const r = 8;
+                return (
+                  <div key={bi}
+                    style={{
+                      position: "absolute", top: DNUM_H + b.lane * BAND_H, height: BAND_H - 5,
+                      left: `calc(${(b.sc / 7) * 100}% + ${b.startsHere ? 4 : 0}px)`,
+                      width: `calc(${((b.ec - b.sc + 1) / 7) * 100}% - ${(b.startsHere ? 4 : 0) + (b.endsHere ? 4 : 0)}px)`,
+                      background: rot.bg, border: `1px solid ${rot.c}40`, pointerEvents: "none",
+                      borderTopLeftRadius: b.startsHere ? r : 0, borderBottomLeftRadius: b.startsHere ? r : 0,
+                      borderTopRightRadius: b.endsHere ? r : 0, borderBottomRightRadius: b.endsHere ? r : 0,
+                      borderLeft: b.startsHere ? `3px solid ${rot.c}` : `1px solid ${rot.c}40`,
+                      display: "flex", alignItems: "center", gap: 5, padding: "0 8px 0 6px", overflow: "hidden", zIndex: 1,
+                    }}>
+                    {boss && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={monSprite(boss.ko, boss.dex)} alt="" width={20} height={20} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
+                    )}
+                    <span style={{ fontSize: "0.7rem", fontWeight: 800, color: rot.c, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {rot.icon} {boss ? boss.name + (boss.shiny ? " ✨" : "") : b.e.title}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           );
         })}
       </div>
@@ -252,44 +340,30 @@ export default function RaidCalendar({ events, today, t }: { events: CalEvent[];
         <span>{t.legendMain}</span><span>{t.legendMega}</span><span>{t.legendShadow}</span><span>{t.legendDay}</span><span>{t.legendHour}</span>
       </div>
 
-      {/* 선택한 날 상세 */}
-      {sel && (
-        <div style={{ marginTop: 14, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "12px 14px" }}>
-          <div style={{ fontSize: "0.86rem", fontWeight: 800, color: "#0f172a", marginBottom: 8 }}>
-            {tpl(t.selDateTitle, { m: Number(sel.split("-")[1]), d: Number(sel.split("-")[2]), w: WD[new Date(sel + "T12:00:00").getDay()], month: monthName(Number(sel.split("-")[1])) })}
-          </div>
-          {selEvents.length === 0 ? (
-            <div style={{ fontSize: "0.8rem", color: "#94a3b8" }}>{t.noSpecial}</div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {selEvents.map((e, idx) => {
-                const k = e.kind === "rotation" && e.variant ? ROT[e.variant] : KIND[e.kind as "hour" | "day"];
+      {/* 선택한 날 특별 이벤트(레이드 아워·데이) — 로테이션 보스는 히어로·밴드로 대체(중복 제거) */}
+      {sel && (() => {
+        const special = selEvents.filter((e) => e.kind !== "rotation");
+        if (special.length === 0) return null;
+        return (
+          <div style={{ marginTop: 14, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "11px 14px" }}>
+            <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#0f172a", marginBottom: 8 }}>
+              {tpl(t.selDateTitle, { m: Number(sel.split("-")[1]), d: Number(sel.split("-")[2]), w: WD[new Date(sel + "T12:00:00").getDay()], month: monthName(Number(sel.split("-")[1])) })}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+              {special.map((e, idx) => {
+                const k = KIND[e.kind as "hour" | "day"];
                 return (
-                  <div key={idx}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#fff", background: k.c, borderRadius: 6, padding: "1px 7px" }}>{k.icon} {k.label}</span>
-                      {e.kind !== "rotation" && <span style={{ fontSize: "0.74rem", color: "#64748b" }}>{fmtTime(e.start)}~{fmtTime(e.end)}</span>}
-                      <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#334155" }}>{e.title}</span>
-                    </div>
-                    {e.bosses.length > 0 && (
-                      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", paddingLeft: 4 }}>
-                        {e.bosses.map((b, bi) => (
-                          <button key={bi} onClick={() => setCpBoss(b)} style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "none", padding: 0, cursor: "pointer" }}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={monSprite(b.ko, b.dex)} alt={b.name} width={34} height={34} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
-                            <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#3b5bdb" }}>{b.name}{b.shiny ? " ✨" : ""}</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap", background: k.bg, borderRadius: 9, padding: "6px 10px" }}>
+                    <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#fff", background: k.c, borderRadius: 6, padding: "1px 8px" }}>{k.icon} {k.label}</span>
+                    <span style={{ fontSize: "0.74rem", fontWeight: 700, color: k.c }}>{fmtTime(e.start)}~{fmtTime(e.end)}</span>
+                    <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#334155" }}>{e.title}</span>
                   </div>
                 );
               })}
-              <div style={{ fontSize: "0.7rem", color: "#94a3b8" }}>{t.bossTapHint}</div>
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        );
+      })()}
 
       {/* 이달 등장 보스 설명 */}
       {monthBosses.length > 0 && (
