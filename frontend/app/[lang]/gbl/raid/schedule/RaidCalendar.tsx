@@ -82,19 +82,14 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
   const buildImage = async () => {
     setBusy(true);
     try {
-      const daysN = new Date(cur.y, cur.m, 0).getDate();
-      const startPad = new Date(cur.y, cur.m - 1, 1).getDay();
-      const info: { d: number; dexMain?: string; mega: boolean; shadow: boolean; rd: boolean; rh: boolean }[] = [];
+      // 주별 로테이션 밴드 + 가변 행높이(페이지와 동일: 5성→메가→그림자 레인)
+      const weekBands = weeks.map(bandsOfWeek);
+      const DNUM_H_C = 40, BAND_H_C = 48, MIN_CELL_H = 104;
+      const rowHeights = weekBands.map((b) => Math.max(MIN_CELL_H, DNUM_H_C + b.length * BAND_H_C + 12));
+
+      // 밴드 보스 스프라이트 수집(폼 반영)
       const dexSet = new Set<string>();
-      for (let d = 1; d <= daysN; d++) {
-        const dk = ymd(new Date(cur.y, cur.m - 1, d));
-        const evs = eventsOn(dk);
-        const rots = evs.filter((e) => e.kind === "rotation");
-        const main = (rots.find((e) => e.variant === "star") || rots.find((e) => e.variant === "mega") || rots.find((e) => e.variant === "shadow"))?.bosses[0];
-        const mdex = main?.dex ? String(formDex(main.ko, Number(main.dex))) : undefined;   // 폼 반영
-        if (mdex) dexSet.add(mdex);
-        info.push({ d, dexMain: mdex, mega: rots.some((e) => e.variant === "mega"), shadow: rots.some((e) => e.variant === "shadow"), rd: evs.some((e) => e.kind === "day"), rh: evs.some((e) => e.kind === "hour") });
-      }
+      weekBands.forEach((bands) => bands.forEach((b) => { const boss = b.e.bosses[0]; if (boss?.dex) dexSet.add(String(formDex(boss.ko, Number(boss.dex)))); }));
       const imgs: Record<string, HTMLImageElement> = {};
       const logoP = loadLogo();
       await Promise.all([...dexSet].map((dex) => new Promise<void>((res) => {
@@ -104,38 +99,74 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
       })));
       const logo = await logoP;
 
-      const W = 1080, gx = 40, gw = W - 80, cw = gw / 7, gyTop = 210, rowH = 176, footH = 150;
-      const rows = Math.ceil((startPad + daysN) / 7);
-      const H = gyTop + rowH * rows + footH;
+      const W = 1080, gx = 30, gw = W - 60, cw = gw / 7;
+      const HEADER_H = 148, WDAY_Y = HEADER_H + 30, GRID_TOP = HEADER_H + 56;
+      const gridH = rowHeights.reduce((a, b) => a + b, 0);
+      const LEGEND_H = 82, footH = 150;
+      const H = GRID_TOP + gridH + LEGEND_H + footH;
+
       const c = document.createElement("canvas"); c.width = W; c.height = H;
       const ctx = c.getContext("2d"); if (!ctx) { setBusy(false); return; }
       ctx.fillStyle = "#fbf7f3"; ctx.fillRect(0, 0, W, H);
+
       // 헤더
-      ctx.textAlign = "left"; ctx.fillStyle = "#0f172a"; ctx.font = "900 74px system-ui, sans-serif";
-      ctx.fillText(tpl(t.imgTitle, { m: cur.m, month: monthName(cur.m) }), 44, 108);
-      ctx.textAlign = "right"; ctx.fillStyle = "#f97316"; ctx.font = "800 42px system-ui, sans-serif";
-      ctx.fillText(`${cur.y}`, W - 44, 104);
+      ctx.textAlign = "left"; ctx.fillStyle = "#0f172a"; ctx.font = "900 66px system-ui, sans-serif";
+      ctx.fillText(tpl(t.imgTitle, { m: cur.m, month: monthName(cur.m) }), 40, 96);
+      ctx.textAlign = "right"; ctx.fillStyle = "#f97316"; ctx.font = "800 40px system-ui, sans-serif";
+      ctx.fillText(`${cur.y}`, W - 40, 92);
       // 요일
-      ctx.textAlign = "center"; ctx.font = "800 34px system-ui, sans-serif";
-      WD.forEach((w, i) => { ctx.fillStyle = i === 0 ? "#dc2626" : i === 6 ? "#3b5bdb" : "#64748b"; ctx.fillText(w, gx + cw * i + cw / 2, 178); });
-      // 그리드
-      for (let idx = startPad; idx < startPad + daysN; idx++) {
-        const col = idx % 7, row = Math.floor(idx / 7);
-        const cx = gx + cw * col, cy = gyTop + rowH * row;
-        const it = info[idx - startPad];
-        ctx.fillStyle = "#ffffff"; ctx.strokeStyle = "#e8e2da"; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.roundRect(cx + 4, cy + 4, cw - 8, rowH - 8, 12); ctx.fill(); ctx.stroke();
-        ctx.textAlign = "left"; ctx.font = "700 28px system-ui, sans-serif";
-        ctx.fillStyle = col === 0 ? "#dc2626" : col === 6 ? "#3b5bdb" : "#94a3b8";
-        ctx.fillText(String(it.d), cx + 16, cy + 40);
-        const im = it.dexMain ? imgs[it.dexMain] : null;
-        if (im) { const s = 96; ctx.drawImage(im, cx + cw / 2 - s / 2, cy + 40, s, s); }
-        let ind = ""; if (it.mega) ind += "🔷"; if (it.shadow) ind += "🌑"; if (it.rd) ind += "🎉"; if (it.rh) ind += "⏰";
-        if (ind) { ctx.textAlign = "center"; ctx.font = "26px system-ui, sans-serif"; ctx.fillStyle = "#334155"; ctx.fillText(ind, cx + cw / 2, cy + rowH - 16); }
-      }
+      ctx.textAlign = "center"; ctx.font = "800 30px system-ui, sans-serif";
+      WD.forEach((w, i) => { ctx.fillStyle = i === 0 ? "#dc2626" : i === 6 ? "#3b5bdb" : "#64748b"; ctx.fillText(w, gx + cw * i + cw / 2, WDAY_Y); });
+
+      // 텍스트 말줄임(현재 폰트 기준)
+      const fit = (text: string, maxW: number) => { if (ctx.measureText(text).width <= maxW) return text; let s = text; while (s.length > 1 && ctx.measureText(s + "…").width > maxW) s = s.slice(0, -1); return s + "…"; };
+
+      // 그리드(주별) — 날짜 칸 + 가로 로테이션 밴드 + 🎉/⏰ 배지
+      let cy = GRID_TOP;
+      weeks.forEach((wk, wi) => {
+        const rh = rowHeights[wi];
+        wk.forEach((dk, col) => {
+          if (!dk) return;
+          const cx = gx + cw * col;
+          const evs = eventsOn(dk);
+          const day = Number(dk.split("-")[2]);
+          const isToday = dk === today;
+          const hasDay = evs.some((e) => e.kind === "day"), hasHour = evs.some((e) => e.kind === "hour");
+          ctx.fillStyle = isToday ? "#fff7ed" : "#ffffff";
+          ctx.strokeStyle = isToday ? "#fb923c" : "#e8e2da"; ctx.lineWidth = isToday ? 3 : 1.5;
+          ctx.beginPath(); ctx.roundRect(cx + 3, cy + 3, cw - 6, rh - 6, 14); ctx.fill(); ctx.stroke();
+          ctx.textAlign = "left"; ctx.font = "800 26px system-ui, sans-serif";
+          ctx.fillStyle = isToday ? "#ea580c" : col === 0 ? "#dc2626" : col === 6 ? "#3b5bdb" : "#94a3b8";
+          ctx.fillText(String(day), cx + 14, cy + 34);
+          if (hasDay || hasHour) { ctx.textAlign = "right"; ctx.font = "26px system-ui, sans-serif"; ctx.fillText((hasDay ? "🎉" : "") + (hasHour ? "⏰" : ""), cx + cw - 12, cy + 34); }
+        });
+        weekBands[wi].forEach((b) => {
+          const rot = ROT[b.e.variant || "star"];
+          const boss = b.e.bosses[0];
+          const bx = gx + b.sc * cw + (b.startsHere ? 4 : 0);
+          const bw = (b.ec - b.sc + 1) * cw - (b.startsHere ? 4 : 0) - (b.endsHere ? 4 : 0);
+          const by = cy + DNUM_H_C + b.lane * BAND_H_C, bh = BAND_H_C - 8;
+          ctx.fillStyle = rot.bg; ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 9); ctx.fill();
+          if (b.startsHere) { ctx.fillStyle = rot.c; ctx.beginPath(); ctx.roundRect(bx, by, 6, bh, 3); ctx.fill(); }
+          let tx = bx + 10;
+          const dex = boss?.dex ? String(formDex(boss.ko, Number(boss.dex))) : "";
+          const im = dex ? imgs[dex] : null;
+          if (im) { const s = 34; ctx.drawImage(im, bx + 8, by + (bh - s) / 2, s, s); tx = bx + 8 + s + 6; }
+          ctx.textAlign = "left"; ctx.font = "800 24px system-ui, sans-serif"; ctx.fillStyle = rot.c;
+          const label = `${rot.icon} ${boss ? boss.name + (boss.shiny ? " ✨" : "") : b.e.title}`;
+          ctx.fillText(fit(label, bx + bw - tx - 8), tx, by + bh / 2 + 9);
+        });
+        cy += rh;
+      });
+
+      // 범례
+      const legends: [string, string][] = [["⭐", t.rotStar], ["🔷", t.rotMega], ["🌑", t.rotShadow], ["🎉", t.kindDay], ["⏰", t.kindHour]];
+      ctx.textAlign = "left"; ctx.font = "700 25px system-ui, sans-serif"; ctx.fillStyle = "#475569";
+      let lx = gx + 4; const ly = cy + 48;
+      legends.forEach(([ic, lb]) => { const seg = `${ic} ${lb}`; ctx.fillText(seg, lx, ly); lx += ctx.measureText(seg).width + 30; });
+
       // 워터마크/주소(로고 삽입)
-      const fy = gyTop + rowH * rows;
-      drawBrandFooter(ctx, logo, W, fy, footH, "#ea580c", t.imgFooter);
+      drawBrandFooter(ctx, logo, W, GRID_TOP + gridH + LEGEND_H, footH, "#ea580c", t.imgFooter);
 
       setCardImage(c.toDataURL("image/png"));
       setCardFile(null);
@@ -259,6 +290,12 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
         <span style={{ fontSize: "1.18rem", fontWeight: 900, color: "#0f172a", letterSpacing: "-0.3px" }}>{tpl(t.navMonth, { y: cur.y, m: cur.m, month: monthName(cur.m) })}</span>
         <button onClick={() => shift(1)} aria-label="next" style={{ border: `1px solid ${BORDER}`, background: CARD, borderRadius: "50%", width: 36, height: 36, cursor: "pointer", fontSize: "1.1rem", color: "#ea580c", fontWeight: 800, lineHeight: 1, boxShadow: "0 2px 6px -3px rgba(15,23,42,.15)" }}>›</button>
       </div>
+
+      {/* 달력 이미지 저장·공유 (홍보) — 달력 위 */}
+      <button onClick={buildImage} disabled={busy}
+        style={{ width: "100%", marginBottom: 12, padding: "11px", borderRadius: 10, border: "none", cursor: busy ? "default" : "pointer", fontWeight: 800, fontSize: "0.9rem", background: busy ? "#cbd5e1" : "linear-gradient(90deg,#ea580c,#db2777)", color: "#fff", boxShadow: busy ? "none" : "0 4px 12px -4px rgba(219,39,119,.5)" }}>
+        {busy ? t.building : tpl(t.saveBtn, { m: cur.m, month: monthName(cur.m) })}
+      </button>
 
       {/* 요일 헤더 */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 4, marginBottom: 4 }}>
@@ -482,12 +519,6 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
           </div>
         </div>
       )}
-
-      {/* 달력 이미지 저장·공유 (홍보) */}
-      <button onClick={buildImage} disabled={busy}
-        style={{ width: "100%", marginTop: 14, padding: "11px", borderRadius: 10, border: "none", cursor: busy ? "default" : "pointer", fontWeight: 800, fontSize: "0.9rem", background: busy ? "#cbd5e1" : "linear-gradient(90deg,#ea580c,#db2777)", color: "#fff" }}>
-        {busy ? t.building : tpl(t.saveBtn, { m: cur.m, month: monthName(cur.m) })}
-      </button>
 
       {/* 미리보기 모달 */}
       {cardImage && (
