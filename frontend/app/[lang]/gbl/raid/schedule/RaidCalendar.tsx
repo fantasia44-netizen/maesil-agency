@@ -193,7 +193,7 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
     raw.forEach((b, i) => { b.lane = i; });
     return raw;
   };
-  const DNUM_H = 20, BAND_H = 26;
+  const DNUM_H = 26, BAND_H = 26;
 
   const shift = (delta: number) => {
     const d = new Date(cur.y, cur.m - 1 + delta, 1);
@@ -299,9 +299,9 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
                         color: wdow === 0 ? "#f87171" : wdow === 6 ? "#93c5fd" : "#94a3b8" }}>{day}</span>
                     )}
                     {(hasDay || hasHour) && (
-                      <span style={{ position: "absolute", top: 3, right: 5, zIndex: 5, display: "flex", gap: 2, lineHeight: 1 }}>
-                        {hasDay && <span style={{ fontSize: "0.74rem" }}>🎉</span>}
-                        {hasHour && <span style={{ fontSize: "0.74rem" }}>⏰</span>}
+                      <span style={{ position: "absolute", top: 2, right: 3, zIndex: 7, display: "flex", gap: 3, lineHeight: 1 }}>
+                        {hasDay && <span style={{ fontSize: "1.05rem", background: "#fff", borderRadius: "50%", padding: "2px", boxShadow: "0 1px 4px rgba(124,58,237,.45)", border: "1px solid #e9d5ff" }}>🎉</span>}
+                        {hasHour && <span style={{ fontSize: "1.05rem", background: "#fff", borderRadius: "50%", padding: "2px", boxShadow: "0 1px 4px rgba(194,65,12,.45)", border: "1px solid #fed7aa" }}>⏰</span>}
                       </span>
                     )}
                   </div>
