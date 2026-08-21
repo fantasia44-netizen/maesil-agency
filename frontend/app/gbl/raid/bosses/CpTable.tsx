@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { saveDataUrl, shareDataUrl, loadSprites, loadImg, loadLogo, drawBrandFooter } from "../raidShareUtil";
+import { saveDataUrl, shareDataUrl, loadSprites, loadImg, loadLogo, drawBrandTop, drawBrandFooter } from "../raidShareUtil";
 import { shinySprite } from "../../sprite";
 import { track } from "../../../../lib/track";
 import ShareModal from "../../ShareModal";
@@ -41,6 +41,7 @@ export default function CpTable({ stats, hundoL20, hundoL25, name = "", accent =
     ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.roundRect(M, M, W - M * 2, H - M * 2, 28); ctx.fill();
     ctx.save(); ctx.beginPath(); ctx.roundRect(M, M, W - M * 2, 14, 28); ctx.clip();
     ctx.fillStyle = accent; ctx.fillRect(M, M, W - M * 2, 20); ctx.restore();
+    drawBrandTop(ctx, logo, W, accent, 74);  // 상단 우측 로고(다운로드본 상단 브랜딩)
     // 보스 스프라이트(+이로치 가능 시 이로치 스프라이트) + 이름
     const S = 104; let sx = 52; const spY = 46;
     if (sprite) { ctx.drawImage(sprite, sx, spY, S, S); sx += S + 4; }

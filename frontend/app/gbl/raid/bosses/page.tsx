@@ -23,6 +23,13 @@ function dexOf(image: string): string {
   return m ? String(Number(m[1])) : "";
 }
 
+// 이로치 데뷔 레이드 수동 보정 — 피드(ScrapedDuck canBeShiny) 반영이 늦은 신상 보스.
+// 이로치는 한 번 풀리면 계속 유지되므로 안전(피드가 true로 바뀌면 자동 중복 무해).
+const SHINY_DEBUT = new Set(["792"]); // 792=루나아라(이로치 데뷔 강조 레이드)
+function canBeShinyOf(b: Boss): boolean {
+  return !!b.canBeShiny || SHINY_DEBUT.has(dexOf(b.image));
+}
+
 const TYPE_COLOR: Record<string, string> = {
   normal: "#9fa19f", fire: "#e62829", water: "#2980ef", electric: "#d9a900", grass: "#3fa129",
   ice: "#37b6c9", fighting: "#ff8000", poison: "#9141cb", ground: "#915121", flying: "#6c93e0",
@@ -163,6 +170,20 @@ export default async function BossesPage() {
           날씨부스트 = 해당 날씨일 때 레벨25로 등장(더 높은 CP). 메가·원시 레이드는 <b style={{ color: "#64748b" }}>기본폼을 포획</b>합니다(표는 잡는 CP). ✨ = 샤이니 가능. 자동 업데이트.
         </p>
 
+        {shareItems.length > 0 && (
+          <ListShare
+            title="이달 레이드 보스 100% CP"
+            subtitle="잡을 때 이 CP면 100개체(15/15/15) · 날씨=부스트"
+            path="/gbl/raid/bosses"
+            accent="#ea580c"
+            buttonLabel="📸 이달 보스 CP표 이미지로 공유·저장"
+            filename="gbl-raid-bosses.png"
+            footerTag="포켓몬GO 레이드 보스 CP"
+            trackLabel="boss-list"
+            items={shareItems}
+          />
+        )}
+
         {visibleTiers.length === 0 ? (
           <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem 1rem" }}>{bosses.length === 0 ? "보스 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요." : "지금 열린 5성·메가 레이드가 없습니다."}</div>
         ) : (
@@ -180,6 +201,7 @@ export default async function BossesPage() {
                     const weak = weaknesses(types).slice(0, 4);
                     const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
                     const st = STATS[dexOf(b.image)];
+                    const shinyOk = canBeShinyOf(b);
                     // 계산 100%가 피드값과 일치할 때만 IV표 노출(지역폼 등 종족값 불일치 방지)
                     const cpOk = !!st && Math.abs(cpAt(st, [15, 15, 15], CPM_L20) - b.combatPower.normal.max) <= 2;
                     return (
@@ -188,15 +210,20 @@ export default async function BossesPage() {
                           {(() => {
                             const fdex = formDex(bossKo(b), dexOf(b.image));
                             const isShadow = /^Shadow /.test(b.name);
+                            const aura = isShadow ? { background: "radial-gradient(circle, #a855f7ee 0%, #7c3aed99 42%, transparent 72%)", borderRadius: "50%" } : {};
                             return (
-                              <div style={{ position: "relative", width: 46, height: 46, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
-                                ...(isShadow ? { background: "radial-gradient(circle, #a855f7ee 0%, #7c3aed99 42%, transparent 72%)", borderRadius: "50%" } : {}) }}>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={pokeSprite(fdex)} alt={bossKo(b)} width={46} height={46} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
-                                {b.canBeShiny && (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img src={shinySprite(fdex)} alt="색이 다른 개체(이로치) 가능" title="색이 다른 개체(이로치) 가능" width={20} height={20}
-                                    style={{ position: "absolute", right: -3, bottom: -3, imageRendering: "pixelated", background: "#fff", borderRadius: "50%", boxShadow: "0 0 0 1.5px #fbbf24", padding: 1 }} />
+                              // 이로치 가능하면 일반+이로치 스프라이트를 나란히 표시
+                              <div style={{ display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
+                                <div style={{ width: 46, height: 46, display: "flex", alignItems: "center", justifyContent: "center", ...aura }}>
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img src={pokeSprite(fdex)} alt={bossKo(b)} width={46} height={46} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                                </div>
+                                {shinyOk && (
+                                  <div style={{ position: "relative", width: 46, height: 46, display: "flex", alignItems: "center", justifyContent: "center", ...aura }} title="색이 다른 개체(이로치) 가능">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={shinySprite(fdex)} alt={`${bossKo(b)} 이로치`} width={46} height={46} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                                    <span style={{ position: "absolute", top: -3, right: -2, fontSize: "0.66rem" }}>✨</span>
+                                  </div>
                                 )}
                               </div>
                             );
@@ -204,7 +231,6 @@ export default async function BossesPage() {
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                               <span style={{ fontSize: "0.98rem", fontWeight: 800, color: "#0f172a" }}>{bossKo(b)}</span>
-                              {b.canBeShiny && <span style={{ fontSize: "0.8rem" }} title="색이 다른 개체 가능">✨</span>}
                               <span style={{ display: "flex", gap: 3 }}>
                                 {types.map((t) => (
                                   <span key={t} style={{ fontSize: "0.6rem", fontWeight: 700, color: "#fff", background: TYPE_COLOR[t] || "#94a3b8", padding: "1px 6px", borderRadius: 6 }}>{TYPE_KO[t] || t}</span>
@@ -220,7 +246,7 @@ export default async function BossesPage() {
                           </div>
                         </div>
                         {cpOk && st && (
-                          <CpTable stats={st} hundoL20={cpAt(st, [15, 15, 15], CPM_L20)} hundoL25={cpAt(st, [15, 15, 15], CPM_L25)} name={bossKo(b)} accent={c1} dex={String(formDex(bossKo(b), dexOf(b.image)))} shiny={b.canBeShiny} />
+                          <CpTable stats={st} hundoL20={cpAt(st, [15, 15, 15], CPM_L20)} hundoL25={cpAt(st, [15, 15, 15], CPM_L25)} name={bossKo(b)} accent={c1} dex={String(formDex(bossKo(b), dexOf(b.image)))} shiny={shinyOk} />
                         )}
                         {weak.length > 0 && (
                           <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", marginTop: 8, paddingTop: 8, borderTop: `1px dashed ${BORDER}` }}>
@@ -243,20 +269,6 @@ export default async function BossesPage() {
               </div>
             );
           })
-        )}
-
-        {shareItems.length > 0 && (
-          <ListShare
-            title="이달 레이드 보스 100% CP"
-            subtitle="잡을 때 이 CP면 100개체(15/15/15) · 날씨=부스트"
-            path="/gbl/raid/bosses"
-            accent="#ea580c"
-            buttonLabel="📸 보스 CP표 이미지 저장·공유"
-            filename="gbl-raid-bosses.png"
-            footerTag="포켓몬GO 레이드 보스 CP"
-            trackLabel="boss-list"
-            items={shareItems}
-          />
         )}
 
         <div style={{ marginTop: 24, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>

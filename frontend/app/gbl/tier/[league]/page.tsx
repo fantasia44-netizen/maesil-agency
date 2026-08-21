@@ -157,6 +157,25 @@ export default async function TierPage({ params }: { params: { league: string } 
           <Link href={`/gbl/meta/${params.league}`} style={{ color: "#3b5bdb", fontWeight: 600 }}>실측 메타 자세히 →</Link>
         </p>
 
+        {list.length > 0 && (
+          <ListShare
+            title={`${lg.ko} 티어 TOP`}
+            subtitle="이론 티어 + 한국 유저 실측 픽률"
+            path={`/gbl/tier/${params.league}`}
+            accent="#7c3aed"
+            buttonLabel="📸 이 티어표 이미지로 공유·저장"
+            filename={`gbl-${params.league}-tier.png`}
+            footerTag="포켓몬GO 배틀리그 티어표"
+            trackLabel="pvp-tier"
+            items={list.slice(0, 12).map((d) => ({
+              dex: (MON[d.id]?.sprite?.match(/(\d+)\.png/)?.[1]) || String(d.dex || MON[d.id]?.dex || ""),
+              name: d.ko || ((MON[d.id]?.shadow ? "그림자 " : "") + nameOf(d.id)),
+              main: String(d.score),
+              sub: pick[d.id] != null ? `실측 ${pick[d.id]}%` : `${d.tier}티어`,
+            }))}
+          />
+        )}
+
         {list.length === 0 ? (
           <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem 1rem" }}>데이터 준비 중입니다.</div>
         ) : (
@@ -204,24 +223,6 @@ export default async function TierPage({ params }: { params: { league: string } 
           ))
         )}
 
-        {list.length > 0 && (
-          <ListShare
-            title={`${lg.ko} 티어 TOP`}
-            subtitle="이론 티어 + 한국 유저 실측 픽률"
-            path={`/gbl/tier/${params.league}`}
-            accent="#7c3aed"
-            buttonLabel="📸 티어표 이미지 저장·공유"
-            filename={`gbl-${params.league}-tier.png`}
-            footerTag="포켓몬GO 배틀리그 티어표"
-            trackLabel="pvp-tier"
-            items={list.slice(0, 12).map((d) => ({
-              dex: (MON[d.id]?.sprite?.match(/(\d+)\.png/)?.[1]) || String(d.dex || MON[d.id]?.dex || ""),
-              name: d.ko || ((MON[d.id]?.shadow ? "그림자 " : "") + nameOf(d.id)),
-              main: String(d.score),
-              sub: pick[d.id] != null ? `실측 ${pick[d.id]}%` : `${d.tier}티어`,
-            }))}
-          />
-        )}
 
         <AdSlot />
 

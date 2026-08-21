@@ -131,6 +131,26 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
           ※ 수치·순위는 공개 게임데이터 기반 자체 계산으로, 계산 방식(대상 보스·레벨·회피 등)에 따라 포켓배틀러 등 다른 사이트와 다를 수 있으며 오차가 있을 수 있습니다. 참고용으로 봐주세요.
         </p>
 
+        {rows.length > 0 && (
+          <ListShare
+            title={`${ko}타입 레이드 딜러 TOP`}
+            subtitle="종합점수(딜+총딜) 순위 · 메가·섀도우 포함"
+            path={`/gbl/raid/${type}`}
+            accent={c}
+            buttonLabel="📸 이 티어표 이미지로 공유·저장"
+            filename={`gbl-raid-${type}.png`}
+            footerTag="포켓몬GO 레이드 딜러 티어"
+            trackLabel="raid-dealer"
+            items={rows.slice(0, 12).map((r) => ({
+              dex: String(formDex(r.name, r.dex)),
+              name: r.name,
+              main: r.er.toFixed(1),
+              sub: `딜 ${r.dps.toFixed(1)}`,
+              note: r.legacy ? "*" : undefined,
+            }))}
+          />
+        )}
+
         {rows.length === 0 ? (
           <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem 1rem" }}>데이터 준비 중입니다.</div>
         ) : (
@@ -179,26 +199,6 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
               );
             })}
           </div>
-        )}
-
-        {rows.length > 0 && (
-          <ListShare
-            title={`${ko}타입 레이드 딜러 TOP`}
-            subtitle="종합점수(딜+총딜) 순위 · 메가·섀도우 포함"
-            path={`/gbl/raid/${type}`}
-            accent={c}
-            buttonLabel="📸 티어표 이미지 저장·공유"
-            filename={`gbl-raid-${type}.png`}
-            footerTag="포켓몬GO 레이드 딜러 티어"
-            trackLabel="raid-dealer"
-            items={rows.slice(0, 12).map((r) => ({
-              dex: String(formDex(r.name, r.dex)),
-              name: r.name,
-              main: r.er.toFixed(1),
-              sub: `딜 ${r.dps.toFixed(1)}`,
-              note: r.legacy ? "*" : undefined,
-            }))}
-          />
         )}
 
         <AdSlot />

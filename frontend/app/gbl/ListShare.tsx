@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { loadSprites, loadLogo, drawBrandFooter, saveDataUrl, shareDataUrl } from "./raid/raidShareUtil";
+import { loadSprites, loadLogo, drawBrandTop, drawBrandFooter, saveDataUrl, shareDataUrl } from "./raid/raidShareUtil";
 import { track } from "../../lib/track";
 import ShareModal from "./ShareModal";
 
@@ -32,6 +32,7 @@ export default function ListShare({
       ctx.save(); ctx.beginPath(); ctx.roundRect(M, M, W - M * 2, 14, 28); ctx.clip();
       ctx.fillStyle = accent; ctx.fillRect(M, M, W - M * 2, 20); ctx.restore();
       // 헤더
+      drawBrandTop(ctx, logo, W, accent, 66);  // 상단 우측 로고(다운로드본 상단 브랜딩)
       ctx.textAlign = "left"; ctx.fillStyle = "#0f172a"; ctx.font = "900 60px system-ui, sans-serif";
       ctx.fillText(title, 52, 108);
       if (subtitle) { ctx.fillStyle = "#64748b"; ctx.font = "600 32px system-ui, sans-serif"; ctx.fillText(subtitle, 54, 158); }

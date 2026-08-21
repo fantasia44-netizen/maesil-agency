@@ -19,6 +19,25 @@ export async function loadLogo(): Promise<HTMLImageElement | null> {
   return _logoCache;
 }
 
+// 공유 이미지 상단 우측 브랜드 마크(로고+GBL Note) — 다운로드본에도 상단 브랜딩 유지.
+// cy=세로 중심(기본 72), rx=우측 기준선(기본 W-52).
+export function drawBrandTop(
+  ctx: CanvasRenderingContext2D, logo: HTMLImageElement | null,
+  W: number, accent: string, cy = 72, rx = 0,
+) {
+  const right = rx || W - 52;
+  const s = 40;
+  ctx.save();
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "right";
+  ctx.fillStyle = accent; ctx.font = "800 30px system-ui, sans-serif";
+  ctx.fillText("GBL Note", right, cy);
+  const tw = ctx.measureText("GBL Note").width;
+  if (logo) ctx.drawImage(logo, right - tw - s - 8, cy - s / 2, s, s);
+  ctx.textBaseline = "alphabetic";
+  ctx.restore();
+}
+
 // 공유 이미지 하단 브랜드 푸터 — 로고+GBL Note(좌) / 태그라인+gblnote.com(우).
 // fyTop=푸터 영역 시작 y, footH=푸터 높이.
 export function drawBrandFooter(
