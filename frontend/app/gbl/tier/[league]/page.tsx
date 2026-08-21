@@ -212,6 +212,8 @@ export default async function TierPage({ params }: { params: { league: string } 
             accent="#7c3aed"
             buttonLabel="📸 티어표 이미지 저장·공유"
             filename={`gbl-${params.league}-tier.png`}
+            footerTag="포켓몬GO 배틀리그 티어표"
+            trackLabel="pvp-tier"
             items={list.slice(0, 12).map((d) => ({
               dex: (MON[d.id]?.sprite?.match(/(\d+)\.png/)?.[1]) || String(d.dex || MON[d.id]?.dex || ""),
               name: d.ko || ((MON[d.id]?.shadow ? "그림자 " : "") + nameOf(d.id)),

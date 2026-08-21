@@ -550,7 +550,7 @@ def gbl_google(body: GblGoogleRequest) -> dict:
         pass
     user["session_id"] = rotate_session(user["id"])  # 단일 세션
     return {
-        "ok": True, "token": create_token(user), "email": user["email"],
+        "ok": True, "token": create_token(user), "id": user["id"], "email": user["email"],
         "role": user["role"], "display_name": user.get("display_name"),
     }
 
@@ -638,7 +638,7 @@ def gbl_kakao(body: GblKakaoRequest) -> dict:
     except Exception:
         pass
     user["session_id"] = rotate_session(user["id"])  # 단일 세션
-    return {"ok": True, "token": create_token(user), "email": user["email"],
+    return {"ok": True, "token": create_token(user), "id": user["id"], "email": user["email"],
             "role": user["role"], "display_name": user.get("display_name")}
 
 

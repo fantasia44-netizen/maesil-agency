@@ -189,6 +189,8 @@ export default function RaidTypePage({ params }: { params: { type: string } }) {
             accent={c}
             buttonLabel="📸 티어표 이미지 저장·공유"
             filename={`gbl-raid-${type}.png`}
+            footerTag="포켓몬GO 레이드 딜러 티어"
+            trackLabel="raid-dealer"
             items={rows.slice(0, 12).map((r) => ({
               dex: String(formDex(r.name, r.dex)),
               name: r.name,

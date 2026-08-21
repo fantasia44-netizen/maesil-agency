@@ -220,7 +220,7 @@ export default async function BossesPage() {
                           </div>
                         </div>
                         {cpOk && st && (
-                          <CpTable stats={st} hundoL20={cpAt(st, [15, 15, 15], CPM_L20)} hundoL25={cpAt(st, [15, 15, 15], CPM_L25)} name={bossKo(b)} accent={c1} />
+                          <CpTable stats={st} hundoL20={cpAt(st, [15, 15, 15], CPM_L20)} hundoL25={cpAt(st, [15, 15, 15], CPM_L25)} name={bossKo(b)} accent={c1} dex={String(formDex(bossKo(b), dexOf(b.image)))} shiny={b.canBeShiny} />
                         )}
                         {weak.length > 0 && (
                           <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", marginTop: 8, paddingTop: 8, borderTop: `1px dashed ${BORDER}` }}>
@@ -253,6 +253,8 @@ export default async function BossesPage() {
             accent="#ea580c"
             buttonLabel="📸 보스 CP표 이미지 저장·공유"
             filename="gbl-raid-bosses.png"
+            footerTag="포켓몬GO 레이드 보스 CP"
+            trackLabel="boss-list"
             items={shareItems}
           />
         )}

@@ -6,6 +6,8 @@ import { apiFetch, logout, getUser, updateNickname } from "../../../lib/api";
 import DATA from "../gbl_data.json";
 import AdSlot from "../AdSlot";
 import CoupangAd from "../CoupangAd";
+import ShareModal from "../ShareModal";
+import { track } from "../../../lib/track";
 import { currentFormats, FORMAT_BY_KEY, filterPool, todayISO, type Format } from "../formats";
 
 // ── 데이터셋 타입 ──────────────────────────────────────────────────────
@@ -618,6 +620,7 @@ export default function GblPage() {
   // 카드 저장(다운로드)
   const saveCard = () => {
     if (!cardImage) return;
+    track("download", "/gbl/app", "stats-card");
     const a = document.createElement("a");
     a.href = cardImage; a.download = "gbl-record.png"; a.click();
     flash("💾 저장됨");
@@ -625,6 +628,7 @@ export default function GblPage() {
   // 카드 공유(모바일 네이티브 공유창: 카톡·메일·SNS / 미지원 시 저장 안내)
   const shareCard = async () => {
     if (!cardImage) return;
+    track("share", "/gbl/app", "stats-card");
     const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
     // 미리 만들어 둔 파일 사용(없으면 즉석 생성) — iOS는 async 지연 시 공유창이 막히므로 파일이 준비된 경우 곧바로 호출
     let file = cardFile;
@@ -707,18 +711,11 @@ export default function GblPage() {
 
       {/* 전적 카드 미리보기 모달 */}
       {cardImage && (
-        <div onClick={() => setCardImage(null)}
-          style={{ position: "fixed", inset: 0, zIndex: 10000, background: "rgba(0,0,0,.72)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "1.2rem", gap: 14 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={cardImage} alt="전적 카드" onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: "min(90vw, 440px)", width: "100%", borderRadius: 14, boxShadow: "0 12px 40px rgba(0,0,0,.5)" }} />
-          <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", gap: 8 }}>
-            <button onClick={shareCard} style={{ padding: "11px 22px", borderRadius: 10, border: "none", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem" }}>📤 공유</button>
-            <button onClick={saveCard} style={{ padding: "11px 22px", borderRadius: 10, border: "1px solid rgba(255,255,255,.3)", background: "rgba(255,255,255,.12)", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem" }}>💾 저장</button>
-            <button onClick={() => setCardImage(null)} style={{ padding: "11px 16px", borderRadius: 10, border: "none", background: "rgba(255,255,255,.12)", color: "#cbd5e1", cursor: "pointer", fontSize: "0.9rem" }}>닫기</button>
-          </div>
-          <div style={{ fontSize: "0.72rem", color: "#cbd5e1" }}>이미지를 길게 눌러 저장하거나 캡처해도 됩니다</div>
-        </div>
+        <ShareModal img={cardImage} onClose={() => setCardImage(null)}>
+          <button onClick={shareCard} style={{ padding: "11px 22px", borderRadius: 10, border: "none", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem" }}>📤 공유</button>
+          <button onClick={saveCard} style={{ padding: "11px 22px", borderRadius: 10, border: "none", background: "#334155", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem" }}>💾 저장</button>
+          <button onClick={() => setCardImage(null)} style={{ padding: "11px 16px", borderRadius: 10, border: "1px solid #e3e8f2", background: "#f1f5f9", color: "#64748b", cursor: "pointer", fontSize: "0.9rem" }}>닫기</button>
+        </ShareModal>
       )}
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>

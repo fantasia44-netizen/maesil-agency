@@ -10,7 +10,8 @@ function tok(key: string, store: Storage): string {
   } catch { return "anon"; }
 }
 
-export function track(event: "pageview" | "share" | "download", path?: string) {
+// label: share/download 카드 유형(예: "cp-table", "raid-dealer", "calendar", "stats-card") — 바이럴 주도 콘텐츠 측정용
+export function track(event: "pageview" | "share" | "download", path?: string, label?: string) {
   if (typeof window === "undefined") return;
   if (getUser()?.role === "super_admin") return; // 관리자(오너) 본인 방문은 통계 제외
   let ref = "";
@@ -23,6 +24,7 @@ export function track(event: "pageview" | "share" | "download", path?: string) {
     session: tok("gbls", sessionStorage),
     path: (path || location.pathname).slice(0, 200),
     ref,
+    label: label ? label.slice(0, 60) : undefined,
   });
   try {
     const url = `${BASE}/api/gbl/track`;

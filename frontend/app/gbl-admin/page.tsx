@@ -19,11 +19,12 @@ const fmtDwell = (s: number) => { const t = Math.round(s || 0); return t >= 60 ?
 
 type Traffic = {
   days: number;
-  daily: { day: string; pageviews: number; uniques: number; sessions: number }[];
-  summary: { pageviews: number; uniques: number; sessions: number; avg_dwell: number; bounce_rate: number; shares: number; downloads: number };
+  daily: { day: string; pageviews: number; uniques: number; new_visitors: number; sessions: number }[];
+  summary: { pageviews: number; uniques: number; new_visitors: number; sessions: number; avg_dwell: number; bounce_rate: number; shares: number; downloads: number };
   active: { active_30m: number; pv_30m: number };
   paths: { path: string; views: number }[];
   refs: { ref: string; views: number }[];
+  shares?: { label: string; shares: number; downloads: number; total: number }[];
 };
 
 type DbStatus = { hub_configured: boolean; maesil_total: number | null; maesil_hub: number | null };
@@ -162,7 +163,8 @@ export default function GblAdmin() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(104px,1fr))", gap: 8, marginBottom: 12 }}>
             {[
               { l: "페이지뷰", v: traffic.summary?.pageviews ?? 0, c: "#3b5bdb" },
-              { l: "순방문자", v: traffic.summary?.uniques ?? 0, c: "#0f172a" },
+              { l: "전체방문자", v: traffic.summary?.uniques ?? 0, c: "#0f172a" },
+              { l: "신규방문자", v: traffic.summary?.new_visitors ?? 0, c: "#16a34a" },
               { l: "세션", v: traffic.summary?.sessions ?? 0, c: "#7c3aed" },
               { l: "평균 체류", v: fmtDwell(traffic.summary?.avg_dwell ?? 0), c: "#059669" },
               { l: "이탈률", v: `${Math.round((traffic.summary?.bounce_rate ?? 0) * 100)}%`, c: "#c2410c" },
@@ -175,21 +177,53 @@ export default function GblAdmin() {
               </div>
             ))}
           </div>
-          {traffic.daily.length > 0 && (
-            <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem", marginBottom: 12 }}>
-              <div style={{ fontSize: "0.76rem", color: "#64748b", marginBottom: 8 }}>일별 페이지뷰</div>
-              <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 100 }}>
-                {(() => { const mx = Math.max(...traffic.daily.map((d) => d.pageviews), 1); return traffic.daily.map((d) => (
-                  <div key={d.day} title={`${d.day} · PV ${d.pageviews} · 순 ${d.uniques} · 세션 ${d.sessions}`} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%" }}>
-                    <div style={{ width: "72%", minWidth: 3, margin: "0 auto", height: `${Math.round(d.pageviews / mx * 100)}%`, background: "linear-gradient(180deg,#3b5bdb,#7c3aed)", borderRadius: "3px 3px 0 0" }} />
-                  </div>
-                )); })()}
-              </div>
+          {traffic.daily.length > 0 && (() => {
+            const mxPv = Math.max(...traffic.daily.map((d) => d.pageviews), 1);
+            const mxU = Math.max(...traffic.daily.map((d) => d.uniques), 1);
+            const axis = (
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.62rem", color: "#94a3b8", marginTop: 4 }}>
-                <span>{traffic.daily[0]?.day.slice(5)}</span><span>{traffic.daily[traffic.daily.length - 1]?.day.slice(5)}</span>
+                <span>{traffic.daily[0]?.day.slice(5)}</span><span>{traffic.daily[traffic.daily.length - 1]?.day.slice(5)} (KST)</span>
               </div>
-            </div>
-          )}
+            );
+            return (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 10, marginBottom: 12 }}>
+                {/* 일별 페이지뷰 */}
+                <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem" }}>
+                  <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>📈 일별 페이지뷰 (PV)</div>
+                  <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 90 }}>
+                    {traffic.daily.map((d) => (
+                      <div key={d.day} title={`${d.day} · PV ${d.pageviews}`} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%" }}>
+                        <div style={{ width: "72%", minWidth: 3, margin: "0 auto", height: `${Math.round(d.pageviews / mxPv * 100)}%`, background: "linear-gradient(180deg,#3b5bdb,#7c3aed)", borderRadius: "3px 3px 0 0" }} />
+                      </div>
+                    ))}
+                  </div>
+                  {axis}
+                </div>
+                {/* 일별 방문자 (신규/재방문) */}
+                <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a" }}>👥 일별 방문자</span>
+                    <span style={{ fontSize: "0.64rem", color: "#16a34a" }}>● 신규</span>
+                    <span style={{ fontSize: "0.64rem", color: "#94a3b8" }}>● 재방문</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 90 }}>
+                    {traffic.daily.map((d) => {
+                      const ret = Math.max(0, d.uniques - d.new_visitors);
+                      return (
+                        <div key={d.day} title={`${d.day} · 방문자 ${d.uniques} (신규 ${d.new_visitors} · 재방문 ${ret})`} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%" }}>
+                          <div style={{ width: "72%", minWidth: 3, margin: "0 auto", height: `${Math.round(d.uniques / mxU * 100)}%`, display: "flex", flexDirection: "column", borderRadius: "3px 3px 0 0", overflow: "hidden" }}>
+                            <div style={{ flex: ret, background: "#cbd5e1" }} />
+                            <div style={{ flex: d.new_visitors, background: "#16a34a" }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {axis}
+                </div>
+              </div>
+            );
+          })()}
           {traffic.daily.length > 0 && (
             <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem", marginBottom: 12, overflowX: "auto" }}>
               <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>
@@ -240,6 +274,37 @@ export default function GblAdmin() {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* 카드 유형별 공유·다운로드 — 어떤 콘텐츠가 바이럴을 주도하는지 */}
+          <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem", marginTop: 10 }}>
+            <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>
+              📤 카드 유형별 공유·다운로드 ({traffic.days}일) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 바이럴 주도 콘텐츠</span>
+            </div>
+            {!traffic.shares || traffic.shares.length === 0 ? (
+              <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>아직 데이터 없음 (SQL 068 재실행 필요)</div>
+            ) : (() => {
+              const LABEL_KO: Record<string, string> = {
+                "cp-table": "개체값 CP표", "boss-list": "레이드 보스 목록", "raid-dealer": "레이드 딜러 TOP",
+                "pvp-tier": "배틀리그 티어표", "raid-calendar": "레이드 달력", "stats-card": "내 전적 카드", "list": "목록", "(기타)": "(기타)",
+              };
+              const mx = Math.max(...traffic.shares.map((s) => s.total), 1);
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {traffic.shares.map((s, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.76rem" }}>
+                      <span style={{ minWidth: 108, color: "#334155", fontWeight: 600 }}>{LABEL_KO[s.label] || s.label}</span>
+                      <div style={{ flex: 1, height: 16, background: "#f1f5f9", borderRadius: 5, overflow: "hidden", display: "flex" }}>
+                        <div style={{ width: `${(s.total / mx) * 100}%`, background: "linear-gradient(90deg,#0891b2,#db2777)", height: "100%" }} />
+                      </div>
+                      <span style={{ minWidth: 92, textAlign: "right", color: "#64748b" }}>
+                        <b style={{ color: "#db2777" }}>📤{s.shares}</b> · <b style={{ color: "#0891b2" }}>💾{s.downloads}</b>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}

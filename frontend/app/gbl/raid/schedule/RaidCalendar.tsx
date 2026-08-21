@@ -3,6 +3,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { track } from "../../../../lib/track";
 import { monSprite, formDex } from "../../sprite";
+import { loadLogo, drawBrandFooter } from "../raidShareUtil";
+import ShareModal from "../../ShareModal";
 
 export type CalBoss = { ko: string; dex: string; image: string; shiny: boolean };
 export type RotVariant = "star" | "shadow" | "mega";
@@ -74,15 +76,17 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
         info.push({ d, dexMain: mdex, mega: rots.some((e) => e.variant === "mega"), shadow: rots.some((e) => e.variant === "shadow"), rd: evs.some((e) => e.kind === "day"), rh: evs.some((e) => e.kind === "hour") });
       }
       const imgs: Record<string, HTMLImageElement> = {};
+      const logoP = loadLogo();
       await Promise.all([...dexSet].map((dex) => new Promise<void>((res) => {
         const im = new Image(); im.crossOrigin = "anonymous";
         im.onload = () => { imgs[dex] = im; res(); }; im.onerror = () => res();
         im.src = `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png`;
       })));
+      const logo = await logoP;
 
-      const W = 1080, gx = 40, gw = W - 80, cw = gw / 7, gyTop = 210, rowH = 176;
+      const W = 1080, gx = 40, gw = W - 80, cw = gw / 7, gyTop = 210, rowH = 176, footH = 150;
       const rows = Math.ceil((startPad + daysN) / 7);
-      const H = gyTop + rowH * rows + 150;
+      const H = gyTop + rowH * rows + footH;
       const c = document.createElement("canvas"); c.width = W; c.height = H;
       const ctx = c.getContext("2d"); if (!ctx) { setBusy(false); return; }
       ctx.fillStyle = "#fbf7f3"; ctx.fillRect(0, 0, W, H);
@@ -109,12 +113,9 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
         let ind = ""; if (it.mega) ind += "🔷"; if (it.shadow) ind += "🌑"; if (it.rd) ind += "🎉"; if (it.rh) ind += "⏰";
         if (ind) { ctx.textAlign = "center"; ctx.font = "26px system-ui, sans-serif"; ctx.fillStyle = "#334155"; ctx.fillText(ind, cx + cw / 2, cy + rowH - 16); }
       }
-      // 워터마크/주소
+      // 워터마크/주소(로고 삽입)
       const fy = gyTop + rowH * rows;
-      ctx.textAlign = "center"; ctx.fillStyle = "#ea580c"; ctx.font = "900 58px system-ui, sans-serif";
-      ctx.fillText("gblnote.com", W / 2, fy + 86);
-      ctx.fillStyle = "#94a3b8"; ctx.font = "500 28px system-ui, sans-serif";
-      ctx.fillText("포켓몬GO 레이드 일정 · GBL Note", W / 2, fy + 128);
+      drawBrandFooter(ctx, logo, W, fy, footH, "#ea580c", "포켓몬GO 레이드 일정");
 
       setCardImage(c.toDataURL("image/png"));
       setCardFile(null);
@@ -122,9 +123,9 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
     } finally { setBusy(false); }
   };
 
-  const saveCard = () => { if (!cardImage) return; track("download", "/gbl/raid/schedule"); const a = document.createElement("a"); a.href = cardImage; a.download = `gbl-raid-${cur.m}월.png`; a.click(); };
+  const saveCard = () => { if (!cardImage) return; track("download", "/gbl/raid/schedule", "raid-calendar"); const a = document.createElement("a"); a.href = cardImage; a.download = `gbl-raid-${cur.m}월.png`; a.click(); };
   const shareCard = async () => {
-    track("share", "/gbl/raid/schedule");
+    track("share", "/gbl/raid/schedule", "raid-calendar");
     if (!cardImage) return;
     const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
     try {
@@ -297,18 +298,11 @@ export default function RaidCalendar({ events, today }: { events: CalEvent[]; to
 
       {/* 미리보기 모달 */}
       {cardImage && (
-        <div onClick={() => setCardImage(null)}
-          style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,.72)", zIndex: 10000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 16, gap: 12 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={cardImage} alt="레이드 달력" onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: "100%", maxHeight: "72vh", borderRadius: 12, boxShadow: "0 10px 40px rgba(0,0,0,.4)" }} />
-          <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", gap: 10 }}>
-            <button onClick={shareCard} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: "linear-gradient(90deg,#ea580c,#db2777)", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>📤 공유</button>
-            <button onClick={saveCard} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: "#334155", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>💾 저장</button>
-            <button onClick={() => setCardImage(null)} style={{ padding: "11px 16px", borderRadius: 10, border: "none", background: "rgba(255,255,255,.15)", color: "#e2e8f0", cursor: "pointer", fontSize: "0.9rem" }}>닫기</button>
-          </div>
-          <div style={{ fontSize: "0.74rem", color: "#cbd5e1" }}>이미지를 길게 눌러 저장하거나 캡처해도 됩니다</div>
-        </div>
+        <ShareModal img={cardImage} onClose={() => setCardImage(null)}>
+          <button onClick={shareCard} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: "linear-gradient(90deg,#ea580c,#db2777)", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>📤 공유</button>
+          <button onClick={saveCard} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: "#334155", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>💾 저장</button>
+          <button onClick={() => setCardImage(null)} style={{ padding: "11px 16px", borderRadius: 10, border: "1px solid #e3e8f2", background: "#f1f5f9", color: "#64748b", cursor: "pointer", fontSize: "0.9rem" }}>닫기</button>
+        </ShareModal>
       )}
     </div>
   );

@@ -102,6 +102,7 @@ export default function GblLanding() {
           <span style={{ fontSize: "0.74rem", color: "#94a3b8" }}>회원 잡담방 · 운영자 문의</span>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 10, marginBottom: 24 }}>
+          <HubCard h={{ ic: "🏆", t: "자랑 갤러리", d: "100% 개체·레전드 포획·전적 카드 자랑하기", href: "/gbl/gallery", c: "#db2777", tag: "NEW" }} />
           <HubCard h={{ ic: "💬", t: "게시판", d: "잡담방 · 운영자에게 문의 (회원 전용)", href: "/gbl/board", c: "#0891b2" }} />
         </div>
 
@@ -136,6 +137,7 @@ export default function GblLanding() {
           <Link href="/gbl/raid" style={{ color: "#64748b" }}>레이드 딜러</Link> ·{" "}
           <Link href="/gbl/raid/schedule" style={{ color: "#64748b" }}>레이드 일정</Link> ·{" "}
           <Link href="/gbl/schedule" style={{ color: "#64748b" }}>시즌 일정</Link> ·{" "}
+          <Link href="/gbl/gallery" style={{ color: "#64748b" }}>자랑 갤러리</Link> ·{" "}
           <Link href="/gbl/board" style={{ color: "#64748b" }}>게시판</Link> ·{" "}
           <Link href="/gbl/contact" style={{ color: "#64748b" }}>문의</Link> ·{" "}
           <Link href="/gbl/guide" style={{ color: "#64748b" }}>가이드</Link> ·{" "}

@@ -7,7 +7,10 @@ gbl.py — 포켓몬 GO GBL 상대 대전 기록 (개인 도구, 유저 스코�
 """
 from __future__ import annotations
 
+import base64
 import logging
+import re
+import uuid
 from collections import Counter
 from datetime import datetime, timezone, timedelta
 
@@ -178,11 +181,24 @@ def delete_rating(rating_id: str, user: UserContext = Depends(get_current_user))
 
 
 # ── 공개 실측 메타 (로그인 불필요, 익명 집계) ──────────────────────────
+# 메타 집계 인메모리 캐시(워커별). 랜딩 티저가 매 방문마다 호출 → 트래픽 급증 시
+# 동일 쿼리(대부분 master/30d)를 반복 집계·대량 SELECT하지 않도록 짧게 캐시.
+# 익명 집계라 90초 지연 무방. 트래픽 200+ 몰려도 워커당 분당 1회만 실제 집계.
+import time as _time
+_META_TTL = 90  # 초
+_meta_cache: dict[str, tuple[float, dict]] = {}
+
+
 @router.get("/meta")
 def public_meta(league: str = "master", days: int = 30,
                 start: str | None = None, end: str | None = None) -> dict:
     """전체 유저가 만난 상대 덱/포켓몬 집계. 개인 식별정보 없음(익명).
     start/end(ISO) 주면 그 구간(시즌·커스텀), 없으면 days(최근 N일, 0=전체)."""
+    ckey = f"{league}|{days}|{start or ''}|{end or ''}"
+    now = _time.time()
+    hit = _meta_cache.get(ckey)
+    if hit and now - hit[0] < _META_TTL:
+        return hit[1]
     db = _db()
     try:
         q = db.table("gbl_matches").select("team_json, result, played_at").eq("league", league)
@@ -218,8 +234,12 @@ def public_meta(league: str = "master", days: int = 30,
     top_decks = [{"deck": k.split("|"), "count": c,
                   "wins": deck_wl.get(k, [0, 0])[0], "losses": deck_wl.get(k, [0, 0])[1]}
                  for k, c in deck_count.most_common(200)]
-    return {"league": league, "days": days, "total": total, "wins": wins, "losses": losses,
-            "top_mons": top_mons, "top_decks": top_decks}
+    result = {"league": league, "days": days, "total": total, "wins": wins, "losses": losses,
+              "top_mons": top_mons, "top_decks": top_decks}
+    if len(_meta_cache) > 64:  # 폭주 방지(구간 조합 다양) — 통째로 비우고 재적재
+        _meta_cache.clear()
+    _meta_cache[ckey] = (now, result)
+    return result
 
 
 # ── 관리자(super_admin) 전용 — GBL 서비스 현황 ──────────────────────────
@@ -270,6 +290,7 @@ class TrackIn(BaseModel):
     path: str | None = None
     ref: str | None = None
     event: str | None = None  # pageview(기본) | share | download
+    label: str | None = None  # share/download 카드 유형(cp-table, raid-dealer, calendar, stats-card 등)
 
 
 @router.post("/track", status_code=204)
@@ -288,6 +309,7 @@ def track(body: TrackIn, request: Request):
             "session": (body.session or "")[:40] or None,
             "path": (body.path or "")[:200] or None,
             "ref": (body.ref or "")[:200] or None,
+            "label": (body.label or "")[:60] or None,
         }).execute()
     except Exception as e:  # 통계 실패가 페이지를 막지 않도록
         logger.warning("gbl track 실패: %s", e)
@@ -308,6 +330,11 @@ def admin_traffic(days: int = 30, admin: UserContext = Depends(require_admin)) -
     except Exception as e:
         logger.error("gbl traffic 실패: %s", e)
         raise HTTPException(500, "트래픽 조회 실패 (SQL 068 실행 여부 확인)")
+    try:
+        shares = db.rpc("gbl_traffic_shares", {"days": days, "lim": 20}).execute().data or []
+    except Exception as e:
+        logger.warning("gbl traffic shares 실패(068 재실행 필요): %s", e)
+        shares = []
     return {
         "days": days,
         "daily": daily,
@@ -315,7 +342,106 @@ def admin_traffic(days: int = 30, admin: UserContext = Depends(require_admin)) -
         "active": (active[0] if active else {}),
         "paths": paths,
         "refs": refs,
+        "shares": shares,
     }
+
+
+# ── 자랑 갤러리 게시판 ────────────────────────────────────────────
+_GALLERY_BUCKET = "gbl-gallery"
+_bucket_ready = False
+
+
+def _ensure_bucket():
+    global _bucket_ready
+    if _bucket_ready:
+        return
+    from app.db.maesil_total_client import get_maesil_hub_client
+    try:
+        get_maesil_hub_client().storage.create_bucket(_GALLERY_BUCKET, options={"public": "true"})
+    except Exception:
+        pass  # 이미 존재
+    _bucket_ready = True
+
+
+class GalleryIn(BaseModel):
+    image: str            # data:image/png;base64,....
+    caption: str | None = None
+
+
+def _gallery_url(path: str) -> str:
+    from app.db.maesil_total_client import hub_storage_base
+    return f"{hub_storage_base()}/{_GALLERY_BUCKET}/{path}"
+
+
+@router.post("/gallery")
+def create_gallery(body: GalleryIn, user: UserContext = Depends(get_current_user)) -> dict:
+    """자랑 이미지 업로드(로그인 필요). 스토리지 저장 후 게시글 생성."""
+    m = re.match(r"data:image/(png|jpeg|jpg|webp);base64,(.+)", (body.image or ""), re.DOTALL)
+    if not m:
+        raise HTTPException(400, "이미지 형식 오류")
+    ext = "jpg" if m.group(1) in ("jpeg", "jpg") else m.group(1)
+    try:
+        raw = base64.b64decode(m.group(2))
+    except Exception:
+        raise HTTPException(400, "이미지 디코딩 실패")
+    if len(raw) > 4 * 1024 * 1024:
+        raise HTTPException(413, "이미지가 너무 큽니다 (4MB 이하)")
+    from app.db.maesil_total_client import get_maesil_hub_client
+    _ensure_bucket()
+    path = f"{user.id}/{uuid.uuid4().hex}.{ext}"
+    try:
+        get_maesil_hub_client().storage.from_(_GALLERY_BUCKET).upload(
+            path, raw, {"content-type": f"image/{ext}"})
+    except Exception as e:
+        logger.error("gallery 업로드 실패: %s", e)
+        raise HTTPException(500, "이미지 업로드 실패")
+    row = {"user_id": user.id, "display_name": user.display_name,
+           "image_path": path, "caption": (body.caption or "").strip()[:200] or None}
+    try:
+        rec = (_db().table("gbl_gallery").insert(row).execute().data or [row])[0]
+    except Exception as e:
+        logger.error("gallery 저장 실패: %s", e)
+        raise HTTPException(500, "게시 실패")
+    rec["image_url"] = _gallery_url(path)
+    return rec
+
+
+@router.get("/gallery")
+def list_gallery(limit: int = 60) -> list[dict]:
+    """자랑 갤러리 목록(공개). 최신순."""
+    try:
+        rows = (_db().table("gbl_gallery").select("*")
+                .order("created_at", desc=True).limit(min(max(limit, 1), 100)).execute().data) or []
+    except Exception as e:
+        logger.error("gallery 조회 실패: %s", e)
+        return []
+    for r in rows:
+        r["image_url"] = _gallery_url(r.get("image_path") or "")
+    return rows
+
+
+@router.delete("/gallery/{gid}")
+def delete_gallery(gid: str, user: UserContext = Depends(get_current_user)) -> dict:
+    """자기 글 또는 관리자만 삭제."""
+    try:
+        rows = _db().table("gbl_gallery").select("*").eq("id", gid).execute().data or []
+        if not rows:
+            raise HTTPException(404, "게시글 없음")
+        post = rows[0]
+        if post.get("user_id") != user.id and not user.is_super_admin:
+            raise HTTPException(403, "삭제 권한 없음")
+        from app.db.maesil_total_client import get_maesil_hub_client
+        try:
+            get_maesil_hub_client().storage.from_(_GALLERY_BUCKET).remove([post["image_path"]])
+        except Exception:
+            pass
+        _db().table("gbl_gallery").delete().eq("id", gid).execute()
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("gallery 삭제 실패: %s", e)
+        raise HTTPException(500, "삭제 실패")
+    return {"ok": True}
 
 
 @router.get("/admin/matches")

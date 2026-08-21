@@ -1,5 +1,48 @@
 // 레이드 이미지 공유 공통 유틸 (클라이언트). PokeAPI 스프라이트=CORS 허용 → 캔버스 오염 방지.
 
+// 임의 URL 이미지 로드(CORS 허용). 실패 시 null.
+export function loadImg(url: string): Promise<HTMLImageElement | null> {
+  return new Promise((res) => {
+    const im = new Image();
+    im.crossOrigin = "anonymous";
+    im.onload = () => res(im);
+    im.onerror = () => res(null);
+    im.src = url;
+  });
+}
+
+// GBL Note 로고 아이콘(동일 출처 /gbl-icon.png). 공유 이미지에 워터마크로 삽입.
+let _logoCache: HTMLImageElement | null | undefined;
+export async function loadLogo(): Promise<HTMLImageElement | null> {
+  if (_logoCache !== undefined) return _logoCache;
+  _logoCache = await loadImg("/gbl-icon.png");
+  return _logoCache;
+}
+
+// 공유 이미지 하단 브랜드 푸터 — 로고+GBL Note(좌) / 태그라인+gblnote.com(우).
+// fyTop=푸터 영역 시작 y, footH=푸터 높이.
+export function drawBrandFooter(
+  ctx: CanvasRenderingContext2D, logo: HTMLImageElement | null,
+  W: number, fyTop: number, footH: number, accent: string, tagline: string,
+) {
+  ctx.save();
+  ctx.strokeStyle = "#e8ecf3"; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(40, fyTop + 8); ctx.lineTo(W - 40, fyTop + 8); ctx.stroke();
+  const cy = fyTop + footH / 2 + 10;
+  ctx.textBaseline = "middle";
+  const ls = 58, lx = 44;
+  if (logo) ctx.drawImage(logo, lx, cy - ls / 2, ls, ls);
+  ctx.textAlign = "left"; ctx.fillStyle = accent; ctx.font = "900 46px system-ui, sans-serif";
+  ctx.fillText("GBL Note", lx + (logo ? ls + 14 : 0), cy);
+  ctx.textAlign = "right";
+  ctx.fillStyle = "#9aa6bd"; ctx.font = "600 27px system-ui, sans-serif";
+  ctx.fillText(tagline, W - 44, cy - 18);
+  ctx.fillStyle = accent; ctx.font = "800 33px system-ui, sans-serif";
+  ctx.fillText("gblnote.com", W - 44, cy + 20);
+  ctx.textBaseline = "alphabetic";
+  ctx.restore();
+}
+
 export function loadSprites(dexes: string[]): Promise<Record<string, HTMLImageElement>> {
   const imgs: Record<string, HTMLImageElement> = {};
   return Promise.all(

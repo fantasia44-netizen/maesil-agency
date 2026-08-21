@@ -24,10 +24,12 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // gbl 서브도메인에서 그 외(루트·에이전시 경로)는 GBL 앱으로
+  // gbl 서브도메인에서 그 외(루트·에이전시 경로)는 GBL 앱으로.
+  // 301(영구) — 도메인 루트가 /gbl로 영구 이전됨을 검색엔진(네이버 Yeti/구글)에 알려
+  // /gbl을 대표(canonical)로 색인·링크가치 전달되게 함. 기본 307(임시)이면 색인이 지연됨.
   const url = req.nextUrl.clone();
   url.pathname = "/gbl";
-  return NextResponse.redirect(url);
+  return NextResponse.redirect(url, 301);
 }
 
 export const config = {

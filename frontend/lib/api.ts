@@ -25,6 +25,7 @@ export function hasToken(): boolean {
 
 // ── 유저 정보 ────────────────────────────────────────────────────────
 export type StoredUser = {
+  id?: string | null;
   email: string;
   role: "super_admin" | "customer" | "gbl";
   display_name: string | null;
@@ -177,6 +178,7 @@ export async function gblSignup(
   const data = await res.json();
   setToken(data.token);
   const user: StoredUser = {
+    id: data.id ?? null,
     email: data.email,
     role: data.role,
     display_name: data.display_name ?? null,
@@ -222,6 +224,7 @@ export async function gblGoogle(credential: string): Promise<StoredUser> {
   const data = await res.json();
   setToken(data.token);
   const user: StoredUser = {
+    id: data.id ?? null,
     email: data.email,
     role: data.role,
     display_name: data.display_name ?? null,
@@ -245,6 +248,7 @@ export async function gblKakao(code: string, redirectUri: string): Promise<Store
   const data = await res.json();
   setToken(data.token);
   const user: StoredUser = {
+    id: data.id ?? null,
     email: data.email,
     role: data.role,
     display_name: data.display_name ?? null,
