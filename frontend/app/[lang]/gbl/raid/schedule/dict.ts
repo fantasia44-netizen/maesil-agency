@@ -28,7 +28,7 @@ export type ScheduleDict = {
   guideHour: string; guideDay: string; guideSuperMega: string; guideNote: string;
   // 비-레이드 주요 이벤트(커뮤니티데이·스포트라이트·맥스 등)
   majorEventsH: string; evtType: Record<string, string>; dynamax: string; evtClassic: string;
-  months: string[]; evtNameMap: Record<string, string>;
+  evtNameMap: Record<string, string>;
   monthBossesH: string; cpTableArrow: string;
   rotationH: string; live: string; upcoming: string; liveNowH: string; endsWord: string;
   saveBtn: string; building: string;
@@ -69,7 +69,6 @@ const ko: ScheduleDict = {
   majorEventsH: "🗓️ {month} 주요 이벤트",
   evtType: { "community-day": "커뮤니티 데이", "pokemon-spotlight-hour": "스포트라이트 아워", "max-mondays": "맥스 먼데이", "max-battles": "맥스 배틀 데이", "pokemon-go-fest": "GO 페스트", "event": "이벤트", "research": "리서치", "go-pass": "GO 패스" },
   dynamax: "다이맥스", evtClassic: "클래식",
-  months: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
   evtNameMap: {
     "LEGO Stores and Pokémon GO": "레고 스토어 & 포켓몬 GO",
     "10th Anniversary Celebration - Perfect Mewtwo Timed Research": "10주년 기념 · 퍼펙트 뮤츠 타임 리서치",
@@ -120,7 +119,6 @@ const en: ScheduleDict = {
   majorEventsH: "🗓️ {month} Major Events",
   evtType: { "community-day": "Community Day", "pokemon-spotlight-hour": "Spotlight Hour", "max-mondays": "Max Monday", "max-battles": "Max Battle Day", "pokemon-go-fest": "GO Fest", "event": "Event", "research": "Research", "go-pass": "GO Pass" },
   dynamax: "Dynamax", evtClassic: "Classic",
-  months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
   evtNameMap: {},
   monthBossesH: "📋 Bosses in {month}", cpTableArrow: "CP table →",
   rotationH: "🔥 Boss rotation periods", live: "Live", upcoming: "Upcoming", liveNowH: "🔥 Live raids now", endsWord: "ends",
@@ -164,7 +162,6 @@ const ja: ScheduleDict = {
   majorEventsH: "🗓️ {month} 主なイベント",
   evtType: { "community-day": "コミュニティ・デイ", "pokemon-spotlight-hour": "スポットライトアワー", "max-mondays": "マックスマンデー", "max-battles": "マックスバトルデイ", "pokemon-go-fest": "GOフェス", "event": "イベント", "research": "リサーチ", "go-pass": "GOパス" },
   dynamax: "ダイマックス", evtClassic: "クラシック",
-  months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
   evtNameMap: {
     "LEGO Stores and Pokémon GO": "レゴストア & ポケモンGO",
     "10th Anniversary Celebration - Perfect Mewtwo Timed Research": "10周年記念 · パーフェクトミュウツー タイムチャレンジ",
