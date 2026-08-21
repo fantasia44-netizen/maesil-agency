@@ -84,8 +84,9 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
     try {
       // 주별 로테이션 밴드 + 가변 행높이(페이지와 동일: 5성→메가→그림자 레인)
       const weekBands = weeks.map(bandsOfWeek);
-      const DNUM_H_C = 40, BAND_H_C = 48, MIN_CELL_H = 104;
-      const rowHeights = weekBands.map((b) => Math.max(MIN_CELL_H, DNUM_H_C + b.length * BAND_H_C + 12));
+      const DNUM_H_C = 30, BAND_H_C = 37, MIN_CELL_H = 80;
+      const laneCount = (b: typeof weekBands[number]) => (b.length ? Math.max(...b.map((x) => x.lane)) + 1 : 0);
+      const rowHeights = weekBands.map((b) => Math.max(MIN_CELL_H, DNUM_H_C + laneCount(b) * BAND_H_C + 12));
 
       // 밴드 보스 스프라이트 수집(폼 반영)
       const dexSet = new Set<string>();
@@ -135,10 +136,10 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
           ctx.fillStyle = isToday ? "#fff7ed" : "#ffffff";
           ctx.strokeStyle = isToday ? "#fb923c" : "#e8e2da"; ctx.lineWidth = isToday ? 3 : 1.5;
           ctx.beginPath(); ctx.roundRect(cx + 3, cy + 3, cw - 6, rh - 6, 14); ctx.fill(); ctx.stroke();
-          ctx.textAlign = "left"; ctx.font = "800 26px system-ui, sans-serif";
+          ctx.textAlign = "left"; ctx.font = "800 23px system-ui, sans-serif";
           ctx.fillStyle = isToday ? "#ea580c" : col === 0 ? "#dc2626" : col === 6 ? "#3b5bdb" : "#94a3b8";
-          ctx.fillText(String(day), cx + 14, cy + 34);
-          if (hasDay || hasHour) { ctx.textAlign = "right"; ctx.font = "26px system-ui, sans-serif"; ctx.fillText((hasDay ? "🎉" : "") + (hasHour ? "⏰" : ""), cx + cw - 12, cy + 34); }
+          ctx.fillText(String(day), cx + 13, cy + 28);
+          if (hasDay || hasHour) { ctx.textAlign = "right"; ctx.font = "22px system-ui, sans-serif"; ctx.fillText((hasDay ? "🎉" : "") + (hasHour ? "⏰" : ""), cx + cw - 11, cy + 28); }
         });
         weekBands[wi].forEach((b) => {
           const rot = ROT[b.e.variant || "star"];
@@ -151,10 +152,10 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
           let tx = bx + 10;
           const dex = boss?.dex ? String(formDex(boss.ko, Number(boss.dex))) : "";
           const im = dex ? imgs[dex] : null;
-          if (im) { const s = 34; ctx.drawImage(im, bx + 8, by + (bh - s) / 2, s, s); tx = bx + 8 + s + 6; }
-          ctx.textAlign = "left"; ctx.font = "800 24px system-ui, sans-serif"; ctx.fillStyle = rot.c;
+          if (im) { const s = 27; ctx.drawImage(im, bx + 7, by + (bh - s) / 2, s, s); tx = bx + 7 + s + 5; }
+          ctx.textAlign = "left"; ctx.font = "800 20px system-ui, sans-serif"; ctx.fillStyle = rot.c;
           const label = `${rot.icon} ${boss ? boss.name + (boss.shiny ? " ✨" : "") : b.e.title}`;
-          ctx.fillText(fit(label, bx + bw - tx - 8), tx, by + bh / 2 + 9);
+          ctx.fillText(fit(label, bx + bw - tx - 7), tx, by + bh / 2 + 7);
         });
         cy += rh;
       });
@@ -219,9 +220,11 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
         endsHere: !eventsOn(dayShift(last, 1)).includes(e),        // 다음날이 없으면 = 진짜 끝
       });
     }
-    // 변형 순서(5성→메가→그림자) 유지하되 레인은 주별로 컴팩트(빈 레인 없음 → 높이 낭비 방지)
+    // 레인 = 변형(5성/메가/그림자)별 1줄. 같은 변형의 순차 로테이션(예: 큐레무→유크시)은
+    // 시간이 안 겹치므로 한 줄 공유. 빈 변형 레인은 제거해 컴팩트(빈 줄로 높이 낭비 방지).
     raw.sort((a, b) => (vOrd[a.e.variant || "star"] ?? 9) - (vOrd[b.e.variant || "star"] ?? 9));
-    raw.forEach((b, i) => { b.lane = i; });
+    const usedV = [...new Set(raw.map((b) => vOrd[b.e.variant || "star"] ?? 9))].sort((x, y) => x - y);
+    raw.forEach((b) => { b.lane = usedV.indexOf(vOrd[b.e.variant || "star"] ?? 9); });
     return raw;
   };
   const DNUM_H = 26, BAND_H = 26;
@@ -308,7 +311,8 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         {weeks.map((wk, wi) => {
           const bands = bandsOfWeek(wk);
-          const rowH = Math.max(46, DNUM_H + bands.length * BAND_H + 5);
+          const laneN = bands.length ? Math.max(...bands.map((b) => b.lane)) + 1 : 0;
+          const rowH = Math.max(46, DNUM_H + laneN * BAND_H + 5);
           return (
             <div key={wi} style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 4 }}>
               {/* 날짜 칸 */}
