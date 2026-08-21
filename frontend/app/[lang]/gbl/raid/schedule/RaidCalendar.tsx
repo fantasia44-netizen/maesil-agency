@@ -20,6 +20,7 @@ export type CalEvent = {
   kind: "rotation" | "hour" | "day";
   variant?: RotVariant;
   title: string;
+  guide?: string;   // 레이드 아워·데이 타입별 상세 안내
   start: string; // ISO
   end: string;
   bosses: CalBoss[];
@@ -340,6 +341,37 @@ export default function RaidCalendar({ events, today, t }: { events: CalEvent[];
         <span>{t.legendMain}</span><span>{t.legendMega}</span><span>{t.legendShadow}</span><span>{t.legendDay}</span><span>{t.legendHour}</span>
       </div>
 
+      {/* 다가오는 레이드 아워·데이 — 상시 표시(월 이동 없이 미래 이벤트 발견) + 타입별 상세 안내 */}
+      {(() => {
+        const up = events.filter((e) => (e.kind === "hour" || e.kind === "day") && new Date(e.end).getTime() >= nowTs)
+          .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+        if (up.length === 0) return null;
+        return (
+          <div style={{ marginTop: 18 }}>
+            <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a", marginBottom: 10 }}>{t.upcomingSpecialH}</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {up.map((e, i) => {
+                const k = KIND[e.kind as "hour" | "day"];
+                const sd = new Date(e.start);
+                const dstr = tpl(t.upcomingDateFmt, { m: sd.getMonth() + 1, d: sd.getDate(), w: WD[sd.getDay()] });
+                return (
+                  <div key={i} style={{ background: CARD, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${k.c}`, borderRadius: 12, padding: "10px 12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap", marginBottom: e.guide ? 5 : 0 }}>
+                      <span style={{ fontSize: "0.68rem", fontWeight: 800, color: "#fff", background: k.c, borderRadius: 8, padding: "2px 9px" }}>{k.icon} {k.label}</span>
+                      <span style={{ fontSize: "0.84rem", fontWeight: 800, color: "#0f172a" }}>{dstr}</span>
+                      <span style={{ fontSize: "0.72rem", fontWeight: 700, color: k.c }}>{fmtTime(e.start)}~{fmtTime(e.end)}</span>
+                      {e.title && <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#334155" }}>· {e.title}</span>}
+                    </div>
+                    {e.guide && <div style={{ fontSize: "0.76rem", color: "#475569", lineHeight: 1.65 }}>{e.guide}</div>}
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ fontSize: "0.66rem", color: "#94a3b8", marginTop: 6 }}>{t.guideNote}</div>
+          </div>
+        );
+      })()}
+
       {/* 선택한 날 특별 이벤트(레이드 아워·데이) — 로테이션 보스는 히어로·밴드로 대체(중복 제거) */}
       {sel && (() => {
         const special = selEvents.filter((e) => e.kind !== "rotation");
@@ -353,10 +385,13 @@ export default function RaidCalendar({ events, today, t }: { events: CalEvent[];
               {special.map((e, idx) => {
                 const k = KIND[e.kind as "hour" | "day"];
                 return (
-                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap", background: k.bg, borderRadius: 9, padding: "6px 10px" }}>
-                    <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#fff", background: k.c, borderRadius: 6, padding: "1px 8px" }}>{k.icon} {k.label}</span>
-                    <span style={{ fontSize: "0.74rem", fontWeight: 700, color: k.c }}>{fmtTime(e.start)}~{fmtTime(e.end)}</span>
-                    <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#334155" }}>{e.title}</span>
+                  <div key={idx} style={{ background: k.bg, borderRadius: 9, padding: "7px 11px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#fff", background: k.c, borderRadius: 6, padding: "1px 8px" }}>{k.icon} {k.label}</span>
+                      <span style={{ fontSize: "0.74rem", fontWeight: 700, color: k.c }}>{fmtTime(e.start)}~{fmtTime(e.end)}</span>
+                      <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#334155" }}>{e.title}</span>
+                    </div>
+                    {e.guide && <div style={{ fontSize: "0.74rem", color: "#475569", lineHeight: 1.6, marginTop: 4 }}>{e.guide}</div>}
                   </div>
                 );
               })}

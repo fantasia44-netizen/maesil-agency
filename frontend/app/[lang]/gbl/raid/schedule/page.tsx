@@ -102,8 +102,8 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
   // 달력엔 과거 이벤트도 포함(빈 날짜 채우기). 피드에 남아있는 범위까지.
   const calEvents: CalEvent[] = events.flatMap((e): CalEvent[] => {
     if (e.eventType === "raid-battles") { const r = rotInfo(e.name, t); return [{ kind: "rotation", variant: r.variant, title: r.title, start: e.start, end: e.end, bosses: bossesOf(lang, e, t) }]; }
-    if (e.eventType === "raid-hour") return [{ kind: "hour", title: localEventName(lang, e.name, t), start: e.start, end: e.end, bosses: [] }];
-    if (e.eventType === "raid-day") return [{ kind: "day", title: localEventName(lang, e.name, t), start: e.start, end: e.end, bosses: [] }];
+    if (e.eventType === "raid-hour") return [{ kind: "hour", title: localEventName(lang, e.name, t), guide: t.guideHour, start: e.start, end: e.end, bosses: [] }];
+    if (e.eventType === "raid-day") return [{ kind: "day", title: localEventName(lang, e.name, t), guide: /super mega|mega raid day/i.test(e.name) ? t.guideSuperMega : t.guideDay, start: e.start, end: e.end, bosses: [] }];
     return [];
   });
 

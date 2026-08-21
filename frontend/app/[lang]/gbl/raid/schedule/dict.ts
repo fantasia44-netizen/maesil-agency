@@ -23,6 +23,9 @@ export type ScheduleDict = {
   legendMain: string; legendMega: string; legendShadow: string; legendDay: string; legendHour: string;
   selDateTitle: string;
   noSpecial: string; bossTapHint: string;
+  // 다가오는 특별 이벤트(레이드 아워·데이) 리스트 + 타입별 상세 안내
+  upcomingSpecialH: string; upcomingDateFmt: string;
+  guideHour: string; guideDay: string; guideSuperMega: string; guideNote: string;
   monthBossesH: string; cpTableArrow: string;
   rotationH: string; live: string; upcoming: string; liveNowH: string; endsWord: string;
   saveBtn: string; building: string;
@@ -55,6 +58,11 @@ const ko: ScheduleDict = {
   legendMain: "🖼️ 날짜 그림 = 5성 전설", legendMega: "🔷 메가", legendShadow: "🌑 그림자", legendDay: "🎉 레이드 데이", legendHour: "⏰ 레이드 아워",
   selDateTitle: "{m}월 {d}일 ({w}) 레이드",
   noSpecial: "이 날 특별 레이드 일정이 없습니다.", bossTapHint: "보스를 누르면 100% CP·약점 딜러를 볼 수 있어요.",
+  upcomingSpecialH: "🎉 다가오는 레이드 아워·데이", upcomingDateFmt: "{m}/{d}({w})",
+  guideHour: "매주 특정 요일 저녁(보통 18~19시, 현지시간) 1시간 동안 거의 모든 체육관에 해당 보스가 동시 등장합니다. 짧은 시간에 여러 마리를 잡을 수 있어 전설 파밍·색이 다른 개체(이로치) 노리기에 좋습니다.",
+  guideDay: "보통 주말 3시간 동안 특정 보스가 집중 등장하고, 무료 레이드패스가 추가 지급되며 색이 다른 개체(이로치) 확률이 크게 올라갑니다.",
+  guideSuperMega: "메가 레이드에 집중하는 특별 데이입니다. 무료 레이드패스 + 메가에너지 대량 획득 + 색이 다른 개체(이로치) 확률↑ 혜택이 주어집니다. 메가진화 준비·메가에너지 파밍의 기회예요.",
+  guideNote: "※ 정확한 보너스·시간은 이벤트마다 다르니 공식 공지를 확인하세요.",
   monthBossesH: "📋 {m}월 등장 보스", cpTableArrow: "CP표 →",
   rotationH: "🔥 보스 로테이션 기간", live: "진행 중", upcoming: "예정", liveNowH: "🔥 지금 열리는 레이드", endsWord: "종료",
   saveBtn: "📅 {m}월 달력 이미지 저장·공유", building: "이미지 생성 중…",
@@ -89,6 +97,11 @@ const en: ScheduleDict = {
   legendMain: "🖼️ Date icon = 5★ legendary", legendMega: "🔷 Mega", legendShadow: "🌑 Shadow", legendDay: "🎉 Raid Day", legendHour: "⏰ Raid Hour",
   selDateTitle: "{month} {d} ({w}) raids",
   noSpecial: "No special raids scheduled on this day.", bossTapHint: "Tap a boss to see its 100% CP and weakness attackers.",
+  upcomingSpecialH: "🎉 Upcoming Raid Hours & Days", upcomingDateFmt: "{m}/{d} ({w})",
+  guideHour: "For one hour on a set evening (usually 6–7 PM local time), the featured boss appears in almost every gym at once — a great window to farm several, chase legendaries and hunt shinies.",
+  guideDay: "Usually a 3-hour weekend window where a specific boss appears frequently, with extra free raid passes and greatly boosted shiny odds.",
+  guideSuperMega: "A special day focused on Mega Raids — extra free passes, big Mega Energy rewards and boosted shiny odds. A prime chance to prep Mega Evolutions and farm Mega Energy.",
+  guideNote: "※ Exact bonuses and times vary per event — check the official announcement.",
   monthBossesH: "📋 Bosses in {month}", cpTableArrow: "CP table →",
   rotationH: "🔥 Boss rotation periods", live: "Live", upcoming: "Upcoming", liveNowH: "🔥 Live raids now", endsWord: "ends",
   saveBtn: "📅 Save/Share {month} calendar image", building: "Generating image…",
@@ -123,6 +136,11 @@ const ja: ScheduleDict = {
   legendMain: "🖼️ 日付の絵 = 5★伝説", legendMega: "🔷 メガ", legendShadow: "🌑 シャドウ", legendDay: "🎉 レイドデイ", legendHour: "⏰ レイドアワー",
   selDateTitle: "{m}月{d}日 ({w}) レイド",
   noSpecial: "この日は特別なレイド日程がありません。", bossTapHint: "ボスを押すと100% CP・弱点アタッカーを確認できます。",
+  upcomingSpecialH: "🎉 今後のレイドアワー・デイ", upcomingDateFmt: "{m}/{d}({w})",
+  guideHour: "特定曜日の夕方(通常18〜19時、現地時間)の1時間、ほぼ全ジムに対象ボスが一斉出現します。短時間で複数討伐でき、伝説厳選・色違い狙いに最適です。",
+  guideDay: "通常は週末の3時間、特定ボスが集中出現。無料レイドパスが追加配布され、色違い確率が大幅にアップします。",
+  guideSuperMega: "メガレイドに集中する特別デイ。無料パス+メガエナジー大量獲得+色違い確率アップの特典があります。メガ進化の準備・メガエナジー厳選の好機です。",
+  guideNote: "※ 正確なボーナス・時間はイベントごとに異なります。公式のお知らせをご確認ください。",
   monthBossesH: "📋 {m}月 登場ボス", cpTableArrow: "CP表 →",
   rotationH: "🔥 ボスローテーション期間", live: "開催中", upcoming: "予定", liveNowH: "🔥 今開催中のレイド", endsWord: "終了",
   saveBtn: "📅 {m}月 カレンダー画像を保存・共有", building: "画像生成中…",
