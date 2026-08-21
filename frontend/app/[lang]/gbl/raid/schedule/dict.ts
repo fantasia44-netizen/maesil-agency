@@ -26,6 +26,8 @@ export type ScheduleDict = {
   // 다가오는 특별 이벤트(레이드 아워·데이) 리스트 + 타입별 상세 안내
   upcomingSpecialH: string; upcomingDateFmt: string;
   guideHour: string; guideDay: string; guideSuperMega: string; guideNote: string;
+  // 비-레이드 주요 이벤트(커뮤니티데이·스포트라이트·맥스 등)
+  majorEventsH: string; evtType: Record<string, string>;
   monthBossesH: string; cpTableArrow: string;
   rotationH: string; live: string; upcoming: string; liveNowH: string; endsWord: string;
   saveBtn: string; building: string;
@@ -63,6 +65,8 @@ const ko: ScheduleDict = {
   guideDay: "보통 주말 3시간 동안 특정 보스가 집중 등장하고, 무료 레이드패스가 추가 지급되며 색이 다른 개체(이로치) 확률이 크게 올라갑니다.",
   guideSuperMega: "메가 레이드에 집중하는 특별 데이입니다. 무료 레이드패스 + 메가에너지 대량 획득 + 색이 다른 개체(이로치) 확률↑ 혜택이 주어집니다. 메가진화 준비·메가에너지 파밍의 기회예요.",
   guideNote: "※ 정확한 보너스·시간은 이벤트마다 다르니 공식 공지를 확인하세요.",
+  majorEventsH: "🗓️ 다가오는 주요 이벤트",
+  evtType: { "community-day": "커뮤니티 데이", "pokemon-spotlight-hour": "스포트라이트 아워", "max-mondays": "맥스 먼데이", "max-battles": "맥스 배틀 데이", "pokemon-go-fest": "GO 페스트", "event": "이벤트", "research": "리서치", "go-pass": "GO 패스" },
   monthBossesH: "📋 {m}월 등장 보스", cpTableArrow: "CP표 →",
   rotationH: "🔥 보스 로테이션 기간", live: "진행 중", upcoming: "예정", liveNowH: "🔥 지금 열리는 레이드", endsWord: "종료",
   saveBtn: "📅 {m}월 달력 이미지 저장·공유", building: "이미지 생성 중…",
@@ -102,6 +106,8 @@ const en: ScheduleDict = {
   guideDay: "Usually a 3-hour weekend window where a specific boss appears frequently, with extra free raid passes and greatly boosted shiny odds.",
   guideSuperMega: "A special day focused on Mega Raids — extra free passes, big Mega Energy rewards and boosted shiny odds. A prime chance to prep Mega Evolutions and farm Mega Energy.",
   guideNote: "※ Exact bonuses and times vary per event — check the official announcement.",
+  majorEventsH: "🗓️ Upcoming Major Events",
+  evtType: { "community-day": "Community Day", "pokemon-spotlight-hour": "Spotlight Hour", "max-mondays": "Max Monday", "max-battles": "Max Battle Day", "pokemon-go-fest": "GO Fest", "event": "Event", "research": "Research", "go-pass": "GO Pass" },
   monthBossesH: "📋 Bosses in {month}", cpTableArrow: "CP table →",
   rotationH: "🔥 Boss rotation periods", live: "Live", upcoming: "Upcoming", liveNowH: "🔥 Live raids now", endsWord: "ends",
   saveBtn: "📅 Save/Share {month} calendar image", building: "Generating image…",
@@ -141,6 +147,8 @@ const ja: ScheduleDict = {
   guideDay: "通常は週末の3時間、特定ボスが集中出現。無料レイドパスが追加配布され、色違い確率が大幅にアップします。",
   guideSuperMega: "メガレイドに集中する特別デイ。無料パス+メガエナジー大量獲得+色違い確率アップの特典があります。メガ進化の準備・メガエナジー厳選の好機です。",
   guideNote: "※ 正確なボーナス・時間はイベントごとに異なります。公式のお知らせをご確認ください。",
+  majorEventsH: "🗓️ 今後の主なイベント",
+  evtType: { "community-day": "コミュニティ・デイ", "pokemon-spotlight-hour": "スポットライトアワー", "max-mondays": "マックスマンデー", "max-battles": "マックスバトルデイ", "pokemon-go-fest": "GOフェス", "event": "イベント", "research": "リサーチ", "go-pass": "GOパス" },
   monthBossesH: "📋 {m}月 登場ボス", cpTableArrow: "CP表 →",
   rotationH: "🔥 ボスローテーション期間", live: "開催中", upcoming: "予定", liveNowH: "🔥 今開催中のレイド", endsWord: "終了",
   saveBtn: "📅 {m}月 カレンダー画像を保存・共有", building: "画像生成中…",
