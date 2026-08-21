@@ -43,7 +43,9 @@ function fmtTime(iso: string): string {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-export default function RaidCalendar({ events, today, t }: { events: CalEvent[]; today: string; t: ScheduleDict }) {
+export type MajorEvent = { eventType: string; emoji: string; name: string; start: string; end: string };
+
+export default function RaidCalendar({ events, majorEvents, today, t }: { events: CalEvent[]; majorEvents: MajorEvent[]; today: string; t: ScheduleDict }) {
   const WD = t.weekdays;
   const ROT: Record<RotVariant, { icon: string; label: string; c: string; bg: string }> = {
     star: { icon: "⭐", label: t.rotStar, c: "#dc2626", bg: "#fee2e2" },
@@ -196,6 +198,7 @@ export default function RaidCalendar({ events, today, t }: { events: CalEvent[];
   const shift = (delta: number) => {
     const d = new Date(cur.y, cur.m - 1 + delta, 1);
     setCur({ y: d.getFullYear(), m: d.getMonth() + 1 });
+    setSel(null);   // 월 이동 시 선택 해제(다른 달 선택일 상세가 남는 것 방지)
   };
 
   const CARD = "#ffffff", BORDER = "#e3e8f2";
@@ -343,12 +346,12 @@ export default function RaidCalendar({ events, today, t }: { events: CalEvent[];
 
       {/* 다가오는 레이드 아워·데이 — 상시 표시(월 이동 없이 미래 이벤트 발견) + 타입별 상세 안내 */}
       {(() => {
-        const up = events.filter((e) => (e.kind === "hour" || e.kind === "day") && new Date(e.end).getTime() >= nowTs)
+        const up = events.filter((e) => (e.kind === "hour" || e.kind === "day") && new Date(e.start).getTime() < mEnd && new Date(e.end).getTime() >= mStart)
           .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
         if (up.length === 0) return null;
         return (
           <div style={{ marginTop: 18 }}>
-            <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a", marginBottom: 10 }}>{t.upcomingSpecialH}</div>
+            <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a", marginBottom: 10 }}>{tpl(t.upcomingSpecialH, { month: monthName(cur.m), m: cur.m })}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {up.map((e, i) => {
                 const k = KIND[e.kind as "hour" | "day"];
@@ -368,6 +371,33 @@ export default function RaidCalendar({ events, today, t }: { events: CalEvent[];
               })}
             </div>
             <div style={{ fontSize: "0.66rem", color: "#94a3b8", marginTop: 6 }}>{t.guideNote}</div>
+          </div>
+        );
+      })()}
+
+      {/* 이 달 주요 이벤트(커뮤니티데이·스포트라이트·맥스 등) — 표시 중인 월에 걸치는 것만 */}
+      {(() => {
+        const me = majorEvents.filter((e) => new Date(e.start).getTime() < mEnd && new Date(e.end).getTime() >= mStart)
+          .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+        if (me.length === 0) return null;
+        return (
+          <div style={{ marginTop: 18 }}>
+            <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a", marginBottom: 10 }}>{tpl(t.majorEventsH, { month: monthName(cur.m), m: cur.m })}</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+              {me.map((e, i) => {
+                const s = new Date(e.start), en = new Date(e.end);
+                const multi = e.start.slice(0, 10) !== e.end.slice(0, 10);
+                const dstr = `${s.getMonth() + 1}/${s.getDate()}` + (multi ? `~${en.getMonth() + 1}/${en.getDate()}` : "");
+                const nm = e.name.replace(/\s+in\s+.*$/i, "").replace(/&amp;/g, "&").trim();
+                return (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "8px 11px" }}>
+                    <span style={{ fontSize: "0.68rem", fontWeight: 800, color: "#7c3aed", background: "#f3e8ff", borderRadius: 8, padding: "2px 9px", whiteSpace: "nowrap" }}>{e.emoji} {t.evtType[e.eventType] || e.eventType}</span>
+                    <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#0f172a" }}>{dstr}</span>
+                    <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#334155" }}>{nm}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         );
       })()}

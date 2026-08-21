@@ -116,11 +116,10 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
   const d = new Date(Date.now() + 9 * 3600 * 1000);
   const today = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
 
-  // 비-레이드 주요 이벤트(커뮤니티데이·스포트라이트·맥스·GO페스트·일반) — 진행중+예정
-  const nowMs = Date.now();
+  // 비-레이드 주요 이벤트(커뮤니티데이·스포트라이트·맥스·GO페스트·일반) — 전체 전달, 월 필터는 달력에서
   const majorEvents = events
-    .filter((e) => MAJOR_EMOJI[e.eventType] && new Date(e.end).getTime() >= nowMs)
-    .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+    .filter((e) => MAJOR_EMOJI[e.eventType])
+    .map((e) => ({ eventType: e.eventType, emoji: MAJOR_EMOJI[e.eventType], name: e.name, start: e.start, end: e.end }));
 
   const wrap: React.CSSProperties = {
     minHeight: "100dvh",
@@ -146,29 +145,8 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
         ) : (
           <>
             <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "12px 12px 14px" }}>
-              <RaidCalendar events={calEvents} today={today} t={t} />
+              <RaidCalendar events={calEvents} majorEvents={majorEvents} today={today} t={t} />
             </div>
-
-            {majorEvents.length > 0 && (
-              <div style={{ marginTop: 18 }}>
-                <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a", marginBottom: 10 }}>{t.majorEventsH}</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  {majorEvents.map((e, i) => {
-                    const s = new Date(e.start), en = new Date(e.end);
-                    const multi = e.start.slice(0, 10) !== e.end.slice(0, 10);
-                    const dstr = `${s.getMonth() + 1}/${s.getDate()}` + (multi ? `~${en.getMonth() + 1}/${en.getDate()}` : "");
-                    const nm = e.name.replace(/\s+in\s+.*$/i, "").replace(/&amp;/g, "&").trim();
-                    return (
-                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "8px 11px" }}>
-                        <span style={{ fontSize: "0.68rem", fontWeight: 800, color: "#7c3aed", background: "#f3e8ff", borderRadius: 8, padding: "2px 9px", whiteSpace: "nowrap" }}>{MAJOR_EMOJI[e.eventType]} {t.evtType[e.eventType] || e.eventType}</span>
-                        <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#0f172a" }}>{dstr}</span>
-                        <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#334155" }}>{nm}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </>
         )}
 
