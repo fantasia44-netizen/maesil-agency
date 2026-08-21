@@ -67,6 +67,36 @@ function localEventName(lang: Locale, name: string, t: ScheduleDict): string {
   const mons = s ? s.split(/,\s*and\s+|,\s*|\s+and\s+/).filter(Boolean).map((x) => monLocal(lang, x, t)).join("·") : "";
   return (mons ? mons + " " : "") + suffix;
 }
+const EN_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+// 비-레이드 이벤트명 로케일화: 오버라이드맵 → 포켓몬명 → 유형어구 → 월이름 순 치환.
+// 피드가 영어 전용이라 반복 요소만 자동 번역, 일회성 캠페인명은 evtNameMap 수동 매핑.
+function localMajorName(lang: Locale, name: string, t: ScheduleDict): string {
+  const clean = name.replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+  if (lang === "en") return clean;
+  if (t.evtNameMap[clean]) return t.evtNameMap[clean];
+  // 1) 포켓몬명 치환(단어 단위) — Mega/Shadow 등 접두 포함 2단어는 monLocal 경유
+  let s = clean.replace(/\b(Mega|Shadow|Alolan|Galarian|Hisuian|Paldean)\s+[A-Za-zé.'-]+/g, (m) => monLocal(lang, m, t));
+  s = s.replace(/[A-Za-zé][A-Za-zé.'-]*/g, (w) => {
+    const k = w.toLowerCase().replace(/[^a-zé]/g, "");
+    return BY_EN[k] ? localName(lang, BY_EN[k], w) : w;
+  });
+  // 2) 유형 어구 치환(긴 것 우선)
+  const P: [RegExp, string][] = [
+    [/Super Mega Raid Day/gi, t.sfxSuperMega], [/Mega Raid Day/gi, t.sfxMega],
+    [/Raid Hour/gi, t.sfxRaidHour], [/Raid Day/gi, t.sfxRaidDay],
+    [/Community Day Classic/gi, `${t.evtType["community-day"]} ${t.evtClassic}`],
+    [/Community Day/gi, t.evtType["community-day"]],
+    [/Spotlight Hour/gi, t.evtType["pokemon-spotlight-hour"]],
+    [/Max Battle Day/gi, t.evtType["max-battles"]],
+    [/during Max Monday/gi, t.evtType["max-mondays"]], [/Max Monday/gi, t.evtType["max-mondays"]],
+    [/GO Pass/gi, t.evtType["go-pass"]], [/GO Fest/gi, t.evtType["pokemon-go-fest"]],
+    [/Dynamax/gi, t.dynamax],
+  ];
+  for (const [re, to] of P) s = s.replace(re, to);
+  // 3) 월 이름 치환
+  EN_MONTHS.forEach((m, i) => { s = s.replace(new RegExp(`\\b${m}\\b`, "gi"), t.months[i]); });
+  return s.replace(/\s{2,}/g, " ").trim();
+}
 function rotInfo(name: string, t: ScheduleDict): { title: string; variant: "star" | "shadow" | "mega" } {
   if (/Mega Raid/i.test(name)) return { title: t.rotMegaTitle, variant: "mega" };
   if (/Shadow Raid/i.test(name)) return { title: t.rotShadowTitle, variant: "shadow" };
@@ -119,7 +149,7 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
   // 비-레이드 주요 이벤트(커뮤니티데이·스포트라이트·맥스·GO페스트·일반) — 전체 전달, 월 필터는 달력에서
   const majorEvents = events
     .filter((e) => MAJOR_EMOJI[e.eventType])
-    .map((e) => ({ eventType: e.eventType, emoji: MAJOR_EMOJI[e.eventType], name: e.name, start: e.start, end: e.end }));
+    .map((e) => ({ eventType: e.eventType, emoji: MAJOR_EMOJI[e.eventType], name: localMajorName(lang, e.name, t), start: e.start, end: e.end }));
 
   const wrap: React.CSSProperties = {
     minHeight: "100dvh",
