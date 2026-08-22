@@ -1,6 +1,6 @@
 "use client";
 // 이벤트 브로마이드 팝업 — A4 비율 포스터형(공유용), 라이트 테마(GBL Note 화이트). 데이터 기반.
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { toPng, toBlob } from "html-to-image";
 import { monSprite } from "../../sprite";
 import { TYPE_COLOR, typeLabel } from "../../typeLabels";
@@ -52,18 +52,35 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
 
   const cardRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(false);
+
+  // 포스터는 720px(DESIGN_W) 고정 디자인 → 좁은 화면(폰)에선 통째로 축소해 비율 유지(세로로 늘어짐 방지).
+  const DESIGN_W = 680;
+  const [scale, setScale] = useState(1);
+  const [cardH, setCardH] = useState(0);
+  useEffect(() => {
+    const measure = () => {
+      setScale(Math.min(1, (window.innerWidth - 24) / DESIGN_W));
+      if (cardRef.current) setCardH(cardRef.current.offsetHeight);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    const t1 = setTimeout(measure, 250), t2 = setTimeout(measure, 900);  // 이미지 로드 후 재측정
+    return () => { window.removeEventListener("resize", measure); clearTimeout(t1); clearTimeout(t2); };
+  }, []);
   // 카톡 등은 공유 이미지를 재압축·다운스케일 → 소스 해상도를 높여(pixelRatio 3) 압축 후에도 선명하게.
   const shotOpts = { pixelRatio: 3, cacheBust: true, backgroundColor: "#ffffff", filter: (n: HTMLElement) => !(n instanceof HTMLElement && n.dataset && n.dataset.noshot === "1") };
   const fname = `gblnote-${b.dateKey}.png`;
+  // 캡처는 화면 축소(scale)와 무관하게 항상 디자인 원본(DESIGN_W×cardH)을 pixelRatio 배로 → 고해상도 보장
+  const capOpts = () => ({ ...shotOpts, width: DESIGN_W, height: cardRef.current!.offsetHeight });
   const download = async () => {
     if (!cardRef.current || busy) return; setBusy(true);
-    try { const url = await toPng(cardRef.current, shotOpts); const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
+    try { const url = await toPng(cardRef.current, capOpts()); const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
     catch (e) { console.error(e); } finally { setBusy(false); }
   };
   const share = async () => {
     if (!cardRef.current || busy) return; setBusy(true);
     try {
-      const blob = await toBlob(cardRef.current, shotOpts);
+      const blob = await toBlob(cardRef.current, capOpts());
       if (!blob) return;
       const file = new File([blob], fname, { type: "image/png" });
       const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
@@ -78,8 +95,10 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,.6)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", zIndex: 10001, overflowY: "auto", padding: "16px 10px" }}>
-     <div style={{ width: "min(96vw, 720px)", margin: "0 auto", display: "flex", flexDirection: "column", gap: 10 }}>
-      <div ref={cardRef} onClick={(e) => e.stopPropagation()} style={{ position: "relative", width: "100%", background: "#ffffff", borderRadius: 20, border: `1px solid ${BORDER}`, boxShadow: "0 30px 80px -20px rgba(15,23,42,.4)", overflow: "hidden", color: INK }}>
+     <div style={{ width: DESIGN_W * scale, maxWidth: "100%", margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+      <div style={{ width: DESIGN_W * scale, height: cardH ? cardH * scale : undefined }}>
+       <div style={{ width: DESIGN_W, transform: `scale(${scale})`, transformOrigin: "top left" }}>
+        <div ref={cardRef} onClick={(e) => e.stopPropagation()} style={{ position: "relative", width: "100%", background: "#ffffff", borderRadius: 20, border: `1px solid ${BORDER}`, boxShadow: "0 30px 80px -20px rgba(15,23,42,.4)", overflow: "hidden", color: INK }}>
         <button data-noshot="1" onClick={onClose} aria-label="close" style={{ position: "absolute", top: 10, right: 10, zIndex: 5, width: 32, height: 32, borderRadius: "50%", border: "1px solid #e2e8f0", background: "#f1f5f9", color: "#475569", cursor: "pointer", fontSize: "1rem", lineHeight: 1 }}>✕</button>
 
         <div style={{ padding: "14px 16px 16px", background: "radial-gradient(700px 260px at 78% -6%, #f3e8ff 0%, transparent 60%)" }}>
@@ -232,6 +251,8 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
             </div>
           </div>
         </div>
+        </div>
+       </div>
       </div>
 
       {/* 카드 밖 컨트롤(공유 스크린샷엔 미포함) */}
