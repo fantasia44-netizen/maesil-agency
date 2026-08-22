@@ -93,11 +93,19 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
     try { const url = await toPng(cardRef.current, { ...baseOpts(), pixelRatio: 2 }); const a = document.createElement("a"); a.href = url; a.download = `gblnote-${b.dateKey}.png`; a.click(); }
     catch (e) { console.error(e); } finally { setBusy(false); }
   };
-  // 공유: 카톡 등은 대용량 이미지를 강하게 재압축 → 저용량 JPEG(1.5x, q0.9)로 카톡이 덜 뭉개게.
+  // 공유: 카톡은 "용량" 기준으로 재압축 → 해상도는 높게 두고 JPEG 품질을 낮춰
+  // 파일이 목표 용량(≈950KB) 아래로 들어올 때까지 (해상도,품질) 단계적으로 시도. 통과하면 카톡이 덜 뭉갬.
   const share = async () => {
     if (!cardRef.current || busy) return; setBusy(true);
     try {
-      const dataUrl = await toJpeg(cardRef.current, { ...baseOpts(), pixelRatio: 1.5, quality: 0.9 });
+      const TARGET = 420 * 1024;   // 카톡이 재압축 안 하는 용량대 목표(작게)
+      const tries: [number, number][] = [[2.5, 0.7], [2, 0.7], [2, 0.55], [1.6, 0.62], [1.4, 0.6]];
+      let dataUrl = "";
+      for (const [pr, q] of tries) {
+        dataUrl = await toJpeg(cardRef.current, { ...baseOpts(), pixelRatio: pr, quality: q });
+        const bytes = Math.ceil((dataUrl.length - dataUrl.indexOf(",") - 1) * 3 / 4);  // base64 길이→바이트 근사
+        if (bytes <= TARGET) break;
+      }
       const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], `gblnote-${b.dateKey}.jpg`, { type: "image/jpeg" });
       const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
