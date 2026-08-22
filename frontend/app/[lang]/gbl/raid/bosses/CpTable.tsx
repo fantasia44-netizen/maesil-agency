@@ -68,8 +68,10 @@ export default function CpTable({ stats, hundoL20, hundoL25, name = "", accent =
   const buildImage = async () => {
     const W = 1080, headH = 210, rowH = 46, footH = 150;
     const H = headH + rowH * (rows.length + 1) + footH;
-    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const SCALE = 2;   // 공유 재압축 대비 고해상도 렌더
+    const c = document.createElement("canvas"); c.width = W * SCALE; c.height = H * SCALE;
     const ctx = c.getContext("2d"); if (!ctx) return;
+    ctx.scale(SCALE, SCALE);
     const [sprite, shinySp, logo] = await Promise.all([
       dex ? loadSprites([dex]).then((m) => m[dex]) : Promise.resolve(null),
       shiny && dex ? loadImg(shinySprite(dex)) : Promise.resolve(null),

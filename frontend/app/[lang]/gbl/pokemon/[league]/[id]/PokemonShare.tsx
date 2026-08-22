@@ -46,8 +46,10 @@ export default function PokemonShare(p: PkShare) {
       for (const ch of chips) { if (curW > 0 && curW + ch.w > maxRowW) { chipRows.push([]); curW = 0; } chipRows[chipRows.length - 1].push(ch); curW += ch.w + 12; }
       const headH = 250, moveH = 60 + chipRows.length * 56, statH = 200, cntHead = 64, cntRowH = 72, footH = 150;
       const H = headH + moveH + statH + cntHead + cntRowH * rows + footH;
-      const c = document.createElement("canvas"); c.width = W; c.height = H;
+      const SCALE = 2;   // 공유 재압축 대비 고해상도 렌더
+      const c = document.createElement("canvas"); c.width = W * SCALE; c.height = H * SCALE;
       const ctx = c.getContext("2d"); if (!ctx) { setBusy(false); return; }
+      ctx.scale(SCALE, SCALE);
       // 라이트 카드
       ctx.fillStyle = "#eceff7"; ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.roundRect(M, M, W - M * 2, H - M * 2, 28); ctx.fill();

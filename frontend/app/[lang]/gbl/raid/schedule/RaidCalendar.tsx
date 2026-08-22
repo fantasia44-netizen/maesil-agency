@@ -111,8 +111,10 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
       const LEGEND_H = 82, footH = 150;
       const H = GRID_TOP + gridH + LEGEND_H + footH;
 
-      const c = document.createElement("canvas"); c.width = W; c.height = H;
+      const SCALE = 2;   // 공유 시 재압축(카톡 등) 대비 고해상도 렌더(2160px)
+      const c = document.createElement("canvas"); c.width = W * SCALE; c.height = H * SCALE;
       const ctx = c.getContext("2d"); if (!ctx) { setBusy(false); return; }
+      ctx.scale(SCALE, SCALE);
       ctx.fillStyle = "#fbf7f3"; ctx.fillRect(0, 0, W, H);
 
       // 헤더

@@ -39,8 +39,10 @@ export default function ListShare({
       ]);
       const W = 1080, rowH = 100, headH = 196, footH = 156;
       const H = headH + rowH * items.length + footH;
-      const c = document.createElement("canvas"); c.width = W; c.height = H;
+      const SCALE = 2;   // 공유 재압축 대비 고해상도 렌더
+      const c = document.createElement("canvas"); c.width = W * SCALE; c.height = H * SCALE;
       const ctx = c.getContext("2d"); if (!ctx) { setBusy(false); return; }
+      ctx.scale(SCALE, SCALE);
       // 라이트 테마: 연회색 바탕 + 흰 카드 + 상단 액센트 바
       ctx.fillStyle = "#eceff7"; ctx.fillRect(0, 0, W, H);
       const M = 22;

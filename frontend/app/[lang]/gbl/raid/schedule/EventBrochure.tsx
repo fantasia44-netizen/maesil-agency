@@ -52,7 +52,8 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
 
   const cardRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(false);
-  const shotOpts = { pixelRatio: 2, cacheBust: true, backgroundColor: "#ffffff", filter: (n: HTMLElement) => !(n instanceof HTMLElement && n.dataset && n.dataset.noshot === "1") };
+  // 카톡 등은 공유 이미지를 재압축·다운스케일 → 소스 해상도를 높여(pixelRatio 3) 압축 후에도 선명하게.
+  const shotOpts = { pixelRatio: 3, cacheBust: true, backgroundColor: "#ffffff", filter: (n: HTMLElement) => !(n instanceof HTMLElement && n.dataset && n.dataset.noshot === "1") };
   const fname = `gblnote-${b.dateKey}.png`;
   const download = async () => {
     if (!cardRef.current || busy) return; setBusy(true);
@@ -95,7 +96,7 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, alignItems: "center", marginBottom: 10 }}>
             <div>
               {b.eyebrow && <span style={{ display: "inline-block", background: "#f3e8ff", border: "1px solid #d8b4fe", color: "#7c3aed", fontWeight: 800, fontSize: "0.76rem", borderRadius: 8, padding: "3px 10px", marginBottom: 6 }}>{b.eyebrow}</span>}
-              <h2 style={{ margin: "2px 0 4px", fontSize: "2rem", fontWeight: 900, lineHeight: 1.02, letterSpacing: "-1px",
+              <h2 style={{ margin: "2px 0 4px", fontSize: "clamp(1.5rem, 6vw, 2rem)", fontWeight: 900, lineHeight: 1.05, letterSpacing: "-1px", wordBreak: "keep-all",
                 background: "linear-gradient(90deg,#db2777,#9333ea,#6366f1)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}>{b.title}</h2>
               {b.subtitle && <p style={{ margin: "0 0 8px", fontSize: "0.82rem", color: "#475569", fontWeight: 600, lineHeight: 1.4 }}>{b.subtitle}</p>}
               <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "8px 12px" }}>

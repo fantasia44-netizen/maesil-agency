@@ -552,10 +552,12 @@ export default function GblPage() {
   // 전적 카드 이미지 생성(캔버스) → 화면에 미리보기(모달). 브랜딩 포함(공유 시 홍보).
   const openStatsCard = () => {
     const S = 1080;
+    const SCALE = 2;   // 공유 재압축 대비 고해상도 렌더
     const c = document.createElement("canvas");
-    c.width = S; c.height = S;
+    c.width = S * SCALE; c.height = S * SCALE;
     const ctx = c.getContext("2d");
     if (!ctx) return;
+    ctx.scale(SCALE, SCALE);
     const cx = S / 2;
     // 배경 그라데이션 + 상단 글로우
     const g = ctx.createLinearGradient(0, 0, S, S);
