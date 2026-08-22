@@ -194,7 +194,7 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
         ) : (
           <>
             <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "12px 12px 14px" }}>
-              <RaidCalendar events={calEvents} majorEvents={majorEvents} today={today} t={t} />
+              <RaidCalendar events={calEvents} majorEvents={majorEvents} today={today} t={t} lang={lang} />
             </div>
           </>
         )}

@@ -3,6 +3,7 @@ import Script from "next/script";
 import GblPwa from "./GblPwa";
 import Tracker from "./Tracker";
 import LangSwitch from "./LangSwitch";
+import EventPopupAuto from "./EventPopupAuto";
 import { locales, localeMeta, isLocale, defaultLocale } from "../../../lib/i18n";
 import { getDict } from "./dictionaries";
 
@@ -58,11 +59,12 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function GblLayout({ children }: { children: React.ReactNode }) {
+export default function GblLayout({ children, params }: { children: React.ReactNode; params: { lang: string } }) {
   return (
     <>
       <GblPwa />
       <Tracker />
+      <EventPopupAuto lang={params.lang} />
       <LangSwitch />
       {ADS_CLIENT && (
         <Script

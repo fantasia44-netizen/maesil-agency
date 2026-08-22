@@ -6,6 +6,9 @@ import { loadLogo, drawBrandFooter } from "../raidShareUtil";
 import ShareModal from "../../ShareModal";
 import CpTable from "../bosses/CpTable";
 import STATSJSON from "../../pokedex_stats.json";
+import EventBrochure from "./EventBrochure";
+import { brochureFor, BROCHURES, type Brochure } from "./eventBrochures";
+import { isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
 import type { ScheduleDict } from "./dict";
 
 const STATS = STATSJSON as Record<string, { a: number; d: number; s: number }>;
@@ -45,7 +48,8 @@ function fmtTime(iso: string): string {
 
 export type MajorEvent = { eventType: string; emoji: string; name: string; start: string; end: string };
 
-export default function RaidCalendar({ events, majorEvents, today, t }: { events: CalEvent[]; majorEvents: MajorEvent[]; today: string; t: ScheduleDict }) {
+export default function RaidCalendar({ events, majorEvents, today, t, lang: langProp }: { events: CalEvent[]; majorEvents: MajorEvent[]; today: string; t: ScheduleDict; lang?: string }) {
+  const lang: Locale = langProp && isLocale(langProp) ? langProp : defaultLocale;
   const WD = t.weekdays;
   const ROT: Record<RotVariant, { icon: string; label: string; c: string; bg: string }> = {
     star: { icon: "⭐", label: t.rotStar, c: "#dc2626", bg: "#fee2e2" },
@@ -64,6 +68,7 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
   const [cardFile, setCardFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [cpBoss, setCpBoss] = useState<CalBoss | null>(null); // 클릭한 보스의 CP표 모달
+  const [brochure, setBrochure] = useState<Brochure | null>(null); // 이벤트 브로마이드 팝업(수동 클릭). 자동팝업은 gbl 레이아웃의 EventPopupAuto가 담당.
 
   const monthName = (m: number) => t.months[m - 1] || String(m);
   const imgFileName = (m: number) => tpl(t.imgFile, { m });
@@ -240,15 +245,24 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
 
   // 표시 중인 월에 걸치는 로테이션 보스 목록(설명용)
   const mStart = new Date(cur.y, cur.m - 1, 1).getTime(), mEnd = new Date(cur.y, cur.m, 1).getTime();
-  const monthBosses: { b: CalBoss; variant?: RotVariant }[] = [];
+  const monthBosses: { b: CalBoss; variant?: RotVariant; brochure?: Brochure }[] = [];
   const seenB = new Set<string>();
+  // 브로마이드 이벤트 보스(예: 슈퍼메가 아쿠스타) — 목록 맨 위, 클릭 시 브로마이드 팝업
+  for (const br of BROCHURES) {
+    const bt = new Date(br.dateKey + "T12:00:00").getTime();
+    if (bt < mStart || bt >= mEnd) continue;
+    const label = br.newLabel || br.title;
+    seenB.add(label);
+    monthBosses.push({ b: { ko: label, name: label, dex: br.hero.spriteDex || "", image: "", shiny: !!br.hero.shiny }, variant: "mega", brochure: br });
+  }
   for (const e of events) {
     if (e.kind !== "rotation") continue;
     if (new Date(e.start).getTime() >= mEnd || new Date(e.end).getTime() <= mStart) continue;
     for (const b of e.bosses) if (!seenB.has(b.ko)) { seenB.add(b.ko); monthBosses.push({ b, variant: e.variant }); }
   }
   const vOrder: Record<string, number> = { star: 0, mega: 1, shadow: 2 };
-  monthBosses.sort((a, b) => (vOrder[a.variant || "star"] ?? 9) - (vOrder[b.variant || "star"] ?? 9));
+  // 브로마이드(특별 이벤트) 보스는 항상 맨 앞, 나머지는 변형순
+  monthBosses.sort((a, b) => (a.brochure ? -1 : 0) - (b.brochure ? -1 : 0) || (vOrder[a.variant || "star"] ?? 9) - (vOrder[b.variant || "star"] ?? 9));
 
   // 보스 로테이션 기간 아젠다(전 기간, 시작일순) — 보스 클릭 시 CP 모달
   const fmtD = (iso: string) => { const d = new Date(iso); return `${d.getMonth() + 1}.${d.getDate()}`; };
@@ -324,9 +338,10 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
                 const hasHour = evs.some((e) => e.kind === "hour");
                 const hasDay = evs.some((e) => e.kind === "day");
                 const wdow = new Date(dk + "T12:00:00").getDay();
-                const clickable = hasHour || hasDay;   // 아워·데이 있는 날만 클릭(상세 표시). 나머진 정적.
+                const hasBrochure = !!brochureFor(dk);   // 브로마이드 있는 이벤트일
+                const clickable = hasHour || hasDay || hasBrochure;   // 아워·데이·브로마이드 있는 날만 클릭
                 return (
-                  <div key={col} onClick={clickable ? () => setSel(dk) : undefined}
+                  <div key={col} onClick={clickable ? () => { const br = brochureFor(dk); if (br) setBrochure(br); else setSel(dk); } : undefined}
                     style={{
                       minHeight: rowH, borderRadius: 11, cursor: clickable ? "pointer" : "default", padding: 0, position: "relative", overflow: "hidden",
                       border: isSel && clickable ? "2px solid #ea580c" : isToday ? "1.5px solid #fb923c" : `1px solid ${BORDER}`,
@@ -478,14 +493,19 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {monthBosses.map((m, i) => {
               const rs = m.variant ? ROT[m.variant] : null;
+              const isBro = !!m.brochure;
+              const spr = isBro && m.brochure!.hero.img ? m.brochure!.hero.img : monSprite(m.b.ko, m.b.dex);
               return (
-                <button key={i} onClick={() => setCpBoss(m.b)}
-                  style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left", cursor: "pointer", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "6px 10px" }}>
+                <button key={i} onClick={() => (m.brochure ? setBrochure(m.brochure) : setCpBoss(m.b))}
+                  style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left", cursor: "pointer",
+                    background: isBro ? "linear-gradient(90deg,#faf5ff,#fdf2f8)" : CARD, border: `1px solid ${isBro ? "#e9d5ff" : BORDER}`, borderRadius: 10, padding: "6px 10px" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={monSprite(m.b.ko, m.b.dex)} alt={m.b.name} width={34} height={34} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                  <img src={spr} alt={m.b.name} width={34} height={34} style={{ imageRendering: m.brochure?.hero.img ? "auto" : "pixelated", objectFit: "contain" }}
+                    onError={(e) => { const f = monSprite(m.b.ko, m.b.dex); if (e.currentTarget.src !== f) { e.currentTarget.src = f; e.currentTarget.style.imageRendering = "pixelated"; } }} />
                   <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a" }}>{m.b.name}{m.b.shiny ? " ✨" : ""}</span>
-                  {rs && <span style={{ fontSize: "0.6rem", fontWeight: 800, color: rs.c, background: rs.bg, border: `1px solid ${rs.c}44`, borderRadius: 6, padding: "1px 7px" }}>{rs.icon} {rs.label}</span>}
-                  <span style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#3b5bdb", fontWeight: 600, whiteSpace: "nowrap" }}>{t.cpTableArrow}</span>
+                  {isBro ? <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#a21caf", background: "#fae8ff", border: "1px solid #f0abfc", borderRadius: 6, padding: "1px 7px" }}>🎉 이벤트</span>
+                    : rs && <span style={{ fontSize: "0.6rem", fontWeight: 800, color: rs.c, background: rs.bg, border: `1px solid ${rs.c}44`, borderRadius: 6, padding: "1px 7px" }}>{rs.icon} {rs.label}</span>}
+                  <span style={{ marginLeft: "auto", fontSize: "0.72rem", color: isBro ? "#a21caf" : "#3b5bdb", fontWeight: 600, whiteSpace: "nowrap" }}>{isBro ? "이벤트 정보 →" : t.cpTableArrow}</span>
                 </button>
               );
             })}
@@ -557,6 +577,10 @@ export default function RaidCalendar({ events, majorEvents, today, t }: { events
           </div>
         );
       })()}
+
+      {/* 이벤트 브로마이드 팝업 */}
+      {brochure && <EventBrochure b={brochure} lang={lang} onClose={() => setBrochure(null)}
+        onDismiss={() => { try { localStorage.setItem("gblBroDismiss:" + brochure.dateKey, "1"); } catch {} setBrochure(null); }} />}
     </div>
   );
 }
