@@ -1,7 +1,7 @@
 "use client";
 // 이벤트 브로마이드 팝업 — A4 비율 포스터형(공유용), 라이트 테마(GBL Note 화이트). 데이터 기반.
 import { useRef, useState, useEffect } from "react";
-import { toPng, toBlob } from "html-to-image";
+import { toPng, toJpeg } from "html-to-image";
 import { monSprite } from "../../sprite";
 import { TYPE_COLOR, typeLabel } from "../../typeLabels";
 import type { Locale } from "../../../../../lib/i18n";
@@ -67,27 +67,27 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
     const t1 = setTimeout(measure, 250), t2 = setTimeout(measure, 900);  // 이미지 로드 후 재측정
     return () => { window.removeEventListener("resize", measure); clearTimeout(t1); clearTimeout(t2); };
   }, []);
-  // 카톡 등은 공유 이미지를 재압축·다운스케일 → 소스 해상도를 높여(pixelRatio 3) 압축 후에도 선명하게.
-  const shotOpts = { pixelRatio: 3, cacheBust: true, backgroundColor: "#ffffff", filter: (n: HTMLElement) => !(n instanceof HTMLElement && n.dataset && n.dataset.noshot === "1") };
-  const fname = `gblnote-${b.dateKey}.png`;
-  // 캡처는 화면 축소(scale)와 무관하게 항상 디자인 원본(DESIGN_W×cardH)을 pixelRatio 배로 → 고해상도 보장
-  const capOpts = () => ({ ...shotOpts, width: DESIGN_W, height: cardRef.current!.offsetHeight });
+  // 캡처는 화면 축소(scale)와 무관하게 항상 디자인 원본(DESIGN_W×cardH) 기준.
+  const baseOpts = () => ({ cacheBust: true, backgroundColor: "#ffffff", width: DESIGN_W, height: cardRef.current!.offsetHeight,
+    filter: (n: HTMLElement) => !(n instanceof HTMLElement && n.dataset && n.dataset.noshot === "1") });
+  // 다운로드: 고화질 PNG(2x)로 파일 저장
   const download = async () => {
     if (!cardRef.current || busy) return; setBusy(true);
-    try { const url = await toPng(cardRef.current, capOpts()); const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
+    try { const url = await toPng(cardRef.current, { ...baseOpts(), pixelRatio: 2 }); const a = document.createElement("a"); a.href = url; a.download = `gblnote-${b.dateKey}.png`; a.click(); }
     catch (e) { console.error(e); } finally { setBusy(false); }
   };
+  // 공유: 카톡 등은 대용량 이미지를 강하게 재압축 → 저용량 JPEG(1.5x, q0.9)로 카톡이 덜 뭉개게.
   const share = async () => {
     if (!cardRef.current || busy) return; setBusy(true);
     try {
-      const blob = await toBlob(cardRef.current, capOpts());
-      if (!blob) return;
-      const file = new File([blob], fname, { type: "image/png" });
+      const dataUrl = await toJpeg(cardRef.current, { ...baseOpts(), pixelRatio: 1.5, quality: 0.9 });
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], `gblnote-${b.dateKey}.jpg`, { type: "image/jpeg" });
       const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
       if (typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: b.title, text: "gblnote.com" });
       } else {
-        const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); URL.revokeObjectURL(url);
+        const a = document.createElement("a"); a.href = dataUrl; a.download = `gblnote-${b.dateKey}.jpg`; a.click();
       }
     } catch (e) { if (e instanceof DOMException && e.name === "AbortError") { /* 사용자 취소 */ } else console.error(e); }
     finally { setBusy(false); }
