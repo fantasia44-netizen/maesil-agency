@@ -24,7 +24,7 @@ export type GblEvent = {
 
 export const GBL_EVENTS: GblEvent[] = [
   {
-    start: "2026-08-25T00:00:00+09:00",
+    start: "2026-08-24T00:00:00+09:00",  // 팝업 트리거는 하루 먼저(표시 기간 라벨은 8/25~8/31 유지)
     end: "2026-08-31T23:59:00+09:00",
     icon: "🏆",
     title: {
