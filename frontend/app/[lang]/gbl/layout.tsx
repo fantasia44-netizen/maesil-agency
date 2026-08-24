@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import GblPwa from "./GblPwa";
 import Tracker from "./Tracker";
-import LangSwitch from "./LangSwitch";
+import GblNav from "./GblNav";
 import EventPopupAuto from "./EventPopupAuto";
 import { locales, localeMeta, isLocale, defaultLocale } from "../../../lib/i18n";
 import { getDict } from "./dictionaries";
@@ -65,7 +65,7 @@ export default function GblLayout({ children, params }: { children: React.ReactN
       <GblPwa />
       <Tracker />
       <EventPopupAuto lang={params.lang} />
-      <LangSwitch />
+      <GblNav />
       {ADS_CLIENT && (
         <Script
           id="adsbygoogle-loader"

@@ -85,9 +85,7 @@ export default function GblLanding() {
           <img src="/gbl-icon.png" alt="GBL Note" width={78} height={78} style={{ marginBottom: 6 }} />
           <h1 style={{
             margin: "0 0 8px", fontSize: "clamp(2rem, 9vw, 3.2rem)", fontWeight: 900, letterSpacing: "-1.5px", lineHeight: 1,
-            color: "#2540b8",  // solid 폴백(SEO 스캐너가 투명 텍스트를 '숨김'으로 오판하지 않게)
-            background: "linear-gradient(92deg,#1e3a8a 0%,#3b5bdb 55%,#7c3aed 100%)",
-            WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent",
+            color: "#2540b8",  // solid 색 — 그라디언트 투명텍스트는 SEO 스캐너가 '숨김/없음'으로 오판하므로 사용 안 함
           }}>GBL NOTE</h1>
           <p style={{ margin: "0 0 4px", fontSize: "clamp(0.95rem,4.5vw,1.25rem)", fontWeight: 800, color: "#0f172a" }}>
             {t.heroPrefix} <span style={{ color: "#3b5bdb" }}>{t.allInOne}</span>
