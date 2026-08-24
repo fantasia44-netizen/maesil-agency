@@ -4,7 +4,7 @@ import type { Dict } from "./ko";
 const en: Dict = {
   meta: {
     title: "GBL Note — Pokémon GO Raids, Battle, Tiers & CP All-in-One",
-    description: "Pokémon GO raid attacker tiers, boss 100% CP, raid schedule, Battle League tiers & encounter meta, and your own battle log. An all-in-one Pokémon GO toolkit.",
+    description: "Pokémon GO raid attacker tiers, boss 100% CP, raid schedule, Battle League tiers & encounter meta, plus your battle log. All-in-one GO toolkit.",
     ogTitle: "GBL Note — Pokémon GO All-in-One",
     ogDescription: "Raid attackers, boss CP, raid schedule + battle tiers, encounter meta + your battle log. A complete Pokémon GO toolkit.",
   },

@@ -33,7 +33,7 @@ const en: RaidHubDict = {
   explainerBody: "Every raid boss has weakness types — e.g., Grass and Electric attackers are strong against a Water boss. Tap the boss's weakness type above to see the top attackers, and use the highest-ranked one you own. Adding one Mega boosts all attackers of the same type. Rankings are DPS calculated from public game data.",
   updateLabel: "Updated",
   metaTitle: "Raid Attacker Tier List · DPS Ranking by Type | GBL Note",
-  metaDesc: "Pokémon GO raid attacker DPS & bulk ranking by type. Best attackers for all 18 types with recommended movesets, Megas and Shadows included. Essential raid farming tiers.",
+  metaDesc: "Pokémon GO raid attacker DPS & bulk tier ranking by type. Best attackers for all 18 types with recommended movesets, Megas and Shadows included.",
   ogTitle: "Pokémon GO Raid Attacker Tiers (DPS by type)", ogDesc: "Best attackers for all 18 types + recommended moves · Megas/Shadows",
 };
 

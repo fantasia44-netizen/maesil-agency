@@ -40,7 +40,7 @@ export const GUIDES: Record<string, Guide> = {
       ],
     },
     en: {
-      title: "Pokémon GO GBL Beginner's Guide — Go Battle League Basics",
+      title: "Pokémon GO GBL Beginner's Guide — Basics",
       desc: "A beginner's guide for anyone starting Pokémon GO's Go Battle League (GBL). We break down the leagues, shields, energy, and move structure in plain terms.",
       sections: [
         { p: "GBL (Go Battle League) is Pokémon GO's real-time 3-vs-3 player battle mode. Two trainers each field a party of three Pokémon, and the first to knock out all three of the opponent's Pokémon wins. This article covers just the essentials a first-timer needs to know." },
@@ -83,8 +83,8 @@ export const GUIDES: Record<string, Guide> = {
       ],
     },
     en: {
-      title: "CP Limits by League — Great, Ultra, and Master League",
-      desc: "A rundown of the CP limits — Great League (1500), Ultra League (2500), and Master League (no cap) — in Pokémon GO's Go Battle League, and what makes each league distinct.",
+      title: "CP Limits by League — Great, Ultra, Master",
+      desc: "The CP limits in Pokémon GO's Go Battle League — Great League (1500), Ultra League (2500), and Master League (no cap) — and what makes each distinct.",
       sections: [
         { p: "GBL's three leagues each set a different CP (Combat Power) ceiling on the Pokémon that can enter. That single cap makes each league's strategy and go-to Pokémon completely different." },
         { h: "Great League — CP 1500 or below", p: "With the lowest cap, type matchups, movesets, and bulk matter more than total base stats. Pokémon with well-balanced stats within that low CP shine, and for IVs a spread with low Attack but high Defense and HP is often the stronger choice. The low barrier to entry makes it the league we recommend for beginners." },
@@ -167,7 +167,7 @@ export const GUIDES: Record<string, Guide> = {
     },
     en: {
       title: "GBL Team Building — Lead, Ace, and Closer",
-      desc: "The basic framework for building a three-Pokémon party in Pokémon GO's Go Battle League — the lead, anti-meta, and safe-switch (closer) roles, plus type-coverage cores.",
+      desc: "The framework for building a three-Pokémon party in Pokémon GO's Go Battle League — the lead, anti-meta, and safe-switch (closer) roles.",
       sections: [
         { p: "GBL is a battle of three-Pokémon parties and their type synergy. A good party is built so the three cover each other's weaknesses, letting you respond no matter what the opponent brings. Here's the basic framework." },
         { h: "1. The lead", p: "The Pokémon you send out first. You want one that's broadly serviceable against the opponents common in the current meta and rarely loses a matchup badly. Pick a lead that's strong against the top pick-rate Pokémon, and you can start the battle with an early edge." },

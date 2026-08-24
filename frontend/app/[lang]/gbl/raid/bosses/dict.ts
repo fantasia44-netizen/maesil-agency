@@ -106,7 +106,7 @@ const en: BossesDict = {
   dataSource: "Boss data: LeekDuck (ScrapedDuck) · ", privacy: "Privacy Policy",
   pfx: { mega: "Mega ", shadow: "Shadow ", hisui: "Hisuian ", alola: "Alolan ", galar: "Galarian ", paldea: "Paldean ", origin: " (Origin)" },
   metaTitle: "Pokémon GO Current Raid Bosses · 100% CP Table | GBL Note",
-  metaDesc: "Live Pokémon GO 5-star and Mega raid bosses. Per-IV catch CP table for each boss — check the 100% (15/15/15) CP for normal and weather-boosted. Plus weaknesses and recommended attackers. Auto-updated.",
+  metaDesc: "Live Pokémon GO 5-star and Mega raid bosses. Per-IV catch CP table for each boss — check the 100% (15/15/15) CP, normal and weather-boosted.",
   metaKeywords: ["pokemon go raid bosses", "100 IV CP", "hundo CP", "raid CP table", "IV CP", "15 15 15 CP", "5-star raid", "mega raid", "pokemon go raid"],
   ogTitle: "Pokémon GO Current Raid Bosses · 100% CP", ogDesc: "5-star, Mega and 3-star boss 100% CP + weakness attackers",
 };

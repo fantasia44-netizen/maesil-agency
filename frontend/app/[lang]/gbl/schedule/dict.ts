@@ -77,7 +77,7 @@ const en: ScheduleDict = {
     "별의모래 4배 (세트 종료 리워드 제외)": "4× Stardust (excludes set completion rewards)",
   },
   metaTitle: "Pokémon GO GBL Season Schedule · League Rotation | GBL Note",
-  metaDesc: "Pokémon GO Battle League (GBL) Season {num} '{name}' league rotation schedule. See this week's Great, Ultra and Master Leagues plus cups (Scroll Cup and more) at a glance.",
+  metaDesc: "Pokémon GO Battle League (GBL) Season {num} '{name}' league rotation schedule. See this week's Great, Ultra and Master Leagues plus cups.",
   metaKeywords: ["Pokémon GO GBL schedule", "battle league rotation", "GBL leagues this week", "GBL cup schedule", "Season {num}"],
   ogTitle: "Pokémon GO GBL Season {num} league rotation schedule",
   ogDesc: "Leagues and cups open this week",

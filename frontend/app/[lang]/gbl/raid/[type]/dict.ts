@@ -72,7 +72,7 @@ const ja: RaidTypeDict = {
   badgePrimal: "ゲンシ", badgeMega: "メガ", badgeShadow: "シャドウ", badgeUpcoming: "実装予定",
   badgeCoverage: "不一致", badgeCoverageTip: "タイプ一致(STAB)ボーナスなし — この属性はサブ技のみで攻撃。高種族値で総合スコアは上位ですが、実戦性能は対象ボスとの相性次第です。",
   metaTitle: "レイドアタッカー ティア表 · DPS順位 | GBL Note",
-  metaDesc: "レイドアタッカーのDPS・耐久順位。メガ・シャドウ含む推奨技構成まで。レイド周回の最適編成。",
+  metaDesc: "レイドアタッカーのDPS・耐久順位を掲載。メガ・シャドウ含む推奨技構成まで。弱点を突く最強アタッカーを一覧で確認でき、レイド周回の最適編成に役立ちます。",
   ogTitle: "レイドアタッカーティア — DPS順位",
   ogDesc: "レイドアタッカーDPS・耐久順位 + 推奨技",
 };

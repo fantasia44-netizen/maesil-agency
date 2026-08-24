@@ -27,7 +27,7 @@ const idxEn: GuideIndexDict = {
   intro: "Guides for anyone just starting Pokémon GO's Go Battle League (GBL) or looking to raise their win rate. We cover everything from the fundamentals to team building, step by step.",
   dataPre: "For live data, see the ", dataMeta: "live meta", dataMid: " and ", dataTier: "tier list", dataSuf: ".",
   about: "About", contact: "Contact", privacy: "Privacy Policy",
-  metaTitle: "Pokémon GO GBL Guides — Basics, Leagues, IVs, Teams | GBL Note",
+  metaTitle: "Pokémon GO GBL Guides — Basics, Leagues, IVs | GBL Note",
   metaDesc: "From getting started in the Pokémon GO Go Battle League (GBL) to CP limits by league, IV optimization, and team building. A guide collection for beginners.",
   keywords: ["Pokémon GO GBL guide", "Go Battle League beginner", "Pokémon GO PvP guide", "how to play GBL"],
   ogTitle: "Pokémon GO GBL Guides", ogDesc: "Guides on basics, leagues, IVs, and team building",

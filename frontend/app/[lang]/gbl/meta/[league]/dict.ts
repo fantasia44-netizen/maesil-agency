@@ -40,8 +40,8 @@ const en: LeagueMetaDict = {
   aboutH: "What is GBL Note?",
   aboutBody: "GBL Note lets you log opponents you meet in Pokémon GO Battle League (GBL), so when you face them again you can check their past team and moves in 5 seconds. This live meta aggregates user logs into anonymized statistics with personal data removed, reflecting the {lg} teams actually trending.",
   aboutCta: "Start for free →", privacy: "Privacy Policy",
-  metaTitle: "Pokémon GO {lg} Live Pick Rates · Top Decks | GBL Note",
-  metaDesc: "Live pick rates and popular deck rankings for Pokémon GO {lg} (GBL), based on opponents players actually faced. Real battle data, not simulation — see what you meet most, last 30 days.",
+  metaTitle: "Pokémon GO {lg} Live Pick Rates | GBL Note",
+  metaDesc: "Live pick rates and deck rankings for Pokémon GO {lg} (GBL), from opponents actually faced. Real battle data, not simulation, last 30 days.",
   ogTitle: "Pokémon GO {lg} Live Meta — Pick Rates & Top Decks", ogDesc: "User-sourced {lg} pick rates & deck rankings (last 30 days)",
 };
 

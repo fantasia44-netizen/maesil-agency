@@ -126,8 +126,8 @@ const en: ScheduleDict = {
   share: "📤 Share", save: "💾 Save", close: "Close",
   imgTitle: "Pokémon GO {month} Raids", imgFooter: "Pokémon GO raid schedule", imgShareTitle: "Pokémon GO {month} raid schedule", imgFile: "gbl-raid-{m}.png",
   cpModalSub: "Catch CP by IV", cpModalNoData: "CP data for this boss isn't ready yet.",
-  metaTitle: "Pokémon GO Raid Schedule Calendar · 5★ & Mega Rotation | GBL Note",
-  metaDesc: "Pokémon GO raid schedule as a calendar. See 5-star legendary, Mega and Shadow raid rotation periods plus Raid Hour and Raid Day by date. Links to boss 100% CP and weakness attackers. Auto-updated.",
+  metaTitle: "Pokémon GO Raid Schedule · 5★ & Mega Rotation | GBL Note",
+  metaDesc: "Pokémon GO raid schedule as a calendar. See 5-star legendary, Mega and Shadow raid rotation periods plus Raid Hour and Raid Day by date.",
   metaKeywords: ["pokemon go raid schedule", "raid calendar", "5-star raid rotation", "mega raid schedule", "raid hour", "raid day"],
   ogTitle: "Pokémon GO Raid Schedule Calendar", ogDesc: "5★ & Mega rotation + Raid Hour & Day",
 };
