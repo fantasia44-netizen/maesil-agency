@@ -319,7 +319,12 @@
       "Bash(curl -s \"http://localhost:3000/gbl/raid/schedule\" -o /tmp/rs.html -w \"HTTP %{http_code}\\\\n\")",
       "Bash(curl -s \"http://localhost:3000/gbl/raid/schedule\")",
       "Bash(curl -s \"http://localhost:3000/gbl/schedule\" -o /dev/null -w \"HTTP %{http_code}\\\\n\")",
-      "Bash(curl -s \"http://localhost:3000/gbl/raid/schedule\" -o /dev/null -w \"raid schedule HTTP %{http_code}\\\\n\")"
+      "Bash(curl -s \"http://localhost:3000/gbl/raid/schedule\" -o /dev/null -w \"raid schedule HTTP %{http_code}\\\\n\")",
+      "Bash(node -e \"const s=require\\('./app/[lang]/gbl/pokedex_stats.json'\\); const k=Object.keys\\(s\\); console.log\\('엔트리수:',k.length,'| dex범위:',Math.min\\(...k.map\\(Number\\)\\),'~',Math.max\\(...k.map\\(Number\\)\\)\\); console.log\\('샘플\\(#647 케르디오\\):',JSON.stringify\\(s['647']\\)\\); console.log\\('#1 이상해씨:',JSON.stringify\\(s['1']\\),'| #493 아르세우스:',JSON.stringify\\(s['493']\\),'| #800 네크로즈마:',JSON.stringify\\(s['800']\\)\\)\")",
+      "Bash(node -e \"const p=require\\('./app/[lang]/gbl/pokedex_names.json'\\); console.log\\('엔트리수:',Object.keys\\(p\\).length,'| #1:',JSON.stringify\\(p['1']\\)\\)\")",
+      "Bash(perl -0pi -e 's/\\(season: \\\\{ t: \"시즌 일정\", d: \"리그 로테이션 · 이번 주 열리는 리그·컵\" \\\\},\\)/$1\\\\n      iv: { t: \"PvP IV 순위\", d: \"원하는 포켓몬 리그별 최적 개체값\\(IV\\) 순위\" },/' \"app/[lang]/gbl/dictionaries/ko.ts\")",
+      "Bash(perl -0pi -e 's/\\(season: \\\\{ t: \"Season Schedule\", d: \"League rotation · leagues & cups open this week\" \\\\},\\)/$1\\\\n      iv: { t: \"PvP IV Ranks\", d: \"Any Pokémon\\\\x27s best IVs per league\" },/' \"app/[lang]/gbl/dictionaries/en.ts\")",
+      "Bash(perl -0pi -e 's/\\(season: \\\\{ t: \"シーズン日程\", d: \"リーグローテ · 今週開催のリーグ・カップ\" \\\\},\\)/$1\\\\n      iv: { t: \"PvP個体値ランク\", d: \"好きなポケモンのリーグ別最適個体値\" },/' \"app/[lang]/gbl/dictionaries/ja.ts\")"
     ]
   }
 }

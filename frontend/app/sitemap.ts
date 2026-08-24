@@ -39,6 +39,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...LEAGUES.map((l) => [`/gbl/meta/${l}`, "daily", 0.9] as [string, CF, number]),
     ...LEAGUES.map((l) => [`/gbl/tier/${l}`, "weekly", 0.8] as [string, CF, number]),
     ...LEAGUES.map((l) => [`/gbl/cmp/${l}`, "weekly", 0.7] as [string, CF, number]),
+    ["/gbl/iv", "weekly", 0.8],
     ...LEAGUES.flatMap((l) =>
       (DET[l] || []).slice(0, POKE_TOP).map((d) => [`/gbl/pokemon/${l}/${d.id}`, "weekly", 0.6] as [string, CF, number]),
     ),
