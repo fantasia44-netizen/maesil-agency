@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { apiFetch, logout, getUser, updateNickname, hasToken } from "../../../../lib/api";
 import DATA from "../gbl_data.json";
 import PKN from "../pokedex_names.json";
+import MOVEPOOLS from "../mon_movepools.json";
 import AdSlot from "../AdSlot";
 import CoupangAd from "../CoupangAd";
 import ShareModal from "../ShareModal";
@@ -40,16 +41,22 @@ for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) {
   if (_covered.has(k)) continue;
   _covered.add(k); _metaMons.push(m);
 }
+// 비메타몬 기술풀 — GameMaster에서 추출한 dex별 학습기술(mon_movepools), 메타데이터(moves) 보유분으로 필터
+const _MP = MOVEPOOLS as unknown as Record<string, { fast: string[]; charged: string[] }>;
+const _mkeys = new Set(Object.keys(DS.moves || {}));
 const _extraMons: Mon[] = [];
 for (const [dexStr, nm] of Object.entries(PKNAMES)) {
   const dex = Number(dexStr);
   if (!dex || !nm.en) continue;
   const base = _slug(nm.en);
+  const mp = _MP[String(dex)];
+  const fast = mp ? mp.fast.filter((x) => _mkeys.has(x)) : [];
+  const charged = mp ? mp.charged.filter((x) => _mkeys.has(x)) : [];
   for (const shadow of [false, true]) {
     const k = `${dex}_${shadow ? 1 : 0}`;
     if (_covered.has(k)) continue;
     _covered.add(k);
-    const m: Mon = { id: shadow ? `${base}_shadow` : base, dex, ko: nm.ko, en: nm.en, types: [], shadow, fast: [], charged: [] };
+    const m: Mon = { id: shadow ? `${base}_shadow` : base, dex, ko: nm.ko, en: nm.en, types: [], shadow, fast: [...fast], charged: [...charged] };
     _extraMons.push(m);
     MON_BY_ID[m.id] = m;                      // 표시용 resolver 확장(메타몬은 위에서 이미 등록됨)
   }
