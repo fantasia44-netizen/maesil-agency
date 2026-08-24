@@ -7,6 +7,7 @@ import { apiFetch, logout, getUser, updateNickname, hasToken } from "../../../..
 import DATA from "../gbl_data.json";
 import PKN from "../pokedex_names.json";
 import MOVEPOOLS from "../mon_movepools.json";
+import { monSlug as _slug } from "../monSlug";
 import AdSlot from "../AdSlot";
 import CoupangAd from "../CoupangAd";
 import ShareModal from "../ShareModal";
@@ -33,7 +34,6 @@ const PKNAMES = PKN as unknown as Record<string, { ko: string; en: string; ja: s
 
 // 상대 검색 pool — 실측은 비메타몬(니로우 등)도 만나므로 전 도감(~1025)+그림자에서 검색 가능해야 함.
 // 메타몬(타입·기술 리치)을 우선 배치(흔한 상대 먼저), 나머지 dex는 경량 엔트리로 보충.
-const _slug = (en: string) => en.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
 const _covered = new Set<string>();          // `${dex}_${shadow?1:0}` 중복 방지
 const _metaMons: Mon[] = [];
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) {

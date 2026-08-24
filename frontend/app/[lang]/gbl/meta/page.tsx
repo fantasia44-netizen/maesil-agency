@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { apiFetch } from "../../../../lib/api";
 import DATA from "../gbl_data.json";
 import PKN from "../pokedex_names.json";
+import { monSlugId } from "../monSlug";
 import AdSlot from "../AdSlot";
 import CoupangAd from "../CoupangAd";
 import { currentFormats, todayISO, type Format } from "../formats";
@@ -19,6 +20,19 @@ const DS = DATA as unknown as { leagues: Record<League, { pokemon: Mon[] }> };
 const MON: Record<string, Mon> = {};
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
 const PKNAMES = PKN as unknown as Record<string, { ko: string; en: string; ja: string }>;
+// 비메타몬(전 도감) 보충 — 기록엔 slug로 저장되므로 표시용 이름/스프라이트도 전 도감에서 해석(입력과 동일 slug)
+{
+  const cov = new Set(Object.values(MON).map((m) => `${m.dex}_${m.shadow ? 1 : 0}`));
+  for (const [dexStr, nm] of Object.entries(PKNAMES)) {
+    const dex = Number(dexStr); if (!dex || !nm.en) continue;
+    for (const shadow of [false, true]) {
+      const k = `${dex}_${shadow ? 1 : 0}`;
+      if (cov.has(k)) continue; cov.add(k);
+      const id = monSlugId(nm.en, shadow);
+      if (!MON[id]) MON[id] = { id, dex, ko: nm.ko, en: nm.en, types: [], shadow };
+    }
+  }
+}
 const spriteUrl = (m?: Mon) => m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
 // 로케일별 포켓몬명 — MON은 ko/en 보유, ja는 pokedex_names(dex)로 보완.
 const monName = (lang: Locale, id: string) => {
