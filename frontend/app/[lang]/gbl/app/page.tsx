@@ -10,7 +10,7 @@ import AdSlot from "../AdSlot";
 import CoupangAd from "../CoupangAd";
 import ShareModal from "../ShareModal";
 import { track } from "../../../../lib/track";
-import { currentFormats, FORMAT_BY_KEY, filterPool, todayISO, type Format } from "../formats";
+import { currentFormats, FORMAT_BY_KEY, todayISO, type Format } from "../formats";
 import { isLocale, defaultLocale, localizePath, type Locale } from "../../../../lib/i18n";
 import { leagueName } from "../contentI18n";
 import { getApp, type AppDict } from "./dict";
@@ -29,6 +29,32 @@ const SEASON = { num: 27, start: "2026-06-02", end: "2026-09-09" };
 const MON_BY_ID: Record<string, Mon> = {};
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON_BY_ID[m.id] = m;
 const PKNAMES = PKN as unknown as Record<string, { ko: string; en: string; ja: string }>;
+
+// 상대 검색 pool — 실측은 비메타몬(니로우 등)도 만나므로 전 도감(~1025)+그림자에서 검색 가능해야 함.
+// 메타몬(타입·기술 리치)을 우선 배치(흔한 상대 먼저), 나머지 dex는 경량 엔트리로 보충.
+const _slug = (en: string) => en.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+const _covered = new Set<string>();          // `${dex}_${shadow?1:0}` 중복 방지
+const _metaMons: Mon[] = [];
+for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) {
+  const k = `${m.dex}_${m.shadow ? 1 : 0}`;
+  if (_covered.has(k)) continue;
+  _covered.add(k); _metaMons.push(m);
+}
+const _extraMons: Mon[] = [];
+for (const [dexStr, nm] of Object.entries(PKNAMES)) {
+  const dex = Number(dexStr);
+  if (!dex || !nm.en) continue;
+  const base = _slug(nm.en);
+  for (const shadow of [false, true]) {
+    const k = `${dex}_${shadow ? 1 : 0}`;
+    if (_covered.has(k)) continue;
+    _covered.add(k);
+    const m: Mon = { id: shadow ? `${base}_shadow` : base, dex, ko: nm.ko, en: nm.en, types: [], shadow, fast: [], charged: [] };
+    _extraMons.push(m);
+    MON_BY_ID[m.id] = m;                      // 표시용 resolver 확장(메타몬은 위에서 이미 등록됨)
+  }
+}
+const FULL_MONS: Mon[] = [..._metaMons, ..._extraMons];  // 메타 먼저 + 전 도감 보충
 
 // 로케일별 이름/라벨 헬퍼
 const localeTag = (lang: Locale) => lang === "en" ? "en-US" : lang === "ja" ? "ja-JP" : "ko-KR";
@@ -355,7 +381,8 @@ export default function GblPage() {
   const changeSort = (s: "recent" | "name") => { setSort(s); try { localStorage.setItem("gbl_sort", s); } catch { /* noop */ } };
   const changeLeague = (l: string) => { setLeague(l); try { localStorage.setItem(LEAGUE_KEY, l); } catch { /* noop */ } };
   const fmt = FORMAT_BY_KEY[league];
-  const pickerMons = filterPool(DS.leagues[(fmt?.base ?? "master") as League].pokemon, fmt);
+  // 상대 검색은 전 도감(메타 우선 + 나머지 도감·그림자) — 비메타 상대(니로우 등)도 기록 가능
+  const pickerMons = FULL_MONS;
 
   // 기록 폼
   const [oppName, setOppName] = useState("");
