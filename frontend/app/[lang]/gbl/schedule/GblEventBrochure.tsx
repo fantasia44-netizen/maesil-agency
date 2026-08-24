@@ -85,9 +85,10 @@ export default function GblEventBrochure({ ev, lang, t, onClose, onDismiss }: { 
             </div>
 
             {/* 타이틀 + 피카츄 2종 */}
-            <div style={{ display: "grid", gridTemplateColumns: "1.05fr 1fr", gap: 12, alignItems: "stretch", marginBottom: 12 }}>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <h2 style={{ margin: "2px 0 8px", fontSize: "clamp(1.4rem, 5.4vw, 1.85rem)", fontWeight: 900, lineHeight: 1.08, letterSpacing: "-0.8px", wordBreak: "keep-all",
+            <div style={{ display: "grid", gridTemplateColumns: "1.02fr 1fr", gap: 12, alignItems: "stretch", marginBottom: 12 }}>
+              <div style={{ minWidth: 0, display: "flex", flexDirection: "column" }}>
+                <h2 style={{ margin: "2px 0 8px", fontSize: lang === "ja" ? "clamp(1.1rem, 4.4vw, 1.45rem)" : "clamp(1.35rem, 5.2vw, 1.8rem)", fontWeight: 900, lineHeight: 1.12, letterSpacing: "-0.6px",
+                  wordBreak: lang === "ko" ? "keep-all" : "normal", overflowWrap: "anywhere",
                   background: "linear-gradient(90deg,#db2777,#9333ea,#6366f1)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}>{lx(ev.title)}</h2>
                 <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", background: "linear-gradient(135deg,#fff7ed,#fefce8)", border: "1px solid #fdba74", borderRadius: 14, padding: "16px 18px" }}>
                   <div style={{ fontSize: "0.74rem", fontWeight: 800, color: "#b45309", marginBottom: 7, letterSpacing: "0.02em" }}>📅 {lx(periodLabel)}</div>
