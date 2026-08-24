@@ -324,7 +324,14 @@
       "Bash(node -e \"const p=require\\('./app/[lang]/gbl/pokedex_names.json'\\); console.log\\('엔트리수:',Object.keys\\(p\\).length,'| #1:',JSON.stringify\\(p['1']\\)\\)\")",
       "Bash(perl -0pi -e 's/\\(season: \\\\{ t: \"시즌 일정\", d: \"리그 로테이션 · 이번 주 열리는 리그·컵\" \\\\},\\)/$1\\\\n      iv: { t: \"PvP IV 순위\", d: \"원하는 포켓몬 리그별 최적 개체값\\(IV\\) 순위\" },/' \"app/[lang]/gbl/dictionaries/ko.ts\")",
       "Bash(perl -0pi -e 's/\\(season: \\\\{ t: \"Season Schedule\", d: \"League rotation · leagues & cups open this week\" \\\\},\\)/$1\\\\n      iv: { t: \"PvP IV Ranks\", d: \"Any Pokémon\\\\x27s best IVs per league\" },/' \"app/[lang]/gbl/dictionaries/en.ts\")",
-      "Bash(perl -0pi -e 's/\\(season: \\\\{ t: \"シーズン日程\", d: \"リーグローテ · 今週開催のリーグ・カップ\" \\\\},\\)/$1\\\\n      iv: { t: \"PvP個体値ランク\", d: \"好きなポケモンのリーグ別最適個体値\" },/' \"app/[lang]/gbl/dictionaries/ja.ts\")"
+      "Bash(perl -0pi -e 's/\\(season: \\\\{ t: \"シーズン日程\", d: \"リーグローテ · 今週開催のリーグ・カップ\" \\\\},\\)/$1\\\\n      iv: { t: \"PvP個体値ランク\", d: \"好きなポケモンのリーグ別最適個体値\" },/' \"app/[lang]/gbl/dictionaries/ja.ts\")",
+      "Bash(timeout 25 curl -s \"https://gblnote.com/sitemap.xml\")",
+      "Bash(timeout 25 curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" \"https://gblnote.com/gbl/iv\")",
+      "Bash(timeout 25 curl -s \"https://gblnote.com/gbl/iv\")",
+      "Bash(timeout 25 curl -s \"https://gblnote.com/gbl?v=$\\(date +%s\\)\")",
+      "Bash(timeout 25 curl -s -I \"https://gblnote.com/gbl\")",
+      "Bash(grep -n \"const CARD = \\\\\"#fff\\\\\", BORDER\\\\|const lgC =\\\\|const top = rows.slice\\\\|<div style={{ fontSize: \\\\\"0.72rem\\\\\", color: \\\\\"#94a3b8\\\\\", margin: \\\\\"7px 2px 0\\\\\" }}>{t.topNote}\" \"app/[lang]/gbl/iv/IvChecker.tsx\")",
+      "Bash(curl -s \"http://localhost:3000/gbl/iv\" -o /dev/null -w \"IV HTTP %{http_code}\\\\n\")"
     ]
   }
 }

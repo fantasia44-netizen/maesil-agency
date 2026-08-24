@@ -7,6 +7,7 @@ export type IvDict = {
   findH: string; ivAtk: string; ivDef: string; ivHp: string; findBtn: string; yourRank: string; rankUnit: string; invalidIv: string;
   thRank: string; thIv: string; thCp: string; thLv: string; thAtk: string; thDef: string; thHp: string; thProduct: string;
   topNote: string; explainerH: string; explainerBody: string;
+  shareBtn: string; imgBuilding: string; imgShare: string; imgSave: string; imgClose: string; imgFooter: string; imgTopLabel: string;
   footerGuide: string; footerPrivacy: string;
   metaTitle: string; metaDesc: string; ogTitle: string; ogDesc: string;
 };
@@ -24,6 +25,7 @@ const ko: IvDict = {
   topNote: "상위 100위까지 표시 · 내 IV는 위에서 조회",
   explainerH: "IV 순위란?",
   explainerBody: "PvP(GBL)에서는 리그 CP 제한(슈퍼 1500·하이퍼 2500) 안에서 스탯곱(공격×방어×체력)이 높을수록 강합니다. CP 제한이 있으면 공격 종족값이 낮은 개체가 더 높은 레벨까지 올라가 방어·체력이 커져 순위가 높아집니다. 마스터리그는 제한이 없어 15/15/15가 항상 1위입니다.",
+  shareBtn: "📸 이 IV 순위표 이미지로 공유·저장", imgBuilding: "이미지 생성 중…", imgShare: "📤 공유", imgSave: "💾 저장", imgClose: "닫기", imgFooter: "포켓몬GO PvP IV 순위", imgTopLabel: "상위 {n}위",
   footerGuide: "가이드", footerPrivacy: "개인정보처리방침",
   metaTitle: "포켓몬고 PvP IV 순위 체커 · 리그별 최적 개체값 | GBL Note",
   metaDesc: "포켓몬 GO PvP(배틀리그) IV 순위 체커. 원하는 포켓몬의 슈퍼·하이퍼·마스터리그 최적 개체값(IV)을 스탯곱 순위로 확인하세요. 전체 도감 지원.",
@@ -43,6 +45,7 @@ const en: IvDict = {
   topNote: "Top 100 shown · look up your IV above",
   explainerH: "What is IV rank?",
   explainerBody: "In PvP (GBL), within the league CP cap (Great 1500, Ultra 2500), a higher stat product (Attack × Defense × HP) is stronger. With a CP cap, a lower Attack base lets the Pokémon reach a higher level, gaining Defense and HP, so it ranks higher. Master League has no cap, so 15/15/15 is always #1.",
+  shareBtn: "📸 Save/Share this IV ranking", imgBuilding: "Generating image…", imgShare: "📤 Share", imgSave: "💾 Save", imgClose: "Close", imgFooter: "Pokémon GO PvP IV Ranks", imgTopLabel: "Top {n}",
   footerGuide: "Guides", footerPrivacy: "Privacy Policy",
   metaTitle: "Pokémon GO PvP IV Rank Checker · Best IVs by League | GBL Note",
   metaDesc: "Pokémon GO PvP (Battle League) IV rank checker. Find any Pokémon's best IVs for Great, Ultra and Master League ranked by stat product. Full Pokédex supported.",
@@ -62,6 +65,7 @@ const ja: IvDict = {
   topNote: "上位100位まで表示 · 自分の個体値は上で照会",
   explainerH: "個体値ランクとは？",
   explainerBody: "PvP(GBL)ではリーグのCP制限(スーパー1500・ハイパー2500)内で、ステータス積(攻×防×HP)が高いほど強力です。CP制限があると、こうげき種族値が低い個体ほど高いレベルまで上げられ、防御・HPが増えて順位が上がります。マスターは制限なしのため15/15/15が常に1位です。",
+  shareBtn: "📸 このIVランキングを保存・共有", imgBuilding: "画像を生成中…", imgShare: "📤 共有", imgSave: "💾 保存", imgClose: "閉じる", imgFooter: "ポケモンGO PvP個体値ランク", imgTopLabel: "上位{n}",
   footerGuide: "ガイド", footerPrivacy: "プライバシーポリシー",
   metaTitle: "ポケモンGO PvP個体値ランクチェッカー · リーグ別最適個体値 | GBL Note",
   metaDesc: "ポケモンGO PvP(バトルリーグ)個体値ランクチェッカー。好きなポケモンのスーパー・ハイパー・マスターリーグ最適個体値をステータス積順で確認。全図鑑対応。",
