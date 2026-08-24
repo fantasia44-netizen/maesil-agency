@@ -34,12 +34,12 @@ const PKNAMES = PKN as unknown as Record<string, { ko: string; en: string; ja: s
 
 // 상대 검색 pool — 실측은 비메타몬(니로우 등)도 만나므로 전 도감(~1025)+그림자에서 검색 가능해야 함.
 // 메타몬(타입·기술 리치)을 우선 배치(흔한 상대 먼저), 나머지 dex는 경량 엔트리로 보충.
-const _covered = new Set<string>();          // `${dex}_${shadow?1:0}` 중복 방지
+// 지역폼(알로라/가라르/히스이)은 base와 dex가 같으므로 중복제거는 dex가 아닌 id(slug) 기준 — base 폼이 항상 유지됨.
 const _metaMons: Mon[] = [];
+const _seen = new Set<string>();
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) {
-  const k = `${m.dex}_${m.shadow ? 1 : 0}`;
-  if (_covered.has(k)) continue;
-  _covered.add(k); _metaMons.push(m);
+  if (_seen.has(m.id)) continue;
+  _seen.add(m.id); _metaMons.push(m);
 }
 // 비메타몬 기술풀 — GameMaster에서 추출한 dex별 학습기술(mon_movepools), 메타데이터(moves) 보유분으로 필터
 const _MP = MOVEPOOLS as unknown as Record<string, { fast: string[]; charged: string[] }>;
@@ -53,12 +53,12 @@ for (const [dexStr, nm] of Object.entries(PKNAMES)) {
   const fast = mp ? mp.fast.filter((x) => _mkeys.has(x)) : [];
   const charged = mp ? mp.charged.filter((x) => _mkeys.has(x)) : [];
   for (const shadow of [false, true]) {
-    const k = `${dex}_${shadow ? 1 : 0}`;
-    if (_covered.has(k)) continue;
-    _covered.add(k);
-    const m: Mon = { id: shadow ? `${base}_shadow` : base, dex, ko: nm.ko, en: nm.en, types: [], shadow, fast: [...fast], charged: [...charged] };
+    const id = shadow ? `${base}_shadow` : base;
+    if (_seen.has(id) || MON_BY_ID[id]) continue;  // 같은 slug이 메타/기존에 있으면 스킵(지역폼은 slug 달라 base 별도 유지)
+    _seen.add(id);
+    const m: Mon = { id, dex, ko: nm.ko, en: nm.en, types: [], shadow, fast: [...fast], charged: [...charged] };
     _extraMons.push(m);
-    MON_BY_ID[m.id] = m;                      // 표시용 resolver 확장(메타몬은 위에서 이미 등록됨)
+    MON_BY_ID[id] = m;                      // 표시용 resolver 확장(메타몬은 위에서 이미 등록됨)
   }
 }
 const FULL_MONS: Mon[] = [..._metaMons, ..._extraMons];  // 메타 먼저 + 전 도감 보충
