@@ -4,6 +4,9 @@ import type { Metadata } from "next";
 import { LEAGUE_SCHEDULE, type SchedulePeriod } from "../formats";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
 import { leagueName } from "../contentI18n";
+import { monSprite } from "../sprite";
+import { GBL_EVENTS } from "./gblEvents";
+import GblEventShareButton from "./GblEventShareButton";
 import { getSchedule, type ScheduleDict } from "./dict";
 
 export const revalidate = 600;
@@ -75,6 +78,16 @@ export default function SchedulePage({ params }: { params: { lang: string } }) {
   const daysLeft = Math.max(0, Math.ceil((endT - nowT) / 86400000));
   const ended = nowT >= endT;
 
+  // GBL 이벤트(월챔 등) — 실제 현재시각으로 진행/예정/종료 판정
+  const nowMs = Date.now();
+  const lx = (o: { ko: string; en: string; ja: string }) => o[lang] ?? o.ko;
+  const events = GBL_EVENTS
+    .map((ev) => {
+      const s: "live" | "soon" | "ended" = nowMs < Date.parse(ev.start) ? "soon" : nowMs >= Date.parse(ev.end) ? "ended" : "live";
+      return { ev, s };
+    })
+    .filter((e) => e.s !== "ended"); // 종료 이벤트는 숨김
+
   const ST: Record<string, { t: string; c: string; bg: string }> = {
     live: { t: t.statusLive, c: "#16a34a", bg: "#dcfce7" },
     soon: { t: t.statusSoon, c: "#2563eb", bg: "#dbeafe" },
@@ -129,6 +142,69 @@ export default function SchedulePage({ params }: { params: { lang: string } }) {
             </div>
           </div>
         </div>
+
+        {/* ── GBL 이벤트 · 보너스 ── */}
+        {events.length > 0 && (
+          <>
+            <h2 style={{ fontSize: "1.1rem", fontWeight: 900, color: "#0f172a", margin: "1.7rem 0 12px", letterSpacing: "-0.3px" }}>{t.eventsH2}</h2>
+            {events.map(({ ev, s }) => {
+              const live = s === "live";
+              const badge = live ? { t: t.evLive, c: "#c2410c", bg: "#ffedd5" } : { t: t.evSoon, c: "#2563eb", bg: "#dbeafe" };
+              return (
+                <div key={ev.start} style={{ position: "relative", overflow: "hidden", marginBottom: 14, borderRadius: 18,
+                  border: `1px solid ${live ? "#fdba74" : BORDER}`, background: live ? "linear-gradient(180deg,#fff7ed,#ffffff 42%)" : CARD,
+                  boxShadow: live ? "0 12px 30px -14px rgba(234,88,12,.4)" : "0 2px 10px -5px rgba(15,23,42,.1)" }}>
+                  <div style={{ position: "absolute", top: -22, right: -8, fontSize: "5.2rem", opacity: 0.1 }}>{ev.icon}</div>
+                  <div style={{ padding: "14px 16px 16px", position: "relative" }}>
+                    {/* 헤더 */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.68rem", fontWeight: 800, color: badge.c, background: badge.bg, borderRadius: 999, padding: "3px 10px" }}>
+                        {live && <span style={{ width: 6, height: 6, borderRadius: "50%", background: badge.c, display: "inline-block", animation: "gblLive 1.8s infinite" }} />}
+                        {badge.t}
+                      </span>
+                      <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#64748b" }}>{lx(ev.period)}</span>
+                      <span style={{ marginLeft: "auto" }}><GblEventShareButton ev={ev} lang={lang} t={t} label={t.evShare} /></span>
+                    </div>
+                    <div style={{ fontSize: "1.16rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.25, letterSpacing: "-0.3px" }}>
+                      <span style={{ marginRight: 6 }}>{ev.icon}</span>{lx(ev.title)}
+                    </div>
+                    {/* 보너스 */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 7, marginTop: 12 }}>
+                      {ev.bonuses.map((b, i) => (
+                        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: "0.9rem", fontWeight: 700, color: "#1e293b", lineHeight: 1.5 }}>
+                          <span style={{ flexShrink: 0, width: 20, height: 20, borderRadius: 6, background: live ? "#fb923c" : "#93c5fd", color: "#fff", fontSize: "0.72rem", fontWeight: 900, display: "inline-flex", alignItems: "center", justifyContent: "center", marginTop: 1 }}>✓</span>
+                          <span>{lx(b)}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {/* 진화 특별기술 */}
+                    {ev.moves && ev.moves.length > 0 && (
+                      <div style={{ marginTop: 15, paddingTop: 14, borderTop: `1px dashed ${BORDER}` }}>
+                        {ev.movesTitle && <div style={{ fontSize: "0.9rem", fontWeight: 900, color: "#0f172a" }}>🧬 {lx(ev.movesTitle).replace("{n}", String(ev.moves.length))}</div>}
+                        {ev.movesNote && <div style={{ fontSize: "0.74rem", color: "#64748b", marginTop: 3, lineHeight: 1.5 }}>{lx(ev.movesNote)}</div>}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 8, marginTop: 11 }}>
+                          {ev.moves.map((m, i) => (
+                            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 9px", borderRadius: 11,
+                              background: m.pvp ? "#eff6ff" : "#f8fafc", border: `1px solid ${m.pvp ? "#bfdbfe" : "#eef2f7"}` }}>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={monSprite(m.nameKo, m.dex)} alt="" width={30} height={30} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
+                              <div style={{ minWidth: 0 }}>
+                                <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#475569", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{lx(m.mon)}</div>
+                                <div style={{ fontSize: "0.8rem", fontWeight: 900, color: m.pvp ? "#1d4ed8" : "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {m.pvp && <span style={{ marginRight: 3 }}>⚔️</span>}{lx(m.move)}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </>
+        )}
 
         {/* ── 리그 로테이션 타임라인 ── */}
         <h2 style={{ fontSize: "1.1rem", fontWeight: 900, color: "#0f172a", margin: "1.7rem 0 12px", letterSpacing: "-0.3px" }}>{t.rotationH2}</h2>

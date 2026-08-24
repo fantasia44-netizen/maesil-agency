@@ -1,1 +1,252 @@
-[{"id":"electrode_hisuian","ko":"히스이 붐볼","en":"Hisuian Electrode","ja":"ヒスイマルマイン","dex":101,"a":176,"d":176,"s":155},{"id":"zapdos_galarian","ko":"가라르 썬더","en":"Galarian Zapdos","ja":"ガラルサンダー","dex":145,"a":252,"d":189,"s":207},{"id":"moltres_galarian","ko":"가라르 파이어","en":"Galarian Moltres","ja":"ガラルファイヤー","dex":146,"a":202,"d":231,"s":207},{"id":"typhlosion_hisuian","ko":"히스이 블레이범","en":"Hisuian Typhlosion","ja":"ヒスイバクフーン","dex":157,"a":238,"d":172,"s":177},{"id":"corsola_galarian","ko":"가라르 코산호","en":"Galarian Corsola","ja":"ガラルサニーゴ","dex":222,"a":116,"d":182,"s":155},{"id":"dialga_origin","ko":"디아루가 (오리진)","en":"Dialga (Origin)","ja":"ディアルガ（オリジンフォルム）","dex":483,"a":270,"d":225,"s":205},{"id":"palkia_origin","ko":"펄기아 (오리진)","en":"Palkia (Origin)","ja":"パルキア（オリジンフォルム）","dex":484,"a":286,"d":223,"s":189},{"id":"giratina_origin","ko":"기라티나 (오리진)","en":"Giratina (Origin)","ja":"ギラティナ（オリジンフォルム）","dex":487,"a":225,"d":187,"s":284},{"id":"thundurus_therian","ko":"볼트로스 (영물폼)","en":"Thundurus (Therian)","ja":"ボルトロス（れいじゅうフォルム）","dex":642,"a":295,"d":161,"s":188},{"id":"landorus_therian","ko":"랜드로스 (영물폼)","en":"Landorus (Therian)","ja":"ランドロス（れいじゅうフォルム）","dex":645,"a":289,"d":179,"s":205},{"id":"kyurem_white","ko":"화이트 큐레무","en":"White Kyurem","ja":"ホワイトキュレム","dex":646,"a":310,"d":183,"s":245},{"id":"kyurem_black","ko":"블랙 큐레무","en":"Black Kyurem","ja":"ブラックキュレム","dex":646,"a":310,"d":183,"s":245},{"id":"gourgeist_large","ko":"펌킨인","en":"Gourgeist","ja":"パンプジン","dex":711,"a":179,"d":206,"s":181},{"id":"gourgeist_super","ko":"펌킨인","en":"Gourgeist","ja":"パンプジン","dex":711,"a":182,"d":200,"s":198},{"id":"gourgeist_average","ko":"펌킨인","en":"Gourgeist","ja":"パンプジン","dex":711,"a":175,"d":213,"s":163},{"id":"avalugg_hisuian","ko":"히스이 크레베이스","en":"Hisuian Avalugg","ja":"ヒスイクレベース","dex":713,"a":214,"d":238,"s":216},{"id":"zygarde_complete","ko":"지가르데","en":"Zygarde","ja":"ジガルデ","dex":718,"a":184,"d":207,"s":389},{"id":"decidueye_hisuian","ko":"히스이 모크나이퍼","en":"Hisuian Decidueye","ja":"ヒスイジュナイパー","dex":724,"a":213,"d":174,"s":204},{"id":"necrozma_dawn_wings","ko":"네크로즈마 (새벽의 날개)","en":"Necrozma (Dawn Wings)","ja":"ネクロズマ (あかつきのつばさ)","dex":800,"a":277,"d":220,"s":200},{"id":"necrozma_dusk_mane","ko":"네크로즈마 (황혼의 갈기)","en":"Necrozma (Dusk Mane)","ja":"ネクロズマ (たそがれのたてがみ)","dex":800,"a":277,"d":220,"s":200},{"id":"zacian_crowned_sword","ko":"자시안 (검왕)","en":"Zacian (Crowned Sword)","ja":"ザシアン (けんのおう)","dex":888,"a":332,"d":240,"s":192},{"id":"zamazenta_crowned_shield","ko":"자마젠타 (방패왕)","en":"Zamazenta (Crowned Shield)","ja":"ザマゼンタ (たてのおう)","dex":889,"a":250,"d":292,"s":192},{"id":"enamorus_therian","ko":"러브로스 (영물폼)","en":"Enamorus (Therian)","ja":"ラブトロス（れいじゅうフォルム）","dex":905,"a":250,"d":201,"s":179},{"id":"oinkologne_female","ko":"퍼퓨돈","en":"Oinkologne","ja":"パフュートン","dex":916,"a":169,"d":162,"s":251}]
+[
+  {
+    "id": "electrode_hisuian",
+    "ko": "히스이 붐볼",
+    "en": "Hisuian Electrode",
+    "ja": "ヒスイマルマイン",
+    "dex": 101,
+    "a": 176,
+    "d": 176,
+    "s": 155
+  },
+  {
+    "id": "zapdos_galarian",
+    "ko": "가라르 썬더",
+    "en": "Galarian Zapdos",
+    "ja": "ガラルサンダー",
+    "dex": 145,
+    "a": 252,
+    "d": 189,
+    "s": 207
+  },
+  {
+    "id": "moltres_galarian",
+    "ko": "가라르 파이어",
+    "en": "Galarian Moltres",
+    "ja": "ガラルファイヤー",
+    "dex": 146,
+    "a": 202,
+    "d": 231,
+    "s": 207
+  },
+  {
+    "id": "typhlosion_hisuian",
+    "ko": "히스이 블레이범",
+    "en": "Hisuian Typhlosion",
+    "ja": "ヒスイバクフーン",
+    "dex": 157,
+    "a": 238,
+    "d": 172,
+    "s": 177
+  },
+  {
+    "id": "corsola_galarian",
+    "ko": "가라르 코산호",
+    "en": "Galarian Corsola",
+    "ja": "ガラルサニーゴ",
+    "dex": 222,
+    "a": 116,
+    "d": 182,
+    "s": 155
+  },
+  {
+    "id": "dialga_origin",
+    "ko": "디아루가 (오리진)",
+    "en": "Dialga (Origin)",
+    "ja": "ディアルガ（オリジンフォルム）",
+    "dex": 483,
+    "a": 270,
+    "d": 225,
+    "s": 205
+  },
+  {
+    "id": "palkia_origin",
+    "ko": "펄기아 (오리진)",
+    "en": "Palkia (Origin)",
+    "ja": "パルキア（オリジンフォルム）",
+    "dex": 484,
+    "a": 286,
+    "d": 223,
+    "s": 189
+  },
+  {
+    "id": "giratina_origin",
+    "ko": "기라티나 (오리진)",
+    "en": "Giratina (Origin)",
+    "ja": "ギラティナ（オリジンフォルム）",
+    "dex": 487,
+    "a": 225,
+    "d": 187,
+    "s": 284
+  },
+  {
+    "id": "thundurus_therian",
+    "ko": "볼트로스 (영물폼)",
+    "en": "Thundurus (Therian)",
+    "ja": "ボルトロス（れいじゅうフォルム）",
+    "dex": 642,
+    "a": 295,
+    "d": 161,
+    "s": 188
+  },
+  {
+    "id": "landorus_therian",
+    "ko": "랜드로스 (영물폼)",
+    "en": "Landorus (Therian)",
+    "ja": "ランドロス（れいじゅうフォルム）",
+    "dex": 645,
+    "a": 289,
+    "d": 179,
+    "s": 205
+  },
+  {
+    "id": "kyurem_white",
+    "ko": "화이트 큐레무",
+    "en": "White Kyurem",
+    "ja": "ホワイトキュレム",
+    "dex": 646,
+    "a": 310,
+    "d": 183,
+    "s": 245
+  },
+  {
+    "id": "kyurem_black",
+    "ko": "블랙 큐레무",
+    "en": "Black Kyurem",
+    "ja": "ブラックキュレム",
+    "dex": 646,
+    "a": 310,
+    "d": 183,
+    "s": 245
+  },
+  {
+    "id": "gourgeist_large",
+    "ko": "펌킨인",
+    "en": "Gourgeist",
+    "ja": "パンプジン",
+    "dex": 711,
+    "a": 179,
+    "d": 206,
+    "s": 181
+  },
+  {
+    "id": "gourgeist_super",
+    "ko": "펌킨인",
+    "en": "Gourgeist",
+    "ja": "パンプジン",
+    "dex": 711,
+    "a": 182,
+    "d": 200,
+    "s": 198
+  },
+  {
+    "id": "gourgeist_average",
+    "ko": "펌킨인",
+    "en": "Gourgeist",
+    "ja": "パンプジン",
+    "dex": 711,
+    "a": 175,
+    "d": 213,
+    "s": 163
+  },
+  {
+    "id": "avalugg_hisuian",
+    "ko": "히스이 크레베이스",
+    "en": "Hisuian Avalugg",
+    "ja": "ヒスイクレベース",
+    "dex": 713,
+    "a": 214,
+    "d": 238,
+    "s": 216
+  },
+  {
+    "id": "zygarde_complete",
+    "ko": "지가르데 (퍼펙트폼)",
+    "en": "Zygarde (Complete)",
+    "ja": "ジガルデ (パーフェクト)",
+    "dex": 718,
+    "a": 184,
+    "d": 207,
+    "s": 389
+  },
+  {
+    "id": "decidueye_hisuian",
+    "ko": "히스이 모크나이퍼",
+    "en": "Hisuian Decidueye",
+    "ja": "ヒスイジュナイパー",
+    "dex": 724,
+    "a": 213,
+    "d": 174,
+    "s": 204
+  },
+  {
+    "id": "necrozma_dawn_wings",
+    "ko": "네크로즈마 (새벽의 날개)",
+    "en": "Necrozma (Dawn Wings)",
+    "ja": "ネクロズマ (あかつきのつばさ)",
+    "dex": 800,
+    "a": 277,
+    "d": 220,
+    "s": 200
+  },
+  {
+    "id": "necrozma_dusk_mane",
+    "ko": "네크로즈마 (황혼의 갈기)",
+    "en": "Necrozma (Dusk Mane)",
+    "ja": "ネクロズマ (たそがれのたてがみ)",
+    "dex": 800,
+    "a": 277,
+    "d": 220,
+    "s": 200
+  },
+  {
+    "id": "zacian_crowned_sword",
+    "ko": "자시안 (검왕)",
+    "en": "Zacian (Crowned Sword)",
+    "ja": "ザシアン (けんのおう)",
+    "dex": 888,
+    "a": 332,
+    "d": 240,
+    "s": 192
+  },
+  {
+    "id": "zamazenta_crowned_shield",
+    "ko": "자마젠타 (방패왕)",
+    "en": "Zamazenta (Crowned Shield)",
+    "ja": "ザマゼンタ (たてのおう)",
+    "dex": 889,
+    "a": 250,
+    "d": 292,
+    "s": 192
+  },
+  {
+    "id": "enamorus_therian",
+    "ko": "러브로스 (영물폼)",
+    "en": "Enamorus (Therian)",
+    "ja": "ラブトロス（れいじゅうフォルム）",
+    "dex": 905,
+    "a": 250,
+    "d": 201,
+    "s": 179
+  },
+  {
+    "id": "oinkologne_female",
+    "ko": "퍼퓨돈",
+    "en": "Oinkologne",
+    "ja": "パフュートン",
+    "dex": 916,
+    "a": 169,
+    "d": 162,
+    "s": 251
+  },
+  {
+    "id": "zygarde_10",
+    "ko": "지가르데 (10% 폼)",
+    "en": "Zygarde (10%)",
+    "ja": "ジガルデ (10%)",
+    "dex": 718,
+    "a": 205,
+    "d": 173,
+    "s": 144
+  }
+]

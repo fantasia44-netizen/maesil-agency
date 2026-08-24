@@ -269,7 +269,8 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
   // 보스 로테이션 기간 아젠다(전 기간, 시작일순) — 보스 클릭 시 CP 모달
   const fmtD = (iso: string) => { const d = new Date(iso); return `${d.getMonth() + 1}.${d.getDate()}`; };
   const nowTs = Date.now();
-  const rotations = events.filter((e) => e.kind === "rotation")
+  // 진행 중/예정만 노출 — 종료된 로테이션(end ≤ now)은 숨김
+  const rotations = events.filter((e) => e.kind === "rotation" && new Date(e.end).getTime() > nowTs)
     .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
   const liveRots = rotations.filter((e) => nowTs >= new Date(e.start).getTime() && nowTs < new Date(e.end).getTime());
@@ -435,20 +436,23 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
 
       {/* 이 달 주요 이벤트(커뮤니티데이·스포트라이트·맥스 등) — 표시 중인 월에 걸치는 것만 */}
       {(() => {
-        const me = majorEvents.filter((e) => new Date(e.start).getTime() < mEnd && new Date(e.end).getTime() >= mStart)
-          .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+        // 진행 중/예정만 — 종료된 이벤트(end ≤ now) 숨김, 진행 중 먼저
+        const me = majorEvents.filter((e) => new Date(e.start).getTime() < mEnd && new Date(e.end).getTime() >= mStart && new Date(e.end).getTime() > nowTs)
+          .map((e) => ({ e, live: nowTs >= new Date(e.start).getTime() && nowTs < new Date(e.end).getTime() }))
+          .sort((a, b) => (b.live ? 1 : 0) - (a.live ? 1 : 0) || new Date(a.e.start).getTime() - new Date(b.e.start).getTime());
         if (me.length === 0) return null;
         return (
           <div style={{ marginTop: 18 }}>
             <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a", marginBottom: 10 }}>{tpl(t.majorEventsH, { month: monthName(cur.m), m: cur.m })}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-              {me.map((e, i) => {
+              {me.map(({ e, live }, i) => {
                 const s = new Date(e.start), en = new Date(e.end);
                 const multi = e.start.slice(0, 10) !== e.end.slice(0, 10);
                 const dstr = `${s.getMonth() + 1}/${s.getDate()}` + (multi ? `~${en.getMonth() + 1}/${en.getDate()}` : "");
                 const nm = e.name.replace(/\s+in\s+.*$/i, "").replace(/&amp;/g, "&").trim();
                 return (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "8px 11px" }}>
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", background: live ? "linear-gradient(180deg,#f0fdf4,#ffffff 60%)" : CARD, border: `1px solid ${live ? "#86efac" : BORDER}`, borderRadius: 10, padding: "8px 11px" }}>
+                    <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#fff", background: live ? "#16a34a" : "#94a3b8", borderRadius: 8, padding: "2px 8px", whiteSpace: "nowrap" }}>{live ? t.live : t.upcoming}</span>
                     <span style={{ fontSize: "0.68rem", fontWeight: 800, color: "#7c3aed", background: "#f3e8ff", borderRadius: 8, padding: "2px 9px", whiteSpace: "nowrap" }}>{e.emoji} {t.evtType[e.eventType] || e.eventType}</span>
                     <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#0f172a" }}>{dstr}</span>
                     <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#334155" }}>{nm}</span>

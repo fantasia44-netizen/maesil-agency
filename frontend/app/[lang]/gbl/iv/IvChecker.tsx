@@ -18,8 +18,12 @@ type FormEntry = { id: string; ko: string; en: string; ja: string; dex: number; 
 const FORMS = FORMSJSON as unknown as FormEntry[];
 // 검색 대상: 전 도감(base) + 폼체인지/합체(검왕·큐레무·네크로즈마·지가르데 등, GM 폼 종족값)
 type Poke = { key: string; ko: string; en: string; ja: string; dex: string; a: number; d: number; s: number; form: boolean };
+// base 도감 이름 오버라이드(폼 구분 필요한 종만) — 예: 지가르데 base=50% 폼
+const BASE_NAME_OVERRIDE: Record<string, { ko: string; en: string; ja: string }> = {
+  "718": { ko: "지가르데 (50% 폼)", en: "Zygarde (50%)", ja: "ジガルデ (50%)" },
+};
 const POKELIST: Poke[] = [
-  ...Object.keys(STATS).filter((dx) => NAMES[dx]).map((dx) => ({ key: dx, ...NAMES[dx], dex: dx, a: STATS[dx].a, d: STATS[dx].d, s: STATS[dx].s, form: false })),
+  ...Object.keys(STATS).filter((dx) => NAMES[dx]).map((dx) => ({ key: dx, ...(BASE_NAME_OVERRIDE[dx] || NAMES[dx]), dex: dx, a: STATS[dx].a, d: STATS[dx].d, s: STATS[dx].s, form: false })),
   ...FORMS.map((f) => ({ key: "f:" + f.id, ko: f.ko, en: f.en, ja: f.ja, dex: String(f.dex), a: f.a, d: f.d, s: f.s, form: true })),
 ].sort((a, b) => Number(a.dex) - Number(b.dex) || (a.form ? 1 : 0) - (b.form ? 1 : 0));
 const spriteOf = (p: Poke) => (p.form ? monSprite(p.ko, p.dex) : pokeSprite(p.dex));

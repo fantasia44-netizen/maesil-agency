@@ -10,6 +10,7 @@ export type ScheduleDict = {
   cpNote1: string; metaLinkText: string; cpNote2: string; tierLinkText: string; cpNote3: string; cpGuideLink: string;
   footerGuide: string; footerPrivacy: string;
   megaSuffix: string;
+  eventsH2: string; evLive: string; evSoon: string; evEnded: string; evSource: string; evShare: string;
   endsInPre: string; daysUnit: string; endedWord: string; seasonProgressLabel: string; capWord: string; tzNote: string;
   cupLabels: Record<string, string>;
   notes: Record<string, string>;
@@ -33,6 +34,7 @@ const ko: ScheduleDict = {
   cpGuideLink: "리그별 CP 제한 가이드 →",
   footerGuide: "가이드", footerPrivacy: "개인정보처리방침",
   megaSuffix: ": 메가",
+  eventsH2: "GBL 이벤트 · 보너스", evLive: "진행 중", evSoon: "예정", evEnded: "종료", evSource: "공식 출처", evShare: "공유/다운로드",
   endsInPre: "종료까지 ", daysUnit: "일", endedWord: "종료됨", seasonProgressLabel: "시즌 진행", capWord: "CP", tzNote: "🕐 KST · UTC+9 기준",
   cupLabels: {
     "스크롤컵 (슈퍼리그)": "스크롤컵 (슈퍼리그)",
@@ -65,6 +67,7 @@ const en: ScheduleDict = {
   cpGuideLink: "League CP cap guide →",
   footerGuide: "Guides", footerPrivacy: "Privacy Policy",
   megaSuffix: ": Mega",
+  eventsH2: "GBL events & bonuses", evLive: "Live now", evSoon: "Upcoming", evEnded: "Ended", evSource: "Official source", evShare: "Share/Save",
   endsInPre: "Ends in ", daysUnit: " days", endedWord: "Ended", seasonProgressLabel: "Season progress", capWord: "CP", tzNote: "🕐 Times shown in KST (UTC+9)",
   cupLabels: {
     "스크롤컵 (슈퍼리그)": "Scroll Cup (Great League)",
@@ -97,6 +100,7 @@ const ja: ScheduleDict = {
   cpGuideLink: "リーグ別CP制限ガイド →",
   footerGuide: "ガイド", footerPrivacy: "プライバシーポリシー",
   megaSuffix: ": メガ",
+  eventsH2: "GBLイベント・ボーナス", evLive: "開催中", evSoon: "予定", evEnded: "終了", evSource: "公式ソース", evShare: "共有/保存",
   endsInPre: "終了まで", daysUnit: "日", endedWord: "終了", seasonProgressLabel: "シーズン進行", capWord: "CP", tzNote: "🕐 KST · UTC+9 基準",
   cupLabels: {
     "스크롤컵 (슈퍼리그)": "スクロールカップ（スーパーリーグ）",
