@@ -221,10 +221,16 @@ def public_meta(league: str = "master", days: int = 30,
     deck_count: Counter = Counter()
     deck_wl: dict = {}
     for r in rows:
-        ids = [t.get("speciesId") for t in (r.get("team_json") or []) if t.get("speciesId")]
+        raw = [t.get("speciesId") for t in (r.get("team_json") or [])]  # 슬롯 순서 유지
+        ids = [s for s in raw if s]
         for sid in ids:
             mon_count[sid] += 1
-        key = "|".join(sorted(ids)) if ids else ""
+        # 덱 키: 선봉(1번)은 고정, 2·3번(백라인)은 배틀마다 순서가 바뀌므로 순서무관으로 묶음
+        lead = raw[0] if raw and raw[0] else None
+        if lead:
+            key = "|".join([lead] + sorted(s for s in raw[1:] if s))
+        else:
+            key = "|".join(sorted(ids)) if ids else ""
         if key:
             deck_count[key] += 1
             wl = deck_wl.setdefault(key, [0, 0])
