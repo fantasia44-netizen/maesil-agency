@@ -144,7 +144,12 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
   );
 
   return (
-    <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: "minmax(0,1fr) auto", gap: 18, alignItems: "start" }}>
+    <>
+      <style>{`
+        .tm-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start;max-width:1000px;margin:0 auto}
+        @media(max-width:820px){ .tm-grid{grid-template-columns:1fr} }
+      `}</style>
+      <div className="tm-grid">
       {/* ── 좌: 빌더 컨트롤 ── */}
       <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
         {/* 대상 섹션 */}
@@ -189,7 +194,7 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
       </div>
 
       {/* ── 우: 라이브 미리보기(캡처 대상) ── */}
-      <div style={{ width: DESIGN_W * scale, margin: "0 auto" }}>
+      <div style={{ width: DESIGN_W * scale, maxWidth: "100%", margin: "0 auto", overflow: "hidden" }}>
         {/* 카드 출력 언어 선택(해외 공유용) — 캡처 대상 밖 */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 10 }}>
           <span style={{ fontSize: "0.85rem" }}>🌐</span>
@@ -228,6 +233,7 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
           <button onClick={download} disabled={busy} style={{ padding: "12px 18px", borderRadius: 999, border: "none", background: busy ? "#cbd5e1" : "#334155", color: "#fff", fontWeight: 800, fontSize: "0.95rem", cursor: busy ? "default" : "pointer" }}>💾 {t.saveBtn}</button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
