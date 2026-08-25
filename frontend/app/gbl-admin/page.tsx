@@ -343,7 +343,8 @@ export default function GblAdmin() {
             ) : (() => {
               const LABEL_KO: Record<string, string> = {
                 "cp-table": "개체값 CP표", "boss-list": "레이드 보스 목록", "raid-dealer": "레이드 딜러 TOP",
-                "pvp-tier": "배틀리그 티어표", "raid-calendar": "레이드 달력", "stats-card": "내 전적 카드", "list": "목록", "(기타)": "(기타)",
+                "pvp-tier": "배틀리그 티어표", "raid-calendar": "레이드 달력", "stats-card": "내 전적 카드", "list": "목록",
+                "trade": "교환 목록 카드", "iv-table": "IV 순위표", "pokemon-card": "포켓몬 상세 카드", "cmp-rank": "CMP 순위", "(기타)": "(기타·라벨없음)",
               };
               const mx = Math.max(...traffic.shares.map((s) => s.total), 1);
               return (

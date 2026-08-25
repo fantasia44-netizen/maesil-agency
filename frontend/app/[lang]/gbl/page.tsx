@@ -55,6 +55,7 @@ export default function GblLanding() {
   const RAID: Card[] = [
     { ic: "🔥", t: t.cards.raidDealer.t, d: t.cards.raidDealer.d, href: L("/gbl/raid"), c: "#ea580c", tag: t.cards.raidDealer.tag },
     { ic: "🗓️", t: t.cards.raidSchedule.t, d: t.cards.raidSchedule.d, href: L("/gbl/raid/schedule"), c: "#db2777" },
+    { ic: "📅", t: t.cards.events.t, d: t.cards.events.d, href: L("/gbl/events"), c: "#0ea5e9", tag: "NEW" },
     { ic: "💯", t: t.cards.raidBosses.t, d: t.cards.raidBosses.d, href: L("/gbl/raid/bosses"), c: "#c2410c" },
     { ic: "💱", t: t.cards.trade.t, d: t.cards.trade.d, href: L("/gbl/trade"), c: "#0ea5e9", tag: "NEW" },
   ];

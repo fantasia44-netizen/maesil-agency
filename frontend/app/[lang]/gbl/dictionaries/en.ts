@@ -21,6 +21,7 @@ const en: Dict = {
     cards: {
       raidDealer: { t: "Raid Attacker Tiers", d: "Best attackers by type · Overall (DPS+TDO)", tag: "Popular" },
       raidSchedule: { t: "Raid Schedule", d: "Monthly calendar · 5★/Mega rotation · Raid Hour/Day" },
+      events: { t: "Event Calendar", d: "Community Day, Spotlight, Max & egg hatches — auto-updated" },
       raidBosses: { t: "Boss 100% CP", d: "Current bosses · catch CP table by IV" },
       tier: { t: "Battle League Tiers", d: "Great/Ultra/Master tiers + recommended moves" },
       meta: { t: "Encounter Meta", d: "Top pick rates of opponents actually faced in battle" },

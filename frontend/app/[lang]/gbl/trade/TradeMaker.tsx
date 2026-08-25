@@ -8,6 +8,7 @@ import COS from "../costumes.json";
 import { pokeSprite } from "../sprite";
 import type { Locale } from "../../../../lib/i18n";
 import { getTrade, type TradeDict } from "./dict";
+import { track } from "../../../../lib/track";
 
 type PKN_T = Record<string, { ko: string; en: string; ja: string }>;
 const NAMES = PKN as unknown as PKN_T;
@@ -102,11 +103,13 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
     filter: (n: HTMLElement) => !(n instanceof HTMLElement && n.dataset && n.dataset.noshot === "1") });
   const download = async () => {
     if (!cardRef.current || busy) return; setBusy(true);
+    track("download", "/gbl/trade", "trade");
     try { const url = await toPng(cardRef.current, { ...baseOpts(), pixelRatio: 2 }); const a = document.createElement("a"); a.href = url; a.download = "gblnote-trade.png"; a.click(); }
     catch (e) { console.error(e); } finally { setBusy(false); }
   };
   const share = async () => {
     if (!cardRef.current || busy) return; setBusy(true);
+    track("share", "/gbl/trade", "trade");
     try {
       const dataUrl = await toJpeg(cardRef.current, { ...baseOpts(), pixelRatio: 1.6, quality: 0.92 });
       const blob = await (await fetch(dataUrl)).blob();

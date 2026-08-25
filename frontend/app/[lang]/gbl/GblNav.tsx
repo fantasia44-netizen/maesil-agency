@@ -13,6 +13,7 @@ const GROUPS: Group[] = [
   { key: "raid", href: "/gbl/raid", items: [
     { path: "/gbl/raid" }, { path: "/gbl/raid/schedule" }, { path: "/gbl/raid/bosses" }, { path: "/gbl/trade" },
   ] },
+  { key: "events", href: "/gbl/events" },
   { key: "pvp", href: "/gbl/tier/master", items: [
     { path: "/gbl/tier/master" }, { path: "/gbl/meta" }, { path: "/gbl/cmp/master" }, { path: "/gbl/iv" }, { path: "/gbl/schedule" },
   ] },
@@ -25,7 +26,7 @@ const GROUPS: Group[] = [
 type Dict = { groups: Record<string, string>; items: Record<string, string>; menu: string; member: string };
 const T: Record<Locale, Dict> = {
   ko: {
-    groups: { raid: "레이드", pvp: "배틀리그", guide: "가이드", community: "커뮤니티" },
+    groups: { raid: "레이드", events: "이벤트", pvp: "배틀리그", guide: "가이드", community: "커뮤니티" },
     items: {
       "/gbl/raid": "딜러 티어", "/gbl/raid/schedule": "레이드 일정", "/gbl/raid/bosses": "보스 100% CP",
       "/gbl/tier/master": "티어표", "/gbl/meta": "실측 메타", "/gbl/cmp/master": "CMP 우선권", "/gbl/iv": "PvP IV 순위", "/gbl/schedule": "시즌 일정",
@@ -34,7 +35,7 @@ const T: Record<Locale, Dict> = {
     menu: "메뉴", member: "회원",
   },
   en: {
-    groups: { raid: "Raids", pvp: "Battle League", guide: "Guides", community: "Community" },
+    groups: { raid: "Raids", events: "Events", pvp: "Battle League", guide: "Guides", community: "Community" },
     items: {
       "/gbl/raid": "Attacker Tiers", "/gbl/raid/schedule": "Raid Schedule", "/gbl/raid/bosses": "Boss 100% CP",
       "/gbl/tier/master": "Tier List", "/gbl/meta": "Live Meta", "/gbl/cmp/master": "CMP Priority", "/gbl/iv": "PvP IV Ranks", "/gbl/schedule": "Season Schedule",
@@ -43,7 +44,7 @@ const T: Record<Locale, Dict> = {
     menu: "Menu", member: "Members",
   },
   ja: {
-    groups: { raid: "レイド", pvp: "バトルリーグ", guide: "ガイド", community: "コミュニティ" },
+    groups: { raid: "レイド", events: "イベント", pvp: "バトルリーグ", guide: "ガイド", community: "コミュニティ" },
     items: {
       "/gbl/raid": "アタッカー", "/gbl/raid/schedule": "レイド日程", "/gbl/raid/bosses": "ボス100%CP",
       "/gbl/tier/master": "ティア表", "/gbl/meta": "実測メタ", "/gbl/cmp/master": "CMP優先", "/gbl/iv": "PvP個体値", "/gbl/schedule": "シーズン日程",
