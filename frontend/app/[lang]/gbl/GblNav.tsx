@@ -11,14 +11,14 @@ type Group = { key: string; href: string; items?: Item[] };
 
 const GROUPS: Group[] = [
   { key: "raid", href: "/gbl/raid", items: [
-    { path: "/gbl/raid" }, { path: "/gbl/raid/schedule" }, { path: "/gbl/raid/bosses" },
+    { path: "/gbl/raid" }, { path: "/gbl/raid/schedule" }, { path: "/gbl/raid/bosses" }, { path: "/gbl/trade" },
   ] },
   { key: "pvp", href: "/gbl/tier/master", items: [
     { path: "/gbl/tier/master" }, { path: "/gbl/meta" }, { path: "/gbl/cmp/master" }, { path: "/gbl/iv" }, { path: "/gbl/schedule" },
   ] },
   { key: "guide", href: "/gbl/guide" },
   { key: "community", href: "/gbl/board", items: [
-    { path: "/gbl/trade" }, { path: "/gbl/board" }, { path: "/gbl/gallery" }, { path: "/gbl/app" }, { path: "/gbl/contact" },
+    { path: "/gbl/board" }, { path: "/gbl/gallery" }, { path: "/gbl/app" }, { path: "/gbl/contact" },
   ] },
 ];
 
