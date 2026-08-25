@@ -48,6 +48,7 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
   const ct = getTrade(cardLang);
 
   const cardRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   // 검색 결과 = 매칭 몬의 변형(기본 + 코스튬 전부). 9db식 변형 그리드.
   const results = useMemo<Variant[]>(() => {
@@ -76,12 +77,25 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
 
   const [scale, setScale] = useState(1);
   const [cardH, setCardH] = useState(0); // 카드 실측 높이(스케일 래퍼 흐름 높이 예약용)
+  // 카드 높이 실측 → 스케일 래퍼 흐름 높이 예약
   useEffect(() => {
-    if (typeof window !== "undefined") setScale(Math.min(1, (window.innerWidth - 28) / DESIGN_W));
     const el = cardRef.current; if (!el) return;
     const ro = new ResizeObserver(() => setCardH(el.offsetHeight));
     ro.observe(el); setCardH(el.offsetHeight);
     return () => ro.disconnect();
+  }, []);
+  // 스케일 실측 — 모바일(단일컬럼)에선 그리드 폭에 카드를 맞춰 가로 오버플로우 방지, 데스크톱은 원본(1)
+  useEffect(() => {
+    const el = gridRef.current; if (!el) return;
+    const compute = () => {
+      const w = el.clientWidth; if (!w) return; // 0폭(숨김/하이드레이션)일 땐 유지
+      const mobile = window.matchMedia("(max-width:820px)").matches;
+      setScale(mobile ? Math.min(1, w / DESIGN_W) : 1);
+    };
+    const ro = new ResizeObserver(compute);
+    ro.observe(el); compute();
+    window.addEventListener("orientationchange", compute);
+    return () => { ro.disconnect(); window.removeEventListener("orientationchange", compute); };
   }, []);
 
   const baseOpts = () => ({ cacheBust: true, backgroundColor: "#ffffff", width: DESIGN_W, height: cardRef.current!.offsetHeight,
@@ -147,9 +161,9 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
     <>
       <style>{`
         .tm-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start;max-width:1000px;margin:0 auto}
-        @media(max-width:820px){ .tm-grid{grid-template-columns:1fr} }
+        @media(max-width:820px){ .tm-grid{grid-template-columns:minmax(0,1fr)} }
       `}</style>
-      <div className="tm-grid">
+      <div className="tm-grid" ref={gridRef}>
       {/* ── 좌: 빌더 컨트롤 ── */}
       <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 14 }}>
         {/* 대상 섹션 */}
@@ -207,7 +221,9 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
             </button>
           ))}
         </div>
-        <div style={{ width: DESIGN_W, transform: `scale(${scale})`, transformOrigin: "top left", height: cardH * scale }}>
+        {/* 외부: 스케일된 크기로 흐름 높이 예약(버튼 위치 정확) · 내부: transform만 */}
+        <div style={{ width: DESIGN_W * scale, height: cardH * scale, maxWidth: "100%", overflow: "hidden" }}>
+          <div style={{ width: DESIGN_W, transform: `scale(${scale})`, transformOrigin: "top left" }}>
           <div ref={cardRef} style={{ width: "100%", background: "#ffffff", border: `1px solid ${LINE}`, borderRadius: 20, padding: "18px 18px 14px", boxShadow: "0 20px 50px -20px rgba(15,23,42,.3)" }}>
             <div style={{ textAlign: "center", fontSize: "1.5rem", fontWeight: 900, color: INK, letterSpacing: "0.02em", marginBottom: 12 }}>
               🔄 {ct.cardTitle}
@@ -225,6 +241,7 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
               </div>
               {code.trim() && <span style={{ fontSize: "0.9rem", fontWeight: 800, color: INK, letterSpacing: "0.06em" }}>👤 {code.trim()}</span>}
             </div>
+          </div>
           </div>
         </div>
         {/* 내보내기 — 완성 카드 바로 아래 */}
