@@ -20,7 +20,7 @@ const fmtDwell = (s: number) => { const t = Math.round(s || 0); return t >= 60 ?
 type Traffic = {
   days: number;
   daily: { day: string; pageviews: number; uniques: number; new_visitors: number; sessions: number }[];
-  summary: { pageviews: number; uniques: number; new_visitors: number; sessions: number; avg_dwell: number; bounce_rate: number; shares: number; downloads: number };
+  summary: { pageviews: number; uniques: number; new_visitors: number; returning_visitors: number; sessions: number; avg_dwell: number; bounce_rate: number; shares: number; downloads: number };
   active: { active_30m: number; pv_30m: number };
   paths: { path: string; views: number }[];
   refs: { ref: string; views: number }[];
@@ -32,16 +32,19 @@ type DbStatus = { hub_configured: boolean; maesil_total: number | null; maesil_h
 
 type BoardPost = { id: number; board: string; author: string; title: string; answered: boolean; is_private: boolean; reply_count: number; created_at: string };
 
-type DailyRow = { day: string; pageviews: number; uniques: number; new_visitors: number; sessions: number };
+type DailyRow = { day: string; pageviews: number; uniques: number; new_visitors: number; returning_visitors?: number; sessions: number };
 const CHART_SERIES: { key: keyof DailyRow; label: string; color: string }[] = [
   { key: "pageviews", label: "페이지뷰", color: "#3b5bdb" },
   { key: "uniques", label: "전체방문자", color: "#0f172a" },
   { key: "new_visitors", label: "신규방문자", color: "#16a34a" },
+  { key: "returning_visitors", label: "재방문자", color: "#0891b2" },
   { key: "sessions", label: "세션", color: "#7c3aed" },
 ];
 
 // 일별 방문 추이 — PV·방문자·신규·세션 통합 라인차트. 범례 클릭=표시/숨김(숨기면 축 자동 재조정).
-function TrafficChart({ daily }: { daily: DailyRow[] }) {
+function TrafficChart({ daily: rawDaily }: { daily: DailyRow[] }) {
+  // 재방문자 = 전체 − 신규(그날 이전에 첫 방문한 사람) — 일별 파생
+  const daily = rawDaily.map((d) => ({ ...d, returning_visitors: Math.max(0, (d.uniques || 0) - (d.new_visitors || 0)) }));
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const toggle = (k: string) => setHidden((h) => { const n = new Set(h); if (n.has(k)) n.delete(k); else n.add(k); return n; });
   const visible = CHART_SERIES.filter((s) => !hidden.has(s.key));
@@ -234,6 +237,7 @@ export default function GblAdmin() {
               { l: "페이지뷰", v: traffic.summary?.pageviews ?? 0, c: "#3b5bdb" },
               { l: "전체방문자", v: traffic.summary?.uniques ?? 0, c: "#0f172a" },
               { l: "신규방문자", v: traffic.summary?.new_visitors ?? 0, c: "#16a34a" },
+              { l: "재방문자", v: traffic.summary?.returning_visitors ?? 0, c: "#0891b2" },
               { l: "세션", v: traffic.summary?.sessions ?? 0, c: "#7c3aed" },
               { l: "평균 체류", v: fmtDwell(traffic.summary?.avg_dwell ?? 0), c: "#059669" },
               { l: "이탈률", v: `${Math.round((traffic.summary?.bounce_rate ?? 0) * 100)}%`, c: "#c2410c" },
