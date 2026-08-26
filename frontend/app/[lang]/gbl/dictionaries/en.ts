@@ -25,6 +25,7 @@ const en: Dict = {
       raidBosses: { t: "Boss 100% CP", d: "Current bosses · catch CP table by IV" },
       tier: { t: "Battle League Tiers", d: "Great/Ultra/Master tiers + recommended moves" },
       meta: { t: "Encounter Meta", d: "Top pick rates of opponents actually faced in battle" },
+      sim: { t: "Battle Simulator", d: "1v1 battle calc with custom IVs & moves · Great/Ultra/Master" },
       cmp: { t: "CMP Priority", d: "Charged move priority (attack) ranking" },
       season: { t: "Season Schedule", d: "League rotation · leagues & cups open this week" },
       iv: { t: "PvP IV Ranks", d: "Any Pokémon's best IVs per league" },

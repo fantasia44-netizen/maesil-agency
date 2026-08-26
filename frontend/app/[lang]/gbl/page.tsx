@@ -62,6 +62,7 @@ export default function GblLanding() {
   const PVP: Card[] = [
     { ic: "🏆", t: t.cards.tier.t, d: t.cards.tier.d, href: L("/gbl/tier/master"), c: "#7c3aed" },
     { ic: "📊", t: t.cards.meta.t, d: t.cards.meta.d, href: L("/gbl/meta"), c: "#059669" },
+    { ic: "⚔️", t: t.cards.sim.t, d: t.cards.sim.d, href: L("/gbl/sim"), c: "#4f46e5", tag: "NEW" },
     { ic: "⚡", t: t.cards.cmp.t, d: t.cards.cmp.d, href: L("/gbl/cmp/master"), c: "#0891b2" },
     { ic: "🧬", t: t.cards.iv.t, d: t.cards.iv.d, href: L("/gbl/iv"), c: "#4f46e5" },
     { ic: "🗓️", t: t.cards.season.t, d: t.cards.season.d, href: L("/gbl/schedule"), c: "#0d9488" },
