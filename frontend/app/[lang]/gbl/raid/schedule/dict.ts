@@ -30,7 +30,7 @@ export type ScheduleDict = {
   majorEventsH: string; evtType: Record<string, string>; dynamax: string; evtClassic: string;
   evtNameMap: Record<string, string>;
   monthBossesH: string; cpTableArrow: string;
-  rotationH: string; live: string; upcoming: string; liveNowH: string; endsWord: string;
+  rotationH: string; live: string; upcoming: string; liveNowH: string; endsWord: string; nBosses: string;
   saveBtn: string; building: string;
   share: string; save: string; close: string;
   imgTitle: string; imgFooter: string; imgShareTitle: string; imgFile: string;
@@ -78,7 +78,7 @@ const ko: ScheduleDict = {
     "Twitch Drops for 2026 Pokémon World Championships": "2026 포켓몬 세계대회 트위치 드롭스",
   },
   monthBossesH: "📋 {m}월 등장 보스", cpTableArrow: "CP표 →",
-  rotationH: "🔥 보스 로테이션 기간", live: "진행 중", upcoming: "예정", liveNowH: "🔥 지금 열리는 레이드", endsWord: "종료",
+  rotationH: "🔥 보스 로테이션 기간", live: "진행 중", upcoming: "예정", liveNowH: "🔥 지금 열리는 레이드", endsWord: "종료", nBosses: "{n}종",
   saveBtn: "📅 {m}월 달력 이미지 저장·공유", building: "이미지 생성 중…",
   share: "📤 공유", save: "💾 저장", close: "닫기",
   imgTitle: "포켓몬고 {m}월 레이드", imgFooter: "포켓몬GO 레이드 일정", imgShareTitle: "포켓몬고 {m}월 레이드 일정", imgFile: "gbl-raid-{m}월.png",
@@ -121,7 +121,7 @@ const en: ScheduleDict = {
   dynamax: "Dynamax", evtClassic: "Classic",
   evtNameMap: {},
   monthBossesH: "📋 Bosses in {month}", cpTableArrow: "CP table →",
-  rotationH: "🔥 Boss rotation periods", live: "Live", upcoming: "Upcoming", liveNowH: "🔥 Live raids now", endsWord: "ends",
+  rotationH: "🔥 Boss rotation periods", live: "Live", upcoming: "Upcoming", liveNowH: "🔥 Live raids now", endsWord: "ends", nBosses: "{n} bosses",
   saveBtn: "📅 Save/Share {month} calendar image", building: "Generating image…",
   share: "📤 Share", save: "💾 Save", close: "Close",
   imgTitle: "Pokémon GO {month} Raids", imgFooter: "Pokémon GO raid schedule", imgShareTitle: "Pokémon GO {month} raid schedule", imgFile: "gbl-raid-{m}.png",
@@ -171,7 +171,7 @@ const ja: ScheduleDict = {
     "Twitch Drops for 2026 Pokémon World Championships": "2026 ポケモンワールドチャンピオンシップ Twitchドロップ",
   },
   monthBossesH: "📋 {m}月 登場ボス", cpTableArrow: "CP表 →",
-  rotationH: "🔥 ボスローテーション期間", live: "開催中", upcoming: "予定", liveNowH: "🔥 今開催中のレイド", endsWord: "終了",
+  rotationH: "🔥 ボスローテーション期間", live: "開催中", upcoming: "予定", liveNowH: "🔥 今開催中のレイド", endsWord: "終了", nBosses: "{n}種",
   saveBtn: "📅 {m}月 カレンダー画像を保存・共有", building: "画像生成中…",
   share: "📤 共有", save: "💾 保存", close: "閉じる",
   imgTitle: "ポケモンGO {m}月 レイド", imgFooter: "ポケモンGO レイド日程", imgShareTitle: "ポケモンGO {m}月 レイド日程", imgFile: "gbl-raid-{m}.png",

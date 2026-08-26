@@ -95,7 +95,7 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
 
       // 밴드 보스 스프라이트 수집(폼 반영)
       const dexSet = new Set<string>();
-      weekBands.forEach((bands) => bands.forEach((b) => { const boss = b.e.bosses[0]; if (boss?.dex) dexSet.add(String(formDex(boss.ko, Number(boss.dex)))); }));
+      weekBands.forEach((bands) => bands.forEach((b) => b.e.bosses.slice(0, 3).forEach((boss) => { if (boss?.dex) dexSet.add(String(formDex(boss.ko, Number(boss.dex)))); })));
       const imgs: Record<string, HTMLImageElement> = {};
       const logoP = loadLogo();
       await Promise.all([...dexSet].map((dex) => new Promise<void>((res) => {
@@ -150,18 +150,23 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
         });
         weekBands[wi].forEach((b) => {
           const rot = ROT[b.e.variant || "star"];
-          const boss = b.e.bosses[0];
+          const bosses = b.e.bosses.slice(0, 3);
+          const first = b.e.bosses[0];
           const bx = gx + b.sc * cw + (b.startsHere ? 4 : 0);
           const bw = (b.ec - b.sc + 1) * cw - (b.startsHere ? 4 : 0) - (b.endsHere ? 4 : 0);
           const by = cy + DNUM_H_C + b.lane * BAND_H_C, bh = BAND_H_C - 8;
           ctx.fillStyle = rot.bg; ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 9); ctx.fill();
           if (b.startsHere) { ctx.fillStyle = rot.c; ctx.beginPath(); ctx.roundRect(bx, by, 6, bh, 3); ctx.fill(); }
-          let tx = bx + 10;
-          const dex = boss?.dex ? String(formDex(boss.ko, Number(boss.dex))) : "";
-          const im = dex ? imgs[dex] : null;
-          if (im) { const s = 27; ctx.drawImage(im, bx + 7, by + (bh - s) / 2, s, s); tx = bx + 7 + s + 5; }
+          const s = 27;
+          let tx = bx + 7;
+          bosses.forEach((boss) => {
+            const dex = boss?.dex ? String(formDex(boss.ko, Number(boss.dex))) : "";
+            const im = dex ? imgs[dex] : null;
+            if (im) { ctx.drawImage(im, tx, by + (bh - s) / 2, s, s); tx += s + 3; }
+          });
+          tx += 4;
           ctx.textAlign = "left"; ctx.font = "800 20px system-ui, sans-serif"; ctx.fillStyle = rot.c;
-          const label = `${rot.icon} ${boss ? boss.name + (boss.shiny ? " ✨" : "") : b.e.title}`;
+          const label = `${rot.icon} ${b.e.bosses.length <= 1 ? (first ? first.name + (first.shiny ? " ✨" : "") : b.e.title) : t.nBosses.replace("{n}", String(b.e.bosses.length))}`;
           ctx.fillText(fit(label, bx + bw - tx - 7), tx, by + bh / 2 + 7);
         });
         cy += rh;
@@ -369,7 +374,6 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
               {/* 가로 로테이션 밴드 (레인별) */}
               {bands.map((b, bi) => {
                 const rot = ROT[b.e.variant || "star"];
-                const boss = b.e.bosses[0];
                 const r = 8;
                 return (
                   <div key={bi}
@@ -383,12 +387,12 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
                       borderLeft: b.startsHere ? `3px solid ${rot.c}` : `1px solid ${rot.c}40`,
                       display: "flex", alignItems: "center", gap: 5, padding: "0 8px 0 6px", overflow: "hidden", zIndex: 1,
                     }}>
-                    {boss && (
+                    {b.e.bosses.slice(0, 3).map((bo, ii) => (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={monSprite(boss.ko, boss.dex)} alt="" width={20} height={20} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
-                    )}
+                      <img key={ii} src={monSprite(bo.ko, bo.dex)} alt="" width={20} height={20} style={{ imageRendering: "pixelated", objectFit: "contain", flexShrink: 0 }} />
+                    ))}
                     <span style={{ fontSize: "0.7rem", fontWeight: 800, color: rot.c, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {rot.icon} {boss ? boss.name + (boss.shiny ? " ✨" : "") : b.e.title}
+                      {rot.icon} {b.e.bosses.length === 0 ? b.e.title : b.e.bosses.length === 1 ? b.e.bosses[0].name + (b.e.bosses[0].shiny ? " ✨" : "") : t.nBosses.replace("{n}", String(b.e.bosses.length))}
                     </span>
                   </div>
                 );
