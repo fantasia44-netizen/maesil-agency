@@ -236,7 +236,7 @@ export default function GblAdmin() {
             {[
               { l: "페이지뷰", v: traffic.summary?.pageviews ?? 0, c: "#3b5bdb" },
               { l: "전체방문자", v: traffic.summary?.uniques ?? 0, c: "#0f172a" },
-              { l: "신규방문자", v: traffic.summary?.new_visitors ?? 0, c: "#16a34a" },
+              { l: "신규방문자", v: Math.max(0, (traffic.summary?.uniques ?? 0) - (traffic.summary?.returning_visitors ?? 0)), c: "#16a34a" },
               { l: "재방문자", v: traffic.summary?.returning_visitors ?? 0, c: "#0891b2" },
               { l: "세션", v: traffic.summary?.sessions ?? 0, c: "#7c3aed" },
               { l: "평균 체류", v: fmtDwell(traffic.summary?.avg_dwell ?? 0), c: "#059669" },
@@ -261,6 +261,8 @@ export default function GblAdmin() {
                   <tr style={{ color: "#94a3b8" }}>
                     <th style={{ textAlign: "left", fontWeight: 600, padding: "4px 6px" }}>날짜</th>
                     <th style={{ textAlign: "right", fontWeight: 600, padding: "4px 6px" }}>방문객</th>
+                    <th style={{ textAlign: "right", fontWeight: 600, padding: "4px 6px", color: "#16a34a" }}>신규</th>
+                    <th style={{ textAlign: "right", fontWeight: 600, padding: "4px 6px", color: "#0891b2" }}>재방문</th>
                     <th style={{ textAlign: "right", fontWeight: 600, padding: "4px 6px" }}>조회</th>
                     <th style={{ textAlign: "right", fontWeight: 600, padding: "4px 6px" }}>세션</th>
                     <th style={{ textAlign: "right", fontWeight: 600, padding: "4px 6px" }}>조회/방문</th>
@@ -271,6 +273,8 @@ export default function GblAdmin() {
                     <tr key={d.day} style={{ borderTop: "1px solid #f1f5f9" }}>
                       <td style={{ textAlign: "left", padding: "4px 6px", color: "#475569" }}>{d.day.slice(5)}</td>
                       <td style={{ textAlign: "right", padding: "4px 6px", fontWeight: 700, color: "#0f172a" }}>{d.uniques}</td>
+                      <td style={{ textAlign: "right", padding: "4px 6px", fontWeight: 600, color: "#16a34a" }}>{d.new_visitors ?? 0}</td>
+                      <td style={{ textAlign: "right", padding: "4px 6px", fontWeight: 600, color: "#0891b2" }}>{Math.max(0, (d.uniques || 0) - (d.new_visitors || 0))}</td>
                       <td style={{ textAlign: "right", padding: "4px 6px", fontWeight: 700, color: "#3b5bdb" }}>{d.pageviews}</td>
                       <td style={{ textAlign: "right", padding: "4px 6px", color: "#7c3aed" }}>{d.sessions}</td>
                       <td style={{ textAlign: "right", padding: "4px 6px", color: "#64748b" }}>{d.uniques ? (d.pageviews / d.uniques).toFixed(1) : "-"}</td>

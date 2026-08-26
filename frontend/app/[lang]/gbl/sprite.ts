@@ -63,3 +63,38 @@ export function formDex(name: string, dex: string | number): number {
 export function monSprite(name: string, dex: string | number): string {
   return pokeSprite(formDex(name, dex));
 }
+
+// ── PvPoke speciesId 기반 폼 스프라이트(배틀 시뮬용) ──────────────────
+// speciesId 접미(therian/origin/mega/black/white/crowned_sword …)를 PokeAPI 폼 dex로.
+// 모든 dex 스프라이트는 Supabase에 존재 확인됨(없으면 기본 dex 폴백=깨지지 않음).
+const FORM_DEX_ID: Record<string, number> = { // "baseDex_suffix" → 폼 dex
+  "386_attack": 10001, "386_defense": 10002, "386_speed": 10003,          // 데오키시스
+  "413_sandy": 10004, "413_trash": 10005,                                  // 도롱마담
+  "479_heat": 10008, "479_wash": 10009, "479_frost": 10010, "479_fan": 10011, "479_mow": 10012, // 로토무
+  "492_sky": 10006,                                                        // 쉐이미
+  "555_zen": 10018, "555_galarian_zen": 10019, "555_galarian_standard": 10230, // 불카모스/히히다루마
+  "646_black": 10022, "646_white": 10023,                                  // 큐레무 합체
+  "647_resolute": 10024,                                                   // 케르디오
+  "681_blade": 10026,                                                      // 킬가르도
+  "718_10": 10118, "718_complete": 10120,                                  // 지가르데
+  "720_unbound": 10086,                                                    // 후파
+  "800_dusk_mane": 10155, "800_dawn_wings": 10156, "800_ultra": 10157,     // 네크로즈마 합체
+  "888_crowned_sword": 10188, "889_crowned_shield": 10189,                 // 자시안/자마젠타 왕관
+  "898_ice_rider": 10193, "898_shadow_rider": 10194,                       // 버드렉스 합체
+};
+export function formDexById(speciesId: string, dex: string | number): number {
+  const d = Number(dex);
+  const id = (speciesId || "").replace(/_shadow$/, "");
+  const suffix = id.includes("_") ? id.slice(id.indexOf("_") + 1) : "";
+  if (!suffix) return d;
+  const spec = FORM_DEX_ID[d + "_" + suffix];
+  if (spec) return spec;
+  if (suffix === "mega" && MEGA[d]) return MEGA[d];
+  if (suffix === "mega_x" && MEGA_XY[d]) return MEGA_XY[d][0];
+  if (suffix === "mega_y" && MEGA_XY[d]) return MEGA_XY[d][1];
+  if (suffix === "primal" && PRIMAL[d]) return PRIMAL[d];
+  if (suffix === "therian" && THERIAN[d]) return THERIAN[d];
+  if (suffix === "origin" && ORIGIN[d]) return ORIGIN[d];
+  if ((suffix === "alolan" || suffix === "galarian" || suffix === "hisuian") && REGIONAL[d]) return REGIONAL[d];
+  return d;
+}
