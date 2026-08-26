@@ -51,7 +51,7 @@ function formLabel(lang: Locale, form: string): string {
   return form.replace(/(^|_)([a-z0-9])/g, (_, a, b) => (a ? " " : "") + b.toUpperCase());
 }
 function monName(lang: Locale, p: { speciesId: string; speciesName: string; dex: number }): string {
-  const cleanEn = p.speciesName.replace(/\s*\(Shadow\)/i, ""); // 그림자는 😈 뱃지로 표시 → 이름서 제거
+  const cleanEn = p.speciesName.replace(/\s*\((Shadow|Busted)\)/i, ""); // 그림자(😈)·디스가이즈 배틀상태 → 이름서 제거
   if (lang === "en") return cleanEn;
   const base = PKN[String(p.dex)];
   const bn = base ? (lang === "ja" ? base.ja : base.ko) : null;
@@ -289,6 +289,8 @@ function Timeline({ res, lang, t }: { res: any; lang: Locale; t: SimDict }) {
               const isCharged = e.type && String(e.type).includes("charged");
               const isFast = e.type && String(e.type).includes("fast");
               const isShield = e.type === "shield";
+              const isDisguise = e.type === "shieldSpecial"; // 따라큐 탈 벗겨짐 등
+              if (isDisguise) return <span key={i} title="Disguise Busted" style={{ position: "absolute", left: `${left}%`, top: 2, transform: `translateX(-50%) scale(${sc})`, fontSize: "0.72rem", opacity: op, transition: "opacity 90ms, transform 90ms" }}>🎭</span>;
               if (isShield) return <span key={i} title="Shield" style={{ position: "absolute", left: `${left}%`, top: 2, transform: `translateX(-50%) scale(${sc})`, fontSize: "0.7rem", opacity: op, transition: "opacity 90ms, transform 90ms" }}>🛡️</span>;
               if (isCharged) return <span key={i} title={e.name} style={{ position: "absolute", left: `${left}%`, top: 2, transform: `translateX(-50%) scale(${sc})`, width: 10, height: 18, borderRadius: 3, background: TYPE_COLOR[moveType(chargedIdOf(e, res, actor))] || color, boxShadow: fresh ? "0 0 0 2px #fbbf24" : "0 0 0 1.5px #fff", opacity: op, transition: "opacity 90ms, transform 90ms, box-shadow 90ms" }} />;
               if (isFast) return <span key={i} style={{ position: "absolute", left: `${left}%`, top: 8, transform: `translateX(-50%) scale(${sc})`, width: 5, height: 8, borderRadius: 2, background: color, opacity: op * 0.8, transition: "opacity 90ms, transform 90ms" }} />;
