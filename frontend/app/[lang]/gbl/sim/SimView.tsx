@@ -472,6 +472,10 @@ export default function SimView({ lang, t }: { lang: Locale; t: SimDict }) {
         : mode === "multi" ? <MultiMode list={list} lang={lang} t={t} league={league} />
         : mode === "matrix" ? <MatrixMode lang={lang} t={t} league={league} />
         : <TeamMode list={list} lang={lang} t={t} league={league} />}
+
+      <p style={{ marginTop: 26, paddingTop: 14, borderTop: "1px solid #e6ebf5", fontSize: "0.68rem", color: "#94a3b8", lineHeight: 1.6, textAlign: "center" }}>
+        ⚙️ {t.engineCredit}
+      </p>
     </div>
   );
 }

@@ -138,8 +138,14 @@ function makePoke(c: Cfg, i: number, battle: any): any {
   const rec = recommendedMoveset(id, leagueOf(cap));
   const fast = c.fast || rec.fast;
   if (fast) p.selectMove("fast", fast);
-  const charged = (c.charged && c.charged.some(Boolean)) ? c.charged : rec.charged;
-  (charged || []).forEach((m, idx) => { if (m && m !== "none") p.selectMove("charged", m, idx); });
+  // 차지무브: 사용자가 하나라도 지정하면 그 배열(빈 슬롯=단일무브 존중), 아니면 추천.
+  // ※ initialize()가 기본 차지무브 2개를 넣으므로, 빈 슬롯은 "none"으로 비워 잔류 방지(노스킬 반영).
+  const chargedInput = (c.charged && c.charged.some(Boolean)) ? c.charged : rec.charged;
+  const chargedWanted = (chargedInput || []).filter((m) => m && m !== "none");
+  p.selectMove("charged", "none", 1); // 2번 슬롯 먼저 비움
+  if (chargedWanted[0]) p.selectMove("charged", chargedWanted[0], 0);
+  else p.selectMove("charged", "none", 0);
+  if (chargedWanted[1]) p.selectMove("charged", chargedWanted[1], 1);
 
   p.setShields(typeof c.shields === "number" ? c.shields : 1);
   return p;

@@ -14,6 +14,7 @@ export type SimDict = {
   exportCsv: string; exportJson: string; sortRating: string; sortScore: string; advanced: string; auto: string; overall: string; keyMoves: string; noWins: string; pickTeam: string;
   shareBtn: string; downloadBtn: string; shareResult: string; shareMeta: string; shareMatrix: string; shareTeam: string;
   play: string; pause: string; replay: string;
+  engineCredit: string;
   metaTitle: string; metaDesc: string; metaKeywords: string[]; ogTitle: string; ogDesc: string;
 };
 
@@ -34,6 +35,7 @@ const ko: SimDict = {
   exportCsv: "CSV 내보내기", exportJson: "JSON 내보내기", sortRating: "점수순", sortScore: "메타순", advanced: "개체값·레벨", auto: "자동", overall: "종합", keyMoves: "주요 기술", noWins: "결과 없음", pickTeam: "팀에 넣을 포켓몬을 선택하세요.",
   shareBtn: "공유하기", downloadBtn: "다운로드하기", shareResult: "PvP 배틀 결과", shareMeta: "메타 분석 결과", shareMatrix: "메타 매트릭스", shareTeam: "팀 스코어카드",
   play: "재생", pause: "일시정지", replay: "다시보기",
+  engineCredit: "계산 엔진은 오픈소스 프로젝트 PvPoke(MIT 라이선스 · © 2019 pvpoke)를 기반으로 실제 배틀 메커니즘(데미지·에너지·실드 AI·베이팅)을 정밀 계산합니다.",
   metaTitle: "포켓몬고 PvP 배틀 시뮬레이터 · 개체값·기술 지정 | GBL Note",
   metaDesc: "포켓몬 GO 배틀리그 1:1 시뮬레이터. 두 포켓몬의 개체값(공/방/체)·기술·레벨·그림자·실드를 지정해 실제 배틀 결과를 계산. 슈퍼·하이퍼·마스터리그.",
   metaKeywords: ["포켓몬고 배틀 시뮬레이터", "PvP 시뮬레이터", "배틀리그 시뮬", "포켓몬고 매치업", "1:1 배틀 계산기"],
@@ -57,6 +59,7 @@ const en: SimDict = {
   exportCsv: "Export CSV", exportJson: "Export JSON", sortRating: "By score", sortScore: "By meta", advanced: "IVs & level", auto: "Auto", overall: "Overall", keyMoves: "Key moves", noWins: "No results", pickTeam: "Pick Pokémon for your team.",
   shareBtn: "Share", downloadBtn: "Download", shareResult: "PvP Battle Result", shareMeta: "Meta Analysis", shareMatrix: "Meta Matrix", shareTeam: "Team Scorecard",
   play: "Play", pause: "Pause", replay: "Replay",
+  engineCredit: "The battle engine is built on the open-source PvPoke project (MIT License · © 2019 pvpoke), computing real battle mechanics (damage, energy, shield AI & baiting) with precision.",
   metaTitle: "Pokémon GO PvP Battle Simulator · IVs & Moves | GBL Note",
   metaDesc: "Pokémon GO Battle League 1v1 simulator. Set each Pokémon's IVs (Atk/Def/Sta), moves, level, shadow and shields to compute the real outcome. Great, Ultra & Master League.",
   metaKeywords: ["pokemon go battle simulator", "pvp simulator", "battle league sim", "pokemon go matchup", "1v1 calculator"],
@@ -80,6 +83,7 @@ const ja: SimDict = {
   exportCsv: "CSV出力", exportJson: "JSON出力", sortRating: "スコア順", sortScore: "メタ順", advanced: "個体値・レベル", auto: "自動", overall: "総合", keyMoves: "主な技", noWins: "結果なし", pickTeam: "チームに入れるポケモンを選択。",
   shareBtn: "シェア", downloadBtn: "ダウンロード", shareResult: "PvPバトル結果", shareMeta: "メタ分析結果", shareMatrix: "メタマトリックス", shareTeam: "チームスコア",
   play: "再生", pause: "一時停止", replay: "リプレイ",
+  engineCredit: "バトルエンジンはオープンソースの PvPoke(MITライセンス · © 2019 pvpoke)を基に、実際のバトル計算(ダメージ・エネルギー・シールドAI・釣り）を精密に行います。",
   metaTitle: "ポケモンGO PvP バトルシミュレーター · 個体値・技指定 | GBL Note",
   metaDesc: "ポケモンGO バトルリーグ 1vs1 シミュレーター。2匹の個体値(攻/防/HP)・技・レベル・シャドウ・シールドを指定して実際の結果を計算。スーパー・ハイパー・マスターリーグ。",
   metaKeywords: ["ポケモンGO バトルシミュレーター", "PvP シミュ", "バトルリーグ 計算", "ポケモンGO 対面", "1vs1 計算機"],
