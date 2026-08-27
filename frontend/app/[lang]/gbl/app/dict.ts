@@ -17,6 +17,11 @@ export type AppDict = {
   tabLookup: string;
   tabLog: string;
   tabStats: string;
+  tabProfile: string;
+  profileHint: string;
+  profileAll: string;
+  profileLifetime: string;
+  profileSeasonN: string;
   // scope
   scopeMine: string;
   scopeAll: string;
@@ -121,6 +126,7 @@ const ko: AppDict = {
   nickTitle: "닉네임 수정 (전적 카드에 표시)", nickSet: "닉네임 설정",
   playsSuffix: "판", winSuffix: "승", lossSuffix: "패", drawSuffix: "무", timesSuffix: "회",
   tabLookup: "🔍 조회", tabLog: "✏️ 기록", tabStats: "📊 전적",
+  tabProfile: "👤 프로필", profileHint: "전체 시즌 통산 — 시즌별로 나눠서 봅니다(들어올 때만 전체 로드).", profileAll: "전체", profileLifetime: "통산", profileSeasonN: "시즌 {n}",
   scopeMine: "내 기록", scopeAll: "🌐 전체 유저",
   searchPlaceholder: "상대 트레이너 이름 몇 글자…",
   sortRecent: "🕒 배틀순", sortName: "🔤 이름순",
@@ -184,6 +190,7 @@ const en: AppDict = {
   nickTitle: "Edit nickname (shown on battle card)", nickSet: "Set nickname",
   playsSuffix: "", winSuffix: "W", lossSuffix: "L", drawSuffix: "D", timesSuffix: "×",
   tabLookup: "🔍 Look up", tabLog: "✏️ Log", tabStats: "📊 Stats",
+  tabProfile: "👤 Profile", profileHint: "All-time record, split by season (full load only when you open this).", profileAll: "All", profileLifetime: "Lifetime", profileSeasonN: "Season {n}",
   scopeMine: "My log", scopeAll: "🌐 All users",
   searchPlaceholder: "A few letters of the opponent's name…",
   sortRecent: "🕒 Recent", sortName: "🔤 Name",
@@ -247,6 +254,7 @@ const ja: AppDict = {
   nickTitle: "ニックネーム編集 (戦績カードに表示)", nickSet: "ニックネーム設定",
   playsSuffix: "戦", winSuffix: "勝", lossSuffix: "敗", drawSuffix: "分", timesSuffix: "回",
   tabLookup: "🔍 検索", tabLog: "✏️ 記録", tabStats: "📊 戦績",
+  tabProfile: "👤 プロフィール", profileHint: "全シーズン通算 — シーズン別に表示(開いた時のみ全読み込み)。", profileAll: "全体", profileLifetime: "通算", profileSeasonN: "シーズン{n}",
   scopeMine: "自分の記録", scopeAll: "🌐 全ユーザー",
   searchPlaceholder: "相手トレーナー名を数文字…",
   sortRecent: "🕒 対戦順", sortName: "🔤 名前順",

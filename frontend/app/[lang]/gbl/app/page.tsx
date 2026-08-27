@@ -27,6 +27,25 @@ const MOVES = DS.moves;
 const LEAGUE_KEY = "gbl_league";
 // 현재 시즌(전적 카드/시즌 필터용). 새 시즌 시작 시 갱신.
 const SEASON = { num: 27, start: "2026-06-02", end: "2026-09-09" };
+// 프로필(전체전적) 시즌별 분리용 — S27을 기준으로 역산(시즌 ≈ 99일). 과거 경계는 근사값(필요시 수정).
+type Seas = { num: number; start: number; end: number };
+function buildSeasons(count = 16): Seas[] {
+  const out: Seas[] = [];
+  let end = new Date(SEASON.end + "T23:59:59+09:00").getTime();
+  let start = new Date(SEASON.start + "T00:00:00+09:00").getTime();
+  for (let i = 0; i < count; i++) {
+    out.push({ num: SEASON.num - i, start, end });
+    end = start - 1;
+    start = end - 99 * 86400000;
+  }
+  return out;
+}
+const SEASONS = buildSeasons();
+function seasonNumOf(playedAtISO: string): number {
+  const t = new Date(playedAtISO).getTime();
+  const s = SEASONS.find((x) => t >= x.start && t <= x.end);
+  return s ? s.num : 0; // 0 = 그 이전(범위 밖)
+}
 // 모든 리그 union → 렌더용 조회맵 (기록은 어느 리그든 speciesId로 조회)
 const MON_BY_ID: Record<string, Mon> = {};
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON_BY_ID[m.id] = m;
@@ -352,13 +371,17 @@ export default function GblPage() {
   const profLabel = (p: string) => (p === "기본" ? t.profileDefault : p);
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"lookup" | "log" | "stats">("lookup");
+  const [tab, setTab] = useState<"lookup" | "log" | "stats" | "profile">("lookup");
   const [query, setQuery] = useState("");
   const [toast, setToast] = useState("");
   const [league, setLeague] = useState<string>("master");
   const [formats, setFormats] = useState<Format[]>(currentFormats("2000-01-01"));  // SSR: 코어만
   const [scope, setScope] = useState<"mine" | "all">("mine");   // super_admin 전체검색
   const [allMatches, setAllMatches] = useState<Match[]>([]);
+  const [searchResults, setSearchResults] = useState<Match[]>([]);  // 조회탭 서버검색 결과(전 시즌)
+  const [profileMatches, setProfileMatches] = useState<Match[] | null>(null);  // 프로필: 전체전적(온디맨드 로드)
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileSeason, setProfileSeason] = useState<number>(SEASON.num);       // 프로필에서 선택한 시즌(0=전체)
   const [isOwner, setIsOwner] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [sort, setSort] = useState<"recent" | "name">("recent");  // 조회 정렬
@@ -417,10 +440,11 @@ export default function GblPage() {
     }
   };
 
+  // 로그/통계/달력용 로드 — 현재 시즌 범위만(리그별 ≤1500, 전 리그 ≤3000). 조회(상대검색)는 별도 서버검색.
   const load = async () => {
     setLoading(true);
     try {
-      const data = await apiFetch<Match[]>("/api/gbl/matches", {}, 15000);
+      const data = await apiFetch<Match[]>(`/api/gbl/matches?since=${SEASON.start}&until=${SEASON.end}T23:59:59`, {}, 15000);
       setMatches(Array.isArray(data) ? data : []);
     } catch (e) {
       flash(e instanceof Error ? e.message : t.loadFail);
@@ -431,6 +455,15 @@ export default function GblPage() {
       const data = await apiFetch<Match[]>("/api/gbl/admin/matches", {}, 20000);
       setAllMatches(Array.isArray(data) ? data : []);
     } catch (e) { flash(e instanceof Error ? e.message : t.loadAllFail); }
+  };
+  // 프로필: 전체 전적(전 시즌) 온디맨드 로드 — 프로필 탭 진입 시 1회만.
+  const loadProfile = async () => {
+    setProfileLoading(true);
+    try {
+      const data = await apiFetch<Match[]>("/api/gbl/matches", {}, 20000);
+      setProfileMatches(Array.isArray(data) ? data : []);
+    } catch (e) { flash(e instanceof Error ? e.message : t.loadFail); setProfileMatches([]); }
+    finally { setProfileLoading(false); }
   };
   const changeScope = (s: "mine" | "all") => {
     setScope(s);
@@ -466,6 +499,20 @@ export default function GblPage() {
   useEffect(() => { if (hasToken()) load(); else setLoading(false); }, []);
   useEffect(() => { if (hasToken()) loadRatings(); }, [league]);   // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (tab === "lookup") searchRef.current?.focus(); }, [tab]);
+  useEffect(() => { if (tab === "profile" && profileMatches === null && hasToken()) loadProfile(); }, [tab]);  // eslint-disable-line react-hooks/exhaustive-deps
+  // 조회탭 상대검색 — 서버 ILIKE(전 시즌). 디바운스 300ms. scope=all(admin)은 기존 클라필터 유지.
+  useEffect(() => {
+    if (tab !== "lookup" || scope === "all") { setSearchResults([]); return; }
+    const qq = query.trim();
+    if (!qq) { setSearchResults([]); return; }
+    const h = setTimeout(async () => {
+      try {
+        const data = await apiFetch<Match[]>(`/api/gbl/matches?opponent=${encodeURIComponent(qq)}`, {}, 15000);
+        setSearchResults(Array.isArray(data) ? data : []);
+      } catch { setSearchResults([]); }
+    }, 300);
+    return () => clearTimeout(h);
+  }, [query, tab, scope]);
 
   // 레이팅: 선택 계정 필터 + 계정 목록
   const ratingProfileList = useMemo(() => {
@@ -479,7 +526,8 @@ export default function GblPage() {
 
   // 조회: 이름으로 그룹핑 (최근순 유지). scope=all이면 전체 유저 기록.
   const groups = useMemo(() => {
-    const src = scope === "all" ? allMatches : matches;
+    // 조회(mine): 검색어 있으면 서버검색 결과(전 시즌), 없으면 현재 시즌 로드분. admin(all)은 기존 클라필터.
+    const src = scope === "all" ? allMatches : (query.trim() ? searchResults : matches);
     const q = query.trim().toLowerCase();
     const filtered = src.filter((m) =>
       (m.league || "master") === league &&
@@ -500,7 +548,7 @@ export default function GblPage() {
       entries.sort((a, b) => latest(b[1]) - latest(a[1]));
     }
     return entries;
-  }, [matches, allMatches, scope, query, league, sort]);
+  }, [matches, allMatches, searchResults, scope, query, league, sort]);
 
   const leagueCount = useMemo(
     () => (scope === "all" ? allMatches : matches).filter((m) => (m.league || "master") === league).length,
@@ -558,6 +606,27 @@ export default function GblPage() {
     return { total: src.length, wins, losses, draws, decks, days };
   }, [matches, league, statsPeriod]);
 
+  // 프로필: 전체전적을 시즌별×리그별로 집계
+  type LgWLD = { w: number; l: number; d: number };
+  const profileStats = useMemo(() => {
+    const src = profileMatches || [];
+    const bySeason = new Map<number, { num: number; total: number; w: number; l: number; d: number; leagues: Record<string, LgWLD> }>();
+    const life = { total: 0, w: 0, l: 0, d: 0 };
+    for (const m of src) {
+      const sn = seasonNumOf(m.played_at);
+      if (!bySeason.has(sn)) bySeason.set(sn, { num: sn, total: 0, w: 0, l: 0, d: 0, leagues: {} });
+      const s = bySeason.get(sn)!;
+      const lg = m.league || "master";
+      if (!s.leagues[lg]) s.leagues[lg] = { w: 0, l: 0, d: 0 };
+      if (m.result === "win") { s.w++; s.leagues[lg].w++; life.w++; }
+      else if (m.result === "loss") { s.l++; s.leagues[lg].l++; life.l++; }
+      else { s.d++; s.leagues[lg].d++; life.d++; }
+      s.total++; life.total++;
+    }
+    const seasons = [...bySeason.values()].sort((a, b) => b.num - a.num);
+    return { seasons, life };
+  }, [profileMatches]);
+
   // 달력용: 날짜(YYYY-MM-DD) → 그날의 대전들 (리그 기준, 전체 기간)
   const dayMatches = useMemo(() => {
     const map = new Map<string, Match[]>();
@@ -582,6 +651,20 @@ export default function GblPage() {
 
   const winRate = (w: number, l: number) => (w + l > 0 ? Math.round((w / (w + l)) * 100) : null);
   const rateColor = (r: number | null) => r == null ? "#94a3b8" : r >= 60 ? "#16a34a" : r >= 45 ? "#c2410c" : "#dc2626";
+  // 프로필 통산/시즌 승패·승률 한 줄
+  const wlrRow = (total: number, w: number, l: number, d: number) => {
+    const r = winRate(w, l);
+    return (
+      <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+        <span style={{ fontSize: "1.3rem", fontWeight: 900, color: rateColor(r) }}>{r ?? "-"}%</span>
+        <span style={{ fontSize: "0.82rem", fontWeight: 700 }}>
+          <span style={{ color: "#16a34a" }}>{w}{t.winSuffix}</span> <span style={{ color: "#dc2626" }}>{l}{t.lossSuffix}</span>
+          {d > 0 && <span style={{ color: "#94a3b8" }}> {d}{t.drawSuffix}</span>}
+        </span>
+        <span style={{ marginLeft: "auto", fontSize: "0.74rem", color: "#94a3b8" }}>{total}{t.timesSuffix}</span>
+      </div>
+    );
+  };
 
   // 전적 카드 이미지 생성(캔버스) → 화면에 미리보기(모달). 브랜딩 포함(공유 시 홍보).
   const openStatsCard = () => {
@@ -848,7 +931,7 @@ export default function GblPage() {
 
       {/* 탭 */}
       <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-        {([["lookup", t.tabLookup], ["log", t.tabLog], ["stats", t.tabStats]] as const).map(([k, label]) => (
+        {([["lookup", t.tabLookup], ["log", t.tabLog], ["stats", t.tabStats], ["profile", t.tabProfile]] as const).map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             style={{ flex: 1, padding: "10px", borderRadius: 10, cursor: "pointer", fontWeight: 700, fontSize: "0.88rem",
               border: tab === k ? "1.5px solid #4f8cff" : "1px solid #dbe2ee",
@@ -1244,6 +1327,45 @@ export default function GblPage() {
               </div>
             );
           })()}
+        </div>
+      )}
+
+      {/* 👤 프로필 — 전체 전적(온디맨드 로드) 시즌별 통산 */}
+      {tab === "profile" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <p style={{ fontSize: "0.76rem", color: "#94a3b8", margin: "0 0 2px", lineHeight: 1.5 }}>{t.profileHint}</p>
+          {profileLoading || profileMatches === null ? (
+            <div style={{ textAlign: "center", padding: "2.5rem", color: "#94a3b8", fontSize: "0.9rem" }}>⏳</div>
+          ) : profileStats.life.total === 0 ? (
+            <div style={{ textAlign: "center", padding: "2.5rem", color: "#94a3b8", fontSize: "0.9rem" }}>{t.emptyNoRecord}</div>
+          ) : (
+            <>
+              {/* 통산 */}
+              <div style={{ border: "1.5px solid #c7d2fe", borderRadius: 14, background: "linear-gradient(180deg,#eef2ff,#fff)", padding: "0.9rem 1rem" }}>
+                <div style={{ fontSize: "0.8rem", fontWeight: 900, color: "#3730a3", marginBottom: 6 }}>🏆 {t.profileLifetime}</div>
+                {wlrRow(profileStats.life.total, profileStats.life.w, profileStats.life.l, profileStats.life.d)}
+              </div>
+              {/* 시즌별 */}
+              {profileStats.seasons.map((s) => (
+                <div key={s.num} style={{ border: "1px solid #e3e8f2", borderRadius: 14, background: "#fff", padding: "0.8rem 1rem" }}>
+                  <div style={{ fontSize: "0.82rem", fontWeight: 900, color: "#0f172a", marginBottom: 6 }}>
+                    {s.num === 0 ? t.profileAll : t.profileSeasonN.replace("{n}", String(s.num))}
+                  </div>
+                  {wlrRow(s.total, s.w, s.l, s.d)}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+                    {["great", "ultra", "master"].filter((lg) => s.leagues[lg]).map((lg) => {
+                      const x = s.leagues[lg]; const r = winRate(x.w, x.l);
+                      return (
+                        <span key={lg} style={{ fontSize: "0.7rem", fontWeight: 700, color: "#475569", background: "#f1f5f9", borderRadius: 7, padding: "3px 8px" }}>
+                          {leagueName(lang, lg)} {x.w}{t.winSuffix}{x.l}{t.lossSuffix} <span style={{ color: rateColor(r) }}>{r ?? "-"}%</span>
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       )}
 

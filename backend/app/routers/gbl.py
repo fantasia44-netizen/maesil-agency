@@ -63,13 +63,24 @@ class MatchPatch(BaseModel):
 
 # ── 라우트 ────────────────────────────────────────────────────────────
 @router.get("/matches")
-def list_matches(league: str | None = None,
+def list_matches(league: str | None = None, since: str | None = None, until: str | None = None,
+                 opponent: str | None = None,
                  user: UserContext = Depends(get_current_user)) -> list[dict]:
-    """내 전체 대전 기록(최근순). 프론트에서 이름으로 즉시 필터."""
-    q = (_db().table("gbl_matches").select("*")
-         .eq("user_id", user.id).order("played_at", desc=True).limit(5000))
-    if league:
-        q = q.eq("league", league)
+    """대전 기록.
+    - opponent 지정 시: 상대 이름으로 **전 기간 검색**(인덱스 필터, 소량 반환). 조회탭용.
+    - 아니면: (리그+기간) 범위. 프론트가 현재 시즌만 로드해 항상 소량 유지.
+    무거운 필터는 전부 Postgres(인덱스)가 처리 — 서버는 질의 중계만."""
+    q = _db().table("gbl_matches").select("*").eq("user_id", user.id)
+    if opponent and opponent.strip():
+        q = q.ilike("opponent_name", f"%{opponent.strip()}%").order("played_at", desc=True).limit(500)
+    else:
+        if league:
+            q = q.eq("league", league)
+        if since:
+            q = q.gte("played_at", since)
+        if until:
+            q = q.lte("played_at", until)
+        q = q.order("played_at", desc=True).limit(5000)
     try:
         return q.execute().data or []
     except Exception as e:
