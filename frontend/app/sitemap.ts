@@ -9,7 +9,7 @@ import { locales, localeMeta, localizePath, defaultLocale } from "../lib/i18n";
 const BASE = "https://gblnote.com";
 const LEAGUES = ["master", "great", "ultra"];
 const RAID_TYPES = Object.keys((RAIDS as unknown as { types: Record<string, unknown> }).types);
-const POKE_TOP = 20; // 리그별 상위 N종 포켓몬 상세만 사이트맵에(신규도메인 자연스러운 규모)
+const POKE_TOP = 200; // 리그별 전 종(200) 포켓몬 상세 사이트맵 포함 — 도메인 성숙 후 롱테일 전면 색인
 const DET = DETAIL as unknown as Record<string, { id: string }[]>;
 
 type CF = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
