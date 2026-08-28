@@ -1,278 +1,167 @@
-"use client";
-
-import { useEffect, useMemo, useState } from "react";
+// "use client" 아님 → 허브 진입 시 백엔드 실측 메타를 서버에서 호출해 HTML에 박아
+// 크롤러가 "불러오는 중…" 대신 실제 데이터·분석문을 읽게 함. (AdSense/SEO 정문 개선)
+// 기간·컵 필터 등 인터랙션은 하단 <MetaHubClient/>가 담당.
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { apiFetch } from "../../../../lib/api";
-import DATA from "../gbl_data.json";
-import PKN from "../pokedex_names.json";
-import { monSlugId } from "../monSlug";
-import AdSlot from "../AdSlot";
-import CoupangAd from "../CoupangAd";
-import { currentFormats, todayISO, type Format } from "../formats";
-import { isLocale, defaultLocale, localizePath, type Locale } from "../../../../lib/i18n";
-import { leagueName, leagueShort } from "../contentI18n";
-import { getMetaHub, type MetaHubDict } from "./dict";
+import type { Metadata } from "next";
+import {
+  isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale,
+} from "../../../../lib/i18n";
+import { leagueName } from "../contentI18n";
+import { monName } from "./monNames";
+import MetaHubClient from "./MetaHubClient";
 
-type Mon = { id: string; dex: number; ko: string; en: string; types: string[]; shadow: boolean; sprite?: string };
-type League = "great" | "ultra" | "master";
-const DS = DATA as unknown as { leagues: Record<League, { pokemon: Mon[] }> };
-const MON: Record<string, Mon> = {};
-for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
-const PKNAMES = PKN as unknown as Record<string, { ko: string; en: string; ja: string }>;
-// 비메타몬(전 도감) 보충 — 기록엔 slug로 저장되므로 표시용 이름/스프라이트도 전 도감에서 해석(입력과 동일 slug)
-{
-  // 지역폼(알로라/가라르/히스이)은 base와 dex가 같으므로 id(slug) 기준 — base 폼 항상 유지
-  for (const [dexStr, nm] of Object.entries(PKNAMES)) {
-    const dex = Number(dexStr); if (!dex || !nm.en) continue;
-    for (const shadow of [false, true]) {
-      const id = monSlugId(nm.en, shadow);
-      if (MON[id]) continue;  // 메타에 같은 slug 있으면 스킵
-      MON[id] = { id, dex, ko: nm.ko, en: nm.en, types: [], shadow };
-    }
-  }
-}
-const spriteUrl = (m?: Mon) => m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
-// 로케일별 포켓몬명 — MON은 ko/en 보유, ja는 pokedex_names(dex)로 보완.
-const monName = (lang: Locale, id: string) => {
-  const m = MON[id]; if (!m) return id;
-  if (lang === "en") return m.en || m.ko;
-  if (lang === "ja") return PKNAMES[String(m.dex)]?.ja || m.en || m.ko;
-  if (lang === "zh-TW") return (PKNAMES[String(m.dex)] as Record<string,string>)?.["zh-TW"] || m.en || m.ko;
-  return m.ko;
-};
+export const revalidate = 600; // 10분마다 재집계(크롤 가능 + 서버 캐시)
 
-const PERIODS: { key: string; days?: number; start?: string; end?: string }[] = [
-  { key: "7", days: 7 },
-  { key: "30", days: 30 },
-  { key: "s27", start: "2026-06-02", end: "2026-09-09" },
-  { key: "all", days: 0 },
-];
-const periodLabel = (t: MetaHubDict, key: string) => key === "7" ? t.p7 : key === "30" ? t.p30 : key === "s27" ? t.season : t.all;
+const SITE = "https://gblnote.com";
+const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+const LEAGUES = ["master", "great", "ultra"];
 
 type MetaMon = { speciesId: string; count: number };
-type MetaDeck = { deck: string[]; count: number; wins: number; losses: number };
-type Meta = { total: number; wins: number; losses: number; top_mons: MetaMon[]; top_decks: MetaDeck[] };
+type Meta = { total: number; wins: number; losses: number; top_mons: MetaMon[]; top_decks: unknown[] };
+
+async function getMeta(league: string): Promise<Meta | null> {
+  try {
+    const res = await fetch(`${BASE}/api/gbl/meta?league=${league}&days=30`, { next: { revalidate: 3600 } });
+    if (!res.ok) return null;
+    return (await res.json()) as Meta;
+  } catch {
+    return null;
+  }
+}
+
+// ── 로케일별 요약/분석 카피 ──────────────────────────────────────────────
+type SumCopy = {
+  h1: string; sub: string; more: string; tier: string; guide: string;
+  line: (lg: string, tot: number, n1: string, p1: number, n2: string, p2: number) => string;
+  title: string; desc: string;
+};
+const SUM: Record<Locale, SumCopy> = {
+  ko: {
+    h1: "실측 GBL 메타 — 실제 대전 집계",
+    sub: "최근 30일 · 유저들이 실제로 만난 상대 데이터",
+    more: "전체 순위 보기", tier: "티어표", guide: "GBL 가이드",
+    line: (lg, tot, n1, p1, n2, p2) =>
+      `최근 30일 ${lg} 실측 ${tot.toLocaleString()}건 집계 결과, 실전에서 가장 많이 만난 상대는 ${n1}(${p1}%)` +
+      (n2 ? `, 다음은 ${n2}(${p2}%)` : "") +
+      `입니다. 시뮬레이션 티어가 아니라 실제 배틀 기록 기반이라 지금 리그에서 무엇을 대비해야 할지 바로 알 수 있습니다.`,
+    title: "실측 GBL 메타 — 포켓몬GO 배틀리그 실전 픽률",
+    desc: "시뮬레이션이 아닌, 유저들이 실제 GBL에서 만난 상대를 집계한 슈퍼·하이퍼·마스터리그 실측 메타. 최근 30일 픽률 TOP.",
+  },
+  en: {
+    h1: "Live GBL Meta — Real Battle Data",
+    sub: "Last 30 days · what players actually faced",
+    more: "Full ranking", tier: "Tier list", guide: "GBL guides",
+    line: (lg, tot, n1, p1, n2, p2) =>
+      `Across ${tot.toLocaleString()} real ${lg} battles in the last 30 days, the most-encountered opponent is ${n1} (${p1}%)` +
+      (n2 ? `, followed by ${n2} (${p2}%)` : "") +
+      `. This is based on actual battle records, not simulation tiers, so you can see exactly what to prepare for right now.`,
+    title: "Live GBL Meta — Pokémon GO Battle League Real Pick Rates",
+    desc: "Not a simulation — real opponents players faced in GBL, aggregated for Great/Ultra/Master League. Last-30-day pick rate TOP.",
+  },
+  ja: {
+    h1: "実測GBLメタ — 実戦データ集計",
+    sub: "直近30日 · ユーザーが実際に対戦した相手データ",
+    more: "全ランキング", tier: "ティア表", guide: "GBLガイド",
+    line: (lg, tot, n1, p1, n2, p2) =>
+      `直近30日の${lg}実戦${tot.toLocaleString()}件を集計した結果、最も多く遭遇した相手は${n1}(${p1}%)` +
+      (n2 ? `、次いで${n2}(${p2}%)` : "") +
+      `です。シミュレーションのティアではなく実際のバトル記録に基づくため、今のリーグで何に備えるべきかがすぐ分かります。`,
+    title: "実測GBLメタ — ポケモンGOバトルリーグ実戦ピック率",
+    desc: "シミュレーションではなく、ユーザーが実際にGBLで対戦した相手を集計したスーパー・ハイパー・マスターリーグの実測メタ。直近30日ピック率TOP。",
+  },
+  "zh-TW": {
+    h1: "實測GBL Meta — 實戰數據統計",
+    sub: "近30日 · 玩家實際遭遇的對手數據",
+    more: "完整排行", tier: "階級表", guide: "GBL攻略",
+    line: (lg, tot, n1, p1, n2, p2) =>
+      `統計近30日${lg}實戰${tot.toLocaleString()}場的結果，最常遇到的對手是${n1}(${p1}%)` +
+      (n2 ? `，其次是${n2}(${p2}%)` : "") +
+      `。這是基於實際對戰紀錄而非模擬階級，能立即掌握目前聯盟需要應對的對手。`,
+    title: "實測GBL Meta — Pokémon GO對戰聯盟實戰使用率",
+    desc: "並非模擬，而是統計玩家在GBL實際遇到的對手，涵蓋超級·高級·大師聯盟的實測Meta。近30日使用率TOP。",
+  },
+};
+
+export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+  const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
+  const c = SUM[lang];
+  const path = "/gbl/meta";
+  return {
+    title: c.title,
+    description: c.desc,
+    alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
+    openGraph: { title: c.title, description: c.desc, url: localizePath(lang, path), images: ["/gbl-og.png"], type: "website" },
+  };
+}
 
 const CARD = "#ffffff";
 const BORDER = "#e3e8f2";
 
-const PAGE_SIZE = 20;
-
-function Sprite({ id, size = 30 }: { id: string; size?: number }) {
-  const m = MON[id];
-  return <img src={spriteUrl(m)} alt={m?.ko || id} width={size} height={size}
-    style={{ imageRendering: "pixelated" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }} />;
-}
-
-function Pager({ page, pages, onPage, t }: { page: number; pages: number; onPage: (p: number) => void; t: MetaHubDict }) {
-  if (pages <= 1) return null;
-  const btn = (disabled: boolean): React.CSSProperties => ({
-    padding: "6px 14px", borderRadius: 8, border: "1px solid #e3e8f2",
-    background: disabled ? "#f1f5f9" : "#fff", color: disabled ? "#cbd5e1" : "#3b5bdb",
-    fontWeight: 700, fontSize: "0.8rem", cursor: disabled ? "default" : "pointer",
-  });
-  return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginTop: 12 }}>
-      <button style={btn(page === 0)} disabled={page === 0} onClick={() => onPage(page - 1)}>{t.prev}</button>
-      <span style={{ fontSize: "0.8rem", color: "#64748b", fontWeight: 600 }}>{page + 1} / {pages}</span>
-      <button style={btn(page >= pages - 1)} disabled={page >= pages - 1} onClick={() => onPage(page + 1)}>{t.next}</button>
-    </div>
-  );
-}
-
-function MonList({ meta, maxMon, lang, t }: { meta: Meta; maxMon: number; lang: Locale; t: MetaHubDict }) {
-  const [page, setPage] = useState(0);
-  useEffect(() => { setPage(0); }, [meta]);
-  const pages = Math.ceil(meta.top_mons.length / PAGE_SIZE);
-  const start = page * PAGE_SIZE;
-  return (
-    <>
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      {meta.top_mons.slice(start, start + PAGE_SIZE).map((mm, idx) => {
-        const i = start + idx;
-        const m = MON[mm.speciesId];
-        const pct = Math.round((mm.count / meta.total) * 100);
-        return (
-          <div key={mm.speciesId} style={{ display: "flex", alignItems: "center", gap: 8, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "5px 10px" }}>
-            <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#a855f7" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
-            <Sprite id={mm.speciesId} size={30} />
-            <span style={{ fontSize: "0.86rem", fontWeight: 600, minWidth: 88, color: "#0f172a" }}>
-              {m?.shadow && <span style={{ color: "#7c3aed" }}>{t.shadowWord}</span>}{monName(lang, mm.speciesId)}
-            </span>
-            <div style={{ flex: 1, height: 8, background: "#e5eaf3", borderRadius: 4, overflow: "hidden" }}>
-              <div style={{ width: `${Math.round((mm.count / maxMon) * 100)}%`, height: "100%", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)" }} />
-            </div>
-            <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#3b5bdb", minWidth: 38, textAlign: "right" }}>{pct}%</span>
-          </div>
-        );
-      })}
-    </div>
-    <Pager page={page} pages={pages} onPage={setPage} t={t} />
-    </>
-  );
-}
-
-function DeckList({ meta, maxDeck, lang, t }: { meta: Meta; maxDeck: number; lang: Locale; t: MetaHubDict }) {
-  const [page, setPage] = useState(0);
-  useEffect(() => { setPage(0); }, [meta]);
-  const pages = Math.ceil(meta.top_decks.length / PAGE_SIZE);
-  const start = page * PAGE_SIZE;
-  return (
-    <>
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 2 }}>{t.deckNote}</div>
-      {meta.top_decks.slice(start, start + PAGE_SIZE).map((d, idx) => {
-        const i = start + idx;
-        const pct = Math.round((d.count / meta.total) * 100);
-        const names = d.deck.map((id) => monName(lang, id)).join(" · ");
-        return (
-          <div key={i} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "7px 10px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#a855f7" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
-              <div style={{ display: "flex", gap: 2 }}>{d.deck.map((id) => <Sprite key={id} id={id} size={32} />)}</div>
-              <span style={{ marginLeft: "auto", fontSize: "1rem", fontWeight: 800, color: "#a855f7" }}>{pct}%</span>
-            </div>
-            <div style={{ height: 6, background: "#e5eaf3", borderRadius: 3, margin: "6px 0 4px", overflow: "hidden" }}>
-              <div style={{ width: `${Math.round((d.count / maxDeck) * 100)}%`, height: "100%", background: "linear-gradient(90deg,#7c3aed,#a855f7)" }} />
-            </div>
-            <div style={{ fontSize: "0.72rem", color: "#64748b", lineHeight: 1.4 }}>{names}</div>
-          </div>
-        );
-      })}
-    </div>
-    <Pager page={page} pages={pages} onPage={setPage} t={t} />
-    </>
-  );
-}
-
-export default function GblMeta() {
-  const params = useParams();
-  const lang: Locale = isLocale(params?.lang as string) ? (params!.lang as Locale) : defaultLocale;
-  const t = getMetaHub(lang);
+export default async function GblMetaHub({ params }: { params: { lang: string } }) {
+  const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
+  const c = SUM[lang];
   const L = (p: string) => localizePath(lang, p);
-  const [league, setLeague] = useState<string>("master");
-  const [formats, setFormats] = useState<Format[]>(() => currentFormats("2000-01-01"));
-  const [periodKey, setPeriodKey] = useState("30");
-  const [view, setView] = useState<"mon" | "deck">("mon");
-  const [wide, setWide] = useState(false);
-  const [meta, setMeta] = useState<Meta | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => { setFormats(currentFormats(todayISO())); }, []);
-  useEffect(() => {
-    const check = () => setWide(window.innerWidth >= 880);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-  useEffect(() => {
-    let alive = true;
-    setLoading(true);
-    const p = PERIODS.find((x) => x.key === periodKey) || PERIODS[1];
-    const qs = new URLSearchParams({ league });
-    if (p.start && p.end) { qs.set("start", p.start); qs.set("end", p.end); }
-    else qs.set("days", String(p.days ?? 30));
-    apiFetch<Meta>(`/api/gbl/meta?${qs.toString()}`, {}, 20000)
-      .then((d) => { if (alive) setMeta(d); })
-      .catch(() => { if (alive) setMeta(null); })
-      .finally(() => { if (alive) setLoading(false); });
-    return () => { alive = false; };
-  }, [league, periodKey]);
-
-  const maxMon = useMemo(() => meta?.top_mons?.[0]?.count || 1, [meta]);
-  const maxDeck = useMemo(() => meta?.top_decks?.[0]?.count || 1, [meta]);
-
-  const pill = (on: boolean, cup = false): React.CSSProperties => ({
-    padding: "7px 14px", borderRadius: 18, cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
-    border: `1px solid ${on ? (cup ? "#7c3aed" : "#4f8cff") : BORDER}`,
-    background: on ? (cup ? "rgba(124,58,237,.18)" : "rgba(79,140,255,.16)") : CARD,
-    color: on ? (cup ? "#7c3aed" : "#3b5bdb") : "#64748b",
-  });
-  const h2: React.CSSProperties = { fontSize: "1rem", fontWeight: 800, margin: "0 0 10px", color: "#0f172a" };
+  const metas = await Promise.all(LEAGUES.map((lg) => getMeta(lg)));
+  const leagueData = LEAGUES.map((lg, i) => ({ lg, meta: metas[i] }))
+    .filter((x): x is { lg: string; meta: Meta } => !!x.meta && x.meta.total > 0);
 
   return (
     <div style={{
       minHeight: "100dvh",
       background: "radial-gradient(1000px 500px at 50% -10%, #dbe4ff 0%, transparent 60%), linear-gradient(180deg,#f7f9fd,#eef2fb)",
-      padding: "1.4rem 1rem 4rem",
+      padding: "1.4rem 1rem 0",
     }}>
-      <div style={{ maxWidth: wide ? 1040 : 760, margin: "0 auto" }}>
-        <div style={{ marginBottom: 6, display: "flex", alignItems: "center" }}>
-          <Link href={L("/gbl")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>← GBL Note</Link>
-          <Link href={L("/gbl/raid")} style={{ marginLeft: "auto", fontSize: "0.82rem", color: "#ea580c", textDecoration: "none", fontWeight: 700 }}>{t.navRaid}</Link>
-          <Link href={L("/gbl/app")} style={{ marginLeft: 12, fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>{t.navRecord}</Link>
-        </div>
-        <h1 style={{ margin: "0.2rem 0 0.2rem", fontSize: "1.4rem", fontWeight: 900, color: "#0f172a" }}>{t.h1}</h1>
-        <p style={{ margin: "0 0 1rem", fontSize: "0.84rem", color: "#64748b", lineHeight: 1.6 }}>
-          {t.intro.split("{b}")[0]}<b style={{ color: "#334155" }}>{t.intro.split("{b}")[1]?.split("{/b}")[0]}</b>{t.intro.split("{/b}")[1]}
-        </p>
+      <div style={{ maxWidth: 1040, margin: "0 auto" }}>
+        {/* ── 서버렌더 요약(크롤러가 읽는 실측 데이터·분석문) ── */}
+        <h1 style={{ margin: "0.2rem 0 0.15rem", fontSize: "1.4rem", fontWeight: 900, color: "#0f172a" }}>{c.h1}</h1>
+        <p style={{ margin: "0 0 1.1rem", fontSize: "0.84rem", color: "#64748b", lineHeight: 1.6 }}>{c.sub}</p>
 
-        <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-          {formats.map((f) => <button key={f.key} style={pill(league === f.key, f.cup)} title={f.note || ""} onClick={() => setLeague(f.key)}>{f.cup ? f.label : leagueName(lang, f.base)}</button>)}
-        </div>
-        <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
-          {PERIODS.map((p) => <button key={p.key} style={pill(periodKey === p.key)} onClick={() => setPeriodKey(p.key)}>{periodLabel(t, p.key)}</button>)}
-        </div>
-
-        {loading ? (
-          <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem" }}>{t.loading}</div>
-        ) : !meta || meta.total === 0 ? (
-          <div style={{ textAlign: "center", color: "#94a3b8", padding: "2.5rem", fontSize: "0.9rem" }}>
-            {t.empty}
+        {leagueData.length > 0 && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 16, marginBottom: 8 }}>
+            {leagueData.map(({ lg, meta }) => {
+              const top = meta.top_mons.slice(0, 12);
+              const n1 = top[0] ? monName(lang, top[0].speciesId) : "";
+              const p1 = top[0] ? Math.round((top[0].count / meta.total) * 100) : 0;
+              const n2 = top[1] ? monName(lang, top[1].speciesId) : "";
+              const p2 = top[1] ? Math.round((top[1].count / meta.total) * 100) : 0;
+              return (
+                <section key={lg} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "1rem 1.1rem" }}>
+                  <h2 style={{ margin: "0 0 8px", fontSize: "1.02rem", fontWeight: 800, color: "#0f172a" }}>
+                    {leagueName(lang, lg)}
+                  </h2>
+                  <p style={{ margin: "0 0 12px", fontSize: "0.8rem", color: "#475569", lineHeight: 1.65 }}>
+                    {c.line(leagueName(lang, lg), meta.total, n1, p1, n2, p2)}
+                  </p>
+                  <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+                    {top.map((mm, i) => {
+                      const pct = Math.round((mm.count / meta.total) * 100);
+                      return (
+                        <li key={mm.speciesId} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.82rem" }}>
+                          <span style={{ fontWeight: 800, color: i < 3 ? "#a855f7" : "#94a3b8", minWidth: 24 }}>#{i + 1}</span>
+                          <span style={{ flex: 1, color: "#0f172a", fontWeight: 600 }}>{monName(lang, mm.speciesId)}</span>
+                          <span style={{ fontWeight: 700, color: "#3b5bdb" }}>{pct}%</span>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                  <div style={{ marginTop: 12, display: "flex", gap: 12, fontSize: "0.78rem", fontWeight: 600 }}>
+                    <Link href={L(`/gbl/meta/${lg}`)} style={{ color: "#3b5bdb", textDecoration: "none" }}>{c.more} →</Link>
+                    <Link href={L(`/gbl/tier/${lg}`)} style={{ color: "#7c3aed", textDecoration: "none" }}>{c.tier}</Link>
+                  </div>
+                </section>
+              );
+            })}
           </div>
-        ) : wide ? (
-          /* 데스크톱: 나란히 대시보드 */
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 22, alignItems: "start" }}>
-            <div>
-              <h2 style={h2}>{t.monTop}</h2>
-              <MonList meta={meta} maxMon={maxMon} lang={lang} t={t} />
-            </div>
-            <div>
-              <h2 style={h2}>{t.deckTop}</h2>
-              <DeckList meta={meta} maxDeck={maxDeck} lang={lang} t={t} />
-            </div>
-          </div>
-        ) : (
-          /* 모바일: 탭 */
-          <>
-            <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-              {([["mon", t.monTab], ["deck", t.deckTab]] as const).map(([k, label]) => (
-                <button key={k} onClick={() => setView(k as "mon" | "deck")}
-                  style={{ flex: 1, padding: "9px", borderRadius: 10, cursor: "pointer", fontWeight: 700, fontSize: "0.86rem",
-                    border: `1px solid ${view === k ? "#4f8cff" : BORDER}`,
-                    background: view === k ? "rgba(79,140,255,.16)" : CARD, color: view === k ? "#3b5bdb" : "#64748b" }}>{label}</button>
-              ))}
-            </div>
-            {view === "mon" ? <MonList meta={meta} maxMon={maxMon} lang={lang} t={t} /> : <DeckList meta={meta} maxDeck={maxDeck} lang={lang} t={t} />}
-          </>
         )}
 
-        {meta && meta.total > 0 && <><AdSlot /><CoupangAd /></>}
-
-        {/* 크롤 가능한 리그별 상세 링크(서버렌더 SEO 페이지로 연결) */}
-        <div style={{ marginTop: 26, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.9rem 1rem" }}>
-          <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>{t.detailH}</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {["master", "great", "ultra"].map((k) => (
-              <span key={k} style={{ display: "flex", gap: 6 }}>
-                <Link href={L(`/gbl/meta/${k}`)} style={{ fontSize: "0.78rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 600 }}>{leagueShort(lang, k)}{t.detailSuffix}</Link>
-                <span style={{ color: "#cbd5e1" }}>·</span>
-                <Link href={L(`/gbl/tier/${k}`)} style={{ fontSize: "0.78rem", color: "#7c3aed", textDecoration: "none", fontWeight: 600 }}>{t.tierTable}</Link>
-              </span>
-            ))}
-          </div>
-          <div style={{ marginTop: 8, fontSize: "0.76rem" }}>
-            <Link href={L("/gbl/guide")} style={{ color: "#64748b", textDecoration: "none" }}>{t.guide}</Link>
-          </div>
-        </div>
-
-        <div style={{ textAlign: "center", marginTop: 20, fontSize: "0.72rem", color: "#94a3b8" }}>
-          <Link href={L("/gbl/about")} style={{ color: "#64748b", textDecoration: "none" }}>{t.about}</Link> ·{" "}
-          <Link href={L("/gbl/contact")} style={{ color: "#64748b", textDecoration: "none" }}>{t.contact}</Link> ·{" "}
-          <Link href={L("/gbl/privacy")} style={{ color: "#64748b", textDecoration: "none" }}>{t.privacy}</Link>
+        <div style={{ margin: "14px 0 4px", fontSize: "0.78rem" }}>
+          <Link href={L("/gbl/guide")} style={{ color: "#64748b", textDecoration: "none" }}>📖 {c.guide}</Link>
         </div>
       </div>
+
+      {/* ── 인터랙티브 위젯(기간·컵 필터·덱 뷰) — 하이드레이션 후 동작 ── */}
+      <MetaHubClient />
     </div>
   );
 }
