@@ -60,8 +60,13 @@ export const viewport: Viewport = {
 };
 
 export default function GblLayout({ children, params }: { children: React.ReactNode; params: { lang: string } }) {
+  // 루트 app/layout.tsx의 <html lang>은 App Router 구조상 [lang]을 못 받아 항상 "ko".
+  // 정적생성을 유지하려 루트를 dynamic화하지 않고, 여기서 로케일별 htmlLang을 조기 주입.
+  const htmlLang = (isLocale(params.lang) ? localeMeta[params.lang] : localeMeta[defaultLocale]).htmlLang;
   return (
     <>
+      {/* 값은 localeMeta(정적)에서만 옴 — 사용자 입력 아님. 파싱 시점에 즉시 실행되어 조기 반영. */}
+      <script dangerouslySetInnerHTML={{ __html: `document.documentElement.lang=${JSON.stringify(htmlLang)}` }} />
       <GblPwa />
       <Tracker />
       <EventPopupAuto lang={params.lang} />
