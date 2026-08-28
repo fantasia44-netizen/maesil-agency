@@ -15,6 +15,7 @@ import { leagueName, localName } from "../../contentI18n";
 import { typeLabel } from "../../typeLabels";
 import { getDict } from "../../dictionaries";
 import { getCmp } from "./dict";
+import { cmpAnalysis } from "../../leagueAnalysis";
 
 export const revalidate = 600;
 
@@ -97,6 +98,12 @@ export default function CmpPage({ params }: { params: { lang: string; league: st
   const maxAtk = list[0]?.stats.atk || 1;
   const minAtk = list[list.length - 1]?.stats.atk || 0;
 
+  // 데이터 파생 CMP 분석(상위 공격 우선권 해석)
+  const byId: Record<string, Detail> = {};
+  for (const d of list) byId[d.id] = d;
+  const nameById = (id: string) => (byId[id] ? dispNameOf(lang, byId[id]) : (MON[id]?.ko || id));
+  const cmpText = cmpAnalysis(lang, lgName, list.map((d) => ({ id: d.id, atk: d.stats.atk || 0 })), nameById);
+
   const wrap: React.CSSProperties = {
     minHeight: "100dvh",
     background: "radial-gradient(1000px 500px at 50% -10%, #dbe4ff 0%, transparent 60%), linear-gradient(180deg,#f7f9fd,#eef2fb)",
@@ -135,6 +142,12 @@ export default function CmpPage({ params }: { params: { lang: string; league: st
         <p style={{ margin: "0.5rem 0 0", fontSize: "0.78rem", color: "#94a3b8" }}>
           {t.intro2}
         </p>
+
+        {cmpText && (
+          <p style={{ margin: "0.9rem 0 0", padding: "0.85rem 1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, fontSize: "0.84rem", color: "#334155", lineHeight: 1.8 }}>
+            {cmpText}
+          </p>
+        )}
 
         {list.length > 0 && (
           <ListShare

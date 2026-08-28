@@ -15,6 +15,7 @@ import { leagueName, localName } from "../../contentI18n";
 import { typeLabel } from "../../typeLabels";
 import { getDict } from "../../dictionaries";
 import { getTier } from "./dict";
+import { tierAnalysis } from "../../leagueAnalysis";
 
 export const revalidate = 600;
 
@@ -132,6 +133,12 @@ export default async function TierPage({ params }: { params: { lang: string; lea
   for (const t of TIERS) byTier[t] = [];
   for (const d of list) (byTier[d.tier] || (byTier[d.tier] = [])).push(d);
 
+  // 데이터 파생 리그 분석(티어 분포 + 이론vs실측 괴리)
+  const byId: Record<string, Detail> = {};
+  for (const d of list) byId[d.id] = d;
+  const nameById = (id: string) => (byId[id] ? dispNameOf(lang, byId[id]) : (MON[id]?.ko || id));
+  const tierText = tierAnalysis(lang, lgName, list, pick, nameById);
+
   const wrap: React.CSSProperties = {
     minHeight: "100dvh",
     background: "radial-gradient(1000px 500px at 50% -10%, #dbe4ff 0%, transparent 60%), linear-gradient(180deg,#f7f9fd,#eef2fb)",
@@ -172,6 +179,12 @@ export default async function TierPage({ params }: { params: { lang: string; lea
           {t.intro2}{" "}
           <Link href={L(`/gbl/meta/${params.league}`)} style={{ color: "#3b5bdb", fontWeight: 600 }}>{t.metaMore}</Link>
         </p>
+
+        {tierText && (
+          <p style={{ margin: "0.9rem 0 0", padding: "0.85rem 1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, fontSize: "0.84rem", color: "#334155", lineHeight: 1.8 }}>
+            {tierText}
+          </p>
+        )}
 
         {list.length > 0 && (
           <ListShare
