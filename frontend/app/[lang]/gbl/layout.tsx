@@ -6,6 +6,9 @@ import GblNav from "./GblNav";
 import EventPopupAuto from "./EventPopupAuto";
 import { locales, localeMeta, isLocale, defaultLocale } from "../../../lib/i18n";
 import { getDict } from "./dictionaries";
+import JsonLd from "./JsonLd";
+
+const SITE = "https://gblnote.com";
 
 // 로케일별 정적 생성 (ko/en/ja/zh-TW) — 하위 [league]/[type]/[id] generateStaticParams와 조합됨.
 export function generateStaticParams() {
@@ -69,9 +72,19 @@ export const viewport: Viewport = {
 export default function GblLayout({ children, params }: { children: React.ReactNode; params: { lang: string } }) {
   // 루트 app/layout.tsx의 <html lang>은 App Router 구조상 [lang]을 못 받아 항상 "ko".
   // 정적생성을 유지하려 루트를 dynamic화하지 않고, 여기서 로케일별 htmlLang을 조기 주입.
-  const htmlLang = (isLocale(params.lang) ? localeMeta[params.lang] : localeMeta[defaultLocale]).htmlLang;
+  const lang = isLocale(params.lang) ? params.lang : defaultLocale;
+  const htmlLang = localeMeta[lang].htmlLang;
+  // 사이트 전역 구조화 데이터 — WebSite + Organization(발행처). 전 gbl 페이지에 노출.
+  const siteJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "WebSite", "@id": `${SITE}/#website`, url: SITE, name: "GBL Note", inLanguage: htmlLang, publisher: { "@id": `${SITE}/#org` } },
+      { "@type": "Organization", "@id": `${SITE}/#org`, name: "GBL Note", url: SITE, logo: { "@type": "ImageObject", url: `${SITE}/gbl-icon.png` } },
+    ],
+  };
   return (
     <>
+      <JsonLd data={siteJsonLd} />
       {/* 값은 localeMeta(정적)에서만 옴 — 사용자 입력 아님. 파싱 시점에 즉시 실행되어 조기 반영. */}
       <script dangerouslySetInnerHTML={{ __html: `document.documentElement.lang=${JSON.stringify(htmlLang)}` }} />
       <GblPwa />

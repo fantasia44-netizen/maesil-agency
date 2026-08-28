@@ -4,9 +4,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
-import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../../../lib/i18n";
+import { isLocale, defaultLocale, localizePath, hreflangLanguages, localeMeta, type Locale } from "../../../../../lib/i18n";
 import { GUIDES, guideContent, guideKeywords } from "../guides";
 import { getGuideArticle } from "../dict";
+import JsonLd from "../../JsonLd";
+
+const SITE = "https://gblnote.com";
+const GUIDE_LABEL: Record<string, string> = { ko: "가이드", en: "Guide", ja: "ガイド", "zh-TW": "攻略" };
 
 export const revalidate = 86400;
 
@@ -42,8 +46,34 @@ export default function GuidePage({ params }: { params: { lang: string; slug: st
   const c = guideContent(lang, g);
   const others = Object.entries(GUIDES).filter(([s]) => s !== params.slug);
 
+  const path = `/gbl/guide/${params.slug}`;
+  const pageUrl = SITE + localizePath(lang, path);
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: c.title,
+    description: c.desc,
+    inLanguage: localeMeta[lang].htmlLang,
+    datePublished: g.updated,
+    dateModified: g.updated,
+    image: `${SITE}/gbl-og.png`,
+    author: { "@type": "Organization", name: "GBL Note", url: SITE },
+    publisher: { "@type": "Organization", name: "GBL Note", logo: { "@type": "ImageObject", url: `${SITE}/gbl-icon.png` } },
+    mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+  };
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "GBL Note", item: SITE + localizePath(lang, "/gbl") },
+      { "@type": "ListItem", position: 2, name: GUIDE_LABEL[lang] || "Guide", item: SITE + localizePath(lang, "/gbl/guide") },
+      { "@type": "ListItem", position: 3, name: c.title, item: pageUrl },
+    ],
+  };
+
   return (
     <div style={{ minHeight: "100dvh", background: "linear-gradient(180deg,#f7f9fd,#eef2fb)", padding: "1.4rem 1rem 4rem" }}>
+      <JsonLd data={[articleJsonLd, breadcrumbJsonLd]} />
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
         <div style={{ marginBottom: 8, display: "flex", gap: 10, flexWrap: "wrap" }}>
           <Link href={L("/gbl")} style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>{t.back}</Link>

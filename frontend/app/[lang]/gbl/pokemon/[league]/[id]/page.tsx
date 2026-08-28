@@ -13,6 +13,7 @@ import CoupangAd from "../../../CoupangAd";
 import PokemonShare from "./PokemonShare";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../../lib/i18n";
 import { leagueName, leagueShort, localName } from "../../../contentI18n";
+import JsonLd from "../../../JsonLd";
 import { typeLabel } from "../../../typeLabels";
 import { getPoke } from "./dict";
 
@@ -212,8 +213,19 @@ export default async function PokemonDetail({ params }: { params: { lang: string
     </div>
   );
 
+  const SITE = "https://gblnote.com";
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "GBL Note", item: SITE + L("/gbl") },
+      { "@type": "ListItem", position: 2, name: lgName, item: SITE + L(`/gbl/tier/${params.league}`) },
+      { "@type": "ListItem", position: 3, name, item: SITE + L(`/gbl/pokemon/${params.league}/${params.id}`) },
+    ],
+  };
   return (
     <div style={wrap}>
+      <JsonLd data={breadcrumbJsonLd} />
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
         <div style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <Link href={L("/gbl")} style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>← GBL Note</Link>
