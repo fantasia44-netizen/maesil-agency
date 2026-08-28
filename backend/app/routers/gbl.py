@@ -800,6 +800,49 @@ def board_list(board: str = "chat", lang: str = "ko", limit: int = 50,
     return rows
 
 
+# 공개 읽기(레딧 방식) — 잡담(chat) 게시판은 비회원·크롤러도 열람. 쓰기만 로그인.
+# 라우트 순서 주의: "/board/public"이 "/board/{post_id}"보다 먼저 선언돼야 함.
+@router.get("/board/public")
+def board_public_list(lang: str = "ko", limit: int = 50) -> list[dict]:
+    """공개 잡담(chat) 목록 — 비회원·크롤러 열람용(비공개글 제외)."""
+    if lang not in _LANGS:
+        lang = "ko"
+    try:
+        rows = (_db().table("gbl_posts").select("*")
+                .eq("board", "chat").eq("lang", lang).eq("is_private", False)
+                .order("created_at", desc=True)
+                .limit(min(max(limit, 1), 100)).execute().data) or []
+    except Exception as e:
+        logger.error("gbl board public list 실패: %s", e)
+        raise HTTPException(500, "게시판 조회 실패")
+    _attach_authors(rows, None)
+    return rows
+
+
+@router.get("/board/public/{post_id}")
+def board_public_get(post_id: int) -> dict:
+    """공개 잡담글 상세 + 댓글 — 비회원·크롤러 열람용. 비공개/문의글은 404."""
+    db = _db()
+    try:
+        prow = (db.table("gbl_posts").select("*").eq("id", post_id).limit(1).execute().data) or []
+        if not prow:
+            raise HTTPException(404, "글을 찾을 수 없습니다.")
+        post = prow[0]
+        if post.get("board") != "chat" or post.get("is_private"):
+            raise HTTPException(404, "글을 찾을 수 없습니다.")
+        replies = (db.table("gbl_post_replies").select("*")
+                   .eq("post_id", post_id).order("created_at").execute().data) or []
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("gbl public post 조회 실패 [%s]: %s", post_id, e)
+        raise HTTPException(500, "글 조회 실패")
+    _attach_authors([post], None)
+    _attach_authors(replies, None)
+    post["replies"] = replies
+    return post
+
+
 @router.get("/board/{post_id}")
 def board_get(post_id: int, user: UserContext = Depends(get_current_user)) -> dict:
     """글 상세 + 댓글."""
