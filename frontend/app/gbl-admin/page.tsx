@@ -91,6 +91,96 @@ function TrafficChart({ daily: rawDaily }: { daily: DailyRow[] }) {
   );
 }
 
+type GuideTopic = { slug: string; title: string; brief: string; league: string; needs_data: boolean };
+type GuideDraft = { slug: string; updated: string; ts_snippet: string; live_context?: string };
+
+// 가이드 초안 자동생성 — 토픽 선택 → Claude 4개국어 초안 → guides.ts 붙여넣기용 TS
+function GuideDrafter() {
+  const [topics, setTopics] = useState<GuideTopic[]>([]);
+  const [sel, setSel] = useState("");
+  const [slug, setSlug] = useState("");
+  const [title, setTitle] = useState("");
+  const [brief, setBrief] = useState("");
+  const [league, setLeague] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [draft, setDraft] = useState<GuideDraft | null>(null);
+  const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    apiFetch<{ topics: GuideTopic[] }>("/api/gbl/guide-topics", {}, 15000)
+      .then((d) => setTopics(d.topics || [])).catch(() => {});
+  }, []);
+
+  function pick(s: string) {
+    setSel(s);
+    const t = topics.find((x) => x.slug === s);
+    if (t) { setSlug(t.slug); setTitle(t.title); setBrief(t.brief); setLeague(t.league); }
+  }
+
+  async function generate() {
+    if (!slug || !title) { setMsg("토픽을 선택하거나 slug·제목을 입력하세요"); return; }
+    setBusy(true); setMsg(""); setDraft(null);
+    try {
+      const d = await apiFetch<GuideDraft>("/api/gbl/guide-draft", {
+        method: "POST",
+        body: JSON.stringify({ slug, title, brief, league, use_live_data: true }),
+      }, 120000);
+      setDraft(d);
+    } catch (e) { setMsg(e instanceof Error ? e.message : "생성 실패"); }
+    setBusy(false);
+  }
+
+  const inp: React.CSSProperties = { padding: "6px 10px", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: "0.82rem", boxSizing: "border-box" };
+
+  return (
+    <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "1rem", marginBottom: "1.2rem" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+        <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>📝 가이드 초안 생성</span>
+        <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>Claude 4개국어 · 실측 데이터 근거 · 검토 후 guides.ts에 붙여넣기</span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8 }}>
+        <select value={sel} onChange={(e) => pick(e.target.value)} style={inp}>
+          <option value="">— 추천 토픽 선택 —</option>
+          {topics.map((t) => <option key={t.slug} value={t.slug}>{t.title}{t.needs_data ? " (실측)" : ""}</option>)}
+        </select>
+        <select value={league} onChange={(e) => setLeague(e.target.value)} style={inp}>
+          <option value="">리그 무관</option>
+          <option value="great">슈퍼리그</option>
+          <option value="ultra">하이퍼리그</option>
+          <option value="master">마스터리그</option>
+        </select>
+        <input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="slug (예: shield-management)" style={inp} />
+        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목(한국어)" style={inp} />
+      </div>
+      <textarea value={brief} onChange={(e) => setBrief(e.target.value)} placeholder="주제 설명(brief)" rows={2}
+        style={{ ...inp, width: "100%", resize: "vertical", marginBottom: 8 }} />
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <button onClick={generate} disabled={busy} style={{ padding: "7px 16px", borderRadius: 8, border: "none", background: busy ? "#93c5fd" : "#3b5bdb", color: "#fff", fontWeight: 700, fontSize: "0.82rem", cursor: busy ? "default" : "pointer" }}>
+          {busy ? "생성 중… (최대 1~2분)" : "초안 생성"}
+        </button>
+        {msg && <span style={{ fontSize: "0.8rem", color: "#dc2626" }}>{msg}</span>}
+      </div>
+      {draft && (
+        <div style={{ marginTop: 12 }}>
+          {draft.live_context && (
+            <details style={{ marginBottom: 8 }}>
+              <summary style={{ fontSize: "0.75rem", color: "#64748b", cursor: "pointer" }}>사용된 실측 데이터 컨텍스트</summary>
+              <pre style={{ fontSize: "0.7rem", color: "#475569", background: "#f8fafc", padding: 8, borderRadius: 6, overflowX: "auto", whiteSpace: "pre-wrap" }}>{draft.live_context}</pre>
+            </details>
+          )}
+          <div style={{ fontSize: "0.76rem", color: "#16a34a", fontWeight: 700, marginBottom: 4 }}>
+            ✅ 초안 생성됨 — 아래 TS를 <code>guides.ts</code>의 GUIDES에 붙여넣으세요 (검토 후)
+          </div>
+          <button onClick={() => { navigator.clipboard?.writeText(draft.ts_snippet); setMsg("복사됨"); }}
+            style={{ padding: "4px 12px", borderRadius: 6, border: "1px solid #3b5bdb", background: "#eef2ff", color: "#3b5bdb", fontSize: "0.75rem", fontWeight: 700, cursor: "pointer", marginBottom: 6 }}>📋 TS 복사</button>
+          <textarea readOnly value={draft.ts_snippet} rows={14}
+            style={{ width: "100%", fontFamily: "monospace", fontSize: "0.72rem", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0", boxSizing: "border-box", background: "#0f172a", color: "#e2e8f0" }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function GblAdmin() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [db, setDb] = useState<DbStatus | null>(null);
@@ -183,6 +273,8 @@ export default function GblAdmin() {
       <p style={{ margin: "0 0 1.2rem", fontSize: "0.82rem", color: "#64748b" }}>gbl.maesil.net 가입 유저·기록 현황 (super_admin 전용)</p>
 
       {err && <div style={{ background: "#fef2f2", color: "#b91c1c", border: "1px solid #fecaca", borderRadius: 10, padding: "0.7rem 1rem", marginBottom: "1rem", fontSize: "0.85rem" }}>{err}</div>}
+
+      <GuideDrafter />
 
       {/* 게시판 · 문의 */}
       <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "1rem", marginBottom: "1.2rem" }}>

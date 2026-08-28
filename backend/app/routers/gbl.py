@@ -388,6 +388,37 @@ def admin_stats(admin: UserContext = Depends(require_admin)) -> dict:
     }
 
 
+# ── 가이드 초안 자동생성(super_admin) ──────────────────────────
+@router.get("/guide-topics")
+def guide_topics(admin: UserContext = Depends(require_admin)) -> dict:
+    """추천 가이드 토픽 목록 — 초안 생성 대상 선택용."""
+    from app.services.gbl_guide_writer import GUIDE_TOPICS
+    return {"topics": GUIDE_TOPICS}
+
+
+class GuideDraftIn(BaseModel):
+    slug: str
+    title: str
+    brief: str = ""
+    league: str = ""
+    use_live_data: bool = True
+
+
+@router.post("/guide-draft")
+def guide_draft(body: GuideDraftIn, admin: UserContext = Depends(require_admin)) -> dict:
+    """Claude로 4개국어 가이드 초안 생성(실측 데이터 근거). 검토 후 guides.ts에 붙여넣기."""
+    from app.services.gbl_guide_writer import generate_guide_draft
+    slug = (body.slug or "").strip()
+    if not re.match(r"^[a-z0-9-]{2,60}$", slug):
+        raise HTTPException(400, "slug은 소문자·숫자·하이픈 2~60자")
+    try:
+        return generate_guide_draft(slug, body.title.strip(), body.brief.strip(),
+                                    body.league.strip(), body.use_live_data)
+    except Exception as e:
+        logger.error("가이드 초안 생성 실패: %s", e)
+        raise HTTPException(502, f"초안 생성 실패: {e}")
+
+
 # ── 자체 방문 통계(1st-party analytics) ──────────────────────────
 _BOT_UA = ("bot", "crawler", "spider", "slurp", "bingpreview", "facebookexternalhit",
            "embedly", "quora link preview", "yeti", "headless", "python-requests", "curl")
