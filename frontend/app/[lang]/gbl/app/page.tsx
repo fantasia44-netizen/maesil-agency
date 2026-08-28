@@ -467,7 +467,7 @@ export default function GblPage() {
   };
   const changeScope = (s: "mine" | "all") => {
     setScope(s);
-    if (s === "all" && allMatches.length === 0) loadAll();
+    if (s === "all") loadAll();  // 전체유저 전환 때마다 최신 재로드(다른 유저 새 기록 반영)
   };
 
   // ── 레이팅 기록(계정별) ──
@@ -835,6 +835,7 @@ export default function GblPage() {
       resetForm();
       setScope("mine");
       setTab("lookup");
+      if (allMatches.length > 0) loadAll();  // 관리자 전체유저 뷰 사용중이면 그 목록도 최신화
     } catch (e) {
       flash(e instanceof Error ? e.message : t.saveFail);
     } finally { setSaving(false); }
@@ -842,6 +843,7 @@ export default function GblPage() {
 
   const del = async (id: string) => {
     setMatches((prev) => prev.filter((m) => m.id !== id));
+    setAllMatches((prev) => prev.filter((m) => m.id !== id));  // 관리자 전체뷰도 즉시 반영
     try { await apiFetch(`/api/gbl/matches/${id}`, { method: "DELETE" }, 10000); } catch { load(); }
   };
 
