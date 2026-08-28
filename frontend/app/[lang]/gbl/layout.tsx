@@ -7,10 +7,17 @@ import EventPopupAuto from "./EventPopupAuto";
 import { locales, localeMeta, isLocale, defaultLocale } from "../../../lib/i18n";
 import { getDict } from "./dictionaries";
 
-// 로케일별 정적 생성 (ko/en/ja) — 하위 [league]/[type]/[id] generateStaticParams와 조합됨.
+// 로케일별 정적 생성 (ko/en/ja/zh-TW) — 하위 [league]/[type]/[id] generateStaticParams와 조합됨.
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
+
+// ko 기본 로케일은 미들웨어가 /gbl/* → /ko/gbl/* 로 rewrite하는데, rewrite 대상이
+// 정적/ISR 프리렌더 페이지면 Next가 본문 없는 셸(콘텐츠·h1 누락)을 서빙하는 문제가 있다.
+// (프리픽스 로케일 en/ja/zh-TW는 rewrite 없이 pass-through라 정상.) 레이아웃에 force-dynamic을
+// 두어 하위 전 gbl 페이지를 요청 시 SSR → rewrite 경로에서도 본문이 완전히 렌더된다.
+// 트래픽 부하는 Cloudflare 엣지 캐시로 완화(정적 콘텐츠라 URL당 캐시 가능).
+export const dynamic = "force-dynamic";
 
 // AdSense 클라이언트(ca-pub-…). Render env NEXT_PUBLIC_ADSENSE_CLIENT 설정 시 연결 코드 노출.
 const ADS_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
