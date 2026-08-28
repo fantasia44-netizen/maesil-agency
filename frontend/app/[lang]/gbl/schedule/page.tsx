@@ -9,9 +9,9 @@ import { GBL_EVENTS } from "./gblEvents";
 import GblEventShareButton from "./GblEventShareButton";
 import { getSchedule, type ScheduleDict } from "./dict";
 
-export const revalidate = 600;
-
 const SEASON = { num: 27, name: "새로운 발걸음", start: "2026-06-02", end: "2026-09-09" };
+
+export const dynamic = "force-dynamic";
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;

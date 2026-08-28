@@ -14,6 +14,8 @@ const META: Record<string, { title: string; description: string }> = {
   "zh-TW": { title: "使用條款 | GBL Note", description: "GBL Note（gblnote.com）服務使用條款 — 帳號、使用者義務、內容、廣告、免責、準據法說明。" },
 };
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
   const lang = isLocale(params.lang) ? params.lang : defaultLocale;
   const m = META[lang] || META[defaultLocale];

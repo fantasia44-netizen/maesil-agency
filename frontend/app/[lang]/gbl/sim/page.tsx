@@ -6,6 +6,9 @@ import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale }
 import { getSim } from "./dict";
 
 const PATH = "/gbl/sim";
+
+export const dynamic = "force-dynamic";
+
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getSim(lang);

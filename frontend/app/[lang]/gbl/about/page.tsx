@@ -6,6 +6,8 @@ import { getAbout } from "./dict";
 
 const PATH = "/gbl/about";
 
+export const dynamic = "force-dynamic";
+
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getAbout(lang);

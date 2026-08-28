@@ -5,6 +5,8 @@ import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale }
 import { GUIDES, guideContent } from "./guides";
 import { getGuideIndex } from "./dict";
 
+export const dynamic = "force-dynamic";
+
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getGuideIndex(lang);

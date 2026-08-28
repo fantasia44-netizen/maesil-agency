@@ -14,6 +14,8 @@ const META: Record<string, { title: string; description: string }> = {
   "zh-TW": { title: "隱私權政策 | GBL Note", description: "GBL Note（gblnote.com）的個人資料蒐集·利用·保管及第三方處理（廣告·分析）說明。" },
 };
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
   const lang = isLocale(params.lang) ? params.lang : defaultLocale;
   const m = META[lang] || META[defaultLocale];

@@ -8,7 +8,8 @@ import { monSprite } from "../sprite";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
 import { getEvents as getDict, FILTER_TYPES } from "./dict";
 
-export const revalidate = 3600; // 1시간마다 피드 갱신
+// 1시간마다 피드 갱신 (route는 force-dynamic, 이 값은 피드 fetch 캐시 시간용)
+const revalidate = 3600;
 
 // 달력에 노출할 eventType → {이모지, 필터버킷}. 여기 없는 타입(season·go-battle-league·go-pass)은 제외.
 const TYPE_META: Record<string, { emoji: string; filter: string }> = {
@@ -27,6 +28,9 @@ const TYPE_META: Record<string, { emoji: string; filter: string }> = {
 const EGG_ORDER = ["1 km", "2 km", "5 km", "7 km", "10 km", "12 km"];
 
 const PATH = "/gbl/events";
+
+export const dynamic = "force-dynamic";
+
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getDict(lang);

@@ -5,8 +5,9 @@ import IvChecker from "./IvChecker";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
 import { getIv } from "./dict";
 
-export const revalidate = 3600;
 const PATH = "/gbl/iv";
+
+export const dynamic = "force-dynamic";
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
