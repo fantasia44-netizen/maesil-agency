@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { locales, defaultLocale } from "./lib/i18n";
+
+// 비기본 로케일 프리픽스(en/ja/zh-TW/…) — locales에서 파생해 언어 추가 시 자동 반영.
+const NON_DEFAULT_LOCALES = locales.filter((l) => l !== defaultLocale);
 
 // 호스트 기반 라우팅 + GBL 다국어(i18n) 로케일 라우팅.
-// - 라우트 트리는 app/[lang]/gbl/* (lang=ko|en|ja).
+// - 라우트 트리는 app/[lang]/gbl/* (lang=ko|en|ja|zh-TW).
 // - 기본 로케일 ko는 프리픽스 없이 /gbl/* 로 노출 → 내부적으로 /ko/gbl/* 로 rewrite(URL 유지).
-// - en/ja는 /en/gbl/*, /ja/gbl/* 로 그대로 노출.
+// - 그 외 로케일은 /<lang>/gbl/* 로 그대로 노출.
 // - gbl 경로 처리는 호스트 무관(로컬 dev + gblnote.com 모두 동작). 루트→/gbl 리다이렉트만 GBL 호스트 한정.
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -20,8 +24,8 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
-  // /en/*, /ja/* — gbl 경로면 통과, 아니면 해당 로케일 gbl 랜딩으로
-  if (seg1 === "en" || seg1 === "ja") {
+  // /en/*, /ja/*, /zh-TW/* 등 — gbl 경로면 통과, 아니면 해당 로케일 gbl 랜딩으로
+  if (NON_DEFAULT_LOCALES.includes(seg1 as (typeof NON_DEFAULT_LOCALES)[number])) {
     const rest = pathname.slice(seg1.length + 1);
     if (rest === "/gbl" || rest.startsWith("/gbl/")) return NextResponse.next();
     const url = req.nextUrl.clone();
