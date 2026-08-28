@@ -883,6 +883,7 @@ def _sprite_sync_worker() -> None:
     _sprite_sync_running = True
     up = 0
     miss = 0
+    skipped = 0
     try:
         storage = get_maesil_hub_client().storage
         try:
@@ -891,6 +892,31 @@ def _sprite_sync_worker() -> None:
         except Exception as e:
             logger.warning("[sprites] 버킷 존재/생성스킵: %s", str(e)[:120])
         bucket = storage.from_(_SPRITE_BUCKET)
+
+        # 이미 존재하는 오브젝트 목록화 → 재동기화 시 재업로드(23505 중복키 로그노이즈) 및
+        # 불필요한 CDN 다운로드를 건너뜀. 목록 실패 시 빈 집합 → 기존 동작(그대로 업로드).
+        existing: set[str] = set()
+
+        def _collect(prefix: str) -> None:
+            off = 0
+            while True:
+                try:
+                    batch = bucket.list(prefix, {"limit": 100, "offset": off})
+                except Exception:
+                    return
+                if not batch:
+                    return
+                for it in batch:
+                    nm = it.get("name") if isinstance(it, dict) else None
+                    if nm and nm.endswith(".png"):
+                        existing.add(f"{prefix}/{nm}" if prefix else nm)
+                if len(batch) < 100:
+                    return
+                off += 100
+
+        _collect("")
+        _collect("shiny")
+        logger.warning("[sprites] 기존 오브젝트 %d개 확인(건너뜀 대상)", len(existing))
 
         targets: list[tuple[str, str]] = []
         for d in list(range(1, 1026)) + list(range(10001, 10278)):
@@ -901,6 +927,9 @@ def _sprite_sync_worker() -> None:
         with httpx.Client(timeout=20, follow_redirects=True) as hc:
             for url, path in targets:
                 try:
+                    if path in existing:      # 이미 있음 → 다운로드·업로드 모두 스킵(중복키 방지)
+                        skipped += 1
+                        continue
                     r = hc.get(url)
                     if r.status_code != 200:
                         miss += 1
@@ -916,7 +945,7 @@ def _sprite_sync_worker() -> None:
         logger.error("[sprites] 동기화 오류: %s", e)
     finally:
         _sprite_sync_running = False
-        logger.warning("[sprites] 동기화 종료: 업로드 %d, 미존재 %d", up, miss)
+        logger.warning("[sprites] 동기화 종료: 업로드 %d, 스킵(기존) %d, 미존재 %d", up, skipped, miss)
 
 
 @router.post("/admin/sprites-sync")
