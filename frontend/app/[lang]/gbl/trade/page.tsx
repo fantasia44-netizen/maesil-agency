@@ -5,7 +5,7 @@ import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale }
 import { getTrade } from "./dict";
 import TradeMaker from "./TradeMaker";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86400;
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;

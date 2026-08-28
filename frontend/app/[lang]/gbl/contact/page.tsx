@@ -7,8 +7,6 @@ import { getContact } from "./dict";
 const CONTACT = "support@maesil-insight.com";
 const PATH = "/gbl/contact";
 
-export const dynamic = "force-dynamic";
-
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getContact(lang);

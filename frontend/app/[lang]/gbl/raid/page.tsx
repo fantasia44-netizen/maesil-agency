@@ -9,6 +9,8 @@ import { typeLabel } from "../typeLabels";
 import { getDict } from "../dictionaries";
 import { getRaidHub } from "./dict";
 
+export const revalidate = 600;
+
 type Row = { name: string; nameEn: string; nameJa: string; dex: number; dps: number; mega: string; shadow: boolean };
 const rName = (lang: Locale, r: Row) => (lang === "en" ? r.nameEn : lang === "ja" ? r.nameJa : lang === "zh-TW" ? r.nameEn : r.name) || r.name;
 type RaidData = { meta: { generated: string; typeKo: Record<string, string> }; types: Record<string, Row[]> };
@@ -22,8 +24,6 @@ const TYPE_COLOR: Record<string, string> = {
   dark: "#4b4243", steel: "#5a8a9c", fairy: "#d76ad7",
 };
 const TYPE_KO = RD.meta.typeKo;
-
-export const dynamic = "force-dynamic";
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
