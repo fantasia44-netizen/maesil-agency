@@ -12,12 +12,16 @@ type Board = "chat" | "inquiry";
 type Reply = { id: number; author: string; is_admin: boolean; body: string; created_at: string; mine: boolean };
 export type Post = {
   id: number; board: Board; author: string; title: string; body: string;
-  answered: boolean; is_private: boolean; reply_count: number; created_at: string; mine: boolean; replies?: Reply[];
+  answered: boolean; is_private: boolean; reply_count: number; created_at: string; mine: boolean;
+  lang?: string; replies?: Reply[];
 };
 
 const BOARD_KEYS: Board[] = ["chat", "inquiry"];
 
 const ACCENT = "#3b5bdb";
+// 언어 통합 게시판 — 글마다 어느 언어인지 배지로 표시
+const LANG_BADGE: Record<string, string> = { ko: "🇰🇷", en: "🇺🇸", ja: "🇯🇵", "zh-TW": "🇹🇼" };
+const langBadge = (l?: string) => (l && LANG_BADGE[l]) || "🌐";
 
 function fmt(iso: string): string {
   try {
@@ -148,6 +152,7 @@ export default function BoardClient({ initialPosts = [] }: { initialPosts?: Post
               </span>
             )}
             {sel.is_private && <span title={t.privateTitle} style={{ fontSize: "0.95rem" }}>🔒</span>}
+            <span title={sel.lang} style={{ fontSize: "0.95rem" }}>{langBadge(sel.lang)}</span>
             <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 800, color: "#0f172a", flex: 1 }}>{sel.title}</h2>
           </div>
           <div style={{ fontSize: "0.74rem", color: "#94a3b8", marginBottom: 10 }}>{sel.author} · {fmt(sel.created_at)}</div>
@@ -248,6 +253,7 @@ export default function BoardClient({ initialPosts = [] }: { initialPosts?: Post
                   </span>
                 )}
                 {p.is_private && <span title={t.privateTitle} style={{ fontSize: "0.82rem" }}>🔒</span>}
+                <span title={p.lang} style={{ fontSize: "0.82rem" }}>{langBadge(p.lang)}</span>
                 <span style={{ flex: 1, fontWeight: 700, color: "#0f172a", fontSize: "0.95rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</span>
                 {p.reply_count > 0 && <span style={{ fontSize: "0.76rem", color: ACCENT, fontWeight: 700 }}>💬 {p.reply_count}</span>}
               </div>

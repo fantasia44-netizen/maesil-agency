@@ -778,16 +778,15 @@ def _attach_authors(rows: list[dict], viewer_id: str | None = None) -> None:
 
 
 @router.get("/board")
-def board_list(board: str = "chat", lang: str = "ko", limit: int = 50,
+def board_list(board: str = "chat", lang: str = "", limit: int = 50,
                user: UserContext = Depends(get_current_user)) -> list[dict]:
-    """회원 전용 게시판 목록. board=chat(잡담방)|inquiry(운영자 문의). lang=언어 게시판(ko/en/ja)."""
+    """게시판 목록. board=chat(잡담방)|inquiry(운영자 문의).
+    언어 통합(모든 언어 유저가 서로의 글을 봄) — lang 파라미터는 무시(하위호환)."""
     if board not in _BOARDS:
         raise HTTPException(400, "잘못된 게시판입니다.")
-    if lang not in _LANGS:
-        lang = "ko"
     try:
         q = (_db().table("gbl_posts").select("*")
-             .eq("board", board).eq("lang", lang).order("created_at", desc=True)
+             .eq("board", board).order("created_at", desc=True)
              .limit(min(max(limit, 1), 100)))
         # 비공개 문의: 작성자 본인 또는 운영자만 목록에 노출
         if not user.is_super_admin:
@@ -803,13 +802,12 @@ def board_list(board: str = "chat", lang: str = "ko", limit: int = 50,
 # 공개 읽기(레딧 방식) — 잡담(chat) 게시판은 비회원·크롤러도 열람. 쓰기만 로그인.
 # 라우트 순서 주의: "/board/public"이 "/board/{post_id}"보다 먼저 선언돼야 함.
 @router.get("/board/public")
-def board_public_list(lang: str = "ko", limit: int = 50) -> list[dict]:
-    """공개 잡담(chat) 목록 — 비회원·크롤러 열람용(비공개글 제외)."""
-    if lang not in _LANGS:
-        lang = "ko"
+def board_public_list(lang: str = "", limit: int = 50) -> list[dict]:
+    """공개 잡담(chat) 목록 — 비회원·크롤러 열람용(비공개글 제외).
+    언어 통합: 모든 언어의 글을 함께 노출(lang 파라미터 무시, 하위호환)."""
     try:
         rows = (_db().table("gbl_posts").select("*")
-                .eq("board", "chat").eq("lang", lang).eq("is_private", False)
+                .eq("board", "chat").eq("is_private", False)
                 .order("created_at", desc=True)
                 .limit(min(max(limit, 1), 100)).execute().data) or []
     except Exception as e:

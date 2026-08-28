@@ -53,9 +53,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ["/gbl/schedule", "weekly", 0.7],
     ["/gbl/guide", "weekly", 0.7],
     ...Object.keys(GUIDES).map((slug) => [`/gbl/guide/${slug}`, "monthly", 0.6] as [string, CF, number]),
+    ["/gbl/board", "daily", 0.7],
     ["/gbl/about", "monthly", 0.4],
     ["/gbl/contact", "yearly", 0.3],
-    ["/gbl/login", "monthly", 0.5],
     ["/gbl/privacy", "yearly", 0.3],
     ["/gbl/terms", "yearly", 0.3],
   ];
