@@ -16,6 +16,7 @@ import { leagueName, leagueShort, localName } from "../../../contentI18n";
 import JsonLd from "../../../JsonLd";
 import { typeLabel } from "../../../typeLabels";
 import { getPoke } from "./dict";
+import { buildAnalysis } from "./analysis";
 
 export const revalidate = 600;
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
@@ -82,16 +83,23 @@ const TYPE_COLOR: Record<string, string> = {
 const TIER_COLOR: Record<string, string> = { S: "#dc2626", A: "#ea580c", B: "#ca8a04", C: "#16a34a", D: "#64748b" };
 
 type Meta = { total: number; top_mons: { speciesId: string; count: number }[] };
-async function getPickRates(league: string): Promise<Record<string, number>> {
+type MetaInfo = { rate: Record<string, number>; rank: Record<string, number> };
+async function getMetaInfo(league: string): Promise<MetaInfo> {
   try {
     const res = await fetch(`${BASE}/api/gbl/meta?league=${league}&days=30`, { next: { revalidate: 3600 } });
-    if (!res.ok) return {};
+    if (!res.ok) return { rate: {}, rank: {} };
     const m = (await res.json()) as Meta;
-    const out: Record<string, number> = {};
-    if (m.total > 0) for (const mm of m.top_mons) out[mm.speciesId] = Math.round((mm.count / m.total) * 100);
-    return out;
+    const rate: Record<string, number> = {};
+    const rank: Record<string, number> = {};
+    if (m.total > 0) {
+      m.top_mons.forEach((mm, i) => {
+        rate[mm.speciesId] = Math.round((mm.count / m.total) * 100);
+        rank[mm.speciesId] = i + 1;
+      });
+    }
+    return { rate, rank };
   } catch {
-    return {};
+    return { rate: {}, rank: {} };
   }
 }
 
@@ -188,8 +196,24 @@ export default async function PokemonDetail({ params }: { params: { lang: string
   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
   const c2 = TYPE_COLOR[types[1]] || c1;
   const name = dispName(lang, d, isShadow ? (lang === "zh-TW" ? "暗影 " : "그림자 ") : "");
-  const pick = await getPickRates(params.league);
-  const pr = pick[d.id];
+  const info = await getMetaInfo(params.league);
+  const pr = info.rate[d.id];
+
+  // ── 데이터 파생 분석문(포켓몬별 분기) ──
+  // 이 포켓몬이 잡는 상대 중 "현재 실측 상위"인 상대(가장 픽률 높은 것) = 메타 카운터 근거
+  let beatsMetaName: string | undefined, beatsMetaPct: number | undefined;
+  for (const w of d.wins) {
+    const rp = info.rate[w.id];
+    // 실제 상위권(픽률 ≥5%)인 상대를 잡을 때만 "메타 카운터" 근거로 채택
+    if (rp != null && rp >= 5 && (beatsMetaPct == null || rp > beatsMetaPct)) { beatsMetaPct = rp; beatsMetaName = locName(lang, w.id); }
+  }
+  const analysis = buildAnalysis({
+    lang, leagueName: lgName, tier: d.tier, scores: d.scores || [],
+    atk: d.stats?.atk || 0, def: d.stats?.def || 0, hp: d.stats?.hp || 0,
+    pickRate: pr, pickRank: info.rank[d.id],
+    topCounterName: d.counters[0] ? locName(lang, d.counters[0].id) : undefined,
+    beatsMetaName, beatsMetaPct,
+  });
   const ratingTitle = lang === "en" ? "Battle rating (500=even, higher = this Pokémon favored)"
     : lang === "ja" ? "バトルレーティング(500=互角、高いほどこのポケモンが有利)"
     : lang === "zh-TW" ? "對戰評分（500=均勢，越高代表這隻寶可夢越有利）"
@@ -262,6 +286,18 @@ export default async function PokemonDetail({ params }: { params: { lang: string
             </div>
           )}
         </div>
+
+        {/* 데이터 파생 분석(포켓몬별 분기) — 크롤러가 읽는 고유 해석 콘텐츠 */}
+        {analysis.length > 0 && (
+          <div style={{ marginTop: 14, background: `linear-gradient(180deg, ${c1}0d, #ffffff 60%)`, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.9rem 1.05rem" }}>
+            <h2 style={{ margin: "0 0 8px", fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>
+              {lang === "en" ? "Analysis" : lang === "ja" ? "分析" : lang === "zh-TW" ? "分析" : "분석"}
+            </h2>
+            <p style={{ margin: 0, fontSize: "0.84rem", color: "#334155", lineHeight: 1.8 }}>
+              {analysis.join(" ")}
+            </p>
+          </div>
+        )}
 
         {/* 공유/저장 — 각 포켓몬 정보카드(프로필: 티어·기술·종족값·카운터)로 바이럴 */}
         <PokemonShare
