@@ -90,5 +90,29 @@ const ja: SimDict = {
   ogTitle: "ポケモンGO PvP バトルシミュレーター", ogDesc: "個体値・技指定の1vs1バトル計算",
 };
 
-const M = { ko, en, ja } as const;
+const zhTW: SimDict = {
+  navBack: "← GBL Note", h1: "寶可夢 GO PvP 對戰模擬器",
+  intro: "讓兩隻寶可夢對戰。指定個體值（攻/防/HP）·招式·等級·暗影·護盾，計算真實對戰結果。",
+  leagues: { great: "超級聯盟", ultra: "高級聯盟", master: "大師聯盟" },
+  searchPh: "搜尋寶可夢", pickMon: "選擇寶可夢",
+  fast: "一般攻擊", charged: "特殊攻擊", ivLabel: "個體值", atk: "攻擊", def: "防禦", sta: "HP",
+  level: "等級", cp: "CP", hp: "HP", shadow: "暗影", bestBuddy: "最佳夥伴(+1)", shields: "護盾",
+  vs: "VS", run: "對戰！",
+  resultH: "對戰結果", winA: "左方獲勝", winB: "右方獲勝", tie: "平手", empty: "請選擇兩隻寶可夢。",
+  dealt: "造成傷害", energyLeft: "剩餘能量", hpLeft: "剩餘HP", rating: "對戰評分", shieldScenarios: "護盾情境", fastHits: "一般", blocked: "擋下", timelineH: "對戰時間軸", chThrown: "特殊", shUsed: "護盾使用", single: "1v1", teamMode: "隊伍評分表", addMon: "+ 寶可夢", vsMetaH: "對環境隊伍評分表", teamHint: "一眼看出我的隊伍(1~3隻)對聯盟環境120隻的勝負。",
+  modes: { single: "1:1 對戰", multi: "環境分析", matrix: "矩陣", team: "隊伍組建" },
+  multiH: "對整體環境分析", multiHint: "讓一隻寶可夢對戰聯盟環境前100隻，計算勝率。",
+  matrixH: "環境矩陣", matrixHint: "環境前段寶可夢互相對戰的勝負表。顏色越深越有利。",
+  analyze: "分析", wins: "勝", losses: "敗", winRate: "勝率", opponent: "對手", computing: "計算中…",
+  exportCsv: "匯出CSV", exportJson: "匯出JSON", sortRating: "評分順", sortScore: "環境順", advanced: "個體值·等級", auto: "自動", overall: "綜合", keyMoves: "主要招式", noWins: "無結果", pickTeam: "請選擇加入隊伍的寶可夢。",
+  shareBtn: "分享", downloadBtn: "下載", shareResult: "PvP 對戰結果", shareMeta: "環境分析結果", shareMatrix: "環境矩陣", shareTeam: "隊伍評分表",
+  play: "播放", pause: "暫停", replay: "重播",
+  engineCredit: "計算引擎基於開源專案 PvPoke（MIT 授權 · © 2019 pvpoke），精密計算真實對戰機制（傷害·能量·護盾AI·誘盾）。",
+  metaTitle: "寶可夢GO PvP 對戰模擬器 · 指定個體值·招式 | GBL Note",
+  metaDesc: "寶可夢GO 對戰聯盟 1:1 模擬器。指定兩隻寶可夢的個體值（攻/防/HP）·招式·等級·暗影·護盾，計算真實對戰結果。超級·高級·大師聯盟。",
+  metaKeywords: ["寶可夢GO 對戰模擬器", "PvP 模擬器", "對戰聯盟 模擬", "寶可夢GO 對面", "1:1 對戰計算機"],
+  ogTitle: "寶可夢GO PvP 對戰模擬器", ogDesc: "指定個體值·招式的1:1對戰計算",
+};
+
+const M = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getSim(lang: string): SimDict { return (M as Record<string, SimDict>)[lang] || ko; }

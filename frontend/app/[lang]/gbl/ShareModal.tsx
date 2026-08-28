@@ -18,7 +18,7 @@ export default function ShareModal({ img, onClose, children }: { img: string; on
         </div>
         {/* 이미지 */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={img} alt="공유 이미지" style={{ maxWidth: "100%", maxHeight: "62vh", borderRadius: 10, border: "1px solid #eef2f8" }} />
+        <img src={img} alt="share" style={{ maxWidth: "100%", maxHeight: "62vh", borderRadius: 10, border: "1px solid #eef2f8" }} />
         {/* 버튼 */}
         <div style={{ display: "flex", gap: 10 }}>{children}</div>
         {/* 하단 주소 */}

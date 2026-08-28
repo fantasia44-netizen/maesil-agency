@@ -68,7 +68,26 @@ const ja: TierDict = {
   ogDesc: "S/A/B ティア + 推奨技 + 実測ピック率",
 };
 
-const T = { ko, en, ja } as const;
+const zhTW: TierDict = {
+  navRaid: "🔥 團體戰攻擊手", navCmp: "⚡ CMP 排名", navMeta: "📊 實測環境 →",
+  h1Suffix: "強度表 · 推薦招式配置",
+  intro1: "強度表與各寶可夢的推薦招式配置。理論排名（基於對戰模擬）搭配玩家實測使用率，讓您一眼看出強度與實際遭遇頻率。",
+  intro2: "強度 = 聯盟內的相對評價（S 為最高）。使用率以近 30 天為準。",
+  metaMore: "查看實測環境 →",
+  topTier: "最高強度", countSuffix: "隻",
+  actualLabel: "實測", scoreLabel: "評分",
+  shareTitleSuffix: "強度 TOP", shareSubtitle: "理論強度 + 玩家實測使用率", shareButton: "📸 將此強度表以圖片分享·儲存", shareFooter: "寶可夢GO 對戰聯盟 強度表",
+  emptyData: "資料準備中。",
+  explainerH: "強度·推薦招式配置是怎麼來的？",
+  explainerBody: "強度與推薦招式配置是根據公開對戰模擬資料（PvPoke）計算，實測使用率則是 GBL Note 使用者實際遇到的對手匿名統計。請一起比較理論上強勢與實際流行的寶可夢。",
+  loginLink: "免費記錄我的戰績 →",
+  metaTitle: "強度表 · 推薦招式配置 | GBL Note",
+  metaDesc: "對戰聯盟強度表（S/A/B）。查看各寶可夢的推薦招式配置與玩家實測使用率。理論排名 + 實戰資料結合。",
+  ogTitle: "強度表 — 招式配置 + 實測使用率",
+  ogDesc: "S/A/B 強度 + 推薦招式 + 實測使用率",
+};
+
+const T = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getTier(lang: string): TierDict {
   return (T as Record<string, TierDict>)[lang] || ko;
 }

@@ -36,7 +36,7 @@ export default function LangSwitch() {
     >
       {locales.map((l) => {
         const active = l === cur;
-        const short = l === "ko" ? "KO" : l === "en" ? "EN" : "JA";
+        const short = localeMeta[l].short;
         return (
           <Link
             key={l}

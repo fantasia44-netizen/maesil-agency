@@ -38,6 +38,7 @@ const monName = (lang: Locale, id: string) => {
   const m = MON[id]; if (!m) return id;
   if (lang === "en") return m.en || m.ko;
   if (lang === "ja") return PKNAMES[String(m.dex)]?.ja || m.en || m.ko;
+  if (lang === "zh-TW") return (PKNAMES[String(m.dex)] as Record<string,string>)?.["zh-TW"] || m.en || m.ko;
   return m.ko;
 };
 

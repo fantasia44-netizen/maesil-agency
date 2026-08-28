@@ -17,14 +17,23 @@ const TYPE_COLOR: Record<string, string> = {
   rock: "#96843d", ghost: "#704170", dragon: "#5060e1", dark: "#4b4243", steel: "#5a8a9c", fairy: "#d76ad7",
 };
 
+const UI: Record<string, { busy: string; share: string; save: string; close: string; footer: string }> = {
+  ko: { busy: "이미지 생성 중…", share: "📤 공유", save: "💾 저장", close: "닫기", footer: "포켓몬GO 올인원 가이드" },
+  en: { busy: "Generating image…", share: "📤 Share", save: "💾 Save", close: "Close", footer: "Pokémon GO all-in-one guide" },
+  ja: { busy: "画像を生成中…", share: "📤 共有", save: "💾 保存", close: "閉じる", footer: "ポケモンGO オールインワンガイド" },
+  "zh-TW": { busy: "產生圖片中…", share: "📤 分享", save: "💾 儲存", close: "關閉", footer: "寶可夢GO 一站式指南" },
+};
+
 export default function ListShare({
-  title, subtitle, path, accent, items, buttonLabel, filename, footerTag = "포켓몬GO 올인원 가이드", trackLabel = "list", headerIcon,
+  title, subtitle, path, accent, items, buttonLabel, filename, footerTag, trackLabel = "list", headerIcon,
 }: {
   title: string; subtitle?: string; path: string; accent: string;
   items: ShareItem[]; buttonLabel: string; filename: string; footerTag?: string; trackLabel?: string; headerIcon?: string;
 }) {
   const params = useParams();
   const lang: Locale = isLocale(params?.lang as string) ? (params!.lang as Locale) : defaultLocale;
+  const ui = UI[lang] || UI.ko;
+  const footerText = footerTag || ui.footer;
   const [img, setImg] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -125,7 +134,7 @@ export default function ListShare({
       });
       // 푸터(로고+주소)
       const fy = headH + rowH * items.length;
-      drawBrandFooter(ctx, logo, W, fy, footH, accent, footerTag);
+      drawBrandFooter(ctx, logo, W, fy, footH, accent, footerText);
 
       setImg(c.toDataURL("image/png"));
       setFile(null);
@@ -137,13 +146,13 @@ export default function ListShare({
     <>
       <button onClick={build} disabled={busy}
         style={{ width: "100%", marginTop: 14, padding: "11px", borderRadius: 10, border: "none", cursor: busy ? "default" : "pointer", fontWeight: 800, fontSize: "0.9rem", background: busy ? "#cbd5e1" : `linear-gradient(90deg,${accent},#7c3aed)`, color: "#fff" }}>
-        {busy ? "이미지 생성 중…" : buttonLabel}
+        {busy ? ui.busy : buttonLabel}
       </button>
       {img && (
         <ShareModal img={img} onClose={() => setImg(null)}>
-          <button onClick={() => { track("share", path, trackLabel); shareDataUrl(img, file, filename, title, `${title} · ${url}`); }} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: `linear-gradient(90deg,${accent},#7c3aed)`, color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>📤 공유</button>
-          <button onClick={() => { track("download", path, trackLabel); saveDataUrl(img, filename); }} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: "#334155", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>💾 저장</button>
-          <button onClick={() => setImg(null)} style={{ padding: "11px 16px", borderRadius: 10, border: "1px solid #e3e8f2", background: "#f1f5f9", color: "#64748b", cursor: "pointer", fontSize: "0.9rem" }}>닫기</button>
+          <button onClick={() => { track("share", path, trackLabel); shareDataUrl(img, file, filename, title, `${title} · ${url}`); }} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: `linear-gradient(90deg,${accent},#7c3aed)`, color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>{ui.share}</button>
+          <button onClick={() => { track("download", path, trackLabel); saveDataUrl(img, filename); }} style={{ padding: "11px 20px", borderRadius: 10, border: "none", background: "#334155", color: "#fff", fontWeight: 800, cursor: "pointer", fontSize: "0.92rem" }}>{ui.save}</button>
+          <button onClick={() => setImg(null)} style={{ padding: "11px 16px", borderRadius: 10, border: "1px solid #e3e8f2", background: "#f1f5f9", color: "#64748b", cursor: "pointer", fontSize: "0.9rem" }}>{ui.close}</button>
         </ShareModal>
       )}
     </>

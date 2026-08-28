@@ -20,6 +20,10 @@ const LABELS: Record<Locale, Record<string, string>> = {
     normal: "ノーマル", fire: "ほのお", water: "みず", electric: "でんき", grass: "くさ", ice: "こおり", fighting: "かくとう", poison: "どく",
     ground: "じめん", flying: "ひこう", psychic: "エスパー", bug: "むし", rock: "いわ", ghost: "ゴースト", dragon: "ドラゴン", dark: "あく", steel: "はがね", fairy: "フェアリー",
   },
+  "zh-TW": {
+    normal: "一般", fire: "火", water: "水", electric: "電", grass: "草", ice: "冰", fighting: "格鬥", poison: "毒",
+    ground: "地面", flying: "飛行", psychic: "超能力", bug: "蟲", rock: "岩石", ghost: "幽靈", dragon: "龍", dark: "惡", steel: "鋼", fairy: "妖精",
+  },
 };
 
 export function typeLabel(locale: Locale, key: string): string {

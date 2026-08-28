@@ -83,7 +83,31 @@ const ja: ContactDict = {
   ogTitle: "GBL Note お問い合わせ", ogDesc: "お問い合わせ・不具合報告・機能提案",
 };
 
-const C = { ko, en, ja } as const;
+const zhTW: ContactDict = {
+  h1: "聯絡我們",
+  introA: "使用 GBL Note 有疑問、錯誤回報、功能建議，請至 ",
+  introB: "會員討論板",
+  introC: " 留言。註冊（免費）後於 ",
+  introD: "管理員聯絡",
+  introE: " 板留言，管理員會回覆，回覆也對其他使用者有幫助。",
+  boardLabel: "至會員討論板聯絡",
+  boardCta: "前往討論板聯絡 →",
+  boardNote: "非會員會被導向登入/註冊畫面。",
+  privateA: "帳號·資料刪除請求等 ",
+  privateB: "需私下處理的事項",
+  privateC: "請寄至下方電子郵件。",
+  emailLabel: "電子郵件",
+  tipsP: "聯絡時若一併寫下以下內容能更快協助：使用的裝置（Android/iPhone）、連線網址、發生問題的畫面與情況。錯誤回報若有截圖更好。",
+  privacyA: "關於個人資料處理，請參考 ",
+  privacyLink: "隱私權政策",
+  privacyC: "。",
+  footerAbout: "關於", footerGuide: "攻略", footerPrivacy: "隱私權政策",
+  metaTitle: "聯絡我們 | GBL Note",
+  metaDesc: "GBL Note 相關洽詢、錯誤回報、功能建議、資料刪除請求，請以電子郵件聯絡。",
+  ogTitle: "GBL Note 聯絡", ogDesc: "洽詢·錯誤回報·功能建議",
+};
+
+const C = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getContact(lang: string): ContactDict {
   return (C as Record<string, ContactDict>)[lang] || ko;
 }

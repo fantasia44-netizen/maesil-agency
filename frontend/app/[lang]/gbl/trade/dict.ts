@@ -60,7 +60,23 @@ const ja: TradeDict = {
   ogTitle: "ポケモンGO 交換リストメーカー", ogDesc: "コスチューム・色違いを入れて交換リスト画像を作成",
 };
 
-const M = { ko, en, ja } as const;
+const zhTW: TradeDict = {
+  navBack: "← GBL Note",
+  h1: "寶可夢 GO 交換清單產生器",
+  intro: "選擇想要的寶可夢與可以給的寶可夢，製作交換清單圖片。可加入異色·造型·極巨化，分享到社團·開放聊天室。",
+  addTo: "要加到哪裡？", wanted: "想要的", offer: "可以給的", shinyMode: "以異色加入", dmax: "極巨化", gmax: "超極巨化",
+  searchPh: "搜尋寶可夢名稱/圖鑑編號", searchHint: "從全圖鑑搜尋 · 點擊即加入上方選取的欄位",
+  background: "背景", bgBadge: "· 競品沒有的功能",
+  trainerCode: "訓練家代碼（選填）",
+  shareBtn: "分享", saveBtn: "儲存", building: "產生中…",
+  cardTitle: "寶可夢交換", emptySlot: "從上方加入寶可夢", tapShiny: "點擊即刪除", shareTitle: "寶可夢 GO 交換清單",
+  footerGuide: "攻略", footerPrivacy: "隱私權政策",
+  metaTitle: "寶可夢GO 交換清單產生器 · 支援造型·異色 | GBL Note",
+  metaDesc: "製作寶可夢 GO 交換清單圖片。想要的·可以給的·異色·造型·極巨化·訓練家代碼一應俱全。社團·開放聊天室分享用圖片產生器。",
+  ogTitle: "寶可夢GO 交換清單產生器", ogDesc: "加入造型·異色製作交換清單圖片",
+};
+
+const M = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getTrade(lang: string): TradeDict {
   return (M as Record<string, TradeDict>)[lang] || ko;
 }

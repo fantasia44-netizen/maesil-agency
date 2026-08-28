@@ -6,6 +6,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import DATA from "../../../gbl_data.json";
 import DETAIL from "../../../gbl_detail.json";
+import PKNAMES from "../../../pokedex_names.json";
+import MOVENAMES from "../../../pvp_move_names.json";
 import AdSlot from "../../../AdSlot";
 import CoupangAd from "../../../CoupangAd";
 import PokemonShare from "./PokemonShare";
@@ -29,10 +31,17 @@ const MOVES = DS.moves;
 const spriteUrl = (m?: Mon) =>
   m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
 const nameOf = (id: string) => MON[id]?.ko || id;
-// 로케일별 기술명 (ko/en/ja).
+const zhMon = (dex?: number) => dex != null ? (PKNAMES as Record<string, Record<string, string>>)[String(dex)]?.["zh-TW"] : undefined;
+// 데이터 엔트리에 zh-TW 이름이 없어 dex로 pokedex_names에서 보완.
+const dispName = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?: string; dex?: number }, prefix = "") => {
+  if (lang === "zh-TW") { const zh = zhMon(d.dex); if (zh) return prefix + zh; }
+  return localName(lang, d, prefix + nameOf(d.id));
+};
+// 로케일별 기술명 (ko/en/ja/zh-TW) — zh-TW는 pvp_move_names(id)로 보완.
 const moveLabel = (lang: Locale, id: string) => {
   const mv = MOVES[id];
   if (!mv) return id;
+  if (lang === "zh-TW") return (MOVENAMES as Record<string, Record<string, string>>)[id]?.["zh-TW"] || mv.en || mv.ko;
   return lang === "ko" ? mv.ko : lang === "ja" ? (mv.ja || mv.en || mv.ko) : (mv.en || mv.ko);
 };
 // 공유 카드 스프라이트용 dex — 화면과 동일 소스(m.sprite 폼 dex) 우선.
@@ -54,10 +63,11 @@ type Detail = { id: string; score: number; tier: string; moveset: string[]; mv: 
 const DET = DETAIL as unknown as Record<string, Detail[]>;
 const findDetail = (league: string, id: string) => (DET[league] || []).find((d) => d.id === id);
 // 상대(카운터/이기는 상대) id → 로케일별 이름. 상세 엔트리(ko/en/ja 보유)를 전 리그에서 인덱싱.
-const NAMEIDX: Record<string, { ko?: string; en?: string; ja?: string }> = {};
-for (const arr of Object.values(DET)) for (const e of arr) if (!NAMEIDX[e.id]) NAMEIDX[e.id] = { ko: e.ko, en: e.en, ja: e.ja };
+const NAMEIDX: Record<string, { ko?: string; en?: string; ja?: string; dex?: number }> = {};
+for (const arr of Object.values(DET)) for (const e of arr) if (!NAMEIDX[e.id]) NAMEIDX[e.id] = { ko: e.ko, en: e.en, ja: e.ja, dex: e.dex };
 const locName = (lang: Locale, id: string) => {
   const e = NAMEIDX[id];
+  if (lang === "zh-TW") { const zh = zhMon(e?.dex ?? MON[id]?.dex); if (zh) return zh; }
   if (e && (e.ko || e.en || e.ja)) return localName(lang, e, MON[id]?.ko || id);
   return MON[id]?.ko || id;
 };
@@ -96,7 +106,7 @@ export function generateMetadata({ params }: { params: { lang: string; league: s
   const d = findDetail(params.league, params.id);
   if (!LEAGUE_KEYS.includes(params.league) || !d) return { title: "GBL Note" };
   const lgName = leagueName(lang, params.league);
-  const name = localName(lang, d, nameOf(d.id));
+  const name = dispName(lang, d);
   const pk = getPoke(lang);
   const path = `/gbl/pokemon/${params.league}/${params.id}`;
   return {
@@ -176,11 +186,12 @@ export default async function PokemonDetail({ params }: { params: { lang: string
   const hdex = d.dex || m?.dex;
   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
   const c2 = TYPE_COLOR[types[1]] || c1;
-  const name = localName(lang, d, (isShadow ? "그림자 " : "") + nameOf(d.id));
+  const name = dispName(lang, d, isShadow ? (lang === "zh-TW" ? "暗影 " : "그림자 ") : "");
   const pick = await getPickRates(params.league);
   const pr = pick[d.id];
   const ratingTitle = lang === "en" ? "Battle rating (500=even, higher = this Pokémon favored)"
     : lang === "ja" ? "バトルレーティング(500=互角、高いほどこのポケモンが有利)"
+    : lang === "zh-TW" ? "對戰評分（500=均勢，越高代表這隻寶可夢越有利）"
     : "배틀 레이팅 (500=대등, 높을수록 이 포켓몬이 유리)";
 
   // CMP(공격력 우선권): 이 리그 상위종을 공격력순 정렬 → 내 위/아래 이웃(가까운 상대가 실전 관건)

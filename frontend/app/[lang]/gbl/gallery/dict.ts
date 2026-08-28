@@ -98,7 +98,32 @@ const ja: GalleryDict = {
   gateDesc2: "無料登録して自慢を共有しよう。", gateBtn: "会員登録 / ログイン",
 };
 
-const M = { ko, en, ja } as const;
+const zhTW: GalleryDict = {
+  navRaid: "🔥 團體戰",
+  h1: "🏆 炫耀相簿",
+  intro: "100% 個體、傳說捕捉、我的戰績卡… 什麼都來炫耀吧。上傳圖片即分享到相簿。",
+  loading: "載入中…",
+  empty: "還沒有炫耀。來當第一位炫耀的主角吧！ 👇",
+  anon: "匿名",
+  altBrag: "炫耀",
+  fab: "📸 上傳炫耀",
+  fabBusy: "上傳中…",
+  del: "刪除",
+  close: "關閉",
+  needLogin: "上傳炫耀需要登入",
+  badType: "只接受 PNG·JPG·WEBP 圖片",
+  tooBig: "圖片限 4MB 以下",
+  captionPrompt: "一句話（選填）— 例：終於 100% 露奈雅拉！",
+  uploadDone: "炫耀上傳完成！ 🎉",
+  uploadFail: "上傳失敗：",
+  confirmDelete: "要刪除這篇嗎？",
+  deleteFail: "刪除失敗：",
+  errWord: "錯誤",
+  gateTitle: "會員專用相簿", gateDescPre: "炫耀相簿 ", gateDescBold: "註冊會員", gateDescPost: " 才能看與上傳。",
+  gateDesc2: "免費註冊後分享我的炫耀吧。", gateBtn: "註冊 / 登入",
+};
+
+const M = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getGallery(lang: string): GalleryDict {
   return (M as Record<string, GalleryDict>)[lang] || ko;
 }

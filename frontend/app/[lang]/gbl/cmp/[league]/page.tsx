@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import DATA from "../../gbl_data.json";
 import DETAIL from "../../gbl_detail.json";
+import PKNAMES from "../../pokedex_names.json";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 import ListShare from "../../ListShare";
@@ -31,6 +32,15 @@ for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id
 const spriteUrl = (m?: Mon) =>
   m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
 const nameOf = (id: string) => MON[id]?.ko || id;
+// zh-TW 포켓몬명 — 데이터 엔트리에 zh-TW가 없어 dex로 pokedex_names에서 보완.
+const dispNameOf = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?: string; dex?: number }) => {
+  if (lang === "zh-TW") {
+    const dex = d.dex ?? MON[d.id]?.dex;
+    const zh = dex != null ? (PKNAMES as Record<string, Record<string, string>>)[String(dex)]?.["zh-TW"] : undefined;
+    if (zh) return zh;
+  }
+  return localName(lang, d, nameOf(d.id));
+};
 
 type Detail = { id: string; tier: string; stats: Record<string, number>; ko?: string; dex?: number; types?: string[] };
 const DET = DETAIL as unknown as Record<string, Detail[]>;
@@ -138,7 +148,7 @@ export default function CmpPage({ params }: { params: { lang: string; league: st
             trackLabel="cmp-rank"
             items={list.slice(0, 12).map((d) => ({
               dex: String(formDex(d.ko || nameOf(d.id), d.dex || MON[d.id]?.dex || 0)),
-              name: localName(lang, d, nameOf(d.id)),
+              name: dispNameOf(lang, d),
               main: (d.stats.atk || 0).toFixed(1),
               sub: `${d.tier}`,
               types: (d.types && d.types.length) ? d.types : (MON[d.id]?.types || []),
@@ -154,7 +164,7 @@ export default function CmpPage({ params }: { params: { lang: string; league: st
             {list.map((d, i) => {
               const types = (d.types && d.types.length) ? d.types : (MON[d.id]?.types || []);
               const dex = d.dex || MON[d.id]?.dex;
-              const dispName = localName(lang, d, nameOf(d.id));
+              const dispName = dispNameOf(lang, d);
               const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
               const atk = d.stats.atk || 0;
               const w = maxAtk > minAtk ? Math.round(((atk - minAtk) / (maxAtk - minAtk)) * 100) : 100;

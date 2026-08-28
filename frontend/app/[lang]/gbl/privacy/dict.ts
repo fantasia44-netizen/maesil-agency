@@ -123,7 +123,43 @@ const ja: PrivacyDict = {
   termsLink: "利用規約",
 };
 
-const PRIV = { ko, en, ja } as const;
+const zhTW: PrivacyDict = {
+  title: "隱私權政策",
+  effectiveLabel: "生效日",
+  intro: "GBL Note（以下稱「本服務」）重視使用者的個人資料，並依下列方式蒐集·利用·保管。本政策適用於本服務（gblnote.com）使用者。",
+  s1h: "1. 蒐集項目",
+  s1: [
+    "• 帳號：電子郵件、密碼（加密儲存）、暱稱（選填）。使用 Google 登入時，Google 提供的電子郵件·個人資料。",
+    "• 使用記錄：使用者自行輸入的寶可夢 GO GBL 對戰備註（對手名稱、使用的寶可夢·招式、備註等）",
+    "• 自動蒐集：連線紀錄、Cookie 及類似技術（維持登入·廣告·分析）、裝置·瀏覽器資訊、大略連線地區",
+  ],
+  s2h: "2. 利用目的",
+  s2: ["• 會員識別與維持登入", "• 提供使用者輸入之對戰記錄的儲存·查詢功能", "• 服務改善、造訪統計分析、錯誤處理", "• 廣告提供與服務營運"],
+  s3h: "3. 保管與銷毀",
+  s3: [
+    "個人資料保管至會員退出或提出刪除請求為止，提出請求時將立即銷毀。個別對戰記錄（對手名稱·備註等）僅該使用者本人可查詢，不會公開給其他使用者。",
+    "惟本服務可將全體使用者的對戰資料加工為去除個人識別資訊的匿名統計（寶可夢·隊伍使用率等），顯示於公開環境頁面。此統計不含對手名稱·使用者資訊等可識別個人之內容。",
+  ],
+  s4h: "4. 第三方委託處理及 Cookie",
+  s4intro: "本服務不對外販售個人資料。惟資料會透過下列提供者處理，各提供者可能使用 Cookie·識別碼。",
+  s4providers: "• Supabase（資料儲存）、Render（伺服器代管）、Cloudflare（網域·網路）",
+  s4gaPre: "• Google Analytics（造訪統計）：以匿名方式彙整造訪·頁面瀏覽·裝置·大略地區等。使用者可透過 ",
+  s4gaLink: "Google Analytics 停用工具",
+  s4gaPost: " 拒絕。",
+  s4adsPre: "• Google AdSense（廣告）：為提供個人化廣告可能使用 Cookie。使用者可於 ",
+  s4adsLink: "Google 廣告設定",
+  s4adsPost: " 管理·拒絕。",
+  s4coupang: "• Coupang Partners（聯盟廣告）：本服務可能包含 Coupang Partners 聯盟連結·橫幅，並可能藉此設定 Coupang 的 Cookie。依此橫幅的曝光·點擊，本服務會獲得一定金額的佣金。",
+  s4cookie: "使用者可於瀏覽器設定拒絕儲存 Cookie，但此時維持登入等部分功能可能受限。",
+  s5h: "5. 使用者的權利",
+  s5: ["使用者可隨時要求查閱·修改·刪除本人個人資料及停止處理。若欲刪除帳號·資料，請以下方聯絡方式提出。"],
+  contactHead: "6. 聯絡處",
+  contactSuffix: "個人資料相關洽詢：",
+  changeNote: "本政策可能依相關法令及服務政策變更，變更時將透過本頁公告。",
+  termsLink: "使用條款",
+};
+
+const PRIV = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getPrivacy(lang: string): PrivacyDict {
   return (PRIV as Record<string, PrivacyDict>)[lang] || ko;
 }

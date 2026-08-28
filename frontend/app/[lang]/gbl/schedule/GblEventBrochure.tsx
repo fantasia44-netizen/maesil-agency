@@ -13,14 +13,23 @@ const PANEL = "#f7f5fd", BORDER = "#e9d5ff";
 
 // 대표 포켓몬(피카츄 2종) — 이미지 파일 있으면 그것, 없으면 기본 피카츄 스프라이트로 폴백.
 const HEROES = [
-  { img: "/gbl/events/pikachu-xp.png", label: { ko: "PokémonXP 피카츄", en: "PokémonXP Pikachu", ja: "PokémonXPピカチュウ" } },
-  { img: "/gbl/events/pikachu-wcs.png", label: { ko: "월챔 피카츄 2026", en: "WCS Pikachu 2026", ja: "WCSピカチュウ2026" } },
+  { img: "/gbl/events/pikachu-xp.png", label: { ko: "PokémonXP 피카츄", en: "PokémonXP Pikachu", ja: "PokémonXPピカチュウ", "zh-TW": "PokémonXP 皮卡丘" } },
+  { img: "/gbl/events/pikachu-wcs.png", label: { ko: "월챔 피카츄 2026", en: "WCS Pikachu 2026", ja: "WCSピカチュウ2026", "zh-TW": "世界賽皮卡丘 2026" } },
 ];
 
+const BRAND_SUB = { ko: "포켓몬 GO 배틀리그 정보", en: "Pokémon GO Battle League info", ja: "ポケモンGO バトルリーグ情報", "zh-TW": "寶可夢GO 對戰聯盟資訊" } as Record<string, string>;
+const BTN = {
+  gen: { ko: "생성 중…", en: "Generating…", ja: "生成中…", "zh-TW": "產生中…" },
+  share: { ko: "📤 공유하기", en: "📤 Share", ja: "📤 共有", "zh-TW": "📤 分享" },
+  save: { ko: "💾 다운로드", en: "💾 Save", ja: "💾 保存", "zh-TW": "💾 下載" },
+  close: { ko: "닫기", en: "Close", ja: "閉じる", "zh-TW": "關閉" },
+  dismiss: { ko: "다시 보지 않기", en: "Don't show again", ja: "今後表示しない", "zh-TW": "不再顯示" },
+} as Record<string, Record<string, string>>;
+
 export default function GblEventBrochure({ ev, lang, t, onClose, onDismiss }: { ev: GblEvent; lang: Locale; t: ScheduleDict; onClose: () => void; onDismiss?: () => void }) {
-  const lx = (o: { ko: string; en: string; ja: string }) => o[lang] ?? o.ko;
-  const shinyNote = { ko: "운이 좋으면 색이 다른 포켓몬을 만날 수도 있습니다!", en: "If you're lucky, you might encounter a Shiny Pokémon!", ja: "運が良ければ色違いのポケモンに出会えるかも！" };
-  const periodLabel = { ko: "이벤트 기간", en: "Event period", ja: "イベント期間" };
+  const lx = (o: Record<string, string>) => o[lang] ?? o.ko;
+  const shinyNote = { ko: "운이 좋으면 색이 다른 포켓몬을 만날 수도 있습니다!", en: "If you're lucky, you might encounter a Shiny Pokémon!", ja: "運が良ければ色違いのポケモンに出会えるかも！", "zh-TW": "運氣好的話，說不定能遇到異色寶可夢！" };
+  const periodLabel = { ko: "이벤트 기간", en: "Event period", ja: "イベント期間", "zh-TW": "活動期間" };
   const periodDates = lx(ev.period).replace(/\s*\([^)]*\)\s*$/, ""); // "(GBL 보너스)" 접미 제거 → 날짜만 크게
   const pikaFallback = pokeSprite(25);
   const moves = ev.moves || [];
@@ -80,7 +89,7 @@ export default function GblEventBrochure({ ev, lang, t, onClose, onDismiss }: { 
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/gbl-icon.png" alt="" width={24} height={24} style={{ objectFit: "contain", flexShrink: 0 }} />
               <span style={{ fontSize: "1rem", fontWeight: 900, color: "#1a2570" }}>GBL Note</span>
-              <span style={{ fontSize: "0.66rem", color: SUB, fontWeight: 700 }}>포켓몬 GO 배틀리그 정보</span>
+              <span style={{ fontSize: "0.66rem", color: SUB, fontWeight: 700 }}>{lx(BRAND_SUB)}</span>
               <span style={{ marginLeft: "auto", background: "linear-gradient(90deg,#f59e0b,#ef4444)", color: "#fff", fontWeight: 900, fontSize: "0.74rem", borderRadius: 999, padding: "4px 12px" }}>{ev.icon} {t.eventsH2}</span>
             </div>
 
@@ -153,7 +162,7 @@ export default function GblEventBrochure({ ev, lang, t, onClose, onDismiss }: { 
               <img src="/gbl-icon.png" alt="" width={30} height={30} style={{ objectFit: "contain" }} />
               <div>
                 <div style={{ fontWeight: 900, fontSize: "1rem", color: "#fff", lineHeight: 1.1 }}>GBL Note</div>
-                <div style={{ fontSize: "0.6rem", color: "#a5b4fc" }}>포켓몬 GO 배틀리그 정보</div>
+                <div style={{ fontSize: "0.6rem", color: "#a5b4fc" }}>{lx(BRAND_SUB)}</div>
               </div>
             </div>
             <div style={{ flex: 1, minWidth: 130, background: "#fff", borderRadius: 999, padding: "7px 16px", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
@@ -167,10 +176,10 @@ export default function GblEventBrochure({ ev, lang, t, onClose, onDismiss }: { 
 
       {/* 컨트롤(공유 스크린샷 제외) */}
       <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", marginBottom: 8 }}>
-        <button onClick={share} disabled={busy} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: busy ? "#cbd5e1" : "linear-gradient(90deg,#db2777,#7c3aed)", color: "#fff", fontWeight: 800, fontSize: "0.85rem", cursor: busy ? "default" : "pointer" }}>{busy ? (lang === "en" ? "Generating…" : lang === "ja" ? "生成中…" : "생성 중…") : (lang === "en" ? "📤 Share" : lang === "ja" ? "📤 共有" : "📤 공유하기")}</button>
-        <button onClick={download} disabled={busy} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: busy ? "#cbd5e1" : "#334155", color: "#fff", fontWeight: 800, fontSize: "0.85rem", cursor: busy ? "default" : "pointer" }}>{lang === "en" ? "💾 Save" : lang === "ja" ? "💾 保存" : "💾 다운로드"}</button>
-        <button onClick={onClose} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: "rgba(255,255,255,.92)", color: "#334155", fontWeight: 800, fontSize: "0.85rem", cursor: "pointer" }}>{lang === "en" ? "Close" : lang === "ja" ? "閉じる" : "닫기"}</button>
-        {onDismiss && <button onClick={onDismiss} style={{ padding: "8px 18px", borderRadius: 999, border: "1px solid rgba(255,255,255,.5)", background: "rgba(255,255,255,.15)", color: "#fff", fontWeight: 700, fontSize: "0.85rem", cursor: "pointer" }}>{lang === "en" ? "Don't show again" : lang === "ja" ? "今後表示しない" : "다시 보지 않기"}</button>}
+        <button onClick={share} disabled={busy} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: busy ? "#cbd5e1" : "linear-gradient(90deg,#db2777,#7c3aed)", color: "#fff", fontWeight: 800, fontSize: "0.85rem", cursor: busy ? "default" : "pointer" }}>{busy ? lx(BTN.gen) : lx(BTN.share)}</button>
+        <button onClick={download} disabled={busy} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: busy ? "#cbd5e1" : "#334155", color: "#fff", fontWeight: 800, fontSize: "0.85rem", cursor: busy ? "default" : "pointer" }}>{lx(BTN.save)}</button>
+        <button onClick={onClose} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: "rgba(255,255,255,.92)", color: "#334155", fontWeight: 800, fontSize: "0.85rem", cursor: "pointer" }}>{lx(BTN.close)}</button>
+        {onDismiss && <button onClick={onDismiss} style={{ padding: "8px 18px", borderRadius: 999, border: "1px solid rgba(255,255,255,.5)", background: "rgba(255,255,255,.15)", color: "#fff", fontWeight: 700, fontSize: "0.85rem", cursor: "pointer" }}>{lx(BTN.dismiss)}</button>}
       </div>
      </div>
     </div>

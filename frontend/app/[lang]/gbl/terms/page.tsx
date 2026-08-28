@@ -11,11 +11,12 @@ const META: Record<string, { title: string; description: string }> = {
   ko: { title: "이용약관 | GBL Note", description: "GBL Note(gblnote.com) 서비스 이용약관 — 계정, 이용자 의무, 콘텐츠, 광고, 면책, 준거법 안내." },
   en: { title: "Terms of Service | GBL Note", description: "GBL Note (gblnote.com) Terms of Service — accounts, user obligations, content, advertising, disclaimer, and governing law." },
   ja: { title: "利用規約 | GBL Note", description: "GBL Note(gblnote.com)の利用規約 — アカウント、利用者の義務、コンテンツ、広告、免責、準拠法について。" },
+  "zh-TW": { title: "使用條款 | GBL Note", description: "GBL Note（gblnote.com）服務使用條款 — 帳號、使用者義務、內容、廣告、免責、準據法說明。" },
 };
 
 export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
   const lang = isLocale(params.lang) ? params.lang : defaultLocale;
-  const m = META[lang];
+  const m = META[lang] || META[defaultLocale];
   return {
     title: m.title,
     description: m.description,

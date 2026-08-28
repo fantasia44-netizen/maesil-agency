@@ -8,7 +8,7 @@ import { isLocale, defaultLocale, localizePath, type Locale } from "../../../../
 import { getGallery } from "./dict";
 
 type Post = {
-  id: string; user_id: string; display_name: string | null;
+  id: string; mine?: boolean; display_name: string | null;
   image_url: string; caption: string | null; created_at: string;
 };
 
@@ -78,7 +78,7 @@ export default function GalleryPage() {
       setView(null);
     } catch (err) { flash(t.deleteFail + (err instanceof Error ? err.message : t.errWord)); }
   };
-  const canDelete = (p: Post) => me && (me.id === p.user_id || me.role === "super_admin");
+  const canDelete = (p: Post) => !!me && (!!p.mine || me.role === "super_admin");
 
   if (!ready) return null;
   // ── 비회원 게이트 (회원 전용 갤러리) ──

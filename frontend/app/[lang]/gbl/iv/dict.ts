@@ -72,7 +72,27 @@ const ja: IvDict = {
   ogTitle: "ポケモンGO PvP個体値ランクチェッカー", ogDesc: "リーグ別最適個体値をステータス積順で",
 };
 
-const M = { ko, en, ja } as const;
+const zhTW: IvDict = {
+  navBack: "← GBL Note", navTier: "🏆 強度表",
+  h1: "寶可夢GO PvP IV 排名檢查器",
+  intro: "搜尋寶可夢，即以能力值乘積(Product)顯示各聯盟（超級·高級·大師）的最佳 IV 排名。超級·高級聯盟因 CP 限制，攻擊 IV 越低排名越高的情況很常見。",
+  searchPlaceholder: "搜尋寶可夢名稱（例：沙奈朵、代拉基翁）",
+  searchHint: "從全圖鑑搜尋 — 團體戰寶可夢·一般寶可夢皆可",
+  selectPrompt: "請搜尋並選擇寶可夢。", noResult: "沒有搜尋結果。",
+  bestBuddy: "最佳夥伴(+1等級)",
+  findH: "找我的 IV 排名", ivAtk: "攻擊", ivDef: "防禦", ivHp: "HP", findBtn: "確認排名", yourRank: "我的 IV 排名", rankUnit: "名", invalidIv: "IV 請輸入 0~15。",
+  thRank: "排名", thIv: "IV（攻/防/HP）", thCp: "CP", thLv: "等級", thAtk: "攻擊", thDef: "防禦", thHp: "HP", thProduct: "Product",
+  topNote: "顯示前 100 名 · 我的 IV 於上方查詢",
+  explainerH: "IV 排名是什麼？",
+  explainerBody: "在 PvP(GBL) 中，於聯盟 CP 限制（超級 1500·高級 2500）內，能力值乘積（攻擊×防禦×HP）越高越強。有 CP 限制時，攻擊種族值低的個體可升到更高等級，防禦·HP 更大而排名更高。大師聯盟沒有限制，15/15/15 永遠第一。",
+  shareBtn: "📸 將此 IV 排名表以圖片分享·儲存", imgBuilding: "產生圖片中…", imgShare: "📤 分享", imgSave: "💾 儲存", imgClose: "關閉", imgFooter: "寶可夢GO PvP IV 排名", imgTopLabel: "前 {n} 名",
+  footerGuide: "攻略", footerPrivacy: "隱私權政策",
+  metaTitle: "寶可夢GO PvP IV 排名檢查器 · 各聯盟最佳個體值 | GBL Note",
+  metaDesc: "寶可夢 GO PvP(對戰聯盟) IV 排名檢查器。以能力值乘積排名確認想要寶可夢在超級·高級·大師聯盟的最佳個體值(IV)。支援全圖鑑。",
+  ogTitle: "寶可夢GO PvP IV 排名檢查器", ogDesc: "以能力值乘積排名顯示各聯盟最佳 IV",
+};
+
+const M = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getIv(lang: string): IvDict {
   return (M as Record<string, IvDict>)[lang] || ko;
 }

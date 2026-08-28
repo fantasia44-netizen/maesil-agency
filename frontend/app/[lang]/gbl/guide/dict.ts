@@ -45,7 +45,19 @@ const idxJa: GuideIndexDict = {
   ogTitle: "ポケモンGO GBLガイド", ogDesc: "入門・リーグ・IV・パーティ構成ガイド",
 };
 
-const IDX = { ko: idxKo, en: idxEn, ja: idxJa } as const;
+const idxZhTW: GuideIndexDict = {
+  back: "← GBL Note",
+  h1: "寶可夢GO GBL 攻略",
+  intro: "為剛開始玩寶可夢 GO 對戰聯盟(GBL)或想提升勝率的人準備的攻略。從基礎到隊伍組建，循序整理。",
+  dataPre: "實戰資料在 ", dataMeta: "實測環境", dataMid: " · ", dataTier: "強度表", dataSuf: "。",
+  about: "關於", contact: "聯絡", privacy: "隱私權政策",
+  metaTitle: "寶可夢GO GBL 攻略 — 入門·聯盟·IV·隊伍 | GBL Note",
+  metaDesc: "寶可夢 GO 對戰聯盟(GBL) 從入門到各聯盟 CP 限制、個體值(IV)最佳化、隊伍組建法。給新手的攻略合集。",
+  keywords: ["寶可夢GO GBL 攻略", "對戰聯盟入門", "寶可夢GO PVP 攻略", "GBL 怎麼玩"],
+  ogTitle: "寶可夢GO GBL 攻略", ogDesc: "入門·聯盟·IV·隊伍組建攻略",
+};
+
+const IDX = { ko: idxKo, en: idxEn, ja: idxJa, "zh-TW": idxZhTW } as const;
 export function getGuideIndex(lang: string): GuideIndexDict {
   return (IDX as Record<string, GuideIndexDict>)[lang] || idxKo;
 }
@@ -83,7 +95,15 @@ const artJa: GuideArticleDict = {
   privacy: "プライバシーポリシー",
 };
 
-const ART = { ko: artKo, en: artEn, ja: artJa } as const;
+const artZhTW: GuideArticleDict = {
+  back: "← GBL Note", listNav: "📖 攻略列表", titleSuffix: " | GBL Note",
+  updatedPre: "更新 ", updatedSuf: " · GBL Note 攻略",
+  othersH: "其他攻略",
+  metaPre: "想了解現在的聯盟環境，請看 ", metaMeta: "實測環境", metaMid: " · ", metaTier: "強度表", metaSuf: "。",
+  privacy: "隱私權政策",
+};
+
+const ART = { ko: artKo, en: artEn, ja: artJa, "zh-TW": artZhTW } as const;
 export function getGuideArticle(lang: string): GuideArticleDict {
   return (ART as Record<string, GuideArticleDict>)[lang] || artKo;
 }

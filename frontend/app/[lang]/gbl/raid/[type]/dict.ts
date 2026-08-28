@@ -77,7 +77,28 @@ const ja: RaidTypeDict = {
   ogDesc: "レイドアタッカーDPS・耐久順位 + 推奨技",
 };
 
-const R = { ko, en, ja } as const;
+const zhTW: RaidTypeDict = {
+  navBack: "← 團體戰攻擊手強度", navPvp: "⚔️ PvP 對戰 →",
+  h1TypeWord: "屬性", h1Rest: " 團體戰攻擊手強度表",
+  intro1: "{t}屬性團體戰（傳說·五星等）的攻擊手 DPS 排名。含超級進化·暗影，一併確認各寶可夢的推薦招式配置與耐久（生存）。",
+  intro2: "以綜合評分（大數字）排名 = 結合輸出(DPS)與總輸出(TDO·撐著打的總傷害)的平衡指標。以 {t} 弱點對象·等級40·屬性一致1.2倍·弱點1.6倍計算（一般招式屬性一致時也加成）。",
+  dateLabel: "資料基準日", legacyNote: "傳承* = 專屬·活動限定招式", upcomingNote: "即將推出 = 尚未推出",
+  disclaimer: "※ 數值·排名為基於公開遊戲資料的自行計算，依計算方式（對象頭目·等級·閃避等）可能與 PokéBattler 等其他網站不同，並可能有誤差。僅供參考。",
+  overallLabel: "綜合評分", dpsLabel: "輸出", tdoLabel: "總輸出",
+  emptyData: "資料準備中。",
+  shareTitleSuffix: "團體戰攻擊手 TOP", shareSubtitle: "綜合評分（輸出+總輸出）排名 · 含超級·暗影", shareButton: "📸 將此強度表以圖片分享·儲存", shareFooter: "寶可夢GO 團體戰攻擊手強度",
+  explainerH: "綜合評分怎麼計算的？",
+  explainerBody: "以公開遊戲資料（種族值·招式威力/施放時間/能量）套用標準 PvE 公式。以等級40攻擊此屬性弱點對象為基準。輸出(DPS)為含屬性一致·弱點1.6倍的每秒傷害，總輸出(TDO)為含撐場時間（HP·防禦）的擊倒前總傷害，綜合評分結合兩者（輸出³×總輸出）排名（PokéBattler Overall 方式）。依計算方式可能與其他網站數值不同，僅供參考。",
+  otherTypes: "其他屬性強度表 →",
+  badgePrimal: "原始", badgeMega: "超級", badgeShadow: "暗影", badgeUpcoming: "即將推出",
+  badgeCoverage: "非本屬", badgeCoverageTip: "以非屬性一致(STAB)的此屬性招式輸出的攻擊手。攻擊種族值·耐久高，因此進入綜合評分(ER)前段。",
+  metaTitle: "團體戰攻擊手強度表 · DPS 排名 | GBL Note",
+  metaDesc: "團體戰攻擊手 DPS·耐久排名。含超級·暗影的推薦招式配置。刷團體戰最佳組合。",
+  ogTitle: "團體戰攻擊手強度表 — DPS 排名",
+  ogDesc: "團體戰攻擊手 DPS·耐久排名 + 推薦招式",
+};
+
+const R = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getRaidType(lang: string): RaidTypeDict {
   return (R as Record<string, RaidTypeDict>)[lang] || ko;
 }

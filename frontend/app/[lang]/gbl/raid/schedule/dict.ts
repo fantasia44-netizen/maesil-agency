@@ -182,7 +182,50 @@ const ja: ScheduleDict = {
   ogTitle: "ポケモンGO レイドスケジュール カレンダー", ogDesc: "5★・メガローテーション + レイドアワー・デイ",
 };
 
-const S = { ko, en, ja } as const;
+const zhTW: ScheduleDict = {
+  navBack: "← 團體戰攻擊手強度", navBosses: "🗓️ 當前頭目 · CP →",
+  h1: "團體戰時程",
+  intro: [
+    { t: "五星傳說·超級·暗影團體戰", b: true },
+    { t: " 的輪替與 " },
+    { t: "團體戰時刻·日", b: true },
+    { t: " 時程。點日期看當天團體戰，點頭目跳到 CP·剋制攻擊手。" },
+  ],
+  loadFail: "無法載入時程。請稍後再試。",
+  footerData: "時程資料：LeekDuck(ScrapedDuck) · 時間為當地時間 · ", footerTierLink: "推薦攻擊手強度表",
+  rotStar: "五星傳說", rotShadow: "暗影五星", rotMega: "超級",
+  rotStarTitle: "五星傳說", rotShadowTitle: "暗影五星", rotMegaTitle: "超級團體戰",
+  kindHour: "團體戰時刻", kindDay: "團體戰日",
+  sfxSuperMega: "超級進化團體戰日", sfxMega: "超級團體戰日", sfxRaidHour: "團體戰時刻", sfxRaidDay: "團體戰日",
+  pfx: { mega: "超級", shadow: "暗影", alola: "阿羅拉", galar: "伽勒爾", hisui: "洗翠", paldea: "帕底亞" },
+  weekdays: ["日", "一", "二", "三", "四", "五", "六"],
+  months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+  navMonth: "{y}年 {m}月",
+  legendMain: "🖼️ 日期圖 = 五星傳說", legendMega: "🔷 超級", legendShadow: "🌑 暗影", legendDay: "🎉 團體戰日", legendHour: "⏰ 團體戰時刻",
+  selDateTitle: "{m}月{d}日（{w}）團體戰",
+  noSpecial: "這天沒有特殊團體戰時程。", bossTapHint: "點頭目可看 100% CP·剋制攻擊手。",
+  upcomingSpecialH: "🎉 {month} 團體戰時刻·日", upcomingDateFmt: "{m}/{d}（{w}）",
+  guideHour: "每週特定星期的傍晚（通常 18~19 時，當地時間）1 小時內，幾乎所有道館同時出現該頭目。短時間可打好幾隻，適合刷傳說·找異色。",
+  guideDay: "通常週末 3 小時內特定頭目密集出現，額外發放免費團體戰入場券，異色機率大幅提升。",
+  guideSuperMega: "專注超級團體戰的特別日。提供免費入場券 + 大量超級能量 + 異色機率↑。是準備超級進化·刷超級能量的好機會。",
+  guideNote: "※ 確切獎勵·時間每個活動不同，請確認官方公告。",
+  majorEventsH: "🗓️ {month} 主要活動",
+  evtType: { "community-day": "社群日", "pokemon-spotlight-hour": "聚焦時刻", "max-mondays": "極巨星期一", "max-battles": "極巨戰日", "pokemon-go-fest": "GO Fest", "event": "活動", "research": "研究", "go-pass": "GO Pass" },
+  dynamax: "極巨化", evtClassic: "經典",
+  evtNameMap: {},
+  monthBossesH: "📋 {m}月 登場頭目", cpTableArrow: "CP表 →",
+  rotationH: "🔥 頭目輪替期間", live: "進行中", upcoming: "預定", liveNowH: "🔥 現正開放的團體戰", endsWord: "結束", nBosses: "{n}種",
+  saveBtn: "📅 儲存·分享 {m}月行事曆圖片", building: "產生圖片中…",
+  share: "📤 分享", save: "💾 儲存", close: "關閉",
+  imgTitle: "寶可夢GO {m}月團體戰", imgFooter: "寶可夢GO 團體戰時程", imgShareTitle: "寶可夢GO {m}月團體戰時程", imgFile: "gbl-raid-{m}月.png",
+  cpModalSub: "各個體值捕捉 CP", cpModalNoData: "此頭目的 CP 資料尚未準備。",
+  metaTitle: "寶可夢GO 團體戰時程行事曆 · 五星·超級輪替 | GBL Note",
+  metaDesc: "寶可夢 GO 團體戰時程行事曆。依日期確認五星傳說·超級·暗影團體戰輪替期間與團體戰時刻·團體戰日。連結頭目 100% CP·剋制攻擊手。自動更新。",
+  metaKeywords: ["寶可夢GO 團體戰時程", "團體戰行事曆", "五星團體戰輪替", "超級團體戰時程", "團體戰時刻", "團體戰日"],
+  ogTitle: "寶可夢GO 團體戰時程行事曆", ogDesc: "五星·超級輪替 + 團體戰時刻·日",
+};
+
+const S = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getSchedule(lang: string): ScheduleDict {
   return (S as Record<string, ScheduleDict>)[lang] || ko;
 }

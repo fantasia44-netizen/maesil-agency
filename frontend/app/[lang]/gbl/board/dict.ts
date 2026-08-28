@@ -167,7 +167,48 @@ const ja: BoardDict = {
   errDelete: "削除に失敗しました",
 };
 
-const M = { ko, en, ja } as const;
+const zhTW: BoardDict = {
+  h1: "討論板",
+  chatLabel: "閒聊區",
+  chatHint: "自由聊天",
+  inquiryLabel: "管理員聯絡",
+  inquiryHint: "錯誤回報·建議·提問 — 管理員會回覆",
+  gateTitle: "會員專用討論板",
+  gateDescPre: "閒聊區與管理員聯絡 ",
+  gateDescBold: "註冊會員",
+  gateDescPost: " 才能使用。",
+  gateDesc2: "請登入或免費註冊後使用。",
+  gateBtn: "登入 / 註冊",
+  backToList: "← 回列表",
+  answered: "已回覆",
+  waiting: "等待回覆",
+  privateTitle: "非公開",
+  commentsLabel: "留言",
+  admin: "🛡️ 管理員",
+  replyPlaceholderAdmin: "管理員回覆…",
+  replyPlaceholder: "留言…",
+  submitting: "送出中…",
+  submitReply: "送出留言",
+  del: "刪除",
+  titlePlaceholder: "標題",
+  inquiryBodyPlaceholder: "洽詢內容（寫下裝置·情況·截圖說明能更快回覆）",
+  chatBodyPlaceholder: "內容",
+  privateCheck: "🔒 非公開洽詢 — 只有我和管理員能看",
+  cancel: "取消",
+  submit: "送出",
+  write: "✏️ 發文",
+  loading: "載入中…",
+  emptyList: "還沒有文章。來發第一篇吧！",
+  confirmDelete: "確定刪除嗎？",
+  errTitleBody: "請輸入標題與內容。",
+  errLoad: "載入失敗",
+  errLoadPost: "文章載入失敗",
+  errWrite: "發表失敗",
+  errReply: "留言失敗",
+  errDelete: "刪除失敗",
+};
+
+const M = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getBoard(lang: string): BoardDict {
   return (M as Record<string, BoardDict>)[lang] || ko;
 }

@@ -51,7 +51,20 @@ const ja: ResetDict = {
   errFail: "再設定に失敗しました",
 };
 
-const M = { ko, en, ja } as const;
+const zhTW: ResetDict = {
+  title: "重設密碼",
+  done: "✅ 已變更。前往登入畫面…",
+  pwPlaceholder: "新密碼（8 字以上）",
+  pw2Placeholder: "確認新密碼",
+  changing: "變更中…",
+  submit: "變更密碼",
+  errShort: "密碼須 8 字以上。",
+  errMismatch: "密碼不一致。",
+  errBadLink: "無效的連結。",
+  errFail: "重設失敗",
+};
+
+const M = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getReset(lang: string): ResetDict {
   return (M as Record<string, ResetDict>)[lang] || ko;
 }

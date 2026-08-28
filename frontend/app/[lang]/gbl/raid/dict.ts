@@ -52,7 +52,22 @@ const ja: RaidHubDict = {
   ogTitle: "ポケモンGO レイドアタッカーティア(属性別DPS順位)", ogDesc: "18タイプ最適アタッカー + 推奨技 · メガ/シャドウ含む",
 };
 
-const R = { ko, en, ja } as const;
+const zhTW: RaidHubDict = {
+  navPvp: "⚔️ PvP 強度表 →",
+  h1: "寶可夢GO 團體戰攻擊手強度表",
+  intro: "依 DPS 順序整理各屬性最強的團體戰攻擊手。選擇要打的頭目弱點屬性，就會顯示該屬性的攻擊手排名與推薦招式配置。含超級進化·暗影。",
+  schedH: "團體戰時程", schedP: "五星·超級輪替期間 + 團體戰時刻·日 時程",
+  bossH: "當前頭目 · 100% CP", bossP: "當前五星·超級頭目與 100% 個體 CP，以及剋制攻擊手",
+  rankPrefix: "第1名 ",
+  explainerH: "團體戰攻擊手這樣選",
+  explainerBody: "每個團體戰頭目都有弱點屬性。例如水屬性頭目，草·電攻擊手就很強。點上方頭目弱點屬性查看前段攻擊手，從手上寶可夢挑排名高的放入即可。放入一隻超級進化，同屬性攻擊手整體都會變強。排名以公開遊戲資料計算的 DPS 為準。",
+  updateLabel: "更新",
+  metaTitle: "寶可夢GO 團體戰攻擊手強度表 · 各屬性攻擊手 DPS 排名 | GBL Note",
+  metaDesc: "寶可夢 GO 團體戰攻擊手各屬性 DPS·耐久排名。18 屬性最佳攻擊手與推薦招式配置，含超級進化·暗影。刷團體戰必備強度表。",
+  ogTitle: "寶可夢GO 團體戰攻擊手強度表（各屬性 DPS 排名）", ogDesc: "18 屬性最佳攻擊手 + 推薦招式 · 含超級/暗影",
+};
+
+const R = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getRaidHub(lang: string): RaidHubDict {
   return (R as Record<string, RaidHubDict>)[lang] || ko;
 }

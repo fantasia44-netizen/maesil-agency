@@ -80,7 +80,7 @@ export default function SchedulePage({ params }: { params: { lang: string } }) {
 
   // GBL 이벤트(월챔 등) — 실제 현재시각으로 진행/예정/종료 판정
   const nowMs = Date.now();
-  const lx = (o: { ko: string; en: string; ja: string }) => o[lang] ?? o.ko;
+  const lx = (o: Record<string, string>) => o[lang] ?? o.ko;
   const events = GBL_EVENTS
     .map((ev) => {
       const s: "live" | "soon" | "ended" = nowMs < Date.parse(ev.start) ? "soon" : nowMs >= Date.parse(ev.end) ? "ended" : "live";

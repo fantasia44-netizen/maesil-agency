@@ -102,7 +102,36 @@ const ja: AboutDict = {
   ogTitle: "GBL Note について", ogDesc: "ポケモンGO バトル相手の記録 & 実測メタ",
 };
 
-const A = { ko, en, ja } as const;
+const zhTW: AboutDict = {
+  h1: "GBL Note 介紹",
+  p1a: "GBL Note 是為享受寶可夢 GO 對戰聯盟(GBL·Go Battle League)的訓練家準備的 ",
+  p1b: "免費服務",
+  p1c: "。幫您記錄對戰中遇到的對手，再次相遇時可在幾秒內確認對手過去的隊伍與招式。",
+  whatH: "可以做什麼",
+  whatLogB: "對手記錄",
+  whatLogRest: " — 可記下剛遇到的對手訓練家名稱、使用的 3 隻寶可夢、招式、備註。下次再遇到同一對手，只要搜尋名字幾個字就能立即叫出過去記錄。",
+  whatRecordB: "我的戰績",
+  whatRecordRest: " — 一眼看出各聯盟的勝負與勝率、每日戰績、對各對手隊伍的戰績。",
+  whatMetaB: "實測環境 · 強度表",
+  whatMetaRest: " — 無需登入即可查看的公開資料。將使用者實際遇到的對手匿名彙整，提供現在聯盟最常遇到什麼（實測使用率）、哪些寶可夢強勢（強度表）、各寶可夢的剋星。",
+  dataH: "資料是怎麼產生的",
+  dataA: "實測環境僅以 GBL Note 使用者留下的對戰記錄中 ",
+  dataB: "去除個人識別資訊的匿名統計",
+  dataC: " 彙整。強度與推薦招式配置以公開對戰模擬資料為基礎，並一併提供玩家實測使用率，這是 GBL Note 的特色。可同時比較理論上強勢與實際常遇到的寶可夢。",
+  usageH: "使用說明",
+  usageA: "記錄功能免費，為維持服務營運可能包含廣告。GBL Note 是粉絲製作的 ",
+  usageB: "非官方",
+  usageC: " 工具，與 Niantic · The Pokémon Company · Nintendo 無合作，也非其官方服務。『寶可夢(Pokémon)』及相關名稱·圖像之所有權利屬於各權利方。聯絡請使用 ",
+  usageLink: "聯絡頁面",
+  usageD: "。",
+  startCta: "免費開始 →",
+  footerGuide: "攻略", footerContact: "聯絡", footerPrivacy: "隱私權政策",
+  metaTitle: "GBL Note 介紹 — 寶可夢GO 對戰對手記錄 & 實測環境",
+  metaDesc: "GBL Note 是記錄寶可夢 GO 對戰聯盟遇到的對手，並以真實玩家資料呈現聯盟環境的免費服務。",
+  ogTitle: "GBL Note 介紹", ogDesc: "寶可夢GO 對戰對手記錄 & 實測環境",
+};
+
+const A = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getAbout(lang: string): AboutDict {
   return (A as Record<string, AboutDict>)[lang] || ko;
 }

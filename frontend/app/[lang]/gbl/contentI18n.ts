@@ -17,6 +17,11 @@ const LEAGUE: Record<Locale, Record<string, { name: string; short: string }>> = 
     great: { name: "スーパーリーグ", short: "スーパー" },
     ultra: { name: "ハイパーリーグ", short: "ハイパー" },
   },
+  "zh-TW": {
+    master: { name: "大師聯盟", short: "大師" },
+    great: { name: "超級聯盟", short: "超級" },
+    ultra: { name: "高級聯盟", short: "高級" },
+  },
 };
 
 export function leagueName(locale: Locale, key: string): string {
@@ -26,12 +31,13 @@ export function leagueShort(locale: Locale, key: string): string {
   return LEAGUE[locale]?.[key]?.short || LEAGUE.ko[key]?.short || key;
 }
 
-// 로케일별 이름 선택. {ko,en,ja} 우선순위(해당 로케일 → ko → fallback).
+// 로케일별 이름 선택. {ko,en,ja,"zh-TW"} 우선순위(해당 로케일 → zh-TW → en → ko → fallback).
 export function localName(
   locale: Locale,
-  e: { ko?: string | null; en?: string | null; ja?: string | null } | undefined,
+  e: { ko?: string | null; en?: string | null; ja?: string | null; "zh-TW"?: string | null } | undefined,
   fallback = "",
 ): string {
   if (!e) return fallback;
-  return (locale === "en" ? e.en : locale === "ja" ? e.ja : e.ko) || e.ko || fallback;
+  const byLocale = locale === "en" ? e.en : locale === "ja" ? e.ja : locale === "zh-TW" ? e["zh-TW"] : e.ko;
+  return byLocale || e["zh-TW"] || e.en || e.ko || fallback;
 }

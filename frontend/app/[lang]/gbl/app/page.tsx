@@ -7,6 +7,7 @@ import { apiFetch, logout, getUser, updateNickname, hasToken } from "../../../..
 import DATA from "../gbl_data.json";
 import PKN from "../pokedex_names.json";
 import MOVEPOOLS from "../mon_movepools.json";
+import MOVENAMES from "../pvp_move_names.json";
 import { monSlug as _slug } from "../monSlug";
 import AdSlot from "../AdSlot";
 import CoupangAd from "../CoupangAd";
@@ -24,6 +25,11 @@ type League = "great" | "ultra" | "master";
 type Dataset = { top_n: number; moves: Record<string, Move>; leagues: Record<League, { count: number; pokemon: Mon[] }> };
 const DS = DATA as unknown as Dataset;
 const MOVES = DS.moves;
+// zh-TW 기술명 보강 — Move 엔트리에 zh-TW 필드가 없어 pvp_move_names(id)로 주입.
+for (const [id, mv] of Object.entries(MOVES)) {
+  const zh = (MOVENAMES as Record<string, Record<string, string>>)[id]?.["zh-TW"];
+  if (zh) (mv as Record<string, string>)["zh-TW"] = zh;
+}
 const LEAGUE_KEY = "gbl_league";
 // 현재 시즌(전적 카드/시즌 필터용). 새 시즌 시작 시 갱신.
 const SEASON = { num: 27, start: "2026-06-02", end: "2026-09-09" };
@@ -83,14 +89,15 @@ for (const [dexStr, nm] of Object.entries(PKNAMES)) {
 const FULL_MONS: Mon[] = [..._metaMons, ..._extraMons];  // 메타 먼저 + 전 도감 보충
 
 // 로케일별 이름/라벨 헬퍼
-const localeTag = (lang: Locale) => lang === "en" ? "en-US" : lang === "ja" ? "ja-JP" : "ko-KR";
+const localeTag = (lang: Locale) => lang === "en" ? "en-US" : lang === "ja" ? "ja-JP" : lang === "zh-TW" ? "zh-TW" : "ko-KR";
 const monName = (lang: Locale, m: Mon | null | undefined): string => {
   if (!m) return "";
   if (lang === "en") return m.en || m.ko;
   if (lang === "ja") return PKNAMES[String(m.dex)]?.ja || m.en || m.ko;
+  if (lang === "zh-TW") return (PKNAMES[String(m.dex)] as Record<string,string>)?.["zh-TW"] || m.en || m.ko;
   return m.ko;
 };
-const moveLabel = (lang: Locale, mv?: Move): string => mv ? (lang === "ko" ? mv.ko : lang === "ja" ? (mv.ja || mv.en || mv.ko) : (mv.en || mv.ko)) : "";
+const moveLabel = (lang: Locale, mv?: Move): string => mv ? (lang === "ko" ? mv.ko : lang === "ja" ? (mv.ja || mv.en || mv.ko) : lang === "zh-TW" ? ((mv as Record<string, string>)["zh-TW"] || mv.en || mv.ko) : (mv.en || mv.ko)) : "";
 const fmtLabel = (lang: Locale, f?: Format): string => f ? (f.cup ? f.label : leagueName(lang, f.base)) : "";
 const periodLabel = (t: AppDict, key: string): string =>
   key === "today" ? t.periodToday : key === "7" ? t.period7 : key === "30" ? t.period30
@@ -154,9 +161,15 @@ function PokemonPicker({ value, manual, pool, onPick, onManual, lang, t }: {
   const [open, setOpen] = useState(false);
   const [manualMode, setManualMode] = useState(false);
   const results = useMemo(() => {
-    const s = q.trim().toLowerCase();
+    const qt = q.trim();
+    const s = qt.toLowerCase();
     if (!s) return pool.slice(0, 40);
-    return pool.filter((m) => m.ko.toLowerCase().includes(s) || m.en.toLowerCase().includes(s)).slice(0, 40);
+    // 다국어 검색: 한/영은 소문자 부분일치, 일/번체(繁)는 dex→pokedex_names에서 원문 매칭.
+    return pool.filter((m) => {
+      if (m.ko.toLowerCase().includes(s) || m.en.toLowerCase().includes(s)) return true;
+      const nm = PKNAMES[String(m.dex)] as Record<string, string> | undefined;
+      return !!nm && ((nm.ja || "").includes(qt) || (nm["zh-TW"] || "").includes(qt));
+    }).slice(0, 40);
   }, [q, pool]);
 
   const selected = value ? MON_BY_ID[value] : null;

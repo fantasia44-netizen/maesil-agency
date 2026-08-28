@@ -116,7 +116,40 @@ const ja: ScheduleDict = {
   ogDesc: "今週開催のリーグ・カップ日程",
 };
 
-const S = { ko, en, ja } as const;
+const zhTW: ScheduleDict = {
+  navMeta: "📊 實測環境",
+  h1: "寶可夢GO GBL 賽季時程",
+  seasonWord: "賽季", seasonName: "嶄新的一步",
+  introA: " 對戰聯盟輪替時程。GBL 的超級·高級·大師聯盟與每週盃賽會 ",
+  introB: "依週輪替", introC: "。",
+  thisWeekHeading: "本週開放的聯盟 · ",
+  rotationH2: "聯盟輪替時程",
+  statusLive: "本週", statusSoon: "預定", statusPast: "結束",
+  cpNote1: "每個聯盟 CP 限制不同（超級 1500 · 高級 2500 · 大師無限制）。盃賽常只限特定屬性參加。現在聯盟最常遇到什麼可看 ",
+  metaLinkText: "實測環境",
+  cpNote2: "，強勢寶可夢看 ",
+  tierLinkText: "強度表",
+  cpNote3: "。 ",
+  cpGuideLink: "各聯盟 CP 限制指南 →",
+  footerGuide: "攻略", footerPrivacy: "隱私權政策",
+  megaSuffix: "：超級",
+  eventsH2: "GBL 活動 · 獎勵", evLive: "進行中", evSoon: "預定", evEnded: "結束", evSource: "官方來源", evShare: "分享/下載",
+  endsInPre: "距結束 ", daysUnit: "天", endedWord: "已結束", seasonProgressLabel: "賽季進度", capWord: "CP", tzNote: "🕐 KST · UTC+9 為準",
+  cupLabels: {
+    "스크롤컵 (슈퍼리그)": "捲軸盃（超級聯盟）",
+  },
+  notes: {
+    "배틀 승리 시 별의모래 4배 (세트 종료 리워드 제외)": "對戰勝利時星星沙子4倍（不含賽組結束獎勵）",
+    "별의모래 4배 (세트 종료 리워드 제외)": "星星沙子4倍（不含賽組結束獎勵）",
+  },
+  metaTitle: "寶可夢GO GBL 賽季時程 · 聯盟輪替 | GBL Note",
+  metaDesc: "寶可夢 GO 對戰聯盟(GBL) 第{num}賽季『{name}』聯盟輪替時程。本週開放的超級·高級·大師聯盟與盃賽（捲軸盃等）時程一目瞭然。",
+  metaKeywords: ["寶可夢GO GBL 時程", "對戰聯盟輪替", "本週 GBL 聯盟", "GBL 盃賽時程", "第{num}賽季"],
+  ogTitle: "寶可夢GO GBL 第{num}賽季 聯盟輪替時程",
+  ogDesc: "本週開放的聯盟·盃賽時程",
+};
+
+const S = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getSchedule(lang: string): ScheduleDict {
   return (S as Record<string, ScheduleDict>)[lang] || ko;
 }

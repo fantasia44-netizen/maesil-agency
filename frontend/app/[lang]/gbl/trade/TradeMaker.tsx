@@ -21,7 +21,7 @@ type Item = { dex: number; shiny: boolean; cf?: string; max?: "d" | "g" }; // cf
 type Variant = { dex: number; cf?: string; hasShiny: boolean };
 const nameOf = (lang: Locale, dex: number) => {
   const n = NAMES[String(dex)];
-  return n ? (lang === "en" ? n.en : lang === "ja" ? n.ja : n.ko) : String(dex);
+  return n ? (lang === "en" ? n.en : lang === "ja" ? n.ja : lang === "zh-TW" ? ((n as Record<string, string>)["zh-TW"] || n.en) : n.ko) : String(dex);
 };
 // 전부 UICONS(게임 아이콘)로 통일 — 기본/코스튬 art 스타일 일치.
 const variantSprite = (v: { dex: number; cf?: string }, shiny: boolean) => {
@@ -57,7 +57,7 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
     if (!s) return [];
     const dexes = DEXES.filter((d) => {
       const n = NAMES[String(d)];
-      return n && (n.ko.toLowerCase().includes(s) || n.en.toLowerCase().includes(s) || (n.ja || "").includes(s) || String(d) === s);
+      return n && (n.ko.toLowerCase().includes(s) || n.en.toLowerCase().includes(s) || (n.ja || "").includes(s) || (((n as Record<string, string>)["zh-TW"]) || "").includes(s) || String(d) === s);
     }).slice(0, 6);
     const out: Variant[] = [];
     for (const d of dexes) {
@@ -215,12 +215,12 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
         {/* 카드 출력 언어 선택(해외 공유용) — 캡처 대상 밖 */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 10 }}>
           <span style={{ fontSize: "0.85rem" }}>🌐</span>
-          {(["ko", "en", "ja"] as Locale[]).map((lc) => (
+          {(["ko", "en", "ja", "zh-TW"] as Locale[]).map((lc) => (
             <button key={lc} onClick={() => setCardLang(lc)}
               style={{ padding: "5px 12px", borderRadius: 999, border: cardLang === lc ? "none" : "1px solid #dbe2ee",
                 background: cardLang === lc ? "#3b5bdb" : "#fff", color: cardLang === lc ? "#fff" : "#475569",
                 fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" }}>
-              {lc === "ko" ? "한국어" : lc === "en" ? "English" : "日本語"}
+              {lc === "ko" ? "한국어" : lc === "en" ? "English" : lc === "ja" ? "日本語" : "繁體中文"}
             </button>
           ))}
         </div>

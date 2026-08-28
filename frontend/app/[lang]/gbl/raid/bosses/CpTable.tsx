@@ -40,6 +40,14 @@ const T: Record<string, CpDict> = {
     close: "▲ CP表を閉じる", openBtn: "▼ 個体値別CP表 (13〜15)", ivShort: "個体値", saveShareBtn: "📸 このCP表を保存・共有", cpShareText: "レイドCP · gblnote.com",
     share: "📤 共有", save: "💾 保存", closeBtn: "閉じる",
   },
+  "zh-TW": {
+    boss: "團體戰頭目", cpSuffix: "100% CP", weather: "天氣",
+    hundoNote: "💯 = 100% 個體 · 暗影（陰影）在 13~15 個體值時，淨化後可達 100%（全能力值 +2）",
+    ivHead: "個體值（攻/防/HP）", normalL20: "一般 L20", weatherL25: "天氣 L25", footer: "寶可夢GO 團體戰頭目 CP 資訊",
+    tipPre: "捕捉時 CP 為 ", tipMid1: "（天氣 ", tipMid2: "）即為 ", tipHundo: "100% 個體", tipBang: "！ · ", tipShadow: "暗影（陰影）", tipPost: "在 13~15 個體值時淨化後達 100%（淨化＝全能力值 +2）",
+    close: "▲ 關閉 CP 表", openBtn: "▼ 各個體值 CP 表（13~15）", ivShort: "個體值", saveShareBtn: "📸 儲存·分享此 CP 表", cpShareText: "團體戰 CP · gblnote.com",
+    share: "📤 分享", save: "💾 儲存", closeBtn: "關閉",
+  },
 };
 
 const CPM_L20 = 0.5974, CPM_L25 = 0.667934;

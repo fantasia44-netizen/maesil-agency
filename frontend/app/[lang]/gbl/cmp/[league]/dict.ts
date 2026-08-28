@@ -57,7 +57,23 @@ const ja: CmpDict = {
   ogDesc: "こうげきランキング = ゲージ優先度順",
 };
 
-const C = { ko, en, ja } as const;
+const zhTW: CmpDict = {
+  navTier: "🏆 強度表", navMeta: "📊 實測環境", navRaid: "🔥 團體戰攻擊手",
+  h1Suffix: "攻擊力(CMP) 先攻權排名",
+  intro1: "兩隻寶可夢同回合放特殊招式時，攻擊種族值高的一方先發動（CMP 先攻權）。下方是將主要寶可夢依攻擊力排序的先攻權排名表。越上面在 CMP 對決越有利。",
+  intro2: "數字 = 有效攻擊力（到小數點後 1 位為實際 CMP 判定基準 — 只高 0.1 也先發動）。相同值實際上也同分（隨機）。點各寶可夢前往詳細。",
+  tierLabel: "強度", emptyData: "資料準備中。",
+  shareTitleSuffix: "CMP 先攻權 TOP", shareSubtitle: "有效攻擊力順 = 同回合特殊招式先攻權", shareButton: "📸 將此 CMP 排名以圖片分享·儲存", shareFooter: "寶可夢GO CMP 先攻權",
+  explainerH: "CMP 先攻權是什麼？",
+  explainerBody: "CMP(Charge Move Priority) 是兩隻寶可夢同回合發動特殊招式時，攻擊種族值高的一方先觸發的規則。先發動可擊倒對手或逼出護盾，在攻擊力相近的對決中決定勝負。攻擊種族值可能隨賽季平衡調整而改變。",
+  recordLink: "記錄我的戰績 →", guide: "攻略",
+  metaTitle: "攻擊力(CMP) 先攻權排名 | GBL Note",
+  metaDesc: "攻擊種族值排名表。同回合放特殊招式時誰先發動（CMP 先攻權），依攻擊力排序整理。",
+  ogTitle: "CMP 先攻權排名",
+  ogDesc: "攻擊力排名 = 特殊招式先攻順序",
+};
+
+const C = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getCmp(lang: string): CmpDict {
   return (C as Record<string, CmpDict>)[lang] || ko;
 }

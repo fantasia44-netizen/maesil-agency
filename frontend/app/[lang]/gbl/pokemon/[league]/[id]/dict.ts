@@ -85,7 +85,29 @@ const ja: PokeDict = {
   },
 };
 
-const P = { ko, en, ja } as const;
+const zhTW: PokeDict = {
+  navTier: "🏆 強度表", navCmp: "⚡ CMP 排名", navMeta: "📊 實測環境",
+  tierScore: "強度 · 評分", pickRate: "📊 玩家實測使用率（近 30 天）",
+  movesetH: "推薦招式配置 · 招式次數", fastLabel: "一般招式", fastTurns: "回合 · 能量 +", chargedHint: "特殊招式 — 連續發動時的次數（含能量結轉）", hitsUnit: "次", energyUnit: "能量",
+  countersH: "🛡️ 剋制這隻寶可夢的寶可夢（剋星）", countersP: "對這隻寶可夢佔優勢的寶可夢。若常遇到，請準備下方這些。",
+  winsH: "⚔️ 這隻寶可夢佔優勢的對手", winsP: "用這隻寶可夢可佔優勢對付的寶可夢。", noData: "無資料",
+  statsH: "種族值（對戰數值）", atk: "攻擊", def: "防禦", hp: "HP",
+  rolesH: "角色評分", roles: ["先鋒", "收尾", "換場", "放招", "攻擊", "穩定性"],
+  rolesNote: "先鋒=前期優勢 · 收尾=後期續航 · 換場=換場應對 · 放招=特殊招式壓迫 · 攻擊=輸出 · 穩定性=相性穩定（0~100）",
+  explainer: "推薦招式配置以公開對戰模擬(PvPoke)為準，剋星·佔優對手依模擬對面結果整理。實測使用率是 GBL Note 使用者實際遇到對手的匿名統計。",
+  explainerTierWord: "強度", recordLink: "記錄我的戰績 →", privacy: "隱私權政策",
+  metaTitle: "剋星·推薦招式配置 | GBL Note", metaDesc: "推薦招式配置、剋星（弱點對手）、佔優對手、種族值與玩家實測使用率。確認對策。",
+  ogDescSuffix: "剋星·推薦招式·實測使用率", ogTitleSuffix: "剋星·招式配置",
+  share: {
+    movesetH: "推薦招式配置 · 招式次數", statsH: "種族值", atk: "攻擊", def: "防禦", hp: "HP",
+    tierLabel: "強度", pickPrefix: "📊 實測使用率", hitsUnit: "次",
+    cardWord: "資訊卡", gameWord: "寶可夢GO", shareSaveWord: "分享·儲存", building: "產生圖片中…",
+    shareBtn: "📤 分享", saveBtn: "💾 儲存", closeBtn: "關閉",
+    winLabel: "獲勝對手", loseLabel: "落敗對手（剋星）",
+  },
+};
+
+const P = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getPoke(lang: string): PokeDict {
   return (P as Record<string, PokeDict>)[lang] || ko;
 }

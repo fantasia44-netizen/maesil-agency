@@ -6,6 +6,22 @@ import { monSprite } from "../../sprite";
 import { TYPE_COLOR, typeLabel } from "../../typeLabels";
 import type { Locale } from "../../../../../lib/i18n";
 import type { Brochure } from "./eventBrochures";
+import PKNAMES from "../../pokedex_names.json";
+
+// UI 뼈대 다국어(이벤트 카피는 데이터=한국어 유지). 몬 이름은 dex로 pokedex_names에서 로케일별 보완.
+const _PK = PKNAMES as Record<string, Record<string, string>>;
+const monNameByDex = (lang: Locale, dex: string, fallbackKo: string) => {
+  const n = _PK[dex];
+  if (!n) return fallbackKo;
+  return lang === "en" ? (n.en || fallbackKo) : lang === "ja" ? (n.ja || n.en || fallbackKo) : lang === "zh-TW" ? (n["zh-TW"] || n.en || fallbackKo) : (n.ko || fallbackKo);
+};
+type BroUI = { brandSub: string; weak: string; resist: string; cpTable: string; cpGain: string; ivHead: string; colNormal: string; colWeather: string; cpNote: string; countersTop: string; shareCta: string; gen: string; share: string; download: string; close: string; dismiss: string };
+const UI: Record<string, BroUI> = {
+  ko: { brandSub: "포켓몬 GO 레이드 정보 & CP 계산기", weak: "약점", resist: "저항", cpTable: "CP 표", cpGain: "(획득 CP)", ivHead: "개체값", colNormal: "일반", colWeather: "날씨", cpNote: "일반=L20 · 날씨(강풍/눈)=L25 획득", countersTop: "추천 포켓몬 TOP 6", shareCta: "일정 공유하고 함께 레이드해요!", gen: "생성 중…", share: "📤 공유하기", download: "💾 다운로드", close: "닫기", dismiss: "다시 안 보기" },
+  en: { brandSub: "Pokémon GO raid info & CP calculator", weak: "Weak", resist: "Resist", cpTable: "CP table", cpGain: "(catch CP)", ivHead: "IV", colNormal: "Normal", colWeather: "Weather", cpNote: "Normal=L20 · Weather (windy/snow)=L25 catch", countersTop: "Top 6 counters", shareCta: "Share the schedule and raid together!", gen: "Generating…", share: "📤 Share", download: "💾 Save", close: "Close", dismiss: "Don't show again" },
+  ja: { brandSub: "ポケモンGO レイド情報 & CP計算機", weak: "弱点", resist: "耐性", cpTable: "CP表", cpGain: "(捕獲CP)", ivHead: "個体値", colNormal: "通常", colWeather: "天候", cpNote: "通常=L20 · 天候(強風/雪)=L25で捕獲", countersTop: "おすすめポケモン TOP 6", shareCta: "予定を共有して一緒にレイドしよう！", gen: "生成中…", share: "📤 共有", download: "💾 保存", close: "閉じる", dismiss: "今後表示しない" },
+  "zh-TW": { brandSub: "寶可夢GO 團體戰資訊 & CP 計算機", weak: "弱點", resist: "抗性", cpTable: "CP 表", cpGain: "（捕捉 CP）", ivHead: "個體值", colNormal: "一般", colWeather: "天氣", cpNote: "一般=L20 · 天氣（強風/雪）=L25 捕捉", countersTop: "推薦寶可夢 TOP 6", shareCta: "分享行程一起打團體戰吧！", gen: "產生中…", share: "📤 分享", download: "💾 下載", close: "關閉", dismiss: "不再顯示" },
+};
 
 const TYPE_EMOJI: Record<string, string> = {
   electric: "⚡", grass: "🌿", water: "💧", fire: "🔥", ice: "❄️", fighting: "🥊", poison: "☠️",
@@ -45,6 +61,7 @@ function BonusCard({ sec }: { sec: Brochure["bonuses"][number] }) {
 }
 
 export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Brochure; lang: Locale; onClose: () => void; onDismiss?: () => void }) {
+  const ui = UI[lang] || UI.ko;
   const spriteFallback = b.hero.spriteKo && b.hero.spriteDex ? monSprite(b.hero.spriteKo, b.hero.spriteDex) : "";
   const heroSrc = b.hero.img || spriteFallback;
   const bonus1 = b.bonuses.find((s) => s.n === 1 || s.accent);
@@ -107,7 +124,7 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/gbl-icon.png" alt="" width={24} height={24} style={{ objectFit: "contain", flexShrink: 0 }} />
             <span style={{ fontSize: "1rem", fontWeight: 900, color: "#1a2570" }}>GBL Note</span>
-            <span style={{ fontSize: "0.66rem", color: SUB, fontWeight: 700 }}>포켓몬 GO 레이드 정보 &amp; CP 계산기</span>
+            <span style={{ fontSize: "0.66rem", color: SUB, fontWeight: 700 }}>{ui.brandSub}</span>
             <span style={{ marginLeft: "auto", background: "linear-gradient(90deg,#f59e0b,#ef4444)", color: "#fff", fontWeight: 900, fontSize: "0.74rem", borderRadius: 999, padding: "4px 12px" }}>⭐ {b.kindLabel}</span>
           </div>
 
@@ -127,13 +144,13 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
                 <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "9px 12px", marginTop: 10 }}>
                   {b.weakTypes?.length ? (
                     <div style={{ marginBottom: b.resistTypes?.length ? 8 : 0 }}>
-                      <div style={{ fontSize: "0.74rem", fontWeight: 800, color: "#dc2626", marginBottom: 5 }}>⚔️ 약점</div>
+                      <div style={{ fontSize: "0.74rem", fontWeight: 800, color: "#dc2626", marginBottom: 5 }}>⚔️ {ui.weak}</div>
                       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{b.weakTypes.map((tk) => <TypeChip key={tk} tk={tk} lang={lang} sm />)}</div>
                     </div>
                   ) : null}
                   {b.resistTypes?.length ? (
                     <div>
-                      <div style={{ fontSize: "0.74rem", fontWeight: 800, color: "#2563eb", marginBottom: 5 }}>🛡️ 저항</div>
+                      <div style={{ fontSize: "0.74rem", fontWeight: 800, color: "#2563eb", marginBottom: 5 }}>🛡️ {ui.resist}</div>
                       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{b.resistTypes.map((tk) => <TypeChip key={tk} tk={tk} lang={lang} sm />)}</div>
                     </div>
                   ) : null}
@@ -180,13 +197,13 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {b.cpIv?.rows.length ? (
                 <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "10px 12px" }}>
-                  <div style={{ fontSize: "0.9rem", fontWeight: 900, marginBottom: 6 }}>💎 CP 표 <span style={{ fontSize: "0.66rem", color: SUB, fontWeight: 700 }}>(획득 CP)</span></div>
+                  <div style={{ fontSize: "0.9rem", fontWeight: 900, marginBottom: 6 }}>💎 {ui.cpTable} <span style={{ fontSize: "0.66rem", color: SUB, fontWeight: 700 }}>{ui.cpGain}</span></div>
                   <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.72rem" }}>
                     <thead><tr style={{ color: SUB }}>
-                      <th style={{ textAlign: "left", padding: "3px 2px", fontWeight: 800 }}>개체값</th>
+                      <th style={{ textAlign: "left", padding: "3px 2px", fontWeight: 800 }}>{ui.ivHead}</th>
                       <th style={{ padding: "3px 2px", fontWeight: 800 }}>%</th>
-                      <th style={{ padding: "3px 2px", fontWeight: 800, color: "#c2410c" }}>일반</th>
-                      <th style={{ padding: "3px 2px", fontWeight: 800, color: "#2563eb" }}>날씨</th>
+                      <th style={{ padding: "3px 2px", fontWeight: 800, color: "#c2410c" }}>{ui.colNormal}</th>
+                      <th style={{ padding: "3px 2px", fontWeight: 800, color: "#2563eb" }}>{ui.colWeather}</th>
                     </tr></thead>
                     <tbody>
                       {b.cpIv.rows.map((r, i) => (
@@ -199,7 +216,7 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
                       ))}
                     </tbody>
                   </table>
-                  <div style={{ fontSize: "0.62rem", color: SUB, marginTop: 4 }}>일반=L20 · 날씨(강풍/눈)=L25 획득</div>
+                  <div style={{ fontSize: "0.62rem", color: SUB, marginTop: 4 }}>{ui.cpNote}</div>
                 </div>
               ) : null}
             </div>
@@ -207,15 +224,15 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
             {/* 추천 TOP6 */}
             {b.counters?.length ? (
               <div style={{ background: PANEL, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "10px 12px" }}>
-                <div style={{ fontSize: "0.86rem", fontWeight: 900, marginBottom: 8 }}>👾 추천 포켓몬 TOP 6</div>
+                <div style={{ fontSize: "0.86rem", fontWeight: 900, marginBottom: 8 }}>👾 {ui.countersTop}</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 6 }}>
                   {b.counters.map((c, i) => {
                     const tc = TYPE_COLOR[c.type] || "#64748b";
                     return (
                       <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, background: "#fff", border: `1px solid ${tc}55`, borderRadius: 10, padding: "6px 2px" }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={monSprite(c.ko, c.dex)} alt={c.ko} width={40} height={40} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
-                        <span style={{ fontSize: "0.62rem", fontWeight: 800, color: INK, textAlign: "center", lineHeight: 1.15 }}>{c.ko}</span>
+                        <img src={monSprite(c.ko, c.dex)} alt={monNameByDex(lang, c.dex, c.ko)} width={40} height={40} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                        <span style={{ fontSize: "0.62rem", fontWeight: 800, color: INK, textAlign: "center", lineHeight: 1.15 }}>{monNameByDex(lang, c.dex, c.ko)}</span>
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 2, fontSize: "0.56rem", fontWeight: 800, color: "#fff", background: tc, borderRadius: 999, padding: "0px 6px" }}>{TYPE_EMOJI[c.type] || "•"} {typeLabel(lang, c.type)}</span>
                       </div>
                     );
@@ -235,7 +252,7 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
             <img src="/gbl-icon.png" alt="" width={30} height={30} style={{ objectFit: "contain" }} />
             <div>
               <div style={{ fontWeight: 900, fontSize: "1rem", color: "#fff", lineHeight: 1.1 }}>GBL Note</div>
-              <div style={{ fontSize: "0.6rem", color: "#a5b4fc" }}>포켓몬 GO 레이드 정보 &amp; CP 계산기</div>
+              <div style={{ fontSize: "0.6rem", color: "#a5b4fc" }}>{ui.brandSub}</div>
             </div>
           </div>
           <div style={{ flex: 1, minWidth: 130, background: "#fff", borderRadius: 999, padding: "7px 16px", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
@@ -243,7 +260,7 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
             <span style={{ color: "#64748b", fontSize: "0.85rem" }}>🔍</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
-            <span style={{ fontSize: "0.64rem", fontWeight: 700, color: "#fff" }}>일정 공유하고 함께 레이드해요!</span>
+            <span style={{ fontSize: "0.64rem", fontWeight: 700, color: "#fff" }}>{ui.shareCta}</span>
             <div style={{ display: "flex", gap: 6 }}>
               {[["#FEE500", "💬"], ["#5865F2", "🎮"], ["#1DA1F2", "🐦"]].map(([bg, ic]) => (
                 <span key={ic} style={{ width: 24, height: 24, borderRadius: "50%", background: bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.72rem" }}>{ic}</span>
@@ -257,10 +274,10 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
 
       {/* 카드 밖 컨트롤(공유 스크린샷엔 미포함) */}
       <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", marginBottom: 8 }}>
-        <button onClick={share} disabled={busy} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: busy ? "#cbd5e1" : "linear-gradient(90deg,#db2777,#7c3aed)", color: "#fff", fontWeight: 800, fontSize: "0.85rem", cursor: busy ? "default" : "pointer" }}>{busy ? "생성 중…" : "📤 공유하기"}</button>
-        <button onClick={download} disabled={busy} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: busy ? "#cbd5e1" : "#334155", color: "#fff", fontWeight: 800, fontSize: "0.85rem", cursor: busy ? "default" : "pointer" }}>💾 다운로드</button>
-        <button onClick={onClose} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: "rgba(255,255,255,.92)", color: "#334155", fontWeight: 800, fontSize: "0.85rem", cursor: "pointer" }}>닫기</button>
-        {onDismiss && <button onClick={onDismiss} style={{ padding: "8px 18px", borderRadius: 999, border: "1px solid rgba(255,255,255,.5)", background: "rgba(255,255,255,.15)", color: "#fff", fontWeight: 700, fontSize: "0.85rem", cursor: "pointer" }}>다시 안 보기</button>}
+        <button onClick={share} disabled={busy} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: busy ? "#cbd5e1" : "linear-gradient(90deg,#db2777,#7c3aed)", color: "#fff", fontWeight: 800, fontSize: "0.85rem", cursor: busy ? "default" : "pointer" }}>{busy ? ui.gen : ui.share}</button>
+        <button onClick={download} disabled={busy} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: busy ? "#cbd5e1" : "#334155", color: "#fff", fontWeight: 800, fontSize: "0.85rem", cursor: busy ? "default" : "pointer" }}>{ui.download}</button>
+        <button onClick={onClose} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: "rgba(255,255,255,.92)", color: "#334155", fontWeight: 800, fontSize: "0.85rem", cursor: "pointer" }}>{ui.close}</button>
+        {onDismiss && <button onClick={onDismiss} style={{ padding: "8px 18px", borderRadius: 999, border: "1px solid rgba(255,255,255,.5)", background: "rgba(255,255,255,.15)", color: "#fff", fontWeight: 700, fontSize: "0.85rem", cursor: "pointer" }}>{ui.dismiss}</button>}
       </div>
      </div>
     </div>

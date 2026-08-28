@@ -31,7 +31,7 @@ const spriteOf = (p: Poke) => (p.form ? monSprite(p.ko, p.dex) : pokeSprite(p.de
 const LEAGUES: { key: string; c: string }[] = [
   { key: "great", c: "#2563eb" }, { key: "ultra", c: "#d97706" }, { key: "master", c: "#7c3aed" },
 ];
-const localName = (lang: Locale, p: { ko: string; en: string; ja: string }) => (lang === "en" ? p.en : lang === "ja" ? p.ja : p.ko);
+const localName = (lang: Locale, p: { ko: string; en: string; ja: string; "zh-TW"?: string }) => (lang === "en" ? p.en : lang === "ja" ? p.ja : lang === "zh-TW" ? (p["zh-TW"] || p.en) : p.ko);
 
 export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
   const [q, setQ] = useState("");
@@ -48,7 +48,7 @@ export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
   const matches = useMemo(() => {
     const s = q.trim().toLowerCase();
     if (!s) return [];
-    return POKELIST.filter((p) => p.ko.toLowerCase().includes(s) || p.en.toLowerCase().includes(s) || p.ja.includes(q.trim()) || p.dex === s).slice(0, 24);
+    return POKELIST.filter((p) => p.ko.toLowerCase().includes(s) || p.en.toLowerCase().includes(s) || p.ja.includes(q.trim()) || ((p as { "zh-TW"?: string })["zh-TW"] || "").includes(q.trim()) || p.dex === s).slice(0, 24);
   }, [q]);
 
   const picked = selKey ? POKELIST.find((p) => p.key === selKey) || null : null;

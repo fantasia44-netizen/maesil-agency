@@ -24,20 +24,20 @@ const TYPE_COLOR: Record<string, string> = {
 };
 
 // 폼 라벨(다국어) — speciesId 접미 매칭
-const FORM_SUFFIX: Record<string, { ko: string; en: string; ja: string }> = {
-  therian: { ko: "영물", en: "Therian", ja: "霊獣" }, origin: { ko: "오리진", en: "Origin", ja: "オリジン" },
-  incarnate: { ko: "화신", en: "Incarnate", ja: "化身" }, altered: { ko: "another", en: "Altered", ja: "アナザー" },
-  black: { ko: "블랙", en: "Black", ja: "ブラック" }, white: { ko: "화이트", en: "White", ja: "ホワイト" },
-  attack: { ko: "어택", en: "Attack", ja: "アタック" }, defense: { ko: "디펜스", en: "Defense", ja: "ディフェンス" }, speed: { ko: "스피드", en: "Speed", ja: "スピード" },
-  heat: { ko: "히트", en: "Heat", ja: "ヒート" }, wash: { ko: "워시", en: "Wash", ja: "ウォッシュ" }, frost: { ko: "프로스트", en: "Frost", ja: "フロスト" }, fan: { ko: "팬", en: "Fan", ja: "スピン" }, mow: { ko: "모우", en: "Mow", ja: "カット" },
-  alolan: { ko: "알로라", en: "Alolan", ja: "アローラ" }, galarian: { ko: "가라르", en: "Galarian", ja: "ガラル" }, hisuian: { ko: "히스이", en: "Hisuian", ja: "ヒスイ" }, paldea: { ko: "팔데아", en: "Paldea", ja: "パルデア" },
-  mega: { ko: "메가", en: "Mega", ja: "メガ" }, mega_x: { ko: "메가X", en: "Mega X", ja: "メガX" }, mega_y: { ko: "메가Y", en: "Mega Y", ja: "メガY" }, primal: { ko: "원시", en: "Primal", ja: "ゲンシ" },
-  dusk_mane: { ko: "황혼의갈기", en: "Dusk Mane", ja: "たそがれ" }, dawn_wings: { ko: "새벽의날개", en: "Dawn Wings", ja: "あかつき" },
-  ice_rider: { ko: "백마", en: "Ice Rider", ja: "はくば" }, shadow_rider: { ko: "흑마", en: "Shadow Rider", ja: "こくば" },
-  crowned_sword: { ko: "검왕", en: "Crowned Sword", ja: "けんのおう" }, crowned_shield: { ko: "방패왕", en: "Crowned Shield", ja: "たてのおう" },
-  hero: { ko: "", en: "", ja: "" }, zen: { ko: "달마모드", en: "Zen", ja: "ダルマ" }, standard: { ko: "", en: "", ja: "" },
-  aria: { ko: "보이스", en: "Aria", ja: "ボイス" }, pirouette: { ko: "스텝", en: "Pirouette", ja: "ステップ" },
-  blade: { ko: "블레이드", en: "Blade", ja: "ブレード" }, shield: { ko: "실드", en: "Shield", ja: "シールド" },
+const FORM_SUFFIX: Record<string, { ko: string; en: string; ja: string; "zh-TW": string }> = {
+  therian: { ko: "영물", en: "Therian", ja: "霊獣", "zh-TW": "靈獸" }, origin: { ko: "오리진", en: "Origin", ja: "オリジン", "zh-TW": "起源" },
+  incarnate: { ko: "화신", en: "Incarnate", ja: "化身", "zh-TW": "化身" }, altered: { ko: "another", en: "Altered", ja: "アナザー", "zh-TW": "別種" },
+  black: { ko: "블랙", en: "Black", ja: "ブラック", "zh-TW": "黑" }, white: { ko: "화이트", en: "White", ja: "ホワイト", "zh-TW": "白" },
+  attack: { ko: "어택", en: "Attack", ja: "アタック", "zh-TW": "攻擊" }, defense: { ko: "디펜스", en: "Defense", ja: "ディフェンス", "zh-TW": "防禦" }, speed: { ko: "스피드", en: "Speed", ja: "スピード", "zh-TW": "速度" },
+  heat: { ko: "히트", en: "Heat", ja: "ヒート", "zh-TW": "加熱" }, wash: { ko: "워시", en: "Wash", ja: "ウォッシュ", "zh-TW": "清洗" }, frost: { ko: "프로스트", en: "Frost", ja: "フロスト", "zh-TW": "結冰" }, fan: { ko: "팬", en: "Fan", ja: "スピン", "zh-TW": "旋轉" }, mow: { ko: "모우", en: "Mow", ja: "カット", "zh-TW": "切割" },
+  alolan: { ko: "알로라", en: "Alolan", ja: "アローラ", "zh-TW": "阿羅拉" }, galarian: { ko: "가라르", en: "Galarian", ja: "ガラル", "zh-TW": "伽勒爾" }, hisuian: { ko: "히스이", en: "Hisuian", ja: "ヒスイ", "zh-TW": "洗翠" }, paldea: { ko: "팔데아", en: "Paldea", ja: "パルデア", "zh-TW": "帕底亞" },
+  mega: { ko: "메가", en: "Mega", ja: "メガ", "zh-TW": "超級" }, mega_x: { ko: "메가X", en: "Mega X", ja: "メガX", "zh-TW": "超級X" }, mega_y: { ko: "메가Y", en: "Mega Y", ja: "メガY", "zh-TW": "超級Y" }, primal: { ko: "원시", en: "Primal", ja: "ゲンシ", "zh-TW": "原始" },
+  dusk_mane: { ko: "황혼의갈기", en: "Dusk Mane", ja: "たそがれ", "zh-TW": "黃昏之鬃" }, dawn_wings: { ko: "새벽의날개", en: "Dawn Wings", ja: "あかつき", "zh-TW": "拂曉之翼" },
+  ice_rider: { ko: "백마", en: "Ice Rider", ja: "はくば", "zh-TW": "白馬" }, shadow_rider: { ko: "흑마", en: "Shadow Rider", ja: "こくば", "zh-TW": "黑馬" },
+  crowned_sword: { ko: "검왕", en: "Crowned Sword", ja: "けんのおう", "zh-TW": "劍王" }, crowned_shield: { ko: "방패왕", en: "Crowned Shield", ja: "たてのおう", "zh-TW": "盾王" },
+  hero: { ko: "", en: "", ja: "", "zh-TW": "" }, zen: { ko: "달마모드", en: "Zen", ja: "ダルマ", "zh-TW": "達摩模式" }, standard: { ko: "", en: "", ja: "", "zh-TW": "" },
+  aria: { ko: "보이스", en: "Aria", ja: "ボイス", "zh-TW": "歌聲" }, pirouette: { ko: "스텝", en: "Pirouette", ja: "ステップ", "zh-TW": "舞步" },
+  blade: { ko: "블레이드", en: "Blade", ja: "ブレード", "zh-TW": "劍刃" }, shield: { ko: "실드", en: "Shield", ja: "シールド", "zh-TW": "盾牌" },
 };
 const FORM_KEYS = Object.keys(FORM_SUFFIX).sort((a, b) => b.length - a.length);
 function parseForm(speciesId: string): string {
@@ -47,21 +47,21 @@ function parseForm(speciesId: string): string {
 }
 function formLabel(lang: Locale, form: string): string {
   const f = FORM_SUFFIX[form];
-  if (f) return lang === "en" ? f.en : lang === "ja" ? f.ja : f.ko;
+  if (f) return lang === "en" || lang === "zh-TW" ? f.en : lang === "ja" ? f.ja : f.ko;
   return form.replace(/(^|_)([a-z0-9])/g, (_, a, b) => (a ? " " : "") + b.toUpperCase());
 }
 function monName(lang: Locale, p: { speciesId: string; speciesName: string; dex: number }): string {
   const cleanEn = p.speciesName.replace(/\s*\((Shadow|Busted)\)/i, ""); // 그림자(😈)·디스가이즈 배틀상태 → 이름서 제거
   if (lang === "en") return cleanEn;
-  const base = PKN[String(p.dex)];
-  const bn = base ? (lang === "ja" ? base.ja : base.ko) : null;
+  const base = PKN[String(p.dex)] as Record<string, string> | undefined;
+  const bn = base ? (lang === "ja" ? base.ja : lang === "zh-TW" ? (base["zh-TW"] || base.en) : base.ko) : null;
   if (!bn) return cleanEn;
   const form = parseForm(p.speciesId);
   if (form && FORM_SUFFIX[form]) { const fl = formLabel(lang, form); return fl ? `${bn} (${fl})` : bn; }
   const m = cleanEn.match(/\(([^)]+)\)/);
   return m ? `${bn} (${m[1]})` : bn;
 }
-const moveName = (lang: Locale, id: string): string => { const m = MN[id]; return m ? (lang === "en" ? m.en : lang === "ja" ? m.ja : m.ko) : id; };
+const moveName = (lang: Locale, id: string): string => { const m = MN[id] as Record<string, string> | undefined; return m ? (lang === "en" ? m.en : lang === "ja" ? m.ja : lang === "zh-TW" ? (m["zh-TW"] || m.en) : m.ko) : id; };
 // pokeSummary(엔진결과)용 이름 지역화 — {speciesId, name(en), dex}
 const monNameOf = (lang: Locale, p: { speciesId: string; name: string; dex: number }): string => monName(lang, { speciesId: p.speciesId, speciesName: p.name, dex: p.dex });
 const moveType = (id: string): string => (moveInfo(id)?.type || "normal");

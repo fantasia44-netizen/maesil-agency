@@ -157,7 +157,53 @@ const ja: BossesDict = {
   ogTitle: "ポケモンGO 現在のレイドボス · 100% CP", ogDesc: "5★・メガ・3★ボスの100% CP + 弱点アタッカー",
 };
 
-const B = { ko, en, ja } as const;
+const zhTW: BossesDict = {
+  navBack: "← 團體戰攻擊手強度", navHub: "GBL Note →",
+  h1: "當前團體戰頭目 · 100% CP",
+  intro: [
+    { t: "現正開放的團體戰頭目與 " },
+    { t: "100% 個體值 CP", b: true },
+    { t: "（捕捉時若為此 CP 即 15/15/15）。" },
+    { t: "弱點屬性", b: true },
+    { t: " 點下去會前往該屬性的 " },
+    { t: "推薦攻擊手強度表", b: true },
+    { t: "。" },
+  ],
+  sub: [
+    { t: "僅顯示五星·超級團體戰（排除1·3星）。各頭目下方的 " },
+    { t: "各個體值捕捉 CP 表", b: true },
+    { t: " 可確認是否為 100 個體（15/15/15）。天氣加成 = 該天氣時以等級25出現（CP 更高）。超級·原始團體戰 " },
+    { t: "捕捉基本型", b: true },
+    { t: "（表為捕捉 CP）。✨ = 可能異色。自動更新。" },
+  ],
+  shareTitle: "本月團體戰頭目 100% CP",
+  shareSubtitle: "捕捉時若為此 CP 即 100 個體（15/15/15）· 天氣=加成",
+  shareButton: "📸 將本月頭目 CP 表以圖片分享·儲存",
+  shareFooter: "寶可夢GO 團體戰頭目 CP",
+  loadFail: "無法載入頭目資訊。請稍後再試。",
+  noneOpen: "目前沒有開放的五星·超級團體戰。",
+  tierElite: "菁英團體戰", tierMega: "超級團體戰", tier5: "五星團體戰（傳說）", tierPrimal: "原始團體戰", tierShadow: "暗影團體戰",
+  countSuffix: "種",
+  weatherLabel: "天氣",
+  weakDealer: "弱點攻擊手 →",
+  explainH: "100% CP 是什麼？",
+  explainBody: [
+    { t: "在團體戰捕捉時，CP 會依個體值(IV)呈現固定值。顯示的 " },
+    { t: "100% CP", b: true },
+    { t: " 是 " },
+    { t: "15/15/15（最高個體值）", b: true },
+    { t: " 時的 CP。捕捉畫面 CP 與此數字相同即為 100% 個體（天氣加成時以天氣 CP 為準）。點弱點屬性確認要用哪隻寶可夢捕捉。" },
+  ],
+  explainLink: "各屬性攻擊手強度表 →",
+  dataSource: "頭目資料：LeekDuck(ScrapedDuck) · ", privacy: "隱私權政策",
+  pfx: { mega: "超級", shadow: "暗影", hisui: "洗翠", alola: "阿羅拉", galar: "伽勒爾", paldea: "帕底亞", origin: "（起源）" },
+  metaTitle: "寶可夢GO 當前團體戰頭目 · 100% CP 表 | GBL Note",
+  metaDesc: "現正開放的寶可夢 GO 五星·超級團體戰頭目清單。各頭目依個體值(IV)的捕捉 CP 表 — 以一般·天氣加成確認 100 個體（15/15/15）CP。含弱點屬性·推薦攻擊手。自動更新。",
+  metaKeywords: ["寶可夢GO 團體戰頭目", "100 CP", "100個體 CP", "團體戰 CP表", "個體值 CP", "15 15 15 CP", "五星團體戰", "超級團體戰"],
+  ogTitle: "寶可夢GO 當前團體戰頭目 · 100% CP", ogDesc: "五星·超級·三星頭目 100% CP + 弱點攻擊手",
+};
+
+const B = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getBosses(lang: string): BossesDict {
   return (B as Record<string, BossesDict>)[lang] || ko;
 }

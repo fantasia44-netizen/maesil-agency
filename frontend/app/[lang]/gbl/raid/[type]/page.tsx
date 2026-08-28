@@ -4,6 +4,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import RAIDS from "../../gbl_raids.json";
+import PKNAMES from "../../pokedex_names.json";
+import MOVENAMES from "../../pvp_move_names.json";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 import ListShare from "../../ListShare";
@@ -14,9 +16,13 @@ import { getDict } from "../../dictionaries";
 import { getRaidType } from "./dict";
 
 // 로케일별 이름/기술명 선택(레이드 행 필드: name/nameEn/nameJa, fastKo/fastEn/fastJa 등)
-const rowName = (lang: Locale, r: Row) => (lang === "en" ? r.nameEn : lang === "ja" ? r.nameJa : r.name) || r.name;
-const rowFast = (lang: Locale, r: Row) => (lang === "en" ? r.fastEn : lang === "ja" ? r.fastJa : r.fastKo) || r.fastKo;
-const rowCharged = (lang: Locale, r: Row) => (lang === "en" ? r.chargedEn : lang === "ja" ? r.chargedJa : r.chargedKo) || r.chargedKo;
+// zh-TW: 포켓몬명은 dex로 pokedex_names, 기술명은 영문명→ID로 pvp_move_names에서 보완(메가/그림자는 뱃지 별도 표시).
+const _pkZh = (dex: number) => (PKNAMES as Record<string, Record<string, string>>)[String(dex)]?.["zh-TW"];
+const _mvId = (en: string) => en.trim().replace(/\*+$/, "").trim().toUpperCase().replace(/[^A-Z0-9]+/g, "_");
+const _mvZh = (en?: string) => en ? (MOVENAMES as Record<string, Record<string, string>>)[_mvId(en)]?.["zh-TW"] : undefined;
+const rowName = (lang: Locale, r: Row) => (lang === "en" ? r.nameEn : lang === "ja" ? r.nameJa : lang === "zh-TW" ? (_pkZh(r.dex) || r.nameEn) : r.name) || r.name;
+const rowFast = (lang: Locale, r: Row) => (lang === "en" ? r.fastEn : lang === "ja" ? r.fastJa : lang === "zh-TW" ? (_mvZh(r.fastEn) || r.fastEn || r.fastKo) : r.fastKo) || r.fastKo;
+const rowCharged = (lang: Locale, r: Row) => (lang === "en" ? r.chargedEn : lang === "ja" ? r.chargedJa : lang === "zh-TW" ? (_mvZh(r.chargedEn) || r.chargedEn || r.chargedKo) : r.chargedKo) || r.chargedKo;
 
 export const revalidate = 600;
 

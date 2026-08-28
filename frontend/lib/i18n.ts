@@ -1,15 +1,16 @@
 // GBL Note 다국어 설정. 기본 ko는 프리픽스 없음(/gbl/...), 나머지는 /{locale}/gbl/...
 // 데이터·계산은 언어 무관 공유, UI 문구만 사전(dictionary)으로 로케일별 제공.
 
-export const locales = ["ko", "en", "ja"] as const;
+export const locales = ["ko", "en", "ja", "zh-TW"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "ko";
 
-// 로케일별 메타/hreflang용 정보
-export const localeMeta: Record<Locale, { htmlLang: string; ogLocale: string; label: string }> = {
-  ko: { htmlLang: "ko", ogLocale: "ko_KR", label: "한국어" },
-  en: { htmlLang: "en", ogLocale: "en_US", label: "English" },
-  ja: { htmlLang: "ja", ogLocale: "ja_JP", label: "日本語" },
+// 로케일별 메타/hreflang용 정보. zh-TW=대만(번체). hreflang은 번체 전체 대상 zh-Hant.
+export const localeMeta: Record<Locale, { htmlLang: string; ogLocale: string; label: string; short: string }> = {
+  ko: { htmlLang: "ko", ogLocale: "ko_KR", label: "한국어", short: "KO" },
+  en: { htmlLang: "en", ogLocale: "en_US", label: "English", short: "EN" },
+  ja: { htmlLang: "ja", ogLocale: "ja_JP", label: "日本語", short: "JA" },
+  "zh-TW": { htmlLang: "zh-Hant", ogLocale: "zh_TW", label: "繁體中文", short: "繁" },
 };
 
 export function isLocale(x: string): x is Locale {

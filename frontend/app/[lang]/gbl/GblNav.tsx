@@ -52,6 +52,15 @@ const T: Record<Locale, Dict> = {
     },
     menu: "メニュー", member: "会員",
   },
+  "zh-TW": {
+    groups: { raid: "團體戰", events: "活動", pvp: "對戰聯盟", guide: "攻略", community: "社群" },
+    items: {
+      "/gbl/raid": "攻擊手排行", "/gbl/raid/schedule": "團體戰時程", "/gbl/raid/bosses": "頭目100%CP",
+      "/gbl/tier/master": "強度表", "/gbl/meta": "實測環境", "/gbl/sim": "對戰模擬器", "/gbl/cmp/master": "CMP先攻權", "/gbl/iv": "PvP個體值排名", "/gbl/schedule": "賽季時程",
+      "/gbl/trade": "交換清單產生器", "/gbl/board": "討論板", "/gbl/gallery": "炫耀相簿", "/gbl/app": "我的戰績", "/gbl/contact": "聯絡我們",
+    },
+    menu: "選單", member: "會員",
+  },
 };
 const MEMBER_PATHS = new Set(["/gbl/board", "/gbl/gallery", "/gbl/app", "/gbl/contact"]);
 
@@ -141,7 +150,7 @@ export default function GblNav() {
                 <Link key={l} href={localizePath(l, bare)} hrefLang={localeMeta[l].htmlLang} title={localeMeta[l].label}
                   style={{ fontSize: "0.72rem", fontWeight: 800, padding: "4px 9px", borderRadius: 999, textDecoration: "none",
                     color: on ? "#fff" : SUB, background: on ? BLUE : "transparent" }}>
-                  {l === "ko" ? "KO" : l === "en" ? "EN" : "JA"}
+                  {localeMeta[l].short}
                 </Link>
               );
             })}
@@ -155,7 +164,7 @@ export default function GblNav() {
                 <Link key={l} href={localizePath(l, bare)} hrefLang={localeMeta[l].htmlLang}
                   style={{ fontSize: "0.66rem", fontWeight: 800, padding: "3px 7px", borderRadius: 999, textDecoration: "none",
                     color: on ? "#fff" : SUB, background: on ? BLUE : "transparent" }}>
-                  {l === "ko" ? "KO" : l === "en" ? "EN" : "JA"}
+                  {localeMeta[l].short}
                 </Link>
               );
             })}

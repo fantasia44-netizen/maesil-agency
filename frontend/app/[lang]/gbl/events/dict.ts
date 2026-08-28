@@ -135,7 +135,38 @@ const ja: EventsDict = {
   ogTitle: "ポケモンGO イベントカレンダー", ogDesc: "コミュデイ・スポットライト・レイド・タマゴ孵化を自動更新",
 };
 
-const E = { ko, en, ja } as const;
+const zhTW: EventsDict = {
+  navBack: "← GBL Note",
+  h1: "寶可夢 GO 活動行事曆",
+  intro: [
+    { t: "本週進行中·預定活動", b: true },
+    { t: " 一目瞭然。社群日·聚焦時刻·團體戰·極巨戰·孵蛋 " },
+    { t: "自動更新", b: true },
+    { t: "。" },
+  ],
+  loadFail: "無法載入活動。請稍後再試。",
+  footerData: "時間為當地時間 · 每小時自動更新 · ", footerTierLink: "團體戰時程 →",
+  liveH: "🔴 進行中", upcomingH: "📅 預定", emptyLive: "目前沒有進行中的活動。", emptyUpcoming: "沒有預定的活動。",
+  filterAll: "全部",
+  startsInDays: "{n}天後開始", startsToday: "今天開始", endsInDays: "剩 {n}天", endsToday: "今天結束", live: "進行中",
+  weekdays: ["日", "一", "二", "三", "四", "五", "六"],
+  dateRange: "{m1}/{d1}（{w1}）~ {m2}/{d2}（{w2}）", dateSingle: "{m}/{d}（{w}）", timeRange: "{h1}:{mm1} ~ {h2}:{mm2}",
+  tagSpawns: "出現↑", tagResearch: "研究", detailLink: "詳細",
+  shareBtn: "📤 分享本週活動", saveBtn: "💾 儲存", building: "產生中…", shareCardTitle: "本週寶可夢 GO 活動", shareCardWeek: "本週", shareFileTitle: "寶可夢GO 本週活動",
+  eggH: "🥚 孵化蛋（依距離）", eggIntro: "目前從蛋孵化的寶可夢。", eggShiny: "異色", eggRegional: "地區限定", eggGift: "禮物", eggAdventure: "冒險同步",
+  pfx: { mega: "超級", shadow: "暗影", alola: "阿羅拉", galar: "伽勒爾", hisui: "洗翠", paldea: "帕底亞" },
+  evtType: { "community-day": "社群日", "pokemon-spotlight-hour": "聚焦時刻", "max-mondays": "極巨星期一", "max-battles": "極巨戰日", "pokemon-go-fest": "GO Fest", "event": "活動", "research": "研究", "go-pass": "GO Pass", "raid-battles": "團體戰", "raid-hour": "團體戰時刻", "raid-day": "團體戰日", "go-battle-league": "GO 對戰聯盟", "season": "賽季" },
+  months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+  dynamax: "極巨化", evtClassic: "經典",
+  evtNameMap: {},
+  sfxSuperMega: "超級進化團體戰日", sfxMega: "超級團體戰日", sfxRaidHour: "團體戰時刻", sfxRaidDay: "團體戰日",
+  metaTitle: "寶可夢GO 活動行事曆 · 社群日·聚焦時刻·孵蛋 | GBL Note",
+  metaDesc: "寶可夢 GO 活動一目瞭然。社群日·聚焦時刻·團體戰·極巨戰·孵蛋時程以進行中/預定自動更新。當地時間為準。",
+  metaKeywords: ["寶可夢GO 活動", "活動時程", "社群日", "聚焦時刻", "孵化蛋", "寶可夢GO 行事曆"],
+  ogTitle: "寶可夢GO 活動行事曆", ogDesc: "社群日·聚焦時刻·團體戰·孵蛋自動更新",
+};
+
+const E = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getEvents(lang: string): EventsDict {
   return (E as Record<string, EventsDict>)[lang] || ko;
 }

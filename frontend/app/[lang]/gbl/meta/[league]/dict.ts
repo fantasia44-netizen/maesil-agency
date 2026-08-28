@@ -63,7 +63,25 @@ const ja: LeagueMetaDict = {
   ogTitle: "ポケモンGO {lg} 実測メタ — 実戦ピック率·人気デッキTOP", ogDesc: "ユーザー実測ベースの{lg}ピック率·デッキ順位(直近30日)",
 };
 
-const M = { ko, en, ja } as const;
+const zhTW: LeagueMetaDict = {
+  navRaid: "🔥 團體戰攻擊手", navRecord: "📝 我的記錄 →", chipSuffix: "聯盟",
+  h1: "寶可夢GO {lg} 實測使用率 · 熱門隊伍",
+  intro1a: "不是模擬，而是統計玩家", intro1b: "實際遇到的對手", intro1c: "的 {lg}(GBL) 實戰環境。",
+  intro2a: "現在 {lg} 最常遇到哪些寶可夢與隊伍（隊組），請以", intro2b: "實測使用率確認。近 30 天為準。",
+  interactiveNote1: "期間·賽季盃篩選在", interactiveLink: "互動環境", interactiveNote2: "頁面。",
+  tierLink: "查看 {lg} 強度表 · 推薦招式配置 →",
+  empty: "統計資料仍在建立中。記錄累積後會補上。",
+  monTopH: "🔥 {lg} 寶可夢實測使用率 TOP", deckTopH: "🏆 {lg} 熱門隊伍（隊組）使用率 TOP",
+  deckNote: "所有對戰中遇到此隊伍（隊組）的比例", shadowWord: "暗影 ",
+  aboutH: "GBL Note 是什麼？",
+  aboutBody: "GBL Note 是記錄您在寶可夢 GO 對戰聯盟(GBL)遇到的對手，再次遇到時可在 5 秒內確認對手過去的隊伍與招式的工具。此實測環境將使用者的記錄以去除個資的匿名統計彙整，反映實際流行的 {lg} 組合。",
+  aboutCta: "免費開始 →", privacy: "隱私權政策",
+  metaTitle: "寶可夢GO {lg} 實測使用率 · 熱門隊伍 TOP | GBL Note",
+  metaDesc: "寶可夢 GO {lg}(GBL) 中玩家實際遇到的對手實測使用率與熱門隊伍排名。實戰資料而非模擬，近 30 天為準，確認現在最常遇到什麼。",
+  ogTitle: "寶可夢GO {lg} 實測環境 — 實戰使用率·熱門隊伍 TOP", ogDesc: "玩家實測的 {lg} 使用率·隊伍排名（近 30 天）",
+};
+
+const M = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getLeagueMeta(lang: string): LeagueMetaDict {
   return (M as Record<string, LeagueMetaDict>)[lang] || ko;
 }

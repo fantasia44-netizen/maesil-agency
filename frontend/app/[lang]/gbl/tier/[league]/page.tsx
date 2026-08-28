@@ -5,6 +5,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import DATA from "../../gbl_data.json";
 import DETAIL from "../../gbl_detail.json";
+import PKNAMES from "../../pokedex_names.json";
+import MOVENAMES from "../../pvp_move_names.json";
 import AdSlot from "../../AdSlot";
 import ListShare from "../../ListShare";
 import CoupangAd from "../../CoupangAd";
@@ -34,9 +36,18 @@ const MOVES = DS.moves;
 const spriteUrl = (m?: Mon) =>
   m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
 const nameOf = (id: string) => MON[id]?.ko || id;
-// 기술명 로케일별 (ko/en/ja)
+// zh-TW 포켓몬명 — 데이터 엔트리에 zh-TW 필드가 없어 dex로 pokedex_names에서 보완.
+const dispNameOf = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?: string; dex?: number }, prefix = "") => {
+  if (lang === "zh-TW") {
+    const zh = d.dex != null ? (PKNAMES as Record<string, Record<string, string>>)[String(d.dex)]?.["zh-TW"] : undefined;
+    if (zh) return prefix + zh;
+  }
+  return localName(lang, d, prefix + nameOf(d.id));
+};
+// 기술명 로케일별 (ko/en/ja/zh-TW) — zh-TW는 pvp_move_names(id)로 보완.
 const moveLabel = (lang: Locale, id: string) => {
   const m = MOVES[id]; if (!m) return id;
+  if (lang === "zh-TW") return (MOVENAMES as Record<string, Record<string, string>>)[id]?.["zh-TW"] || m.en || m.ko;
   return lang === "en" ? (m.en || m.ko) : lang === "ja" ? (m.ja || m.en || m.ko) : m.ko;
 };
 
@@ -174,7 +185,7 @@ export default async function TierPage({ params }: { params: { lang: string; lea
             trackLabel="pvp-tier"
             items={list.slice(0, 12).map((d) => ({
               dex: (MON[d.id]?.sprite?.match(/(\d+)\.png/)?.[1]) || String(d.dex || MON[d.id]?.dex || ""),
-              name: localName(lang, d, nameOf(d.id)),
+              name: dispNameOf(lang, d),
               main: String(d.score),
               sub: pick[d.id] != null ? `${t.actualLabel} ${pick[d.id]}%` : `${d.tier}`,
               types: (d.types && d.types.length) ? d.types : (MON[d.id]?.types || []),
@@ -198,7 +209,7 @@ export default async function TierPage({ params }: { params: { lang: string; lea
                   const pr = pick[d.id];
                   const types = (d.types && d.types.length) ? d.types : (MON[d.id]?.types || []);
                   const dex = d.dex || MON[d.id]?.dex;
-                  const dispName = localName(lang, d, nameOf(d.id));
+                  const dispName = dispNameOf(lang, d);
                   const isShadow = d.id.endsWith("_shadow");
                   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
                   const c2 = TYPE_COLOR[types[1]] || c1;

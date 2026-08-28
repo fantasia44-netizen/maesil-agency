@@ -46,7 +46,19 @@ const ja: MetaHubDict = {
   about: "紹介", contact: "問い合わせ", privacy: "プライバシーポリシー",
 };
 
-const M = { ko, en, ja } as const;
+const zhTW: MetaHubDict = {
+  navRaid: "🔥 團體戰攻擊手", navRecord: "📝 我的記錄 →",
+  h1: "實測 GBL 環境", intro: "不是模擬，而是玩家{b}實際遇到的對手{/b}資料統計。現在聯盟最常遇到什麼。",
+  p7: "近 7 天", p30: "近 30 天", season: "第27賽季（嶄新的一步）", all: "全部",
+  loading: "載入中…", empty: "此條件的統計資料還不足。記錄累積後會補上。",
+  monTop: "🔥 寶可夢使用率 TOP", deckTop: "🏆 隊伍使用率 TOP", monTab: "🔥 寶可夢使用率", deckTab: "🏆 隊伍使用率",
+  deckNote: "所有對戰中遇到此隊伍（隊組）的比例",
+  shadowWord: "暗影 ", prev: "← 上一頁", next: "下一頁 →",
+  detailH: "各聯盟詳細頁", detailSuffix: "聯盟實測", tierTable: "強度表", guide: "📖 GBL 攻略",
+  about: "關於", contact: "聯絡", privacy: "隱私權政策",
+};
+
+const M = { ko, en, ja, "zh-TW": zhTW } as const;
 export function getMetaHub(lang: string): MetaHubDict {
   return (M as Record<string, MetaHubDict>)[lang] || ko;
 }
