@@ -18,6 +18,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.auth import UserContext, get_current_user, require_admin, invalidate_revalidate_cache
+from app.services.ratelimit import rate_limit as _rate_limit
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/gbl", tags=["gbl"])
@@ -61,6 +62,67 @@ class MatchPatch(BaseModel):
     result: str | None = None
 
 
+# ── 입력 캡(저장 남용·메모리 공격 방지 — 게시판과 동일 정책) ──────────────
+_MAX_OPP = 80          # 상대 트레이너명
+_MAX_MEMO = 2000       # 전체 메모
+_MAX_TEAM = 6          # 팀 개체 수(3v3이지만 여유)
+_MAX_ID = 64           # speciesId/moveId
+_MAX_NOTE = 200        # 개체 메모
+_MAX_PROFILE = 40      # 레이팅 프로필 라벨
+
+
+def _cut(s, n: int):
+    return s.strip()[:n] if isinstance(s, str) else s
+
+
+def _clean_result(r):
+    return r if r in ("win", "loss") else None
+
+
+def _clean_team(team) -> list[dict]:
+    """팀 배열 정규화 — 개수·각 필드 길이 캡, 차지기술 2개 제한."""
+    out = []
+    for m in (team or [])[:_MAX_TEAM]:
+        out.append({
+            "speciesId": _cut(m.speciesId, _MAX_ID),
+            "manual": _cut(m.manual, _MAX_OPP),
+            "fast": _cut(m.fast, _MAX_ID),
+            "charged": [_cut(c, _MAX_ID) for c in (m.charged or [])[:2] if c],
+            "note": _cut(m.note, _MAX_NOTE),
+        })
+    return out
+
+
+def _parse_played_at(val) -> str:
+    """played_at ISO 검증 — 잘못된 값은 500 대신 서버 now로 폴백."""
+    if not val:
+        return datetime.now(timezone.utc).isoformat()
+    try:
+        return datetime.fromisoformat(str(val).replace("Z", "+00:00")).isoformat()
+    except (ValueError, TypeError):
+        return datetime.now(timezone.utc).isoformat()
+
+
+def _assert_uuid(val) -> str:
+    """PostgREST .or_() 필터에 보간되는 값은 반드시 UUID임을 강제(구조적 인젝션 방지).
+    user.id는 서명된 JWT sub(UUID)라 오늘은 안전하지만, '문자열 보간 금지' 정책의 방어층."""
+    try:
+        return str(uuid.UUID(str(val)))
+    except (ValueError, TypeError, AttributeError):
+        raise HTTPException(400, "잘못된 사용자입니다.")
+
+
+def _ensure_iso(val: str | None, field: str) -> str | None:
+    """ISO 날짜/시각 검증만(원본 유지 — 시즌 경계 정밀도 보존). 잘못되면 500 대신 400."""
+    if not val:
+        return None
+    try:
+        datetime.fromisoformat(val.replace("Z", "+00:00"))
+        return val
+    except (ValueError, TypeError):
+        raise HTTPException(400, f"{field} 형식이 올바르지 않습니다(ISO).")
+
+
 # ── 라우트 ────────────────────────────────────────────────────────────
 @router.get("/matches")
 def list_matches(league: str | None = None, since: str | None = None, until: str | None = None,
@@ -70,12 +132,14 @@ def list_matches(league: str | None = None, since: str | None = None, until: str
     - opponent 지정 시: 상대 이름으로 **전 기간 검색**(인덱스 필터, 소량 반환). 조회탭용.
     - 아니면: (리그+기간) 범위. 프론트가 현재 시즌만 로드해 항상 소량 유지.
     무거운 필터는 전부 Postgres(인덱스)가 처리 — 서버는 질의 중계만."""
+    since = _ensure_iso(since, "since")
+    until = _ensure_iso(until, "until")
     q = _db().table("gbl_matches").select("*").eq("user_id", user.id)
     if opponent and opponent.strip():
-        q = q.ilike("opponent_name", f"%{opponent.strip()}%").order("played_at", desc=True).limit(500)
+        q = q.ilike("opponent_name", f"%{opponent.strip()[:_MAX_OPP]}%").order("played_at", desc=True).limit(500)
     else:
         if league:
-            q = q.eq("league", league)
+            q = q.eq("league", _clean_league(league))
         if since:
             q = q.gte("played_at", since)
         if until:
@@ -89,17 +153,18 @@ def list_matches(league: str | None = None, since: str | None = None, until: str
 
 
 @router.post("/matches")
-def create_match(body: MatchIn, user: UserContext = Depends(get_current_user)) -> dict:
+def create_match(request: Request, body: MatchIn, user: UserContext = Depends(get_current_user)) -> dict:
     if not body.opponent_name.strip():
         raise HTTPException(400, "상대 이름을 입력하세요.")
+    _rate_limit(request, "gbl_write", limit=60, window=60)   # 퍼유저IP 쓰기 폭주 방지
     row = {
         "user_id": user.id,
-        "league": body.league or "master",
-        "opponent_name": body.opponent_name.strip(),
-        "team_json": [m.model_dump() for m in body.team],
-        "memo": body.memo,
-        "result": body.result,
-        "played_at": body.played_at or datetime.now(timezone.utc).isoformat(),
+        "league": _clean_league(body.league),
+        "opponent_name": _cut(body.opponent_name, _MAX_OPP),
+        "team_json": _clean_team(body.team),
+        "memo": _cut(body.memo, _MAX_MEMO),
+        "result": _clean_result(body.result),
+        "played_at": _parse_played_at(body.played_at),
     }
     try:
         resp = _db().table("gbl_matches").insert(row).execute()
@@ -114,13 +179,13 @@ def update_match(match_id: str, body: MatchPatch,
                  user: UserContext = Depends(get_current_user)) -> dict:
     patch: dict = {}
     if body.opponent_name is not None:
-        patch["opponent_name"] = body.opponent_name.strip()
+        patch["opponent_name"] = _cut(body.opponent_name, _MAX_OPP)
     if body.team is not None:
-        patch["team_json"] = [m.model_dump() for m in body.team]
+        patch["team_json"] = _clean_team(body.team)
     if body.memo is not None:
-        patch["memo"] = body.memo
+        patch["memo"] = _cut(body.memo, _MAX_MEMO)
     if body.result is not None:
-        patch["result"] = body.result
+        patch["result"] = _clean_result(body.result)
     if not patch:
         raise HTTPException(400, "변경할 내용이 없습니다.")
     try:
@@ -169,11 +234,12 @@ def list_ratings(league: str | None = None,
 
 
 @router.post("/ratings")
-def create_rating(body: RatingIn, user: UserContext = Depends(get_current_user)) -> dict:
+def create_rating(request: Request, body: RatingIn, user: UserContext = Depends(get_current_user)) -> dict:
     if body.rating < 0 or body.rating > 6000:
         raise HTTPException(400, "레이팅 값이 올바르지 않습니다.")
-    prof = (body.profile or "").strip() or None
-    row = {"user_id": user.id, "league": body.league or "master", "profile": prof, "rating": body.rating}
+    _rate_limit(request, "gbl_write", limit=60, window=60)
+    prof = _cut(body.profile, _MAX_PROFILE) or None
+    row = {"user_id": user.id, "league": _clean_league(body.league), "profile": prof, "rating": body.rating}
     try:
         return (_db().table("gbl_ratings").insert(row).execute().data or [row])[0]
     except Exception as e:
@@ -198,13 +264,38 @@ def delete_rating(rating_id: str, user: UserContext = Depends(get_current_user))
 import time as _time
 _META_TTL = 90  # 초
 _meta_cache: dict[str, tuple[float, dict]] = {}
+_META_CACHE_MAX = 256          # 바운드 캐시(폭주 시 오래된 것만 축출 — 통째 clear 금지)
+_META_ROW_LIMIT = 20000
+_LEAGUE_RE = re.compile(r"^[a-z0-9_]{1,24}$")  # 캐시키/쿼리 폭주 방지용 화이트닝
+
+
+def _clean_league(league: str) -> str:
+    """리그명 정규화 — 소문자/영숫자/언더스코어 24자 이내만 허용, 그 외 master."""
+    lg = (league or "").strip().lower()
+    return lg if _LEAGUE_RE.match(lg) else "master"
+
+
+def _parse_date_or_400(val: str | None, field: str) -> str | None:
+    """ISO 날짜/시각 파싱 → 날짜(YYYY-MM-DD)로 정규화. 캐시키 폭주·500 방지.
+    잘못된 값은 400(500 대신). None은 그대로 None."""
+    if not val:
+        return None
+    try:
+        return datetime.fromisoformat(val.replace("Z", "+00:00")).date().isoformat()
+    except (ValueError, TypeError):
+        raise HTTPException(400, f"{field} 형식이 올바르지 않습니다(ISO 날짜).")
 
 
 @router.get("/meta")
-def public_meta(league: str = "master", days: int = 30,
+def public_meta(request: Request, league: str = "master", days: int = 30,
                 start: str | None = None, end: str | None = None) -> dict:
     """전체 유저가 만난 상대 덱/포켓몬 집계. 개인 식별정보 없음(익명).
     start/end(ISO) 주면 그 구간(시즌·커스텀), 없으면 days(최근 N일, 0=전체)."""
+    _rate_limit(request, "meta", limit=30, window=60)   # 공개 엔드포인트 남용 방지
+    league = _clean_league(league)
+    days = max(0, min(int(days), 365))                  # [0,365] 클램프(음수·과대 차단)
+    start = _parse_date_or_400(start, "start")
+    end = _parse_date_or_400(end, "end")
     ckey = f"{league}|{days}|{start or ''}|{end or ''}"
     now = _time.time()
     hit = _meta_cache.get(ckey)
@@ -220,7 +311,7 @@ def public_meta(league: str = "master", days: int = 30,
         if not start and not end and days and days > 0:
             since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
             q = q.gte("played_at", since)
-        rows = q.limit(20000).execute().data or []
+        rows = q.limit(_META_ROW_LIMIT).execute().data or []
     except Exception as e:
         logger.error("gbl meta 실패: %s", e)
         raise HTTPException(500, "메타 조회 실패")
@@ -253,8 +344,9 @@ def public_meta(league: str = "master", days: int = 30,
                  for k, c in deck_count.most_common(200)]
     result = {"league": league, "days": days, "total": total, "wins": wins, "losses": losses,
               "top_mons": top_mons, "top_decks": top_decks}
-    if len(_meta_cache) > 64:  # 폭주 방지(구간 조합 다양) — 통째로 비우고 재적재
-        _meta_cache.clear()
+    if len(_meta_cache) > _META_CACHE_MAX:  # 바운드: 오래된 절반만 축출(정상 캐시 스탬피드 방지)
+        for k in sorted(_meta_cache, key=lambda k: _meta_cache[k][0])[:_META_CACHE_MAX // 2]:
+            _meta_cache.pop(k, None)
     _meta_cache[ckey] = (now, result)
     return result
 
@@ -315,6 +407,10 @@ def track(body: TrackIn, request: Request):
     """방문/이벤트 1건 기록(비로그인 포함, 익명). 봇은 UA로 스킵. fire-and-forget."""
     ua = (request.headers.get("user-agent") or "").lower()
     if not ua or any(b in ua for b in _BOT_UA):
+        return
+    try:  # 과다 삽입(스팸/봇) 방지 — 초과 시 조용히 드롭(분석은 fire-and-forget)
+        _rate_limit(request, "track", limit=120, window=60)
+    except HTTPException:
         return
     ev = (body.event or "pageview")
     if ev not in ("pageview", "share", "download"):
@@ -396,25 +492,41 @@ def _gallery_url(path: str) -> str:
     return f"{hub_storage_base()}/{_GALLERY_BUCKET}/{path}"
 
 
+def _detect_image(raw: bytes) -> str | None:
+    """매직바이트로 실제 이미지 종류 판별(선언 확장자 신뢰 금지 — 위장 페이로드 차단).
+    반환: 'png' | 'jpg' | 'webp' | None(허용 안 됨). SVG 등 스크립트 가능 포맷은 미허용."""
+    if raw[:8] == b"\x89PNG\r\n\x1a\n":
+        return "png"
+    if raw[:3] == b"\xff\xd8\xff":
+        return "jpg"
+    if raw[:4] == b"RIFF" and raw[8:12] == b"WEBP":
+        return "webp"
+    return None
+
+
 @router.post("/gallery")
-def create_gallery(body: GalleryIn, user: UserContext = Depends(get_current_user)) -> dict:
+def create_gallery(request: Request, body: GalleryIn, user: UserContext = Depends(get_current_user)) -> dict:
     """자랑 이미지 업로드(로그인 필요). 스토리지 저장 후 게시글 생성."""
+    _rate_limit(request, "gallery", limit=20, window=3600)   # 시간당 업로드 제한
     m = re.match(r"data:image/(png|jpeg|jpg|webp);base64,(.+)", (body.image or ""), re.DOTALL)
     if not m:
         raise HTTPException(400, "이미지 형식 오류")
-    ext = "jpg" if m.group(1) in ("jpeg", "jpg") else m.group(1)
     try:
         raw = base64.b64decode(m.group(2))
     except Exception:
         raise HTTPException(400, "이미지 디코딩 실패")
     if len(raw) > 4 * 1024 * 1024:
         raise HTTPException(413, "이미지가 너무 큽니다 (4MB 이하)")
+    ext = _detect_image(raw)   # 선언 확장자 대신 실제 바이트로 판별
+    if not ext:
+        raise HTTPException(400, "이미지 내용이 올바르지 않습니다 (PNG·JPG·WEBP만 허용)")
     from app.db.maesil_total_client import get_maesil_hub_client
     _ensure_bucket()
     path = f"{user.id}/{uuid.uuid4().hex}.{ext}"
+    _ctype = {"png": "image/png", "jpg": "image/jpeg", "webp": "image/webp"}[ext]
     try:
         get_maesil_hub_client().storage.from_(_GALLERY_BUCKET).upload(
-            path, raw, {"content-type": f"image/{ext}"})
+            path, raw, {"content-type": _ctype})
     except Exception as e:
         logger.error("gallery 업로드 실패: %s", e)
         raise HTTPException(500, "이미지 업로드 실패")
@@ -438,8 +550,12 @@ def list_gallery(limit: int = 60, user: UserContext = Depends(get_current_user))
     except Exception as e:
         logger.error("gallery 조회 실패: %s", e)
         return []
+    is_admin = getattr(user, "is_super_admin", False)
     for r in rows:
         r["image_url"] = _gallery_url(r.get("image_path") or "")
+        # 원시 user_id UUID 노출 금지 — 삭제권한은 mine/관리자 플래그로만 전달
+        r["mine"] = (r.get("user_id") == user.id) or bool(is_admin)
+        r.pop("user_id", None)
     return rows
 
 
@@ -596,7 +712,7 @@ def admin_migrate_to_hub(admin: UserContext = Depends(require_admin)) -> dict:
 _BOARDS = ("chat", "inquiry")
 
 
-_LANGS = ("ko", "en", "ja")
+_LANGS = ("ko", "en", "ja", "zh-TW")
 
 
 class PostIn(BaseModel):
@@ -644,7 +760,7 @@ def board_list(board: str = "chat", lang: str = "ko", limit: int = 50,
              .limit(min(max(limit, 1), 100)))
         # 비공개 문의: 작성자 본인 또는 운영자만 목록에 노출
         if not user.is_super_admin:
-            q = q.or_(f"is_private.eq.false,user_id.eq.{user.id}")
+            q = q.or_(f"is_private.eq.false,user_id.eq.{_assert_uuid(user.id)}")
         rows = q.execute().data or []
     except Exception as e:
         logger.error("gbl board list 실패: %s", e)
@@ -670,7 +786,8 @@ def board_get(post_id: int, user: UserContext = Depends(get_current_user)) -> di
         raise HTTPException(500, "글 조회 실패")
     post = prow[0]
     if post.get("is_private") and not user.is_super_admin and str(post.get("user_id")) != str(user.id):
-        raise HTTPException(403, "비공개 글입니다. 작성자와 운영자만 볼 수 있습니다.")
+        # 비공개글은 404로 응답 — 403과 달리 "존재 여부"를 노출하지 않음(열거 방지)
+        raise HTTPException(404, "글을 찾을 수 없습니다.")
     _attach_authors([post], user.id)
     _attach_authors(replies, user.id)
     post["replies"] = replies
@@ -678,8 +795,9 @@ def board_get(post_id: int, user: UserContext = Depends(get_current_user)) -> di
 
 
 @router.post("/board")
-def board_create(body: PostIn, user: UserContext = Depends(get_current_user)) -> dict:
-    """글 작성(로그인 필수). 회원 전용이라 별도 캡차 없이 스팸/봇 차단."""
+def board_create(request: Request, body: PostIn, user: UserContext = Depends(get_current_user)) -> dict:
+    """글 작성(로그인 필수). 가입이 공개라 로그인=사람 보장 아님 → 퍼유저IP 레이트리밋으로 스팸 차단."""
+    _rate_limit(request, "board_write", limit=10, window=60)
     if body.board not in _BOARDS:
         raise HTTPException(400, "잘못된 게시판입니다.")
     title = (body.title or "").strip()
@@ -702,8 +820,9 @@ def board_create(body: PostIn, user: UserContext = Depends(get_current_user)) ->
 
 
 @router.post("/board/{post_id}/reply")
-def board_reply(post_id: int, body: ReplyIn, user: UserContext = Depends(get_current_user)) -> dict:
+def board_reply(request: Request, post_id: int, body: ReplyIn, user: UserContext = Depends(get_current_user)) -> dict:
     """댓글/답변 작성. super_admin이면 is_admin=true(운영자 답변) + inquiry는 answered=true."""
+    _rate_limit(request, "board_write", limit=20, window=60)
     text = (body.body or "").strip()
     if not text:
         raise HTTPException(400, "내용을 입력하세요.")

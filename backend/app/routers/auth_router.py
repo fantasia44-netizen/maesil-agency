@@ -45,13 +45,14 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 # ─────────────────────────────────────────────────────────────────
 _login_fail: dict[str, list[float]] = {}   # key → 실패 시각 목록
 _login_lock = threading.Lock()
+# 존재하지 않는 이메일에도 bcrypt를 돌려 응답시간을 평준화(계정 열거 방지).
+_DUMMY_HASH = hash_password("timing-equalizer-not-a-real-password")
 
 
 def _client_ip(request: Request) -> str:
-    fwd = request.headers.get("x-forwarded-for", "")
-    if fwd:
-        return fwd.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
+    # 신뢰 가능한 원 IP만 사용(CF-Connecting-IP 등). 조작 가능한 최좌측 XFF 신뢰 금지.
+    from app.services.ratelimit import client_ip
+    return client_ip(request)
 
 
 def _login_key(request: Request, email: str) -> str:
@@ -350,9 +351,11 @@ class GblSignupRequest(BaseModel):
 
 
 @router.post("/gbl-signup")
-def gbl_signup(body: GblSignupRequest) -> dict:
+def gbl_signup(body: GblSignupRequest, request: Request) -> dict:
     """포켓몬GO GBL 앱 셀프 가입 — role='gbl' 유저 생성 후 자동 로그인.
     에이전시 워크스페이스(tenant)와 완전 분리 — GBL 기능만 접근 가능."""
+    from app.services.ratelimit import rate_limit
+    rate_limit(request, "signup", limit=5, window=3600)   # IP당 시간당 5계정(봇 대량가입 차단)
     email = (body.email or "").lower().strip()
     if not email or "@" not in email:
         raise HTTPException(400, "올바른 이메일을 입력하세요.")
@@ -405,8 +408,13 @@ class GblPwResetConfirm(BaseModel):
 
 
 @router.post("/gbl-password/request")
-def gbl_password_request(body: GblPwResetRequest) -> dict:
+def gbl_password_request(body: GblPwResetRequest, request: Request) -> dict:
     """재설정 메일 발송. 계정 존재 여부를 노출하지 않기 위해 항상 200."""
+    from app.services.ratelimit import rate_limit
+    try:  # IP당 남용 방지 — 초과 시 조용히 200(열거·오라클 방지)
+        rate_limit(request, "pwreset", limit=10, window=3600)
+    except HTTPException:
+        return {"ok": True}
     email = (body.email or "").lower().strip()
     if not email or "@" not in email:
         return {"ok": True}
@@ -666,13 +674,15 @@ def login(body: LoginRequest, request: Request) -> LoginResponse:
 
     user = get_user_by_email(body.email)
     if not user:
+        verify_password(body.password, _DUMMY_HASH)  # 타이밍 평준화(열거 방지)
         _login_record_fail(lk)
         raise HTTPException(401, "이메일 또는 비밀번호가 올바르지 않습니다.")
-    if not user.get("is_active", True):
-        raise HTTPException(403, "비활성화된 계정입니다. 관리자에게 문의하세요.")
     if not verify_password(body.password, user["password_hash"]):
         _login_record_fail(lk)
         raise HTTPException(401, "이메일 또는 비밀번호가 올바르지 않습니다.")
+    # is_active 체크는 비밀번호 검증 이후 → 잘못된 비번으로 계정 존재/상태를 알아낼 수 없음
+    if not user.get("is_active", True):
+        raise HTTPException(403, "비활성화된 계정입니다. 관리자에게 문의하세요.")
 
     _login_reset(lk)
 
@@ -837,6 +847,10 @@ def patch_user(user_id: str, body: PatchUserRequest, admin: UserContext = Depend
     rows = resp.data or []
     if not rows:
         raise HTTPException(404, "user not found")
+    if body.password:
+        # 비번 재설정 시 기존 토큰 전부 무효화(단일 세션 회전) — 유출된 세션 폐기.
+        # rotate_session이 users.session_id를 갱신하므로 password update 이후 호출.
+        rotate_session(user_id)
     invalidate_revalidate_cache(user_id)  # 비활성화/강등 즉시 반영
     rows[0].pop("password_hash", None)
     return rows[0]

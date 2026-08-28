@@ -200,13 +200,20 @@ def get_current_user(request: Request) -> UserContext:
         row = _fresh_user_row(user_id)
         if row is None:
             raise HTTPException(401, "계정을 찾을 수 없습니다. 다시 로그인하세요.")
+        # [수용된 위험 · M6] DB 오류(__db_error__) 시 아래 재검증(is_active/role/sid)을
+        # 건너뛰고 서명된 토큰 페이로드를 신뢰한다 — 가용성 우선(Supabase 순단에도 서비스 유지).
+        # 트레이드오프: DB 순단 동안 비활성화·강등·세션무효화가 최대 토큰수명까지 지연될 수 있음.
+        # 완화: JWT 수명 단축 또는 last-known-good 캐시 재사용을 향후 검토.
         if not row.get("__db_error__"):
             if not row.get("is_active", True):
                 raise HTTPException(403, "비활성화된 계정입니다. 관리자에게 문의하세요.")
-            # 단일 세션 강제(gbl 전용): DB session_id가 있고 토큰 sid와 다르면 무효화.
+            # 단일 세션 강제(관리자 제외): DB session_id가 있고 토큰 sid와 다르면 무효화.
+            # 목적 — 일반유저(gbl/customer)의 계정 공유·중복 로그인 차단(배틀데이터 무단 공유 방지).
+            #   마지막 로그인만 유효 → 공유하면 서로 로그아웃되어 동시 사용 불가.
+            # super_admin(오너)은 다기기 운영을 위해 예외(중복 로그인 허용).
             # db_sid 없으면(마이그레이션 전/최초) 미적용 → 기존 세션 무중단.
             db_sid = row.get("session_id")
-            if row.get("role") == "gbl" and db_sid and payload.get("sid") != db_sid:
+            if row.get("role") != "super_admin" and db_sid and payload.get("sid") != db_sid:
                 raise HTTPException(401, "다른 기기에서 로그인되어 로그아웃되었습니다. 다시 로그인해주세요.")
             # DB의 현재 값으로 갱신(토큰 페이로드보다 우선)
             role = row.get("role", role)

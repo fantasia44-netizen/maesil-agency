@@ -209,7 +209,14 @@ async def lifespan(application: FastAPI):
     logger.info("[scheduler] 스케줄러 종료")
 
 
-app = FastAPI(title="maesil-agency", version="0.1.0", lifespan=lifespan)
+# 프로덕션에선 Swagger/OpenAPI 노출 차단(전 라우트 열거 = 정찰 보조). 디버그 모드에서만 공개.
+_docs_on = settings.enable_debug_endpoints
+app = FastAPI(
+    title="maesil-agency", version="0.1.0", lifespan=lifespan,
+    docs_url="/docs" if _docs_on else None,
+    redoc_url="/redoc" if _docs_on else None,
+    openapi_url="/openapi.json" if _docs_on else None,
+)
 
 app.add_middleware(
     CORSMiddleware,
