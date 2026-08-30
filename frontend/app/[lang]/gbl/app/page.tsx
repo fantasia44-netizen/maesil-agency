@@ -453,11 +453,13 @@ export default function GblPage() {
     }
   };
 
-  // 로그/통계/달력용 로드 — 현재 시즌 범위만(리그별 ≤1500, 전 리그 ≤3000). 조회(상대검색)는 별도 서버검색.
+  // 로그/통계/달력용 로드 — 본인 기록 전부(.eq user_id 단일 유저 쿼리라 부담 없음, 백엔드 limit 5000).
+  // 시즌 스코프를 걸면 played_at이 시즌창 밖이거나 비어있는 옛 기록이 통째로 사라지는 문제가 있어 제거.
+  // 시즌/기간별 보기는 아래 statsPeriod(오늘·7·30·시즌·전체) 필터로 처리.
   const load = async () => {
     setLoading(true);
     try {
-      const data = await apiFetch<Match[]>(`/api/gbl/matches?since=${SEASON.start}&until=${SEASON.end}T23:59:59`, {}, 15000);
+      const data = await apiFetch<Match[]>(`/api/gbl/matches`, {}, 20000);
       setMatches(Array.isArray(data) ? data : []);
     } catch (e) {
       flash(e instanceof Error ? e.message : t.loadFail);
