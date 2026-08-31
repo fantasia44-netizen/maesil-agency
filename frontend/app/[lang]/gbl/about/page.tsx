@@ -35,6 +35,17 @@ export default function About({ params }: { params: { lang: string } }) {
           {t.p1a}<b>{t.p1b}</b>{t.p1c}
         </p>
 
+        {/* 운영자 신원(E-E-A-T) — 실제 레전드 랭커. 신뢰 시그널로 상단 배치. */}
+        <div style={{ margin: "1.2rem 0", padding: "1rem 1.15rem", background: "#fff", border: "1px solid #e3e8f2", borderLeft: "4px solid #7c3aed", borderRadius: 12 }}>
+          <h2 style={{ ...H2, margin: "0 0 0.5rem" }}>{t.creatorH}</h2>
+          <p style={{ ...P, margin: 0 }}>
+            <b>{t.creatorLeadB}</b>{t.creatorBody}
+          </p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/gbl/legend-proof.jpg" alt={t.creatorProofAlt}
+            style={{ display: "block", maxWidth: 260, width: "100%", height: "auto", margin: "0.9rem auto 0", borderRadius: 12, border: "1px solid #e3e8f2" }} />
+        </div>
+
         <h2 style={H2}>{t.whatH}</h2>
         <p style={P}>
           <b>{t.whatLogB}</b>{t.whatLogRest}

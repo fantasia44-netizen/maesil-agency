@@ -2,6 +2,7 @@
 export type AboutDict = {
   h1: string;
   p1a: string; p1b: string; p1c: string;
+  creatorH: string; creatorLeadB: string; creatorBody: string; creatorProofAlt: string;
   whatH: string;
   whatLogB: string; whatLogRest: string;
   whatRecordB: string; whatRecordRest: string;
@@ -20,6 +21,10 @@ const ko: AboutDict = {
   p1a: "GBL Note는 포켓몬 GO의 배틀리그(GBL·Go Battle League)를 즐기는 트레이너를 위한 ",
   p1b: "무료 서비스",
   p1c: "입니다. 배틀에서 만난 상대를 기록해두고, 다시 만났을 때 상대의 과거 파티와 기술을 몇 초 안에 확인할 수 있게 돕습니다.",
+  creatorH: "운영자 — 실제 레전드 랭커가 만듭니다",
+  creatorLeadB: "GBL Note는 배틀리그 레전드 랭커가 직접 만들고 운영합니다.",
+  creatorBody: " 운영자는 맥스 아웃·즐거운 나날·변화하는 이야기·생생한 추억·새로운 발걸음 등 5개 시즌에 걸쳐 GBL 레전드를 달성한 현역 배틀러입니다. 현재 레이팅 3,003, 누적 13,030전 6,864승으로 슈퍼·하이퍼·마스터리그·경쟁컵을 모두 플레이합니다. 그래서 이 사이트의 데이터와 분석은 이론이 아니라 실제로 이겨 본 관점으로 검증됩니다.",
+  creatorProofAlt: "GBL Note 운영자의 배틀리그 레전드 랭크 인증",
   whatH: "무엇을 할 수 있나요",
   whatLogB: "상대 기록",
   whatLogRest: " — 방금 만난 상대의 트레이너 이름, 사용 포켓몬 3마리, 기술, 메모를 남길 수 있습니다. 다음에 같은 상대를 만나면 이름 몇 글자만 검색해 과거 기록을 즉시 불러옵니다.",
@@ -49,6 +54,10 @@ const en: AboutDict = {
   p1a: "GBL Note is a ",
   p1b: "free service",
   p1c: " for trainers who play the Pokémon GO Go Battle League (GBL). Log the opponents you meet in battle, and when you face them again, check their past teams and moves within seconds.",
+  creatorH: "The creator — built by a real Legend-rank battler",
+  creatorLeadB: "GBL Note is built and run by a Go Battle League Legend-rank player.",
+  creatorBody: " The operator has reached GBL Legend across 5 seasons and is an active battler with a current rating of 3,003 and a lifetime record of 13,030 battles and 6,864 wins, playing the Great, Ultra, Master, and Championship formats. That's why the data and analysis here are validated from the perspective of someone who actually wins — not just theory.",
+  creatorProofAlt: "GBL Note operator's Go Battle League Legend rank",
   whatH: "What you can do",
   whatLogB: "Log opponents",
   whatLogRest: " — save the trainer name, three Pokémon, moves, and notes for an opponent you just faced. The next time you meet the same trainer, search a few letters of their name to instantly pull up your past record.",
@@ -78,6 +87,10 @@ const ja: AboutDict = {
   p1a: "GBL Note は、ポケモン GO の GOバトルリーグ(GBL)を楽しむトレーナーのための",
   p1b: "無料サービス",
   p1c: "です。バトルで遭遇した相手を記録しておき、再戦したときに相手の過去のパーティや技を数秒で確認できるようにします。",
+  creatorH: "運営者 — 実際のレジェンドランクのバトラーが制作",
+  creatorLeadB: "GBL Note は、GOバトルリーグのレジェンドランクのプレイヤーが自ら作り、運営しています。",
+  creatorBody: " 運営者は5シーズンにわたりGBLレジェンドを達成した現役バトラーです。現在のレーティングは3,003、通算13,030戦6,864勝で、スーパー・ハイパー・マスターリーグ・チャンピオンシップをすべてプレイします。だからこのサイトのデータと分析は、理論ではなく実際に勝ってきた視点で検証されています。",
+  creatorProofAlt: "GBL Note 運営者のGOバトルリーグ レジェンドランク認証",
   whatH: "できること",
   whatLogB: "相手の記録",
   whatLogRest: " — 今遭遇した相手のトレーナー名、使用ポケモン3体、技、メモを残せます。次に同じ相手と会ったら、名前を数文字検索するだけで過去の記録をすぐ呼び出せます。",
@@ -107,6 +120,10 @@ const zhTW: AboutDict = {
   p1a: "GBL Note 是為享受寶可夢 GO 對戰聯盟(GBL·Go Battle League)的訓練家準備的 ",
   p1b: "免費服務",
   p1c: "。幫您記錄對戰中遇到的對手，再次相遇時可在幾秒內確認對手過去的隊伍與招式。",
+  creatorH: "營運者 — 由真正的傳說階級對戰者打造",
+  creatorLeadB: "GBL Note 由對戰聯盟傳說階級的玩家親自打造與營運。",
+  creatorBody: " 營運者曾在 5 個賽季達成 GBL 傳說，是現役對戰者，目前積分 3,003，生涯 13,030 場 6,864 勝，超級·高級·大師聯盟·錦標賽全部參戰。因此本站的資料與分析，是以「實際贏過」的視角驗證，而非僅止於理論。",
+  creatorProofAlt: "GBL Note 營運者的對戰聯盟傳說階級認證",
   whatH: "可以做什麼",
   whatLogB: "對手記錄",
   whatLogRest: " — 可記下剛遇到的對手訓練家名稱、使用的 3 隻寶可夢、招式、備註。下次再遇到同一對手，只要搜尋名字幾個字就能立即叫出過去記錄。",
