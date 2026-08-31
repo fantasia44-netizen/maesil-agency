@@ -95,15 +95,18 @@ _AFFIX = {
     "ko": {"reg": {"_alolan": "알로라 ", "_galarian": "가라르 ", "_hisuian": "히스이 ", "_paldean": "팔데아 "},
            "mega": "메가 ", "megaX": " X", "megaY": " Y", "primal": "원시 ",
            "white": "화이트 ", "black": "블랙 ", "shadow": "그림자 ",
-           "origin": " (오리진)", "therian": " (영물폼)"},
+           "origin": " (오리진)", "therian": " (영물폼)",
+           "crowned_sword": " (검왕)", "crowned_shield": " (방패왕)", "dusk_mane": " (황혼의 갈기)", "dawn_wings": " (새벽의 날개)", "hero": " (역전의 용사)"},
     "en": {"reg": {"_alolan": "Alolan ", "_galarian": "Galarian ", "_hisuian": "Hisuian ", "_paldean": "Paldean "},
            "mega": "Mega ", "megaX": " X", "megaY": " Y", "primal": "Primal ",
            "white": "White ", "black": "Black ", "shadow": "Shadow ",
-           "origin": " (Origin)", "therian": " (Therian)"},
+           "origin": " (Origin)", "therian": " (Therian)",
+           "crowned_sword": " (Crowned Sword)", "crowned_shield": " (Crowned Shield)", "dusk_mane": " (Dusk Mane)", "dawn_wings": " (Dawn Wings)", "hero": " (Hero)"},
     "ja": {"reg": {"_alolan": "アローラ", "_galarian": "ガラル", "_hisuian": "ヒスイ", "_paldean": "パルデア"},
            "mega": "メガ", "megaX": "X", "megaY": "Y", "primal": "ゲンシ",
            "white": "ホワイト", "black": "ブラック", "shadow": "シャドウ",
-           "origin": "（オリジンフォルム）", "therian": "（れいじゅうフォルム）"},
+           "origin": "（オリジンフォルム）", "therian": "（れいじゅうフォルム）",
+           "crowned_sword": " (けんのおう)", "crowned_shield": " (たてのおう)", "dusk_mane": " (たそがれのたてがみ)", "dawn_wings": " (あかつきのつばさ)", "hero": " (れきせんのゆうしゃ)"},
 }
 
 
@@ -135,6 +138,11 @@ def _disp(sid: str, base: str | None, aff: dict) -> str | None:
     else: name = reg + base
     if "_origin" in sid: name += aff["origin"]
     elif "_therian" in sid: name += aff["therian"]
+    elif "_crowned_sword" in sid: name += aff["crowned_sword"]
+    elif "_crowned_shield" in sid: name += aff["crowned_shield"]
+    elif "_dusk_mane" in sid: name += aff["dusk_mane"]
+    elif "_dawn_wings" in sid: name += aff["dawn_wings"]
+    elif "_hero" in sid: name += aff["hero"]
     if "_shadow" in sid or sid.endswith("_shadow"): name = aff["shadow"] + name
     return name
 
