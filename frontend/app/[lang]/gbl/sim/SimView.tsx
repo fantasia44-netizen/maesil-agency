@@ -299,6 +299,26 @@ function Timeline({ res, lang, t }: { res: any; lang: Locale; t: SimDict }) {
             {/* 플레이헤드 */}
             {!done && <div style={{ position: "absolute", left: `${(now / dur) * 100}%`, top: 0, bottom: 0, width: 2, background: "#0f172a", opacity: 0.5, transform: "translateX(-1px)" }} />}
           </div>
+          {/* 실제 사용한 차지무브 순서(로케일명·타입색·재생연동) */}
+          {(() => {
+            const cs = evts.filter((e: any) => e.type && String(e.type).includes("charged"));
+            if (!cs.length) return null;
+            return (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginTop: 4 }}>
+                {cs.map((e: any, i: number) => {
+                  const mid = chargedIdOf(e, res, actor);
+                  const c = TYPE_COLOR[moveType(mid)] || "#64748b";
+                  const reached = e.time <= now + 1;
+                  return (
+                    <span key={i} title={`${(e.time / 1000).toFixed(1)}s`}
+                      style={{ fontSize: "0.58rem", fontWeight: 800, padding: "1px 6px", borderRadius: 7, background: c + "22", color: c, border: `1px solid ${c}55`, opacity: reached ? 1 : 0.32, transition: "opacity 120ms" }}>
+                      {moveName(lang, mid)}
+                    </span>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       </div>
     );
@@ -324,7 +344,17 @@ function Timeline({ res, lang, t }: { res: any; lang: Locale; t: SimDict }) {
     </div>
   );
 }
-function chargedIdOf(_e: any, res: any, actor: number): string { const c = actor === 0 ? res.a.charged : res.b.charged; return c && c[0] ? c[0].moveId : ""; }
+// 이벤트가 실제로 쓴 차지무브 식별(색·라벨용). 엔진 이벤트의 name(영문 무브명)으로 매칭 — 없으면 타입으로 폴백.
+function chargedIdOf(e: any, res: any, actor: number): string {
+  const c = (actor === 0 ? res.a.charged : res.b.charged) || [];
+  if (!c.length) return "";
+  const hit = c.find((m: any) => m && (m.name === e?.name || m.moveId === e?.name || m.moveId === e?.moveId));
+  if (hit) return hit.moveId;
+  // 폴백: 이벤트 type("charged fire" 등)의 속성과 일치하는 무브
+  const ty = String(e?.type || "").replace(/^charged\s*/, "").split(" ")[0];
+  const byType = c.find((m: any) => m && moveType(m.moveId) === ty);
+  return (byType || c[0] || {}).moveId || "";
+}
 
 // ── 결과 패널 ──
 function ResultPanel({ res, lang, t }: { res: any; lang: Locale; t: SimDict }) {
