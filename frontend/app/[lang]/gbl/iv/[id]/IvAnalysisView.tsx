@@ -31,22 +31,26 @@ const UI: Record<Locale, Record<string, string>> = {
         thIv: "개체값(공/방/체)", thCp: "CP", thHp: "HP", thVerdict: "판정", thWeak: "불리해지는 상대", none: "없음", shieldTag: "실드",
         shieldH: "백(100%)의 실드별 성적", win: "승", loss: "패", methodH: "분석 방법", updated: "업데이트", privacy: "개인정보처리방침",
         cmpH: "공격 15는 왜 필수인가 — 동시차징(CMP)", cmpMirror: "미러전 (그란돈 vs 그란돈)", cmpRival: "vs 라이벌", cmpMine: "내 공14", cmpOpp: "상대 공15", cmpNote: "공격 종족값이 곧 우선권. 공14는 같은 종족값 라이벌에게 무조건 밀립니다.",
-        bbH: "베스트버디(L51) 효과", bbCp: "베파 CP", bbNote: "타협 개체도 베스트버디로 키우면 대결이 전부 나아지고, 같은 종족값 라이벌까지 이깁니다." },
+        bbH: "베스트버디(L51) 효과", bbCp: "베파 CP", bbNote: "타협 개체도 베스트버디로 키우면 대결이 전부 나아지고, 같은 종족값 라이벌까지 이깁니다.",
+        verdictBoxH: "강화할까, 말까 — 한눈에", growLabel: "그냥 강화", condLabel: "조건부", waitLabel: "강화 말고 대기", faqH: "자주 묻는 질문" },
   en: { back: "← GBL Note", ivTool: "IV rank checker", tier: "Tier list", compromiseLabel: "Compromise IVs", verdictH: "Verdict by IV spread (Master League sim)",
         thIv: "IVs (Atk/Def/Sta)", thCp: "CP", thHp: "HP", thVerdict: "Verdict", thWeak: "Matchups lost", none: "none", shieldTag: "shields",
         shieldH: "Hundo record by shield count", win: "W", loss: "L", methodH: "Method", updated: "Updated", privacy: "Privacy",
         cmpH: "Why attack 15 is mandatory — CMP", cmpMirror: "Mirror (Groudon vs Groudon)", cmpRival: "vs rival", cmpMine: "Mine (atk 14)", cmpOpp: "Foe (atk 15)", cmpNote: "Attack decides priority. Attack 14 always loses to a same-stat rival.",
-        bbH: "Best Buddy (L51) effect", bbCp: "BB CP", bbNote: "Best-buddying even a compromise improves every matchup and beats same-stat rivals." },
+        bbH: "Best Buddy (L51) effect", bbCp: "BB CP", bbNote: "Best-buddying even a compromise improves every matchup and beats same-stat rivals.",
+        verdictBoxH: "Build it or not — at a glance", growLabel: "Just build", condLabel: "Conditional", waitLabel: "Don't build yet", faqH: "FAQ" },
   ja: { back: "← GBL Note", ivTool: "個体値ランク", tier: "ティア表", compromiseLabel: "妥協個体値", verdictH: "個体値ごとの判定（マスター実測シミュ）",
         thIv: "個体値(攻/防/HP)", thCp: "CP", thHp: "HP", thVerdict: "判定", thWeak: "不利になる相手", none: "なし", shieldTag: "シールド",
         shieldH: "100%のシールド別成績", win: "勝", loss: "負", methodH: "分析方法", updated: "更新", privacy: "プライバシー",
         cmpH: "攻撃15が必須の理由 — 同時発動(CMP)", cmpMirror: "ミラー(グラードン対決)", cmpRival: "vs ライバル", cmpMine: "自分 攻14", cmpOpp: "相手 攻15", cmpNote: "攻撃種族値が優先度を決める。攻14は同種族値ライバルに必ず負けます。",
-        bbH: "ベストバディ(L51)効果", bbCp: "BB CP", bbNote: "妥協個体でもベストバディにすれば全対面が改善し、同種族値ライバルにも勝てます。" },
+        bbH: "ベストバディ(L51)効果", bbCp: "BB CP", bbNote: "妥協個体でもベストバディにすれば全対面が改善し、同種族値ライバルにも勝てます。",
+        verdictBoxH: "強化する？しない？ — 一目で", growLabel: "そのまま強化", condLabel: "条件付き", waitLabel: "強化せず待つ", faqH: "よくある質問" },
   "zh-TW": { back: "← GBL Note", ivTool: "個體值排名", tier: "階級表", compromiseLabel: "妥協個體值", verdictH: "各個體值判定（大師實測模擬）",
         thIv: "個體值(攻/防/HP)", thCp: "CP", thHp: "HP", thVerdict: "判定", thWeak: "落敗對手", none: "無", shieldTag: "護盾",
         shieldH: "100%的護盾別戰績", win: "勝", loss: "負", methodH: "分析方法", updated: "更新", privacy: "隱私權",
         cmpH: "為何攻擊15必須 — 同時放招(CMP)", cmpMirror: "鏡像(固拉多對決)", cmpRival: "vs 對手", cmpMine: "我方 攻14", cmpOpp: "對手 攻15", cmpNote: "攻擊種族值決定優先權。攻14必輸給同種族值對手。",
-        bbH: "最佳夥伴(L51)效果", bbCp: "BB CP", bbNote: "妥協個體只要升最佳夥伴，所有對戰皆改善，還能贏過同種族值對手。" },
+        bbH: "最佳夥伴(L51)效果", bbCp: "BB CP", bbNote: "妥協個體只要升最佳夥伴，所有對戰皆改善，還能贏過同種族值對手。",
+        verdictBoxH: "要不要升 — 一眼看懂", growLabel: "直接升", condLabel: "有條件", waitLabel: "先別升", faqH: "常見問題" },
 };
 
 const METHOD: Record<Locale, string> = {
@@ -117,12 +121,14 @@ export default function IvAnalysisView({ lang, id }: { lang: Locale; id: string 
           <img src={SPRITE(e.dex)} alt={name} width={68} height={68} style={{ imageRendering: "pixelated" }} />
           <div>
             <h1 style={{ margin: 0, fontSize: "1.4rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>{a.title}</h1>
-            <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: 4 }}>100% CP {nrm.hundo.cp} · L{nrm.hundo.level} · {u.updated} {e.updated}</div>
+            <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: 4 }}>100% CP {nrm.hundo.cp} · L{nrm.hundo.level} · {e.season} · {u.updated} {e.updated}</div>
           </div>
         </div>
 
+        {/* 공감 후킹 리드 */}
+        {a.hook && <p style={{ margin: "0.6rem 0 0.3rem", fontSize: "0.98rem", color: "#0f172a", fontWeight: 700, lineHeight: 1.75 }}>{a.hook}</p>}
         {/* 리드 */}
-        <p style={{ margin: "0.8rem 0 1rem", fontSize: "0.95rem", color: "#334155", lineHeight: 1.85 }}>{a.lead}</p>
+        <p style={{ margin: "0.4rem 0 1rem", fontSize: "0.95rem", color: "#334155", lineHeight: 1.85 }}>{a.lead}</p>
 
         {/* 타협개체 결론 배지 */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, background: "linear-gradient(120deg,#eef2ff,#ffffff 70%)", border: `1px solid ${BORDER}`, borderLeft: "4px solid #3b5bdb", borderRadius: 12, padding: "0.9rem 1.1rem", marginBottom: 20 }}>
@@ -132,6 +138,29 @@ export default function IvAnalysisView({ lang, id }: { lang: Locale; id: string 
           </div>
           <div style={{ fontSize: "0.82rem", color: "#475569", lineHeight: 1.6 }}>{a.compromiseNote}</div>
         </div>
+
+        {/* 강화 의사결정 판정 박스(TL;DR) — 그냥 강화 / 조건부 / 대기 */}
+        {a.verdict && a.verdict.length > 0 && (
+          <div style={{ marginBottom: 22 }}>
+            <h2 style={{ fontSize: "1.05rem", fontWeight: 800, margin: "0 0 10px", color: "#0f172a" }}>{u.verdictBoxH}</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {a.verdict.map((v, i) => {
+                const m = v.tier === "grow" ? { c: "#16a34a", ic: "✅", label: u.growLabel }
+                  : v.tier === "conditional" ? { c: "#d97706", ic: "⚠️", label: u.condLabel }
+                  : { c: "#dc2626", ic: "❌", label: u.waitLabel };
+                return (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", background: "#fff", border: `1px solid ${BORDER}`, borderLeft: `4px solid ${m.c}`, borderRadius: 10, padding: "0.7rem 0.9rem" }}>
+                    <span style={{ fontSize: "1rem", lineHeight: 1.4 }}>{m.ic}</span>
+                    <div>
+                      <div style={{ fontSize: "0.9rem", fontWeight: 900, color: m.c }}>{m.label} <span style={{ color: "#0f172a" }}>· {v.iv}</span></div>
+                      <div style={{ fontSize: "0.83rem", color: "#475569", lineHeight: 1.55, marginTop: 2 }}>{v.note}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* CMP — 공격15 필수(미러/라이벌 대결, 스프라이트) */}
         <h2 style={{ fontSize: "1.05rem", fontWeight: 800, margin: "0 0 4px", color: "#0f172a" }}>{u.cmpH}</h2>
@@ -252,6 +281,21 @@ export default function IvAnalysisView({ lang, id }: { lang: Locale; id: string 
 
         {a.closing && (
           <p style={{ margin: "0 0 20px", padding: "0.9rem 1.1rem", background: "#f8fafc", border: `1px solid ${BORDER}`, borderRadius: 12, fontSize: "0.9rem", color: "#0f172a", fontWeight: 600, lineHeight: 1.8 }}>{a.closing}</p>
+        )}
+
+        {/* FAQ — 자주 묻는 질문(구조화 데이터는 page.tsx의 FAQPage JSON-LD와 동기) */}
+        {a.faq && a.faq.length > 0 && (
+          <div style={{ marginBottom: 20 }}>
+            <h2 style={{ fontSize: "1.05rem", fontWeight: 800, margin: "0 0 10px", color: "#0f172a" }}>{u.faqH}</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {a.faq.map((f, i) => (
+                <div key={i} style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 10, padding: "0.75rem 0.95rem" }}>
+                  <div style={{ fontSize: "0.88rem", fontWeight: 800, color: "#0f172a", lineHeight: 1.6 }}>Q. {f.q}</div>
+                  <div style={{ fontSize: "0.85rem", color: "#475569", lineHeight: 1.7, marginTop: 4 }}>{f.a}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* 분석 방법(E-E-A-T) */}

@@ -20,27 +20,41 @@ export type Sim = {
   normal: Analysis; bestBuddy: Analysis; cmp: { mirror: CmpDuel; rival: CmpDuel | null };
 };
 
+// 강화 의사결정 판정(3단): grow=그냥 강화 / conditional=조건부 / wait=강화 말고 대기
+export type Verdict = { tier: "grow" | "conditional" | "wait"; iv: string; note: string };
+export type Faq = { q: string; a: string };
+
 export type Article = {
   title: string;
+  hook: string;              // 공감 후킹 리드
   lead: string;
   compromise: string;
   compromiseNote: string;
+  verdict: Verdict[];        // 강화/조건부/대기 판정 박스(TL;DR)
   sections: { h?: string; body: string }[];
+  faq: Faq[];                // 자주 묻는 질문(실제 플레이어 질문)
   closing?: string;
 };
 
 export type IvEntry = {
   sim: Sim; dex: number; rivalName: Record<Locale, string> | null;
   name: Record<Locale, string>; updated: string;
+  season: string;            // 예: "시즌 27 (2026.06.02~09.09)" — 타협은 메타 의존이라 명시
   article: Record<Locale, Article>;
 };
 
 // ── 그란돈 — "공격 15는 절대조건, 나머지는 관대" ──────────────────────────────
 const groudon_ko: Article = {
   title: "그란돈 개체값 타협점 — 마스터리그, 어디까지 괜찮을까",
+  hook: "박스에 그란돈, 아직 안 보내셨죠? XL 겨우 모아서 강화하려는데 100%가 안 떴다면 — 강화 버튼 누르기 전에 딱 30초. 이 개체 그냥 키워도 되는지, 시뮬 돌려서 정리해뒀습니다.",
   lead: "그란돈은 공격 15만 지키면 방어·체력은 꽤 풀어줘도 됩니다. 다만 이 '공격 15'는 타협 대상이 아니라 절대조건입니다. 마스터리그 상위 100종을 배틀 시뮬레이터로 전수 대입하고, 미러전·라이벌 대면·베스트버디까지 계산한 결과를 아래에 정리했습니다.",
   compromise: "15 / 13 / 14",
   compromiseNote: "일반(L50) 기준 이 이상이면 100% 개체와 승패 매치업이 사실상 동일합니다. 베스트버디를 하면 여기서 더 좋아집니다.",
+  verdict: [
+    { tier: "grow", iv: "15 / 13 / 14 이상", note: "100% 개체와 승패 매치업이 사실상 동일합니다. 고민 말고 그냥 강화하세요." },
+    { tier: "conditional", iv: "방어 10~12", note: "게노세크트·우르시프 등 한두 매치업을 놓치지만, 베스트버디를 하면 대부분 회복됩니다. 당장 쓸 거면 OK." },
+    { tier: "wait", iv: "공격 14 이하", note: "그란돈·가이오가·오리진 디아루가는 공격 실수치가 같아, 미러·이 셋에게 동시차징(CMP) 우선권을 무조건 내줍니다. 강화하지 말고 더 좋은 개체를 기다리세요." },
+  ],
   sections: [
     {
       h: "공격 14는 타협이 아니라 탈락입니다",
@@ -62,14 +76,26 @@ const groudon_ko: Article = {
       body: "한 가지 덧붙이면, 이 브레이크포인트는 메타가 바뀌면 함께 움직입니다. 게노세크트나 랜드로스의 비중이 달라지거나 신규 포켓몬이 들어오면 지금 '괜찮던' 개체가 아슬아슬해질 수 있습니다. 지금 당장 쓸 게 아니라면 이왕이면 고개체를 잡아두는 편이 마음 편합니다.",
     },
   ],
+  faq: [
+    { q: "공격 14인데 그냥 강화해도 되나요?", a: "비추천입니다. 그란돈은 가이오가·오리진 디아루가와 공격 실수치가 같아서, 공14면 이 셋과 미러전에서 동시차징 우선권을 무조건 내줍니다. 실드 싸움을 50:50으로 갈 걸 0:100으로 지는 셈이라, 미러가 잦은 마스터리그에선 치명적입니다." },
+    { q: "15/13/14랑 15/15/13 중 뭘 키우죠?", a: "15/13/14 쪽입니다. 체력을 2 낮춘 15/15/13은 실HP가 183으로 떨어지면서 게노세크트를 실드 0개에서 놓칩니다. 방어를 1~2 낮추는 건 승패에 티가 잘 안 나니, HP를 지키는 15/13/14가 더 안전합니다." },
+    { q: "베스트버디는 꼭 해야 하나요?", a: "필수는 아니지만 강력합니다. 타협 개체 15/13/14를 베스트버디하면 상위 100종 중 77개 매치업이 좋아지고, 나빠지는 건 0개였습니다. 미러·가이오가·루나아라까지 잡아요. 개체값이 아쉬울수록 베파 가치가 큽니다." },
+    { q: "이 기준은 언제까지 유효한가요?", a: "시즌 27 메타 기준입니다. 게노세크트·랜드로스의 비중이 달라지거나 신규 포켓몬이 들어오면 브레이크포인트가 움직여 타협선도 바뀝니다. 시즌이 바뀌면 상위 100종을 다시 전수 시뮬해서 갱신합니다." },
+  ],
   closing: "정리 — 공격 15는 타협 불가(미러·가이오가 우선권), 방어는 13 이상 권장, 체력은 -1까지 자유(-2부터 주의). 15/13/14면 지금 마스터리그에서 100% 개체와 같은 급이고, 베스트버디를 얹으면 그 이상입니다.",
 };
 
 const groudon_en: Article = {
   title: "Groudon IV Compromise — How Far Can You Go in Master League?",
+  hook: "Still got a Groudon sitting in your box? Finally scraped the XL together but it didn't come out 100%? Before you hit power-up — 30 seconds. Here's whether that spread is fine to build, straight from the sim.",
   lead: "For Groudon, as long as attack is 15 you can be relaxed about defense and HP. But that attack 15 isn't a compromise — it's a hard requirement. Below is the result of running the top 100 of the Master League meta through a battle simulator, plus the mirror, the same-stat rival, and best buddy.",
   compromise: "15 / 13 / 14",
   compromiseNote: "At L50, at or above this the win/loss matchups match a hundo. Best buddy only improves it further.",
+  verdict: [
+    { tier: "grow", iv: "15 / 13 / 14 or better", note: "Win/loss matchups are effectively identical to a hundo. Don't overthink it — just power it up." },
+    { tier: "conditional", iv: "Defense 10–12", note: "You drop one or two matchups (Genesect, Urshifu), but best buddy recovers most of them. Fine if you need it now." },
+    { tier: "wait", iv: "Attack 14 or below", note: "Groudon, Kyogre and Origin Dialga share the same effective attack, so attack-14 always loses CMP priority in the mirror and to those two. Don't build it — wait for a better one." },
+  ],
   sections: [
     {
       h: "Attack 14 isn't a compromise — it's a fail",
@@ -91,6 +117,12 @@ const groudon_en: Article = {
       body: "One caveat: these breakpoints move with the meta. If Genesect or Landorus usage shifts, or a new Pokémon arrives, a spread that's fine today can get shaky. If you're not using it right now, banking a higher-IV catch is the easier peace of mind.",
     },
   ],
+  faq: [
+    { q: "Attack is 14 — can I just build it?", a: "Not recommended. Groudon shares its effective attack with Kyogre and Origin Dialga, so at attack 14 you always lose CMP priority to all three in the mirror. A shield fight that should be 50:50 becomes 0:100 — brutal in a mirror-heavy Master League." },
+    { q: "15/13/14 or 15/15/13 — which do I build?", a: "15/13/14. Dropping HP by two (15/15/13) falls to 183 effective HP and loses Genesect at 0 shields. Shaving defense barely shows on win/loss, so keeping the HP with 15/13/14 is safer." },
+    { q: "Is best buddy required?", a: "Not required, but strong. Best-buddying a 15/13/14 improves 77 of the top-100 matchups and worsens zero — flipping the mirror, Kyogre, and Lunala into wins. The rougher the spread, the more best buddy is worth." },
+    { q: "How long does this hold?", a: "It's Season 27 meta. If Genesect or Landorus usage shifts, or a new Pokémon arrives, the breakpoints move and so does the compromise line. When the season changes we re-run the full top-100 sim and update this." },
+  ],
   closing: "Bottom line — attack 15 is non-negotiable (mirror & Kyogre CMP), defense 13+ recommended, HP free to -1 (watch from -2). 15/13/14 plays at hundo level in today's Master League, and best buddy pushes it beyond.",
 };
 
@@ -101,6 +133,7 @@ export const IV_ANALYSIS: Record<string, IvEntry> = {
     rivalName: { ko: "가이오가", en: "Kyogre", ja: "カイオーガ", "zh-TW": "蓋歐卡" },
     name: { ko: "그란돈", en: "Groudon", ja: "グラードン", "zh-TW": "固拉多" },
     updated: "2026-08-30",
+    season: "시즌 27 (2026.06.02~09.09)",
     article: { ko: groudon_ko, en: groudon_en, ja: groudon_en, "zh-TW": groudon_en },
   },
 };
