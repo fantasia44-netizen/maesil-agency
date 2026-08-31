@@ -47,17 +47,32 @@ function chipLabel(lang: Locale, t: ScheduleDict, it: { label: string; base: str
   return it.label.includes("메가") ? `${name}${t.megaSuffix}` : name;
 }
 
-// 리그 배지 — 색 그라데이션 pill + CP 제한 칩
+// 리그 몬스터볼 아이콘(SVG) — 인게임 리그 색상. 상단 컬러/하단 흰색/중앙 버튼.
+function LeagueOrb({ base, size = 20 }: { base: string; size?: number }) {
+  const c = (LEAGUE[base] || { c: "#64748b" }).c;
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" style={{ flexShrink: 0, filter: "drop-shadow(0 1px 1px rgba(0,0,0,.12))" }}>
+      <circle cx="12" cy="12" r="11" fill="#fff" stroke={c} strokeWidth="1.5" />
+      <path d="M1.2 11 A11 11 0 0 1 22.8 11 Z" fill={c} />
+      <rect x="1" y="11" width="22" height="2" fill={c} />
+      <circle cx="12" cy="12" r="3.6" fill="#fff" stroke={c} strokeWidth="1.6" />
+    </svg>
+  );
+}
+
+// 리그 배지 — 몬스터볼 아이콘 + 색 pill + CP 제한 칩(메가는 ⚡)
 function LeagueBadge({ it, lang, t }: { it: { label: string; base: string }; lang: Locale; t: ScheduleDict }) {
   const lg = LEAGUE[it.base] || { c: "#64748b", soft: "#f1f5f9", cap: "" };
   const isMega = it.base !== "cup" && it.label.includes("메가");
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 7, background: lg.soft, border: `1px solid ${lg.c}33`,
-      borderRadius: 999, padding: "5px 6px 5px 13px", fontSize: "0.84rem", fontWeight: 800, color: lg.c }}>
-      {it.base === "cup" ? "🏆 " : ""}{chipLabel(lang, t, it)}
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: lg.soft, border: `1px solid ${lg.c}33`,
+      borderRadius: 999, padding: "4px 7px 4px 5px", fontSize: "0.84rem", fontWeight: 800, color: lg.c }}>
+      {it.base === "cup" ? <span style={{ fontSize: "1.05rem", lineHeight: 1 }}>🏆</span> : <LeagueOrb base={it.base} size={20} />}
+      {isMega && <span style={{ fontSize: "0.72rem" }}>⚡</span>}
+      {chipLabel(lang, t, it)}
       {lg.cap && (
         <span style={{ fontSize: "0.68rem", fontWeight: 800, color: "#fff", background: lg.c, borderRadius: 999, padding: "2px 9px", letterSpacing: "0.02em" }}>
-          {isMega ? "⚡" : ""}{t.capWord} {lg.cap}
+          {t.capWord} {lg.cap}
         </span>
       )}
     </span>
