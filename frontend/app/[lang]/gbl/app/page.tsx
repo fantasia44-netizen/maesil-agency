@@ -583,8 +583,9 @@ export default function GblPage() {
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}` === tk;
       });
     } else if (statsPeriod === "season") {
-      const s = new Date(SEASON.start + "T00:00:00").getTime();
-      const e = new Date(SEASON.end + "T23:59:59").getTime();
+      // KST(+09:00) 고정 — 타임존 누락 시 기기 로컬 타임존으로 파싱돼 시즌 경계가 하루 어긋남
+      const s = new Date(SEASON.start + "T00:00:00+09:00").getTime();
+      const e = new Date(SEASON.end + "T23:59:59+09:00").getTime();
       src = src.filter((m) => { const t = new Date(m.played_at).getTime(); return t >= s && t <= e; });
     } else if (statsPeriod !== "all") {
       const since = Date.now() - Number(statsPeriod) * 86400000;

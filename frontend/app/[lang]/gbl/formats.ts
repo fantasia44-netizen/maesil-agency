@@ -86,4 +86,5 @@ export function filterPool<T extends { types: string[] }>(pool: T[], f?: Format)
   return pool;
 }
 
-export const todayISO = () => new Date().toISOString().slice(0, 10);
+// KST(UTC+9) 기준 오늘 날짜. toISOString()은 UTC라 한국 자정~오전9시엔 하루 전이 나오는 버그 방지.
+export const todayISO = () => new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
