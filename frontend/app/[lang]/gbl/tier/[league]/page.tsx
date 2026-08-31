@@ -81,9 +81,13 @@ const SEASON_NOTE: Record<string, Record<string, string>> = {
 };
 
 type Meta = { total: number; top_mons: { speciesId: string; count: number }[] };
-async function getPickRates(league: string): Promise<Record<string, number>> {
+// 실측 픽률 — 현재 시즌은 최근 30일, 비현재(아카이브/미리보기)는 그 시즌 날짜범위(미래 시즌=빈값).
+async function getPickRates(league: string, season: { start: string; end: string }, isCurrent: boolean): Promise<Record<string, number>> {
   try {
-    const res = await fetch(`${BASE}/api/gbl/meta?league=${league}&days=30`, { next: { revalidate: 3600 } });
+    const scope = isCurrent
+      ? `days=30`
+      : `start=${encodeURIComponent(`${season.start}T00:00:00+09:00`)}&end=${encodeURIComponent(`${season.end}T23:59:59+09:00`)}`;
+    const res = await fetch(`${BASE}/api/gbl/meta?league=${league}&${scope}`, { next: { revalidate: 3600 } });
     if (!res.ok) return {};
     const m = (await res.json()) as Meta;
     const out: Record<string, number> = {};
@@ -153,7 +157,7 @@ export default async function TierPage({ params, searchParams }: { params: { lan
   const seasonDet = (DETAIL_BY_SLUG[season.slug] || DETAIL) as Record<string, Detail[]>;
   const seasons = selectableSeasons(TIER_SEASON_SLUGS);
   const list = (seasonDet[params.league] || []).slice(0, 100);  // 티어표는 상위 100종(CMP·조회는 200종까지)
-  const pick = await getPickRates(params.league);
+  const pick = await getPickRates(params.league, season, season.slug === currentSeason().slug);
   const TIERS = ["S", "A", "B", "C", "D"];
   const byTier: Record<string, Detail[]> = {};
   for (const t of TIERS) byTier[t] = [];
