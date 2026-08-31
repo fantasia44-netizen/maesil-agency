@@ -1,0 +1,2921 @@
+{
+  "speciesId": "groudon",
+  "league": "master",
+  "metaLimit": 100,
+  "rival": "kyogre",
+  "rivalDex": 382,
+  "normal": {
+    "hundo": {
+      "cp": 4652,
+      "level": 50,
+      "stats": {
+        "atk": 239.5,
+        "def": 204.2,
+        "hp": 184
+      },
+      "byShield": [
+        {
+          "shields": 0,
+          "wins": 70,
+          "losses": 30
+        },
+        {
+          "shields": 1,
+          "wins": 56,
+          "losses": 44
+        },
+        {
+          "shields": 2,
+          "wins": 55,
+          "losses": 45
+        }
+      ]
+    },
+    "spreads": [
+      {
+        "iv": [
+          15,
+          15,
+          15
+        ],
+        "cp": 4652,
+        "level": 50,
+        "stats": {
+          "atk": 239.5,
+          "def": 204.2,
+          "hp": 184
+        },
+        "effHundo": true,
+        "verdict": "실질백",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 70,
+            "losses": 30
+          },
+          {
+            "shields": 1,
+            "wins": 56,
+            "losses": 44
+          },
+          {
+            "shields": 2,
+            "wins": 55,
+            "losses": 45
+          }
+        ],
+        "flips": [],
+        "nearFlips": []
+      },
+      {
+        "iv": [
+          14,
+          15,
+          15
+        ],
+        "cp": 4636,
+        "level": 50,
+        "stats": {
+          "atk": 238.6,
+          "def": 204.2,
+          "hp": 184
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 70,
+            "losses": 30
+          },
+          {
+            "shields": 1,
+            "wins": 55,
+            "losses": 45
+          },
+          {
+            "shields": 2,
+            "wins": 54,
+            "losses": 46
+          }
+        ],
+        "flips": [
+          {
+            "shields": 1,
+            "oppId": "golisopod",
+            "dex": 768,
+            "opp": "Golisopod",
+            "types": [
+              "bug",
+              "water"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -28
+          },
+          {
+            "shields": 2,
+            "oppId": "zygarde_complete",
+            "dex": 718,
+            "opp": "Zygarde (Complete Forme)",
+            "types": [
+              "dragon",
+              "ground"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -29
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 0,
+            "oppId": "kyogre_shadow",
+            "dex": 382,
+            "opp": "Kyogre (Shadow)",
+            "types": [
+              "water"
+            ],
+            "delta": -308
+          },
+          {
+            "shields": 0,
+            "oppId": "kyogre",
+            "dex": 382,
+            "opp": "Kyogre",
+            "types": [
+              "water"
+            ],
+            "delta": -264
+          },
+          {
+            "shields": 1,
+            "oppId": "kyogre",
+            "dex": 382,
+            "opp": "Kyogre",
+            "types": [
+              "water"
+            ],
+            "delta": -264
+          },
+          {
+            "shields": 0,
+            "oppId": "groudon_shadow",
+            "dex": 383,
+            "opp": "Groudon (Shadow)",
+            "types": [
+              "ground"
+            ],
+            "delta": -253
+          },
+          {
+            "shields": 1,
+            "oppId": "kyogre_shadow",
+            "dex": 382,
+            "opp": "Kyogre (Shadow)",
+            "types": [
+              "water"
+            ],
+            "delta": -207
+          },
+          {
+            "shields": 2,
+            "oppId": "groudon",
+            "dex": 383,
+            "opp": "Groudon",
+            "types": [
+              "ground"
+            ],
+            "delta": -161
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          15,
+          14
+        ],
+        "cp": 4642,
+        "level": 50,
+        "stats": {
+          "atk": 239.5,
+          "def": 204.2,
+          "hp": 184
+        },
+        "effHundo": false,
+        "verdict": "유사백",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 70,
+            "losses": 30
+          },
+          {
+            "shields": 1,
+            "wins": 56,
+            "losses": 44
+          },
+          {
+            "shields": 2,
+            "wins": 55,
+            "losses": 45
+          }
+        ],
+        "flips": [],
+        "nearFlips": []
+      },
+      {
+        "iv": [
+          15,
+          15,
+          13
+        ],
+        "cp": 4631,
+        "level": 50,
+        "stats": {
+          "atk": 239.5,
+          "def": 204.2,
+          "hp": 183
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 69,
+            "losses": 31
+          },
+          {
+            "shields": 1,
+            "wins": 56,
+            "losses": 44
+          },
+          {
+            "shields": 2,
+            "wins": 55,
+            "losses": 45
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "genesect_chill",
+            "dex": 649,
+            "opp": "Genesect (Chill)",
+            "types": [
+              "bug",
+              "steel"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -423
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "dragonite",
+            "dex": 149,
+            "opp": "Dragonite",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "delta": -158
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_incarnate_shadow",
+            "dex": 645,
+            "opp": "Landorus (Incarnate) (Shadow)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -105
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_therian",
+            "dex": 645,
+            "opp": "Landorus (Therian)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -90
+          },
+          {
+            "shields": 2,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "delta": -63
+          },
+          {
+            "shields": 0,
+            "oppId": "hydreigon",
+            "dex": 635,
+            "opp": "Hydreigon",
+            "types": [
+              "dark",
+              "dragon"
+            ],
+            "delta": -21
+          },
+          {
+            "shields": 0,
+            "oppId": "tapu_fini",
+            "dex": 788,
+            "opp": "Tapu Fini",
+            "types": [
+              "water",
+              "fairy"
+            ],
+            "delta": -9
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          15,
+          12
+        ],
+        "cp": 4621,
+        "level": 50,
+        "stats": {
+          "atk": 239.5,
+          "def": 204.2,
+          "hp": 182
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 69,
+            "losses": 31
+          },
+          {
+            "shields": 1,
+            "wins": 56,
+            "losses": 44
+          },
+          {
+            "shields": 2,
+            "wins": 55,
+            "losses": 45
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "genesect_chill",
+            "dex": 649,
+            "opp": "Genesect (Chill)",
+            "types": [
+              "bug",
+              "steel"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -423
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "dragonite",
+            "dex": 149,
+            "opp": "Dragonite",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "delta": -160
+          },
+          {
+            "shields": 1,
+            "oppId": "kommo_o",
+            "dex": 784,
+            "opp": "Kommo-o",
+            "types": [
+              "dragon",
+              "fighting"
+            ],
+            "delta": -108
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_incarnate_shadow",
+            "dex": 645,
+            "opp": "Landorus (Incarnate) (Shadow)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -106
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_therian",
+            "dex": 645,
+            "opp": "Landorus (Therian)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -90
+          },
+          {
+            "shields": 2,
+            "oppId": "kyurem",
+            "dex": 646,
+            "opp": "Kyurem",
+            "types": [
+              "dragon",
+              "ice"
+            ],
+            "delta": -80
+          },
+          {
+            "shields": 2,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "delta": -63
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          14,
+          15
+        ],
+        "cp": 4643,
+        "level": 50,
+        "stats": {
+          "atk": 239.5,
+          "def": 203.4,
+          "hp": 184
+        },
+        "effHundo": false,
+        "verdict": "유사백",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 70,
+            "losses": 30
+          },
+          {
+            "shields": 1,
+            "wins": 56,
+            "losses": 44
+          },
+          {
+            "shields": 2,
+            "wins": 55,
+            "losses": 45
+          }
+        ],
+        "flips": [],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "landorus_incarnate_shadow",
+            "dex": 645,
+            "opp": "Landorus (Incarnate) (Shadow)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -252
+          },
+          {
+            "shields": 2,
+            "oppId": "garchomp",
+            "dex": 445,
+            "opp": "Garchomp",
+            "types": [
+              "dragon",
+              "ground"
+            ],
+            "delta": -33
+          },
+          {
+            "shields": 2,
+            "oppId": "primarina",
+            "dex": 730,
+            "opp": "Primarina",
+            "types": [
+              "water",
+              "fairy"
+            ],
+            "delta": -33
+          },
+          {
+            "shields": 2,
+            "oppId": "gholdengo",
+            "dex": 1000,
+            "opp": "Gholdengo",
+            "types": [
+              "steel",
+              "ghost"
+            ],
+            "delta": -32
+          },
+          {
+            "shields": 1,
+            "oppId": "gholdengo",
+            "dex": 1000,
+            "opp": "Gholdengo",
+            "types": [
+              "steel",
+              "ghost"
+            ],
+            "delta": -25
+          },
+          {
+            "shields": 0,
+            "oppId": "hydreigon",
+            "dex": 635,
+            "opp": "Hydreigon",
+            "types": [
+              "dark",
+              "dragon"
+            ],
+            "delta": -22
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          14,
+          14
+        ],
+        "cp": 4632,
+        "level": 50,
+        "stats": {
+          "atk": 239.5,
+          "def": 203.4,
+          "hp": 184
+        },
+        "effHundo": false,
+        "verdict": "유사백",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 70,
+            "losses": 30
+          },
+          {
+            "shields": 1,
+            "wins": 56,
+            "losses": 44
+          },
+          {
+            "shields": 2,
+            "wins": 55,
+            "losses": 45
+          }
+        ],
+        "flips": [],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "landorus_incarnate_shadow",
+            "dex": 645,
+            "opp": "Landorus (Incarnate) (Shadow)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -252
+          },
+          {
+            "shields": 2,
+            "oppId": "garchomp",
+            "dex": 445,
+            "opp": "Garchomp",
+            "types": [
+              "dragon",
+              "ground"
+            ],
+            "delta": -33
+          },
+          {
+            "shields": 2,
+            "oppId": "primarina",
+            "dex": 730,
+            "opp": "Primarina",
+            "types": [
+              "water",
+              "fairy"
+            ],
+            "delta": -33
+          },
+          {
+            "shields": 2,
+            "oppId": "gholdengo",
+            "dex": 1000,
+            "opp": "Gholdengo",
+            "types": [
+              "steel",
+              "ghost"
+            ],
+            "delta": -32
+          },
+          {
+            "shields": 1,
+            "oppId": "gholdengo",
+            "dex": 1000,
+            "opp": "Gholdengo",
+            "types": [
+              "steel",
+              "ghost"
+            ],
+            "delta": -25
+          },
+          {
+            "shields": 0,
+            "oppId": "hydreigon",
+            "dex": 635,
+            "opp": "Hydreigon",
+            "types": [
+              "dark",
+              "dragon"
+            ],
+            "delta": -22
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          14,
+          13
+        ],
+        "cp": 4622,
+        "level": 50,
+        "stats": {
+          "atk": 239.5,
+          "def": 203.4,
+          "hp": 183
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 69,
+            "losses": 31
+          },
+          {
+            "shields": 1,
+            "wins": 56,
+            "losses": 44
+          },
+          {
+            "shields": 2,
+            "wins": 55,
+            "losses": 45
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "genesect_chill",
+            "dex": 649,
+            "opp": "Genesect (Chill)",
+            "types": [
+              "bug",
+              "steel"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -423
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "landorus_incarnate_shadow",
+            "dex": 645,
+            "opp": "Landorus (Incarnate) (Shadow)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -255
+          },
+          {
+            "shields": 2,
+            "oppId": "dragonite",
+            "dex": 149,
+            "opp": "Dragonite",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "delta": -158
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_therian",
+            "dex": 645,
+            "opp": "Landorus (Therian)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -90
+          },
+          {
+            "shields": 2,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "delta": -63
+          },
+          {
+            "shields": 2,
+            "oppId": "garchomp",
+            "dex": 445,
+            "opp": "Garchomp",
+            "types": [
+              "dragon",
+              "ground"
+            ],
+            "delta": -36
+          },
+          {
+            "shields": 2,
+            "oppId": "primarina",
+            "dex": 730,
+            "opp": "Primarina",
+            "types": [
+              "water",
+              "fairy"
+            ],
+            "delta": -36
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          13,
+          14
+        ],
+        "cp": 4623,
+        "level": 50,
+        "stats": {
+          "atk": 239.5,
+          "def": 202.5,
+          "hp": 184
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 69,
+            "losses": 31
+          },
+          {
+            "shields": 1,
+            "wins": 56,
+            "losses": 44
+          },
+          {
+            "shields": 2,
+            "wins": 55,
+            "losses": 45
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "genesect_chill",
+            "dex": 649,
+            "opp": "Genesect (Chill)",
+            "types": [
+              "bug",
+              "steel"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -423
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "landorus_incarnate_shadow",
+            "dex": 645,
+            "opp": "Landorus (Incarnate) (Shadow)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -252
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_therian",
+            "dex": 645,
+            "opp": "Landorus (Therian)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -90
+          },
+          {
+            "shields": 2,
+            "oppId": "garchomp",
+            "dex": 445,
+            "opp": "Garchomp",
+            "types": [
+              "dragon",
+              "ground"
+            ],
+            "delta": -33
+          },
+          {
+            "shields": 2,
+            "oppId": "primarina",
+            "dex": 730,
+            "opp": "Primarina",
+            "types": [
+              "water",
+              "fairy"
+            ],
+            "delta": -33
+          },
+          {
+            "shields": 2,
+            "oppId": "gholdengo",
+            "dex": 1000,
+            "opp": "Gholdengo",
+            "types": [
+              "steel",
+              "ghost"
+            ],
+            "delta": -32
+          },
+          {
+            "shields": 2,
+            "oppId": "solgaleo",
+            "dex": 791,
+            "opp": "Solgaleo",
+            "types": [
+              "psychic",
+              "steel"
+            ],
+            "delta": -30
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          13,
+          13
+        ],
+        "cp": 4612,
+        "level": 50,
+        "stats": {
+          "atk": 239.5,
+          "def": 202.5,
+          "hp": 183
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 69,
+            "losses": 31
+          },
+          {
+            "shields": 1,
+            "wins": 56,
+            "losses": 44
+          },
+          {
+            "shields": 2,
+            "wins": 55,
+            "losses": 45
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "genesect_chill",
+            "dex": 649,
+            "opp": "Genesect (Chill)",
+            "types": [
+              "bug",
+              "steel"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -423
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "landorus_incarnate_shadow",
+            "dex": 645,
+            "opp": "Landorus (Incarnate) (Shadow)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -255
+          },
+          {
+            "shields": 2,
+            "oppId": "dragonite",
+            "dex": 149,
+            "opp": "Dragonite",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "delta": -158
+          },
+          {
+            "shields": 1,
+            "oppId": "kommo_o",
+            "dex": 784,
+            "opp": "Kommo-o",
+            "types": [
+              "dragon",
+              "fighting"
+            ],
+            "delta": -108
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_therian",
+            "dex": 645,
+            "opp": "Landorus (Therian)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -90
+          },
+          {
+            "shields": 2,
+            "oppId": "kyurem",
+            "dex": 646,
+            "opp": "Kyurem",
+            "types": [
+              "dragon",
+              "ice"
+            ],
+            "delta": -80
+          },
+          {
+            "shields": 2,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "delta": -63
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          12,
+          14
+        ],
+        "cp": 4613,
+        "level": 50,
+        "stats": {
+          "atk": 239.5,
+          "def": 201.7,
+          "hp": 184
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 69,
+            "losses": 31
+          },
+          {
+            "shields": 1,
+            "wins": 56,
+            "losses": 44
+          },
+          {
+            "shields": 2,
+            "wins": 55,
+            "losses": 45
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "genesect_chill",
+            "dex": 649,
+            "opp": "Genesect (Chill)",
+            "types": [
+              "bug",
+              "steel"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -423
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "landorus_incarnate_shadow",
+            "dex": 645,
+            "opp": "Landorus (Incarnate) (Shadow)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -252
+          },
+          {
+            "shields": 2,
+            "oppId": "dragonite",
+            "dex": 149,
+            "opp": "Dragonite",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "delta": -158
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_therian",
+            "dex": 645,
+            "opp": "Landorus (Therian)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -90
+          },
+          {
+            "shields": 2,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "delta": -63
+          },
+          {
+            "shields": 2,
+            "oppId": "garchomp",
+            "dex": 445,
+            "opp": "Garchomp",
+            "types": [
+              "dragon",
+              "ground"
+            ],
+            "delta": -33
+          },
+          {
+            "shields": 2,
+            "oppId": "primarina",
+            "dex": 730,
+            "opp": "Primarina",
+            "types": [
+              "water",
+              "fairy"
+            ],
+            "delta": -33
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          10,
+          14
+        ],
+        "cp": 4594,
+        "level": 50,
+        "stats": {
+          "atk": 239.5,
+          "def": 200,
+          "hp": 184
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 69,
+            "losses": 31
+          },
+          {
+            "shields": 1,
+            "wins": 55,
+            "losses": 45
+          },
+          {
+            "shields": 2,
+            "wins": 55,
+            "losses": 45
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "genesect_chill",
+            "dex": 649,
+            "opp": "Genesect (Chill)",
+            "types": [
+              "bug",
+              "steel"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -423
+          },
+          {
+            "shields": 1,
+            "oppId": "urshifu_single_strike",
+            "dex": 892,
+            "opp": "Urshifu (Single Strike)",
+            "types": [
+              "fighting",
+              "dark"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -213
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "tapu_fini",
+            "dex": 788,
+            "opp": "Tapu Fini",
+            "types": [
+              "water",
+              "fairy"
+            ],
+            "delta": -354
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_incarnate_shadow",
+            "dex": 645,
+            "opp": "Landorus (Incarnate) (Shadow)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -255
+          },
+          {
+            "shields": 1,
+            "oppId": "dondozo",
+            "dex": 977,
+            "opp": "Dondozo",
+            "types": [
+              "water"
+            ],
+            "delta": -224
+          },
+          {
+            "shields": 2,
+            "oppId": "dragonite",
+            "dex": 149,
+            "opp": "Dragonite",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "delta": -158
+          },
+          {
+            "shields": 1,
+            "oppId": "kommo_o",
+            "dex": 784,
+            "opp": "Kommo-o",
+            "types": [
+              "dragon",
+              "fighting"
+            ],
+            "delta": -109
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_therian",
+            "dex": 645,
+            "opp": "Landorus (Therian)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -90
+          }
+        ]
+      }
+    ]
+  },
+  "bestBuddy": {
+    "hundo": {
+      "cp": 4708,
+      "level": 51,
+      "stats": {
+        "atk": 240.9,
+        "def": 205.4,
+        "hp": 185
+      },
+      "byShield": [
+        {
+          "shields": 0,
+          "wins": 75,
+          "losses": 25
+        },
+        {
+          "shields": 1,
+          "wins": 64,
+          "losses": 36
+        },
+        {
+          "shields": 2,
+          "wins": 58,
+          "losses": 42
+        }
+      ]
+    },
+    "spreads": [
+      {
+        "iv": [
+          15,
+          15,
+          15
+        ],
+        "cp": 4708,
+        "level": 51,
+        "stats": {
+          "atk": 240.9,
+          "def": 205.4,
+          "hp": 185
+        },
+        "effHundo": true,
+        "verdict": "실질백",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 75,
+            "losses": 25
+          },
+          {
+            "shields": 1,
+            "wins": 64,
+            "losses": 36
+          },
+          {
+            "shields": 2,
+            "wins": 58,
+            "losses": 42
+          }
+        ],
+        "flips": [],
+        "nearFlips": []
+      },
+      {
+        "iv": [
+          14,
+          15,
+          15
+        ],
+        "cp": 4691,
+        "level": 51,
+        "stats": {
+          "atk": 240.1,
+          "def": 205.4,
+          "hp": 185
+        },
+        "effHundo": false,
+        "verdict": "유사백",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 75,
+            "losses": 25
+          },
+          {
+            "shields": 1,
+            "wins": 64,
+            "losses": 36
+          },
+          {
+            "shields": 2,
+            "wins": 58,
+            "losses": 42
+          }
+        ],
+        "flips": [],
+        "nearFlips": [
+          {
+            "shields": 0,
+            "oppId": "avalugg_hisuian",
+            "dex": 713,
+            "opp": "Avalugg (Hisuian)",
+            "types": [
+              "ice",
+              "rock"
+            ],
+            "delta": -43
+          },
+          {
+            "shields": 2,
+            "oppId": "mewtwo_armored",
+            "dex": 150,
+            "opp": "Mewtwo (Armored)",
+            "types": [
+              "psychic"
+            ],
+            "delta": -30
+          },
+          {
+            "shields": 2,
+            "oppId": "gyarados_shadow",
+            "dex": 130,
+            "opp": "Gyarados (Shadow)",
+            "types": [
+              "water",
+              "flying"
+            ],
+            "delta": -29
+          },
+          {
+            "shields": 2,
+            "oppId": "palkia_shadow",
+            "dex": 484,
+            "opp": "Palkia (Shadow)",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -26
+          },
+          {
+            "shields": 1,
+            "oppId": "gyarados_shadow",
+            "dex": 130,
+            "opp": "Gyarados (Shadow)",
+            "types": [
+              "water",
+              "flying"
+            ],
+            "delta": -23
+          },
+          {
+            "shields": 1,
+            "oppId": "palkia_shadow",
+            "dex": 484,
+            "opp": "Palkia (Shadow)",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -20
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          15,
+          14
+        ],
+        "cp": 4697,
+        "level": 51,
+        "stats": {
+          "atk": 240.9,
+          "def": 205.4,
+          "hp": 185
+        },
+        "effHundo": false,
+        "verdict": "유사백",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 75,
+            "losses": 25
+          },
+          {
+            "shields": 1,
+            "wins": 64,
+            "losses": 36
+          },
+          {
+            "shields": 2,
+            "wins": 58,
+            "losses": 42
+          }
+        ],
+        "flips": [],
+        "nearFlips": []
+      },
+      {
+        "iv": [
+          15,
+          15,
+          13
+        ],
+        "cp": 4687,
+        "level": 51,
+        "stats": {
+          "atk": 240.9,
+          "def": 205.4,
+          "hp": 184
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 75,
+            "losses": 25
+          },
+          {
+            "shields": 1,
+            "wins": 60,
+            "losses": 40
+          },
+          {
+            "shields": 2,
+            "wins": 58,
+            "losses": 42
+          }
+        ],
+        "flips": [
+          {
+            "shields": 1,
+            "oppId": "lunala",
+            "dex": 792,
+            "opp": "Lunala",
+            "types": [
+              "psychic",
+              "ghost"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -5
+          },
+          {
+            "shields": 1,
+            "oppId": "zekrom",
+            "dex": 644,
+            "opp": "Zekrom",
+            "types": [
+              "dragon",
+              "electric"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -122
+          },
+          {
+            "shields": 1,
+            "oppId": "metagross_shadow",
+            "dex": 376,
+            "opp": "Metagross (Shadow)",
+            "types": [
+              "steel",
+              "psychic"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -101
+          },
+          {
+            "shields": 1,
+            "oppId": "dragonite_shadow",
+            "dex": 149,
+            "opp": "Dragonite (Shadow)",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -117
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "palkia",
+            "dex": 484,
+            "opp": "Palkia",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -56
+          },
+          {
+            "shields": 0,
+            "oppId": "lugia_shadow",
+            "dex": 249,
+            "opp": "Lugia (Shadow)",
+            "types": [
+              "psychic",
+              "flying"
+            ],
+            "delta": -17
+          },
+          {
+            "shields": 1,
+            "oppId": "avalugg_hisuian",
+            "dex": 713,
+            "opp": "Avalugg (Hisuian)",
+            "types": [
+              "ice",
+              "rock"
+            ],
+            "delta": -12
+          },
+          {
+            "shields": 2,
+            "oppId": "zacian_hero",
+            "dex": 888,
+            "opp": "Zacian (Hero)",
+            "types": [
+              "fairy"
+            ],
+            "delta": -9
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          15,
+          12
+        ],
+        "cp": 4676,
+        "level": 51,
+        "stats": {
+          "atk": 240.9,
+          "def": 205.4,
+          "hp": 183
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 74,
+            "losses": 26
+          },
+          {
+            "shields": 1,
+            "wins": 60,
+            "losses": 40
+          },
+          {
+            "shields": 2,
+            "wins": 57,
+            "losses": 43
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -207
+          },
+          {
+            "shields": 1,
+            "oppId": "lunala",
+            "dex": 792,
+            "opp": "Lunala",
+            "types": [
+              "psychic",
+              "ghost"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -5
+          },
+          {
+            "shields": 1,
+            "oppId": "zekrom",
+            "dex": 644,
+            "opp": "Zekrom",
+            "types": [
+              "dragon",
+              "electric"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -122
+          },
+          {
+            "shields": 1,
+            "oppId": "metagross_shadow",
+            "dex": 376,
+            "opp": "Metagross (Shadow)",
+            "types": [
+              "steel",
+              "psychic"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -101
+          },
+          {
+            "shields": 1,
+            "oppId": "dragonite_shadow",
+            "dex": 149,
+            "opp": "Dragonite (Shadow)",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -117
+          },
+          {
+            "shields": 2,
+            "oppId": "mewtwo",
+            "dex": 150,
+            "opp": "Mewtwo",
+            "types": [
+              "psychic"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -219
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "dragonite",
+            "dex": 149,
+            "opp": "Dragonite",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "delta": -159
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_incarnate_shadow",
+            "dex": 645,
+            "opp": "Landorus (Incarnate) (Shadow)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -106
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_therian",
+            "dex": 645,
+            "opp": "Landorus (Therian)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -90
+          },
+          {
+            "shields": 2,
+            "oppId": "palkia",
+            "dex": 484,
+            "opp": "Palkia",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -56
+          },
+          {
+            "shields": 1,
+            "oppId": "kyurem_white",
+            "dex": 646,
+            "opp": "Kyurem (White)",
+            "types": [
+              "dragon",
+              "ice"
+            ],
+            "delta": -33
+          },
+          {
+            "shields": 1,
+            "oppId": "dialga_shadow",
+            "dex": 483,
+            "opp": "Dialga (Shadow)",
+            "types": [
+              "steel",
+              "dragon"
+            ],
+            "delta": -24
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          14,
+          15
+        ],
+        "cp": 4698,
+        "level": 51,
+        "stats": {
+          "atk": 240.9,
+          "def": 204.6,
+          "hp": 185
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 74,
+            "losses": 26
+          },
+          {
+            "shields": 1,
+            "wins": 63,
+            "losses": 37
+          },
+          {
+            "shields": 2,
+            "wins": 58,
+            "losses": 42
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -207
+          },
+          {
+            "shields": 1,
+            "oppId": "zekrom",
+            "dex": 644,
+            "opp": "Zekrom",
+            "types": [
+              "dragon",
+              "electric"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -122
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "palkia",
+            "dex": 484,
+            "opp": "Palkia",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -56
+          },
+          {
+            "shields": 0,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -35
+          },
+          {
+            "shields": 2,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -32
+          },
+          {
+            "shields": 2,
+            "oppId": "rhyperior",
+            "dex": 464,
+            "opp": "Rhyperior",
+            "types": [
+              "ground",
+              "rock"
+            ],
+            "delta": -32
+          },
+          {
+            "shields": 1,
+            "oppId": "rhyperior",
+            "dex": 464,
+            "opp": "Rhyperior",
+            "types": [
+              "ground",
+              "rock"
+            ],
+            "delta": -21
+          },
+          {
+            "shields": 1,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -18
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          14,
+          14
+        ],
+        "cp": 4688,
+        "level": 51,
+        "stats": {
+          "atk": 240.9,
+          "def": 204.6,
+          "hp": 185
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 74,
+            "losses": 26
+          },
+          {
+            "shields": 1,
+            "wins": 63,
+            "losses": 37
+          },
+          {
+            "shields": 2,
+            "wins": 58,
+            "losses": 42
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -207
+          },
+          {
+            "shields": 1,
+            "oppId": "zekrom",
+            "dex": 644,
+            "opp": "Zekrom",
+            "types": [
+              "dragon",
+              "electric"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -122
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "palkia",
+            "dex": 484,
+            "opp": "Palkia",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -56
+          },
+          {
+            "shields": 0,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -35
+          },
+          {
+            "shields": 2,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -32
+          },
+          {
+            "shields": 2,
+            "oppId": "rhyperior",
+            "dex": 464,
+            "opp": "Rhyperior",
+            "types": [
+              "ground",
+              "rock"
+            ],
+            "delta": -32
+          },
+          {
+            "shields": 1,
+            "oppId": "rhyperior",
+            "dex": 464,
+            "opp": "Rhyperior",
+            "types": [
+              "ground",
+              "rock"
+            ],
+            "delta": -21
+          },
+          {
+            "shields": 1,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -18
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          14,
+          13
+        ],
+        "cp": 4677,
+        "level": 51,
+        "stats": {
+          "atk": 240.9,
+          "def": 204.6,
+          "hp": 184
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 74,
+            "losses": 26
+          },
+          {
+            "shields": 1,
+            "wins": 60,
+            "losses": 40
+          },
+          {
+            "shields": 2,
+            "wins": 58,
+            "losses": 42
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -207
+          },
+          {
+            "shields": 1,
+            "oppId": "lunala",
+            "dex": 792,
+            "opp": "Lunala",
+            "types": [
+              "psychic",
+              "ghost"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -5
+          },
+          {
+            "shields": 1,
+            "oppId": "zekrom",
+            "dex": 644,
+            "opp": "Zekrom",
+            "types": [
+              "dragon",
+              "electric"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -122
+          },
+          {
+            "shields": 1,
+            "oppId": "metagross_shadow",
+            "dex": 376,
+            "opp": "Metagross (Shadow)",
+            "types": [
+              "steel",
+              "psychic"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -101
+          },
+          {
+            "shields": 1,
+            "oppId": "dragonite_shadow",
+            "dex": 149,
+            "opp": "Dragonite (Shadow)",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -117
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "palkia",
+            "dex": 484,
+            "opp": "Palkia",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -56
+          },
+          {
+            "shields": 0,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -38
+          },
+          {
+            "shields": 2,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -34
+          },
+          {
+            "shields": 2,
+            "oppId": "rhyperior",
+            "dex": 464,
+            "opp": "Rhyperior",
+            "types": [
+              "ground",
+              "rock"
+            ],
+            "delta": -34
+          },
+          {
+            "shields": 1,
+            "oppId": "kyurem_white",
+            "dex": 646,
+            "opp": "Kyurem (White)",
+            "types": [
+              "dragon",
+              "ice"
+            ],
+            "delta": -33
+          },
+          {
+            "shields": 1,
+            "oppId": "dialga_shadow",
+            "dex": 483,
+            "opp": "Dialga (Shadow)",
+            "types": [
+              "steel",
+              "dragon"
+            ],
+            "delta": -24
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          13,
+          14
+        ],
+        "cp": 4678,
+        "level": 51,
+        "stats": {
+          "atk": 240.9,
+          "def": 203.7,
+          "hp": 185
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 74,
+            "losses": 26
+          },
+          {
+            "shields": 1,
+            "wins": 61,
+            "losses": 39
+          },
+          {
+            "shields": 2,
+            "wins": 58,
+            "losses": 42
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -207
+          },
+          {
+            "shields": 1,
+            "oppId": "zekrom",
+            "dex": 644,
+            "opp": "Zekrom",
+            "types": [
+              "dragon",
+              "electric"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -122
+          },
+          {
+            "shields": 1,
+            "oppId": "metagross_shadow",
+            "dex": 376,
+            "opp": "Metagross (Shadow)",
+            "types": [
+              "steel",
+              "psychic"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -101
+          },
+          {
+            "shields": 1,
+            "oppId": "dragonite_shadow",
+            "dex": 149,
+            "opp": "Dragonite (Shadow)",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -117
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 0,
+            "oppId": "lugia_shadow",
+            "dex": 249,
+            "opp": "Lugia (Shadow)",
+            "types": [
+              "psychic",
+              "flying"
+            ],
+            "delta": -133
+          },
+          {
+            "shields": 2,
+            "oppId": "palkia",
+            "dex": 484,
+            "opp": "Palkia",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -56
+          },
+          {
+            "shields": 0,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -35
+          },
+          {
+            "shields": 2,
+            "oppId": "gholdengo",
+            "dex": 1000,
+            "opp": "Gholdengo",
+            "types": [
+              "steel",
+              "ghost"
+            ],
+            "delta": -33
+          },
+          {
+            "shields": 2,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -32
+          },
+          {
+            "shields": 2,
+            "oppId": "rhyperior",
+            "dex": 464,
+            "opp": "Rhyperior",
+            "types": [
+              "ground",
+              "rock"
+            ],
+            "delta": -32
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          13,
+          13
+        ],
+        "cp": 4667,
+        "level": 51,
+        "stats": {
+          "atk": 240.9,
+          "def": 203.7,
+          "hp": 184
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 74,
+            "losses": 26
+          },
+          {
+            "shields": 1,
+            "wins": 60,
+            "losses": 40
+          },
+          {
+            "shields": 2,
+            "wins": 57,
+            "losses": 43
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -207
+          },
+          {
+            "shields": 1,
+            "oppId": "lunala",
+            "dex": 792,
+            "opp": "Lunala",
+            "types": [
+              "psychic",
+              "ghost"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -5
+          },
+          {
+            "shields": 1,
+            "oppId": "zekrom",
+            "dex": 644,
+            "opp": "Zekrom",
+            "types": [
+              "dragon",
+              "electric"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -122
+          },
+          {
+            "shields": 1,
+            "oppId": "metagross_shadow",
+            "dex": 376,
+            "opp": "Metagross (Shadow)",
+            "types": [
+              "steel",
+              "psychic"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -101
+          },
+          {
+            "shields": 1,
+            "oppId": "dragonite_shadow",
+            "dex": 149,
+            "opp": "Dragonite (Shadow)",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -117
+          },
+          {
+            "shields": 2,
+            "oppId": "mewtwo",
+            "dex": 150,
+            "opp": "Mewtwo",
+            "types": [
+              "psychic"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -219
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 0,
+            "oppId": "lugia_shadow",
+            "dex": 249,
+            "opp": "Lugia (Shadow)",
+            "types": [
+              "psychic",
+              "flying"
+            ],
+            "delta": -133
+          },
+          {
+            "shields": 2,
+            "oppId": "palkia",
+            "dex": 484,
+            "opp": "Palkia",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -56
+          },
+          {
+            "shields": 0,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -38
+          },
+          {
+            "shields": 2,
+            "oppId": "gholdengo",
+            "dex": 1000,
+            "opp": "Gholdengo",
+            "types": [
+              "steel",
+              "ghost"
+            ],
+            "delta": -34
+          },
+          {
+            "shields": 2,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -34
+          },
+          {
+            "shields": 2,
+            "oppId": "rhyperior",
+            "dex": 464,
+            "opp": "Rhyperior",
+            "types": [
+              "ground",
+              "rock"
+            ],
+            "delta": -34
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          12,
+          14
+        ],
+        "cp": 4668,
+        "level": 51,
+        "stats": {
+          "atk": 240.9,
+          "def": 202.9,
+          "hp": 185
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 74,
+            "losses": 26
+          },
+          {
+            "shields": 1,
+            "wins": 60,
+            "losses": 40
+          },
+          {
+            "shields": 2,
+            "wins": 58,
+            "losses": 42
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -207
+          },
+          {
+            "shields": 1,
+            "oppId": "lunala",
+            "dex": 792,
+            "opp": "Lunala",
+            "types": [
+              "psychic",
+              "ghost"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -5
+          },
+          {
+            "shields": 1,
+            "oppId": "zekrom",
+            "dex": 644,
+            "opp": "Zekrom",
+            "types": [
+              "dragon",
+              "electric"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -122
+          },
+          {
+            "shields": 1,
+            "oppId": "metagross_shadow",
+            "dex": 376,
+            "opp": "Metagross (Shadow)",
+            "types": [
+              "steel",
+              "psychic"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -101
+          },
+          {
+            "shields": 1,
+            "oppId": "dragonite_shadow",
+            "dex": 149,
+            "opp": "Dragonite (Shadow)",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -117
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 0,
+            "oppId": "lugia_shadow",
+            "dex": 249,
+            "opp": "Lugia (Shadow)",
+            "types": [
+              "psychic",
+              "flying"
+            ],
+            "delta": -133
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_incarnate_shadow",
+            "dex": 645,
+            "opp": "Landorus (Incarnate) (Shadow)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -102
+          },
+          {
+            "shields": 2,
+            "oppId": "palkia",
+            "dex": 484,
+            "opp": "Palkia",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -56
+          },
+          {
+            "shields": 0,
+            "oppId": "annihilape",
+            "dex": 979,
+            "opp": "Annihilape",
+            "types": [
+              "fighting",
+              "ghost"
+            ],
+            "delta": -35
+          },
+          {
+            "shields": 2,
+            "oppId": "gholdengo",
+            "dex": 1000,
+            "opp": "Gholdengo",
+            "types": [
+              "steel",
+              "ghost"
+            ],
+            "delta": -33
+          },
+          {
+            "shields": 2,
+            "oppId": "garchomp",
+            "dex": 445,
+            "opp": "Garchomp",
+            "types": [
+              "dragon",
+              "ground"
+            ],
+            "delta": -32
+          }
+        ]
+      },
+      {
+        "iv": [
+          15,
+          10,
+          14
+        ],
+        "cp": 4649,
+        "level": 51,
+        "stats": {
+          "atk": 240.9,
+          "def": 201.2,
+          "hp": 185
+        },
+        "effHundo": false,
+        "verdict": "타협",
+        "byShield": [
+          {
+            "shields": 0,
+            "wins": 73,
+            "losses": 27
+          },
+          {
+            "shields": 1,
+            "wins": 60,
+            "losses": 40
+          },
+          {
+            "shields": 2,
+            "wins": 57,
+            "losses": 43
+          }
+        ],
+        "flips": [
+          {
+            "shields": 0,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -207
+          },
+          {
+            "shields": 0,
+            "oppId": "genesect_chill",
+            "dex": 649,
+            "opp": "Genesect (Chill)",
+            "types": [
+              "bug",
+              "steel"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -429
+          },
+          {
+            "shields": 1,
+            "oppId": "lunala",
+            "dex": 792,
+            "opp": "Lunala",
+            "types": [
+              "psychic",
+              "ghost"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -5
+          },
+          {
+            "shields": 1,
+            "oppId": "zekrom",
+            "dex": 644,
+            "opp": "Zekrom",
+            "types": [
+              "dragon",
+              "electric"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -122
+          },
+          {
+            "shields": 1,
+            "oppId": "metagross_shadow",
+            "dex": 376,
+            "opp": "Metagross (Shadow)",
+            "types": [
+              "steel",
+              "psychic"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -101
+          },
+          {
+            "shields": 1,
+            "oppId": "dragonite_shadow",
+            "dex": 149,
+            "opp": "Dragonite (Shadow)",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -117
+          },
+          {
+            "shields": 2,
+            "oppId": "mewtwo",
+            "dex": 150,
+            "opp": "Mewtwo",
+            "types": [
+              "psychic"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -219
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 2,
+            "oppId": "landorus_incarnate_shadow",
+            "dex": 645,
+            "opp": "Landorus (Incarnate) (Shadow)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -254
+          },
+          {
+            "shields": 2,
+            "oppId": "dragonite",
+            "dex": 149,
+            "opp": "Dragonite",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "delta": -157
+          },
+          {
+            "shields": 0,
+            "oppId": "lugia_shadow",
+            "dex": 249,
+            "opp": "Lugia (Shadow)",
+            "types": [
+              "psychic",
+              "flying"
+            ],
+            "delta": -133
+          },
+          {
+            "shields": 2,
+            "oppId": "landorus_therian",
+            "dex": 645,
+            "opp": "Landorus (Therian)",
+            "types": [
+              "ground",
+              "flying"
+            ],
+            "delta": -90
+          },
+          {
+            "shields": 2,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "delta": -60
+          },
+          {
+            "shields": 2,
+            "oppId": "palkia",
+            "dex": 484,
+            "opp": "Palkia",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -56
+          }
+        ]
+      }
+    ]
+  },
+  "cmp": {
+    "mirror": [
+      {
+        "shields": 0,
+        "mine": 494,
+        "opp": 505,
+        "result": "패"
+      },
+      {
+        "shields": 1,
+        "mine": 500,
+        "opp": 500,
+        "result": "무"
+      },
+      {
+        "shields": 2,
+        "mine": 339,
+        "opp": 660,
+        "result": "패"
+      }
+    ],
+    "rival": [
+      {
+        "shields": 0,
+        "mine": 154,
+        "opp": 845,
+        "result": "패"
+      },
+      {
+        "shields": 1,
+        "mine": 233,
+        "opp": 766,
+        "result": "패"
+      },
+      {
+        "shields": 2,
+        "mine": 176,
+        "opp": 823,
+        "result": "패"
+      }
+    ]
+  }
+}
