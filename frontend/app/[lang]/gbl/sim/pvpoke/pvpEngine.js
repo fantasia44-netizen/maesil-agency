@@ -2,7 +2,11 @@
 // @ts-nocheck
 // PvPoke 배틀 엔진(MIT, © 2019 pvpoke) — 헤드리스 구동 래퍼. PVPOKE_LICENSE.txt 참조.
 // GameMaster.js + Pokemon.js + Battle.js를 무수정 포함하고, 브라우저/jQuery 의존만 셔임.
-import GM_DATA from "./gamemaster.json";
+import GM_DATA_DEFAULT from "./gamemaster.json";
+// 시즌 전환용 — 기본은 S27(gamemaster.json). setSeason 시 __setGmData로 S28 데이터로 교체.
+// GM_DATA는 let(라이브 바인딩): ajax 셔임이 flush 시점에 현재값을 읽으므로 교체가 반영됨.
+let GM_DATA = GM_DATA_DEFAULT;
+export function __setGmData(d){ GM_DATA = d || GM_DATA_DEFAULT; }
 
 const host = "http://localhost";   // gmVersion을 "gamemaster"(비-min)로 유지
 const webRoot = "/";
@@ -3591,7 +3595,9 @@ var GameMaster = (function () {
                 instance = createInstance(iface);
             }
             return instance;
-        }
+        },
+        // 시즌 전환용 — 인스턴스 파기. 다음 getInstance()가 현재 GM_DATA로 재빌드(pokemonMap/moveMap 포함).
+        reset: function(){ instance = undefined; }
     };
 })();
 // JavaScript Document

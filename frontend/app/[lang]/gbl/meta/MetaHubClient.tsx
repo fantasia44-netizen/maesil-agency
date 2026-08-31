@@ -10,6 +10,7 @@ import { monSlugId } from "../monSlug";
 import AdSlot from "../AdSlot";
 import CoupangAd from "../CoupangAd";
 import { currentFormats, todayISO, type Format } from "../formats";
+import { SEASONS, SEASON_BY_SLUG, statusOf, seasonShort } from "../seasons";
 import { isLocale, defaultLocale, localizePath, type Locale } from "../../../../lib/i18n";
 import { leagueName, leagueShort } from "../contentI18n";
 import { getMetaHub, type MetaHubDict } from "./dict";
@@ -42,13 +43,21 @@ const monName = (lang: Locale, id: string) => {
   return m.ko;
 };
 
+// 실측 메타는 실제 대전 집계 → 이미 시작된 시즌(현재+과거)만 노출(미래시즌은 데이터 없음). 최신순.
+const STARTED_SEASONS = SEASONS.filter((s) => statusOf(s) === "current" || statusOf(s) === "past").sort((a, b) => b.num - a.num);
 const PERIODS: { key: string; days?: number; start?: string; end?: string }[] = [
   { key: "7", days: 7 },
   { key: "30", days: 30 },
-  { key: "s27", start: "2026-06-02", end: "2026-09-09" },
+  ...STARTED_SEASONS.map((s) => ({ key: s.slug, start: s.start, end: s.end })),
   { key: "all", days: 0 },
 ];
-const periodLabel = (t: MetaHubDict, key: string) => key === "7" ? t.p7 : key === "30" ? t.p30 : key === "s27" ? t.season : t.all;
+const periodLabel = (t: MetaHubDict, key: string, lang: Locale) => {
+  if (key === "7") return t.p7;
+  if (key === "30") return t.p30;
+  if (key === "all") return t.all;
+  const s = SEASON_BY_SLUG[key];
+  return s ? seasonShort(s, lang) : key;
+};
 
 type MetaMon = { speciesId: string; count: number };
 type MetaDeck = { deck: string[]; count: number; wins: number; losses: number };
@@ -212,7 +221,7 @@ export default function MetaHubClient() {
           {formats.map((f) => <button key={f.key} style={pill(league === f.key, f.cup)} title={f.note || ""} onClick={() => setLeague(f.key)}>{f.cup ? f.label : leagueName(lang, f.base)}</button>)}
         </div>
         <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
-          {PERIODS.map((p) => <button key={p.key} style={pill(periodKey === p.key)} onClick={() => setPeriodKey(p.key)}>{periodLabel(t, p.key)}</button>)}
+          {PERIODS.map((p) => <button key={p.key} style={pill(periodKey === p.key)} onClick={() => setPeriodKey(p.key)}>{periodLabel(t, p.key, lang)}</button>)}
         </div>
 
         {loading ? (

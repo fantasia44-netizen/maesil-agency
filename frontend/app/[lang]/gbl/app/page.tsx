@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { apiFetch, logout, getUser, updateNickname, hasToken } from "../../../../lib/api";
 import DATA from "../gbl_data.json";
 import PKN from "../pokedex_names.json";
+import { currentSeason, seasonForDate, SEASONS as REG_SEASONS } from "../seasons";
 import MOVEPOOLS from "../mon_movepools.json";
 import MOVENAMES from "../pvp_move_names.json";
 import { monSlug as _slug } from "../monSlug";
@@ -31,16 +32,21 @@ for (const [id, mv] of Object.entries(MOVES)) {
   if (zh) (mv as Record<string, string>)["zh-TW"] = zh;
 }
 const LEAGUE_KEY = "gbl_league";
-// 현재 시즌(전적 카드/시즌 필터용). 새 시즌 시작 시 갱신.
-const SEASON = { num: 27, start: "2026-06-02", end: "2026-09-09" };
-// 프로필(전체전적) 시즌별 분리용 — S27을 기준으로 역산(시즌 ≈ 99일). 과거 경계는 근사값(필요시 수정).
+// 현재 시즌 — 공용 레지스트리(seasons.ts)에서 파생. 시즌 넘어가면 자동 롤오버(수동 갱신 불필요).
+const SEASON = currentSeason();
+// 프로필(전체전적) 시즌별 분리용 — 레지스트리 시즌은 정확 경계, 그 이전은 ≈99일 근사 역산.
 type Seas = { num: number; start: number; end: number };
 function buildSeasons(count = 16): Seas[] {
-  const out: Seas[] = [];
-  let end = new Date(SEASON.end + "T23:59:59+09:00").getTime();
-  let start = new Date(SEASON.start + "T00:00:00+09:00").getTime();
-  for (let i = 0; i < count; i++) {
-    out.push({ num: SEASON.num - i, start, end });
+  const reg = REG_SEASONS.map((s) => ({
+    num: s.num,
+    start: new Date(s.start + "T05:00:00+09:00").getTime(),
+    end: new Date(s.end + "T05:00:00+09:00").getTime() - 1,
+  })).sort((a, b) => b.num - a.num);
+  const out = [...reg];
+  const oldest = reg[reg.length - 1];
+  let end = oldest.start - 1, start = end - 99 * 86400000;
+  for (let n = oldest.num - 1; n > oldest.num - 1 - count && n > 0; n--) {
+    out.push({ num: n, start, end });
     end = start - 1;
     start = end - 99 * 86400000;
   }
@@ -48,9 +54,11 @@ function buildSeasons(count = 16): Seas[] {
 }
 const SEASONS = buildSeasons();
 function seasonNumOf(playedAtISO: string): number {
-  const t = new Date(playedAtISO).getTime();
+  const reg = seasonForDate(playedAtISO);   // 레지스트리(정확) 우선
+  if (reg) return reg.num;
+  const t = new Date(playedAtISO).getTime(); // 그 이전 시즌은 근사 매칭
   const s = SEASONS.find((x) => t >= x.start && t <= x.end);
-  return s ? s.num : 0; // 0 = 그 이전(범위 밖)
+  return s ? s.num : 0; // 0 = 범위 밖
 }
 // 모든 리그 union → 렌더용 조회맵 (기록은 어느 리그든 speciesId로 조회)
 const MON_BY_ID: Record<string, Mon> = {};

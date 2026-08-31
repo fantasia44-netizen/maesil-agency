@@ -13,13 +13,23 @@ frontend/app/gbl/gbl_detail.json 을 생성한다. 한글명은 기존 gbl_data.
 import json
 import math
 import os
+import sys
 import urllib.request
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GBL = os.path.join(REPO, "frontend", "app", "[lang]", "gbl")
 
-PVPOKE = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/rankings/all/overall"
-GAMEMASTER = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.json"
+# 시즌 인자: 없음=현재 시즌(master), "s28"=다음 시즌(twilight-trails 브랜치, 사전 스테이징).
+#   python scripts/gbl_compile_detail.py         → gbl_detail.json (현재)
+#   python scripts/gbl_compile_detail.py s28      → gbl_detail_s28.json (다음 시즌 미리보기)
+# 새 시즌 발표 시 SEASON_BRANCH에 slug→브랜치 한 줄만 추가.
+SEASON = sys.argv[1] if len(sys.argv) > 1 else ""
+SEASON_BRANCH = {"": "master", "s28": "twilight-trails"}
+BRANCH = SEASON_BRANCH.get(SEASON, "master")
+SUFFIX = f"_{SEASON}" if SEASON else ""
+
+PVPOKE = f"https://raw.githubusercontent.com/pvpoke/pvpoke/{BRANCH}/src/data/rankings/all/overall"
+GAMEMASTER = f"https://raw.githubusercontent.com/pvpoke/pvpoke/{BRANCH}/src/data/gamemaster.json"
 # PokeMiners 다국어 i18n (pokemon_name_XXXX / move_name_XXXX 병렬 키 구조)
 I18N = {
     "ko": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Texts/Latest%20APK/JSON/i18n_korean.json",
@@ -197,9 +207,13 @@ def main() -> None:
     else:
         print("한글명 매핑 100% (누락 0)")
 
-    dest = os.path.join(GBL, "gbl_detail.json")
+    dest = os.path.join(GBL, f"gbl_detail{SUFFIX}.json")
     json.dump(out, open(dest, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
-    print(f"saved {dest} ({os.path.getsize(dest)} bytes)")
+    print(f"saved {dest} ({os.path.getsize(dest)} bytes)  [branch={BRANCH}]")
+
+    # 포켓몬 이름은 시즌 불변 → 시즌 스냅샷(SUFFIX)에서는 pokedex_names.json 재생성 생략.
+    if SUFFIX:
+        return
 
     # 다국어 dex→이름 맵 (신규 파일, pokedex_ko.json은 하위호환 위해 그대로 유지)
     pdnames, miss_en, miss_ja = {}, [], []

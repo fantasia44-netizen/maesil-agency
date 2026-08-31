@@ -9,7 +9,7 @@ import { pokeSprite, formDexById } from "../sprite";
 import { track } from "../../../../lib/track";
 import {
   runBattle, runMulti, runMatrix, pokemonList, recommendedMoveset, moveInfo, metaList, defaultsFor,
-  CP, type League, type Cfg, type PokeInfo,
+  setSeason, CP, type League, type Cfg, type PokeInfo, type SeasonNum,
 } from "./pvpoke";
 import type { SimDict } from "./dict";
 import type { Locale } from "../../../../lib/i18n";
@@ -441,13 +441,40 @@ export default function SimView({ lang, t }: { lang: Locale; t: SimDict }) {
   const [ready, setReady] = useState(false);
   const [league, setLeague] = useState<League>("great");
   const [mode, setMode] = useState<"single" | "multi" | "matrix" | "team">("single");
-  const list = useMemo(() => (ready ? pokemonList() : []), [ready]);
+  const [season, setSeasonNum] = useState<SeasonNum>(27);
+  const list = useMemo(() => (ready ? pokemonList() : []), [ready, season]);
 
   useEffect(() => { setReady(true); }, []);
+
+  // 시즌 전환: 엔진 데이터 스왑을 동기로 먼저 수행한 뒤 상태 갱신(→ list 재계산이 새 데이터로 실행됨).
+  const changeSeason = (s: SeasonNum) => { if (s === season) return; setSeason(s); setSeasonNum(s); };
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
       <style>{`@media(max-width:640px){.sim-slots{grid-template-columns:1fr !important;}}`}</style>
+      {/* 시즌 선택 (27 현재 / 28 미리보기) */}
+      <div style={{ display: "flex", gap: 6, justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
+        {([27, 28] as SeasonNum[]).map((s) => {
+          const on = season === s;
+          const isNew = s === 28;
+          return (
+            <button key={s} onClick={() => changeSeason(s)}
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "0.38rem 0.9rem", borderRadius: 999,
+                border: on ? (isNew ? "1px solid #6d28d9" : "1px solid #0f172a") : "1px solid #e2e8f0",
+                fontSize: "0.8rem", fontWeight: 800, cursor: "pointer",
+                background: on ? (isNew ? "linear-gradient(135deg,#4c1d95,#6d28d9)" : "#0f172a") : "#fff",
+                color: on ? "#fff" : "#64748b" }}>
+              {isNew && "🌙"} {s === 27 ? t.seasonCur : t.seasonNew}
+              {isNew && <span style={{ fontSize: "0.6rem", fontWeight: 900, background: on ? "rgba(255,255,255,.22)" : "#ede9fe", color: on ? "#fff" : "#6d28d9", borderRadius: 999, padding: "1px 6px" }}>{t.seasonNewBadge}</span>}
+            </button>
+          );
+        })}
+      </div>
+      {season === 28 && (
+        <div style={{ fontSize: "0.72rem", color: "#6d28d9", background: "#f5f3ff", border: "1px solid #ddd6fe", borderRadius: 10, padding: "7px 12px", marginBottom: 10, lineHeight: 1.55, textAlign: "center" }}>
+          {t.seasonNote}
+        </div>
+      )}
       {/* 리그 탭 */}
       <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 10 }}>
         {(["great", "ultra", "master"] as League[]).map((lg) => (
@@ -468,10 +495,10 @@ export default function SimView({ lang, t }: { lang: Locale; t: SimDict }) {
       </div>
 
       {!ready ? <div style={{ textAlign: "center", padding: "3rem", color: "#94a3b8", fontSize: "0.9rem" }}>{t.computing}</div>
-        : mode === "single" ? <SingleMode list={list} lang={lang} t={t} league={league} />
-        : mode === "multi" ? <MultiMode list={list} lang={lang} t={t} league={league} />
-        : mode === "matrix" ? <MatrixMode lang={lang} t={t} league={league} />
-        : <TeamMode list={list} lang={lang} t={t} league={league} />}
+        : mode === "single" ? <SingleMode key={season} list={list} lang={lang} t={t} league={league} />
+        : mode === "multi" ? <MultiMode key={season} list={list} lang={lang} t={t} league={league} />
+        : mode === "matrix" ? <MatrixMode key={season} lang={lang} t={t} league={league} />
+        : <TeamMode key={season} list={list} lang={lang} t={t} league={league} />}
 
       <p style={{ marginTop: 26, paddingTop: 14, borderTop: "1px solid #e6ebf5", fontSize: "0.68rem", color: "#94a3b8", lineHeight: 1.6, textAlign: "center" }}>
         ⚙️ {t.engineCredit}

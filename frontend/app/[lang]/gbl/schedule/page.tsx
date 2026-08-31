@@ -8,15 +8,15 @@ import { monSprite } from "../sprite";
 import { GBL_EVENTS } from "./gblEvents";
 import GblEventShareButton from "./GblEventShareButton";
 import { getSchedule, type ScheduleDict } from "./dict";
+import { currentSeason, nextSeason, seasonName } from "../seasons";
 
 export const revalidate = 600;
-
-const SEASON = { num: 27, name: "새로운 발걸음", start: "2026-06-02", end: "2026-09-09" };
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getSchedule(lang);
-  const sub = (s: string) => s.replace(/\{num\}/g, String(SEASON.num)).replace(/\{name\}/g, t.seasonName);
+  const season = currentSeason();
+  const sub = (s: string) => s.replace(/\{num\}/g, String(season.num)).replace(/\{name\}/g, seasonName(season, lang));
   const path = "/gbl/schedule";
   return {
     title: sub(t.metaTitle),
@@ -69,14 +69,21 @@ export default function SchedulePage({ params }: { params: { lang: string } }) {
   const t = getSchedule(lang);
   const L = (p: string) => localizePath(lang, p);
   const noteText = (n?: string) => (n ? t.notes[n] || n : "");
-  const seasonName = t.seasonName;
+  // 시즌은 레지스트리에서 파생 — 시즌이 넘어가면 자동으로 현재/다음이 롤오버.
+  const season = currentSeason();
+  const next = nextSeason();
+  const sName = seasonName(season, lang);
 
   // 시즌·로테이션 날짜는 KST 기준이라 today도 KST(UTC+9)로 계산 — 언어 무관 동일(라벨로 명시).
   const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-  const startT = Date.parse(SEASON.start), endT = Date.parse(SEASON.end), nowT = Date.parse(today);
+  const startT = Date.parse(season.start), endT = Date.parse(season.end), nowT = Date.parse(today);
   const pct = Math.max(3, Math.min(100, Math.round(((nowT - startT) / (endT - startT)) * 100)));
   const daysLeft = Math.max(0, Math.ceil((endT - nowT) / 86400000));
   const ended = nowT >= endT;
+  // 다음 시즌 카운트다운(발표됐고 아직 시작 전일 때만 예고 카드 노출)
+  const nextStartT = next ? Date.parse(next.start) : 0;
+  const startsIn = next ? Math.max(0, Math.ceil((nextStartT - nowT) / 86400000)) : 0;
+  const showNext = !!next && today < next.start;
 
   // GBL 이벤트(월챔 등) — 실제 현재시각으로 진행/예정/종료 판정
   const nowMs = Date.now();
@@ -105,7 +112,7 @@ export default function SchedulePage({ params }: { params: { lang: string } }) {
 
         <h1 style={{ margin: "0.2rem 0", fontSize: "1.55rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3, letterSpacing: "-0.4px" }}>{t.h1}</h1>
         <p style={{ margin: "0.4rem 0 0", fontSize: "0.9rem", color: "#475569", lineHeight: 1.7 }}>
-          <b style={{ color: "#334155" }}>{t.seasonWord}{SEASON.num} · {seasonName}</b>{t.introA}<b style={{ color: "#334155" }}>{t.introB}</b>{t.introC}
+          <b style={{ color: "#334155" }}>{t.seasonWord}{season.num} · {sName}</b>{t.introA}<b style={{ color: "#334155" }}>{t.introB}</b>{t.introC}
         </p>
 
         {/* ── 시즌 히어로 (진행바 + NOW 마커) ── */}
@@ -114,9 +121,9 @@ export default function SchedulePage({ params }: { params: { lang: string } }) {
           <div style={{ position: "absolute", top: -40, right: -20, fontSize: "7rem", opacity: 0.12 }}>🗓️</div>
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, position: "relative" }}>
             <div>
-              <div style={{ fontSize: "0.7rem", fontWeight: 800, letterSpacing: "0.16em", color: "#c4b5fd", textTransform: "uppercase" }}>{t.seasonWord}{SEASON.num}</div>
-              <div style={{ fontSize: "1.5rem", fontWeight: 900, color: "#fff", lineHeight: 1.15, marginTop: 2 }}>{seasonName}</div>
-              <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "#a5b4fc", marginTop: 3 }}>{fmtD(SEASON.start)} – {fmtD(SEASON.end)}</div>
+              <div style={{ fontSize: "0.7rem", fontWeight: 800, letterSpacing: "0.16em", color: "#c4b5fd", textTransform: "uppercase" }}>{t.seasonWord}{season.num}</div>
+              <div style={{ fontSize: "1.5rem", fontWeight: 900, color: "#fff", lineHeight: 1.15, marginTop: 2 }}>{sName}</div>
+              <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "#a5b4fc", marginTop: 3 }}>{fmtD(season.start)} – {fmtD(season.end)}</div>
               <div style={{ display: "inline-block", marginTop: 8, fontSize: "0.66rem", fontWeight: 700, color: "#c4b5fd", background: "rgba(255,255,255,.1)", borderRadius: 999, padding: "3px 10px" }}>{t.tzNote}</div>
             </div>
             <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -142,6 +149,25 @@ export default function SchedulePage({ params }: { params: { lang: string } }) {
             </div>
           </div>
         </div>
+
+        {/* ── 다음 시즌 예고 (시작 전에만) ── */}
+        {showNext && (
+          <div style={{ position: "relative", overflow: "hidden", marginTop: 14, borderRadius: 16, padding: "0.95rem 1.1rem",
+            background: "linear-gradient(135deg,#1e1b4b 0%,#3730a3 58%,#6d28d9 100%)", boxShadow: "0 10px 26px -14px rgba(55,48,163,.55)" }}>
+            <div style={{ position: "absolute", top: -26, right: -8, fontSize: "5rem", opacity: 0.13 }}>🌙</div>
+            <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <span style={{ fontSize: "0.62rem", fontWeight: 800, letterSpacing: "0.14em", color: "#c7d2fe", textTransform: "uppercase", background: "rgba(255,255,255,.13)", borderRadius: 999, padding: "3px 10px" }}>{t.nextSeasonBadge}</span>
+              <span style={{ fontSize: "0.72rem", fontWeight: 800, color: "#a5b4fc" }}>{t.seasonWord}{next!.num}</span>
+              <span style={{ marginLeft: "auto", fontSize: "0.82rem", fontWeight: 900, color: "#fff", background: "rgba(255,255,255,.14)", borderRadius: 999, padding: "3px 11px" }}>D-{startsIn}</span>
+            </div>
+            <div style={{ position: "relative", marginTop: 7, fontSize: "1.28rem", fontWeight: 900, color: "#fff", lineHeight: 1.2 }}>{seasonName(next!, lang)}</div>
+            <div style={{ position: "relative", fontSize: "0.8rem", fontWeight: 700, color: "#c7d2fe", marginTop: 3 }}>{fmtD(next!.start)} – {fmtD(next!.end)} · {t.startsInPre}{startsIn}{t.daysUnit}</div>
+            <div style={{ position: "relative", marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,.15)" }}>
+              <div style={{ fontSize: "0.64rem", fontWeight: 800, color: "#a5b4fc", textTransform: "uppercase", letterSpacing: "0.08em" }}>{t.nextSeasonChangesLabel}</div>
+              <div style={{ fontSize: "0.86rem", fontWeight: 700, color: "#eef2ff", lineHeight: 1.6, marginTop: 3 }}>⚔️ {t.nextSeasonChanges}</div>
+            </div>
+          </div>
+        )}
 
         {/* ── GBL 이벤트 · 보너스 ── */}
         {events.length > 0 && (

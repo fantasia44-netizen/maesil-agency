@@ -1,10 +1,15 @@
 // @ts-nocheck
 // PvPoke 엔진 헤드리스 래퍼 — 깔끔한 API. 엔진은 pvpEngine.js(MIT, © 2019 pvpoke).
 // 검증: pvpoke.com과 수치 완전일치(레이팅·타임라인·지속시간). 상세 memory: gbl-pvpoke-engine-integration.
-import { Pokemon, Battle, GameMaster, __flushGm } from "./pvpEngine.js";
+import { Pokemon, Battle, GameMaster, __flushGm, __setGmData } from "./pvpEngine.js";
 import META_GREAT from "./meta_great.json";
 import META_ULTRA from "./meta_ultra.json";
 import META_MASTER from "./meta_master.json";
+// 시즌28(황혼의 여정) 미리보기 데이터 — PvPoke twilight-trails 브랜치 추출(build_season28.mjs).
+import META_GREAT_S28 from "./meta_great_s28.json";
+import META_ULTRA_S28 from "./meta_ultra_s28.json";
+import META_MASTER_S28 from "./meta_master_s28.json";
+import GM_S28 from "./gamemaster_s28.json";
 
 let _gm: any = null;
 export function gm() {
@@ -12,9 +17,27 @@ export function gm() {
   return _gm;
 }
 
+// ── 시즌 전환(27 현재 / 28 미리보기) ──────────────────────────────
+// 유사백은 메타 무관 고정이지만, 타협 판정·메타 풀은 시즌(리밸런스)에 따라 달라짐.
+let _season: 27 | 28 = 27;
+export type SeasonNum = 27 | 28;
+export function currentSeason(): SeasonNum { return _season; }
+export function setSeason(n: SeasonNum): void {
+  const t: SeasonNum = n === 28 ? 28 : 27;
+  if (t === _season) return;
+  _season = t;
+  __setGmData(t === 28 ? (GM_S28 as any) : null);  // null → 기본 S27 gamemaster
+  GameMaster.reset();          // 인스턴스 파기 → pokemonMap/moveMap 재빌드 유도
+  _gm = null; _list = null;    // index 캐시 초기화
+  gm();                        // 새 시즌 데이터로 즉시 재로딩
+}
+
 export type League = "great" | "ultra" | "master";
 export const CP: Record<League, number> = { great: 1500, ultra: 2500, master: 10000 };
-const METAS: Record<League, MetaEntry[]> = { great: META_GREAT as any, ultra: META_ULTRA as any, master: META_MASTER as any };
+const METAS_S27: Record<League, MetaEntry[]> = { great: META_GREAT as any, ultra: META_ULTRA as any, master: META_MASTER as any };
+const METAS_S28: Record<League, MetaEntry[]> = { great: META_GREAT_S28 as any, ultra: META_ULTRA_S28 as any, master: META_MASTER_S28 as any };
+// 현재 시즌 메타 맵 — 시즌 전환에 따라 S27/S28 자동 선택
+const METAS = (): Record<League, MetaEntry[]> => (_season === 28 ? METAS_S28 : METAS_S27);
 
 export type IVs = [number, number, number]; // atk, def, hp
 export type MetaEntry = { s: string; m: string[]; sc: number };
@@ -67,7 +90,7 @@ export function moveInfo(moveId: string): MoveInfo | null {
 }
 
 // 리그별 메타(상위 100). moveset 포함.
-export function metaList(league: League): MetaEntry[] { return METAS[league] || []; }
+export function metaList(league: League): MetaEntry[] { return METAS()[league] || []; }
 
 // 종+리그의 기본 IV/레벨(커스텀 IV 패널 시드용) — 마스터=15/15/15, 그外=defaultIVs(랭크1)
 export function defaultsFor(speciesId: string, league: League): { ivs: IVs; level: number } {
@@ -81,7 +104,7 @@ export function defaultsFor(speciesId: string, league: League): { ivs: IVs; leve
 
 // 종의 추천 무브셋(메타에 있으면 그걸, 없으면 pokedex 첫 무브들)
 export function recommendedMoveset(speciesId: string, league: League): { fast: string; charged: string[] } {
-  const meta = METAS[league].find((e) => e.s === speciesId || e.s === speciesId.replace("_shadow", ""));
+  const meta = METAS()[league].find((e) => e.s === speciesId || e.s === speciesId.replace("_shadow", ""));
   if (meta && meta.m && meta.m.length) {
     return { fast: meta.m[0], charged: meta.m.slice(1) };
   }
@@ -222,7 +245,7 @@ export function runBattle(a: Cfg, b: Cfg, league: League) {
 export function runMulti(a: Cfg, league: League, shields = 1, limit = 100) {
   gm();
   const cap = CP[league];
-  const meta = METAS[league].slice(0, limit);
+  const meta = METAS()[league].slice(0, limit);
   const results = meta.map((opp) => {
     try {
       const battle: any = new Battle();
@@ -246,7 +269,7 @@ export function runMulti(a: Cfg, league: League, shields = 1, limit = 100) {
 export function runMatrix(league: League, speciesIds?: string[], shields = 1, limit = 20) {
   gm();
   const cap = CP[league];
-  const meta = METAS[league];
+  const meta = METAS()[league];
   const ids = speciesIds && speciesIds.length ? speciesIds : meta.slice(0, limit).map((m) => m.s);
   const cfgs: Cfg[] = ids.map((id) => {
     const m = meta.find((e) => e.s === id);

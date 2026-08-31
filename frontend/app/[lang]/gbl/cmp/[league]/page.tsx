@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import DATA from "../../gbl_data.json";
 import DETAIL from "../../gbl_detail.json";
+import DETAIL_S28 from "../../gbl_detail_s28.json";
 import PKNAMES from "../../pokedex_names.json";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
@@ -16,8 +17,23 @@ import { typeLabel } from "../../typeLabels";
 import { getDict } from "../../dictionaries";
 import { getCmp } from "./dict";
 import { cmpAnalysis } from "../../leagueAnalysis";
+import { currentSeason, seasonBySlug, selectableSeasons, seasonShort, statusOf } from "../../seasons";
 
 export const revalidate = 600;
+
+// 시즌별 상세 스냅샷(티어 페이지와 공유하는 gbl_detail 시리즈).
+const DETAIL_BY_SLUG: Record<string, unknown> = { s27: DETAIL, s28: DETAIL_S28 };
+const CMP_SEASON_SLUGS = Object.keys(DETAIL_BY_SLUG);
+function resolveSeason(s?: string) {
+  const sel = seasonBySlug(s);
+  if (sel && CMP_SEASON_SLUGS.includes(sel.slug)) return sel;
+  const cur = currentSeason();
+  return CMP_SEASON_SLUGS.includes(cur.slug) ? cur : (seasonBySlug(CMP_SEASON_SLUGS[0]) ?? cur);
+}
+const SEASON_NOTE: Record<string, Record<string, string>> = {
+  preview: { ko: "미리보기", en: "Preview", ja: "プレビュー", "zh-TW": "預覽" },
+  archive: { ko: "이전 시즌", en: "Past season", ja: "過去シーズン", "zh-TW": "過去賽季" },
+};
 
 const LEAGUES: Record<string, { ko: string; short: string }> = {
   master: { ko: "마스터리그", short: "마스터" },
@@ -44,8 +60,6 @@ const dispNameOf = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?
 };
 
 type Detail = { id: string; tier: string; stats: Record<string, number>; ko?: string; dex?: number; types?: string[] };
-const DET = DETAIL as unknown as Record<string, Detail[]>;
-
 const TYPE_COLOR: Record<string, string> = {
   normal: "#9fa19f", fire: "#e62829", water: "#2980ef", electric: "#d9a900", grass: "#3fa129",
   ice: "#37b6c9", fighting: "#ff8000", poison: "#9141cb", ground: "#915121", flying: "#6c93e0",
@@ -57,15 +71,19 @@ export function generateStaticParams() {
   return LEAGUE_KEYS.map((league) => ({ league }));
 }
 
-export function generateMetadata({ params }: { params: { lang: string; league: string } }): Metadata {
+export function generateMetadata({ params, searchParams }: { params: { lang: string; league: string }; searchParams?: { s?: string } }): Metadata {
   if (!LEAGUES[params.league]) return { title: "GBL Note" };
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const lgName = leagueName(lang, params.league);
   const t = getCmp(lang);
+  const season = resolveSeason(searchParams?.s);
+  const isCurrent = season.slug === currentSeason().slug;
+  const seasonTag = isCurrent ? "" : ` (${seasonShort(season, lang)})`;
   return {
-    title: `${lgName} ${t.metaTitle}`,
+    title: `${lgName} ${t.metaTitle}${seasonTag}`,
     description: `${lgName} ${t.metaDesc}`,
     alternates: { canonical: localizePath(lang, `/gbl/cmp/${params.league}`), languages: hreflangLanguages(`/gbl/cmp/${params.league}`) },
+    ...(isCurrent ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
       title: `${lgName} ${t.ogTitle}`,
       description: `${lgName} ${t.ogDesc}`,
@@ -86,14 +104,17 @@ function Sprite({ id, size = 32 }: { id: string; size?: number }) {
   return <img src={spriteUrl(m)} alt={m?.ko || id} width={size} height={size} style={{ imageRendering: "pixelated" }} />;
 }
 
-export default function CmpPage({ params }: { params: { lang: string; league: string } }) {
+export default function CmpPage({ params, searchParams }: { params: { lang: string; league: string }; searchParams?: { s?: string } }) {
   if (!LEAGUES[params.league]) notFound();
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getCmp(lang);
   const lgName = leagueName(lang, params.league);
   const L = (p: string) => localizePath(lang, p);
 
-  const list = (DET[params.league] || []).filter((d) => d.stats && d.stats.atk)
+  const season = resolveSeason(searchParams?.s);
+  const seasonDet = (DETAIL_BY_SLUG[season.slug] || DETAIL) as Record<string, Detail[]>;
+  const seasons = selectableSeasons(CMP_SEASON_SLUGS);
+  const list = (seasonDet[params.league] || []).filter((d) => d.stats && d.stats.atk)
     .sort((a, b) => (b.stats.atk || 0) - (a.stats.atk || 0));
   const maxAtk = list[0]?.stats.atk || 1;
   const minAtk = list[list.length - 1]?.stats.atk || 0;
@@ -132,6 +153,29 @@ export default function CmpPage({ params }: { params: { lang: string; league: st
             );
           })}
         </div>
+
+        {/* 시즌 선택 (현재/다음/이전) — 서버렌더 링크 */}
+        {seasons.length > 1 && (
+          <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+            {seasons.map((s) => {
+              const on = s.slug === season.slug;
+              const isNext = statusOf(s) === "next";
+              const href = s.slug === currentSeason().slug ? L(`/gbl/cmp/${params.league}`) : `${L(`/gbl/cmp/${params.league}`)}?s=${s.slug}`;
+              return (
+                <Link key={s.slug} href={href}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 16, fontSize: "0.78rem", fontWeight: 800, textDecoration: "none",
+                    border: on ? (isNext ? "1px solid #6d28d9" : "1px solid #0f172a") : `1px solid ${BORDER}`,
+                    background: on ? (isNext ? "linear-gradient(135deg,#4c1d95,#6d28d9)" : "#0f172a") : CARD,
+                    color: on ? "#fff" : "#64748b" }}>
+                  {isNext && "🌙"} {seasonShort(s, lang)}
+                </Link>
+              );
+            })}
+            {season.slug !== currentSeason().slug && (
+              <span style={{ fontSize: "0.7rem", color: "#6d28d9", fontWeight: 700 }}>· {SEASON_NOTE[statusOf(season) === "next" ? "preview" : "archive"][lang] || SEASON_NOTE.preview.ko}</span>
+            )}
+          </div>
+        )}
 
         <h1 style={{ margin: "0.2rem 0", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>
           {lgName} {t.h1Suffix}

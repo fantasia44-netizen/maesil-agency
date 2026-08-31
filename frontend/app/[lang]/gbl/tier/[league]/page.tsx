@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import DATA from "../../gbl_data.json";
 import DETAIL from "../../gbl_detail.json";
+import DETAIL_S28 from "../../gbl_detail_s28.json";
 import PKNAMES from "../../pokedex_names.json";
 import MOVENAMES from "../../pvp_move_names.json";
 import AdSlot from "../../AdSlot";
@@ -16,8 +17,20 @@ import { typeLabel } from "../../typeLabels";
 import { getDict } from "../../dictionaries";
 import { getTier } from "./dict";
 import { tierAnalysis } from "../../leagueAnalysis";
+import { currentSeason, seasonBySlug, selectableSeasons, seasonShort, statusOf } from "../../seasons";
 
 export const revalidate = 600;
+
+// 시즌별 티어 상세(스냅샷). 새 시즌 스냅샷은 gbl_compile_detail.py로 생성 후 여기에 등록.
+const DETAIL_BY_SLUG: Record<string, unknown> = { s27: DETAIL, s28: DETAIL_S28 };
+const TIER_SEASON_SLUGS = Object.keys(DETAIL_BY_SLUG);
+// 요청 시즌 해석 — searchParams.s(유효한 티어 시즌만), 기본=현재 시즌.
+function resolveSeason(s?: string) {
+  const sel = seasonBySlug(s);
+  if (sel && TIER_SEASON_SLUGS.includes(sel.slug)) return sel;
+  const cur = currentSeason();
+  return TIER_SEASON_SLUGS.includes(cur.slug) ? cur : (seasonBySlug(TIER_SEASON_SLUGS[0]) ?? cur);
+}
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
@@ -53,7 +66,6 @@ const moveLabel = (lang: Locale, id: string) => {
 };
 
 type Detail = { id: string; score: number; tier: string; moveset: string[]; counters: string[]; wins: string[]; stats: Record<string, number>; ko?: string; dex?: number; types?: string[] };
-const DET = DETAIL as unknown as Record<string, Detail[]>;
 
 const TYPE_COLOR: Record<string, string> = {
   normal: "#9fa19f", fire: "#e62829", water: "#2980ef", electric: "#d9a900", grass: "#3fa129",
@@ -62,6 +74,11 @@ const TYPE_COLOR: Record<string, string> = {
   dark: "#4b4243", steel: "#5a8a9c", fairy: "#d76ad7",
 };
 const TIER_COLOR: Record<string, string> = { S: "#dc2626", A: "#ea580c", B: "#ca8a04", C: "#16a34a", D: "#64748b" };
+// 비현재 시즌 안내(미리보기/이전) — 4개국어
+const SEASON_NOTE: Record<string, Record<string, string>> = {
+  preview: { ko: "미리보기", en: "Preview", ja: "プレビュー", "zh-TW": "預覽" },
+  archive: { ko: "이전 시즌", en: "Past season", ja: "過去シーズン", "zh-TW": "過去賽季" },
+};
 
 type Meta = { total: number; top_mons: { speciesId: string; count: number }[] };
 async function getPickRates(league: string): Promise<Record<string, number>> {
@@ -81,15 +98,20 @@ export function generateStaticParams() {
   return LEAGUE_KEYS.map((league) => ({ league }));
 }
 
-export function generateMetadata({ params }: { params: { lang: string; league: string } }): Metadata {
+export function generateMetadata({ params, searchParams }: { params: { lang: string; league: string }; searchParams?: { s?: string } }): Metadata {
   if (!LEAGUES[params.league]) return { title: "GBL Note" };
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const lgName = leagueName(lang, params.league);
   const t = getTier(lang);
+  const season = resolveSeason(searchParams?.s);
+  const isCurrent = season.slug === currentSeason().slug;
+  const seasonTag = isCurrent ? "" : ` (${seasonShort(season, lang)})`;
+  // 캐노니컬은 항상 현재 시즌(파라미터 없는 URL). 비현재(미리보기/아카이브)는 색인 제외로 중복 방지.
   return {
-    title: `${lgName} ${t.metaTitle}`,
+    title: `${lgName} ${t.metaTitle}${seasonTag}`,
     description: `${lgName} ${t.metaDesc}`,
     alternates: { canonical: localizePath(lang, `/gbl/tier/${params.league}`), languages: hreflangLanguages(`/gbl/tier/${params.league}`) },
+    ...(isCurrent ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
       title: `${lgName} ${t.ogTitle}`,
       description: `${lgName} ${t.ogDesc}`,
@@ -119,14 +141,18 @@ function MoveChip({ id, lang }: { id: string; lang: Locale }) {
   );
 }
 
-export default async function TierPage({ params }: { params: { lang: string; league: string } }) {
+export default async function TierPage({ params, searchParams }: { params: { lang: string; league: string }; searchParams?: { s?: string } }) {
   if (!LEAGUES[params.league]) notFound();
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getTier(lang);
   const lgName = leagueName(lang, params.league);
   const L = (p: string) => localizePath(lang, p);
 
-  const list = (DET[params.league] || []).slice(0, 100);  // 티어표는 상위 100종(CMP·조회는 200종까지)
+  // 시즌 해석 + 해당 시즌 티어 상세 선택
+  const season = resolveSeason(searchParams?.s);
+  const seasonDet = (DETAIL_BY_SLUG[season.slug] || DETAIL) as Record<string, Detail[]>;
+  const seasons = selectableSeasons(TIER_SEASON_SLUGS);
+  const list = (seasonDet[params.league] || []).slice(0, 100);  // 티어표는 상위 100종(CMP·조회는 200종까지)
   const pick = await getPickRates(params.league);
   const TIERS = ["S", "A", "B", "C", "D"];
   const byTier: Record<string, Detail[]> = {};
@@ -168,6 +194,29 @@ export default async function TierPage({ params }: { params: { lang: string; lea
             );
           })}
         </div>
+
+        {/* 시즌 선택 (현재/다음/이전) — 서버렌더 링크, force-dynamic이라 SEO 안전 */}
+        {seasons.length > 1 && (
+          <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+            {seasons.map((s) => {
+              const on = s.slug === season.slug;
+              const isNext = statusOf(s) === "next";
+              const href = s.slug === currentSeason().slug ? L(`/gbl/tier/${params.league}`) : `${L(`/gbl/tier/${params.league}`)}?s=${s.slug}`;
+              return (
+                <Link key={s.slug} href={href}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 16, fontSize: "0.78rem", fontWeight: 800, textDecoration: "none",
+                    border: on ? (isNext ? "1px solid #6d28d9" : "1px solid #0f172a") : `1px solid ${BORDER}`,
+                    background: on ? (isNext ? "linear-gradient(135deg,#4c1d95,#6d28d9)" : "#0f172a") : CARD,
+                    color: on ? "#fff" : "#64748b" }}>
+                  {isNext && "🌙"} {seasonShort(s, lang)}
+                </Link>
+              );
+            })}
+            {season.slug !== currentSeason().slug && (
+              <span style={{ fontSize: "0.7rem", color: "#6d28d9", fontWeight: 700 }}>· {SEASON_NOTE[statusOf(season) === "next" ? "preview" : "archive"][lang] || SEASON_NOTE.preview.ko}</span>
+            )}
+          </div>
+        )}
 
         <h1 style={{ margin: "0.2rem 0", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>
           {lgName} {t.h1Suffix}

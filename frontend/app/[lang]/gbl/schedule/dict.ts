@@ -12,6 +12,7 @@ export type ScheduleDict = {
   megaSuffix: string;
   eventsH2: string; evLive: string; evSoon: string; evEnded: string; evSource: string; evShare: string;
   endsInPre: string; daysUnit: string; endedWord: string; seasonProgressLabel: string; capWord: string; tzNote: string;
+  nextSeasonBadge: string; nextSeasonName: string; startsInPre: string; nextSeasonChangesLabel: string; nextSeasonChanges: string;
   cupLabels: Record<string, string>;
   notes: Record<string, string>;
   metaTitle: string; metaDesc: string; metaKeywords: string[]; ogTitle: string; ogDesc: string;
@@ -36,6 +37,8 @@ const ko: ScheduleDict = {
   megaSuffix: ": 메가",
   eventsH2: "GBL 이벤트 · 보너스", evLive: "진행 중", evSoon: "예정", evEnded: "종료", evSource: "공식 출처", evShare: "공유/다운로드",
   endsInPre: "종료까지 ", daysUnit: "일", endedWord: "종료됨", seasonProgressLabel: "시즌 진행", capWord: "CP", tzNote: "🕐 KST · UTC+9 기준",
+  nextSeasonBadge: "다음 시즌", nextSeasonName: "황혼의 여정", startsInPre: "시작까지 ",
+  nextSeasonChangesLabel: "다음 시즌 예고", nextSeasonChanges: "기술 리밸런스 · 신규 기술 다수 (라이츄 볼트태클 등)",
   cupLabels: {
     "스크롤컵 (슈퍼리그)": "스크롤컵 (슈퍼리그)",
   },
@@ -69,6 +72,8 @@ const en: ScheduleDict = {
   megaSuffix: ": Mega",
   eventsH2: "GBL events & bonuses", evLive: "Live now", evSoon: "Upcoming", evEnded: "Ended", evSource: "Official source", evShare: "Share/Save",
   endsInPre: "Ends in ", daysUnit: " days", endedWord: "Ended", seasonProgressLabel: "Season progress", capWord: "CP", tzNote: "🕐 Times shown in KST (UTC+9)",
+  nextSeasonBadge: "Next season", nextSeasonName: "Twilight Trails", startsInPre: "Starts in ",
+  nextSeasonChangesLabel: "What's coming", nextSeasonChanges: "Move rebalance · several new moves (Raichu Volt Tackle, etc.)",
   cupLabels: {
     "스크롤컵 (슈퍼리그)": "Scroll Cup (Great League)",
   },
@@ -102,6 +107,8 @@ const ja: ScheduleDict = {
   megaSuffix: ": メガ",
   eventsH2: "GBLイベント・ボーナス", evLive: "開催中", evSoon: "予定", evEnded: "終了", evSource: "公式ソース", evShare: "共有/保存",
   endsInPre: "終了まで", daysUnit: "日", endedWord: "終了", seasonProgressLabel: "シーズン進行", capWord: "CP", tzNote: "🕐 KST · UTC+9 基準",
+  nextSeasonBadge: "次シーズン", nextSeasonName: "黄昏の旅路", startsInPre: "開始まで",
+  nextSeasonChangesLabel: "次シーズン予告", nextSeasonChanges: "技のリバランス · 新規技追加 (ライチュウ ボルテッカー等)",
   cupLabels: {
     "스크롤컵 (슈퍼리그)": "スクロールカップ（スーパーリーグ）",
   },
@@ -135,6 +142,8 @@ const zhTW: ScheduleDict = {
   megaSuffix: "：超級",
   eventsH2: "GBL 活動 · 獎勵", evLive: "進行中", evSoon: "預定", evEnded: "結束", evSource: "官方來源", evShare: "分享/下載",
   endsInPre: "距結束 ", daysUnit: "天", endedWord: "已結束", seasonProgressLabel: "賽季進度", capWord: "CP", tzNote: "🕐 KST · UTC+9 為準",
+  nextSeasonBadge: "下個賽季", nextSeasonName: "黃昏旅途", startsInPre: "距開始 ",
+  nextSeasonChangesLabel: "下賽季預告", nextSeasonChanges: "招式重新平衡 · 新增多個招式（雷丘 伏特攻擊等）",
   cupLabels: {
     "스크롤컵 (슈퍼리그)": "捲軸盃（超級聯盟）",
   },
