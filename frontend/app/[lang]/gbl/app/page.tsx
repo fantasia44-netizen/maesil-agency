@@ -453,13 +453,15 @@ export default function GblPage() {
     }
   };
 
-  // 로그/통계/달력용 로드 — 본인 기록 전부(.eq user_id 단일 유저 쿼리라 부담 없음, 백엔드 limit 5000).
-  // 시즌 스코프를 걸면 played_at이 시즌창 밖이거나 비어있는 옛 기록이 통째로 사라지는 문제가 있어 제거.
-  // 시즌/기간별 보기는 아래 statsPeriod(오늘·7·30·시즌·전체) 필터로 처리.
+  // 로그/통계/달력용 로드 — 조회/기록/전적은 **현재 시즌만**(전 시즌 전체는 프로필 탭에서 온디맨드).
+  // 경계는 KST(+09:00) 명시 — TZ 누락 시 시즌 경계가 하루 어긋나 기록이 누락되던 버그 방지.
+  // (이전엔 스코프를 통째로 제거했었으나, 그러면 전 시즌이 섞여 의도와 어긋남 → KST 경계로 재도입.)
   const load = async () => {
     setLoading(true);
     try {
-      const data = await apiFetch<Match[]>(`/api/gbl/matches`, {}, 20000);
+      const since = encodeURIComponent(`${SEASON.start}T00:00:00+09:00`);
+      const until = encodeURIComponent(`${SEASON.end}T23:59:59+09:00`);
+      const data = await apiFetch<Match[]>(`/api/gbl/matches?since=${since}&until=${until}`, {}, 20000);
       setMatches(Array.isArray(data) ? data : []);
     } catch (e) {
       flash(e instanceof Error ? e.message : t.loadFail);
@@ -515,14 +517,16 @@ export default function GblPage() {
   useEffect(() => { if (hasToken()) loadRatings(); }, [league]);   // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (tab === "lookup") searchRef.current?.focus(); }, [tab]);
   useEffect(() => { if (tab === "profile" && profileMatches === null && hasToken()) loadProfile(); }, [tab]);  // eslint-disable-line react-hooks/exhaustive-deps
-  // 조회탭 상대검색 — 서버 ILIKE(전 시즌). 디바운스 300ms. scope=all(admin)은 기존 클라필터 유지.
+  // 조회탭 상대검색 — 서버 ILIKE, **현재 시즌만**(전 시즌 상대 이력은 프로필에서). 디바운스 300ms. scope=all(admin)은 기존 클라필터 유지.
   useEffect(() => {
     if (tab !== "lookup" || scope === "all") { setSearchResults([]); return; }
     const qq = query.trim();
     if (!qq) { setSearchResults([]); return; }
     const h = setTimeout(async () => {
       try {
-        const data = await apiFetch<Match[]>(`/api/gbl/matches?opponent=${encodeURIComponent(qq)}`, {}, 15000);
+        const since = encodeURIComponent(`${SEASON.start}T00:00:00+09:00`);
+        const until = encodeURIComponent(`${SEASON.end}T23:59:59+09:00`);
+        const data = await apiFetch<Match[]>(`/api/gbl/matches?opponent=${encodeURIComponent(qq)}&since=${since}&until=${until}`, {}, 15000);
         setSearchResults(Array.isArray(data) ? data : []);
       } catch { setSearchResults([]); }
     }, 300);
@@ -1086,7 +1090,8 @@ export default function GblPage() {
         <div>
           {/* 기간 필터 */}
           <div style={{ display: "flex", gap: 5, marginBottom: 12 }}>
-            {([["today", t.periodToday], ["7", t.period7], ["30", t.period30], ["season", t.periodSeason], ["all", t.periodAll]] as const).map(([k, label]) => {
+            {/* 메인이 현재 시즌으로 스코프되므로 "전체"=이번 시즌 전체. "시즌" 버튼은 중복이라 제거(전 시즌은 프로필 탭). */}
+            {([["today", t.periodToday], ["7", t.period7], ["30", t.period30], ["all", t.periodAll]] as const).map(([k, label]) => {
               const on = statsPeriod === k;
               return (
                 <button key={k} onClick={() => setStatsPeriod(k)}
