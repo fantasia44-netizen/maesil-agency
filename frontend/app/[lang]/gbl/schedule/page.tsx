@@ -249,7 +249,7 @@ export default function SchedulePage({ params, searchParams }: { params: { lang:
               const isNext = next && s.slug === next.slug;
               const href = s.slug === season.slug ? L("/gbl/schedule") : `${L("/gbl/schedule")}?s=${s.slug}`;
               return (
-                <Link key={s.slug} href={href}
+                <Link key={s.slug} href={href} scroll={false}
                   style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 13px", borderRadius: 16, fontSize: "0.8rem", fontWeight: 800, textDecoration: "none",
                     border: on ? (isNext ? "1px solid #6d28d9" : "1px solid #0f172a") : `1px solid ${BORDER}`,
                     background: on ? (isNext ? "linear-gradient(135deg,#4c1d95,#6d28d9)" : "#0f172a") : CARD,
