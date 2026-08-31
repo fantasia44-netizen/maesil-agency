@@ -1,14 +1,14 @@
 // GBL 시즌 스케줄표 — 서버렌더 SEO. 공식 리그 로테이션 일정(formats.ts, 시즌마다 갱신).
 import Link from "next/link";
 import type { Metadata } from "next";
-import { LEAGUE_SCHEDULE, type SchedulePeriod } from "../formats";
+import { LEAGUE_SCHEDULE_BY_SEASON, type SchedulePeriod } from "../formats";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
 import { leagueName } from "../contentI18n";
 import { monSprite } from "../sprite";
 import { GBL_EVENTS } from "./gblEvents";
 import GblEventShareButton from "./GblEventShareButton";
 import { getSchedule, type ScheduleDict } from "./dict";
-import { currentSeason, nextSeason, seasonName } from "../seasons";
+import { currentSeason, nextSeason, seasonName, seasonBySlug, selectableSeasons, seasonShort } from "../seasons";
 
 export const revalidate = 600;
 
@@ -64,7 +64,7 @@ function LeagueBadge({ it, lang, t }: { it: { label: string; base: string }; lan
   );
 }
 
-export default function SchedulePage({ params }: { params: { lang: string } }) {
+export default function SchedulePage({ params, searchParams }: { params: { lang: string }; searchParams?: { s?: string } }) {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getSchedule(lang);
   const L = (p: string) => localizePath(lang, p);
@@ -73,6 +73,13 @@ export default function SchedulePage({ params }: { params: { lang: string } }) {
   const season = currentSeason();
   const next = nextSeason();
   const sName = seasonName(season, lang);
+
+  // 로테이션 뷰 시즌 — searchParams.s(로테이션 데이터 있는 시즌만), 기본=현재.
+  const ROTATION_SLUGS = Object.keys(LEAGUE_SCHEDULE_BY_SEASON);
+  const selSeason = seasonBySlug(searchParams?.s);
+  const viewed = selSeason && ROTATION_SLUGS.includes(selSeason.slug) ? selSeason : season;
+  const rotation = LEAGUE_SCHEDULE_BY_SEASON[viewed.slug] || LEAGUE_SCHEDULE_BY_SEASON.s27;
+  const rotationSeasons = selectableSeasons(ROTATION_SLUGS);
 
   // 시즌·로테이션 날짜는 KST 기준이라 today도 KST(UTC+9)로 계산 — 언어 무관 동일(라벨로 명시).
   const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
@@ -233,11 +240,30 @@ export default function SchedulePage({ params }: { params: { lang: string } }) {
         )}
 
         {/* ── 리그 로테이션 타임라인 ── */}
-        <h2 style={{ fontSize: "1.1rem", fontWeight: 900, color: "#0f172a", margin: "1.7rem 0 12px", letterSpacing: "-0.3px" }}>{t.rotationH2}</h2>
+        <h2 style={{ fontSize: "1.1rem", fontWeight: 900, color: "#0f172a", margin: "1.7rem 0 10px", letterSpacing: "-0.3px" }}>{t.rotationH2}</h2>
+        {/* 시즌 선택 — 클릭 시 해당 시즌 로테이션 표시 */}
+        {rotationSeasons.length > 1 && (
+          <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap", alignItems: "center" }}>
+            {rotationSeasons.map((s) => {
+              const on = s.slug === viewed.slug;
+              const isNext = next && s.slug === next.slug;
+              const href = s.slug === season.slug ? L("/gbl/schedule") : `${L("/gbl/schedule")}?s=${s.slug}`;
+              return (
+                <Link key={s.slug} href={href}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 13px", borderRadius: 16, fontSize: "0.8rem", fontWeight: 800, textDecoration: "none",
+                    border: on ? (isNext ? "1px solid #6d28d9" : "1px solid #0f172a") : `1px solid ${BORDER}`,
+                    background: on ? (isNext ? "linear-gradient(135deg,#4c1d95,#6d28d9)" : "#0f172a") : CARD,
+                    color: on ? "#fff" : "#64748b" }}>
+                  {isNext && "🌙"} {seasonShort(s, lang)}{s.slug === season.slug ? ` · ${t.statusLive}` : ""}
+                </Link>
+              );
+            })}
+          </div>
+        )}
         <div style={{ position: "relative", paddingLeft: 30 }}>
           {/* 세로 라인 */}
           <div style={{ position: "absolute", left: 9, top: 12, bottom: 12, width: 3, borderRadius: 3, background: "linear-gradient(180deg,#c7d2fe,#e9d5ff,#eef2fb)" }} />
-          {LEAGUE_SCHEDULE.map((p) => {
+          {rotation.map((p) => {
             const s = statusOf(today, p);
             const st = ST[s];
             const isLive = s === "live";

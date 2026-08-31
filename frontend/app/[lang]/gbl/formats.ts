@@ -38,7 +38,9 @@ export type SchedulePeriod = {
   items: { label: string; base: "great" | "ultra" | "master" | "cup" }[];
   note?: string;
 };
-export const LEAGUE_SCHEDULE: SchedulePeriod[] = [
+// 시즌별 리그 로테이션. 새 시즌 발표 시 slug 키로 추가. (경계=KST 수요일, 시즌 시작 05:00 KST)
+export const LEAGUE_SCHEDULE_BY_SEASON: Record<string, SchedulePeriod[]> = {
+  s27: [
   {
     start: "2026-08-19", end: "2026-08-26",
     items: [
@@ -64,7 +66,37 @@ export const LEAGUE_SCHEDULE: SchedulePeriod[] = [
     ],
     note: "별의모래 4배 (세트 종료 리워드 제외)",
   },
-];
+  ],
+  // 시즌28(황혼의 여정) — 공식 발표 기준. 경계는 KST 수요일 주간(9/9 05:00 시작).
+  s28: [
+    { start: "2026-09-09", end: "2026-09-16", note: "별의모래 4배 (세트 종료 리워드 제외)", items: [
+      { label: "슈퍼리그: 메가", base: "great" }, { label: "하이퍼리그: 메가", base: "ultra" }, { label: "마스터리그: 메가", base: "master" }] },
+    { start: "2026-09-16", end: "2026-09-23", items: [
+      { label: "슈퍼리그", base: "great" }, { label: "하이퍼리그: 메가", base: "ultra" }, { label: "컴페티티브컵 (슈퍼리그)", base: "cup" }] },
+    { start: "2026-09-23", end: "2026-09-30", note: "별의모래 4배 (세트 종료 리워드 제외)", items: [
+      { label: "하이퍼리그", base: "ultra" }, { label: "마스터리그: 메가", base: "master" }, { label: "레트로컵 (슈퍼리그)", base: "cup" }] },
+    { start: "2026-09-30", end: "2026-10-07", note: "별의모래 4배 (세트 종료 리워드 제외)", items: [
+      { label: "마스터리그", base: "master" }, { label: "메가 4색컵 (슈퍼리그)", base: "cup" }] },
+    { start: "2026-10-07", end: "2026-10-14", note: "별의모래 4배 (세트 종료 리워드 제외)", items: [
+      { label: "슈퍼리그: 메가", base: "great" }, { label: "하이퍼리그: 메가", base: "ultra" }, { label: "마스터리그: 메가", base: "master" }] },
+    { start: "2026-10-14", end: "2026-10-21", items: [
+      { label: "슈퍼리그", base: "great" }, { label: "하이퍼리그: 메가", base: "ultra" }, { label: "리틀컵", base: "cup" }] },
+    { start: "2026-10-21", end: "2026-10-28", note: "별의모래 4배 (세트 종료 리워드 제외)", items: [
+      { label: "하이퍼리그", base: "ultra" }, { label: "마스터리그: 메가", base: "master" }, { label: "판타지컵 (슈퍼리그)", base: "cup" }] },
+    { start: "2026-10-28", end: "2026-11-04", note: "별의모래 4배 (세트 종료 리워드 제외)", items: [
+      { label: "마스터리그", base: "master" }, { label: "메가 할로윈컵 (슈퍼리그)", base: "cup" }] },
+    { start: "2026-11-04", end: "2026-11-11", note: "별의모래 4배 (세트 종료 리워드 제외)", items: [
+      { label: "슈퍼리그: 메가", base: "great" }, { label: "하이퍼리그: 메가", base: "ultra" }, { label: "마스터리그: 메가", base: "master" }] },
+    { start: "2026-11-11", end: "2026-11-18", items: [
+      { label: "슈퍼리그", base: "great" }, { label: "하이퍼리그: 메가", base: "ultra" }, { label: "GO 챔피언십 LA컵", base: "cup" }] },
+    { start: "2026-11-18", end: "2026-11-25", note: "별의모래 4배 (세트 종료 리워드 제외)", items: [
+      { label: "하이퍼리그", base: "ultra" }, { label: "마스터리그: 메가", base: "master" }, { label: "GO 챔피언십 LA컵", base: "cup" }] },
+    { start: "2026-11-25", end: "2026-12-01", note: "별의모래 4배 (세트 종료 리워드 제외)", items: [
+      { label: "마스터리그", base: "master" }, { label: "메가 캐치컵 (슈퍼리그)", base: "cup" }] },
+  ],
+};
+// 하위호환 — 기존 참조(현재 시즌 로테이션)
+export const LEAGUE_SCHEDULE = LEAGUE_SCHEDULE_BY_SEASON.s27;
 
 export const ALL_FORMATS = [...CORE_FORMATS, ...CUP_FORMATS];
 export const FORMAT_BY_KEY: Record<string, Format> = Object.fromEntries(ALL_FORMATS.map((f) => [f.key, f]));
