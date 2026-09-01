@@ -26,6 +26,7 @@ import json
 import math
 import os
 import re
+import sys
 import urllib.request
 from datetime import datetime, timezone
 
@@ -50,6 +51,18 @@ BOSS_K = 950.0
 # PvPoke released=False 지만 출시 예정으로 포함할 폼(사용자 승인). "출시예정" 배지 표시.
 # 칼로스 스타터 메가 3종 — 2026-10 출시예정
 INCLUDE_UPCOMING = {"greninja_mega", "delphox_mega", "chesnaught_mega"}
+
+# ── 버전 인자: 없음=현재, "megafinale"=메가 피날레(슈퍼메가 버프 적용) ──
+#   python scripts/gbl_compile_raids.py            → gbl_raids.json (현재)
+#   python scripts/gbl_compile_raids.py megafinale → gbl_raids_megafinale.json (슈퍼메가)
+VERSION = sys.argv[1] if len(sys.argv) > 1 else ""
+SUFFIX = f"_{VERSION}" if VERSION else ""
+IS_MEGAFINALE = VERSION == "megafinale"
+# 슈퍼메가(메가레벨4) 공격배수 — MEGA_EVO_SETTINGS 기준(같은타입/다른타입) + 자기 +2레벨 CPM
+SM_SAME, SM_DIFF = 1.3, 1.1
+CPM42 = 0.8003
+SM_CPM = CPM42 / CPM40  # 슈퍼메가 자기 +2레벨 → 공격 스탯 배수(약 1.013)
+SUPER_MEGA_DEX: set[int] = set()  # main()에서 게임마스터로 채움(레벨4 보유 메가 dex)
 
 # 전설 전용/시그니처 기술 — PvPoke eliteMoves에 없어도 * 레거시(특수기) 마킹. 참고사이트 관례와 일치.
 EXTRA_LEGACY = {
@@ -102,10 +115,13 @@ def load_pve_moves(gm: list, ko: dict, en: dict, ja: dict) -> dict:
         if not ms:
             continue
         mid = ms.get("movementId")
+        m = re.match(r"V(\d+)_MOVE_(.+)$", t.get("templateId", ""))
+        num = m.group(1) if m else None
+        # 신규 무브는 movementId가 숫자로 옴 → templateId에서 이름 추출(예 V0406_MOVE_AURA_WHEEL_ELECTRIC)
+        if not isinstance(mid, str):
+            mid = m.group(2) if m else None
         if not mid:
             continue
-        m = re.match(r"V(\d+)_MOVE_", t.get("templateId", ""))
-        num = m.group(1) if m else None
         out[mid] = {
             "type": ptype(ms.get("pokemonType")),
             "power": float(ms.get("power") or 0),
@@ -208,6 +224,13 @@ def main():
     pvp = fetch(PVPOKE_GM)["pokemon"]
     print("fetching PokeMiners GM (PvE move stats)…")
     gm = fetch(PVE_GM)
+    # 슈퍼메가(레벨4) 대상 dex 추출 — MEGA_EVOLUTION_LEVEL_4_V####_POKEMON_XXX
+    for t in gm:
+        m4 = re.match(r"MEGA_EVOLUTION_LEVEL_4_V0*(\d+)_", t.get("templateId", ""))
+        if m4:
+            SUPER_MEGA_DEX.add(int(m4.group(1)))
+    if IS_MEGAFINALE:
+        print(f"  super-mega dex ({len(SUPER_MEGA_DEX)}종): {sorted(SUPER_MEGA_DEX)}")
     print("fetching i18n (ko/en/ja)…")
 
     def i18n(url):
@@ -240,11 +263,14 @@ def main():
         chargeds = p.get("chargedMoves") or []
         elite = set(p.get("eliteMoves") or [])
 
-        atk = (bs["atk"] + 15) * CPM40 * (SHADOW_ATK if shadow else 1.0)
+        nm, mega, primal = form_label(sid, dex, names, shadow)
+        # 슈퍼메가(메가 피날레): 메가레벨4 대상이면 자기 +2레벨 CPM + 무브 타입배수(같은1.3/다른1.1)
+        is_super_mega = IS_MEGAFINALE and bool(mega) and dex in SUPER_MEGA_DEX
+        atk_cpm = CPM40 * (SM_CPM if is_super_mega else 1.0)
+        atk = (bs["atk"] + 15) * atk_cpm * (SHADOW_ATK if shadow else 1.0)
         deff = (bs["def"] + 15) * CPM40 * (SHADOW_DEF if shadow else 1.0)
         hp = (bs["hp"] + 15) * CPM40
         survive = hp * deff / BOSS_K   # 버티는 시간(초) 지수
-        nm, mega, primal = form_label(sid, dex, names, shadow)
 
         # 속성별 최고 조합
         by_type = {}
@@ -257,7 +283,8 @@ def main():
             bt = c["type"]  # 역할(공격) 속성 = 차지기술 타입. 이 속성 약점 대상 기준으로 계산.
             e_c = -c["energy"]
             c_stab = 1.2 if bt in ptypes else 1.0
-            c_dmg = dmg(c["power"], atk, c_stab, 1.6)  # 차지=역할속성 → 약점 1.6
+            c_mega = (SM_SAME if bt in ptypes else SM_DIFF) if is_super_mega else 1.0
+            c_dmg = dmg(c["power"], atk, c_stab, 1.6 * c_mega)  # 차지=역할속성 → 약점 1.6 (슈퍼메가 타입배수)
             best = None
             for fid in fasts:
                 f = pve(fid, MV, True)
@@ -267,7 +294,8 @@ def main():
                     continue
                 f_stab = 1.2 if f["type"] in ptypes else 1.0
                 f_eff = 1.6 if f["type"] == bt else 1.0  # 빠른기술이 역할속성이면 약점 1.6 (전기역할=전기 빠른기술 우대)
-                f_dmg = dmg(f["power"], atk, f_stab, f_eff)
+                f_mega = (SM_SAME if f["type"] in ptypes else SM_DIFF) if is_super_mega else 1.0
+                f_dmg = dmg(f["power"], atk, f_stab, f_eff * f_mega)
                 n = math.ceil(e_c / f["energy"])
                 dps = (n * f_dmg + c_dmg) / (n * f["dur"] + c["dur"])
                 if best is None or dps > best[0]:
@@ -321,17 +349,19 @@ def main():
             "level": 40, "cpm": CPM40, "targetDef": TARGET_DEF,
             "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
             "source": "PvPoke + PokeMiners (오픈데이터)",
+            "version": VERSION or "current",
+            "superMega": IS_MEGAFINALE,   # 슈퍼메가(레벨4) 버프 적용 여부
             "typeKo": TYPE_KO,
         },
         "types": out_types,
     }
-    dest = os.path.join(GBL, "gbl_raids.json")
+    dest = os.path.join(GBL, f"gbl_raids{SUFFIX}.json")
     json.dump(out, open(dest, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
-    print(f"saved {dest} ({os.path.getsize(dest)} bytes)")
+    print(f"saved {dest} ({os.path.getsize(dest)} bytes)  [version={VERSION or 'current'}]")
 
     if missing:
         print(f"[warn] PvE 수치 없는 기술 {len(missing)}개(스킵): {sorted(missing)[:10]}")
-    for tp in ("water", "fire", "dragon", "electric", "flying", "fighting"):
+    for tp in ("poison", "grass", "water", "fire", "dragon", "fighting"):
         print(f"\n[{TYPE_KO[tp]}] 상위 10:")
         for i, r in enumerate(out_types[tp][:10], 1):
             lg = "*" if r["legacy"] else " "

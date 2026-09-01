@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import RAIDS from "../../gbl_raids.json";
+import RAIDS_MF from "../../gbl_raids_megafinale.json";
 import PKNAMES from "../../pokedex_names.json";
 import MOVENAMES from "../../pvp_move_names.json";
 import AdSlot from "../../AdSlot";
@@ -39,6 +40,16 @@ type RaidData = {
 const RD = RAIDS as unknown as RaidData;
 const TYPES = Object.keys(RD.types);
 
+// 레이드 딜러 버전(메타). 기본=현재, 메가 피날레(슈퍼메가 버프)=신규(내일부터). 새 버전은 여기 추가.
+const RAID_BY_VER: Record<string, RaidData> = { current: RAIDS as unknown as RaidData, megafinale: RAIDS_MF as unknown as RaidData };
+const RAID_VERSIONS: { slug: string; isNew?: boolean; label: Record<string, string> }[] = [
+  { slug: "megafinale", isNew: true, label: { ko: "메가 피날레", en: "Mega Finale", ja: "メガフィナーレ", "zh-TW": "超級大結局" } },
+  { slug: "current", label: { ko: "현재", en: "Current", ja: "現在", "zh-TW": "目前" } },
+];
+const RAID_VER_NOTE: Record<string, Record<string, string>> = {
+  megafinale: { ko: "🌙 슈퍼메가 버프 반영 미리보기", en: "🌙 Super Mega buff preview", ja: "🌙 スーパーメガ強化プレビュー", "zh-TW": "🌙 超級Mega強化預覽" },
+};
+
 const TYPE_COLOR: Record<string, string> = {
   normal: "#9fa19f", fire: "#e62829", water: "#2980ef", electric: "#d9a900", grass: "#3fa129",
   ice: "#37b6c9", fighting: "#ff8000", poison: "#9141cb", ground: "#915121", flying: "#6c93e0",
@@ -55,15 +66,17 @@ export function generateStaticParams() {
   return TYPES.map((type) => ({ type }));
 }
 
-export function generateMetadata({ params }: { params: { lang: string; type: string } }): Metadata {
+export function generateMetadata({ params, searchParams }: { params: { lang: string; type: string }; searchParams?: { v?: string } }): Metadata {
   if (!TYPE_KO[params.type]) return { title: "GBL Note" };
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const tName = typeLabel(lang, params.type);
   const d = getRaidType(lang);
+  const isCurrent = !(searchParams?.v && searchParams.v !== "current" && RAID_BY_VER[searchParams.v]);
   return {
     title: `${tName} ${d.metaTitle}`,
     description: `${tName} ${d.metaDesc}`,
     alternates: { canonical: localizePath(lang, `/gbl/raid/${params.type}`), languages: hreflangLanguages(`/gbl/raid/${params.type}`) },
+    ...(isCurrent ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
       title: `${tName} ${d.ogTitle}`,
       description: `${tName} ${d.ogDesc}`,
@@ -94,14 +107,17 @@ function VariantBadge({ r, d, stabType }: { r: Row; d: import("./dict").RaidType
   );
 }
 
-export default function RaidTypePage({ params }: { params: { lang: string; type: string } }) {
+export default function RaidTypePage({ params, searchParams }: { params: { lang: string; type: string }; searchParams?: { v?: string } }) {
   const type = params.type;
   if (!TYPE_KO[type]) notFound();
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const d = getRaidType(lang);
   const tName = typeLabel(lang, type);
   const L = (p: string) => localizePath(lang, p);
-  const rows = RD.types[type] || [];
+  // 버전 해석 — searchParams.v(유효 버전만), 기본=현재
+  const ver = searchParams?.v && RAID_BY_VER[searchParams.v] ? searchParams.v : "current";
+  const RDV = RAID_BY_VER[ver];
+  const rows = RDV.types[type] || [];
   const c = TYPE_COLOR[type] || "#64748b";
 
   const wrap: React.CSSProperties = {
@@ -133,6 +149,26 @@ export default function RaidTypePage({ params }: { params: { lang: string; type:
           })}
         </div>
 
+        {/* 버전 선택 (현재 / 메가 피날레 슈퍼메가) */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+          {RAID_VERSIONS.map((v) => {
+            const on = v.slug === ver;
+            const href = v.slug === "current" ? L(`/gbl/raid/${type}`) : `${L(`/gbl/raid/${type}`)}?v=${v.slug}`;
+            return (
+              <Link key={v.slug} href={href} scroll={false}
+                style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 13px", borderRadius: 16, fontSize: "0.8rem", fontWeight: 800, textDecoration: "none",
+                  border: on ? (v.isNew ? "1px solid #6d28d9" : "1px solid #0f172a") : `1px solid ${BORDER}`,
+                  background: on ? (v.isNew ? "linear-gradient(135deg,#4c1d95,#6d28d9)" : "#0f172a") : CARD,
+                  color: on ? "#fff" : "#64748b" }}>
+                {v.isNew && "🌙"} {v.label[lang] || v.label.ko}
+              </Link>
+            );
+          })}
+          {ver !== "current" && RAID_VER_NOTE[ver] && (
+            <span style={{ fontSize: "0.72rem", color: "#6d28d9", fontWeight: 700 }}>{RAID_VER_NOTE[ver][lang] || RAID_VER_NOTE[ver].ko}</span>
+          )}
+        </div>
+
         <h1 style={{ margin: "0.2rem 0", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>
           <span style={{ color: c }}>{tName}{d.h1TypeWord}</span>{d.h1Rest}
         </h1>
@@ -143,7 +179,7 @@ export default function RaidTypePage({ params }: { params: { lang: string; type:
           {d.intro2.replace("{t}", tName)}
         </p>
         <p style={{ margin: "0.35rem 0 0", fontSize: "0.72rem", color: "#94a3b8" }}>
-          {d.dateLabel} <b style={{ color: "#64748b" }}>{RD.meta.generated}</b> · <span style={{ color: "#d97706", fontWeight: 700 }}>{d.legacyNote}</span> · <span style={{ color: "#0891b2", fontWeight: 700 }}>{d.upcomingNote}</span>
+          {d.dateLabel} <b style={{ color: "#64748b" }}>{RDV.meta.generated}</b> · <span style={{ color: "#d97706", fontWeight: 700 }}>{d.legacyNote}</span> · <span style={{ color: "#0891b2", fontWeight: 700 }}>{d.upcomingNote}</span>
         </p>
         <p style={{ margin: "0.3rem 0 0", fontSize: "0.7rem", color: "#b0b8c4" }}>
           {d.disclaimer}
