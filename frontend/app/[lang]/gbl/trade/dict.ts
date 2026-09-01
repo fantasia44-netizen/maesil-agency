@@ -5,6 +5,7 @@ export type TradeDict = {
   addTo: string; wanted: string; offer: string; shinyMode: string; dmax: string; gmax: string;
   searchPh: string; searchHint: string;
   background: string; bgBadge: string;
+  bgSection: string; bgEventGroup: string; bgRegionGroup: string; bgSceneGroup: string; bgTypeGroup: string; tapApplyBg: string;
   trainerCode: string;
   shareBtn: string; saveBtn: string; building: string;
   cardTitle: string; emptySlot: string; tapShiny: string; shareTitle: string;
@@ -19,6 +20,7 @@ const ko: TradeDict = {
   addTo: "어디에 추가할까요?", wanted: "원하는 것", offer: "줄 수 있는 것", shinyMode: "이로치로 추가", dmax: "다이맥스", gmax: "거다이맥스",
   searchPh: "포켓몬 이름/도감번호 검색", searchHint: "전체 도감에서 검색 · 클릭하면 위 선택한 칸에 추가",
   background: "배경", bgBadge: "· 경쟁사엔 없는 기능",
+  bgSection: "🎨 배경 (포켓몬마다)", bgEventGroup: "이벤트·우주", bgRegionGroup: "지역", bgSceneGroup: "풍경", bgTypeGroup: "타입", tapApplyBg: "탭=선택한 배경 적용 · ✕ 삭제",
   trainerCode: "트레이너 코드 (선택)",
   shareBtn: "공유하기", saveBtn: "저장", building: "생성 중…",
   cardTitle: "포켓몬 교환", emptySlot: "위에서 포켓몬을 추가하세요", tapShiny: "탭하면 삭제", shareTitle: "포켓몬 GO 교환 목록",
@@ -35,6 +37,7 @@ const en: TradeDict = {
   addTo: "Add to which list?", wanted: "Wanted", offer: "Can offer", shinyMode: "Add as shiny", dmax: "Dynamax", gmax: "Gigantamax",
   searchPh: "Search Pokémon name / Dex no.", searchHint: "Search full Pokédex · click to add to the selected list",
   background: "Background", bgBadge: "· not on other sites",
+  bgSection: "🎨 Background (per Pokémon)", bgEventGroup: "Event · Cosmic", bgRegionGroup: "Region", bgSceneGroup: "Scenery", bgTypeGroup: "Type", tapApplyBg: "Tap = apply background · ✕ remove",
   trainerCode: "Trainer code (optional)",
   shareBtn: "Share", saveBtn: "Save", building: "Generating…",
   cardTitle: "POKÉMON TRADE", emptySlot: "Add Pokémon above", tapShiny: "Tap to remove", shareTitle: "Pokémon GO Trade List",
@@ -51,6 +54,7 @@ const ja: TradeDict = {
   addTo: "どちらに追加？", wanted: "欲しい", offer: "出せる", shinyMode: "色違いで追加", dmax: "ダイマックス", gmax: "キョダイマックス",
   searchPh: "ポケモン名/図鑑番号で検索", searchHint: "全図鑑から検索 · クリックで選択中のリストに追加",
   background: "背景", bgBadge: "· 他サイトにない機能",
+  bgSection: "🎨 背景(ポケモンごと)", bgEventGroup: "イベント・宇宙", bgRegionGroup: "地域", bgSceneGroup: "風景", bgTypeGroup: "タイプ", tapApplyBg: "タップ=選択中の背景を適用 · ✕ 削除",
   trainerCode: "トレーナーコード (任意)",
   shareBtn: "共有", saveBtn: "保存", building: "生成中…",
   cardTitle: "ポケモン交換", emptySlot: "上からポケモンを追加", tapShiny: "タップで削除", shareTitle: "ポケモンGO 交換リスト",
@@ -67,6 +71,7 @@ const zhTW: TradeDict = {
   addTo: "要加到哪裡？", wanted: "想要的", offer: "可以給的", shinyMode: "以異色加入", dmax: "極巨化", gmax: "超極巨化",
   searchPh: "搜尋寶可夢名稱/圖鑑編號", searchHint: "從全圖鑑搜尋 · 點擊即加入上方選取的欄位",
   background: "背景", bgBadge: "· 競品沒有的功能",
+  bgSection: "🎨 背景（每隻寶可夢）", bgEventGroup: "活動·宇宙", bgRegionGroup: "地域", bgSceneGroup: "風景", bgTypeGroup: "屬性", tapApplyBg: "點擊＝套用選取的背景 · ✕ 刪除",
   trainerCode: "訓練家代碼（選填）",
   shareBtn: "分享", saveBtn: "儲存", building: "產生中…",
   cardTitle: "寶可夢交換", emptySlot: "從上方加入寶可夢", tapShiny: "點擊即刪除", shareTitle: "寶可夢 GO 交換清單",

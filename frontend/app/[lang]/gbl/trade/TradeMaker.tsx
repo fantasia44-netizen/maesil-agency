@@ -8,6 +8,7 @@ import COS from "../costumes.json";
 import { pokeSprite } from "../sprite";
 import type { Locale } from "../../../../lib/i18n";
 import { getTrade, type TradeDict } from "./dict";
+import { BG_SWATCHES, resolveBg, bgLabel } from "./backgrounds";
 import { track } from "../../../../lib/track";
 
 type PKN_T = Record<string, { ko: string; en: string; ja: string }>;
@@ -17,7 +18,7 @@ const DEXES = Object.keys(NAMES).map(Number).filter((d) => d > 0).sort((a, b) =>
 const COSTUMES = COS as unknown as Record<string, { cid: string; f: string; s: number }[]>;
 const UICONS = "https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/pokemon/";
 
-type Item = { dex: number; shiny: boolean; cf?: string; max?: "d" | "g" }; // cf: 코스튬, max: 다이맥스/거다이맥스
+type Item = { dex: number; shiny: boolean; cf?: string; max?: "d" | "g"; bg?: string }; // cf: 코스튬, max: 다이맥스/거다이맥스, bg: 배경 id
 type Variant = { dex: number; cf?: string; hasShiny: boolean };
 const nameOf = (lang: Locale, dex: number) => {
   const n = NAMES[String(dex)];
@@ -41,6 +42,7 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
   const [target, setTarget] = useState<"want" | "offer">("want");
   const [shinyMode, setShinyMode] = useState(false);
   const [maxMode, setMaxMode] = useState<"" | "d" | "g">("");
+  const [curBg, setCurBg] = useState<string>(""); // 선택 중인 배경(추가/페인트에 적용)
   const [code, setCode] = useState("");
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
@@ -68,12 +70,17 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
   }, [q]);
 
   const add = (v: Variant) => {
-    const it: Item = { dex: v.dex, shiny: shinyMode && v.hasShiny, cf: v.cf, max: maxMode || undefined };
+    const it: Item = { dex: v.dex, shiny: shinyMode && v.hasShiny, cf: v.cf, max: maxMode || undefined, bg: curBg || undefined };
     if (target === "want") setWant((a) => [...a, it]); else setOffer((a) => [...a, it]);
   };
   const remove = (list: "want" | "offer", i: number) => {
     const set = list === "want" ? setWant : setOffer;
     set((a) => a.filter((_, j) => j !== i));
+  };
+  // 슬롯 탭 = 선택 중인 배경을 그 몬에 적용(페인트). 삭제는 ✕ 버튼.
+  const paint = (list: "want" | "offer", i: number) => {
+    const set = list === "want" ? setWant : setOffer;
+    set((a) => a.map((it, j) => (j === i ? { ...it, bg: curBg || undefined } : it)));
   };
 
   const [scale, setScale] = useState(1);
@@ -127,6 +134,26 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
     border: on ? "none" : "1px solid #dbe2ee", background: on ? "#3b5bdb" : "#fff", color: on ? "#fff" : "#475569",
   });
 
+  // 배경 스와치(이미지 썸네일 + 라벨 오버레이)
+  const bgSwatch = (s: (typeof BG_SWATCHES)[number], showLabel: boolean) => {
+    const on = curBg === s.id;
+    return (
+      <button key={s.id} onClick={() => setCurBg(s.id)} title={bgLabel(s.id, lang)}
+        style={{ position: "relative", aspectRatio: "1 / 1", borderRadius: 7, overflow: "hidden", padding: 0, cursor: "pointer",
+          border: on ? "2px solid #3b5bdb" : "1px solid #dbe2ee", boxShadow: on ? "0 0 0 2px rgba(59,91,219,.3)" : "none" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={s.sample} alt={bgLabel(s.id, lang)} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        {showLabel && (
+          <span style={{ position: "absolute", bottom: 0, left: 0, right: 0, fontSize: "0.5rem", fontWeight: 800, color: "#fff",
+            background: "rgba(0,0,0,.5)", textAlign: "center", padding: "1px 1px", lineHeight: 1.25, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {bgLabel(s.id, lang)}
+          </span>
+        )}
+      </button>
+    );
+  };
+  const bgGroupLabel: React.CSSProperties = { fontSize: "0.68rem", fontWeight: 700, color: "#94a3b8", margin: "6px 0 4px" };
+
   // 미리보기 섹션(원하는것/줄것)
   const Section = ({ list, items, title, dot }: { list: "want" | "offer"; items: Item[]; title: string; dot: string }) => (
     <div style={{ background: PANEL, border: `1px solid ${LINE}`, borderRadius: 14, padding: "10px 12px 12px" }}>
@@ -138,23 +165,34 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
         <div style={{ minHeight: 60, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", color: "#94a3b8" }}>{ct.emptySlot}</div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4 }}>
-          {items.map((it, i) => (
-            <button key={i} data-noshot={undefined} onClick={() => remove(list, i)} title={t.tapShiny}
+          {items.map((it, i) => {
+            const bgUrl = resolveBg(it.bg, it.dex);
+            return (
+            <button key={i} data-noshot={undefined} onClick={() => paint(list, i)} title={t.tapApplyBg}
               style={{ position: "relative", background: "#fff", border: `1px solid ${LINE}`, borderRadius: 10, padding: "4px 2px", cursor: "pointer", overflow: "hidden" }}>
-              {/* 반짝이 데코(9db식) — 각 포켓몬 뒤 별 */}
-              <span style={{ position: "absolute", top: 4, left: 5, fontSize: "0.5rem", color: "#38bdf8" }}>✦</span>
-              <span style={{ position: "absolute", bottom: 6, right: 6, fontSize: "0.62rem", color: "#7dd3fc" }}>✦</span>
-              <span style={{ position: "absolute", top: 12, right: 8, fontSize: "0.42rem", color: "#bae6fd" }}>✦</span>
-              {it.shiny && <span data-noshot="0" style={{ position: "absolute", top: 0, right: 3, fontSize: "0.8rem", zIndex: 2 }}>✨</span>}
+              {bgUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={bgUrl} alt="" aria-hidden="true" crossOrigin="anonymous"
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }} />
+              ) : (
+                <>
+                  {/* 반짝이 데코(9db식) — 배경 없을 때만 */}
+                  <span style={{ position: "absolute", top: 4, left: 5, fontSize: "0.5rem", color: "#38bdf8" }}>✦</span>
+                  <span style={{ position: "absolute", bottom: 6, right: 6, fontSize: "0.62rem", color: "#7dd3fc" }}>✦</span>
+                  <span style={{ position: "absolute", top: 12, right: 8, fontSize: "0.42rem", color: "#bae6fd" }}>✦</span>
+                </>
+              )}
+              {it.shiny && <span data-noshot="0" style={{ position: "absolute", top: 0, right: 3, fontSize: "0.8rem", zIndex: 2, filter: bgUrl ? "drop-shadow(0 1px 1px rgba(0,0,0,.5))" : undefined }}>✨</span>}
               {it.max && <span style={{ position: "absolute", bottom: -1, left: "50%", transform: "translateX(-50%)", fontSize: "0.46rem", fontWeight: 900, color: "#fff", background: it.max === "d" ? "#ef4444" : "#a855f7", borderRadius: 4, padding: "0px 4px", zIndex: 2, letterSpacing: "0.02em" }}>{it.max === "d" ? "DMAX" : "GMAX"}</span>}
               <span data-noshot="1" onClick={(e) => { e.stopPropagation(); remove(list, i); }}
                 style={{ position: "absolute", top: -6, left: -4, width: 16, height: 16, borderRadius: "50%", background: "#ef4444", color: "#fff", fontSize: "0.6rem", lineHeight: "16px", textAlign: "center", zIndex: 3 }}>✕</span>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={spriteOf(it)} alt="" width={46} height={46} crossOrigin="anonymous"
                 onError={(e) => { const fb = fallbackSprite(it); if (fb && e.currentTarget.src !== fb) e.currentTarget.src = fb; }}
-                style={{ position: "relative", zIndex: 1, objectFit: "contain", display: "block", margin: "0 auto" }} />
+                style={{ position: "relative", zIndex: 1, objectFit: "contain", display: "block", margin: "0 auto", filter: bgUrl ? "drop-shadow(0 1px 2px rgba(0,0,0,.45))" : undefined }} />
             </button>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -181,6 +219,47 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
             <button style={chipBtn(maxMode === "d")} onClick={() => setMaxMode((m) => (m === "d" ? "" : "d"))}>🔴 {t.dmax}</button>
             <button style={chipBtn(maxMode === "g")} onClick={() => setMaxMode((m) => (m === "g" ? "" : "g"))}>🟣 {t.gmax}</button>
           </div>
+        </div>
+        {/* 🎨 배경 팔레트 — 각 포켓몬마다 배경(경쟁사 대응 차별 기능) */}
+        <div>
+          <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#64748b", marginBottom: 6 }}>
+            {t.bgSection} <span style={{ color: "#db2777", fontWeight: 700 }}>{t.bgBadge}</span>
+          </div>
+          <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
+            {BG_SWATCHES.filter((s) => s.kind === "special").map((s) => {
+              const on = curBg === s.id;
+              return (
+                <button key={s.id || "none"} onClick={() => setCurBg(s.id)}
+                  style={{ padding: "5px 11px", borderRadius: 999, fontSize: "0.78rem", fontWeight: 800, cursor: "pointer",
+                    border: on ? "none" : "1px solid #dbe2ee",
+                    background: s.id === "auto" ? (on ? "linear-gradient(90deg,#db2777,#7c3aed,#2563eb)" : "linear-gradient(90deg,#f9a8d4,#c4b5fd,#93c5fd)") : (on ? "#3b5bdb" : "#fff"),
+                    color: s.id === "auto" ? "#fff" : on ? "#fff" : "#475569" }}>
+                  {s.id === "auto" ? "🎨 " : s.id === "" ? "🚫 " : ""}{bgLabel(s.id, lang)}
+                </button>
+              );
+            })}
+          </div>
+          {/* 이벤트·우주 (울트라홀·고페 글로벌/피날레 등) */}
+          <div style={bgGroupLabel}>{t.bgEventGroup}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
+            {BG_SWATCHES.filter((s) => s.kind === "event").map((s) => bgSwatch(s, true))}
+          </div>
+          {/* 지역 (고페 도시·지역축제) */}
+          <div style={bgGroupLabel}>{t.bgRegionGroup}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
+            {BG_SWATCHES.filter((s) => s.kind === "region").map((s) => bgSwatch(s, true))}
+          </div>
+          {/* 풍경 */}
+          <div style={bgGroupLabel}>{t.bgSceneGroup}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
+            {BG_SWATCHES.filter((s) => s.kind === "scene").map((s) => bgSwatch(s, true))}
+          </div>
+          {/* 타입 */}
+          <div style={bgGroupLabel}>{t.bgTypeGroup}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(9, 1fr)", gap: 4 }}>
+            {BG_SWATCHES.filter((s) => s.kind === "type").map((s) => bgSwatch(s, false))}
+          </div>
+          <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginTop: 6 }}>{t.tapApplyBg}</div>
         </div>
         {/* 검색 */}
         <div style={{ position: "relative" }}>
