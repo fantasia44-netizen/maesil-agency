@@ -35,13 +35,14 @@ async function getEvents(): Promise<EventItem[]> {
 }
 
 function dexOf(image: string): string {
-  const m = image.match(/\/pm(\d+)\./) || image.match(/pokemon_icon_(\d+)_/);
+  // LeekDuck 아이콘 URL 다양한 포맷 대응: .../pm150.png, pokemon_icon_150_..., pokemon_icon_pm0150_00_pgo_a.png(아머드 등 폼)
+  const m = image.match(/\/pm(\d+)\./) || image.match(/pokemon_icon_(?:pm)?0*(\d+)/);
   return m ? String(Number(m[1])) : "";
 }
 // 영문 포켓몬명 → 한글 (메가/섀도우/지역폼 접두 처리) — 스프라이트 폼 판정용(한글 유지 필수)
 function koMon(english: string): string {
   let n = english.trim(), prefix = "";
-  const pfs: [RegExp, string][] = [[/^Mega\s+/i, "메가 "], [/^Shadow\s+/i, "섀도우 "], [/^Alolan\s+/i, "알로라 "], [/^Galarian\s+/i, "가라르 "], [/^Hisuian\s+/i, "히스이 "], [/^Paldean\s+/i, "팔데아 "]];
+  const pfs: [RegExp, string][] = [[/^Mega\s+/i, "메가 "], [/^Shadow\s+/i, "섀도우 "], [/^Armored\s+/i, "아머드 "], [/^Alolan\s+/i, "알로라 "], [/^Galarian\s+/i, "가라르 "], [/^Hisuian\s+/i, "히스이 "], [/^Paldean\s+/i, "팔데아 "]];
   for (const [re, k] of pfs) { if (re.test(n)) { prefix = k; n = n.replace(re, ""); break; } }
   n = n.replace(/\s*\(.*\)\s*$/, ""); // "(Altered)" 등 폼 괄호 제거
   return prefix + (EN_KO[n.toLowerCase()] || n);
@@ -49,7 +50,8 @@ function koMon(english: string): string {
 // 영문 포켓몬명 → 로케일 표시명(접두는 사전 기반)
 function monLocal(lang: Locale, english: string, t: ScheduleDict): string {
   let n = english.trim(), prefix = "";
-  const pfs: [RegExp, string][] = [[/^Mega\s+/i, t.pfx.mega], [/^Shadow\s+/i, t.pfx.shadow], [/^Alolan\s+/i, t.pfx.alola], [/^Galarian\s+/i, t.pfx.galar], [/^Hisuian\s+/i, t.pfx.hisui], [/^Paldean\s+/i, t.pfx.paldea]];
+  const armored = lang === "en" ? "Armored " : lang === "ja" ? "アーマード" : lang === "zh-TW" ? "裝甲" : "아머드 ";
+  const pfs: [RegExp, string][] = [[/^Mega\s+/i, t.pfx.mega], [/^Shadow\s+/i, t.pfx.shadow], [/^Armored\s+/i, armored], [/^Alolan\s+/i, t.pfx.alola], [/^Galarian\s+/i, t.pfx.galar], [/^Hisuian\s+/i, t.pfx.hisui], [/^Paldean\s+/i, t.pfx.paldea]];
   for (const [re, k] of pfs) { if (re.test(n)) { prefix = k; n = n.replace(re, ""); break; } }
   n = n.replace(/\s*\(.*\)\s*$/, "");
   const key = n.toLowerCase();
@@ -165,14 +167,14 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
   const MA_START = "2026-08-31T06:00:00+09:00", MA_END = "2026-09-06T22:00:00+09:00";
   const maS = Date.parse(MA_START), maE = Date.parse(MA_END);
   const megaAscensionActive = Date.now() >= maS && Date.now() < maE;
-  // 겹치는 정규 로테이션 클립 — 기간 안쪽 제거(그 기간엔 실제로 안 열림), 이전/이후 조각만 유지
+  // 사전 정규 로테이션만 클립 — 기간 전에 시작해 기간으로 이어지는 5성/그림자/정규메가는 기간동안 미개최.
+  // (기간 내 시작하는 이벤트 보스=아머드 뮤츠·메가 피날레 등은 유지)
   calEvents = calEvents.flatMap((ev): CalEvent[] => {
     if (ev.kind !== "rotation") return [ev];
     const s = Date.parse(ev.start), e = Date.parse(ev.end);
-    if (e <= maS || s >= maE) return [ev];   // 겹침 없음
-    const out: CalEvent[] = [];
-    if (s < maS) out.push({ ...ev, end: MA_START });   // 이전 조각
-    if (e > maE) out.push({ ...ev, start: MA_END });    // 이후 조각
+    if (e <= maS || s >= maS) return [ev];   // 겹침 없음 OR 기간 내/후 시작(이벤트 보스=유지)
+    const out: CalEvent[] = [{ ...ev, end: MA_START }];   // 기간 이전 조각만
+    if (e > maE) out.push({ ...ev, start: MA_END });       // 기간 이후 조각(정규 재개)
     return out;
   });
   // 메가 어센션 대체 레이드(일자별 + 기간내내 라티아스/라티오스)
