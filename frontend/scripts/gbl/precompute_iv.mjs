@@ -28,8 +28,9 @@ function statOf(iv, bb) {
   return { cp: r.a.cp, level: r.a.level, stats: r.a.stats };
 }
 
-function metaRun(iv, shields, bb) {
-  const r = runMulti({ speciesId: TARGET, ivs: iv, bestBuddy: bb, shields }, LEAGUE, shields, META_LIMIT);
+function metaRun(iv, shields, bb, oppBB = false) {
+  // oppBB=상대도 베스트파트너 여부. 기본은 상대 노베파(L50).
+  const r = runMulti({ speciesId: TARGET, ivs: iv, bestBuddy: bb, shields }, LEAGUE, shields, META_LIMIT, oppBB);
   const byOpp = {};
   for (const x of r.results) byOpp[x.oppId] = { id: x.oppId, name: x.oppName, dex: dexOf(x.oppId), types: x.oppTypes, rating: x.rating, win: x.win, score: x.score };
   return { wins: r.wins, losses: r.losses, byOpp };
@@ -57,8 +58,15 @@ function analyze(bb) {
       }
     }
     nearFlips.sort((a, b) => a.delta - b.delta);
-    return { iv, cp: st.cp, level: st.level, stats: st.stats, effHundo,
-             verdict: flips.length === 0 ? (effHundo ? "실질백" : "유사백") : "타협",
+    // 판정: 공격<15 + 같은종족값 라이벌 → CMP탈락(미러·라이벌 필패). 승패 flip 또는 마진 급락(≤-150) → 타협.
+    const atkMaxed = iv[0] === 15;
+    const cmpFail = !atkMaxed && RIVAL != null;
+    const worstNear = nearFlips.length ? nearFlips[0].delta : 0;
+    const severeNear = worstNear <= -150;
+    const verdict = cmpFail ? "CMP탈락"
+      : (flips.length > 0 || severeNear) ? "타협"
+      : (effHundo ? "실질백" : "유사백");
+    return { iv, cp: st.cp, level: st.level, stats: st.stats, effHundo, verdict,
              byShield, flips, nearFlips: nearFlips.slice(0, 6) };
   });
   // 전체 메타 커버리지(백 기준) — "실제로 100종 전수 시뮬했다"를 시각화(팀빌더식 매치업 그리드)
@@ -84,10 +92,21 @@ function cmpDuel(oppId, bb) {
   });
 }
 
+const bbAnalysis = analyze(true); // 내 베파 vs 상대 노베파(L50)
+// 상대도 베스트파트너(L51) 시나리오 — 백 커버리지만(공정: 내 L51 vs 상대 L51). 미러·라이벌은 여기서 무승부가 정상.
+{
+  const runs = {};
+  for (const s of SHIELDS) runs[s] = metaRun([15, 15, 15], s, true, true);
+  bbAnalysis.oppBB = {
+    byShield: SHIELDS.map((s) => ({ shields: s, wins: runs[s].wins, losses: runs[s].losses })),
+    coverage: SHIELDS.map((s) => ({ shields: s, opps: Object.values(runs[s].byOpp).map((o) => ({ id: o.id, name: o.name, dex: o.dex, types: o.types, rating: o.rating, win: o.win, score: o.score })) })),
+  };
+}
+
 const out = {
   speciesId: TARGET, league: LEAGUE, metaLimit: META_LIMIT, rival: RIVAL, rivalDex: RIVAL ? dexOf(RIVAL) : null,
   normal: analyze(false),
-  bestBuddy: analyze(true),
+  bestBuddy: bbAnalysis,
   cmp: {
     mirror: cmpDuel(TARGET, false),
     rival: RIVAL ? cmpDuel(RIVAL, false) : null,

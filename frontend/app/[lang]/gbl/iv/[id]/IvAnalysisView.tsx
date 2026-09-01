@@ -27,6 +27,7 @@ const VERDICT: Record<string, { color: string; bg: string; label: Record<Locale,
   "실질백": { color: "#15803d", bg: "#dcfce7", label: { ko: "실질백", en: "Stat-hundo", ja: "実質100", "zh-TW": "實質100" } },
   "유사백": { color: "#0369a1", bg: "#e0f2fe", label: { ko: "유사백", en: "Battle-equal", ja: "準100", "zh-TW": "準100" } },
   "타협":   { color: "#b45309", bg: "#fef3c7", label: { ko: "타협",   en: "Compromise", ja: "妥協",  "zh-TW": "妥協" } },
+  "CMP탈락": { color: "#dc2626", bg: "#fee2e2", label: { ko: "CMP 탈락", en: "CMP loss", ja: "CMP負け", "zh-TW": "CMP落敗" } },
 };
 
 const UI: Record<Locale, Record<string, string>> = {
@@ -34,7 +35,7 @@ const UI: Record<Locale, Record<string, string>> = {
         thIv: "개체값(공/방/체)", thCp: "CP", thHp: "HP", thVerdict: "판정", thWeak: "불리해지는 상대", none: "없음", shieldTag: "실드",
         shieldH: "백(100%)의 실드별 성적", win: "승", loss: "패", methodH: "분석 방법", updated: "업데이트", privacy: "개인정보처리방침",
         cmpH: "공격 15는 왜 필수인가 — 동시차징(CMP)", cmpMirror: "미러전 (그란돈 vs 그란돈)", cmpRival: "vs 라이벌", cmpMine: "내 공14", cmpOpp: "상대 공15", cmpNote: "공격 종족값이 곧 우선권. 공14는 같은 종족값 라이벌에게 무조건 밀립니다.",
-        bbH: "베스트버디(L51) 효과", bbCp: "베파 CP", bbNote: "타협 개체도 베스트버디로 키우면 대결이 전부 나아지고, 같은 종족값 라이벌까지 이깁니다.",
+        bbH: "베스트파트너(L51) 효과", bbCp: "베파 CP", bbNote: "베스트파트너로 키우면 몇몇 매치업을 새로 잡습니다. 단, 상대도 베스트파트너면 미러·라이벌은 무승부라 — 아래 커버리지의 두 시나리오(상대 노베파/베파)를 함께 보세요.",
         verdictBoxH: "강화할까, 말까 — 한눈에", growLabel: "그냥 강화", condLabel: "조건부", waitLabel: "강화 말고 대기", faqH: "자주 묻는 질문" },
   en: { back: "← GBL Note", ivTool: "IV rank checker", tier: "Tier list", compromiseLabel: "Compromise IVs", verdictH: "Verdict by IV spread (Master League sim)",
         thIv: "IVs (Atk/Def/Sta)", thCp: "CP", thHp: "HP", thVerdict: "Verdict", thWeak: "Matchups lost", none: "none", shieldTag: "shields",
@@ -64,23 +65,39 @@ const METHOD: Record<Locale, string> = {
 };
 
 // ── 전 메타 커버리지 그리드 문구 ──
-const COV: Record<Locale, { h: string; sub: string; shieldTag: string; win: string; loss: string; hi: string; lo: string; bbH: string; bbSub: string; gained: (n: number) => string; noGain: string; legendWin: string; legendLoss: string }> = {
+const COV: Record<Locale, { h: string; sub: string; shieldTag: string; win: string; loss: string; bbH: string; bbSub: string; oppNoBB: string; oppBB: string; bbMirrorNote: string; noGain: string }> = {
   ko: { h: "🔬 전 메타 100종 전수 시뮬 — 만나고 이기는 상대", sub: "마스터리그 상위 100종과 실드별로 1:1 직접 배틀한 결과입니다. 초록=승, 빨강=패. (배틀 레이팅 500=대등, 높을수록 여유승)",
-        shieldTag: "실드", win: "승", loss: "패", hi: "여유승", lo: "신승", bbH: "⭐ 베스트버디 전/후 — 새로 이기는 상대", bbSub: "베스트버디(L51)로 키우면 같은 실드에서 승패가 뒤집히는 상대입니다.",
-        gained: (n) => `베스트버디 시 새로 이기는 상대 ${n}종`, noGain: "이 실드에서는 베스트버디로 새로 이기는 상대가 없습니다(이미 충분).", legendWin: "승", legendLoss: "패" },
-  en: { h: "🔬 Full-meta sim — all 100, who you meet & beat", sub: "1-on-1 battles against the Master League top 100, per shield count. Green = win, red = loss. (Battle rating 500 = even; higher = more comfortable.)",
-        shieldTag: "shields", win: "W", loss: "L", hi: "comfortable", lo: "narrow", bbH: "⭐ Best Buddy before/after — newly won matchups", bbSub: "Opponents that flip from loss to win at the same shield count once best-buddied (L51).",
-        gained: (n) => `${n} new wins with Best Buddy`, noGain: "No new wins from Best Buddy at this shield count (already enough).", legendWin: "Win", legendLoss: "Loss" },
-  ja: { h: "🔬 全メタ100種フルシミュ — 遭遇して勝てる相手", sub: "マスター上位100種とシールド別に1対1で直接対戦した結果です。緑=勝、赤=負。(バトルレーティング500=互角、高いほど余裕勝ち)",
-        shieldTag: "シールド", win: "勝", loss: "負", hi: "余裕", lo: "辛勝", bbH: "⭐ ベストバディ前後 — 新たに勝てる相手", bbSub: "ベストバディ(L51)にすると同じシールドで勝敗が逆転する相手です。",
-        gained: (n) => `ベストバディで新たに勝てる相手 ${n}種`, noGain: "このシールドではベストバディで新たに勝てる相手はいません(既に十分)。", legendWin: "勝", legendLoss: "負" },
-  "zh-TW": { h: "🔬 全環境100種完整模擬 — 遭遇並戰勝的對手", sub: "與大師聯盟前100名依護盾數1對1直接對戰的結果。綠=勝，紅=負。(對戰評分500=平手，越高越輕鬆)",
-        shieldTag: "護盾", win: "勝", loss: "負", hi: "輕鬆", lo: "險勝", bbH: "⭐ 最佳夥伴前後 — 新增戰勝對手", bbSub: "升最佳夥伴(L51)後，同護盾數下勝負逆轉的對手。",
-        gained: (n) => `最佳夥伴新增戰勝 ${n} 種`, noGain: "此護盾數下最佳夥伴無新增戰勝對手(已足夠)。", legendWin: "勝", legendLoss: "負" },
+        shieldTag: "실드", win: "승", loss: "패",
+        bbH: "⭐ 베스트파트너(L51) 효과 — 새로 이기는 상대",
+        bbSub: "베스트파트너로 키우면 새로 이기는 상대입니다. 상대가 베스트파트너인지 아닌지에 따라 결과가 달라져 두 경우를 모두 표시합니다.",
+        oppNoBB: "상대 노베파 (L50)", oppBB: "상대도 베파 (L51)",
+        bbMirrorNote: "※ 미러·같은 종족값 라이벌(가이오가)은 상대도 베스트파트너면 무승부로 돌아갑니다(양쪽 L51 동일). 즉 베스트파트너가 미러를 이기게 해주는 건 상대가 노베파일 때뿐입니다.",
+        noGain: "없음" },
+  en: { h: "🔬 Full-meta sim — all 100, who you meet & beat", sub: "1-on-1 battles vs the Master League top 100, per shield. Green = win, red = loss. (Rating 500 = even; higher = more comfortable.)",
+        shieldTag: "shields", win: "W", loss: "L",
+        bbH: "⭐ Best Buddy (L51) effect — newly won matchups",
+        bbSub: "Opponents you newly beat once best-buddied. The result depends on whether the opponent is best-buddied too, so both cases are shown.",
+        oppNoBB: "Opp not BB (L50)", oppBB: "Opp also BB (L51)",
+        bbMirrorNote: "※ The mirror and same-stat rival (Kyogre) return to a tie when the opponent is best-buddied too (both L51). So Best Buddy only wins the mirror when the opponent isn't best-buddied.",
+        noGain: "none" },
+  ja: { h: "🔬 全メタ100種フルシミュ — 遭遇して勝てる相手", sub: "マスター上位100種とシールド別に1対1で対戦した結果。緑=勝、赤=負。(レーティング500=互角、高いほど余裕勝ち)",
+        shieldTag: "シールド", win: "勝", loss: "負",
+        bbH: "⭐ ベストパートナー(L51)効果 — 新たに勝てる相手",
+        bbSub: "ベストパートナーにすると新たに勝てる相手です。相手がベストパートナーかどうかで結果が変わるため両方表示します。",
+        oppNoBB: "相手ノーBP (L50)", oppBB: "相手もBP (L51)",
+        bbMirrorNote: "※ ミラー・同種族値ライバル(カイオーガ)は相手もベストパートナーなら互角に戻ります(両方L51)。つまりBPでミラーに勝てるのは相手がノーBPのときだけです。",
+        noGain: "なし" },
+  "zh-TW": { h: "🔬 全環境100種完整模擬 — 遭遇並戰勝的對手", sub: "與大師聯盟前100名依護盾1對1對戰的結果。綠=勝，紅=負。(評分500=平手，越高越輕鬆)",
+        shieldTag: "護盾", win: "勝", loss: "負",
+        bbH: "⭐ 最佳夥伴(L51)效果 — 新增戰勝對手",
+        bbSub: "升最佳夥伴後新增戰勝的對手。結果取決於對手是否也升最佳夥伴，故兩種情況都顯示。",
+        oppNoBB: "對手未BP (L50)", oppBB: "對手也BP (L51)",
+        bbMirrorNote: "※ 鏡像·同種族值對手(蓋歐卡)在對手也升最佳夥伴時回到平手(雙方L51)。也就是說最佳夥伴只有在對手未升時才能贏鏡像。",
+        noGain: "無" },
 };
 
 // 전 메타 커버리지 그리드 — 팀빌더식(스프라이트 + 승/패 색 + 레이팅). 실드 토글.
-function CoverageSection({ lang, cov, bbCov }: { lang: Locale; cov: Coverage; bbCov?: Coverage }) {
+function CoverageSection({ lang, cov, bbCov, bbOppCov }: { lang: Locale; cov: Coverage; bbCov?: Coverage; bbOppCov?: Coverage }) {
   const [sh, setSh] = useState(1);
   const c = COV[lang] || COV.en;
   const cur = cov.find((x) => x.shields === sh) || cov[0];
@@ -89,11 +106,13 @@ function CoverageSection({ lang, cov, bbCov }: { lang: Locale; cov: Coverage; bb
   const wins = opps.filter((o) => o.win).length;
   const total = opps.length;
   const pct = Math.round((wins / total) * 100);
-  // 베스트버디 전/후: 같은 실드에서 패→승으로 뒤집히는 상대
-  const bbCur = bbCov?.find((x) => x.shields === sh);
-  const gained = bbCur
-    ? bbCur.opps.filter((o) => { const n = opps.find((x) => x.id === o.id); return n && !n.win && o.win; })
-    : [];
+  // 베스트파트너로 새로 이기는 상대(같은 실드, 노멀 대비). 상대 노베파/베파 두 경우.
+  const gainedOf = (c2?: Coverage) => {
+    const g = c2?.find((x) => x.shields === sh);
+    return g ? g.opps.filter((o) => { const n = opps.find((x) => x.id === o.id); return n && !n.win && o.win; }) : [];
+  };
+  const gainedNoBB = gainedOf(bbCov);
+  const gainedBB = gainedOf(bbOppCov);
   const cell = (o: { dex: number | null; name: string; rating: number; win: boolean }) => {
     const bg = o.win ? "#dcfce7" : "#fee2e2";
     const bd = o.win ? "#86efac" : "#fca5a5";
@@ -137,22 +156,32 @@ function CoverageSection({ lang, cov, bbCov }: { lang: Locale; cov: Coverage; bb
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(40px, 1fr))", gap: 4 }}>
         {opps.map(cell)}
       </div>
-      {/* 베스트버디 새로 이기는 상대 */}
+      {/* 베스트파트너 효과 — 상대 노베파/베파 두 시나리오 */}
       {bbCov && (
         <div style={{ marginTop: 16, background: "linear-gradient(120deg,#fef9c3,#ffffff 72%)", border: "1px solid #fde68a", borderRadius: 12, padding: "0.85rem 1rem" }}>
           <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a", marginBottom: 2 }}>{c.bbH}</div>
-          <div style={{ fontSize: "0.78rem", color: "#a16207", marginBottom: gained.length ? 10 : 0 }}>{gained.length ? c.gained(gained.length) : c.noGain}</div>
-          {gained.length > 0 && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(40px, 1fr))", gap: 4 }}>
-              {gained.map((o) => (
-                <div key={o.id} title={`${o.name} · +${o.rating}`} style={{ position: "relative", aspectRatio: "1", background: "#fef3c7", border: "1px solid #fbbf24", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={SPRITE(o.dex)} alt={o.name} width={30} height={30} loading="lazy" style={{ imageRendering: "pixelated" }} />
-                  <span style={{ position: "absolute", top: -3, right: -3, fontSize: "0.6rem" }}>⭐</span>
+          <div style={{ fontSize: "0.78rem", color: "#a16207", marginBottom: 10 }}>{c.bbSub}</div>
+          {([[c.oppNoBB, gainedNoBB], [c.oppBB, gainedBB]] as const).map(([label, list], i) => (
+            (i === 1 && !bbOppCov) ? null : (
+            <div key={i} style={{ marginBottom: 8 }}>
+              <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "#0f172a", marginBottom: 4 }}>
+                {label} <span style={{ color: "#a16207" }}>· +{list.length}{c.win}</span>
+              </div>
+              {list.length > 0 ? (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(40px, 1fr))", gap: 4 }}>
+                  {list.map((o) => (
+                    <div key={o.id} title={`${o.name} · ${o.rating}`} style={{ position: "relative", aspectRatio: "1", background: "#fef3c7", border: "1px solid #fbbf24", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={SPRITE(o.dex)} alt={o.name} width={30} height={30} loading="lazy" style={{ imageRendering: "pixelated" }} />
+                      <span style={{ position: "absolute", top: -3, right: -3, fontSize: "0.6rem" }}>⭐</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : <div style={{ fontSize: "0.76rem", color: "#94a3b8" }}>{c.noGain}</div>}
             </div>
-          )}
+            )
+          ))}
+          <div style={{ fontSize: "0.72rem", color: "#64748b", lineHeight: 1.55, marginTop: 6, paddingTop: 8, borderTop: "1px solid #fde68a" }}>{c.bbMirrorNote}</div>
         </div>
       )}
     </section>
@@ -272,7 +301,7 @@ export default function IvAnalysisView({ lang, id }: { lang: Locale; id: string 
 
         {/* 전 메타 100종 커버리지 그리드(연구 증거 — 팀빌더식) */}
         {sim.normal.coverage && (
-          <CoverageSection lang={lang} cov={sim.normal.coverage} bbCov={sim.bestBuddy.coverage} />
+          <CoverageSection lang={lang} cov={sim.normal.coverage} bbCov={sim.bestBuddy.coverage} bbOppCov={sim.bestBuddy.oppBB?.coverage} />
         )}
 
         {/* CMP — 공격15 필수(미러/라이벌 대결, 스프라이트) */}

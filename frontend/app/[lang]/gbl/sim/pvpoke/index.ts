@@ -143,10 +143,8 @@ function makePoke(c: Cfg, i: number, battle: any): any {
 
   if (!custom) {
     // PvPoke 기본(랭크1 IV/레벨) — pvpoke.com 기본값과 일치
+    if (c.bestBuddy) p.levelCap = (p.levelCap || 50) + 1;  // 베스트파트너 = 레벨캡 +1(마스터는 L51까지) → initialize가 최대레벨로 세팅
     p.initialize(cap);
-    if (c.bestBuddy && p.level < (p.levelCap || 50) + 1) {
-      p.setLevel(Math.min((p.levelCap || 50) + 1, p.level + 1), false);
-    }
   } else {
     p.isCustom = true;
     if (c.ivs) p.ivs = { atk: c.ivs[0], def: c.ivs[1], hp: c.ivs[2] };
@@ -242,7 +240,7 @@ export function runBattle(a: Cfg, b: Cfg, league: League) {
 }
 
 // 1 vs 메타 — 각 상대별 레이팅/승패
-export function runMulti(a: Cfg, league: League, shields = 1, limit = 100) {
+export function runMulti(a: Cfg, league: League, shields = 1, limit = 100, oppBestBuddy = false) {
   gm();
   const cap = CP[league];
   const meta = METAS()[league].slice(0, limit);
@@ -251,7 +249,7 @@ export function runMulti(a: Cfg, league: League, shields = 1, limit = 100) {
       const battle: any = new Battle();
       battle.setCP(cap);
       const pa = makePoke({ ...a, shields }, 0, battle);
-      const pb = makePoke({ speciesId: opp.s, fast: opp.m[0], charged: opp.m.slice(1), shields }, 1, battle);
+      const pb = makePoke({ speciesId: opp.s, fast: opp.m[0], charged: opp.m.slice(1), shields, bestBuddy: oppBestBuddy }, 1, battle);
       battle.setNewPokemon(pa, 0, false);
       battle.setNewPokemon(pb, 1, false);
       battle.setDecisionMethod("default");
