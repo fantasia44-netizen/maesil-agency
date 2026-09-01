@@ -10,8 +10,11 @@ export type SimSpread = {
   flips: { shields: number; oppId: string; dex: number | null; opp: string; types: string[]; from: boolean; to: boolean; delta: number }[];
   nearFlips: { shields: number; oppId: string; dex: number | null; opp: string; types: string[]; delta: number }[];
 };
+export type CoverageOpp = { id: string; name: string; dex: number | null; types: string[]; rating: number; win: boolean; score: number };
+export type Coverage = { shields: number; opps: CoverageOpp[] }[];
 export type Analysis = {
   hundo: { cp: number; level: number; stats: { atk: number; def: number; hp: number }; byShield: { shields: number; wins: number; losses: number }[] };
+  coverage?: Coverage;   // 전 메타 100종 전수 매치업(팀빌더식 커버리지 그리드용)
   spreads: SimSpread[];
 };
 export type CmpDuel = { shields: number; mine: number; opp: number; result: string }[];

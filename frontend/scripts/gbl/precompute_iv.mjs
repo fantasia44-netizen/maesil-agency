@@ -31,7 +31,7 @@ function statOf(iv, bb) {
 function metaRun(iv, shields, bb) {
   const r = runMulti({ speciesId: TARGET, ivs: iv, bestBuddy: bb, shields }, LEAGUE, shields, META_LIMIT);
   const byOpp = {};
-  for (const x of r.results) byOpp[x.oppId] = { id: x.oppId, name: x.oppName, types: x.oppTypes, rating: x.rating, win: x.win };
+  for (const x of r.results) byOpp[x.oppId] = { id: x.oppId, name: x.oppName, dex: dexOf(x.oppId), types: x.oppTypes, rating: x.rating, win: x.win, score: x.score };
   return { wins: r.wins, losses: r.losses, byOpp };
 }
 
@@ -61,9 +61,18 @@ function analyze(bb) {
              verdict: flips.length === 0 ? (effHundo ? "실질백" : "유사백") : "타협",
              byShield, flips, nearFlips: nearFlips.slice(0, 6) };
   });
+  // 전체 메타 커버리지(백 기준) — "실제로 100종 전수 시뮬했다"를 시각화(팀빌더식 매치업 그리드)
+  // 상대는 메타 랭킹(score) 순. 각 상대별 승/패·레이팅을 실드별로 저장.
+  const coverage = SHIELDS.map((s) => ({
+    shields: s,
+    opps: Object.values(hundoRuns[s].byOpp).map((o) => ({
+      id: o.id, name: o.name, dex: o.dex, types: o.types, rating: o.rating, win: o.win, score: o.score,
+    })),
+  }));
+
   return { hundo: { cp: hundoStat.cp, level: hundoStat.level, stats: hundoStat.stats,
                     byShield: SHIELDS.map((s) => ({ shields: s, wins: hundoRuns[s].wins, losses: hundoRuns[s].losses })) },
-           spreads };
+           coverage, spreads };
 }
 
 // CMP 대결 — 공격14(내) vs 공격15(상대). 미러 + 라이벌. (공격 IV 필수성 증명)

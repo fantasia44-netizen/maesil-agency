@@ -6,10 +6,13 @@ import Link from "next/link";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 import { localizePath, type Locale } from "../../../../../lib/i18n";
-import { ivEntry, type SimSpread } from "../analysis/registry";
+import { ivEntry, type SimSpread, type Coverage } from "../analysis/registry";
 import { getUser } from "../../../../../lib/api";
+import DEX_TYPE from "../../dex_type.json";
 
 const SPRITE = (dex: number | null) => dex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png` : "";
+const DT = DEX_TYPE as Record<string, string>;
+const primaryType = (dex: number | null) => (dex ? DT[String(dex)] : null) || "normal";
 
 const CARD = "#ffffff", BORDER = "#e3e8f2";
 const TYPE_COLOR: Record<string, string> = {
@@ -59,6 +62,102 @@ const METHOD: Record<Locale, string> = {
   ja: "この判定は、オープンソースのPvPoke対戦エンジンでマスターリーグ上位100種すべて、シールド0・1・2枚の全シナリオをシミュレートした結果です。100%個体と勝敗が変わる相手が一つもなければ「準100」、ステータス・CPまで同一なら「実質100」、勝敗を落とす相手が出れば「妥協」と表記しました。",
   "zh-TW": "此判定以開源PvPoke對戰引擎，將各個體值對大師聯盟前100名、護盾0·1·2的所有情境完整模擬得出。若與100%相比無任何對戰勝負改變則為「準100」，連數值·CP都相同則為「實質100」，若有對手落敗則為「妥協」。",
 };
+
+// ── 전 메타 커버리지 그리드 문구 ──
+const COV: Record<Locale, { h: string; sub: string; shieldTag: string; win: string; loss: string; hi: string; lo: string; bbH: string; bbSub: string; gained: (n: number) => string; noGain: string; legendWin: string; legendLoss: string }> = {
+  ko: { h: "🔬 전 메타 100종 전수 시뮬 — 만나고 이기는 상대", sub: "마스터리그 상위 100종과 실드별로 1:1 직접 배틀한 결과입니다. 초록=승, 빨강=패. (배틀 레이팅 500=대등, 높을수록 여유승)",
+        shieldTag: "실드", win: "승", loss: "패", hi: "여유승", lo: "신승", bbH: "⭐ 베스트버디 전/후 — 새로 이기는 상대", bbSub: "베스트버디(L51)로 키우면 같은 실드에서 승패가 뒤집히는 상대입니다.",
+        gained: (n) => `베스트버디 시 새로 이기는 상대 ${n}종`, noGain: "이 실드에서는 베스트버디로 새로 이기는 상대가 없습니다(이미 충분).", legendWin: "승", legendLoss: "패" },
+  en: { h: "🔬 Full-meta sim — all 100, who you meet & beat", sub: "1-on-1 battles against the Master League top 100, per shield count. Green = win, red = loss. (Battle rating 500 = even; higher = more comfortable.)",
+        shieldTag: "shields", win: "W", loss: "L", hi: "comfortable", lo: "narrow", bbH: "⭐ Best Buddy before/after — newly won matchups", bbSub: "Opponents that flip from loss to win at the same shield count once best-buddied (L51).",
+        gained: (n) => `${n} new wins with Best Buddy`, noGain: "No new wins from Best Buddy at this shield count (already enough).", legendWin: "Win", legendLoss: "Loss" },
+  ja: { h: "🔬 全メタ100種フルシミュ — 遭遇して勝てる相手", sub: "マスター上位100種とシールド別に1対1で直接対戦した結果です。緑=勝、赤=負。(バトルレーティング500=互角、高いほど余裕勝ち)",
+        shieldTag: "シールド", win: "勝", loss: "負", hi: "余裕", lo: "辛勝", bbH: "⭐ ベストバディ前後 — 新たに勝てる相手", bbSub: "ベストバディ(L51)にすると同じシールドで勝敗が逆転する相手です。",
+        gained: (n) => `ベストバディで新たに勝てる相手 ${n}種`, noGain: "このシールドではベストバディで新たに勝てる相手はいません(既に十分)。", legendWin: "勝", legendLoss: "負" },
+  "zh-TW": { h: "🔬 全環境100種完整模擬 — 遭遇並戰勝的對手", sub: "與大師聯盟前100名依護盾數1對1直接對戰的結果。綠=勝，紅=負。(對戰評分500=平手，越高越輕鬆)",
+        shieldTag: "護盾", win: "勝", loss: "負", hi: "輕鬆", lo: "險勝", bbH: "⭐ 最佳夥伴前後 — 新增戰勝對手", bbSub: "升最佳夥伴(L51)後，同護盾數下勝負逆轉的對手。",
+        gained: (n) => `最佳夥伴新增戰勝 ${n} 種`, noGain: "此護盾數下最佳夥伴無新增戰勝對手(已足夠)。", legendWin: "勝", legendLoss: "負" },
+};
+
+// 전 메타 커버리지 그리드 — 팀빌더식(스프라이트 + 승/패 색 + 레이팅). 실드 토글.
+function CoverageSection({ lang, cov, bbCov }: { lang: Locale; cov: Coverage; bbCov?: Coverage }) {
+  const [sh, setSh] = useState(1);
+  const c = COV[lang] || COV.en;
+  const cur = cov.find((x) => x.shields === sh) || cov[0];
+  if (!cur) return null;
+  const opps = cur.opps;
+  const wins = opps.filter((o) => o.win).length;
+  const total = opps.length;
+  const pct = Math.round((wins / total) * 100);
+  // 베스트버디 전/후: 같은 실드에서 패→승으로 뒤집히는 상대
+  const bbCur = bbCov?.find((x) => x.shields === sh);
+  const gained = bbCur
+    ? bbCur.opps.filter((o) => { const n = opps.find((x) => x.id === o.id); return n && !n.win && o.win; })
+    : [];
+  const cell = (o: { dex: number | null; name: string; rating: number; win: boolean }) => {
+    const bg = o.win ? "#dcfce7" : "#fee2e2";
+    const bd = o.win ? "#86efac" : "#fca5a5";
+    const rc = o.win ? "#15803d" : "#b91c1c";
+    return (
+      <div key={o.dex + o.name} title={`${o.name} · ${o.rating}`}
+        style={{ position: "relative", aspectRatio: "1", background: bg, border: `1px solid ${bd}`, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={SPRITE(o.dex)} alt={o.name} width={30} height={30} loading="lazy" style={{ imageRendering: "pixelated" }} />
+        <span style={{ position: "absolute", bottom: 0, right: 1, fontSize: "0.52rem", fontWeight: 800, color: rc }}>{o.rating}</span>
+      </div>
+    );
+  };
+  return (
+    <section style={{ marginBottom: 26 }}>
+      <h2 style={{ fontSize: "1.05rem", fontWeight: 800, margin: "0 0 4px", color: "#0f172a" }}>{c.h}</h2>
+      <p style={{ margin: "0 0 10px", fontSize: "0.8rem", color: "#64748b", lineHeight: 1.6 }}>{c.sub}</p>
+      {/* 실드 토글 */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+        {[0, 1, 2].map((s) => (
+          <button key={s} onClick={() => setSh(s)}
+            style={{ padding: "5px 14px", borderRadius: 999, fontSize: "0.8rem", fontWeight: 800, cursor: "pointer",
+              border: sh === s ? "none" : "1px solid #dbe2ee", background: sh === s ? "#3b5bdb" : "#fff", color: sh === s ? "#fff" : "#475569" }}>
+            {c.shieldTag} {s}
+          </button>
+        ))}
+      </div>
+      {/* 승률 바 */}
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem", fontWeight: 800, marginBottom: 4 }}>
+          <span style={{ color: "#15803d" }}>{wins}{c.win}</span>
+          <span style={{ color: "#0f172a" }}>{pct}%</span>
+          <span style={{ color: "#b91c1c" }}>{total - wins}{c.loss}</span>
+        </div>
+        <div style={{ height: 10, borderRadius: 999, overflow: "hidden", display: "flex", border: `1px solid ${BORDER}` }}>
+          <div style={{ width: `${pct}%`, background: "linear-gradient(90deg,#22c55e,#16a34a)" }} />
+          <div style={{ flex: 1, background: "#fecaca" }} />
+        </div>
+      </div>
+      {/* 100종 스프라이트 그리드 */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(40px, 1fr))", gap: 4 }}>
+        {opps.map(cell)}
+      </div>
+      {/* 베스트버디 새로 이기는 상대 */}
+      {bbCov && (
+        <div style={{ marginTop: 16, background: "linear-gradient(120deg,#fef9c3,#ffffff 72%)", border: "1px solid #fde68a", borderRadius: 12, padding: "0.85rem 1rem" }}>
+          <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a", marginBottom: 2 }}>{c.bbH}</div>
+          <div style={{ fontSize: "0.78rem", color: "#a16207", marginBottom: gained.length ? 10 : 0 }}>{gained.length ? c.gained(gained.length) : c.noGain}</div>
+          {gained.length > 0 && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(40px, 1fr))", gap: 4 }}>
+              {gained.map((o) => (
+                <div key={o.id} title={`${o.name} · +${o.rating}`} style={{ position: "relative", aspectRatio: "1", background: "#fef3c7", border: "1px solid #fbbf24", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={SPRITE(o.dex)} alt={o.name} width={30} height={30} loading="lazy" style={{ imageRendering: "pixelated" }} />
+                  <span style={{ position: "absolute", top: -3, right: -3, fontSize: "0.6rem" }}>⭐</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
 
 // 불리 매치업 스프라이트 칩(상대별 dedupe, 실드 태그 병합)
 function weakChips(spread: SimSpread, shieldWord: string) {
@@ -115,15 +214,24 @@ export default function IvAnalysisView({ lang, id }: { lang: Locale; id: string 
           <Link href={L(`/gbl/pokemon/master/${id}`)} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>{name}</Link>
         </div>
 
-        {/* 히어로 */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 6 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={SPRITE(e.dex)} alt={name} width={68} height={68} style={{ imageRendering: "pixelated" }} />
-          <div>
-            <h1 style={{ margin: 0, fontSize: "1.4rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>{a.title}</h1>
-            <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: 4 }}>100% CP {nrm.hundo.cp} · L{nrm.hundo.level} · {e.season} · {u.updated} {e.updated}</div>
-          </div>
-        </div>
+        {/* 히어로 배너 — 타입 테마 그라디언트 + 큰 스프라이트(썸네일/og 재사용 가능) */}
+        {(() => {
+          const tc = TYPE_COLOR[primaryType(e.dex)] || "#3b5bdb";
+          return (
+            <div style={{ position: "relative", overflow: "hidden", borderRadius: 16, padding: "1.15rem 1.2rem", marginBottom: 8,
+              background: `radial-gradient(520px 180px at 90% -25%, ${tc}44, transparent 66%), linear-gradient(135deg, ${tc}14, #ffffff 82%)`,
+              border: `1px solid ${tc}40` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={SPRITE(e.dex)} alt={name} width={92} height={92} style={{ imageRendering: "pixelated", filter: `drop-shadow(0 4px 10px ${tc}55)`, flexShrink: 0 }} />
+                <div style={{ minWidth: 0 }}>
+                  <h1 style={{ margin: 0, fontSize: "1.4rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>{a.title}</h1>
+                  <div style={{ fontSize: "0.76rem", color: "#475569", marginTop: 5, fontWeight: 600 }}>💯 CP {nrm.hundo.cp} · L{nrm.hundo.level} · {e.season} · {u.updated} {e.updated}</div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* 공감 후킹 리드 */}
         {a.hook && <p style={{ margin: "0.6rem 0 0.3rem", fontSize: "0.98rem", color: "#0f172a", fontWeight: 700, lineHeight: 1.75 }}>{a.hook}</p>}
@@ -160,6 +268,11 @@ export default function IvAnalysisView({ lang, id }: { lang: Locale; id: string 
               })}
             </div>
           </div>
+        )}
+
+        {/* 전 메타 100종 커버리지 그리드(연구 증거 — 팀빌더식) */}
+        {sim.normal.coverage && (
+          <CoverageSection lang={lang} cov={sim.normal.coverage} bbCov={sim.bestBuddy.coverage} />
         )}
 
         {/* CMP — 공격15 필수(미러/라이벌 대결, 스프라이트) */}
