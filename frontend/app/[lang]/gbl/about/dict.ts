@@ -9,6 +9,7 @@ export type AboutDict = {
   whatMetaB: string; whatMetaRest: string;
   dataH: string;
   dataA: string; dataB: string; dataC: string;
+  methH: string; methExtL: string; methExt: string; methOwnL: string; methOwn: string; methAnaL: string; methAna: string;
   usageH: string;
   usageA: string; usageB: string; usageC: string; usageLink: string; usageD: string;
   startCta: string;
@@ -36,6 +37,13 @@ const ko: AboutDict = {
   dataA: "실측 메타는 GBL Note 사용자들이 남긴 대전 기록에서 ",
   dataB: "개인 식별정보를 제거한 익명 통계",
   dataC: "로만 집계합니다. 티어와 추천 기술배치는 공개 전투 시뮬레이션 데이터를 기반으로 하며, 여기에 유저 실측 픽률을 함께 제공하는 것이 GBL Note의 특징입니다. 이론상 강한 포켓몬과 실제로 많이 만나는 포켓몬을 함께 볼 수 있습니다.",
+  methH: "데이터 방법론 — 무엇을, 어떻게",
+  methExtL: "외부 공개 데이터",
+  methExt: "PvPoke 전투 시뮬레이션(티어·추천 기술·매치업), 게임 스프라이트. 출처를 명시하며 그대로 베끼지 않고 계산·해석의 입력으로만 사용합니다.",
+  methOwnL: "GBL Note 자체 실측 데이터",
+  methOwn: "사용자들이 실제 대전에서 만난 상대를 개인정보 제거 후 익명 집계 → 리그별 실측 픽률(최근 30일). 다른 사이트가 복제할 수 없는 원본입니다.",
+  methAnaL: "GBL Note 자체 분석",
+  methAna: "이론 티어와 실측 픽률을 비교하고, 카운터·주요 매치업을 정리합니다. (타협개체·CMP·Breakpoint 심층 분석 확대 예정)",
   usageH: "이용 안내",
   usageA: "기록 기능은 무료이며, 서비스 운영을 위해 광고가 포함될 수 있습니다. GBL Note는 팬이 만든 ",
   usageB: "비공식",
@@ -69,6 +77,13 @@ const en: AboutDict = {
   dataA: "The live meta is aggregated only as ",
   dataB: "anonymized statistics with personal identifiers removed",
   dataC: ", drawn from the battle logs GBL Note users leave. Tiers and recommended movesets are based on public battle simulation data, and pairing that with users’ live pick rates is what makes GBL Note distinctive — you can see the theoretically strong Pokémon alongside the ones you actually meet most.",
+  methH: "Data methodology — what, and how",
+  methExtL: "External open data",
+  methExt: "PvPoke battle simulation (tiers, recommended moves, matchups) and game sprites. We cite sources and never copy them verbatim — they are only inputs to our own calculation and interpretation.",
+  methOwnL: "GBL Note's own measured data",
+  methOwn: "Opponents users actually faced, anonymized with identifiers removed, aggregated into per-league live pick rates (last 30 days). Original data other sites cannot replicate.",
+  methAnaL: "GBL Note's own analysis",
+  methAna: "We compare theoretical tiers against live pick rates and lay out counters and key matchups. (Compromise-IV, CMP and breakpoint deep-dives coming.)",
   usageH: "Usage notes",
   usageA: "The logging features are free, and ads may be included to keep the service running. GBL Note is a fan-made ",
   usageB: "unofficial",
@@ -102,6 +117,13 @@ const ja: AboutDict = {
   dataA: "実測メタは、GBL Note 利用者が残した対戦記録から",
   dataB: "個人を識別できる情報を除いた匿名統計",
   dataC: "としてのみ集計しています。ティアと推奨技構成は公開の戦闘シミュレーションデータに基づき、そこにユーザーの実測ピック率を併せて提供するのが GBL Note の特徴です。理論上強いポケモンと、実際によく遭遇するポケモンを一緒に確認できます。",
+  methH: "データ方法論 — 何を、どう",
+  methExtL: "外部の公開データ",
+  methExt: "PvPokeの戦闘シミュレーション(ティア・推奨技・対面)、ゲームスプライト。出典を明記し、そのまま転載せず、計算・解釈の入力としてのみ利用します。",
+  methOwnL: "GBL Note 独自の実測データ",
+  methOwn: "ユーザーが実際に対戦した相手を個人情報を除いて匿名集計 → リーグ別の実測ピック率(直近30日)。他サイトが複製できない独自データです。",
+  methAnaL: "GBL Note 独自の分析",
+  methAna: "理論ティアと実測ピック率を比較し、カウンター・主要対面を整理します。(妥協個体・CMP・ブレイクポイントの深掘りは拡大予定)",
   usageH: "ご利用にあたって",
   usageA: "記録機能は無料で、サービス運営のため広告が含まれる場合があります。GBL Note はファンが作った",
   usageB: "非公式",
@@ -135,6 +157,13 @@ const zhTW: AboutDict = {
   dataA: "實測環境僅以 GBL Note 使用者留下的對戰記錄中 ",
   dataB: "去除個人識別資訊的匿名統計",
   dataC: " 彙整。強度與推薦招式配置以公開對戰模擬資料為基礎，並一併提供玩家實測使用率，這是 GBL Note 的特色。可同時比較理論上強勢與實際常遇到的寶可夢。",
+  methH: "資料方法論 — 做什麼、怎麼做",
+  methExtL: "外部公開資料",
+  methExt: "PvPoke 對戰模擬（強度·推薦招式·對面）、遊戲圖示。標明出處且不直接照抄，僅作為計算與解讀的輸入。",
+  methOwnL: "GBL Note 自有實測資料",
+  methOwn: "將使用者實際對戰遇到的對手去除個資後匿名彙整 → 各聯盟實測使用率（近30日）。是其他網站無法複製的原創資料。",
+  methAnaL: "GBL Note 自有分析",
+  methAna: "比較理論強度與實測使用率，整理剋星與主要對面。（折衷個體·CMP·Breakpoint 深入分析將擴充）",
   usageH: "使用說明",
   usageA: "記錄功能免費，為維持服務營運可能包含廣告。GBL Note 是粉絲製作的 ",
   usageB: "非官方",
