@@ -32,6 +32,32 @@ const STRIP: Record<Locale, { h: string; more: string; note: string }> = {
   "zh-TW": { h: "🔴 即時實測TOP5（近7日）", more: "完整實測Meta →", note: "並非模擬，而是玩家實際對戰遇到的對手統計" },
 };
 
+// ── SSR 미션 히어로(정문 독창성 — 크롤러가 초기 HTML에서 "무엇을/왜"를 읽음) ──
+// 퍼널: 실측메타 → 티어 → IV → CMP → 시뮬 → 레이드
+const FUNNEL_PATHS = ["/gbl/meta", "/gbl/tier/great", "/gbl/iv", "/gbl/cmp/great", "/gbl/sim", "/gbl/raid"];
+const HERO: Record<Locale, { h1: string; mission: string; funnel: string[] }> = {
+  ko: {
+    h1: "GBL Note — 포켓몬GO PvP·레이드 올인원 분석",
+    mission: "PvPoke 공개 시뮬레이션 데이터와 GBL Note 사용자의 실제 배틀 기록을 결합해, 포켓몬GO 배틀리그(PvP)와 레이드를 데이터로 분석합니다.",
+    funnel: ["실측 메타", "티어표", "PvP IV", "CMP 순위", "시뮬레이터", "레이드"],
+  },
+  en: {
+    h1: "GBL Note — Pokémon GO PvP & Raid Analysis, All-in-One",
+    mission: "GBL Note combines public PvPoke simulation data with real battle records from our users to analyze Pokémon GO Battle League (PvP) and raids with data.",
+    funnel: ["Live meta", "Tier list", "PvP IV", "CMP", "Simulator", "Raids"],
+  },
+  ja: {
+    h1: "GBL Note — ポケモンGO PvP・レイド オールインワン分析",
+    mission: "PvPoke公開シミュレーションデータとGBL Note利用者の実際のバトル記録を組み合わせ、ポケモンGOバトルリーグ(PvP)とレイドをデータで分析します。",
+    funnel: ["実測メタ", "ティア表", "PvP IV", "CMP", "シミュレーター", "レイド"],
+  },
+  "zh-TW": {
+    h1: "GBL Note — Pokémon GO PvP·團體戰 一站式分析",
+    mission: "結合 PvPoke 公開模擬數據與 GBL Note 使用者的實際對戰紀錄，以數據分析 Pokémon GO 對戰聯盟（PvP）與團體戰。",
+    funnel: ["實測Meta", "強度表", "PvP IV", "CMP", "模擬器", "團體戰"],
+  },
+};
+
 const CARD = "#ffffff";
 const BORDER = "#e3e8f2";
 
@@ -44,8 +70,30 @@ export default async function GblLandingPage({ params }: { params: { lang: strin
   const cols = LEAGUES.map((lg, i) => ({ lg, meta: metas[i] }))
     .filter((x): x is { lg: string; meta: Meta } => !!x.meta && x.meta.total > 0);
 
+  const hero = HERO[lang];
+
   return (
     <>
+      {/* ── SSR 미션 히어로(정문 독창성 · 크롤러가 초기 HTML에서 읽는 h1·미션·내부링크) ── */}
+      <div style={{ background: "linear-gradient(180deg,#eef2fb,#f7f9fd)", padding: "1.5rem 1rem 0.5rem" }}>
+        <div style={{ maxWidth: 1040, margin: "0 auto" }}>
+          <h1 style={{ margin: "0 0 6px", fontSize: "clamp(1.15rem,4.5vw,1.5rem)", fontWeight: 900, color: "#1e2f9e", letterSpacing: "-0.5px", lineHeight: 1.25 }}>
+            {hero.h1}
+          </h1>
+          <p style={{ margin: "0 0 10px", fontSize: "0.86rem", color: "#475569", lineHeight: 1.6, maxWidth: 760 }}>
+            {hero.mission}
+          </p>
+          <nav style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+            {FUNNEL_PATHS.map((p, i) => (
+              <Link key={p} href={L(p)} style={{
+                fontSize: "0.78rem", fontWeight: 700, color: "#3b5bdb", textDecoration: "none",
+                background: "#fff", border: "1px solid #dbe4f5", borderRadius: 999, padding: "5px 12px",
+              }}>{hero.funnel[i]}</Link>
+            ))}
+          </nav>
+        </div>
+      </div>
+
       {/* ── 서버렌더 실측 TOP5 스트립(크롤러가 읽는 고유 데이터 + 내부링크) ── */}
       {cols.length > 0 && (
         <div style={{ background: "linear-gradient(180deg,#eef2fb,#f7f9fd)", padding: "1.4rem 1rem 1.6rem" }}>

@@ -86,10 +86,11 @@ export default function GblLandingClient() {
         <div style={{ textAlign: "center", marginBottom: 22 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/gbl-icon.png" alt="GBL Note" width={78} height={78} style={{ marginBottom: 6 }} />
-          <h1 style={{
+          {/* 브랜드 워드마크(시각). 페이지 대표 h1은 서버렌더 미션 히어로(page.tsx)에 있음 — 중복 h1 방지. */}
+          <div style={{
             margin: "0 0 8px", fontSize: "clamp(2rem, 9vw, 3.2rem)", fontWeight: 900, letterSpacing: "-1.5px", lineHeight: 1,
             color: "#2540b8",  // solid 색 — 그라디언트 투명텍스트는 SEO 스캐너가 '숨김/없음'으로 오판하므로 사용 안 함
-          }}>GBL NOTE</h1>
+          }}>GBL NOTE</div>
           <p style={{ margin: "0 0 4px", fontSize: "clamp(0.95rem,4.5vw,1.25rem)", fontWeight: 800, color: "#0f172a" }}>
             {t.heroPrefix} <span style={{ color: "#3b5bdb" }}>{t.allInOne}</span>
           </p>
