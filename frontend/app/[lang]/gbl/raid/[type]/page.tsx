@@ -117,6 +117,8 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
   // 버전 해석 — searchParams.v(유효 버전만), 기본=현재
   const ver = searchParams?.v && RAID_BY_VER[searchParams.v] ? searchParams.v : "current";
   const RDV = RAID_BY_VER[ver];
+  const verInfo = RAID_VERSIONS.find((v) => v.slug === ver) || RAID_VERSIONS[RAID_VERSIONS.length - 1];
+  const verLabel = `${verInfo.isNew ? "🌙 " : ""}${verInfo.label[lang] || verInfo.label.ko}`;
   const rows = RDV.types[type] || [];
   const c = TYPE_COLOR[type] || "#64748b";
 
@@ -134,6 +136,26 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
           <Link href={L("/gbl")} style={{ marginLeft: "auto", fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>{d.navPvp}</Link>
         </div>
 
+        {/* 버전 선택 (상단) — 현재 / 메가 피날레 슈퍼메가 */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+          {RAID_VERSIONS.map((v) => {
+            const on = v.slug === ver;
+            const href = v.slug === "current" ? L(`/gbl/raid/${type}`) : `${L(`/gbl/raid/${type}`)}?v=${v.slug}`;
+            return (
+              <Link key={v.slug} href={href} scroll={false}
+                style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 14px", borderRadius: 16, fontSize: "0.82rem", fontWeight: 800, textDecoration: "none",
+                  border: on ? (v.isNew ? "1px solid #6d28d9" : "1px solid #0f172a") : `1px solid ${BORDER}`,
+                  background: on ? (v.isNew ? "linear-gradient(135deg,#4c1d95,#6d28d9)" : "#0f172a") : CARD,
+                  color: on ? "#fff" : "#64748b" }}>
+                {v.isNew && "🌙"} {v.label[lang] || v.label.ko}
+              </Link>
+            );
+          })}
+          {ver !== "current" && RAID_VER_NOTE[ver] && (
+            <span style={{ fontSize: "0.72rem", color: "#6d28d9", fontWeight: 700 }}>{RAID_VER_NOTE[ver][lang] || RAID_VER_NOTE[ver].ko}</span>
+          )}
+        </div>
+
         {/* 속성 스위처 */}
         <div style={{ display: "flex", gap: 5, marginBottom: 14, flexWrap: "wrap" }}>
           {TYPES.map((tk) => {
@@ -147,26 +169,6 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
               </Link>
             );
           })}
-        </div>
-
-        {/* 버전 선택 (현재 / 메가 피날레 슈퍼메가) */}
-        <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
-          {RAID_VERSIONS.map((v) => {
-            const on = v.slug === ver;
-            const href = v.slug === "current" ? L(`/gbl/raid/${type}`) : `${L(`/gbl/raid/${type}`)}?v=${v.slug}`;
-            return (
-              <Link key={v.slug} href={href} scroll={false}
-                style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 13px", borderRadius: 16, fontSize: "0.8rem", fontWeight: 800, textDecoration: "none",
-                  border: on ? (v.isNew ? "1px solid #6d28d9" : "1px solid #0f172a") : `1px solid ${BORDER}`,
-                  background: on ? (v.isNew ? "linear-gradient(135deg,#4c1d95,#6d28d9)" : "#0f172a") : CARD,
-                  color: on ? "#fff" : "#64748b" }}>
-                {v.isNew && "🌙"} {v.label[lang] || v.label.ko}
-              </Link>
-            );
-          })}
-          {ver !== "current" && RAID_VER_NOTE[ver] && (
-            <span style={{ fontSize: "0.72rem", color: "#6d28d9", fontWeight: 700 }}>{RAID_VER_NOTE[ver][lang] || RAID_VER_NOTE[ver].ko}</span>
-          )}
         </div>
 
         <h1 style={{ margin: "0.2rem 0", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>
@@ -188,11 +190,11 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
         {rows.length > 0 && (
           <ListShare
             title={`${tName} ${d.shareTitleSuffix}`}
-            subtitle={d.shareSubtitle}
-            path={`/gbl/raid/${type}`}
+            subtitle={`${verLabel} · ${d.shareSubtitle}`}
+            path={ver === "current" ? `/gbl/raid/${type}` : `/gbl/raid/${type}?v=${ver}`}
             accent={c}
             buttonLabel={d.shareButton}
-            filename={`gbl-raid-${type}.png`}
+            filename={`gbl-raid-${type}${ver === "current" ? "" : "-" + ver}.png`}
             footerTag={d.shareFooter}
             trackLabel="raid-dealer"
             headerIcon={type}
