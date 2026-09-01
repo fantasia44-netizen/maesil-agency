@@ -135,7 +135,7 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
   const events = await getEvents();
 
   // 달력엔 과거 이벤트도 포함(빈 날짜 채우기). 피드에 남아있는 범위까지.
-  const calEvents: CalEvent[] = events.flatMap((e): CalEvent[] => {
+  let calEvents: CalEvent[] = events.flatMap((e): CalEvent[] => {
     if (e.eventType === "raid-battles") { const r = rotInfo(e.name, t); return [{ kind: "rotation", variant: r.variant, title: r.title, start: e.start, end: e.end, bosses: bossesOf(lang, e, t) }]; }
     if (e.eventType === "raid-hour") return [{ kind: "hour", title: localEventName(lang, e.name, t), guide: t.guideHour, start: e.start, end: e.end, bosses: [] }];
     if (e.eventType === "raid-day") return [{ kind: "day", title: localEventName(lang, e.name, t), guide: /super mega|mega raid day/i.test(e.name) ? t.guideSuperMega : t.guideDay, start: e.start, end: e.end, bosses: [] }];
@@ -159,6 +159,36 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
   for (const r of PAST_RAIDS) {
     calEvents.push({ kind: "rotation", variant: r.variant, title: rotInfo(r.variant === "mega" ? "Mega Raid" : r.variant === "shadow" ? "Shadow Raid" : "", t).title, start: r.start, end: r.end,
       bosses: r.bosses.map((b) => ({ ko: koMon(b.en), name: monLocal(lang, b.en, t), dex: b.dex, image: "", shiny: b.shiny })) });
+  }
+
+  // ── 메가 어센션(2026-08-31~09-06) — 이 기간 5성·그림자·정규 메가·레이드아워·스포트라이트 중단, 메가 레이드가 대체(LeekDuck 공식) ──
+  const MA_START = "2026-08-31T06:00:00+09:00", MA_END = "2026-09-06T22:00:00+09:00";
+  const maS = Date.parse(MA_START), maE = Date.parse(MA_END);
+  const megaAscensionActive = Date.now() >= maS && Date.now() < maE;
+  // 겹치는 정규 로테이션 클립 — 기간 안쪽 제거(그 기간엔 실제로 안 열림), 이전/이후 조각만 유지
+  calEvents = calEvents.flatMap((ev): CalEvent[] => {
+    if (ev.kind !== "rotation") return [ev];
+    const s = Date.parse(ev.start), e = Date.parse(ev.end);
+    if (e <= maS || s >= maE) return [ev];   // 겹침 없음
+    const out: CalEvent[] = [];
+    if (s < maS) out.push({ ...ev, end: MA_START });   // 이전 조각
+    if (e > maE) out.push({ ...ev, start: MA_END });    // 이후 조각
+    return out;
+  });
+  // 메가 어센션 대체 레이드(일자별 + 기간내내 라티아스/라티오스)
+  const D = (day: string) => `2026-09-${day}T06:00:00+09:00`;
+  const MEGA_ASCENSION: { start: string; end: string; bosses: { en: string; dex: string }[] }[] = [
+    { start: MA_START, end: D("01"), bosses: [{ en: "Mega Victreebel", dex: "71" }, { en: "Mega Dragonite", dex: "149" }, { en: "Mega Malamar", dex: "687" }] },
+    { start: D("01"), end: D("02"), bosses: [{ en: "Mega Falinks", dex: "870" }] },
+    { start: D("02"), end: D("03"), bosses: [{ en: "Mega Skarmory", dex: "227" }] },
+    { start: D("03"), end: D("04"), bosses: [{ en: "Mega Starmie", dex: "121" }] },
+    { start: D("04"), end: D("05"), bosses: [{ en: "Mega Raichu", dex: "26" }] },
+    { start: MA_START, end: MA_END, bosses: [{ en: "Mega Latias", dex: "380" }, { en: "Mega Latios", dex: "381" }] },
+  ];
+  const maLabel = lang === "en" ? "Mega Ascension" : lang === "ja" ? "メガアセンション" : lang === "zh-TW" ? "超級進化盛典" : "메가 어센션";
+  for (const r of MEGA_ASCENSION) {
+    calEvents.push({ kind: "rotation", variant: "mega", title: `${t.rotMegaTitle} · ${maLabel}`, start: r.start, end: r.end,
+      bosses: r.bosses.map((b) => ({ ko: koMon(b.en), name: monLocal(lang, b.en, t), dex: b.dex, image: "", shiny: true })) });
   }
 
   // KST(UTC+9) 벽시계 날짜 — 서버가 UTC라도 한국 '오늘'이 맞도록(새벽 0~9시 하루 밀림 방지)
@@ -188,6 +218,22 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
         <p style={{ margin: "0.4rem 0 0.8rem", fontSize: "0.9rem", color: "#475569", lineHeight: 1.7 }}>
           {t.intro.map((s, i) => s.b ? <b key={i} style={{ color: "#334155" }}>{s.t}</b> : <span key={i}>{s.t}</span>)}
         </p>
+
+        {/* 메가 어센션 진행 중 — 5성·그림자·정규 레이드 중단 안내 */}
+        {megaAscensionActive && (
+          <div style={{ display: "flex", gap: 10, alignItems: "flex-start", background: "linear-gradient(120deg,#f5f3ff,#ffffff 70%)", border: "1px solid #ddd6fe", borderLeft: "4px solid #7c3aed", borderRadius: 12, padding: "0.85rem 1rem", marginBottom: 14 }}>
+            <span style={{ fontSize: "1.3rem", lineHeight: 1.2 }}>🌙</span>
+            <div style={{ fontSize: "0.86rem", color: "#4c1d95", lineHeight: 1.6 }}>
+              <b style={{ color: "#6d28d9" }}>{maLabel} {lang === "ko" ? "진행 중 (8/31~9/6)" : "(Aug 31–Sep 6)"}</b>
+              <div style={{ color: "#5b21b6", marginTop: 2 }}>
+                {lang === "en" ? "5-star, Shadow, and regular Mega raids are paused. Mega Ascension raids replace them (megas below rotate daily)."
+                  : lang === "ja" ? "5つ星・シャドウ・通常メガレイドは休止。メガアセンションのメガレイドが代替（下記メガが日替わり）。"
+                  : lang === "zh-TW" ? "5星、暗影、常規超級Mega團戰暫停，改由超級進化盛典的Mega團戰替代（下方Mega每日輪替）。"
+                  : "5성·그림자·정규 메가 레이드가 중단되고, 메가 어센션 메가 레이드로 대체됩니다 (아래 메가가 일자별 로테이션)."}
+              </div>
+            </div>
+          </div>
+        )}
 
         {calEvents.length === 0 ? (
           <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem 1rem" }}>{t.loadFail}</div>
