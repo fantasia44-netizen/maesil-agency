@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { track } from "../../../../../lib/track";
 import { monSprite, formDex } from "../../sprite";
 import { loadLogo, drawBrandFooter } from "../raidShareUtil";
@@ -273,7 +273,10 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
 
   // 보스 로테이션 기간 아젠다(전 기간, 시작일순) — 보스 클릭 시 CP 모달
   const fmtD = (iso: string) => { const d = new Date(iso); return `${d.getMonth() + 1}.${d.getDate()}`; };
-  const nowTs = Date.now();
+  // 하이드레이션 안전: SSR·초기렌더는 today(서버 KST 날짜) 정오로 고정 → 서버/클라 일치.
+  // 마운트 후 실제 시각으로 갱신(클라 전용, 불일치 없음). Date.now()를 렌더 중 직접 쓰면 하이드레이션 깨짐.
+  const [nowTs, setNowTs] = useState(() => Date.parse(today + "T12:00:00+09:00") || Date.parse(today) || 0);
+  useEffect(() => { setNowTs(Date.now()); }, []);
   // 진행 중/예정만 노출 — 종료된 로테이션(end ≤ now)은 숨김
   const rotations = events.filter((e) => e.kind === "rotation" && new Date(e.end).getTime() > nowTs)
     .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
