@@ -106,6 +106,14 @@ for (const f of _forms) {
 }
 const FULL_MONS: Mon[] = [..._metaMons, ...FORM_MONS, ..._extraMons];  // 메타 + 메가/원시 폼 + 전 도감 보충
 
+// 아머드 뮤츠 라벨 보정 — 메타 데이터가 base명 "뮤츠"로 라벨돼 base 뮤츠와 중복 표시되던 버그.
+// MON_BY_ID(마지막 리그)와 검색풀 _metaMons(첫 리그)가 다른 객체일 수 있어 양쪽 다 보정.
+for (const m of [...FULL_MONS, MON_BY_ID["mewtwo_armored"]]) {
+  if (m && m.id === "mewtwo_armored" && m.ko === "뮤츠") {
+    m.ko = "아머드 뮤츠"; m.en = "Armored Mewtwo"; m.ja = "アーマードミュウツー";
+  }
+}
+
 // 로케일별 이름/라벨 헬퍼
 const localeTag = (lang: Locale) => lang === "en" ? "en-US" : lang === "ja" ? "ja-JP" : lang === "zh-TW" ? "zh-TW" : "ko-KR";
 const monName = (lang: Locale, m: Mon | null | undefined): string => {
@@ -124,6 +132,18 @@ const periodLabel = (t: AppDict, key: string): string =>
 
 const sprite = (dex: number) =>
   `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png`;
+
+// 폼(메가/원시/아머드) 스프라이트 — 기본 dex 스프라이트엔 폼이 없어 LeekDuck UICONS로 폼별 이미지 매칭.
+const LD = "https://cdn.leekduck.com/assets/img/pokemon_icons";
+function formSprite(m: Mon): string | null {
+  const id = m.id;
+  if (/_mega_x$/.test(id)) return `${LD}/pm${m.dex}.fMEGA_X.icon.png`;
+  if (/_mega_y$/.test(id)) return `${LD}/pm${m.dex}.fMEGA_Y.icon.png`;
+  if (/_mega$/.test(id)) return `${LD}/pm${m.dex}.fMEGA.icon.png`;
+  if (/_primal$/.test(id)) return `${LD}/pm${m.dex}.fPRIMAL.icon.png`;
+  if (/_armored$/.test(id)) return `${LD}/pm${m.dex}.fA.icon.png`;
+  return null;
+}
 
 const TYPE_COLOR: Record<string, string> = {
   normal: "#9fa19f", fire: "#e62829", water: "#2980ef", electric: "#d9a900",
@@ -163,7 +183,7 @@ function MoveChip({ id, lang }: { id: string; lang: Locale }) {
 
 function MonSprite({ mon, size = 44 }: { mon: Mon; size?: number }) {
   return (
-    <img src={mon.sprite || sprite(mon.dex)} alt="" width={size} height={size}
+    <img src={formSprite(mon) || mon.sprite || sprite(mon.dex)} alt="" width={size} height={size}
       loading="lazy"
       style={{ imageRendering: "pixelated", flexShrink: 0 }}
       onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }} />
