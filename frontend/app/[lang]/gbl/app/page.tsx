@@ -182,11 +182,21 @@ function MoveChip({ id, lang }: { id: string; lang: Locale }) {
 }
 
 function MonSprite({ mon, size = 44 }: { mon: Mon; size?: number }) {
-  return (
+  const isShadow = mon.shadow || /_shadow$/.test(mon.id);
+  const img = (
     <img src={formSprite(mon) || mon.sprite || sprite(mon.dex)} alt="" width={size} height={size}
       loading="lazy"
-      style={{ imageRendering: "pixelated", flexShrink: 0 }}
+      style={{ imageRendering: "pixelated", flexShrink: 0, position: "relative", zIndex: 1 }}
       onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }} />
+  );
+  if (!isShadow) return img;
+  // 그림자 포켓몬 — 보라색 오라 배경(포켓몬GO 그림자 연출)
+  return (
+    <span style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", width: size, height: size, flexShrink: 0 }}>
+      <span aria-hidden="true" style={{ position: "absolute", inset: -3, borderRadius: "50%",
+        background: "radial-gradient(circle at 50% 58%, rgba(139,92,246,0.7) 0%, rgba(76,29,149,0.35) 50%, transparent 72%)" }} />
+      {img}
+    </span>
   );
 }
 
