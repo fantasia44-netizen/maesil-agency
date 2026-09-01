@@ -273,12 +273,9 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
 
   // 보스 로테이션 기간 아젠다(전 기간, 시작일순) — 보스 클릭 시 CP 모달
   const fmtD = (iso: string) => { const d = new Date(iso); return `${d.getMonth() + 1}.${d.getDate()}`; };
-  // 하이드레이션 안전: 달력은 시각·타임존 의존 렌더가 많아(new Date 로컬파싱·Date.now 등) 서버(UTC)/클라(KST) 불일치 위험.
-  // → 마운트 후에만 실제 렌더(클라 전용). SSR·초기렌더는 플레이스홀더로 서버/클라 일치시켜 하이드레이션 깨짐 방지.
-  const [nowTs, setNowTs] = useState(() => Date.parse(today + "T12:00:00+09:00") || Date.parse(today) || 0);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); setNowTs(Date.now()); }, []);
-  if (!mounted) return <div style={{ minHeight: 520 }} aria-hidden />;
+  // 이 컴포넌트는 RaidCalendarClient에서 dynamic(ssr:false)로 클라 전용 마운트됨 → Date.now() 렌더 사용 안전.
+  const [nowTs, setNowTs] = useState(() => Date.now());
+  useEffect(() => { const id = setInterval(() => setNowTs(Date.now()), 60000); return () => clearInterval(id); }, []);
   // 진행 중/예정만 노출 — 종료된 로테이션(end ≤ now)은 숨김
   const rotations = events.filter((e) => e.kind === "rotation" && new Date(e.end).getTime() > nowTs)
     .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());

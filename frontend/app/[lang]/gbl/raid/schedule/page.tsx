@@ -4,7 +4,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import PKN from "../../pokedex_names.json";
 import NAME_EN_KO from "../../name_en_ko.json";
-import RaidCalendar, { type CalEvent, type CalBoss } from "./RaidCalendar";
+import RaidCalendarClient from "./RaidCalendarClient";
+import { type CalEvent, type CalBoss } from "./RaidCalendar";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
 import { localName } from "../../contentI18n";
 import { getSchedule, type ScheduleDict } from "./dict";
@@ -261,7 +262,7 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
         ) : (
           <>
             <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "12px 12px 14px" }}>
-              <RaidCalendar events={calEvents} majorEvents={majorEvents} today={today} t={t} lang={lang} />
+              <RaidCalendarClient events={calEvents} majorEvents={majorEvents} today={today} t={t} lang={lang} />
             </div>
           </>
         )}
