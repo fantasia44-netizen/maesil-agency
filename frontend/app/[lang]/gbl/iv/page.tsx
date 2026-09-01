@@ -4,6 +4,16 @@ import type { Metadata } from "next";
 import IvChecker from "./IvChecker";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
 import { getIv } from "./dict";
+import { IV_ANALYSIS } from "./analysis/registry";
+
+const PUBLISHED_IV = Object.values(IV_ANALYSIS).filter((e) => e.published);
+const ivSprite = (dex: number) => `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png`;
+const DEEP_H: Record<Locale, string> = {
+  ko: "🔬 타협개체 심층 분석 — 어디까지 키워도 될까?",
+  en: "🔬 Compromise-IV deep dives — how far can you build?",
+  ja: "🔬 妥協個体の詳細分析 — どこまで育成OK？",
+  "zh-TW": "🔬 妥協個體深入分析 — 能養到哪？",
+};
 
 export const revalidate = 3600;
 const PATH = "/gbl/iv";
@@ -38,6 +48,26 @@ export default function IvPage({ params }: { params: { lang: string } }) {
         <p style={{ margin: "0.4rem 0 1rem", fontSize: "0.88rem", color: "#475569", lineHeight: 1.7 }}>{t.intro}</p>
 
         <IvChecker lang={lang} t={t} />
+
+        {/* 타협개체 심층 분석 — 독창 콘텐츠 발견 경로(내부링크) */}
+        {PUBLISHED_IV.length > 0 && (
+          <div style={{ marginTop: 22 }}>
+            <h2 style={{ fontSize: "0.98rem", fontWeight: 800, margin: "0 0 10px", color: "#0f172a" }}>{DEEP_H[lang] || DEEP_H.en}</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10 }}>
+              {PUBLISHED_IV.map((e) => (
+                <Link key={e.sim.speciesId} href={L(`/gbl/iv/${e.sim.speciesId}`)}
+                  style={{ display: "flex", alignItems: "center", gap: 10, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.7rem 0.9rem", textDecoration: "none" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={ivSprite(e.dex)} alt="" width={44} height={44} style={{ imageRendering: "pixelated", flexShrink: 0 }} />
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a" }}>{e.name[lang] || e.name.en}</div>
+                    <div style={{ fontSize: "0.74rem", color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{(e.article[lang] || e.article.en).title}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div style={{ marginTop: 22, padding: "1rem 1.1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14 }}>
           <h2 style={{ fontSize: "0.95rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>{t.explainerH}</h2>

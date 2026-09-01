@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import DETAIL from "./[lang]/gbl/gbl_detail.json";
 import RAIDS from "./[lang]/gbl/gbl_raids.json";
 import { GUIDES } from "./[lang]/gbl/guide/guides";
+import { IV_ANALYSIS } from "./[lang]/gbl/iv/analysis/registry";
 import { locales, localeMeta, localizePath, defaultLocale } from "../lib/i18n";
 
 // gblnote.com 공개 SEO 사이트맵. 검색엔진이 리그별 실측 메타·티어·포켓몬 상세를 발견하도록.
@@ -40,6 +41,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...LEAGUES.map((l) => [`/gbl/tier/${l}`, "weekly", 0.8] as [string, CF, number]),
     ...LEAGUES.map((l) => [`/gbl/cmp/${l}`, "weekly", 0.7] as [string, CF, number]),
     ["/gbl/iv", "weekly", 0.8],
+    // 타협개체 심층 분석(발행된 몬만) — 독창 콘텐츠라 우선순위 상향
+    ...Object.entries(IV_ANALYSIS).filter(([, e]) => e.published).map(([id]) => [`/gbl/iv/${id}`, "monthly", 0.7] as [string, CF, number]),
     ["/gbl/sim", "weekly", 0.8],
     ["/gbl/trade", "weekly", 0.7],
     ["/gbl/events", "daily", 0.8],

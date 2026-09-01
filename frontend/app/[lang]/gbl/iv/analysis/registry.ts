@@ -45,6 +45,7 @@ export type IvEntry = {
   name: Record<Locale, string>; updated: string;
   season: string;            // 예: "시즌 27 (2026.06.02~09.09)" — 타협은 메타 의존이라 명시
   article: Record<Locale, Article>;
+  published?: boolean;       // true=색인 허용+FAQ 리치결과. 미검수 몬은 생략(noindex).
 };
 
 // ── 그란돈 — "공격 15는 절대조건, 나머지는 관대" ──────────────────────────────
@@ -139,6 +140,7 @@ export const IV_ANALYSIS: Record<string, IvEntry> = {
     updated: "2026-09-01",
     season: "시즌 27 (2026.06.02~09.09)",
     article: { ko: groudon_ko, en: groudon_en, ja: groudon_en, "zh-TW": groudon_en },
+    published: true,
   },
 };
 

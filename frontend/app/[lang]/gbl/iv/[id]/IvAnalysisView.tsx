@@ -1,14 +1,14 @@
 "use client";
 // 포켓몬별 "개체값 타협점" 분석 뷰 — 관리자 전용(완성 전까지). 완성 시 공개로 전환.
 // PvPoke 엔진 전수 시뮬 데이터 + 블로그식 해설 + 판정표 + 불리 매치업 스프라이트.
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 import { localizePath, type Locale } from "../../../../../lib/i18n";
 import { ivEntry, type SimSpread, type Coverage } from "../analysis/registry";
-import { getUser } from "../../../../../lib/api";
 import DEX_TYPE from "../../dex_type.json";
+import { localizeOpp } from "./oppNames";
 
 const SPRITE = (dex: number | null) => dex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png` : "";
 const DT = DEX_TYPE as Record<string, string>;
@@ -117,11 +117,12 @@ function CoverageSection({ lang, cov, bbCov, bbOppCov }: { lang: Locale; cov: Co
     const bg = o.win ? "#dcfce7" : "#fee2e2";
     const bd = o.win ? "#86efac" : "#fca5a5";
     const rc = o.win ? "#15803d" : "#b91c1c";
+    const nm = localizeOpp(o, lang);
     return (
-      <div key={o.dex + o.name} title={`${o.name} · ${o.rating}`}
+      <div key={o.dex + o.name} title={`${nm} · ${o.rating}`}
         style={{ position: "relative", aspectRatio: "1", background: bg, border: `1px solid ${bd}`, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={SPRITE(o.dex)} alt={o.name} width={30} height={30} loading="lazy" style={{ imageRendering: "pixelated" }} />
+        <img src={SPRITE(o.dex)} alt={nm} width={30} height={30} loading="lazy" style={{ imageRendering: "pixelated" }} />
         <span style={{ position: "absolute", bottom: 0, right: 1, fontSize: "0.52rem", fontWeight: 800, color: rc }}>{o.rating}</span>
       </div>
     );
@@ -170,9 +171,9 @@ function CoverageSection({ lang, cov, bbCov, bbOppCov }: { lang: Locale; cov: Co
               {list.length > 0 ? (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(40px, 1fr))", gap: 4 }}>
                   {list.map((o) => (
-                    <div key={o.id} title={`${o.name} · ${o.rating}`} style={{ position: "relative", aspectRatio: "1", background: "#fef3c7", border: "1px solid #fbbf24", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div key={o.id} title={`${localizeOpp(o, lang)} · ${o.rating}`} style={{ position: "relative", aspectRatio: "1", background: "#fef3c7", border: "1px solid #fbbf24", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={SPRITE(o.dex)} alt={o.name} width={30} height={30} loading="lazy" style={{ imageRendering: "pixelated" }} />
+                      <img src={SPRITE(o.dex)} alt={localizeOpp(o, lang)} width={30} height={30} loading="lazy" style={{ imageRendering: "pixelated" }} />
                       <span style={{ position: "absolute", top: -3, right: -3, fontSize: "0.6rem" }}>⭐</span>
                     </div>
                   ))}
@@ -200,28 +201,9 @@ function weakChips(spread: SimSpread, shieldWord: string) {
 }
 
 export default function IvAnalysisView({ lang, id }: { lang: Locale; id: string }) {
-  // 관리자 전용 게이트 — 완성 전까지 super_admin만 열람. 완성 시 이 게이트 제거하면 전체 공개.
-  // 게이트 통과 전엔 데이터를 조회조차 않아 초기 HTML에 콘텐츠가 실리지 않음(비공개).
-  const [ready, setReady] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  useEffect(() => { setIsAdmin(getUser()?.role === "super_admin"); setReady(true); }, []);
+  // 공개 — 서버렌더(초기 HTML에 콘텐츠 실림, 크롤 가능). 발행 여부는 page.tsx가 색인/JSON-LD로 제어.
   const e = ivEntry(id);
-  if (!ready || !e) {
-    if (ready && !e) return null;
-    return <div style={{ minHeight: "60vh" }} />;
-  }
-  if (!isAdmin) {
-    return (
-      <div style={{ minHeight: "70dvh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, padding: "2rem", textAlign: "center" }}>
-        <div style={{ fontSize: "2.2rem" }}>🔒</div>
-        <div style={{ fontSize: "1rem", fontWeight: 800, color: "#0f172a" }}>준비 중인 기능입니다</div>
-        <div style={{ fontSize: "0.85rem", color: "#64748b", lineHeight: 1.7, maxWidth: 340 }}>
-          개체값 타협 분석은 관리자 검수 중입니다. 곧 모든 트레이너에게 공개됩니다.
-        </div>
-        <Link href={localizePath(lang, "/gbl")} style={{ marginTop: 6, fontSize: "0.85rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>← GBL Note</Link>
-      </div>
-    );
-  }
+  if (!e) return null;
   const a = e.article[lang] || e.article.en;
   const u = UI[lang] || UI.en;
   const L = (p: string) => localizePath(lang, p);
@@ -233,9 +215,6 @@ export default function IvAnalysisView({ lang, id }: { lang: Locale; id: string 
 
   return (
     <div style={{ minHeight: "100dvh", background: "radial-gradient(1000px 500px at 50% -10%, #dbe4ff 0%, transparent 60%), linear-gradient(180deg,#f7f9fd,#eef2fb)", padding: "1.4rem 1rem 4rem" }}>
-      <div style={{ maxWidth: 740, margin: "0 auto 6px" }}>
-        <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#b45309", background: "#fef3c7", padding: "2px 10px", borderRadius: 20 }}>🔒 관리자 검수용 · 비공개</span>
-      </div>
       <div style={{ maxWidth: 740, margin: "0 auto" }}>
         <div style={{ marginBottom: 10, display: "flex", gap: 12, flexWrap: "wrap" }}>
           <Link href={L("/gbl")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>{u.back}</Link>
@@ -369,13 +348,16 @@ export default function IvAnalysisView({ lang, id }: { lang: Locale; id: string 
                     <td style={{ padding: "0.55rem 0.8rem" }}>
                       {chips.length === 0 ? <span style={{ color: "#cbd5e1" }}>{u.none}</span> : (
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                          {chips.map((c) => (
-                            <span key={c.name} title={c.name} style={{ display: "inline-flex", alignItems: "center", gap: 3, background: (TYPE_COLOR[c.types[0]] || "#94a3b8") + "1a", border: `1px solid ${BORDER}`, borderRadius: 20, padding: "1px 8px 1px 2px", fontSize: "0.72rem", color: "#334155", fontWeight: 600 }}>
+                          {chips.map((c) => {
+                            const cn = localizeOpp(c, lang);
+                            return (
+                            <span key={c.name} title={cn} style={{ display: "inline-flex", alignItems: "center", gap: 3, background: (TYPE_COLOR[c.types[0]] || "#94a3b8") + "1a", border: `1px solid ${BORDER}`, borderRadius: 20, padding: "1px 8px 1px 2px", fontSize: "0.72rem", color: "#334155", fontWeight: 600 }}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={SPRITE(c.dex)} alt={c.name} width={22} height={22} style={{ imageRendering: "pixelated" }} />
-                              {c.name}<span style={{ color: "#94a3b8", fontWeight: 500 }}>·{u.shieldTag}{[...c.shields].sort().join("")}</span>
+                              <img src={SPRITE(c.dex)} alt={cn} width={22} height={22} style={{ imageRendering: "pixelated" }} />
+                              {cn}<span style={{ color: "#94a3b8", fontWeight: 500 }}>·{u.shieldTag}{[...c.shields].sort().join("")}</span>
                             </span>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </td>
