@@ -2,6 +2,28 @@
 // ※ 반(反)패턴: 포켓몬마다 "발견"이 다르므로 sections 구조도 다르게(고정 템플릿 금지).
 import GROUDON from "../data/groudon.json";
 import { type Locale } from "../../../../../lib/i18n";
+import PKNAMES from "../../pokedex_names.json";
+import { genArticle } from "./articleGen";
+// 자동 초안 20종(마스터 실측 상위) — 데이터 파일
+import LUNALA from "../data/lunala.json";
+import RESHIRAM from "../data/reshiram.json";
+import ZACIAN_CS from "../data/zacian_crowned_sword.json";
+import XERNEAS from "../data/xerneas.json";
+import KYUREM_W from "../data/kyurem_white.json";
+import PALKIA_O from "../data/palkia_origin.json";
+import KYOGRE from "../data/kyogre.json";
+import ZEKROM from "../data/zekrom.json";
+import ZYGARDE_C from "../data/zygarde_complete.json";
+import HO_OH from "../data/ho_oh.json";
+import ETERNATUS from "../data/eternatus.json";
+import DIALGA_O from "../data/dialga_origin.json";
+import RHYPERIOR_S from "../data/rhyperior_shadow.json";
+import YVELTAL from "../data/yveltal.json";
+import KELDEO_R from "../data/keldeo_resolute.json";
+import RHYPERIOR from "../data/rhyperior.json";
+import METAGROSS from "../data/metagross.json";
+import GHOLDENGO from "../data/gholdengo.json";
+import GARCHOMP from "../data/garchomp.json";
 
 export type SimSpread = {
   iv: number[]; cp: number; level: number; stats: { atk: number; def: number; hp: number };
@@ -20,7 +42,7 @@ export type Analysis = {
 };
 export type CmpDuel = { shields: number; mine: number; opp: number; result: string }[];
 export type Sim = {
-  speciesId: string; league: string; metaLimit: number; rival: string | null; rivalDex: number | null;
+  speciesId: string; dex?: number; league: string; metaLimit: number; rival: string | null; rivalDex: number | null;
   normal: Analysis; bestBuddy: Analysis; cmp: { mirror: CmpDuel; rival: CmpDuel | null };
 };
 
@@ -131,17 +153,66 @@ const groudon_en: Article = {
   closing: "Bottom line — attack 15 is non-negotiable (mirror & Kyogre CMP), defense 13+ recommended, HP free to -1 (watch from -2). 15/13/14 plays at hundo level in today's Master League. Best buddy is a small, risk-free bump (bigger against non-best-buddied opponents), but it doesn't win a best-buddied mirror.",
 };
 
+// ── 이름 리졸버(dex 도감명 + 폼 접사) ──
+const PKN = PKNAMES as unknown as Record<string, Record<string, string>>;
+const NAME_AFFIX: Record<string, [string, string, string, string, "p" | "s"]> = {
+  crowned_sword: [" (검왕)", " (Crowned Sword)", "（けんのおう）", "（劍之王）", "s"],
+  crowned_shield: [" (방패왕)", " (Crowned Shield)", "（たてのおう）", "（盾之王）", "s"],
+  origin: [" (오리진)", " (Origin)", "（オリジンフォルム）", "（起源）", "s"],
+  white: [" (화이트)", " (White)", "（ホワイト）", "（白）", "s"],
+  black: [" (블랙)", " (Black)", "（ブラック）", "（黑）", "s"],
+  complete: [" (퍼펙트폼)", " (Complete Forme)", "（パーフェクトフォルム）", "（完全體）", "s"],
+  resolute: [" (각오의 모습)", " (Resolute)", "（かくごのすがた）", "（覺悟）", "s"],
+  shadow: ["그림자 ", "Shadow ", "シャドウ", "暗影", "p"],
+};
+const LI: Record<Locale, number> = { ko: 0, en: 1, ja: 2, "zh-TW": 3 };
+function monNames(id: string, dex: number): Record<Locale, string> {
+  const out = {} as Record<Locale, string>;
+  for (const l of ["ko", "en", "ja", "zh-TW"] as Locale[]) {
+    const base = PKN[String(dex)]?.[l] || PKN[String(dex)]?.en || id;
+    let prefix = "", suffix = "";
+    for (const [suf, v] of Object.entries(NAME_AFFIX)) {
+      if (id.includes("_" + suf)) { const t = v[LI[l]]; if (v[4] === "p") prefix += t; else suffix += t; }
+    }
+    out[l] = prefix + base + suffix;
+  }
+  return out;
+}
+
+const SEASON = "시즌 27 (2026.06.02~09.09)";
+const UPDATED = "2026-09-01";
+// 자동 초안 IvEntry 빌더 — 시뮬 데이터 → genArticle(검수 후 손질 전제)
+function mk(data: unknown): IvEntry {
+  const sim = data as Sim;
+  const dex = sim.dex ?? 0;
+  const names = monNames(sim.speciesId, dex);
+  const rivalNames = sim.rival && sim.rivalDex != null ? monNames(sim.rival, sim.rivalDex) : null;
+  const en = genArticle(sim, names, rivalNames, SEASON, "en");
+  return {
+    sim, dex, rivalName: rivalNames, name: names, updated: UPDATED, season: SEASON,
+    article: { ko: genArticle(sim, names, rivalNames, SEASON, "ko"), en, ja: en, "zh-TW": en },
+    published: true,
+  };
+}
+
 export const IV_ANALYSIS: Record<string, IvEntry> = {
+  // 손수 작성·검수(고품질 기준)
   groudon: {
-    sim: GROUDON as unknown as Sim,
-    dex: 383,
+    sim: GROUDON as unknown as Sim, dex: 383,
     rivalName: { ko: "가이오가", en: "Kyogre", ja: "カイオーガ", "zh-TW": "蓋歐卡" },
     name: { ko: "그란돈", en: "Groudon", ja: "グラードン", "zh-TW": "固拉多" },
-    updated: "2026-09-01",
-    season: "시즌 27 (2026.06.02~09.09)",
+    updated: UPDATED, season: SEASON,
     article: { ko: groudon_ko, en: groudon_en, ja: groudon_en, "zh-TW": groudon_en },
     published: true,
   },
+  // 자동 초안(검수 대기) — 마스터 실측 상위
+  lunala: mk(LUNALA), reshiram: mk(RESHIRAM), zacian_crowned_sword: mk(ZACIAN_CS),
+  xerneas: mk(XERNEAS), kyurem_white: mk(KYUREM_W), palkia_origin: mk(PALKIA_O),
+  kyogre: mk(KYOGRE), zekrom: mk(ZEKROM), zygarde_complete: mk(ZYGARDE_C),
+  ho_oh: mk(HO_OH), eternatus: mk(ETERNATUS), dialga_origin: mk(DIALGA_O),
+  rhyperior_shadow: mk(RHYPERIOR_S), yveltal: mk(YVELTAL), keldeo_resolute: mk(KELDEO_R),
+  rhyperior: mk(RHYPERIOR), metagross: mk(METAGROSS), gholdengo: mk(GHOLDENGO),
+  garchomp: mk(GARCHOMP),
 };
 
 export function ivEntry(id: string): IvEntry | null {

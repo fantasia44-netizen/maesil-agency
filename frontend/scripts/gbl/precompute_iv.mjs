@@ -104,7 +104,7 @@ const bbAnalysis = analyze(true); // 내 베파 vs 상대 노베파(L50)
 }
 
 const out = {
-  speciesId: TARGET, league: LEAGUE, metaLimit: META_LIMIT, rival: RIVAL, rivalDex: RIVAL ? dexOf(RIVAL) : null,
+  speciesId: TARGET, dex: dexOf(TARGET), league: LEAGUE, metaLimit: META_LIMIT, rival: RIVAL, rivalDex: RIVAL ? dexOf(RIVAL) : null,
   normal: analyze(false),
   bestBuddy: bbAnalysis,
   cmp: {
