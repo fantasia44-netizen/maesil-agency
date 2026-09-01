@@ -244,6 +244,8 @@ def main():
     print(f"  pvpoke pokemon={len(pvp)}  pve moves={len(MV)}  i18n keys ko={len(ko)} en={len(en)} ja={len(ja)}")
 
     rows = []
+    forms_out: list = []   # 메가/원시 폼 목록(전적앱 검색풀용) — id(slug)·이름·dex·타입
+    forms_seen: set = set()
     missing = set()
     for p in pvp:
         bs = p.get("baseStats") or {}
@@ -264,6 +266,11 @@ def main():
         elite = set(p.get("eliteMoves") or [])
 
         nm, mega, primal = form_label(sid, dex, names, shadow)
+        # 메가/원시 폼 수집(전적앱 검색풀) — 그림자는 앱에서 이미 생성하므로 제외
+        if (mega or primal) and not shadow and sid not in forms_seen:
+            forms_seen.add(sid)
+            forms_out.append({"id": sid, "ko": nm["ko"], "en": nm["en"], "ja": nm["ja"],
+                              "dex": dex, "types": types_list, "mega": bool(mega), "primal": bool(primal)})
         # 슈퍼메가(메가 피날레): 메가레벨4 대상이면 자기 +2레벨 CPM + 무브 타입배수(같은1.3/다른1.1)
         is_super_mega = IS_MEGAFINALE and bool(mega) and dex in SUPER_MEGA_DEX
         atk_cpm = CPM40 * (SM_CPM if is_super_mega else 1.0)
@@ -358,6 +365,13 @@ def main():
     dest = os.path.join(GBL, f"gbl_raids{SUFFIX}.json")
     json.dump(out, open(dest, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"saved {dest} ({os.path.getsize(dest)} bytes)  [version={VERSION or 'current'}]")
+
+    # 메가/원시 폼 목록(전적앱 검색풀) — 이름은 시즌/버전 무관이라 현재 실행 시만 출력
+    if not SUFFIX:
+        forms_out.sort(key=lambda f: (f["dex"], f["id"]))
+        fdest = os.path.join(GBL, "gbl_forms.json")
+        json.dump(forms_out, open(fdest, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+        print(f"saved {fdest} ({len(forms_out)}종 메가/원시)")
 
     if missing:
         print(f"[warn] PvE 수치 없는 기술 {len(missing)}개(스킵): {sorted(missing)[:10]}")

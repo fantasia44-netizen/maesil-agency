@@ -20,6 +20,13 @@ export const CORE_FORMATS: Format[] = [
   { key: "master", label: "마스터리그", base: "master" },
 ];
 
+// 메가 리그(메가 피날레~) — 메가 허용 별도 포맷. 통계 완전 분리(일반 슈리/하리/마리와 다른 key).
+export const MEGA_FORMATS: Format[] = [
+  { key: "great_mega", label: "슈퍼리그 (메가)", base: "great", cup: true, note: "메가 허용" },
+  { key: "ultra_mega", label: "하이퍼리그 (메가)", base: "ultra", cup: true, note: "메가 허용" },
+  { key: "master_mega", label: "마스터리그 (메가)", base: "master", cup: true, note: "메가 허용" },
+];
+
 // 시즌27(새로운 발걸음) 컵 일정 — 공식 기준. 다음 시즌엔 교체.
 export const CUP_FORMATS: Format[] = [
   { key: "cup_scroll", label: "스크롤컵", base: "great", cup: true, start: "2026-08-18", end: "2026-08-26", allowTypes: ["water", "fighting", "dark"], note: "슈퍼 · 물/격투/악" },
@@ -98,16 +105,16 @@ export const LEAGUE_SCHEDULE_BY_SEASON: Record<string, SchedulePeriod[]> = {
 // 하위호환 — 기존 참조(현재 시즌 로테이션)
 export const LEAGUE_SCHEDULE = LEAGUE_SCHEDULE_BY_SEASON.s27;
 
-export const ALL_FORMATS = [...CORE_FORMATS, ...CUP_FORMATS];
+export const ALL_FORMATS = [...CORE_FORMATS, ...MEGA_FORMATS, ...CUP_FORMATS];
 export const FORMAT_BY_KEY: Record<string, Format> = Object.fromEntries(ALL_FORMATS.map((f) => [f.key, f]));
 
 export function activeCups(todayISO: string): Format[] {
   return CUP_FORMATS.filter((c) => c.start && c.end && c.start <= todayISO && todayISO < c.end);
 }
 
-// 코어 3리그 + 오늘 진행 중인 컵
+// 코어 3리그 + 메가 리그 3종 + 오늘 진행 중인 컵
 export function currentFormats(todayISO: string): Format[] {
-  return [...CORE_FORMATS, ...activeCups(todayISO)];
+  return [...CORE_FORMATS, ...MEGA_FORMATS, ...activeCups(todayISO)];
 }
 
 // 컵 타입 제한으로 입력 풀 좁히기

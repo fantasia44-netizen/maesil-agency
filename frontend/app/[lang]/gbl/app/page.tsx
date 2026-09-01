@@ -8,6 +8,7 @@ import DATA from "../gbl_data.json";
 import PKN from "../pokedex_names.json";
 import { currentSeason, seasonForDate, SEASONS as REG_SEASONS } from "../seasons";
 import MOVEPOOLS from "../mon_movepools.json";
+import FORMS from "../gbl_forms.json";
 import MOVENAMES from "../pvp_move_names.json";
 import { monSlug as _slug } from "../monSlug";
 import AdSlot from "../AdSlot";
@@ -21,7 +22,7 @@ import { getApp, type AppDict } from "./dict";
 
 // ── 데이터셋 타입 ──────────────────────────────────────────────────────
 type Move = { ko: string; en: string; ja?: string; type: string; kind: string };
-type Mon = { id: string; dex: number; ko: string; en: string; types: string[]; shadow: boolean; fast: string[]; charged: string[]; sprite?: string };
+type Mon = { id: string; dex: number; ko: string; en: string; ja?: string; types: string[]; shadow: boolean; fast: string[]; charged: string[]; sprite?: string; form?: boolean };
 type League = "great" | "ultra" | "master";
 type Dataset = { top_n: number; moves: Record<string, Move>; leagues: Record<League, { count: number; pokemon: Mon[] }> };
 const DS = DATA as unknown as Dataset;
@@ -94,15 +95,25 @@ for (const [dexStr, nm] of Object.entries(PKNAMES)) {
     MON_BY_ID[id] = m;                      // 표시용 resolver 확장(메타몬은 위에서 이미 등록됨)
   }
 }
-const FULL_MONS: Mon[] = [..._metaMons, ..._extraMons];  // 메타 먼저 + 전 도감 보충
+// 메가/원시 폼(gbl_forms.json) — 메가 컵 상대 검색용. 그림자는 위에서 이미 생성됨.
+const _forms = FORMS as unknown as { id: string; ko: string; en: string; ja: string; dex: number; types: string[] }[];
+const FORM_MONS: Mon[] = [];
+for (const f of _forms) {
+  if (MON_BY_ID[f.id]) continue;
+  const m: Mon = { id: f.id, dex: f.dex, ko: f.ko, en: f.en, ja: f.ja, types: f.types || [], shadow: false, fast: [], charged: [], form: true };
+  MON_BY_ID[f.id] = m;
+  FORM_MONS.push(m);
+}
+const FULL_MONS: Mon[] = [..._metaMons, ...FORM_MONS, ..._extraMons];  // 메타 + 메가/원시 폼 + 전 도감 보충
 
 // 로케일별 이름/라벨 헬퍼
 const localeTag = (lang: Locale) => lang === "en" ? "en-US" : lang === "ja" ? "ja-JP" : lang === "zh-TW" ? "zh-TW" : "ko-KR";
 const monName = (lang: Locale, m: Mon | null | undefined): string => {
   if (!m) return "";
   if (lang === "en") return m.en || m.ko;
-  if (lang === "ja") return PKNAMES[String(m.dex)]?.ja || m.en || m.ko;
-  if (lang === "zh-TW") return (PKNAMES[String(m.dex)] as Record<string,string>)?.["zh-TW"] || m.en || m.ko;
+  // 메가/원시 폼은 자체 이름(폼 접두 포함) 우선 — dex 기반 PKNAMES는 base 이름이라 폼이 사라짐
+  if (lang === "ja") return m.ja || PKNAMES[String(m.dex)]?.ja || m.en || m.ko;
+  if (lang === "zh-TW") return m.form ? (m.en || m.ko) : ((PKNAMES[String(m.dex)] as Record<string,string>)?.["zh-TW"] || m.en || m.ko);
   return m.ko;
 };
 const moveLabel = (lang: Locale, mv?: Move): string => mv ? (lang === "ko" ? mv.ko : lang === "ja" ? (mv.ja || mv.en || mv.ko) : lang === "zh-TW" ? ((mv as Record<string, string>)["zh-TW"] || mv.en || mv.ko) : (mv.en || mv.ko)) : "";
@@ -838,7 +849,7 @@ export default function GblPage() {
     setTeam(t.slice(0, 3));
     setMemo(m.memo || "");
     setResult(m.result);
-    if (m.league && DS.leagues[m.league as League]) changeLeague(m.league as League);
+    if (m.league && FORMAT_BY_KEY[m.league]) changeLeague(m.league);
     setTab("log");
   };
 
