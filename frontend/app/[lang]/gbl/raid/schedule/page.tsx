@@ -237,6 +237,25 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
           </div>
         )}
 
+        {/* GO Fest 2026: 메가 피날레 (9/5~9/6) — 카드 하나, 상세는 공식 링크 */}
+        {Date.now() < Date.parse("2026-09-07T00:00:00+09:00") && (
+          <a href="https://www.pokemon.com/us/news/pokemon-go-fest-2026-mega-finale-offers-mega-raids-and-super-mega-raids" target="_blank" rel="noopener noreferrer"
+            style={{ display: "block", textDecoration: "none", background: "linear-gradient(120deg,#fff7ed,#ffffff 72%)", border: "1px solid #fed7aa", borderLeft: "4px solid #ea580c", borderRadius: 12, padding: "0.85rem 1rem", marginBottom: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <span style={{ fontSize: "1.15rem" }}>🎪</span>
+              <b style={{ fontSize: "0.92rem", color: "#c2410c" }}>{lang === "en" ? "GO Fest 2026: Mega Finale" : lang === "ja" ? "GO Fest 2026: メガフィナーレ" : lang === "zh-TW" ? "GO Fest 2026：超級大結局" : "GO Fest 2026: 메가 피날레"}</b>
+              <span style={{ fontSize: "0.76rem", fontWeight: 700, color: "#9a3412", background: "#ffedd5", borderRadius: 999, padding: "2px 9px" }}>9/5~9/6</span>
+              <span style={{ marginLeft: "auto", fontSize: "0.78rem", fontWeight: 700, color: "#ea580c" }}>{lang === "en" ? "Official details →" : lang === "ja" ? "公式詳細 →" : lang === "zh-TW" ? "官方詳情 →" : "공식 상세 →"}</span>
+            </div>
+            <div style={{ fontSize: "0.82rem", color: "#7c2d12", lineHeight: 1.6, marginTop: 4 }}>
+              {lang === "en" ? "Super Mega Raids (Mega Mewtwo X/Y, Armored Mewtwo) + hourly mega habitats. Ticketed event."
+                : lang === "ja" ? "スーパーメガレイド(メガミュウツーX/Y・アーマードミュウツー)+時間帯別メガ生息地。有料チケットイベント。"
+                : lang === "zh-TW" ? "超級Mega團戰（超級超夢X/Y・裝甲超夢）+每小時Mega棲息地。付費票券活動。"
+                : "슈퍼 메가 레이드(메가 뮤츠 X·Y, 아머드 뮤츠) + 시간대별 메가 서식지 총출동. (GO Fest 티켓 이벤트 — 상세는 공식 페이지)"}
+            </div>
+          </a>
+        )}
+
         {calEvents.length === 0 ? (
           <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem 1rem" }}>{t.loadFail}</div>
         ) : (
