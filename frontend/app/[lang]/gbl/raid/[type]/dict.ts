@@ -29,10 +29,10 @@ const ko: RaidTypeDict = {
   otherTypes: "다른 속성 티어표 →",
   badgePrimal: "원시", badgeMega: "메가", badgeShadow: "섀도우", badgeUpcoming: "출시예정",
   badgeCoverage: "비자속", badgeCoverageTip: "자속(STAB)이 아닌 이 속성 커버기술로 딜하는 딜러입니다. 공격 종족값·내구가 높아 종합점수(ER) 상위권에 듭니다.",
-  metaTitle: "레이드 딜러 티어표 · DPS 순위 | GBL Note",
-  metaDesc: "레이드 공격수(어택커) DPS·내구 순위. 메가·섀도우 포함 추천 기술배치까지. 레이드 파밍 최적 조합.",
-  ogTitle: "레이드 딜러 티어표 — DPS 순위",
-  ogDesc: "레이드 어택커 DPS·내구 순위 + 추천 기술",
+  metaTitle: "레이드 최강 딜러 티어표 · 실측 DPS 순위 | GBL Note",
+  metaDesc: "레이드 최강 딜러 TOP 30 — 실측 DPS·내구(TDO) 종합 순위. 메가·원시·섀도우 포함, 딜러별 추천 기술배치까지 한눈에. 매주 자동 갱신.",
+  ogTitle: "레이드 최강 딜러 티어표 — 실측 DPS 순위",
+  ogDesc: "레이드 딜러 TOP 30 DPS·내구 순위 + 추천 기술",
 };
 
 const en: RaidTypeDict = {
