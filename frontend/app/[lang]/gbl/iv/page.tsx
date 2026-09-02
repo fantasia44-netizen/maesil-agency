@@ -14,6 +14,12 @@ const DEEP_H: Record<Locale, string> = {
   ja: "🔬 妥協個体の詳細分析 — どこまで育成OK？",
   "zh-TW": "🔬 妥協個體深入分析 — 能養到哪？",
 };
+const DEEP_P: Record<Locale, string> = {
+  ko: "100% 개체와 타협 IV를 마스터리그 상위 100종에 0·1·2실드 전수 시뮬레이션하고, CMP·승패 변화·베스트파트너 효과를 비교해 실제 육성 가능한 타협선을 계산한 GBL Note 자체 분석입니다.",
+  en: "GBL Note's own analysis: we simulate the 100% and each compromise IV against the Master League top 100 across 0/1/2 shields, comparing CMP, win/loss flips and Best Buddy effects to compute the real build-worthy compromise line.",
+  ja: "100%個体と妥協個体をマスター上位100種に0・1・2シールドで全数シミュし、CMP・勝敗変化・ベストパートナー効果を比較して実育成できる妥協ラインを計算したGBL Note独自分析です。",
+  "zh-TW": "GBL Note 自行分析：將100%與妥協個體對大師前100名以0·1·2護盾完整模擬，比較CMP·勝負變化·最佳夥伴效果，計算實際可養的妥協線。",
+};
 
 export const revalidate = 3600;
 const PATH = "/gbl/iv";
@@ -52,7 +58,8 @@ export default function IvPage({ params }: { params: { lang: string } }) {
         {/* 타협개체 심층 분석 — 독창 콘텐츠 발견 경로(내부링크) */}
         {PUBLISHED_IV.length > 0 && (
           <div style={{ marginTop: 22 }}>
-            <h2 style={{ fontSize: "0.98rem", fontWeight: 800, margin: "0 0 10px", color: "#0f172a" }}>{DEEP_H[lang] || DEEP_H.en}</h2>
+            <h2 style={{ fontSize: "0.98rem", fontWeight: 800, margin: "0 0 4px", color: "#0f172a" }}>{DEEP_H[lang] || DEEP_H.en}</h2>
+            <p style={{ margin: "0 0 10px", fontSize: "0.8rem", color: "#64748b", lineHeight: 1.7 }}>{DEEP_P[lang] || DEEP_P.en}</p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10 }}>
               {PUBLISHED_IV.map((e) => (
                 <Link key={e.sim.speciesId} href={L(`/gbl/iv/${e.sim.speciesId}`)}

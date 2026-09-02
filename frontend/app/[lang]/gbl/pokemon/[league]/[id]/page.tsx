@@ -13,6 +13,7 @@ import CoupangAd from "../../../CoupangAd";
 import PokemonShare from "./PokemonShare";
 import MovesetShare from "./MovesetShare";
 import { type FastOpt, type ChargedOpt } from "./MovesetPanel";
+import { PUBLISHED_ANALYSIS } from "../../../iv/analysis/published";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../../lib/i18n";
 import { leagueName, leagueShort, localName } from "../../../contentI18n";
 import JsonLd from "../../../JsonLd";
@@ -289,6 +290,25 @@ export default async function PokemonDetail({ params }: { params: { lang: string
             </div>
           )}
         </div>
+
+        {/* 타협개체 심층 분석 링크 — 발행된 몬만(독창 콘텐츠 발견 경로) */}
+        {PUBLISHED_ANALYSIS.has(d.id) && (
+          <Link href={L(`/gbl/iv/${d.id}`)} style={{ display: "block", marginTop: 12, textDecoration: "none",
+            background: "linear-gradient(90deg,#eef2ff,#faf5ff)", border: "1px solid #dcd7fb", borderRadius: 12, padding: "0.75rem 1rem" }}>
+            <div style={{ fontSize: "0.86rem", fontWeight: 800, color: "#3b2fb7" }}>
+              {lang === "en" ? "🔬 How far can you build this Pokémon's compromise IVs?"
+                : lang === "ja" ? "🔬 このポケモンの妥協個体、どこまで育成OK？"
+                : lang === "zh-TW" ? "🔬 這隻寶可夢的妥協個體能養到哪？"
+                : "🔬 이 포켓몬, 타협 개체값 어디까지 키워도 될까?"}
+            </div>
+            <div style={{ fontSize: "0.76rem", color: "#6d5fc0", marginTop: 3, fontWeight: 600 }}>
+              {lang === "en" ? "See the full top-100 sim analysis (CMP · Best Buddy · matchups) →"
+                : lang === "ja" ? "上位100種フルシミュ分析を見る（CMP・ベストパートナー・相性）→"
+                : lang === "zh-TW" ? "查看前100名完整模擬分析（CMP·最佳夥伴·對戰）→"
+                : "상위 100종 전수 시뮬 분석 보기 (CMP·베스트파트너·매치업) →"}
+            </div>
+          </Link>
+        )}
 
         {/* 데이터 파생 분석(포켓몬별 분기) — 크롤러가 읽는 고유 해석 콘텐츠 */}
         {analysis.length > 0 && (

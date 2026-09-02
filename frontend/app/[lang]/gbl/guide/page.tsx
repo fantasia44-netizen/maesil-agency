@@ -12,10 +12,10 @@ const IV_H: Record<Locale, string> = {
   ko: "🔬 타협개체 심층 분석", en: "🔬 Compromise-IV deep dives", ja: "🔬 妥協個体の詳細分析", "zh-TW": "🔬 妥協個體深入分析",
 };
 const IV_SUB: Record<Locale, string> = {
-  ko: "1위 개체가 없어도 그냥 키워도 되는지, 마스터 상위 100종 전수 시뮬로 분석합니다. 타협선은 시즌 메타에 따라 달라지므로 시즌별로 재계산·갱신합니다.",
-  en: "Whether a spread is fine to build without a rank-1 IV — analyzed by simulating the entire Master top 100. The line shifts with the seasonal meta, so we recompute it each season.",
-  ja: "1位個体でなくても育成OKかを、マスター上位100種のフルシミュで分析。妥協ラインはシーズンメタで変わるためシーズンごとに再計算します。",
-  "zh-TW": "沒有第一名個體也能養嗎——以大師前100名完整模擬分析。妥協線隨賽季環境變化，故每季重新計算更新。",
+  ko: "100% 개체와 타협 IV를 마스터리그 상위 100종에 대해 0·1·2실드 전수 시뮬레이션하고, CMP·승패 변화·베스트파트너 효과를 비교해 실제 육성 가능한 타협선을 계산합니다. 타협선은 시즌 메타에 따라 달라지므로 시즌별로 재계산·갱신합니다.",
+  en: "We simulate the 100% and each compromise IV against the Master League top 100 across 0/1/2 shields, then compare CMP, win/loss flips and Best Buddy effects to compute the real build-worthy compromise line. It shifts with the seasonal meta, so we recompute it each season.",
+  ja: "100%個体と妥協個体を、マスターリーグ上位100種に対し0・1・2シールドで全数シミュレートし、CMP・勝敗変化・ベストパートナー効果を比較して実際に育成できる妥協ラインを計算します。妥協ラインはシーズンメタで変わるため毎シーズン再計算します。",
+  "zh-TW": "將100%個體與妥協個體，對大師聯盟前100名以0·1·2護盾完整模擬，比較CMP·勝負變化·最佳夥伴效果，計算實際可養的妥協線。妥協線隨賽季環境變化，故每季重新計算更新。",
 };
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {

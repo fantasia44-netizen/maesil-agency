@@ -1,7 +1,7 @@
 "use client";
 // 포켓몬별 "개체값 타협점" 분석 뷰 — 관리자 전용(완성 전까지). 완성 시 공개로 전환.
 // PvPoke 엔진 전수 시뮬 데이터 + 블로그식 해설 + 판정표 + 불리 매치업 스프라이트.
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
@@ -63,6 +63,14 @@ const METHOD: Record<Locale, string> = {
   en: "These verdicts come from simulating each spread against the entire Master League top-100 across 0-, 1-, and 2-shield scenarios with the open-source PvPoke battle engine. If no matchup flips versus a hundo it's 'battle-equal'; if stats and CP are identical too it's 'stat-hundo'; losing 1–2 specific matchups is 'conditional', and losing 3 or more is 'compromise'.",
   ja: "この判定は、オープンソースのPvPoke対戦エンジンでマスターリーグ上位100種すべて、シールド0・1・2枚の全シナリオをシミュレートした結果です。100%個体と勝敗が変わる相手が一つもなければ「準100」、ステータス・CPまで同一なら「実質100」、特定の相手・シールドで1~2体だけ落とせば「条件付き」、3体以上落とせば「妥協」と表記しました。",
   "zh-TW": "此判定以開源PvPoke對戰引擎，將各個體值對大師聯盟前100名、護盾0·1·2的所有情境完整模擬得出。若與100%相比無任何勝負改變則為「準100」，連數值·CP都相同則為「實質100」，僅在特定對手·護盾落敗1~2個為「有條件」，落敗3個以上為「妥協」。",
+};
+
+// 방법론 명세 박스 라벨(E-E-A-T·심사자용) — "복사한 표가 아니라 자체 계산" 신호.
+const MBOX: Record<Locale, { basis: string; target: string; targetV: string; shield: string; level: string; levelV: string; engine: string; engineV: string; baseline: string; source: string; last: string; more: string }> = {
+  ko: { basis: "분석 기준", target: "대상", targetV: "마스터리그 상위 100종", shield: "실드", level: "레벨", levelV: "50 / 베스트파트너 51", engine: "배틀 엔진", engineV: "PvPoke 기반 GBL Note 시뮬레이터", baseline: "비교 기준", source: "GBL Note 자체 계산·분석", last: "최종 계산", more: "분석 방법 자세히 보기 →" },
+  en: { basis: "Basis", target: "Scope", targetV: "Master League Top 100", shield: "Shields", level: "Level", levelV: "50 / Best Buddy 51", engine: "Battle engine", engineV: "GBL Note Simulator (PvPoke-based)", baseline: "Baseline", source: "Calculated & analyzed by GBL Note", last: "Last calculated", more: "About the method →" },
+  ja: { basis: "分析基準", target: "対象", targetV: "マスターリーグ上位100種", shield: "シールド", level: "レベル", levelV: "50 / ベストパートナー51", engine: "対戦エンジン", engineV: "PvPoke基盤 GBL Note シミュレーター", baseline: "比較基準", source: "GBL Note 独自計算・分析", last: "最終計算", more: "分析方法の詳細 →" },
+  "zh-TW": { basis: "分析基準", target: "對象", targetV: "大師聯盟前100名", shield: "護盾", level: "等級", levelV: "50 / 最佳夥伴51", engine: "對戰引擎", engineV: "PvPoke 基礎 GBL Note 模擬器", baseline: "比較基準", source: "GBL Note 自行計算·分析", last: "最後計算", more: "分析方法詳情 →" },
 };
 
 // ── 전 메타 커버리지 그리드 문구 ──
@@ -423,11 +431,26 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
           </div>
         )}
 
-        {/* 분석 방법(E-E-A-T) */}
-        <div style={{ marginTop: 8, padding: "0.9rem 1.1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
-          <div style={{ fontSize: "0.8rem", fontWeight: 800, color: "#0f172a", marginBottom: 6 }}>{u.methodH}</div>
-          <p style={{ margin: 0, fontSize: "0.8rem", color: "#64748b", lineHeight: 1.75 }}>{METHOD[lang] || METHOD.en}</p>
-        </div>
+        {/* 분석 방법(E-E-A-T) — 자체 계산 명세 박스 + 서술 + Methodology 링크 */}
+        {(() => { const mb = MBOX[lang] || MBOX.en; const rows: [string, string][] = [
+          [mb.basis, e.season], [mb.target, mb.targetV], [mb.shield, "0 · 1 · 2"],
+          [mb.level, mb.levelV], [mb.engine, mb.engineV], [mb.baseline, "15/15/15"], [mb.last, e.updated],
+        ]; return (
+          <div style={{ marginTop: 8, padding: "0.9rem 1.1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
+            <div style={{ fontSize: "0.8rem", fontWeight: 800, color: "#0f172a", marginBottom: 8 }}>{u.methodH}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "3px 12px", fontSize: "0.76rem", marginBottom: 9 }}>
+              {rows.map(([k, v]) => (
+                <React.Fragment key={k}>
+                  <span style={{ color: "#94a3b8", fontWeight: 700 }}>{k}</span>
+                  <span style={{ color: "#334155", fontWeight: 600 }}>{v}</span>
+                </React.Fragment>
+              ))}
+            </div>
+            <div style={{ fontSize: "0.72rem", fontWeight: 800, color: "#3b5bdb", marginBottom: 8 }}>✔ {mb.source}</div>
+            <p style={{ margin: "0 0 8px", fontSize: "0.8rem", color: "#64748b", lineHeight: 1.75 }}>{METHOD[lang] || METHOD.en}</p>
+            <Link href={L("/gbl/about")} style={{ fontSize: "0.78rem", color: "#3b5bdb", fontWeight: 700, textDecoration: "none" }}>{mb.more}</Link>
+          </div>
+        ); })()}
 
         <CoupangAd />
 

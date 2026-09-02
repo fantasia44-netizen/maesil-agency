@@ -65,6 +65,7 @@ export default function GblLandingClient() {
     { ic: "⚔️", t: t.cards.sim.t, d: t.cards.sim.d, href: L("/gbl/sim"), c: "#4f46e5", tag: "test" },
     { ic: "⚡", t: t.cards.cmp.t, d: t.cards.cmp.d, href: L("/gbl/cmp/master"), c: "#0891b2" },
     { ic: "🧬", t: t.cards.iv.t, d: t.cards.iv.d, href: L("/gbl/iv"), c: "#4f46e5" },
+    { ic: "🔬", t: t.cards.ivDeep.t, d: t.cards.ivDeep.d, href: L("/gbl/iv"), c: "#7c3aed", tag: t.cards.ivDeep.tag },
     { ic: "🗓️", t: t.cards.season.t, d: t.cards.season.d, href: L("/gbl/schedule"), c: "#0d9488" },
   ];
   // 회원 전용(로그인 필요) — 각 페이지가 비회원 게이트 표시
