@@ -232,11 +232,22 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
         endsHere: !eventsOn(dayShift(last, 1)).includes(e),        // 다음날이 없으면 = 진짜 끝
       });
     }
-    // 레인 = 변형(5성/메가/그림자)별 1줄. 같은 변형의 순차 로테이션(예: 큐레무→유크시)은
-    // 시간이 안 겹치므로 한 줄 공유. 빈 변형 레인은 제거해 컴팩트(빈 줄로 높이 낭비 방지).
-    raw.sort((a, b) => (vOrd[a.e.variant || "star"] ?? 9) - (vOrd[b.e.variant || "star"] ?? 9));
-    const usedV = [...new Set(raw.map((b) => vOrd[b.e.variant || "star"] ?? 9))].sort((x, y) => x - y);
-    raw.forEach((b) => { b.lane = usedV.indexOf(vOrd[b.e.variant || "star"] ?? 9); });
+    // 레인 = 변형(5성/메가/그림자)별 묶음. 같은 변형이라도 시간이 겹치면 서브레인 추가
+    // (메가 어센션: 라티아스/라티오스 상시 + 일자별 메가 동시 → 각자 줄 차지해야 안 숨음).
+    // 안 겹치는 순차 로테이션(큐레무→유크시)은 한 줄 공유(컴팩트).
+    raw.sort((a, b) => (vOrd[a.e.variant || "star"] ?? 9) - (vOrd[b.e.variant || "star"] ?? 9) || a.sc - b.sc);
+    const variants = [...new Set(raw.map((b) => vOrd[b.e.variant || "star"] ?? 9))].sort((x, y) => x - y);
+    let base = 0;
+    for (const v of variants) {
+      const group = raw.filter((b) => (vOrd[b.e.variant || "star"] ?? 9) === v);
+      const laneEnds: number[] = []; // 각 서브레인의 마지막 종료 컬럼
+      for (const b of group) {
+        let sub = laneEnds.findIndex((ec) => ec < b.sc);
+        if (sub < 0) { sub = laneEnds.length; laneEnds.push(b.ec); } else laneEnds[sub] = b.ec;
+        b.lane = base + sub;
+      }
+      base += laneEnds.length;
+    }
     return raw;
   };
   const DNUM_H = 26, BAND_H = 26;
