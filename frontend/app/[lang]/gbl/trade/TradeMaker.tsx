@@ -43,6 +43,7 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
   const [shinyMode, setShinyMode] = useState(false);
   const [maxMode, setMaxMode] = useState<"" | "d" | "g">("");
   const [curBg, setCurBg] = useState<string>(""); // 선택 중인 배경(추가/페인트에 적용)
+  const [bgOpen, setBgOpen] = useState(false); // 배경 팔레트 접기(기본 닫힘)
   const [code, setCode] = useState("");
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
@@ -166,7 +167,7 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4 }}>
           {items.map((it, i) => {
-            const bgUrl = resolveBg(it.bg, it.dex);
+            const bgUrl = resolveBg(it.bg);
             return (
             <button key={i} data-noshot={undefined} onClick={() => paint(list, i)} title={t.tapApplyBg}
               style={{ position: "relative", background: "#fff", border: `1px solid ${LINE}`, borderRadius: 10, padding: "4px 2px", cursor: "pointer", overflow: "hidden" }}>
@@ -220,46 +221,51 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
             <button style={chipBtn(maxMode === "g")} onClick={() => setMaxMode((m) => (m === "g" ? "" : "g"))}>🟣 {t.gmax}</button>
           </div>
         </div>
-        {/* 🎨 배경 팔레트 — 각 포켓몬마다 배경(경쟁사 대응 차별 기능) */}
+        {/* 🎨 배경 팔레트 — 접기(기본 닫힘). 누르면 배경들 펼쳐짐. */}
         <div>
-          <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#64748b", marginBottom: 6 }}>
-            {t.bgSection} <span style={{ color: "#db2777", fontWeight: 700 }}>{t.bgBadge}</span>
-          </div>
-          <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-            {BG_SWATCHES.filter((s) => s.kind === "special").map((s) => {
-              const on = curBg === s.id;
-              return (
-                <button key={s.id || "none"} onClick={() => setCurBg(s.id)}
-                  style={{ padding: "5px 11px", borderRadius: 999, fontSize: "0.78rem", fontWeight: 800, cursor: "pointer",
-                    border: on ? "none" : "1px solid #dbe2ee",
-                    background: s.id === "auto" ? (on ? "linear-gradient(90deg,#db2777,#7c3aed,#2563eb)" : "linear-gradient(90deg,#f9a8d4,#c4b5fd,#93c5fd)") : (on ? "#3b5bdb" : "#fff"),
-                    color: s.id === "auto" ? "#fff" : on ? "#fff" : "#475569" }}>
-                  {s.id === "auto" ? "🎨 " : s.id === "" ? "🚫 " : ""}{bgLabel(s.id, lang)}
-                </button>
-              );
-            })}
-          </div>
-          {/* 이벤트·우주 (울트라홀·고페 글로벌/피날레 등) */}
-          <div style={bgGroupLabel}>{t.bgEventGroup}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
-            {BG_SWATCHES.filter((s) => s.kind === "event").map((s) => bgSwatch(s, true))}
-          </div>
-          {/* 지역 (고페 도시·지역축제) */}
-          <div style={bgGroupLabel}>{t.bgRegionGroup}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
-            {BG_SWATCHES.filter((s) => s.kind === "region").map((s) => bgSwatch(s, true))}
-          </div>
-          {/* 풍경 */}
-          <div style={bgGroupLabel}>{t.bgSceneGroup}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
-            {BG_SWATCHES.filter((s) => s.kind === "scene").map((s) => bgSwatch(s, true))}
-          </div>
-          {/* 타입 */}
-          <div style={bgGroupLabel}>{t.bgTypeGroup}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(9, 1fr)", gap: 4 }}>
-            {BG_SWATCHES.filter((s) => s.kind === "type").map((s) => bgSwatch(s, false))}
-          </div>
-          <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginTop: 6 }}>{t.tapApplyBg}</div>
+          <button onClick={() => setBgOpen((v) => !v)}
+            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "8px 10px", borderRadius: 10, cursor: "pointer",
+              border: "1px solid #dbe2ee", background: bgOpen ? "#f1f5ff" : "#fff", textAlign: "left" }}>
+            <span style={{ fontSize: "0.78rem", fontWeight: 800, color: "#64748b" }}>
+              {t.bgSection} <span style={{ color: "#db2777", fontWeight: 700 }}>{t.bgBadge}</span>
+              {curBg ? <span style={{ color: "#3b5bdb", fontWeight: 700 }}> · {bgLabel(curBg, lang)}</span> : null}
+            </span>
+            <span style={{ fontSize: "0.7rem", color: "#94a3b8", fontWeight: 800 }}>{bgOpen ? "▲" : "▼"}</span>
+          </button>
+          {bgOpen && (
+            <div style={{ marginTop: 8 }}>
+              <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
+                {BG_SWATCHES.filter((s) => s.kind === "special").map((s) => {
+                  const on = curBg === s.id;
+                  return (
+                    <button key={s.id || "none"} onClick={() => setCurBg(s.id)}
+                      style={{ padding: "5px 11px", borderRadius: 999, fontSize: "0.78rem", fontWeight: 800, cursor: "pointer",
+                        border: on ? "none" : "1px solid #dbe2ee",
+                        background: on ? "#3b5bdb" : "#fff", color: on ? "#fff" : "#475569" }}>
+                      {s.id === "" ? "🚫 " : ""}{bgLabel(s.id, lang)}
+                    </button>
+                  );
+                })}
+              </div>
+              {/* 전설 마스코트 (자시안·자마젠타·가이오가·그란돈·창조삼신 등) — 경쟁사 배경 대응 */}
+              <div style={bgGroupLabel}>{t.bgLegendGroup}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
+                {BG_SWATCHES.filter((s) => s.kind === "legend").map((s) => bgSwatch(s, false))}
+              </div>
+              {/* 이벤트·우주 (울트라홀·고페 글로벌/피날레·바다·불·팀리더 등) */}
+              <div style={bgGroupLabel}>{t.bgEventGroup}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
+                {BG_SWATCHES.filter((s) => s.kind === "event").map((s) => bgSwatch(s, false))}
+              </div>
+              {/* 지역 (고페 도시·지역축제) */}
+              <div style={bgGroupLabel}>{t.bgRegionGroup}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
+                {BG_SWATCHES.filter((s) => s.kind === "region").map((s) => bgSwatch(s, false))}
+              </div>
+              <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginTop: 6 }}>{t.tapApplyBg}</div>
+            </div>
+          )}
         </div>
         {/* 검색 */}
         <div style={{ position: "relative" }}>
