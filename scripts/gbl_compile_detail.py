@@ -61,8 +61,10 @@ def taus_seq(cost: int, gain: int, n: int = 5) -> list:
     return seq
 
 
-def moveset_detail(moveset: list, MV: dict) -> dict | None:
-    """추천 기술배치 → 빠른기술(획득·턴) + 차지별 연속 타수 시퀀스."""
+def moveset_detail(moveset: list, MV: dict, poke: dict | None = None) -> dict | None:
+    """추천 기술배치 → 빠른기술(획득·턴) + 차지별 연속 타수 시퀀스.
+    poke(게임마스터 엔트리) 주면 전체 학습기술풀(fasts/chargedAll)도 추가 —
+    상세페이지에서 노멀기 선택·차지 여러개 표시용(타수는 클라에서 선택기술 기준 재계산)."""
     if not moveset:
         return None
     f = MV.get(moveset[0], {})
@@ -71,7 +73,22 @@ def moveset_detail(moveset: list, MV: dict) -> dict | None:
     for cid in moveset[1:]:
         c = MV.get(cid, {})
         charged.append({"id": cid, "energy": c.get("energy", 0), "counts": taus_seq(c.get("energy", 0), gain)})
-    return {"fast": {"id": moveset[0], "gain": gain, "turns": f.get("turns", 1)}, "charged": charged}
+    out = {"fast": {"id": moveset[0], "gain": gain, "turns": f.get("turns", 1)}, "charged": charged}
+    if poke:
+        rec_charged = [c["id"] for c in charged]
+        fast_ids = [moveset[0]] + [x for x in poke.get("fastMoves", []) if x != moveset[0]]
+        out["fasts"] = [{"id": fid, "gain": MV.get(fid, {}).get("gain", 0), "turns": MV.get(fid, {}).get("turns", 1)}
+                        for fid in fast_ids if fid in MV]
+        seen, chargedAll = set(), []
+        for cid in rec_charged + [x for x in poke.get("chargedMoves", []) if x not in rec_charged]:
+            if cid in seen or cid == "FRUSTRATION":
+                continue
+            seen.add(cid)
+            e = MV.get(cid, {}).get("energy", 0)
+            if e > 0:
+                chargedAll.append({"id": cid, "energy": e})
+        out["chargedAll"] = chargedAll
+    return out
 
 
 def fetch(url: str) -> list:
@@ -184,7 +201,7 @@ def main() -> None:
                 "score": round(r.get("score", 0)),
                 "tier": tier_of(r.get("score", 0), mx),
                 "moveset": r.get("moveset", []),
-                "mv": moveset_detail(r.get("moveset", []), MV),  # 빠른기술 획득·턴 + 차지별 타수
+                "mv": moveset_detail(r.get("moveset", []), MV, sp.get(r["speciesId"])),  # 빠른기술 획득·턴 + 차지별 타수 + 전체 기술풀
                 # 매치업 레이팅(500=대등, >500 우세, <500 열세)
                 "counters": [{"id": c["opponent"], "r": c["rating"]} for c in (r.get("counters") or [])[:5]],
                 "wins": [{"id": c["opponent"], "r": c["rating"]} for c in (r.get("matchups") or [])[:5]],

@@ -11,6 +11,7 @@ import MOVENAMES from "../../../pvp_move_names.json";
 import AdSlot from "../../../AdSlot";
 import CoupangAd from "../../../CoupangAd";
 import PokemonShare from "./PokemonShare";
+import MovesetPanel, { type FastOpt, type ChargedOpt } from "./MovesetPanel";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../../lib/i18n";
 import { leagueName, leagueShort, localName } from "../../../contentI18n";
 import JsonLd from "../../../JsonLd";
@@ -60,7 +61,8 @@ const hasBatchim = (w: string) => { const c = (w || "").trim().slice(-1).charCod
 const eunNeun = (w: string) => (hasBatchim(w) ? "은" : "는");
 
 type Opp = { id: string; r: number };
-type Mv = { fast: { id: string; gain: number; turns: number }; charged: { id: string; energy: number; counts: number[] }[] };
+type Mv = { fast: { id: string; gain: number; turns: number }; charged: { id: string; energy: number; counts: number[] }[];
+  fasts?: { id: string; gain: number; turns: number }[]; chargedAll?: { id: string; energy: number }[] };
 type Detail = { id: string; score: number; tier: string; moveset: string[]; mv: Mv | null; counters: Opp[]; wins: Opp[]; scores: number[]; stats: Record<string, number>; ko?: string; en?: string; ja?: string; dex?: number; types?: string[] };
 const DET = DETAIL as unknown as Record<string, Detail[]>;
 const findDetail = (league: string, id: string) => (DET[league] || []).find((d) => d.id === id);
@@ -322,31 +324,16 @@ export default async function PokemonDetail({ params }: { params: { lang: string
         {/* 추천 기술배치 + 스킬 타수 */}
         <h2 style={h2}>{pk.movesetH}</h2>
         <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "11px 12px" }}>
-          {d.mv ? (
-            <>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                <span style={{ fontSize: "0.72rem", color: "#94a3b8", minWidth: 52 }}>{pk.fastLabel}</span>
-                <MoveChip lang={lang} id={d.mv.fast.id} />
-                <span style={{ fontSize: "0.72rem", color: "#64748b" }}>{d.mv.fast.turns}{pk.fastTurns}{d.mv.fast.gain}</span>
-              </div>
-              <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 5 }}>{pk.chargedHint}</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {d.mv.charged.map((c) => (
-                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                    <MoveChip lang={lang} id={c.id} />
-                    <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{c.energy} {pk.energyUnit}</span>
-                    <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 3 }}>
-                      {c.counts.map((n, i) => (
-                        <span key={i} style={{ fontSize: "0.82rem", fontWeight: 800, color: i === 0 ? "#3b5bdb" : "#64748b",
-                          background: i === 0 ? "#e8eeff" : "#f1f5f9", borderRadius: 6, padding: "1px 7px" }}>{n}</span>
-                      ))}
-                      {pk.hitsUnit && <span style={{ fontSize: "0.72rem", color: "#94a3b8", marginLeft: 2 }}>{pk.hitsUnit}</span>}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
+          {d.mv ? (() => {
+            const disp = (mid: string) => { const mm = MOVES[mid]; return { id: mid, label: moveLabel(lang, mid), color: mm ? (TYPE_COLOR[mm.type] || "#64748b") : "#94a3b8" }; };
+            const recCharged = new Set(d.mv.charged.map((c) => c.id));
+            const fastsRaw = d.mv.fasts && d.mv.fasts.length ? d.mv.fasts : [d.mv.fast];
+            const fasts: FastOpt[] = fastsRaw.map((f) => ({ ...disp(f.id), gain: f.gain, turns: f.turns }));
+            const chRaw = d.mv.chargedAll && d.mv.chargedAll.length ? d.mv.chargedAll : d.mv.charged.map((c) => ({ id: c.id, energy: c.energy }));
+            const charged: ChargedOpt[] = chRaw.map((c) => ({ ...disp(c.id), energy: c.energy, rec: recCharged.has(c.id) }));
+            return <MovesetPanel fasts={fasts} charged={charged} defaultFastId={d.mv.fast.id}
+              labels={{ fastLabel: pk.fastLabel, chargedHint: pk.chargedHint, energyUnit: pk.energyUnit, hitsUnit: pk.hitsUnit, fastTurns: pk.fastTurns, recTag: pk.recTag, altFastHint: pk.altFastHint }} />;
+          })() : (
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{d.moveset.map((mid) => <MoveChip key={mid} lang={lang} id={mid} />)}</div>
           )}
         </div>

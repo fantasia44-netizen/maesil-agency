@@ -10,7 +10,7 @@ export type PokeShareDict = {
 export type PokeDict = {
   navTier: string; navCmp: string; navMeta: string;
   tierScore: string; pickRate: string;
-  movesetH: string; fastLabel: string; fastTurns: string; chargedHint: string; hitsUnit: string; energyUnit: string;
+  movesetH: string; fastLabel: string; fastTurns: string; chargedHint: string; hitsUnit: string; energyUnit: string; recTag: string; altFastHint: string;
   countersH: string; countersP: string; winsH: string; winsP: string; noData: string;
   statsH: string; atk: string; def: string; hp: string;
   rolesH: string; roles: string[]; rolesNote: string;
@@ -22,7 +22,7 @@ export type PokeDict = {
 const ko: PokeDict = {
   navTier: "🏆 티어표", navCmp: "⚡ CMP 순위", navMeta: "📊 실측 메타",
   tierScore: "티어 · 점수", pickRate: "📊 유저 실측 픽률(최근 30일)",
-  movesetH: "추천 기술배치 · 스킬 타수", fastLabel: "빠른 기술", fastTurns: "턴 · 에너지 +", chargedHint: "차지 기술 — 연속 발동 시 타수(에너지 이월 반영)", hitsUnit: "타", energyUnit: "에너지",
+  movesetH: "추천 기술배치 · 스킬 타수", fastLabel: "빠른 기술", fastTurns: "턴 · 에너지 +", chargedHint: "차지 기술 — 연속 발동 시 타수(에너지 이월 반영)", hitsUnit: "타", energyUnit: "에너지", recTag: "추천", altFastHint: "↑ 빠른 기술을 눌러 바꾸면 타수가 다시 계산됩니다",
   countersH: "🛡️ 이 포켓몬이 불리한 포켓몬 (카운터)", countersP: "이 포켓몬을 상대로 유리한 포켓몬입니다. 자주 만난다면 아래를 준비하세요.",
   winsH: "⚔️ 이 포켓몬이 유리한 포켓몬", winsP: "이 포켓몬으로 유리하게 상대할 수 있는 포켓몬입니다.", noData: "데이터 없음",
   statsH: "종족값 (전투 스탯)", atk: "공격", def: "방어", hp: "체력",
@@ -44,7 +44,7 @@ const ko: PokeDict = {
 const en: PokeDict = {
   navTier: "🏆 Tier list", navCmp: "⚡ CMP ranking", navMeta: "📊 Encounter meta",
   tierScore: "Tier · Score", pickRate: "📊 Real pick rate (last 30 days)",
-  movesetH: "Recommended Moveset · Fast-move Counts", fastLabel: "Fast move", fastTurns: " turns · energy +", chargedHint: "Charged moves — fast-move counts for consecutive uses (energy carryover included)", hitsUnit: "", energyUnit: "energy",
+  movesetH: "Recommended Moveset · Fast-move Counts", fastLabel: "Fast move", fastTurns: " turns · energy +", chargedHint: "Charged moves — fast-move counts for consecutive uses (energy carryover included)", hitsUnit: "", energyUnit: "energy", recTag: "Rec", altFastHint: "↑ Tap a fast move to switch — counts recompute",
   countersH: "🛡️ Loses to (counters)", countersP: "Pokémon favored against this one. If you meet it often, prepare the below.",
   winsH: "⚔️ Beats", winsP: "Pokémon you can favorably beat with this one.", noData: "No data",
   statsH: "Base stats (battle)", atk: "Atk", def: "Def", hp: "HP",
@@ -66,7 +66,7 @@ const en: PokeDict = {
 const ja: PokeDict = {
   navTier: "🏆 ティア表", navCmp: "⚡ CMPランキング", navMeta: "📊 実測メタ",
   tierScore: "ティア · スコア", pickRate: "📊 実測ピック率(直近30日)",
-  movesetH: "推奨技構成 · 発動回数", fastLabel: "ノーマルアタック", fastTurns: "ターン · エネルギー +", chargedHint: "ゲージ技 — 連続発動時の回数(エネルギー持ち越し反映)", hitsUnit: "回", energyUnit: "エネルギー",
+  movesetH: "推奨技構成 · 発動回数", fastLabel: "ノーマルアタック", fastTurns: "ターン · エネルギー +", chargedHint: "ゲージ技 — 連続発動時の回数(エネルギー持ち越し反映)", hitsUnit: "回", energyUnit: "エネルギー", recTag: "推奨", altFastHint: "↑ ノーマルアタックをタップで切替 — 回数を再計算",
   countersH: "🛡️ 不利な相手(カウンター)", countersP: "この相手に有利なポケモンです。よく遭遇するなら下記を準備。",
   winsH: "⚔️ 有利な相手", winsP: "このポケモンで有利に戦える相手です。", noData: "データなし",
   statsH: "種族値(バトル)", atk: "こうげき", def: "ぼうぎょ", hp: "HP",
@@ -88,7 +88,7 @@ const ja: PokeDict = {
 const zhTW: PokeDict = {
   navTier: "🏆 強度表", navCmp: "⚡ CMP 排名", navMeta: "📊 實測環境",
   tierScore: "強度 · 評分", pickRate: "📊 玩家實測使用率（近 30 天）",
-  movesetH: "推薦招式配置 · 招式次數", fastLabel: "一般招式", fastTurns: "回合 · 能量 +", chargedHint: "特殊招式 — 連續發動時的次數（含能量結轉）", hitsUnit: "次", energyUnit: "能量",
+  movesetH: "推薦招式配置 · 招式次數", fastLabel: "一般招式", fastTurns: "回合 · 能量 +", chargedHint: "特殊招式 — 連續發動時的次數（含能量結轉）", hitsUnit: "次", energyUnit: "能量", recTag: "推薦", altFastHint: "↑ 點擊一般招式切換 — 次數重新計算",
   countersH: "🛡️ 剋制這隻寶可夢的寶可夢（剋星）", countersP: "對這隻寶可夢佔優勢的寶可夢。若常遇到，請準備下方這些。",
   winsH: "⚔️ 這隻寶可夢佔優勢的對手", winsP: "用這隻寶可夢可佔優勢對付的寶可夢。", noData: "無資料",
   statsH: "種族值（對戰數值）", atk: "攻擊", def: "防禦", hp: "HP",
