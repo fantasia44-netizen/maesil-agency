@@ -19,7 +19,7 @@ import { leagueName, leagueShort, localName } from "../../../contentI18n";
 import JsonLd from "../../../JsonLd";
 import { typeLabel } from "../../../typeLabels";
 import { getPoke } from "./dict";
-import { buildAnalysis } from "./analysis";
+import { buildAnalysis, HEADINGS } from "./analysis";
 
 export const revalidate = 600;
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
@@ -214,12 +214,15 @@ export default async function PokemonDetail({ params }: { params: { lang: string
   // 이론 순위 = 리그 score 정렬 리스트(DET)에서의 위치(1-base). 실측 순위와 괴리 수치화용.
   const theoryIdx = (DET[params.league] || []).findIndex((x) => x.id === d.id);
   const analysis = buildAnalysis({
-    lang, leagueName: lgName, tier: d.tier, scores: d.scores || [],
+    lang, leagueName: lgName, tier: d.tier, scores: d.scores || [], types,
     atk: d.stats?.atk || 0, def: d.stats?.def || 0, hp: d.stats?.hp || 0,
     pickRate: pr, pickRank: info.rank[d.id], theoryRank: theoryIdx >= 0 ? theoryIdx + 1 : undefined,
     topCounterName: d.counters[0] ? locName(lang, d.counters[0].id) : undefined,
     beatsMetaName, beatsMetaPct,
   });
+  const aH = HEADINGS[lang] || HEADINGS.en;
+  const aTitle = lang === "en" ? "GBL Note Analysis" : lang === "ja" ? "GBL Note 分析" : lang === "zh-TW" ? "GBL Note 分析" : "GBL Note 분석";
+  const hasAnalysis = analysis.strengths.length > 0 || analysis.weaknesses.length > 0 || !!analysis.verdict;
   const ratingTitle = lang === "en" ? "Battle rating (500=even, higher = this Pokémon favored)"
     : lang === "ja" ? "バトルレーティング(500=互角、高いほどこのポケモンが有利)"
     : lang === "zh-TW" ? "對戰評分（500=均勢，越高代表這隻寶可夢越有利）"
@@ -312,15 +315,32 @@ export default async function PokemonDetail({ params }: { params: { lang: string
           </Link>
         )}
 
-        {/* 데이터 파생 분석(포켓몬별 분기) — 크롤러가 읽는 고유 해석 콘텐츠 */}
-        {analysis.length > 0 && (
+        {/* 데이터 파생 분석 — 강점/약점/평가 3구조(크롤러가 분석 문서로 인식) */}
+        {hasAnalysis && (
           <div style={{ marginTop: 14, background: `linear-gradient(180deg, ${c1}0d, #ffffff 60%)`, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.9rem 1.05rem" }}>
-            <h2 style={{ margin: "0 0 8px", fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>
-              {lang === "en" ? "Analysis" : lang === "ja" ? "分析" : lang === "zh-TW" ? "分析" : "분석"}
-            </h2>
-            <p style={{ margin: 0, fontSize: "0.84rem", color: "#334155", lineHeight: 1.8 }}>
-              {analysis.join(" ")}
-            </p>
+            <h2 style={{ margin: "0 0 6px", fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>{aTitle}</h2>
+            {analysis.strengths.length > 0 && (
+              <>
+                <h3 style={{ margin: "10px 0 4px", fontSize: "0.86rem", fontWeight: 800, color: "#15803d" }}>✔ {aH.strengths}</h3>
+                <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.84rem", color: "#334155", lineHeight: 1.75 }}>
+                  {analysis.strengths.map((s, i) => <li key={i} style={{ marginBottom: 3 }}>{s}</li>)}
+                </ul>
+              </>
+            )}
+            {analysis.weaknesses.length > 0 && (
+              <>
+                <h3 style={{ margin: "12px 0 4px", fontSize: "0.86rem", fontWeight: 800, color: "#b45309" }}>⚠ {aH.weaknesses}</h3>
+                <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.84rem", color: "#334155", lineHeight: 1.75 }}>
+                  {analysis.weaknesses.map((s, i) => <li key={i} style={{ marginBottom: 3 }}>{s}</li>)}
+                </ul>
+              </>
+            )}
+            {analysis.verdict && (
+              <>
+                <h3 style={{ margin: "12px 0 4px", fontSize: "0.86rem", fontWeight: 800, color: "#3b5bdb" }}>{aH.verdict}</h3>
+                <p style={{ margin: 0, fontSize: "0.84rem", color: "#334155", lineHeight: 1.8 }}>{analysis.verdict}</p>
+              </>
+            )}
           </div>
         )}
 
