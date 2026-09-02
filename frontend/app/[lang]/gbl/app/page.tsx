@@ -100,7 +100,11 @@ const _forms = FORMS as unknown as { id: string; ko: string; en: string; ja: str
 const FORM_MONS: Mon[] = [];
 for (const f of _forms) {
   if (MON_BY_ID[f.id]) continue;
-  const m: Mon = { id: f.id, dex: f.dex, ko: f.ko, en: f.en, ja: f.ja, types: f.types || [], shadow: false, fast: [], charged: [], form: true };
+  // 메가/원시 폼도 스킬목록이 뜨도록 베이스 종족(dex) 학습기술을 주입(GO PvP상 메가는 베이스와 동일 기술).
+  const mp = _MP[String(f.dex)];
+  const fast = mp ? mp.fast.filter((x) => _mkeys.has(x)) : [];
+  const charged = mp ? mp.charged.filter((x) => _mkeys.has(x)) : [];
+  const m: Mon = { id: f.id, dex: f.dex, ko: f.ko, en: f.en, ja: f.ja, types: f.types || [], shadow: false, fast, charged, form: true };
   MON_BY_ID[f.id] = m;
   FORM_MONS.push(m);
 }
