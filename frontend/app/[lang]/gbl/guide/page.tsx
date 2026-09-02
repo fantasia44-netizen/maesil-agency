@@ -5,6 +5,7 @@ import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale }
 import { GUIDES, guideContent } from "./guides";
 import { getGuideIndex } from "./dict";
 import { IV_ANALYSIS } from "../iv/analysis/registry";
+import { formDexById } from "../sprite";
 
 const PUB_IV = Object.values(IV_ANALYSIS).filter((e) => e.published);
 const ivSprite = (dex: number) => `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png`;
@@ -58,7 +59,7 @@ export default function GuideIndex({ params }: { params: { lang: string } }) {
                 <Link key={e.sim.speciesId} href={L(`/gbl/iv/${e.sim.speciesId}`)}
                   style={{ display: "flex", alignItems: "center", gap: 10, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.7rem 0.9rem", textDecoration: "none" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ivSprite(e.dex)} alt="" width={42} height={42} style={{ imageRendering: "pixelated", flexShrink: 0 }} />
+                  <img src={ivSprite(formDexById(e.sim.speciesId, e.dex))} alt="" width={42} height={42} style={{ imageRendering: "pixelated", flexShrink: 0 }} />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a" }}>{e.name[lang] || e.name.en}</div>
                     <div style={{ fontSize: "0.7rem", color: "#7c3aed", fontWeight: 700 }}>{e.season}</div>

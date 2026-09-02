@@ -60,10 +60,10 @@ const UI: Record<Locale, Record<string, string>> = {
 };
 
 const METHOD: Record<Locale, string> = {
-  ko: "이 판정은 PvPoke 오픈소스 배틀 엔진으로 마스터리그 상위 100종 전부와, 실드 0·1·2개 시나리오를 모두 시뮬레이션해 얻은 결과입니다. 100% 개체와 승패가 갈리는 매치업이 하나도 없으면 '유사백', 스탯·CP까지 완전히 같으면 '실질백', 특정 상대·실드에서 1~2개만 놓치면 '조건부', 3개 이상 놓치면 '타협'으로 표기했습니다.",
-  en: "These verdicts come from simulating each spread against the entire Master League top-100 across 0-, 1-, and 2-shield scenarios with the open-source PvPoke battle engine. If no matchup flips versus a hundo it's 'battle-equal'; if stats and CP are identical too it's 'stat-hundo'; losing 1–2 specific matchups is 'conditional', and losing 3 or more is 'compromise'.",
-  ja: "この判定は、オープンソースのPvPoke対戦エンジンでマスターリーグ上位100種すべて、シールド0・1・2枚の全シナリオをシミュレートした結果です。100%個体と勝敗が変わる相手が一つもなければ「準100」、ステータス・CPまで同一なら「実質100」、特定の相手・シールドで1~2体だけ落とせば「条件付き」、3体以上落とせば「妥協」と表記しました。",
-  "zh-TW": "此判定以開源PvPoke對戰引擎，將各個體值對大師聯盟前100名、護盾0·1·2的所有情境完整模擬得出。若與100%相比無任何勝負改變則為「準100」，連數值·CP都相同則為「實質100」，僅在特定對手·護盾落敗1~2個為「有條件」，落敗3個以上為「妥協」。",
+  ko: "이 판정은 PvPoke 오픈소스 배틀 엔진으로 마스터리그 상위 100종 전부와 실드 0·1·2 시나리오를 모두 시뮬레이션한 결과입니다. 100% 개체와 승패가 하나도 안 갈리면 '완벽/유사백', 놓치는 상대가 약한 편(상위권 밖)이면 '타협', 상위 10위권 상대에게 지기 시작하면 진 상대 수만큼 '불리 N종'으로 표기했습니다. 공격 14는 미러 우선권을 잃어 'CMP 탈락'입니다.",
+  en: "These verdicts come from simulating each spread against the entire Master League top-100 across 0/1/2-shield scenarios with the open-source PvPoke engine. If no matchup flips versus a hundo it's 'Perfect/Battle-equal'; if it only loses to weaker (non-top) opponents it's 'Fine'; once it loses to a top-10 opponent it's 'N lost' by the number of losses. Attack 14 loses mirror priority — 'CMP loss'.",
+  ja: "この判定は、オープンソースのPvPoke対戦エンジンでマスターリーグ上位100種すべて、シールド0・1・2の全シナリオをシミュレートした結果です。100%個体と勝敗が一つも変わらなければ「完璧/準100」、負ける相手が弱め（上位外）なら「妥協」、上位10位の相手に負け始めると負けた数だけ「不利 N体」と表記しました。攻撃14はミラー優先権を失い「CMP負け」です。",
+  "zh-TW": "此判定以開源PvPoke對戰引擎，將各個體值對大師聯盟前100名、護盾0·1·2所有情境完整模擬得出。若與100%相比無任何勝負改變則為「完美/準100」，僅輸給較弱（非上位）對手則為「妥協」，一旦輸給前10名對手則依落敗數標為「不利 N種」。攻擊14失去鏡像優先權，為「CMP落敗」。",
 };
 
 // 방법론 명세 박스 라벨(E-E-A-T·심사자용) — "복사한 표가 아니라 자체 계산" 신호.
@@ -75,22 +75,30 @@ const MBOX: Record<Locale, { basis: string; target: string; targetV: string; shi
 };
 
 // 판정표 읽는 법(범례) — 처음 보는 사람도 이해되게.
-const TGUIDE: Record<Locale, { intro: string; safe: string; cond: string; comp: string; cmp: string; weak: string }> = {
-  ko: { intro: "위에서 아래로 갈수록 낮은 개체값(IV)입니다. 판정 색이 실전 안전도예요.",
-        safe: "= 100% 개체와 승패가 같아 그냥 써도 됩니다.", cond: "= 특정 상대·실드에서 1~2개만 소폭 불리.",
-        comp: "= 여러 매치업을 놓칩니다.", cmp: "= 공격 14는 미러·같은 종족값에게 무조건 밀립니다.",
-        weak: "‘불리해지는 상대’ = 그 개체값으로 낮췄을 때 새로 지는 상대입니다 (실드0·1·2 = 실드를 몇 개 쓰는 상황)." },
-  en: { intro: "Rows go from high to low IVs, top to bottom. The verdict color shows how safe it is in practice.",
-        safe: "= win/loss identical to a hundo — just use it.", cond: "= only 1–2 specific matchups slip, in certain shields.",
-        comp: "= you lose several matchups.", cmp: "= at attack 14 you always lose the mirror / same-stat rivals.",
+const TGUIDE: Record<Locale, { intro: string; perfect: string; perfectB: string; comp: string; compB: string; bad: string; badB: string; cmp: string; cmpB: string; weak: string }> = {
+  ko: { intro: "맨 위 15/15/15가 완벽 개체(제일 좋음)이고, 아래로 갈수록 낮은 개체값입니다.",
+        perfectB: "완벽·유사백", perfect: "= 100% 개체와 승패가 같음 (불리 없음, 그냥 쓰세요).",
+        compB: "타협", comp: "= 놓치는 상대가 약한 편(상위권 아님)이라 감수하고 쓸 만합니다.",
+        badB: "불리 N", bad: "= 상위 10위권 강한 상대 N종에게 지기 시작 — 실질 손해가 큽니다.",
+        cmpB: "CMP 탈락", cmp: "= 공격 14는 미러·같은 종족값에게 무조건 밀립니다.",
+        weak: "‘불리해지는 상대’ = 그 개체값으로 낮췄을 때 새로 지는 상대 (실드0·1·2 = 실드 개수 상황)." },
+  en: { intro: "15/15/15 at the top is the perfect IV (best); rows go to lower IVs downward.",
+        perfectB: "Perfect·Battle-equal", perfect: "= win/loss identical to a hundo (no disadvantage — just use it).",
+        compB: "Fine", comp: "= it only loses to weaker (non-top) opponents, so it's acceptable to run.",
+        badB: "N lost", bad: "= it starts losing to N strong top-10 opponents — a real disadvantage.",
+        cmpB: "CMP loss", cmp: "= at attack 14 you always lose the mirror / same-stat rivals.",
         weak: "‘Matchups lost’ = opponents you newly lose to at that spread (0/1/2 shields = how many shields are used)." },
-  ja: { intro: "上から下へ個体値が下がります。判定の色が実戦での安全度です。",
-        safe: "= 100%個体と勝敗が同じ、そのまま使えます。", cond: "= 特定の相手・シールドで1~2体だけわずかに不利。",
-        comp: "= 複数の対面を落とします。", cmp: "= 攻撃14はミラー・同種族値に必ず負けます。",
-        weak: "「不利になる相手」= その個体値で新たに負ける相手です（シールド0・1・2 = シールドを何枚使う状況か）。" },
-  "zh-TW": { intro: "由上到下個體值遞減。判定顏色代表實戰安全度。",
-        safe: "= 與100%個體勝負相同，可直接使用。", cond: "= 僅特定對手·護盾略微不利1~2個。",
-        comp: "= 會輸掉多個對面。", cmp: "= 攻擊14必輸給鏡像·同種族值對手。",
+  ja: { intro: "一番上の15/15/15が完璧個体（最良）で、下へ行くほど個体値が下がります。",
+        perfectB: "完璧·準100", perfect: "= 100%個体と勝敗が同じ（不利なし、そのまま使えます）。",
+        compB: "妥協", comp: "= 負ける相手が弱め（上位ではない）なので割り切って使えます。",
+        badB: "不利 N", bad: "= 上位10位の強い相手N体に負け始める — 実質的な損失が大きいです。",
+        cmpB: "CMP負け", cmp: "= 攻撃14はミラー・同種族値に必ず負けます。",
+        weak: "「不利になる相手」= その個体値で新たに負ける相手（シールド0・1・2 = シールドを何枚使う状況か）。" },
+  "zh-TW": { intro: "最上方15/15/15為完美個體（最佳），往下個體值遞減。",
+        perfectB: "完美·準100", perfect: "= 與100%個體勝負相同（無不利，可直接使用）。",
+        compB: "妥協", comp: "= 只輸給較弱（非上位）的對手，可接受並使用。",
+        badB: "不利 N", bad: "= 開始輸給前10名強敵N種 — 實質損失較大。",
+        cmpB: "CMP落敗", cmp: "= 攻擊14必輸給鏡像·同種族值對手。",
         weak: "「落敗對手」= 該個體值下新增落敗的對手（護盾0·1·2 = 使用幾個護盾的情境）。" },
 };
 
@@ -243,6 +251,10 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
   const bb = sim.bestBuddy;
   const name = e.name[lang] || e.name.en;
   const rivalName = e.rivalName ? (e.rivalName[lang] || e.rivalName.en) : null;
+  // 상대 메타 랭크(커버리지 score 내림차순) — 판정에 "누구에게 지는가"를 반영.
+  const rankOf: Record<string, number> = {};
+  ((nrm.coverage?.find((c) => c.shields === 1) || nrm.coverage?.[0])?.opps || []).forEach((o, i) => { rankOf[o.id] = i + 1; });
+  const TOP_RANK = 10; // 이 순위 안 상대에게 지면 '불리', 그보다 약한 상대만 놓치면 '조건부 타협'
 
   return (
     <div style={{ minHeight: "100dvh", background: "radial-gradient(1000px 500px at 50% -10%, #dbe4ff 0%, transparent 60%), linear-gradient(180deg,#f7f9fd,#eef2fb)", padding: "1.4rem 1rem 4rem" }}>
@@ -355,14 +367,11 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
         {(() => { const g = TGUIDE[lang] || TGUIDE.en; return (
           <div style={{ margin: "0 0 10px", padding: "0.7rem 0.9rem", background: "#f8fafc", border: `1px solid ${BORDER}`, borderRadius: 10, fontSize: "0.76rem", color: "#475569", lineHeight: 1.7 }}>
             <div style={{ fontWeight: 700, color: "#334155", marginBottom: 6 }}>💡 {g.intro}</div>
-            {([["유사백", g.safe], ["조건부", g.cond], ["타협", g.comp], ["CMP탈락", g.cmp]] as const).map(([k, txt]) => {
-              const v = VERDICT[k];
-              return (
-                <div key={k} style={{ marginBottom: 2 }}>
-                  <span style={{ display: "inline-block", minWidth: 50, textAlign: "center", background: v.bg, color: v.color, fontWeight: 800, borderRadius: 6, padding: "0px 6px", fontSize: "0.7rem", marginRight: 6 }}>{v.label[lang]}</span>{txt}
-                </div>
-              );
-            })}
+            {([[g.perfectB, g.perfect, "#15803d", "#dcfce7"], [g.compB, g.comp, "#ca8a04", "#fef9c3"], [g.badB, g.bad, "#dc2626", "#fee2e2"], [g.cmpB, g.cmp, "#991b1b", "#fee2e2"]] as const).map(([badge, txt, color, bg]) => (
+              <div key={badge} style={{ marginBottom: 2 }}>
+                <span style={{ display: "inline-block", minWidth: 64, textAlign: "center", background: bg, color, fontWeight: 800, borderRadius: 6, padding: "0px 6px", fontSize: "0.7rem", marginRight: 6 }}>{badge}</span>{txt}
+              </div>
+            ))}
             <div style={{ marginTop: 6, color: "#64748b" }}>{g.weak}</div>
           </div>
         ); })()}
@@ -382,13 +391,23 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
                 const v = VERDICT[sp.verdict] || VERDICT["타협"];
                 const chips = weakChips(sp, u.shieldTag);
                 const isHundo = sp.iv.join("") === "151515";
+                // 재판정: 완벽(15/15/15) / CMP탈락 / 유사백(무손실) / 조건부 타협(약한 상대만) / 불리 N(상위 랭크에게 짐).
+                const nLoss = chips.length;
+                const minLostRank = nLoss ? Math.min(...sp.flips.map((f) => rankOf[f.oppId] || 99)) : 99;
+                let vc: { color: string; bg: string } = v;
+                let vlabel = v.label[lang] || v.label.en;
+                if (sp.verdict === "CMP탈락") { vc = VERDICT["CMP탈락"]; vlabel = VERDICT["CMP탈락"].label[lang]; }
+                else if (isHundo) { vc = VERDICT["실질백"]; vlabel = lang === "en" ? "Perfect" : lang === "ja" ? "完璧" : lang === "zh-TW" ? "完美" : "완벽"; }
+                else if (nLoss === 0) { vc = VERDICT["유사백"]; vlabel = VERDICT["유사백"].label[lang]; }
+                else if (minLostRank <= TOP_RANK) { vc = { color: "#dc2626", bg: "#fee2e2" }; vlabel = lang === "en" ? `${nLoss} lost` : lang === "ja" ? `不利 ${nLoss}体` : lang === "zh-TW" ? `不利 ${nLoss}種` : `불리 ${nLoss}종`; }
+                else { vc = { color: "#ca8a04", bg: "#fef9c3" }; vlabel = lang === "en" ? "Fine" : lang === "ja" ? "妥協" : lang === "zh-TW" ? "妥協" : "타협"; }
                 return (
                   <tr key={sp.iv.join("/")} style={{ borderTop: `1px solid #f1f5f9`, background: isHundo ? "#fafbff" : undefined }}>
                     <td style={{ padding: "0.55rem 0.8rem", fontWeight: 800, color: "#0f172a", whiteSpace: "nowrap" }}>{sp.iv.join(" / ")}</td>
                     <td style={{ padding: "0.55rem 0.8rem", color: "#475569" }}>{sp.cp}</td>
                     <td style={{ padding: "0.55rem 0.8rem", color: sp.stats.hp < nrm.hundo.stats.hp ? "#b45309" : "#475569", fontWeight: sp.stats.hp < nrm.hundo.stats.hp ? 700 : 400 }}>{sp.stats.hp}</td>
                     <td style={{ padding: "0.55rem 0.8rem" }}>
-                      <span style={{ fontSize: "0.74rem", fontWeight: 800, color: v.color, background: v.bg, padding: "2px 9px", borderRadius: 20, whiteSpace: "nowrap" }}>{v.label[lang] || v.label.en}</span>
+                      <span style={{ fontSize: "0.74rem", fontWeight: 800, color: vc.color, background: vc.bg, padding: "2px 9px", borderRadius: 20, whiteSpace: "nowrap" }}>{vlabel}</span>
                     </td>
                     <td style={{ padding: "0.55rem 0.8rem" }}>
                       {chips.length === 0 ? <span style={{ color: "#cbd5e1" }}>{u.none}</span> : (
