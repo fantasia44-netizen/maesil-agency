@@ -4,9 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { apiFetch } from "../../../../lib/api";
-import DATA from "../gbl_data.json";
-import PKN from "../pokedex_names.json";
-import { monSlugId } from "../monSlug";
+import { MON, monName, spriteUrl } from "./monNames";
 import AdSlot from "../AdSlot";
 import CoupangAd from "../CoupangAd";
 import { currentFormats, todayISO, type Format } from "../formats";
@@ -15,33 +13,7 @@ import { isLocale, defaultLocale, localizePath, type Locale } from "../../../../
 import { leagueName, leagueShort } from "../contentI18n";
 import { getMetaHub, type MetaHubDict } from "./dict";
 
-type Mon = { id: string; dex: number; ko: string; en: string; types: string[]; shadow: boolean; sprite?: string };
-type League = "great" | "ultra" | "master";
-const DS = DATA as unknown as { leagues: Record<League, { pokemon: Mon[] }> };
-const MON: Record<string, Mon> = {};
-for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
-const PKNAMES = PKN as unknown as Record<string, { ko: string; en: string; ja: string }>;
-// 비메타몬(전 도감) 보충 — 기록엔 slug로 저장되므로 표시용 이름/스프라이트도 전 도감에서 해석(입력과 동일 slug)
-{
-  // 지역폼(알로라/가라르/히스이)은 base와 dex가 같으므로 id(slug) 기준 — base 폼 항상 유지
-  for (const [dexStr, nm] of Object.entries(PKNAMES)) {
-    const dex = Number(dexStr); if (!dex || !nm.en) continue;
-    for (const shadow of [false, true]) {
-      const id = monSlugId(nm.en, shadow);
-      if (MON[id]) continue;  // 메타에 같은 slug 있으면 스킵
-      MON[id] = { id, dex, ko: nm.ko, en: nm.en, types: [], shadow };
-    }
-  }
-}
-const spriteUrl = (m?: Mon) => m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
-// 로케일별 포켓몬명 — MON은 ko/en 보유, ja는 pokedex_names(dex)로 보완.
-const monName = (lang: Locale, id: string) => {
-  const m = MON[id]; if (!m) return id;
-  if (lang === "en") return m.en || m.ko;
-  if (lang === "ja") return PKNAMES[String(m.dex)]?.ja || m.en || m.ko;
-  if (lang === "zh-TW") return (PKNAMES[String(m.dex)] as Record<string,string>)?.["zh-TW"] || m.en || m.ko;
-  return m.ko;
-};
+// MON·monName·spriteUrl은 ./monNames 공용(메가/원시·후파 언바운드 등 폼 이름·스프라이트 포함).
 
 // 실측 메타는 실제 대전 집계 → 이미 시작된 시즌(현재+과거)만 노출(미래시즌은 데이터 없음). 최신순.
 const STARTED_SEASONS = SEASONS.filter((s) => statusOf(s) === "current" || statusOf(s) === "past").sort((a, b) => b.num - a.num);
