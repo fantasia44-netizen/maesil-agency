@@ -36,25 +36,25 @@ const UI: Record<Locale, Record<string, string>> = {
   ko: { back: "← GBL Note", ivTool: "개체값 순위 체커", tier: "티어표", compromiseLabel: "타협 개체값", verdictH: "개체값별 판정 (마스터리그 실측 시뮬)",
         thIv: "개체값(공/방/체)", thCp: "CP", thHp: "HP", thVerdict: "판정", thWeak: "불리해지는 상대", none: "없음", shieldTag: "실드",
         shieldH: "백(100%)의 실드별 성적", win: "승", loss: "패", methodH: "분석 방법", updated: "업데이트", privacy: "개인정보처리방침",
-        cmpH: "공격 15는 왜 필수인가 — 동시차징(CMP)", cmpMirror: "미러전 (그란돈 vs 그란돈)", cmpRival: "vs 라이벌", cmpMine: "내 공14", cmpOpp: "상대 공15", cmpNote: "공격 종족값이 곧 우선권. 공14는 같은 종족값 라이벌에게 무조건 밀립니다.",
+        cmpH: "공격 15는 왜 필수인가 — 동시차징(CMP)", cmpRival: "vs 라이벌", cmpMine: "내 공14", cmpOpp: "상대 공15", cmpNote: "공격 종족값이 곧 우선권. 공14는 같은 종족값 라이벌에게 무조건 밀립니다.",
         bbH: "베스트파트너(L51) 효과", bbCp: "베파 CP", bbNote: "베스트파트너로 키우면 몇몇 매치업을 새로 잡습니다. 단, 상대도 베스트파트너면 미러·라이벌은 무승부라 — 아래 커버리지의 두 시나리오(상대 노베파/베파)를 함께 보세요.",
         verdictBoxH: "강화할까, 말까 — 한눈에", growLabel: "그냥 강화", condLabel: "조건부", waitLabel: "강화 말고 대기", faqH: "자주 묻는 질문" },
   en: { back: "← GBL Note", ivTool: "IV rank checker", tier: "Tier list", compromiseLabel: "Compromise IVs", verdictH: "Verdict by IV spread (Master League sim)",
         thIv: "IVs (Atk/Def/Sta)", thCp: "CP", thHp: "HP", thVerdict: "Verdict", thWeak: "Matchups lost", none: "none", shieldTag: "shields",
         shieldH: "Hundo record by shield count", win: "W", loss: "L", methodH: "Method", updated: "Updated", privacy: "Privacy",
-        cmpH: "Why attack 15 is mandatory — CMP", cmpMirror: "Mirror (Groudon vs Groudon)", cmpRival: "vs rival", cmpMine: "Mine (atk 14)", cmpOpp: "Foe (atk 15)", cmpNote: "Attack decides priority. Attack 14 always loses to a same-stat rival.",
+        cmpH: "Why attack 15 is mandatory — CMP", cmpRival: "vs rival", cmpMine: "Mine (atk 14)", cmpOpp: "Foe (atk 15)", cmpNote: "Attack decides priority. Attack 14 always loses to a same-stat rival.",
         bbH: "Best Buddy (L51) effect", bbCp: "BB CP", bbNote: "Best-buddying even a compromise improves every matchup and beats same-stat rivals.",
         verdictBoxH: "Build it or not — at a glance", growLabel: "Just build", condLabel: "Conditional", waitLabel: "Don't build yet", faqH: "FAQ" },
   ja: { back: "← GBL Note", ivTool: "個体値ランク", tier: "ティア表", compromiseLabel: "妥協個体値", verdictH: "個体値ごとの判定（マスター実測シミュ）",
         thIv: "個体値(攻/防/HP)", thCp: "CP", thHp: "HP", thVerdict: "判定", thWeak: "不利になる相手", none: "なし", shieldTag: "シールド",
         shieldH: "100%のシールド別成績", win: "勝", loss: "負", methodH: "分析方法", updated: "更新", privacy: "プライバシー",
-        cmpH: "攻撃15が必須の理由 — 同時発動(CMP)", cmpMirror: "ミラー(グラードン対決)", cmpRival: "vs ライバル", cmpMine: "自分 攻14", cmpOpp: "相手 攻15", cmpNote: "攻撃種族値が優先度を決める。攻14は同種族値ライバルに必ず負けます。",
+        cmpH: "攻撃15が必須の理由 — 同時発動(CMP)", cmpRival: "vs ライバル", cmpMine: "自分 攻14", cmpOpp: "相手 攻15", cmpNote: "攻撃種族値が優先度を決める。攻14は同種族値ライバルに必ず負けます。",
         bbH: "ベストバディ(L51)効果", bbCp: "BB CP", bbNote: "妥協個体でもベストバディにすれば全対面が改善し、同種族値ライバルにも勝てます。",
         verdictBoxH: "強化する？しない？ — 一目で", growLabel: "そのまま強化", condLabel: "条件付き", waitLabel: "強化せず待つ", faqH: "よくある質問" },
   "zh-TW": { back: "← GBL Note", ivTool: "個體值排名", tier: "階級表", compromiseLabel: "妥協個體值", verdictH: "各個體值判定（大師實測模擬）",
         thIv: "個體值(攻/防/HP)", thCp: "CP", thHp: "HP", thVerdict: "判定", thWeak: "落敗對手", none: "無", shieldTag: "護盾",
         shieldH: "100%的護盾別戰績", win: "勝", loss: "負", methodH: "分析方法", updated: "更新", privacy: "隱私權",
-        cmpH: "為何攻擊15必須 — 同時放招(CMP)", cmpMirror: "鏡像(固拉多對決)", cmpRival: "vs 對手", cmpMine: "我方 攻14", cmpOpp: "對手 攻15", cmpNote: "攻擊種族值決定優先權。攻14必輸給同種族值對手。",
+        cmpH: "為何攻擊15必須 — 同時放招(CMP)", cmpRival: "vs 對手", cmpMine: "我方 攻14", cmpOpp: "對手 攻15", cmpNote: "攻擊種族值決定優先權。攻14必輸給同種族值對手。",
         bbH: "最佳夥伴(L51)效果", bbCp: "BB CP", bbNote: "妥協個體只要升最佳夥伴，所有對戰皆改善，還能贏過同種族值對手。",
         verdictBoxH: "要不要升 — 一眼看懂", growLabel: "直接升", condLabel: "有條件", waitLabel: "先別升", faqH: "常見問題" },
 };
@@ -109,35 +109,38 @@ const COV: Record<Locale, { h: string; sub: string; shieldTag: string; win: stri
         bbH: "⭐ 베스트파트너(L51) 효과 — 새로 이기는 상대",
         bbSub: "베스트파트너로 키우면 새로 이기는 상대입니다. 상대가 베스트파트너인지 아닌지에 따라 결과가 달라져 두 경우를 모두 표시합니다.",
         oppNoBB: "상대 노베파 (L50)", oppBB: "상대도 베파 (L51)",
-        bbMirrorNote: "※ 미러·같은 종족값 라이벌(가이오가)은 상대도 베스트파트너면 무승부로 돌아갑니다(양쪽 L51 동일). 즉 베스트파트너가 미러를 이기게 해주는 건 상대가 노베파일 때뿐입니다.",
+        bbMirrorNote: "※ 미러·같은 종족값 라이벌{rival}은 상대도 베스트파트너면 무승부로 돌아갑니다(양쪽 L51 동일). 즉 베스트파트너가 미러를 이기게 해주는 건 상대가 노베파일 때뿐입니다.",
         noGain: "없음" },
   en: { h: "🔬 Full-meta sim — all 100, who you meet & beat", sub: "1-on-1 battles vs the Master League top 100, per shield. Green = win, red = loss. (Rating 500 = even; higher = more comfortable.)",
         shieldTag: "shields", win: "W", loss: "L",
         bbH: "⭐ Best Buddy (L51) effect — newly won matchups",
         bbSub: "Opponents you newly beat once best-buddied. The result depends on whether the opponent is best-buddied too, so both cases are shown.",
         oppNoBB: "Opp not BB (L50)", oppBB: "Opp also BB (L51)",
-        bbMirrorNote: "※ The mirror and same-stat rival (Kyogre) return to a tie when the opponent is best-buddied too (both L51). So Best Buddy only wins the mirror when the opponent isn't best-buddied.",
+        bbMirrorNote: "※ The mirror and same-stat rival{rival} return to a tie when the opponent is best-buddied too (both L51). So Best Buddy only wins the mirror when the opponent isn't best-buddied.",
         noGain: "none" },
   ja: { h: "🔬 全メタ100種フルシミュ — 遭遇して勝てる相手", sub: "マスター上位100種とシールド別に1対1で対戦した結果。緑=勝、赤=負。(レーティング500=互角、高いほど余裕勝ち)",
         shieldTag: "シールド", win: "勝", loss: "負",
         bbH: "⭐ ベストパートナー(L51)効果 — 新たに勝てる相手",
         bbSub: "ベストパートナーにすると新たに勝てる相手です。相手がベストパートナーかどうかで結果が変わるため両方表示します。",
         oppNoBB: "相手ノーBP (L50)", oppBB: "相手もBP (L51)",
-        bbMirrorNote: "※ ミラー・同種族値ライバル(カイオーガ)は相手もベストパートナーなら互角に戻ります(両方L51)。つまりBPでミラーに勝てるのは相手がノーBPのときだけです。",
+        bbMirrorNote: "※ ミラー・同種族値ライバル{rival}は相手もベストパートナーなら互角に戻ります(両方L51)。つまりBPでミラーに勝てるのは相手がノーBPのときだけです。",
         noGain: "なし" },
   "zh-TW": { h: "🔬 全環境100種完整模擬 — 遭遇並戰勝的對手", sub: "與大師聯盟前100名依護盾1對1對戰的結果。綠=勝，紅=負。(評分500=平手，越高越輕鬆)",
         shieldTag: "護盾", win: "勝", loss: "負",
         bbH: "⭐ 最佳夥伴(L51)效果 — 新增戰勝對手",
         bbSub: "升最佳夥伴後新增戰勝的對手。結果取決於對手是否也升最佳夥伴，故兩種情況都顯示。",
         oppNoBB: "對手未BP (L50)", oppBB: "對手也BP (L51)",
-        bbMirrorNote: "※ 鏡像·同種族值對手(蓋歐卡)在對手也升最佳夥伴時回到平手(雙方L51)。也就是說最佳夥伴只有在對手未升時才能贏鏡像。",
+        bbMirrorNote: "※ 鏡像·同種族值對手{rival}在對手也升最佳夥伴時回到平手(雙方L51)。也就是說最佳夥伴只有在對手未升時才能贏鏡像。",
         noGain: "無" },
 };
 
 // 전 메타 커버리지 그리드 — 팀빌더식(스프라이트 + 승/패 색 + 레이팅). 실드 토글.
-function CoverageSection({ lang, cov, bbCov, bbOppCov }: { lang: Locale; cov: Coverage; bbCov?: Coverage; bbOppCov?: Coverage }) {
+function CoverageSection({ lang, cov, bbCov, bbOppCov, rivalName }: { lang: Locale; cov: Coverage; bbCov?: Coverage; bbOppCov?: Coverage; rivalName?: string | null }) {
   const [sh, setSh] = useState(1);
   const c = COV[lang] || COV.en;
+  // 미러 노트의 라이벌 이름은 페이지 포켓몬별로 다름 → {rival} 자리에 실제 이름(없으면 괄호 생략).
+  const rivalTok = rivalName ? (lang === "ko" ? `(${rivalName})` : lang === "ja" || lang === "zh-TW" ? `(${rivalName})` : ` (${rivalName})`) : "";
+  const bbMirrorNote = c.bbMirrorNote.replace("{rival}", rivalTok);
   const cur = cov.find((x) => x.shields === sh) || cov[0];
   if (!cur) return null;
   const opps = cur.opps;
@@ -220,7 +223,7 @@ function CoverageSection({ lang, cov, bbCov, bbOppCov }: { lang: Locale; cov: Co
             </div>
             )
           ))}
-          <div style={{ fontSize: "0.72rem", color: "#64748b", lineHeight: 1.55, marginTop: 6, paddingTop: 8, borderTop: "1px solid #fde68a" }}>{c.bbMirrorNote}</div>
+          <div style={{ fontSize: "0.72rem", color: "#64748b", lineHeight: 1.55, marginTop: 6, paddingTop: 8, borderTop: "1px solid #fde68a" }}>{bbMirrorNote}</div>
         </div>
       )}
     </section>
@@ -251,6 +254,11 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
   const bb = sim.bestBuddy;
   const name = e.name[lang] || e.name.en;
   const rivalName = e.rivalName ? (e.rivalName[lang] || e.rivalName.en) : null;
+  // CMP 미러 라벨 — 페이지 포켓몬 이름으로 동적 생성(과거 '그란돈' 하드코딩 버그 방지).
+  const cmpMirrorLabel = lang === "ja" ? `ミラー(${name}対決)`
+    : lang === "zh-TW" ? `鏡像(${name}對決)`
+    : lang === "en" ? `Mirror (${name} vs ${name})`
+    : `미러전 (${name} vs ${name})`;
   // 상대 메타 랭크(커버리지 score 내림차순) — 판정에 "누구에게 지는가"를 반영.
   const rankOf: Record<string, number> = {};
   ((nrm.coverage?.find((c) => c.shields === 1) || nrm.coverage?.[0])?.opps || []).forEach((o, i) => { rankOf[o.id] = i + 1; });
@@ -323,14 +331,14 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
 
         {/* 전 메타 100종 커버리지 그리드(연구 증거 — 팀빌더식) */}
         {sim.normal.coverage && (
-          <CoverageSection lang={lang} cov={sim.normal.coverage} bbCov={sim.bestBuddy.coverage} bbOppCov={sim.bestBuddy.oppBB?.coverage} />
+          <CoverageSection lang={lang} cov={sim.normal.coverage} bbCov={sim.bestBuddy.coverage} bbOppCov={sim.bestBuddy.oppBB?.coverage} rivalName={rivalName} />
         )}
 
         {/* CMP — 공격15 필수(미러/라이벌 대결, 스프라이트) */}
         <h2 style={{ fontSize: "1.05rem", fontWeight: 800, margin: "0 0 4px", color: "#0f172a" }}>{u.cmpH}</h2>
         <p style={{ margin: "0 0 12px", fontSize: "0.82rem", color: "#64748b", lineHeight: 1.6 }}>{u.cmpNote}</p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 24 }}>
-          {([["mirror", u.cmpMirror, e.dex], ["rival", u.cmpRival + (rivalName ? ` · ${rivalName}` : ""), sim.rivalDex]] as const).map(([key, label, oppDex]) => {
+          {([["mirror", cmpMirrorLabel, e.dex], ["rival", u.cmpRival + (rivalName ? ` · ${rivalName}` : ""), sim.rivalDex]] as const).map(([key, label, oppDex]) => {
             const duel = key === "mirror" ? sim.cmp.mirror : sim.cmp.rival;
             if (!duel) return null;
             return (
