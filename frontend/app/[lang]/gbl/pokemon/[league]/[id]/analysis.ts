@@ -93,7 +93,7 @@ const PH: Record<Locale, Phr> = {
     sTypeDef: (desc) => `타입 상성상 ${desc} — 해당 타입 공격수 앞에서 잘 버팁니다.`,
     sStab: (stab, tg) => `자속 ${stab} 기술로 ${tg} 타입을 효과적으로 찔러, 상성이 맞으면 확실한 딜을 냅니다.`,
     wTypeWeak: (desc) => `타입 상성상 ${desc} — 해당 타입 상대는 주의해야 합니다.`,
-    wStrongWord: "이중반감·무효", wResistWord: "반감", wWeakWord: "약점", wDoubleWord: "4배 약점",
+    wStrongWord: "이중반감", wResistWord: "반감", wWeakWord: "약점", wDoubleWord: "이중 약점",
     etc: "등",
   },
   en: {
@@ -123,7 +123,7 @@ const PH: Record<Locale, Phr> = {
     sTypeDef: (desc) => `On defense it ${desc}, holding up well against those attackers.`,
     sStab: (stab, tg) => `Its STAB ${stab} hits ${tg} super-effectively, landing real damage when the matchup lines up.`,
     wTypeWeak: (desc) => `On defense it ${desc}, so watch out for those attackers.`,
-    wStrongWord: "double-resists", wResistWord: "resists", wWeakWord: "is weak to", wDoubleWord: "is 4× weak to",
+    wStrongWord: "double-resists", wResistWord: "resists", wWeakWord: "is weak to", wDoubleWord: "is doubly weak to",
     etc: "etc",
   },
   ja: {
@@ -153,7 +153,7 @@ const PH: Record<Locale, Phr> = {
     sTypeDef: (desc) => `タイプ相性上 ${desc} — これらの攻撃前で粘れます。`,
     sStab: (stab, tg) => `自タイプ${stab}技で${tg}を効果的に突き、噛み合えば確実にダメージを通します。`,
     wTypeWeak: (desc) => `タイプ相性上 ${desc} — 該当タイプの相手には注意が必要です。`,
-    wStrongWord: "二重半減・無効", wResistWord: "半減", wWeakWord: "弱点", wDoubleWord: "4倍弱点",
+    wStrongWord: "二重半減", wResistWord: "半減", wWeakWord: "弱点", wDoubleWord: "二重弱点",
     etc: "など",
   },
   "zh-TW": {
@@ -183,7 +183,7 @@ const PH: Record<Locale, Phr> = {
     sTypeDef: (desc) => `屬性上 ${desc} — 面對這些屬性的攻擊很耐打。`,
     sStab: (stab, tg) => `本系${stab}招式能有效打擊${tg}，對上時能造成確實傷害。`,
     wTypeWeak: (desc) => `屬性上 ${desc} — 需提防這些屬性的對手。`,
-    wStrongWord: "雙重減半·無效", wResistWord: "減半", wWeakWord: "弱點", wDoubleWord: "4倍弱點",
+    wStrongWord: "雙重減半", wResistWord: "減半", wWeakWord: "弱點", wDoubleWord: "雙重弱點",
     etc: "等",
   },
 };
