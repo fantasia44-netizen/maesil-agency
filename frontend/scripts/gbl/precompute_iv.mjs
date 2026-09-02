@@ -58,9 +58,11 @@ function analyze(bb) {
       }
     }
     nearFlips.sort((a, b) => a.delta - b.delta);
-    // 판정: 공격<15 + 같은종족값 라이벌 → CMP탈락(미러·라이벌 필패). 승패 flip 또는 마진 급락(≤-150) → 타협.
+    // 판정: 공격<15 → CMP탈락. 마스터는 모두 최대레벨이라 공격 실수치가 곧 동시차징(CMP) 우선권 —
+    // 공격 14는 미러(같은 포켓몬)·같은 종족값 상대에게 우선권을 무조건 내주므로 사실상 탈락.
+    // 그 외 승패 flip 또는 마진 급락(≤-150) → 타협.
     const atkMaxed = iv[0] === 15;
-    const cmpFail = !atkMaxed && RIVAL != null;
+    const cmpFail = !atkMaxed;
     const worstNear = nearFlips.length ? nearFlips[0].delta : 0;
     const severeNear = worstNear <= -150;
     const verdict = cmpFail ? "CMP탈락"

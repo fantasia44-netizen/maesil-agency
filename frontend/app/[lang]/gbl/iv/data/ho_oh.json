@@ -3636,7 +3636,7 @@
           "hp": 192
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "CMP탈락",
         "byShield": [
           {
             "shields": 0,
@@ -8804,7 +8804,7 @@
           "hp": 193
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "CMP탈락",
         "byShield": [
           {
             "shields": 0,
