@@ -78,11 +78,6 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
     const set = list === "want" ? setWant : setOffer;
     set((a) => a.filter((_, j) => j !== i));
   };
-  // 슬롯 탭 = 선택 중인 배경을 그 몬에 적용(페인트). 삭제는 ✕ 버튼.
-  const paint = (list: "want" | "offer", i: number) => {
-    const set = list === "want" ? setWant : setOffer;
-    set((a) => a.map((it, j) => (j === i ? { ...it, bg: curBg || undefined } : it)));
-  };
 
   const [scale, setScale] = useState(1);
   const [cardH, setCardH] = useState(0); // 카드 실측 높이(스케일 래퍼 흐름 높이 예약용)
@@ -169,7 +164,7 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
           {items.map((it, i) => {
             const bgUrl = resolveBg(it.bg);
             return (
-            <button key={i} data-noshot={undefined} onClick={() => paint(list, i)} title={t.tapApplyBg}
+            <button key={i} data-noshot={undefined} onClick={() => remove(list, i)} title={t.tapShiny}
               style={{ position: "relative", background: "#fff", border: `1px solid ${LINE}`, borderRadius: 10, padding: "4px 2px", cursor: "pointer", overflow: "hidden" }}>
               {bgUrl ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
@@ -185,8 +180,6 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
               )}
               {it.shiny && <span data-noshot="0" style={{ position: "absolute", top: 0, right: 3, fontSize: "0.8rem", zIndex: 2, filter: bgUrl ? "drop-shadow(0 1px 1px rgba(0,0,0,.5))" : undefined }}>✨</span>}
               {it.max && <span style={{ position: "absolute", bottom: -1, left: "50%", transform: "translateX(-50%)", fontSize: "0.46rem", fontWeight: 900, color: "#fff", background: it.max === "d" ? "#ef4444" : "#a855f7", borderRadius: 4, padding: "0px 4px", zIndex: 2, letterSpacing: "0.02em" }}>{it.max === "d" ? "DMAX" : "GMAX"}</span>}
-              <span data-noshot="1" onClick={(e) => { e.stopPropagation(); remove(list, i); }}
-                style={{ position: "absolute", top: -6, left: -4, width: 16, height: 16, borderRadius: "50%", background: "#ef4444", color: "#fff", fontSize: "0.6rem", lineHeight: "16px", textAlign: "center", zIndex: 3 }}>✕</span>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={spriteOf(it)} alt="" width={46} height={46} crossOrigin="anonymous"
                 onError={(e) => { const fb = fallbackSprite(it); if (fb && e.currentTarget.src !== fb) e.currentTarget.src = fb; }}
