@@ -6,11 +6,20 @@ import { isLocale, defaultLocale, localizePath, type Locale } from "../../../lib
 import { leagueName } from "./contentI18n";
 import { monName } from "./meta/monNames";
 import GblLandingClient from "./GblLandingClient";
+import { CORE_FORMATS, MEGA_FORMATS, activeCups, todayISO, type Format } from "./formats";
 
 export const revalidate = 600;
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
-const LEAGUES = ["master", "great", "ultra"];
+// 코어 3리그 + 메가(메가마리 등) + 진행 중 컵. 데이터 없는 포맷은 아래서 자동 숨김(total>0).
+const stripFormats = (): Format[] => [...CORE_FORMATS, ...MEGA_FORMATS, ...activeCups(todayISO())];
+// 컬럼 라벨 — 코어는 리그명, 메가/컵은 label(메가는 리그명+접미) 현지화.
+const MEGA_TAG: Record<Locale, string> = { ko: " (메가)", en: " (Mega)", ja: "（メガ）", "zh-TW": "（Mega）" };
+function fmtLabel(lang: Locale, f: Format): string {
+  if (!f.cup) return leagueName(lang, f.key);                 // 코어 great/ultra/master
+  if (f.key.endsWith("_mega")) return leagueName(lang, f.base) + MEGA_TAG[lang]; // 메가
+  return f.label;                                             // 컵(한국어 라벨)
+}
 
 type MetaMon = { speciesId: string; count: number };
 type Meta = { total: number; top_mons: MetaMon[] };
@@ -66,9 +75,10 @@ export default async function GblLandingPage({ params }: { params: { lang: strin
   const L = (p: string) => localizePath(lang, p);
   const s = STRIP[lang];
 
-  const metas = await Promise.all(LEAGUES.map((lg) => getMeta(lg)));
-  const cols = LEAGUES.map((lg, i) => ({ lg, meta: metas[i] }))
-    .filter((x): x is { lg: string; meta: Meta } => !!x.meta && x.meta.total > 0);
+  const fmts = stripFormats();
+  const metas = await Promise.all(fmts.map((f) => getMeta(f.key)));
+  const cols = fmts.map((fmt, i) => ({ fmt, meta: metas[i] }))
+    .filter((x): x is { fmt: Format; meta: Meta } => !!x.meta && x.meta.total > 0);
 
   const hero = HERO[lang];
 
@@ -94,16 +104,18 @@ export default async function GblLandingPage({ params }: { params: { lang: strin
         </div>
       </div>
 
-      {/* ── 서버렌더 실측 TOP5 스트립(크롤러가 읽는 고유 데이터 + 내부링크) ── */}
+      <GblLandingClient />
+
+      {/* ── 서버렌더 실측 TOP5 스트립(크롤러가 읽는 고유 데이터 + 내부링크) — 인터랙티브 랜딩 아래 배치 ── */}
       {cols.length > 0 && (
         <div style={{ background: "linear-gradient(180deg,#eef2fb,#f7f9fd)", padding: "1.4rem 1rem 1.6rem" }}>
           <div style={{ maxWidth: 1040, margin: "0 auto" }}>
             <h2 style={{ margin: "0 0 2px", fontSize: "1.05rem", fontWeight: 800, color: "#0f172a" }}>{s.h}</h2>
             <p style={{ margin: "0 0 12px", fontSize: "0.78rem", color: "#64748b" }}>{s.note}</p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 14 }}>
-              {cols.map(({ lg, meta }) => (
-                <section key={lg} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.85rem 1rem" }}>
-                  <h3 style={{ margin: "0 0 8px", fontSize: "0.92rem", fontWeight: 800, color: "#0f172a" }}>{leagueName(lang, lg)}</h3>
+              {cols.map(({ fmt, meta }) => (
+                <section key={fmt.key} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.85rem 1rem" }}>
+                  <h3 style={{ margin: "0 0 8px", fontSize: "0.92rem", fontWeight: 800, color: "#0f172a" }}>{fmtLabel(lang, fmt)}</h3>
                   <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 4 }}>
                     {meta.top_mons.slice(0, 5).map((mm, i) => {
                       const pct = Math.round((mm.count / meta.total) * 100);
@@ -116,7 +128,7 @@ export default async function GblLandingPage({ params }: { params: { lang: strin
                       );
                     })}
                   </ol>
-                  <Link href={L(`/gbl/meta/${lg}`)} style={{ display: "inline-block", marginTop: 10, fontSize: "0.78rem", fontWeight: 700, color: "#3b5bdb", textDecoration: "none" }}>
+                  <Link href={L(fmt.cup ? "/gbl/meta" : `/gbl/meta/${fmt.key}`)} style={{ display: "inline-block", marginTop: 10, fontSize: "0.78rem", fontWeight: 700, color: "#3b5bdb", textDecoration: "none" }}>
                     {s.more}
                   </Link>
                 </section>
@@ -125,8 +137,6 @@ export default async function GblLandingPage({ params }: { params: { lang: strin
           </div>
         </div>
       )}
-
-      <GblLandingClient />
     </>
   );
 }
