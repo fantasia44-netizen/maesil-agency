@@ -3705,7 +3705,7 @@
           "hp": 170
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -4202,7 +4202,7 @@
           "hp": 171
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -9967,7 +9967,7 @@
           "hp": 172
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,

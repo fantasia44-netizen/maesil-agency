@@ -26,6 +26,7 @@ const TYPE_COLOR: Record<string, string> = {
 const VERDICT: Record<string, { color: string; bg: string; label: Record<Locale, string> }> = {
   "실질백": { color: "#15803d", bg: "#dcfce7", label: { ko: "실질백", en: "Stat-hundo", ja: "実質100", "zh-TW": "實質100" } },
   "유사백": { color: "#0369a1", bg: "#e0f2fe", label: { ko: "유사백", en: "Battle-equal", ja: "準100", "zh-TW": "準100" } },
+  "조건부": { color: "#ca8a04", bg: "#fef9c3", label: { ko: "조건부", en: "Conditional", ja: "条件付き", "zh-TW": "有條件" } },
   "타협":   { color: "#b45309", bg: "#fef3c7", label: { ko: "타협",   en: "Compromise", ja: "妥協",  "zh-TW": "妥協" } },
   "CMP탈락": { color: "#dc2626", bg: "#fee2e2", label: { ko: "CMP 탈락", en: "CMP loss", ja: "CMP負け", "zh-TW": "CMP落敗" } },
 };
@@ -58,10 +59,10 @@ const UI: Record<Locale, Record<string, string>> = {
 };
 
 const METHOD: Record<Locale, string> = {
-  ko: "이 판정은 PvPoke 오픈소스 배틀 엔진으로 마스터리그 상위 100종 전부와, 실드 0·1·2개 시나리오를 모두 시뮬레이션해 얻은 결과입니다. 100% 개체와 승패가 갈리는 매치업이 하나도 없으면 '유사백', 스탯·CP까지 완전히 같으면 '실질백', 승패를 놓치는 상대가 생기면 '타협'으로 표기했습니다.",
-  en: "These verdicts come from simulating each spread against the entire Master League top-100 across 0-, 1-, and 2-shield scenarios with the open-source PvPoke battle engine. If no matchup flips versus a hundo it's 'battle-equal'; if stats and CP are identical too it's 'stat-hundo'; if any matchup is lost it's 'compromise'.",
-  ja: "この判定は、オープンソースのPvPoke対戦エンジンでマスターリーグ上位100種すべて、シールド0・1・2枚の全シナリオをシミュレートした結果です。100%個体と勝敗が変わる相手が一つもなければ「準100」、ステータス・CPまで同一なら「実質100」、勝敗を落とす相手が出れば「妥協」と表記しました。",
-  "zh-TW": "此判定以開源PvPoke對戰引擎，將各個體值對大師聯盟前100名、護盾0·1·2的所有情境完整模擬得出。若與100%相比無任何對戰勝負改變則為「準100」，連數值·CP都相同則為「實質100」，若有對手落敗則為「妥協」。",
+  ko: "이 판정은 PvPoke 오픈소스 배틀 엔진으로 마스터리그 상위 100종 전부와, 실드 0·1·2개 시나리오를 모두 시뮬레이션해 얻은 결과입니다. 100% 개체와 승패가 갈리는 매치업이 하나도 없으면 '유사백', 스탯·CP까지 완전히 같으면 '실질백', 특정 상대·실드에서 1~2개만 놓치면 '조건부', 3개 이상 놓치면 '타협'으로 표기했습니다.",
+  en: "These verdicts come from simulating each spread against the entire Master League top-100 across 0-, 1-, and 2-shield scenarios with the open-source PvPoke battle engine. If no matchup flips versus a hundo it's 'battle-equal'; if stats and CP are identical too it's 'stat-hundo'; losing 1–2 specific matchups is 'conditional', and losing 3 or more is 'compromise'.",
+  ja: "この判定は、オープンソースのPvPoke対戦エンジンでマスターリーグ上位100種すべて、シールド0・1・2枚の全シナリオをシミュレートした結果です。100%個体と勝敗が変わる相手が一つもなければ「準100」、ステータス・CPまで同一なら「実質100」、特定の相手・シールドで1~2体だけ落とせば「条件付き」、3体以上落とせば「妥協」と表記しました。",
+  "zh-TW": "此判定以開源PvPoke對戰引擎，將各個體值對大師聯盟前100名、護盾0·1·2的所有情境完整模擬得出。若與100%相比無任何勝負改變則為「準100」，連數值·CP都相同則為「實質100」，僅在特定對手·護盾落敗1~2個為「有條件」，落敗3個以上為「妥協」。",
 };
 
 // ── 전 메타 커버리지 그리드 문구 ──

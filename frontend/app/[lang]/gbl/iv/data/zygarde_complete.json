@@ -3750,7 +3750,7 @@
           "hp": 338
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -4142,7 +4142,7 @@
           "hp": 339
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -4257,7 +4257,7 @@
           "hp": 338
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -8984,7 +8984,7 @@
           "hp": 340
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -9343,7 +9343,7 @@
           "hp": 341
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -9415,7 +9415,7 @@
           "hp": 340
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,

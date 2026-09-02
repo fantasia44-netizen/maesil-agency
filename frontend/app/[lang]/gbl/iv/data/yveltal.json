@@ -3750,7 +3750,7 @@
           "hp": 218
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -3831,7 +3831,7 @@
           "hp": 217
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -4096,7 +4096,7 @@
           "hp": 219
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -9060,7 +9060,7 @@
           "hp": 218
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -9174,7 +9174,7 @@
           "hp": 218
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -9488,7 +9488,7 @@
           "hp": 218
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,
@@ -9602,7 +9602,7 @@
           "hp": 219
         },
         "effHundo": false,
-        "verdict": "타협",
+        "verdict": "조건부",
         "byShield": [
           {
             "shields": 0,

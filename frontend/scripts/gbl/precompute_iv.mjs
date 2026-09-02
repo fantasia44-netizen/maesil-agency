@@ -60,14 +60,17 @@ function analyze(bb) {
     nearFlips.sort((a, b) => a.delta - b.delta);
     // 판정: 공격<15 → CMP탈락. 마스터는 모두 최대레벨이라 공격 실수치가 곧 동시차징(CMP) 우선권 —
     // 공격 14는 미러(같은 포켓몬)·같은 종족값 상대에게 우선권을 무조건 내주므로 사실상 탈락.
-    // 그 외 승패 flip 또는 마진 급락(≤-150) → 타협.
+    // flip 없음 → 실질백/유사백. flip 1~2(특정 상대·실드만) 또는 마진 급락 → 조건부.
+    // flip 3+(다수 매치업 손실) → 타협. flip은 상대 기준 중복제거(같은 상대 여러 실드=1).
     const atkMaxed = iv[0] === 15;
     const cmpFail = !atkMaxed;
     const worstNear = nearFlips.length ? nearFlips[0].delta : 0;
     const severeNear = worstNear <= -150;
+    const nFlip = new Set(flips.map((f) => f.oppId)).size; // 손실 상대 수(실드 중복 제거)
     const verdict = cmpFail ? "CMP탈락"
-      : (flips.length > 0 || severeNear) ? "타협"
-      : (effHundo ? "실질백" : "유사백");
+      : (nFlip === 0 && !severeNear) ? (effHundo ? "실질백" : "유사백")
+      : (nFlip <= 2) ? "조건부"
+      : "타협";
     return { iv, cp: st.cp, level: st.level, stats: st.stats, effHundo, verdict,
              byShield, flips, nearFlips: nearFlips.slice(0, 6) };
   });
