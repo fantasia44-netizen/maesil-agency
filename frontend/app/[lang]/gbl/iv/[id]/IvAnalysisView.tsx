@@ -6,7 +6,7 @@ import Link from "next/link";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 import { localizePath, type Locale } from "../../../../../lib/i18n";
-import { ivEntry, type SimSpread, type Coverage } from "../analysis/registry";
+import type { IvEntry, SimSpread, Coverage } from "../analysis/registry";
 import DEX_TYPE from "../../dex_type.json";
 import { localizeOpp } from "./oppNames";
 
@@ -201,10 +201,10 @@ function weakChips(spread: SimSpread, shieldWord: string) {
   return Object.values(byOpp);
 }
 
-export default function IvAnalysisView({ lang, id }: { lang: Locale; id: string }) {
+export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: string; e: IvEntry }) {
   // 공개 — 서버렌더(초기 HTML에 콘텐츠 실림, 크롤 가능). 발행 여부는 page.tsx가 색인/JSON-LD로 제어.
-  const e = ivEntry(id);
-  if (!e) return null;
+  // 데이터(e)는 서버(page.tsx)에서 해당 몬만 prop으로 전달 — registry를 클라에서 import하면
+  // 20종 6.3MB가 통째로 번들돼 로드가 5초 걸리던 문제를 막음(이 파일은 registry를 타입만 참조).
   const a = e.article[lang] || e.article.en;
   const u = UI[lang] || UI.en;
   const L = (p: string) => localizePath(lang, p);

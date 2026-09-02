@@ -48,7 +48,7 @@ export default function IvAnalysisPage({ params }: { params: { lang: string; id:
   return (
     <>
       {faqLd && <JsonLd data={faqLd} />}
-      <IvAnalysisView lang={lang} id={params.id} />
+      <IvAnalysisView lang={lang} id={params.id} e={e} />
     </>
   );
 }
