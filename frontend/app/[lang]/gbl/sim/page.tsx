@@ -25,7 +25,12 @@ export default function SimPage({ params }: { params: { lang: string } }) {
   return (
     <div style={{ minHeight: "100dvh", background: "radial-gradient(1000px 500px at 50% -10%, #e0e7ff 0%, transparent 60%), linear-gradient(180deg,#f7f9ff,#eef2f8)", padding: "1.4rem 1rem 4rem" }}>
       <div style={{ maxWidth: 760, margin: "0 auto 10px" }}>
-        <Link href={L("/gbl")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>{t.navBack}</Link>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <Link href={L("/gbl")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>{t.navBack}</Link>
+          <Link href={L("/gbl/guide/pogo-pvp-calc")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>
+            {lang === "en" ? "PvP damage math →" : lang === "ja" ? "PvP計算の仕組み →" : lang === "zh-TW" ? "PvP傷害計算 →" : "PvP 계산법 →"}
+          </Link>
+        </div>
         <h1 style={{ margin: "0.3rem 0", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a" }}>{t.h1}</h1>
         <p style={{ margin: "0.3rem 0 0.4rem", fontSize: "0.9rem", color: "#475569", lineHeight: 1.6 }}>{t.intro}</p>
       </div>

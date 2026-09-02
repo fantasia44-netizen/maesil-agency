@@ -350,6 +350,9 @@ export default async function PokemonDetail({ params }: { params: { lang: string
                 <p style={{ margin: 0, fontSize: "0.84rem", color: "#334155", lineHeight: 1.8 }}>{analysis.verdict}</p>
               </>
             )}
+            <Link href={L("/gbl/guide/pogo-pvp-calc")} style={{ display: "inline-block", marginTop: 10, fontSize: "0.76rem", color: "#3b5bdb", fontWeight: 700, textDecoration: "none" }}>
+              {lang === "en" ? "How GO calculates type & damage →" : lang === "ja" ? "GOのタイプ・ダメージ計算 →" : lang === "zh-TW" ? "GO的屬性·傷害計算 →" : "GO 타입 배율·데미지 계산법 →"}
+            </Link>
           </div>
         )}
 

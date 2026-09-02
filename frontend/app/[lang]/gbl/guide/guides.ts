@@ -21,6 +21,67 @@ export function guideKeywords(lang: string, g: Guide): string[] {
 }
 
 export const GUIDES: Record<string, Guide> = {
+  "pogo-pvp-calc": {
+    updated: "2026-09-02",
+    keywords: {
+      ko: ["포켓몬고 타입 상성", "포켓몬고 데미지 계산", "포켓몬고 PvP 배율", "포켓몬고 자속 STAB", "CMP 동시차징", "포켓몬고 원작 차이"],
+      en: ["Pokémon GO type effectiveness", "Pokémon GO damage formula", "Pokémon GO PvP multipliers", "Pokémon GO STAB", "CMP charged priority", "GO vs main series"],
+      ja: ["ポケモンGO タイプ相性", "ポケモンGO ダメージ計算", "ポケモンGO PvP 倍率", "ポケモンGO タイプ一致 STAB", "CMP 同時ゲージ", "原作との違い"],
+      "zh-TW": ["寶可夢GO 屬性相剋", "寶可夢GO 傷害計算", "寶可夢GO PvP 倍率", "寶可夢GO 本系加成", "CMP 同時充能", "與原作差異"],
+    },
+    ko: {
+      title: "포켓몬GO PvP 계산법 — 원작과 다른 점 (타입 배율·자속·CP)",
+      desc: "포켓몬 GO 배틀리그는 원작 게임과 데미지 계산이 다릅니다. 타입 상성 배율(1.6·0.625배), 자속 1.2배, CP·CPM, 동시차징(CMP), 그림자 보정까지 GBL Note 시뮬레이터 기준으로 정확히 정리했습니다.",
+      sections: [
+        { p: "포켓몬 GO 배틀리그(PvP)는 원작(본편 게임)과 계산식이 다릅니다. 같은 '약점'이라도 배율이 다르고, 자속·CP·기술 시스템도 GO만의 방식입니다. 이 글은 GBL Note 배틀 시뮬레이터(오픈소스 PvPoke 엔진)가 실제로 쓰는 수치를 그대로 정리한 것입니다." },
+        { h: "1. 타입 상성 배율 — GO는 1.6배 / 0.625배", p: "가장 큰 차이입니다. 원작은 약점 2배·반감 0.5배·무효 0배지만, 포켓몬 GO는 다릅니다. 효과굉장(약점) ×1.6, 이중 약점(양 타입 모두 약점) ×2.56, 반감 ×0.625, 이중반감 ×0.390625입니다. 원작에서 '무효(0배)'인 관계도 GO에서는 0이 아니라 ×0.390625로 데미지가 들어갑니다 — 즉 GO에는 완전 무효가 없습니다. 흔히 말하는 '2배 약점·0.5배 반감·4배 약점'은 원작 수치이며, GO 실제 값이 아닙니다." },
+        { h: "2. 자속(STAB) — GO는 1.2배", p: "포켓몬의 타입과 같은 타입 기술을 쓰면 붙는 '자속' 보너스도 GO는 ×1.2입니다(원작 ×1.5). 자속 기술이 강하긴 하지만 원작만큼 압도적이진 않습니다." },
+        { h: "3. CP·레벨·개체값(IV)", p: "GO의 CP는 공격·방어·체력 종족값과 개체값(IV 0~15), 레벨(CPM)으로 계산됩니다. 리그 CP 제한(슈퍼 1500·하이퍼 2500) 안에서 최대 스탯을 내는 개체값 조합이 리그마다 달라, 원작처럼 '무조건 6V가 최고'가 아닙니다. 낮은 리그일수록 방어·체력을 살린 개체가 유리한 경우가 많습니다." },
+        { h: "4. 기술 시스템 — 에너지·턴·타수, 그리고 CMP", p: "빠른 기술은 턴마다 정해진 에너지를 모으고, 차지 기술은 필요한 에너지를 채우면 발동합니다(그래서 '몇 번 만에 차는가' = 타수 개념이 생깁니다). 두 포켓몬이 같은 턴에 차지를 채우면 공격 실능력치가 높은 쪽이 먼저 발동하는데, 이것이 동시차징 우선권(CMP)입니다. 그래서 마스터리그에서는 공격 개체값이 미러전 승패를 가르기도 합니다." },
+        { h: "5. 그림자·버프/디버프", p: "그림자 포켓몬은 공격 ×1.2로 데미지가 세지지만 받는 데미지도 늘어납니다(방어 ×0.833). 또 일부 기술은 공격/방어 능력치 단계를 올리거나 내리는 버프·디버프가 있어, 단순 스탯 비교만으로는 실전 결과를 알 수 없습니다." },
+        { h: "GBL Note는 이 수치로 계산합니다", p: "GBL Note의 티어표·타입 분석·타협개체 연구·배틀 시뮬레이터는 모두 위 GO 배율로 계산됩니다. 그래서 원작 위키의 배율(2배·0.5배)과 달라 보일 수 있는데, 이것이 실제 GBL에서 일어나는 수치입니다." },
+      ],
+    },
+    en: {
+      title: "Pokémon GO PvP Damage Math — How It Differs From the Main Games",
+      desc: "Pokémon GO's Battle League calculates damage differently from the main series. Type multipliers (×1.6 / ×0.625), 1.2× STAB, CP/CPM, charged-move priority (CMP) and shadow modifiers — all exactly as GBL Note's simulator uses them.",
+      sections: [
+        { p: "Pokémon GO's Battle League (PvP) uses different formulas from the main series. The same 'weakness' has a different multiplier, and STAB, CP and the move system all work the GO way. This article lays out the exact values GBL Note's simulator (the open-source PvPoke engine) actually uses." },
+        { h: "1. Type effectiveness — GO uses ×1.6 / ×0.625", p: "This is the biggest difference. The main games use ×2 for a weakness, ×0.5 for a resist and ×0 for an immunity — but Pokémon GO is different: super-effective ×1.6, doubly super-effective (both types weak) ×2.56, resisted ×0.625, double-resisted ×0.390625. Even 'immunity' relationships aren't 0 in GO — they deal ×0.390625, so there is no true immunity. The familiar '2× weak, 0.5× resist, 4× weak' figures are main-series values, not GO's." },
+        { h: "2. STAB — GO uses ×1.2", p: "The same-type attack bonus (STAB) for using a move matching the Pokémon's type is ×1.2 in GO (×1.5 in the main games). STAB moves are strong, but not as overwhelming as in the core series." },
+        { h: "3. CP, level and IVs", p: "GO's CP comes from Attack/Defense/HP base stats, IVs (0–15) and level (CPM). Within a league's CP cap (Great 1500, Ultra 2500), the IV spread that yields the best stats differs by league — so 'max IVs are always best' isn't true like in the main games. In lower leagues, a spread favoring Defense/HP is often better." },
+        { h: "4. Moves — energy, turns, counts, and CMP", p: "Fast moves gain a set amount of energy per turn, and a charged move fires once you have enough energy (hence the 'how many fast moves to charge' = move count). If two Pokémon reach a charged move on the same turn, the one with the higher Attack stat fires first — this is Charged Move Priority (CMP). That's why in the Master League an Attack IV can decide the mirror match." },
+        { h: "5. Shadow and buffs/debuffs", p: "Shadow Pokémon hit harder (Attack ×1.2) but also take more damage (Defense ×0.833). Some moves also raise or lower Attack/Defense stat stages (buffs/debuffs), so raw stat comparisons alone don't tell you the real outcome." },
+        { h: "GBL Note calculates with these values", p: "GBL Note's tier lists, type analysis, compromise-IV research and battle simulator all use the GO multipliers above. That's why numbers may look different from a main-series wiki (×2, ×0.5) — these are what actually happens in GBL." },
+      ],
+    },
+    ja: {
+      title: "ポケモンGO PvP計算 — 原作との違い（タイプ倍率・タイプ一致・CP）",
+      desc: "ポケモンGOのバトルリーグは原作とダメージ計算が異なります。タイプ相性倍率（×1.6・×0.625）、タイプ一致×1.2、CP・CPM、同時ゲージ（CMP）、シャドウ補正まで、GBL Noteシミュレーター基準で正確に整理しました。",
+      sections: [
+        { p: "ポケモンGOのバトルリーグ（PvP）は原作（本編）と計算式が異なります。同じ「弱点」でも倍率が違い、タイプ一致・CP・技システムもGO独自です。この記事はGBL Noteのバトルシミュレーター（オープンソースPvPokeエンジン）が実際に使う数値をそのまま整理したものです。" },
+        { h: "1. タイプ相性倍率 — GOは×1.6 / ×0.625", p: "最大の違いです。原作は弱点×2・半減×0.5・無効×0ですが、ポケモンGOは異なります。効果抜群（弱点）×1.6、二重弱点（両タイプとも弱点）×2.56、半減×0.625、二重半減×0.390625。原作で「無効（×0）」の関係もGOでは0ではなく×0.390625でダメージが入ります — つまりGOに完全無効はありません。よく言う「2倍弱点・0.5倍半減・4倍弱点」は原作の数値で、GOの実値ではありません。" },
+        { h: "2. タイプ一致（STAB）— GOは×1.2", p: "ポケモンのタイプと同じタイプの技に付く「タイプ一致」ボーナスもGOは×1.2です（原作×1.5）。強力ですが原作ほど圧倒的ではありません。" },
+        { h: "3. CP・レベル・個体値(IV)", p: "GOのCPは攻撃・防御・HP種族値と個体値(IV 0〜15)、レベル(CPM)で計算されます。リーグのCP制限（スーパー1500・ハイパー2500）内で最大ステータスになる個体値の組み合わせはリーグごとに異なり、原作のように「常に6Vが最強」ではありません。低いリーグほど防御・HPを活かした個体が有利な場合が多いです。" },
+        { h: "4. 技システム — エネルギー・ターン・回数、そしてCMP", p: "ノーマルアタックはターンごとに一定のエネルギーを貯め、ゲージ技は必要エネルギーが貯まると発動します（そこで「何回で貯まるか」=発動回数の概念が生まれます）。2匹が同じターンにゲージを貯めると、攻撃実数値が高い方が先に発動します — これが同時ゲージ優先（CMP）です。だからマスターリーグでは攻撃個体値がミラー戦の勝敗を分けることがあります。" },
+        { h: "5. シャドウ・バフ/デバフ", p: "シャドウポケモンは攻撃×1.2でダメージが上がる一方、受けるダメージも増えます（防御×0.833）。また一部の技は攻撃/防御ランクを上げ下げするバフ・デバフがあり、単純なステータス比較だけでは実戦結果は分かりません。" },
+        { h: "GBL Noteはこの数値で計算します", p: "GBL Noteのティア表・タイプ分析・妥協個体研究・バトルシミュレーターはすべて上記GO倍率で計算されます。原作Wikiの倍率（×2・×0.5）と違って見えることがありますが、これがGBLで実際に起きる数値です。" },
+      ],
+    },
+    "zh-TW": {
+      title: "寶可夢GO PvP傷害計算 — 與原作的差異（屬性倍率·本系·CP）",
+      desc: "寶可夢GO對戰聯盟的傷害計算與原作不同。屬性相剋倍率（×1.6・×0.625）、本系×1.2、CP·CPM、同時充能（CMP）、暗影修正，皆以GBL Note模擬器基準精確整理。",
+      sections: [
+        { p: "寶可夢GO對戰聯盟（PvP）與原作（本傳）計算方式不同。同樣是「弱點」倍率也不同，本系加成·CP·招式系統都是GO獨有。本文整理GBL Note對戰模擬器（開源PvPoke引擎）實際使用的數值。" },
+        { h: "1. 屬性相剋倍率 — GO為×1.6 / ×0.625", p: "這是最大差異。原作弱點×2·減半×0.5·無效×0，但寶可夢GO不同：效果絕佳（弱點）×1.6、雙重弱點（兩屬性皆弱）×2.56、減半×0.625、雙重減半×0.390625。原作中「無效（×0）」的關係在GO也不是0，而是×0.390625仍會造成傷害 — 也就是GO沒有完全無效。常說的「2倍弱點·0.5倍減半·4倍弱點」是原作數值，並非GO實際值。" },
+        { h: "2. 本系加成（STAB）— GO為×1.2", p: "使用與寶可夢同屬性招式的「本系」加成，GO為×1.2（原作×1.5）。本系招式雖強，但不如原作壓倒性。" },
+        { h: "3. CP·等級·個體值(IV)", p: "GO的CP由攻擊·防禦·HP種族值與個體值(IV 0~15)、等級(CPM)計算。在聯盟CP上限（超級1500·高級2500）內能達到最佳數值的個體值組合各聯盟不同，並非像原作「6V永遠最強」。越低的聯盟，偏重防禦·HP的個體往往更有利。" },
+        { h: "4. 招式系統 — 能量·回合·次數，以及CMP", p: "一般招式每回合累積固定能量，特殊招式在能量足夠時發動（因此有「幾次充滿」=發動次數的概念）。兩隻在同一回合充滿時，攻擊實數值較高者先發動 — 這就是同時充能優先權（CMP）。所以在大師聯盟，攻擊個體值有時決定鏡像對戰勝負。" },
+        { h: "5. 暗影·強化/弱化", p: "暗影寶可夢攻擊×1.2傷害更高，但受到的傷害也增加（防禦×0.833）。部分招式還會提升或降低攻擊/防禦等級（強化·弱化），因此單看數值無法得知實戰結果。" },
+        { h: "GBL Note以這些數值計算", p: "GBL Note的階級表·屬性分析·妥協個體研究·對戰模擬器全以上述GO倍率計算。因此可能與原作Wiki倍率（×2·×0.5）看起來不同，但這才是GBL實際發生的數值。" },
+      ],
+    },
+  },
   "gbl-basics": {
     updated: "2026-08-19",
     keywords: {
