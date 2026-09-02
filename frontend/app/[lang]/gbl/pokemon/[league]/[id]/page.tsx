@@ -11,7 +11,8 @@ import MOVENAMES from "../../../pvp_move_names.json";
 import AdSlot from "../../../AdSlot";
 import CoupangAd from "../../../CoupangAd";
 import PokemonShare from "./PokemonShare";
-import MovesetPanel, { type FastOpt, type ChargedOpt } from "./MovesetPanel";
+import MovesetShare from "./MovesetShare";
+import { type FastOpt, type ChargedOpt } from "./MovesetPanel";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../../lib/i18n";
 import { leagueName, leagueShort, localName } from "../../../contentI18n";
 import JsonLd from "../../../JsonLd";
@@ -301,42 +302,36 @@ export default async function PokemonDetail({ params }: { params: { lang: string
           </div>
         )}
 
-        {/* 공유/저장 — 각 포켓몬 정보카드(프로필: 티어·기술·종족값·카운터)로 바이럴 */}
-        <PokemonShare
-          name={name}
-          dex={spriteDexOf(d.id, hdex)}
-          shadow={d.id.endsWith("_shadow")}
-          types={types.map((t) => ({ label: typeLabel(lang, t), color: TYPE_COLOR[t] || "#94a3b8" }))}
-          tier={d.tier}
-          tierColor={TIER_COLOR[d.tier]}
-          league={lgName}
-          pickRate={pr}
-          accent={c1}
-          fastMove={d.mv ? moveLabel(lang, d.mv.fast.id) : (d.moveset[0] ? moveLabel(lang, d.moveset[0]) : undefined)}
-          chargedMoves={d.mv ? d.mv.charged.map((c) => ({ name: moveLabel(lang, c.id), counts: c.counts })) : d.moveset.slice(1).map((mid) => ({ name: moveLabel(lang, mid) }))}
-          stats={{ atk: d.stats?.atk || 0, def: d.stats?.def || 0, hp: d.stats?.hp || 0 }}
-          t={pk.share}
-          wins={d.wins.slice(0, 5).map((c) => ({ dex: spriteDexOf(c.id), name: locName(lang, c.id), rating: c.r }))}
-          counters={d.counters.slice(0, 5).map((c) => ({ dex: spriteDexOf(c.id), name: locName(lang, c.id), rating: c.r }))}
-          path={`/gbl/pokemon/${params.league}/${params.id}`}
-        />
-
-        {/* 추천 기술배치 + 스킬 타수 */}
-        <h2 style={h2}>{pk.movesetH}</h2>
-        <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "11px 12px" }}>
-          {d.mv ? (() => {
-            const disp = (mid: string) => { const mm = MOVES[mid]; return { id: mid, label: moveLabel(lang, mid), color: mm ? (TYPE_COLOR[mm.type] || "#64748b") : "#94a3b8" }; };
-            const recCharged = new Set(d.mv.charged.map((c) => c.id));
-            const fastsRaw = d.mv.fasts && d.mv.fasts.length ? d.mv.fasts : [d.mv.fast];
-            const fasts: FastOpt[] = fastsRaw.map((f) => ({ ...disp(f.id), gain: f.gain, turns: f.turns }));
-            const chRaw = d.mv.chargedAll && d.mv.chargedAll.length ? d.mv.chargedAll : d.mv.charged.map((c) => ({ id: c.id, energy: c.energy }));
-            const charged: ChargedOpt[] = chRaw.map((c) => ({ ...disp(c.id), energy: c.energy, rec: recCharged.has(c.id) }));
-            return <MovesetPanel fasts={fasts} charged={charged} defaultFastId={d.mv.fast.id}
-              labels={{ fastLabel: pk.fastLabel, chargedHint: pk.chargedHint, energyUnit: pk.energyUnit, hitsUnit: pk.hitsUnit, fastTurns: pk.fastTurns, recTag: pk.recTag, altFastHint: pk.altFastHint }} />;
-          })() : (
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{d.moveset.map((mid) => <MoveChip key={mid} lang={lang} id={mid} />)}</div>
-          )}
-        </div>
+        {/* 공유/저장 카드 + 추천 기술배치 — 빠른기술 선택 상태 공유(패널서 바꾸면 카드도 갱신) */}
+        {(() => {
+          const cardStyle = { background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "11px 12px" } as const;
+          const shareBase = {
+            name, dex: spriteDexOf(d.id, hdex), shadow: d.id.endsWith("_shadow"),
+            types: types.map((t) => ({ label: typeLabel(lang, t), color: TYPE_COLOR[t] || "#94a3b8" })),
+            tier: d.tier, tierColor: TIER_COLOR[d.tier], league: lgName, pickRate: pr, accent: c1,
+            stats: { atk: d.stats?.atk || 0, def: d.stats?.def || 0, hp: d.stats?.hp || 0 }, t: pk.share,
+            wins: d.wins.slice(0, 5).map((c) => ({ dex: spriteDexOf(c.id), name: locName(lang, c.id), rating: c.r })),
+            counters: d.counters.slice(0, 5).map((c) => ({ dex: spriteDexOf(c.id), name: locName(lang, c.id), rating: c.r })),
+            path: `/gbl/pokemon/${params.league}/${params.id}`,
+          };
+          if (!d.mv) return (
+            <>
+              <PokemonShare {...shareBase} fastMove={d.moveset[0] ? moveLabel(lang, d.moveset[0]) : undefined}
+                chargedMoves={d.moveset.slice(1).map((mid) => ({ name: moveLabel(lang, mid) }))} />
+              <h2 style={h2}>{pk.movesetH}</h2>
+              <div style={cardStyle}><div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{d.moveset.map((mid) => <MoveChip key={mid} lang={lang} id={mid} />)}</div></div>
+            </>
+          );
+          const disp = (mid: string) => { const mm = MOVES[mid]; return { id: mid, label: moveLabel(lang, mid), color: mm ? (TYPE_COLOR[mm.type] || "#64748b") : "#94a3b8" }; };
+          const recCharged = new Set(d.mv.charged.map((c) => c.id));
+          const fastsRaw = d.mv.fasts && d.mv.fasts.length ? d.mv.fasts : [d.mv.fast];
+          const fasts: FastOpt[] = fastsRaw.map((f) => ({ ...disp(f.id), gain: f.gain, turns: f.turns }));
+          const chRaw = d.mv.chargedAll && d.mv.chargedAll.length ? d.mv.chargedAll : d.mv.charged.map((c) => ({ id: c.id, energy: c.energy }));
+          const charged: ChargedOpt[] = chRaw.map((c) => ({ ...disp(c.id), energy: c.energy, rec: recCharged.has(c.id) }));
+          return <MovesetShare share={shareBase} fasts={fasts} charged={charged} defaultFastId={d.mv.fast.id}
+            movesetH={pk.movesetH} h2Style={h2} cardStyle={cardStyle}
+            panelLabels={{ fastLabel: pk.fastLabel, chargedHint: pk.chargedHint, energyUnit: pk.energyUnit, hitsUnit: pk.hitsUnit, fastTurns: pk.fastTurns, recTag: pk.recTag, altFastHint: pk.altFastHint }} />;
+        })()}
 
         {/* 카운터 (이 포켓몬에게 강한 상대) — 상단 배치 */}
         <h2 style={h2}>{pk.countersH}</h2>

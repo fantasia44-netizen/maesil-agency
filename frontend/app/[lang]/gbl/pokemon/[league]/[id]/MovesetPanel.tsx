@@ -1,7 +1,7 @@
 "use client";
 // 추천 기술배치 + 스킬 타수 — 빠른기술(노멀기) 선택 시 차지 타수를 즉석 재계산.
 // 데이터: 서버(page.tsx)에서 이름·타입색 해석해 prop으로 전달. 타수만 클라 계산.
-import { useState } from "react";
+// 선택 상태(sel)는 상위(MovesetShare)에서 관리 — 공유/저장 카드와 동기화.
 
 export type MoveDisp = { id: string; label: string; color: string };
 export type FastOpt = MoveDisp & { gain: number; turns: number };
@@ -12,7 +12,7 @@ export type PanelLabels = {
 };
 
 // 연속 발동 시 타수 시퀀스(에너지 이월). taus_seq(파이썬)와 동일.
-function tausSeq(cost: number, gain: number, n = 5): number[] {
+export function tausSeq(cost: number, gain: number, n = 5): number[] {
   if (!gain || !cost) return [];
   let energy = 0; const seq: number[] = [];
   for (let i = 0; i < n; i++) {
@@ -33,10 +33,9 @@ function Chip({ m, dim }: { m: MoveDisp; dim?: boolean }) {
   );
 }
 
-export default function MovesetPanel({ fasts, charged, defaultFastId, labels }: {
-  fasts: FastOpt[]; charged: ChargedOpt[]; defaultFastId: string; labels: PanelLabels;
+export default function MovesetPanel({ fasts, charged, sel, onSel, labels }: {
+  fasts: FastOpt[]; charged: ChargedOpt[]; sel: string; onSel: (id: string) => void; labels: PanelLabels;
 }) {
-  const [sel, setSel] = useState(defaultFastId);
   const selFast = fasts.find((f) => f.id === sel) || fasts[0];
   if (!selFast) return null;
   return (
@@ -47,7 +46,7 @@ export default function MovesetPanel({ fasts, charged, defaultFastId, labels }: 
         {fasts.map((f) => {
           const on = f.id === selFast.id;
           return (
-            <button key={f.id} onClick={() => setSel(f.id)} disabled={fasts.length <= 1}
+            <button key={f.id} onClick={() => onSel(f.id)} disabled={fasts.length <= 1}
               style={{ padding: 0, border: "none", background: "none", cursor: fasts.length > 1 ? "pointer" : "default",
                 outline: on && fasts.length > 1 ? `2px solid ${f.color}` : "none", outlineOffset: 2, borderRadius: 10, opacity: on ? 1 : 0.45 }}>
               <Chip m={f} />
