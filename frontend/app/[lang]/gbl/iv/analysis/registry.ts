@@ -190,7 +190,11 @@ function mk(data: unknown): IvEntry {
   const en = genArticle(sim, names, rivalNames, SEASON, "en");
   return {
     sim, dex, rivalName: rivalNames, name: names, updated: UPDATED, season: SEASON,
-    article: { ko: genArticle(sim, names, rivalNames, SEASON, "ko"), en, ja: en, "zh-TW": en },
+    article: {
+      ko: genArticle(sim, names, rivalNames, SEASON, "ko"), en,
+      ja: genArticle(sim, names, rivalNames, SEASON, "ja"),
+      "zh-TW": genArticle(sim, names, rivalNames, SEASON, "zh-TW"),
+    },
     published: true,
   };
 }
@@ -202,7 +206,11 @@ export const IV_ANALYSIS: Record<string, IvEntry> = {
     rivalName: { ko: "가이오가", en: "Kyogre", ja: "カイオーガ", "zh-TW": "蓋歐卡" },
     name: { ko: "그란돈", en: "Groudon", ja: "グラードン", "zh-TW": "固拉多" },
     updated: UPDATED, season: SEASON,
-    article: { ko: groudon_ko, en: groudon_en, ja: groudon_en, "zh-TW": groudon_en },
+    article: {
+      ko: groudon_ko, en: groudon_en,
+      ja: genArticle(GROUDON as unknown as Sim, { ko: "그란돈", en: "Groudon", ja: "グラードン", "zh-TW": "固拉多" }, { ko: "가이오가", en: "Kyogre", ja: "カイオーガ", "zh-TW": "蓋歐卡" }, SEASON, "ja"),
+      "zh-TW": genArticle(GROUDON as unknown as Sim, { ko: "그란돈", en: "Groudon", ja: "グラードン", "zh-TW": "固拉多" }, { ko: "가이오가", en: "Kyogre", ja: "カイオーガ", "zh-TW": "蓋歐卡" }, SEASON, "zh-TW"),
+    },
     published: true,
   },
   // 자동 초안(검수 대기) — 마스터 실측 상위

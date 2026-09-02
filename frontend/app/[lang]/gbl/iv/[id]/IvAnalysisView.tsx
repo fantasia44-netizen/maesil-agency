@@ -215,6 +215,7 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
   // 데이터(e)는 서버(page.tsx)에서 해당 몬만 prop으로 전달 — registry를 클라에서 import하면
   // 20종 6.3MB가 통째로 번들돼 로드가 5초 걸리던 문제를 막음(이 파일은 registry를 타입만 참조).
   const a = e.article[lang] || e.article.en;
+  const seasonLoc = lang === "ja" ? e.season.replace("시즌", "シーズン") : lang === "zh-TW" ? e.season.replace("시즌", "賽季") : lang === "en" ? e.season.replace("시즌", "Season") : e.season;
   const u = UI[lang] || UI.en;
   const L = (p: string) => localizePath(lang, p);
   const sim = e.sim;
@@ -244,7 +245,7 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
                 <img src={SPRITE(formDexById(id, e.dex))} alt={name} width={92} height={92} style={{ imageRendering: "pixelated", filter: `drop-shadow(0 4px 10px ${tc}55)`, flexShrink: 0 }} />
                 <div style={{ minWidth: 0 }}>
                   <h1 style={{ margin: 0, fontSize: "1.4rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>{a.title}</h1>
-                  <div style={{ fontSize: "0.76rem", color: "#475569", marginTop: 5, fontWeight: 600 }}>💯 CP {nrm.hundo.cp} · L{nrm.hundo.level} · {e.season} · {u.updated} {e.updated}</div>
+                  <div style={{ fontSize: "0.76rem", color: "#475569", marginTop: 5, fontWeight: 600 }}>💯 CP {nrm.hundo.cp} · L{nrm.hundo.level} · {seasonLoc} · {u.updated} {e.updated}</div>
                 </div>
               </div>
             </div>
@@ -434,7 +435,7 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
 
         {/* 분석 방법(E-E-A-T) — 자체 계산 명세 박스 + 서술 + Methodology 링크 */}
         {(() => { const mb = MBOX[lang] || MBOX.en; const rows: [string, string][] = [
-          [mb.basis, e.season], [mb.target, mb.targetV], [mb.shield, "0 · 1 · 2"],
+          [mb.basis, seasonLoc], [mb.target, mb.targetV], [mb.shield, "0 · 1 · 2"],
           [mb.level, mb.levelV], [mb.engine, mb.engineV], [mb.baseline, "15/15/15"], [mb.last, e.updated],
         ]; return (
           <div style={{ marginTop: 8, padding: "0.9rem 1.1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
