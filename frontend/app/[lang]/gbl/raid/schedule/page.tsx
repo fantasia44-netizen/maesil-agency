@@ -164,8 +164,9 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
       bosses: r.bosses.map((b) => ({ ko: koMon(b.en), name: monLocal(lang, b.en, t), dex: b.dex, image: "", shiny: b.shiny })) });
   }
 
-  // ── 메가 어센션(2026-08-31~09-06) — 이 기간 5성·그림자·정규 메가·레이드아워·스포트라이트 중단, 메가 레이드가 대체(LeekDuck 공식) ──
-  const MA_START = "2026-08-31T06:00:00+09:00", MA_END = "2026-09-06T22:00:00+09:00";
+  // ── 메가 어센션(2026-08-31~09-04, LeekDuck 공식) — 이 기간 5성·그림자·정규 메가 중단, 메가 레이드가 대체 ──
+  // (9/5~9/6은 별개 이벤트 = GO Fest 메가 피날레 · 아머드 뮤츠 5성. 정규 레이드는 9/5부터 재개)
+  const MA_START = "2026-08-31T06:00:00+09:00", MA_END = "2026-09-05T06:00:00+09:00";
   const maS = Date.parse(MA_START), maE = Date.parse(MA_END);
   const megaAscensionActive = Date.now() >= maS && Date.now() < maE;
   // 사전 정규 로테이션만 클립 — 기간 전에 시작해 기간으로 이어지는 5성/그림자/정규메가는 기간동안 미개최.
@@ -227,7 +228,7 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
           <div style={{ display: "flex", gap: 10, alignItems: "flex-start", background: "linear-gradient(120deg,#f5f3ff,#ffffff 70%)", border: "1px solid #ddd6fe", borderLeft: "4px solid #7c3aed", borderRadius: 12, padding: "0.85rem 1rem", marginBottom: 14 }}>
             <span style={{ fontSize: "1.3rem", lineHeight: 1.2 }}>🌙</span>
             <div style={{ fontSize: "0.86rem", color: "#4c1d95", lineHeight: 1.6 }}>
-              <b style={{ color: "#6d28d9" }}>{maLabel} {lang === "ko" ? "진행 중 (8/31~9/6)" : "(Aug 31–Sep 6)"}</b>
+              <b style={{ color: "#6d28d9" }}>{maLabel} {lang === "ko" ? "진행 중 (8/31~9/4)" : "(Aug 31–Sep 4)"}</b>
               <div style={{ color: "#5b21b6", marginTop: 2 }}>
                 {lang === "en" ? "5-star, Shadow, and regular Mega raids are paused. Mega Ascension raids replace them (megas below rotate daily)."
                   : lang === "ja" ? "5つ星・シャドウ・通常メガレイドは休止。メガアセンションのメガレイドが代替（下記メガが日替わり）。"
