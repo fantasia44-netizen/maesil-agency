@@ -211,10 +211,12 @@ export default async function PokemonDetail({ params }: { params: { lang: string
     // 실제 상위권(픽률 ≥5%)인 상대를 잡을 때만 "메타 카운터" 근거로 채택
     if (rp != null && rp >= 5 && (beatsMetaPct == null || rp > beatsMetaPct)) { beatsMetaPct = rp; beatsMetaName = locName(lang, w.id); }
   }
+  // 이론 순위 = 리그 score 정렬 리스트(DET)에서의 위치(1-base). 실측 순위와 괴리 수치화용.
+  const theoryIdx = (DET[params.league] || []).findIndex((x) => x.id === d.id);
   const analysis = buildAnalysis({
     lang, leagueName: lgName, tier: d.tier, scores: d.scores || [],
     atk: d.stats?.atk || 0, def: d.stats?.def || 0, hp: d.stats?.hp || 0,
-    pickRate: pr, pickRank: info.rank[d.id],
+    pickRate: pr, pickRank: info.rank[d.id], theoryRank: theoryIdx >= 0 ? theoryIdx + 1 : undefined,
     topCounterName: d.counters[0] ? locName(lang, d.counters[0].id) : undefined,
     beatsMetaName, beatsMetaPct,
   });

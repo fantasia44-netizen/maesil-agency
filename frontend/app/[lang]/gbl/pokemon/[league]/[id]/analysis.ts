@@ -11,6 +11,7 @@ export type AnalysisCtx = {
   atk: number; def: number; hp: number;
   pickRate?: number;         // 실측 픽률 %
   pickRank?: number;         // 실측 순위(1-base) — 상위권 판정
+  theoryRank?: number;       // 이론(PvPoke score) 순위 — 실측과 괴리 수치화
   topCounterName?: string;   // 가장 위협적인 카운터
   beatsMetaName?: string;    // 이 포켓몬이 잡는 "현재 실측 상위" 상대
   beatsMetaPct?: number;
@@ -32,6 +33,9 @@ type Phr = {
   // 스탯 성향
   glass: string;
   bulky: string;
+  // 이론 순위 vs 실측 순위 괴리(수치)
+  rankTheoryHigh: (tr: number, ur: number) => string;
+  rankUsageHigh: (tr: number, ur: number) => string;
   // 메타 카운터 / 주의
   metaCounter: (name: string, pct: number) => string;
   caution: (name: string) => string;
@@ -54,6 +58,8 @@ const PH: Record<Locale, Phr> = {
     },
     glass: "공격 종족값이 높은 대신 내구가 얇아, 실드 관리가 승패를 크게 가릅니다.",
     bulky: "내구 종족값이 탄탄해 오래 버티며 이득을 쌓는 안정적 운영이 가능합니다.",
+    rankTheoryHigh: (tr, ur) => `이론 순위 ${tr}위 대비 실측 사용률은 ${ur}위로, 이론 성능보다 실제 채용이 낮은 편입니다.`,
+    rankUsageHigh: (tr, ur) => `이론 순위 ${tr}위지만 실측 사용률은 ${ur}위로, 이론보다 실전에서 더 많이 선택됩니다.`,
     metaCounter: (name, pct) => `특히 현재 실측 상위권인 ${name}(${pct}%)를 상대로 우위를 가져, 메타 카운터로서의 가치가 높습니다.`,
     caution: (name) => `다만 ${name} 같은 상대에게는 불리하므로 맞대면을 피하는 운용이 안전합니다.`,
   },
@@ -73,6 +79,8 @@ const PH: Record<Locale, Phr> = {
     },
     glass: "High attack but thin bulk means shield management heavily decides its games.",
     bulky: "Solid bulk lets it stall and grind out advantage in extended fights.",
+    rankTheoryHigh: (tr, ur) => `Ranked #${tr} on paper but #${ur} by real usage — picked less than its rating suggests.`,
+    rankUsageHigh: (tr, ur) => `Ranked #${tr} on paper yet #${ur} by real usage — chosen more in practice than theory implies.`,
     metaCounter: (name, pct) => `Notably, it holds an edge against ${name} (${pct}%), a current field-meta staple — giving it real value as a meta counter.`,
     caution: (name) => `That said, it's unfavored into threats like ${name}, so avoid that head-to-head.`,
   },
@@ -92,6 +100,8 @@ const PH: Record<Locale, Phr> = {
     },
     glass: "攻撃種族値が高い反面、耐久が薄く、シールド管理が勝敗を大きく分けます。",
     bulky: "耐久種族値が厚く、長く粘って有利を積む安定運用が可能です。",
+    rankTheoryHigh: (tr, ur) => `理論順位${tr}位に対し実測使用率は${ur}位で、理論性能より実際の採用が低めです。`,
+    rankUsageHigh: (tr, ur) => `理論順位${tr}位ですが実測使用率は${ur}位で、理論より実戦で多く選ばれています。`,
     metaCounter: (name, pct) => `特に現在の実測上位である${name}(${pct}%)に対して有利を取れ、メタカウンターとしての価値が高いです。`,
     caution: (name) => `ただし${name}のような相手には不利なため、対面を避ける運用が安全です。`,
   },
@@ -111,6 +121,8 @@ const PH: Record<Locale, Phr> = {
     },
     glass: "攻擊種族值高但耐久偏薄，護盾管理將大幅左右勝負。",
     bulky: "耐久種族值紮實，可長期消耗、累積優勢的穩定運用。",
+    rankTheoryHigh: (tr, ur) => `理論排名第${tr}，實測使用率卻第${ur}——實際採用低於理論評價。`,
+    rankUsageHigh: (tr, ur) => `理論排名第${tr}，實測使用率第${ur}——實戰採用高於理論評價。`,
     metaCounter: (name, pct) => `尤其能對目前實測上位的${name}(${pct}%)取得優勢，作為Meta剋星價值很高。`,
     caution: (name) => `不過面對${name}這類對手較為不利，建議避免正面對上。`,
   },
@@ -133,6 +145,13 @@ export function buildAnalysis(ctx: AnalysisCtx): string[] {
     out.push(p.common(ctx.leagueName, ctx.pickRate));
   } else {
     out.push(p.neutral(ctx.leagueName, ctx.tier));
+  }
+
+  // 1-b) 이론 순위 vs 실측 순위 괴리(수치) — 15계단 이상 벌어질 때만 명시
+  if (ctx.theoryRank && ctx.pickRank) {
+    const gap = ctx.pickRank - ctx.theoryRank;
+    if (gap >= 15) out.push(p.rankTheoryHigh(ctx.theoryRank, ctx.pickRank));
+    else if (gap <= -15) out.push(p.rankUsageHigh(ctx.theoryRank, ctx.pickRank));
   }
 
   // 2) 역할 성향 — 최고 역할 점수 기준
