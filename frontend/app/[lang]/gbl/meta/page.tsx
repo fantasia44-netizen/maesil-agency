@@ -118,6 +118,9 @@ export function generateMetadata({ params }: { params: { lang: string } }): Meta
   return {
     title: c.title,
     description: c.desc,
+    // 허브(/gbl/meta)는 클라 렌더(로딩 스피너)라 크롤러엔 빈 페이지 → noindex.
+    // 실제 콘텐츠는 SSR인 /gbl/meta/[league]가 담당(follow로 그쪽으로 크롤 유도).
+    robots: { index: false, follow: true },
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
     openGraph: { title: c.title, description: c.desc, url: localizePath(lang, path), images: ["/gbl-og.png"], type: "website" },
   };
