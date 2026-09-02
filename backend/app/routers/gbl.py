@@ -37,6 +37,21 @@ def _users_db():
     return get_maesil_total_client().schema("agent_work")
 
 
+def _fetch_all(query_builder, columns: str, page: int = 1000):
+    """PostgREST 기본 1000행 상한을 넘겨 테이블 전량을 페이지네이션으로 수집.
+    query_builder() 는 매 페이지마다 .table(...).select(columns) 상태의 빌더를 반환해야 함."""
+    rows: list = []
+    off = 0
+    while True:
+        batch = (query_builder().select(columns).order("id")
+                 .range(off, off + page - 1).execute().data) or []
+        rows.extend(batch)
+        if len(batch) < page:
+            break
+        off += page
+    return rows
+
+
 # ── 모델 ──────────────────────────────────────────────────────────────
 class TeamMon(BaseModel):
     speciesId: str | None = None       # 데이터셋 매칭 개체
@@ -365,8 +380,8 @@ def admin_stats(admin: UserContext = Depends(require_admin)) -> dict:
         urows = (_users_db().table("users")
                  .select("id, email, display_name, is_active, last_login_at, created_at")
                  .eq("role", "gbl").execute().data) or []
-        mrows = (db.table("gbl_matches")
-                 .select("id, user_id, league, created_at").execute().data) or []
+        # PostgREST 기본 1000행 상한 회피 — 전량 페이지네이션(총계·리그별·유저별 집계 정확도).
+        mrows = _fetch_all(lambda: db.table("gbl_matches"), "id, user_id, league, created_at")
     except Exception as e:
         logger.error("gbl admin stats 실패: %s", e)
         raise HTTPException(500, "현황 조회 실패")
