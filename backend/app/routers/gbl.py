@@ -37,18 +37,21 @@ def _users_db():
     return get_maesil_total_client().schema("agent_work")
 
 
-def _fetch_all(query_builder, columns: str, page: int = 1000):
-    """PostgREST 기본 1000행 상한을 넘겨 테이블 전량을 페이지네이션으로 수집.
-    query_builder() 는 매 페이지마다 .table(...).select(columns) 상태의 빌더를 반환해야 함."""
+def _fetch_all(build, page: int = 1000, cap: int | None = None):
+    """PostgREST 기본 1000행 상한을 넘겨 range 페이지네이션으로 수집.
+    build() 는 호출마다 필터·정렬까지 끝난 '새' 쿼리 빌더(.range() 직전 상태)를 반환해야 함.
+    cap 지정 시 그 행 수에 도달하면 중단(개인 전적 시즌당 상한 등)."""
     rows: list = []
     off = 0
     while True:
-        batch = (query_builder().select(columns).order("id")
-                 .range(off, off + page - 1).execute().data) or []
-        rows.extend(batch)
-        if len(batch) < page:
+        want = page if cap is None else min(page, cap - len(rows))
+        if want <= 0:
             break
-        off += page
+        batch = build().range(off, off + want - 1).execute().data or []
+        rows.extend(batch)
+        if len(batch) < want:
+            break
+        off += want
     return rows
 
 
@@ -139,34 +142,39 @@ def _ensure_iso(val: str | None, field: str) -> str | None:
 
 
 # ── 라우트 ────────────────────────────────────────────────────────────
+_SEASON_MATCH_CAP = 3000   # 개인 전적: 시즌(기간)당 최대 로드 판수
+
+
 @router.get("/matches")
 def list_matches(league: str | None = None, since: str | None = None, until: str | None = None,
                  opponent: str | None = None,
                  user: UserContext = Depends(get_current_user)) -> list[dict]:
-    """대전 기록.
+    """대전 기록(개인 스코프).
     - opponent 지정 시: 상대 이름 검색(인덱스 필터, 소량 반환). since/until 주면 그 기간(시즌)으로 한정. 조회탭용.
-    - 아니면: (리그+기간) 범위. 프론트가 현재 시즌만 로드해 항상 소량 유지.
+    - 아니면: (리그+기간) 범위. 시즌당 최대 3000판까지 페이지네이션(PostgREST 기본 1000행 상한 회피).
     무거운 필터는 전부 Postgres(인덱스)가 처리 — 서버는 질의 중계만."""
     since = _ensure_iso(since, "since")
     until = _ensure_iso(until, "until")
-    q = _db().table("gbl_matches").select("*").eq("user_id", user.id)
-    if opponent and opponent.strip():
-        q = q.ilike("opponent_name", f"%{opponent.strip()[:_MAX_OPP]}%")
-        if since:
-            q = q.gte("played_at", since)
-        if until:
-            q = q.lte("played_at", until)
-        q = q.order("played_at", desc=True).limit(500)
-    else:
-        if league:
-            q = q.eq("league", _clean_league(league))
-        if since:
-            q = q.gte("played_at", since)
-        if until:
-            q = q.lte("played_at", until)
-        q = q.order("played_at", desc=True).limit(5000)
     try:
-        return q.execute().data or []
+        if opponent and opponent.strip():
+            q = (_db().table("gbl_matches").select("*").eq("user_id", user.id)
+                 .ilike("opponent_name", f"%{opponent.strip()[:_MAX_OPP]}%"))
+            if since:
+                q = q.gte("played_at", since)
+            if until:
+                q = q.lte("played_at", until)
+            return q.order("played_at", desc=True).limit(500).execute().data or []
+
+        def _build():
+            b = _db().table("gbl_matches").select("*").eq("user_id", user.id)
+            if league:
+                b = b.eq("league", _clean_league(league))
+            if since:
+                b = b.gte("played_at", since)
+            if until:
+                b = b.lte("played_at", until)
+            return b.order("played_at", desc=True).order("id")   # id=페이지 경계 결정성(동률 방지)
+        return _fetch_all(_build, cap=_SEASON_MATCH_CAP)
     except Exception as e:
         logger.error("gbl list 실패 [%s]: %s", user.id, e)
         raise HTTPException(500, "기록 조회 실패")
@@ -380,8 +388,9 @@ def admin_stats(admin: UserContext = Depends(require_admin)) -> dict:
         urows = (_users_db().table("users")
                  .select("id, email, display_name, is_active, last_login_at, created_at")
                  .eq("role", "gbl").execute().data) or []
-        # PostgREST 기본 1000행 상한 회피 — 전량 페이지네이션(총계·리그별·유저별 집계 정확도).
-        mrows = _fetch_all(lambda: db.table("gbl_matches"), "id, user_id, league, created_at")
+        # 전체 집계(관리자 전용) — 제한 없이 전량 페이지네이션(총계·리그별·유저별 정확도).
+        mrows = _fetch_all(lambda: db.table("gbl_matches")
+                           .select("id, user_id, league, created_at").order("id"))
     except Exception as e:
         logger.error("gbl admin stats 실패: %s", e)
         raise HTTPException(500, "현황 조회 실패")
