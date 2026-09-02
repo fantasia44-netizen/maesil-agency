@@ -204,21 +204,30 @@ export default async function PokemonDetail({ params }: { params: { lang: string
   const pr = info.rate[d.id];
 
   // ── 데이터 파생 분석문(포켓몬별 분기) ──
-  // 이 포켓몬이 잡는 상대 중 "현재 실측 상위"인 상대(가장 픽률 높은 것) = 메타 카운터 근거
+  const rankTag = (r: number) => lang === "en" ? `#${r}` : lang === "ja" ? `${r}位` : lang === "zh-TW" ? `第${r}名` : `${r}위`;
+  // 이 몬이 유리한 매치업(d.wins) 중 실측 사용률 상위(≤25위)인 상대 = 실측 결합 강점 근거
+  const metaWins = d.wins
+    .filter((w) => info.rank[w.id] != null && info.rank[w.id] <= 25)
+    .sort((a, b) => info.rank[a.id] - info.rank[b.id])
+    .slice(0, 3)
+    .map((w) => `${locName(lang, w.id)}(${rankTag(info.rank[w.id])})`);
+  const beatsNames = metaWins.length ? metaWins.join(" · ") : undefined;
+  // 폴백(실측 상위 유리상대 없을 때) — 픽률 ≥5% 잡는 단일 상대
   let beatsMetaName: string | undefined, beatsMetaPct: number | undefined;
-  for (const w of d.wins) {
+  if (!beatsNames) for (const w of d.wins) {
     const rp = info.rate[w.id];
-    // 실제 상위권(픽률 ≥5%)인 상대를 잡을 때만 "메타 카운터" 근거로 채택
     if (rp != null && rp >= 5 && (beatsMetaPct == null || rp > beatsMetaPct)) { beatsMetaPct = rp; beatsMetaName = locName(lang, w.id); }
   }
   // 이론 순위 = 리그 score 정렬 리스트(DET)에서의 위치(1-base). 실측 순위와 괴리 수치화용.
   const theoryIdx = (DET[params.league] || []).findIndex((x) => x.id === d.id);
+  const topCounter = d.counters[0];
   const analysis = buildAnalysis({
     lang, leagueName: lgName, tier: d.tier, scores: d.scores || [], types,
     atk: d.stats?.atk || 0, def: d.stats?.def || 0, hp: d.stats?.hp || 0,
     pickRate: pr, pickRank: info.rank[d.id], theoryRank: theoryIdx >= 0 ? theoryIdx + 1 : undefined,
-    topCounterName: d.counters[0] ? locName(lang, d.counters[0].id) : undefined,
-    beatsMetaName, beatsMetaPct,
+    topCounterName: topCounter ? locName(lang, topCounter.id) : undefined,
+    topCounterRank: topCounter && info.rank[topCounter.id] != null && info.rank[topCounter.id] <= 30 ? info.rank[topCounter.id] : undefined,
+    beatsMetaName, beatsMetaPct, beatsNames,
   });
   const aH = HEADINGS[lang] || HEADINGS.en;
   const aTitle = lang === "en" ? "GBL Note Analysis" : lang === "ja" ? "GBL Note 分析" : lang === "zh-TW" ? "GBL Note 分析" : "GBL Note 분석";

@@ -16,11 +16,10 @@ export type AnalysisCtx = {
   pickRank?: number;         // 실측 순위(1-base) — 상위권 판정
   theoryRank?: number;       // 이론(PvPoke score) 순위 — 실측과 괴리 수치화
   topCounterName?: string;   // 가장 위협적인 카운터
-  beatsMetaName?: string;    // 이 포켓몬이 잡는 "현재 실측 상위" 상대
+  topCounterRank?: number;   // 그 카운터의 실측 사용률 순위(있으면 결합)
+  beatsMetaName?: string;    // 이 포켓몬이 잡는 "현재 실측 상위" 상대(폴백용 단일)
   beatsMetaPct?: number;
-  beatsTopN?: number;        // 실측 상위 N종 기준
-  beatsCount?: number;       // 그중 이 몬이 유리한 종 수
-  beatsNames?: string;       // 대표로 이기는 실측 상대(로케일명, 콤마조인)
+  beatsNames?: string;       // 이 몬이 유리한 실측 상위 상대(로케일명+순위 조인). 있으면 우선.
 };
 
 // 결과 = 강점/약점/평가 3구조(양 AI 권고: 분석 문서로 인식 + 단점 필수).
@@ -45,6 +44,8 @@ type Phr = {
   neutral: (lg: string, tier: string) => string;
   // 역할 성향
   role: Record<RoleKey, string>;
+  roleShort: string[];                         // 역할 짧은 이름(ROLE_KEYS 순서)
+  roleVersatile: (roles: string) => string;    // 동점/근소차 → 다양한 포지션
   // 스탯 성향
   glass: string;
   bulky: string;
@@ -54,11 +55,13 @@ type Phr = {
   // 메타 카운터 / 주의
   metaCounter: (name: string, pct: number) => string;
   caution: (name: string) => string;
-  // 타입 기반(모든 몬 항상 계산 가능 — 폴백 핵심) + 실측 승패 카운트
-  sMetaBeats: (n: number, m: number, names: string) => string;
-  sTypeDef: (list: string, dbl: string) => string;
+  cautionRanked: (name: string, rank: number) => string;   // 카운터 + 실측 순위 결합
+  // 타입 기반(모든 몬 항상 계산 가능 — 폴백 핵심) + 실측 승패 결합
+  sMetaBeats: (names: string) => string;
+  sTypeDef: (desc: string) => string;          // desc = "이중반감·무효 A · 반감 B"(빌드됨)
   sStab: (stab: string, tg: string) => string;
-  wTypeWeak: (list: string, dbl: string) => string;
+  wTypeWeak: (desc: string) => string;         // desc = "4배 약점 A · 약점 B"(빌드됨)
+  wStrongWord: string; wResistWord: string; wWeakWord: string; wDoubleWord: string; // 상성 단어
   etc: string;
 };
 
@@ -77,16 +80,20 @@ const PH: Record<Locale, Phr> = {
       attacker: "순수 딜링이 높아 상성만 맞으면 큰 데미지를 밀어 넣습니다.",
       consistency: "상성 안정성이 높아 폭넓은 상대에게 고르게 무난한 성능을 냅니다.",
     },
+    roleShort: ["선봉", "마무리", "교체", "차지", "공격", "일관성"],
+    roleVersatile: (roles) => `${roles} 등 여러 역할 점수가 고르게 높아 특정 포지션에 국한되지 않고 다양하게 기용할 수 있습니다.`,
     glass: "공격 종족값이 높은 대신 내구가 얇아, 실드 관리가 승패를 크게 가릅니다.",
     bulky: "내구 종족값이 탄탄해 오래 버티며 이득을 쌓는 안정적 운영이 가능합니다.",
     rankTheoryHigh: (tr, ur) => `이론 순위 ${tr}위 대비 실측 사용률은 ${ur}위로, 이론 성능보다 실제 채용이 낮은 편입니다.`,
     rankUsageHigh: (tr, ur) => `이론 순위 ${tr}위지만 실측 사용률은 ${ur}위로, 이론보다 실전에서 더 많이 선택됩니다.`,
     metaCounter: (name, pct) => `특히 현재 실측 상위권인 ${name}(${pct}%)를 상대로 우위를 가져, 메타 카운터로서의 가치가 높습니다.`,
     caution: (name) => `다만 ${name} 같은 상대에게는 불리하므로 맞대면을 피하는 운용이 안전합니다.`,
-    sMetaBeats: (n, m, names) => `실측 상위 ${n}종 중 ${m}종을 상대로 유리한 결과를 냅니다${names ? ` (특히 ${names})` : ""}.`,
-    sTypeDef: (list, dbl) => `타입 상성상 ${list} 공격을 반감해${dbl ? ` (이중반감·무효: ${dbl})` : ""} 해당 타입 공격수 앞에서 잘 버팁니다.`,
+    cautionRanked: (name, rank) => `특히 실측 사용률 ${rank}위인 ${name}에게 불리해, 현재 메타에서는 이 매치업을 피하는 편이 안전합니다.`,
+    sMetaBeats: (names) => `현재 실측에서 자주 나오는 ${names}에게 유리한 결과를 내, 메타 카운터로서의 가치가 있습니다.`,
+    sTypeDef: (desc) => `타입 상성상 ${desc} — 해당 타입 공격수 앞에서 잘 버팁니다.`,
     sStab: (stab, tg) => `자속 ${stab} 기술로 ${tg} 타입을 효과적으로 찔러, 상성이 맞으면 확실한 딜을 냅니다.`,
-    wTypeWeak: (list, dbl) => `${list} 공격에 약해${dbl ? ` (이중약점: ${dbl})` : ""} 해당 타입 상대는 주의해야 합니다.`,
+    wTypeWeak: (desc) => `타입 상성상 ${desc} — 해당 타입 상대는 주의해야 합니다.`,
+    wStrongWord: "이중반감·무효", wResistWord: "반감", wWeakWord: "약점", wDoubleWord: "4배 약점",
     etc: "등",
   },
   en: {
@@ -103,16 +110,20 @@ const PH: Record<Locale, Phr> = {
       attacker: "High raw damage means it hits hard whenever typing lines up.",
       consistency: "High matchup stability gives it even, reliable performance across a wide field.",
     },
+    roleShort: ["Lead", "Closer", "Switch", "Charger", "Attacker", "Consistency"],
+    roleVersatile: (roles) => `Its ${roles} role scores are all high, so it isn't tied to one slot and can flex across positions.`,
     glass: "High attack but thin bulk means shield management heavily decides its games.",
     bulky: "Solid bulk lets it stall and grind out advantage in extended fights.",
     rankTheoryHigh: (tr, ur) => `Ranked #${tr} on paper but #${ur} by real usage — picked less than its rating suggests.`,
     rankUsageHigh: (tr, ur) => `Ranked #${tr} on paper yet #${ur} by real usage — chosen more in practice than theory implies.`,
     metaCounter: (name, pct) => `Notably, it holds an edge against ${name} (${pct}%), a current field-meta staple — giving it real value as a meta counter.`,
     caution: (name) => `That said, it's unfavored into threats like ${name}, so avoid that head-to-head.`,
-    sMetaBeats: (n, m, names) => `It posts favorable results against ${m} of the top ${n} field-meta Pokémon${names ? ` (notably ${names})` : ""}.`,
-    sTypeDef: (list, dbl) => `By typing it resists ${list}${dbl ? ` (double-resisting ${dbl})` : ""}, holding up well against those attackers.`,
+    cautionRanked: (name, rank) => `It's notably unfavored into ${name} (usage rank #${rank}), common right now, so dodging that matchup is safer in the current meta.`,
+    sMetaBeats: (names) => `It posts favorable results against current field-meta staples ${names}, giving it real value as a meta counter.`,
+    sTypeDef: (desc) => `On defense it ${desc}, holding up well against those attackers.`,
     sStab: (stab, tg) => `Its STAB ${stab} hits ${tg} super-effectively, landing real damage when the matchup lines up.`,
-    wTypeWeak: (list, dbl) => `It's weak to ${list}${dbl ? ` (double-weak to ${dbl})` : ''}, so watch for those attackers.`,
+    wTypeWeak: (desc) => `On defense it ${desc}, so watch out for those attackers.`,
+    wStrongWord: "double-resists", wResistWord: "resists", wWeakWord: "is weak to", wDoubleWord: "is 4× weak to",
     etc: "etc",
   },
   ja: {
@@ -129,16 +140,20 @@ const PH: Record<Locale, Phr> = {
       attacker: "純粋な火力が高く、相性さえ合えば大きなダメージを通します。",
       consistency: "相性安定性が高く、幅広い相手に均一で無難な性能を出します。",
     },
+    roleShort: ["先発", "締め", "交代", "ゲージ", "攻撃", "一貫性"],
+    roleVersatile: (roles) => `${roles}など複数の役割スコアが揃って高く、特定のポジションに縛られず幅広く起用できます。`,
     glass: "攻撃種族値が高い反面、耐久が薄く、シールド管理が勝敗を大きく分けます。",
     bulky: "耐久種族値が厚く、長く粘って有利を積む安定運用が可能です。",
     rankTheoryHigh: (tr, ur) => `理論順位${tr}位に対し実測使用率は${ur}位で、理論性能より実際の採用が低めです。`,
     rankUsageHigh: (tr, ur) => `理論順位${tr}位ですが実測使用率は${ur}位で、理論より実戦で多く選ばれています。`,
     metaCounter: (name, pct) => `特に現在の実測上位である${name}(${pct}%)に対して有利を取れ、メタカウンターとしての価値が高いです。`,
     caution: (name) => `ただし${name}のような相手には不利なため、対面を避ける運用が安全です。`,
-    sMetaBeats: (n, m, names) => `実測上位${n}種のうち${m}種に有利な結果を出します${names ? `（特に${names}）` : ""}。`,
-    sTypeDef: (list, dbl) => `タイプ相性上${list}を半減し${dbl ? `（${dbl}は二重半減・無効）` : ""}、これらの攻撃前で粘れます。`,
+    cautionRanked: (name, rank) => `特に実測使用率${rank}位の${name}に不利で、現環境ではこの対面を避けるのが安全です。`,
+    sMetaBeats: (names) => `現在実測で多く見られる${names}に有利な結果を出し、メタカウンターとしての価値があります。`,
+    sTypeDef: (desc) => `タイプ相性上 ${desc} — これらの攻撃前で粘れます。`,
     sStab: (stab, tg) => `自タイプ${stab}技で${tg}を効果的に突き、噛み合えば確実にダメージを通します。`,
-    wTypeWeak: (list, dbl) => `${list}に弱く${dbl ? `（${dbl}は二重弱点）` : ""}、該当タイプの相手には注意が必要です。`,
+    wTypeWeak: (desc) => `タイプ相性上 ${desc} — 該当タイプの相手には注意が必要です。`,
+    wStrongWord: "二重半減・無効", wResistWord: "半減", wWeakWord: "弱点", wDoubleWord: "4倍弱点",
     etc: "など",
   },
   "zh-TW": {
@@ -155,16 +170,20 @@ const PH: Record<Locale, Phr> = {
       attacker: "純輸出高，相性對上時能打出可觀傷害。",
       consistency: "相性穩定性高，面對廣泛對手都有均衡穩健的表現。",
     },
+    roleShort: ["先鋒", "收尾", "換場", "充能", "輸出", "穩定"],
+    roleVersatile: (roles) => `${roles}等多個角色評分都高，不受限於特定位置，可靈活運用於各種位置。`,
     glass: "攻擊種族值高但耐久偏薄，護盾管理將大幅左右勝負。",
     bulky: "耐久種族值紮實，可長期消耗、累積優勢的穩定運用。",
     rankTheoryHigh: (tr, ur) => `理論排名第${tr}，實測使用率卻第${ur}——實際採用低於理論評價。`,
     rankUsageHigh: (tr, ur) => `理論排名第${tr}，實測使用率第${ur}——實戰採用高於理論評價。`,
     metaCounter: (name, pct) => `尤其能對目前實測上位的${name}(${pct}%)取得優勢，作為Meta剋星價值很高。`,
     caution: (name) => `不過面對${name}這類對手較為不利，建議避免正面對上。`,
-    sMetaBeats: (n, m, names) => `對實測前${n}名中的${m}種取得有利結果${names ? `（尤其${names}）` : ""}。`,
-    sTypeDef: (list, dbl) => `屬性上減半${list}${dbl ? `（${dbl}為雙重減半·無效）` : ""}，面對這些屬性的攻擊很耐打。`,
+    cautionRanked: (name, rank) => `尤其對實測使用率第${rank}名的${name}不利，當前環境建議避開此對面。`,
+    sMetaBeats: (names) => `對目前實測常見的${names}取得有利結果，作為Meta剋星具有價值。`,
+    sTypeDef: (desc) => `屬性上 ${desc} — 面對這些屬性的攻擊很耐打。`,
     sStab: (stab, tg) => `本系${stab}招式能有效打擊${tg}，對上時能造成確實傷害。`,
-    wTypeWeak: (list, dbl) => `弱${list}${dbl ? `（${dbl}為雙重弱點）` : ""}，需提防這些屬性的對手。`,
+    wTypeWeak: (desc) => `屬性上 ${desc} — 需提防這些屬性的對手。`,
+    wStrongWord: "雙重減半·無效", wResistWord: "減半", wWeakWord: "弱點", wDoubleWord: "4倍弱點",
     etc: "等",
   },
 };
@@ -182,22 +201,32 @@ export function buildAnalysis(ctx: AnalysisCtx): AnalysisOut {
   const bulk = (ctx.def + ctx.hp) / 2;
 
   // ── 강점 ──
-  // 역할(최고 역할 점수)
-  if (ctx.scores && ctx.scores.length === 6) {
-    let maxI = 0;
-    for (let i = 1; i < 6; i++) if (ctx.scores[i] > ctx.scores[maxI]) maxI = i;
-    if (ctx.scores[2] >= ctx.scores[0] + 12 && maxI === 0) maxI = 2; // 교체 우선
-    strengths.push(p.role[ROLE_KEYS[maxI]]);
+  // 역할 — 포지션 3역할(선봉0·마무리1·교체2)이 근소차(≤5)로 여럿 높으면 "다양한 포지션",
+  //        아니면 단일 최고 역할. (따라큐 100/100/100 동점 오판 방지)
+  const s = ctx.scores;
+  if (s && s.length === 6) {
+    const maxPos = Math.max(s[0], s[1], s[2]);
+    const near = [0, 1, 2].filter((i) => s[i] >= maxPos - 5 && s[i] >= 70);
+    if (near.length >= 2) {
+      strengths.push(p.roleVersatile(near.map((i) => p.roleShort[i]).join(" · ")));
+    } else {
+      let maxI = 0;
+      for (let i = 1; i < 6; i++) if (s[i] > s[maxI]) maxI = i;
+      if (s[2] >= s[0] + 12 && maxI === 0) maxI = 2; // 교체 우선
+      strengths.push(p.role[ROLE_KEYS[maxI]]);
+    }
   }
-  // 실측 대응력(승패 카운트) — 있으면 우선, 없으면 단일 메타카운터
-  if (ctx.beatsCount != null && ctx.beatsTopN != null && ctx.beatsCount > 0) {
-    strengths.push(p.sMetaBeats(ctx.beatsTopN, ctx.beatsCount, ctx.beatsNames || ""));
+  // 실측 대응력 — 실측 상위 상대 리스트(순위 포함) 있으면 우선, 없으면 단일 메타카운터
+  if (ctx.beatsNames) {
+    strengths.push(p.sMetaBeats(ctx.beatsNames));
   } else if (ctx.beatsMetaName && ctx.beatsMetaPct != null) {
     strengths.push(p.metaCounter(ctx.beatsMetaName, ctx.beatsMetaPct));
   }
-  // 타입 방어(항상 계산 가능 — 폴백 핵심)
-  const resistAll = [...prof.strongResist, ...prof.resist];
-  if (resistAll.length >= 2) strengths.push(p.sTypeDef(joinT(resistAll), prof.strongResist.length ? joinT(prof.strongResist, 4) : ""));
+  // 타입 방어(항상 계산 가능 — 폴백 핵심). 이중반감/반감 분리 조립(중복 표기 방지).
+  const sParts: string[] = [];
+  if (prof.strongResist.length) sParts.push(`${p.wStrongWord} ${joinT(prof.strongResist, 4)}`);
+  if (prof.resist.length) sParts.push(`${p.wResistWord} ${joinT(prof.resist)}`);
+  if (prof.strongResist.length + prof.resist.length >= 2) strengths.push(p.sTypeDef(sParts.join(" · ")));
   // 내구형
   if (bulk >= ctx.atk + 35) strengths.push(p.bulky);
   // 자속 커버리지(강점 2개 미만이면 보강)
@@ -207,10 +236,12 @@ export function buildAnalysis(ctx: AnalysisCtx): AnalysisOut {
   }
 
   // ── 약점 ──
-  const weakAll = [...prof.doubleWeak, ...prof.weak];
-  if (weakAll.length) weaknesses.push(p.wTypeWeak(joinT(weakAll), prof.doubleWeak.length ? joinT(prof.doubleWeak, 3) : ""));
+  const wParts: string[] = [];
+  if (prof.doubleWeak.length) wParts.push(`${p.wDoubleWord} ${joinT(prof.doubleWeak, 3)}`);
+  if (prof.weak.length) wParts.push(`${p.wWeakWord} ${joinT(prof.weak)}`);
+  if (wParts.length) weaknesses.push(p.wTypeWeak(wParts.join(" · ")));
   if (ctx.atk >= bulk + 35) weaknesses.push(p.glass); // 유리대포=얇은 내구
-  if (ctx.topCounterName) weaknesses.push(p.caution(ctx.topCounterName));
+  if (ctx.topCounterName) weaknesses.push(ctx.topCounterRank ? p.cautionRanked(ctx.topCounterName, ctx.topCounterRank) : p.caution(ctx.topCounterName));
 
   // ── 평가(verdict) — 티어×실측 + 이론vs실측 괴리 ──
   const v: string[] = [];
@@ -221,8 +252,8 @@ export function buildAnalysis(ctx: AnalysisCtx): AnalysisOut {
   else v.push(p.neutral(ctx.leagueName, ctx.tier));
   if (ctx.theoryRank && ctx.pickRank) {
     const gap = ctx.pickRank - ctx.theoryRank;
-    if (gap >= 15) v.push(p.rankTheoryHigh(ctx.theoryRank, ctx.pickRank));
-    else if (gap <= -15) v.push(p.rankUsageHigh(ctx.theoryRank, ctx.pickRank));
+    if (gap >= 12) v.push(p.rankTheoryHigh(ctx.theoryRank, ctx.pickRank));
+    else if (gap <= -12) v.push(p.rankUsageHigh(ctx.theoryRank, ctx.pickRank));
   }
 
   return { strengths, weaknesses, verdict: v.join(" ") };
