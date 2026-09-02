@@ -5,6 +5,7 @@ import IvChecker from "./IvChecker";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
 import { getIv } from "./dict";
 import { IV_ANALYSIS } from "./analysis/registry";
+import { formDexById } from "../sprite";
 
 const PUBLISHED_IV = Object.values(IV_ANALYSIS).filter((e) => e.published);
 const ivSprite = (dex: number) => `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png`;
@@ -65,7 +66,7 @@ export default function IvPage({ params }: { params: { lang: string } }) {
                 <Link key={e.sim.speciesId} href={L(`/gbl/iv/${e.sim.speciesId}`)}
                   style={{ display: "flex", alignItems: "center", gap: 10, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.7rem 0.9rem", textDecoration: "none" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ivSprite(e.dex)} alt="" width={44} height={44} style={{ imageRendering: "pixelated", flexShrink: 0 }} />
+                  <img src={ivSprite(formDexById(e.sim.speciesId, e.dex))} alt="" width={44} height={44} style={{ imageRendering: "pixelated", flexShrink: 0 }} />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a" }}>{e.name[lang] || e.name.en}</div>
                     <div style={{ fontSize: "0.74rem", color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{(e.article[lang] || e.article.en).title}</div>

@@ -9,6 +9,7 @@ import { localizePath, type Locale } from "../../../../../lib/i18n";
 import type { IvEntry, SimSpread, Coverage } from "../analysis/registry";
 import DEX_TYPE from "../../dex_type.json";
 import { localizeOpp } from "./oppNames";
+import { formDexById } from "../../sprite";
 
 const SPRITE = (dex: number | null) => dex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png` : "";
 const DT = DEX_TYPE as Record<string, string>;
@@ -200,10 +201,10 @@ function CoverageSection({ lang, cov, bbCov, bbOppCov }: { lang: Locale; cov: Co
 
 // 불리 매치업 스프라이트 칩(상대별 dedupe, 실드 태그 병합)
 function weakChips(spread: SimSpread, shieldWord: string) {
-  const byOpp: Record<string, { dex: number | null; name: string; types: string[]; shields: Set<number> }> = {};
+  const byOpp: Record<string, { id: string; dex: number | null; name: string; types: string[]; shields: Set<number> }> = {};
   for (const f of spread.flips) {
     const k = f.oppId;
-    if (!byOpp[k]) byOpp[k] = { dex: f.dex, name: f.opp, types: f.types || [], shields: new Set() };
+    if (!byOpp[k]) byOpp[k] = { id: k, dex: f.dex, name: f.opp, types: f.types || [], shields: new Set() };
     byOpp[k].shields.add(f.shields);
   }
   return Object.values(byOpp);
@@ -240,7 +241,7 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
               border: `1px solid ${tc}40` }}>
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={SPRITE(e.dex)} alt={name} width={92} height={92} style={{ imageRendering: "pixelated", filter: `drop-shadow(0 4px 10px ${tc}55)`, flexShrink: 0 }} />
+                <img src={SPRITE(formDexById(id, e.dex))} alt={name} width={92} height={92} style={{ imageRendering: "pixelated", filter: `drop-shadow(0 4px 10px ${tc}55)`, flexShrink: 0 }} />
                 <div style={{ minWidth: 0 }}>
                   <h1 style={{ margin: 0, fontSize: "1.4rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>{a.title}</h1>
                   <div style={{ fontSize: "0.76rem", color: "#475569", marginTop: 5, fontWeight: 600 }}>💯 CP {nrm.hundo.cp} · L{nrm.hundo.level} · {e.season} · {u.updated} {e.updated}</div>
@@ -303,10 +304,10 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
               <div key={key} style={{ flex: "1 1 260px", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.9rem 1rem" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={SPRITE(e.dex)} alt="" width={34} height={34} style={{ imageRendering: "pixelated" }} />
+                  <img src={SPRITE(formDexById(id, e.dex))} alt="" width={34} height={34} style={{ imageRendering: "pixelated" }} />
                   <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "#94a3b8" }}>vs</span>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={SPRITE(oppDex)} alt="" width={34} height={34} style={{ imageRendering: "pixelated" }} />
+                  <img src={SPRITE(key === "mirror" ? formDexById(id, e.dex) : oppDex)} alt="" width={34} height={34} style={{ imageRendering: "pixelated" }} />
                   <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#0f172a", marginLeft: 2 }}>{label}</span>
                 </div>
                 <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 6 }}>{u.cmpMine} vs {u.cmpOpp}</div>
