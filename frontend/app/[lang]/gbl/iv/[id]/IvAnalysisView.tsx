@@ -10,6 +10,7 @@ import type { IvEntry, SimSpread, Coverage } from "../analysis/registry";
 import DEX_TYPE from "../../dex_type.json";
 import { localizeOpp } from "./oppNames";
 import { formDexById } from "../../sprite";
+import LinkShareButton from "./LinkShareButton";
 
 const SPRITE = (dex: number | null) => dex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png` : "";
 const DT = DEX_TYPE as Record<string, string>;
@@ -291,6 +292,11 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
             </div>
           );
         })()}
+
+        {/* 링크 공유 — 분량이 커 이미지 대신 URL 공유(SNS/카톡/카페 미리보기=몬별 OG카드) */}
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
+          <LinkShareButton lang={lang} title={a.title} />
+        </div>
 
         {/* 공감 후킹 리드 */}
         {a.hook && <p style={{ margin: "0.6rem 0 0.3rem", fontSize: "0.98rem", color: "#0f172a", fontWeight: 700, lineHeight: 1.75 }}>{a.hook}</p>}

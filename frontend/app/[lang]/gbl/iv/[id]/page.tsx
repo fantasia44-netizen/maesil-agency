@@ -24,7 +24,9 @@ export function generateMetadata({ params }: { params: { lang: string; id: strin
     title: `${a.title} | GBL Note`,
     description: desc,
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
-    openGraph: { title: a.title, description: desc, url: localizePath(lang, path), images: ["/gbl-og.png"], type: "article" },
+    // og:image는 co-located opengraph-image.tsx(몬별 동적 카드)가 자동 주입 — images 미지정.
+    openGraph: { title: a.title, description: desc, url: localizePath(lang, path), type: "article" },
+    twitter: { card: "summary_large_image", title: a.title, description: desc },
   };
   // 미검수 몬은 색인 금지.
   return e.published ? md : { ...md, robots: { index: false, follow: false } };
