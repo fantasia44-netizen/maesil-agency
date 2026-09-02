@@ -74,6 +74,26 @@ const MBOX: Record<Locale, { basis: string; target: string; targetV: string; shi
   "zh-TW": { basis: "分析基準", target: "對象", targetV: "大師聯盟前100名", shield: "護盾", level: "等級", levelV: "50 / 最佳夥伴51", engine: "對戰引擎", engineV: "PvPoke 基礎 GBL Note 模擬器", baseline: "比較基準", source: "GBL Note 自行計算·分析", last: "最後計算", more: "分析方法詳情 →" },
 };
 
+// 판정표 읽는 법(범례) — 처음 보는 사람도 이해되게.
+const TGUIDE: Record<Locale, { intro: string; safe: string; cond: string; comp: string; cmp: string; weak: string }> = {
+  ko: { intro: "위에서 아래로 갈수록 낮은 개체값(IV)입니다. 판정 색이 실전 안전도예요.",
+        safe: "= 100% 개체와 승패가 같아 그냥 써도 됩니다.", cond: "= 특정 상대·실드에서 1~2개만 소폭 불리.",
+        comp: "= 여러 매치업을 놓칩니다.", cmp: "= 공격 14는 미러·같은 종족값에게 무조건 밀립니다.",
+        weak: "‘불리해지는 상대’ = 그 개체값으로 낮췄을 때 새로 지는 상대입니다 (실드0·1·2 = 실드를 몇 개 쓰는 상황)." },
+  en: { intro: "Rows go from high to low IVs, top to bottom. The verdict color shows how safe it is in practice.",
+        safe: "= win/loss identical to a hundo — just use it.", cond: "= only 1–2 specific matchups slip, in certain shields.",
+        comp: "= you lose several matchups.", cmp: "= at attack 14 you always lose the mirror / same-stat rivals.",
+        weak: "‘Matchups lost’ = opponents you newly lose to at that spread (0/1/2 shields = how many shields are used)." },
+  ja: { intro: "上から下へ個体値が下がります。判定の色が実戦での安全度です。",
+        safe: "= 100%個体と勝敗が同じ、そのまま使えます。", cond: "= 特定の相手・シールドで1~2体だけわずかに不利。",
+        comp: "= 複数の対面を落とします。", cmp: "= 攻撃14はミラー・同種族値に必ず負けます。",
+        weak: "「不利になる相手」= その個体値で新たに負ける相手です（シールド0・1・2 = シールドを何枚使う状況か）。" },
+  "zh-TW": { intro: "由上到下個體值遞減。判定顏色代表實戰安全度。",
+        safe: "= 與100%個體勝負相同，可直接使用。", cond: "= 僅特定對手·護盾略微不利1~2個。",
+        comp: "= 會輸掉多個對面。", cmp: "= 攻擊14必輸給鏡像·同種族值對手。",
+        weak: "「落敗對手」= 該個體值下新增落敗的對手（護盾0·1·2 = 使用幾個護盾的情境）。" },
+};
+
 // ── 전 메타 커버리지 그리드 문구 ──
 const COV: Record<Locale, { h: string; sub: string; shieldTag: string; win: string; loss: string; bbH: string; bbSub: string; oppNoBB: string; oppBB: string; bbMirrorNote: string; noGain: string }> = {
   ko: { h: "🔬 전 메타 100종 전수 시뮬 — 만나고 이기는 상대", sub: "마스터리그 상위 100종과 실드별로 1:1 직접 배틀한 결과입니다. 초록=승, 빨강=패. (배틀 레이팅 500=대등, 높을수록 여유승)",
@@ -331,7 +351,21 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
         </div>
 
         {/* 판정 표 */}
-        <h2 style={{ fontSize: "1.05rem", fontWeight: 800, margin: "0 0 10px", color: "#0f172a" }}>{u.verdictH}</h2>
+        <h2 style={{ fontSize: "1.05rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>{u.verdictH}</h2>
+        {(() => { const g = TGUIDE[lang] || TGUIDE.en; return (
+          <div style={{ margin: "0 0 10px", padding: "0.7rem 0.9rem", background: "#f8fafc", border: `1px solid ${BORDER}`, borderRadius: 10, fontSize: "0.76rem", color: "#475569", lineHeight: 1.7 }}>
+            <div style={{ fontWeight: 700, color: "#334155", marginBottom: 6 }}>💡 {g.intro}</div>
+            {([["유사백", g.safe], ["조건부", g.cond], ["타협", g.comp], ["CMP탈락", g.cmp]] as const).map(([k, txt]) => {
+              const v = VERDICT[k];
+              return (
+                <div key={k} style={{ marginBottom: 2 }}>
+                  <span style={{ display: "inline-block", minWidth: 50, textAlign: "center", background: v.bg, color: v.color, fontWeight: 800, borderRadius: 6, padding: "0px 6px", fontSize: "0.7rem", marginRight: 6 }}>{v.label[lang]}</span>{txt}
+                </div>
+              );
+            })}
+            <div style={{ marginTop: 6, color: "#64748b" }}>{g.weak}</div>
+          </div>
+        ); })()}
         <div style={{ overflowX: "auto", marginBottom: 24 }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.84rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, overflow: "hidden" }}>
             <thead>
