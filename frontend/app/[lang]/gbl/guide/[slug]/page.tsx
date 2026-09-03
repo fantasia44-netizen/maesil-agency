@@ -13,6 +13,7 @@ import TypeChart from "./TypeChart";
 import TypeMatrix from "./TypeMatrix";
 import DualType from "./DualType";
 import CctGuide from "./CctGuide";
+import MovesetExamples from "./MovesetExamples";
 
 // 전용 OG(opengraph-image.tsx)를 가진 슬러그 — 리다이렉트 없는 직접 URL로 연결.
 const OG_SLUGS = new Set(["type-chart", "cct"]);
@@ -107,6 +108,7 @@ export default function GuidePage({ params }: { params: { lang: string; slug: st
           {/* 타입 상성 가이드 — 18타입 시각 약점표 + 전체 매트릭스(다운로드/공유). 섹션은 텍스트 전용이라 slug 조건부 삽입 */}
           {params.slug === "type-chart" && <><TypeMatrix lang={lang} /><TypeChart lang={lang} /><DualType lang={lang} /></>}
           {params.slug === "cct" && <CctGuide lang={lang} />}
+          {params.slug === "moveset" && <MovesetExamples lang={lang} />}
         </article>
 
         <CoupangAd />
