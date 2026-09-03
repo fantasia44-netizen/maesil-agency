@@ -66,10 +66,21 @@ const dispNameOf = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?
   return localName(lang, d, prefix + nameOf(d.id));
 };
 // 기술명 로케일별 (ko/en/ja/zh-TW) — zh-TW는 pvp_move_names(id)로 보완.
+// _PLUS = PvPoke 강화기술 변형(기존 기술명 데이터에 없음) → 기본 기술명 + "+"로 표기.
+const baseMoveId = (id: string) => (MOVES[id] ? id : id.replace(/_PLUS$/, ""));
+const MNAMES = MOVENAMES as Record<string, Record<string, string>>;
 const moveLabel = (lang: Locale, id: string) => {
-  const m = MOVES[id]; if (!m) return id;
-  if (lang === "zh-TW") return (MOVENAMES as Record<string, Record<string, string>>)[id]?.["zh-TW"] || m.en || m.ko;
-  return lang === "en" ? (m.en || m.ko) : lang === "ja" ? (m.ja || m.en || m.ko) : m.ko;
+  const bid = baseMoveId(id);
+  const plus = bid !== id ? "+" : "";
+  const m = MOVES[bid];
+  if (m) {
+    if (lang === "zh-TW") return (MNAMES[bid]?.["zh-TW"] || m.en || m.ko) + plus;
+    return (lang === "en" ? (m.en || m.ko) : lang === "ja" ? (m.ja || m.en || m.ko) : m.ko) + plus;
+  }
+  // gbl_data 미보유 기술(볼트태클 등) → pvp_move_names 4개국어 폴백.
+  const mn = MNAMES[bid];
+  if (mn) return ((lang === "en" ? mn.en : lang === "ja" ? mn.ja : lang === "zh-TW" ? mn["zh-TW"] : mn.ko) || mn.en || mn.ko || id) + plus;
+  return id;
 };
 
 type Detail = { id: string; score: number; tier: string; moveset: string[]; counters: string[]; wins: string[]; stats: Record<string, number>; ko?: string; dex?: number; types?: string[] };
@@ -143,7 +154,7 @@ function Sprite({ id, size = 34 }: { id: string; size?: number }) {
 }
 
 function MoveChip({ id, lang }: { id: string; lang: Locale }) {
-  const mv = MOVES[id];
+  const mv = MOVES[baseMoveId(id)];
   const c = mv ? (TYPE_COLOR[mv.type] || "#64748b") : "#64748b";
   return (
     <span style={{ fontSize: "0.68rem", fontWeight: 600, padding: "1px 7px", borderRadius: 10, background: c + "22", color: c, border: `1px solid ${c}55`, whiteSpace: "nowrap" }}>
