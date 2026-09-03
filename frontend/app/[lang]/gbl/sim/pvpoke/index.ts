@@ -9,6 +9,10 @@ import META_MASTER from "./meta_master.json";
 import META_GREAT_S28 from "./meta_great_s28.json";
 import META_ULTRA_S28 from "./meta_ultra_s28.json";
 import META_MASTER_S28 from "./meta_master_s28.json";
+// 메가 리그(great/ultra/master_mega) 메타 풀 — PvPoke mega 랭킹 top100(gbl_sim_mega_meta.py).
+import META_GREAT_MEGA from "./meta_great_mega_s28.json";
+import META_ULTRA_MEGA from "./meta_ultra_mega_s28.json";
+import META_MASTER_MEGA from "./meta_master_mega_s28.json";
 import GM_S28 from "./gamemaster_s28.json";
 
 let _gm: any = null;
@@ -32,12 +36,16 @@ export function setSeason(n: SeasonNum): void {
   gm();                        // 새 시즌 데이터로 즉시 재로딩
 }
 
-export type League = "great" | "ultra" | "master";
-export const CP: Record<League, number> = { great: 1500, ultra: 2500, master: 10000 };
-const METAS_S27: Record<League, MetaEntry[]> = { great: META_GREAT as any, ultra: META_ULTRA as any, master: META_MASTER as any };
-const METAS_S28: Record<League, MetaEntry[]> = { great: META_GREAT_S28 as any, ultra: META_ULTRA_S28 as any, master: META_MASTER_S28 as any };
-// 현재 시즌 메타 맵 — 시즌 전환에 따라 S27/S28 자동 선택
+export type League = "great" | "ultra" | "master" | "great_mega" | "ultra_mega" | "master_mega";
+export const CP: Record<League, number> = { great: 1500, ultra: 2500, master: 10000, great_mega: 1500, ultra_mega: 2500, master_mega: 10000 };
+// 메가 리그 메타 풀(시즌 무관 — PvPoke mega 랭킹). 코어 리그와 CP는 같고 풀만 다름.
+const METAS_MEGA = { great_mega: META_GREAT_MEGA as any, ultra_mega: META_ULTRA_MEGA as any, master_mega: META_MASTER_MEGA as any };
+const METAS_S27: Record<League, MetaEntry[]> = { great: META_GREAT as any, ultra: META_ULTRA as any, master: META_MASTER as any, ...METAS_MEGA };
+const METAS_S28: Record<League, MetaEntry[]> = { great: META_GREAT_S28 as any, ultra: META_ULTRA_S28 as any, master: META_MASTER_S28 as any, ...METAS_MEGA };
+// 현재 시즌 메타 맵 — 시즌 전환에 따라 S27/S28 자동 선택(메가 풀은 공통)
 const METAS = (): Record<League, MetaEntry[]> => (_season === 28 ? METAS_S28 : METAS_S27);
+// 메가 리그 여부(같은 CP캡을 공유하므로 CP로는 구분 불가)
+export const isMegaLeague = (l: League): boolean => l.endsWith("_mega");
 
 export type IVs = [number, number, number]; // atk, def, hp
 export type MetaEntry = { s: string; m: string[]; sc: number };
@@ -95,7 +103,7 @@ export function metaList(league: League): MetaEntry[] { return METAS()[league] |
 // 종+리그의 기본 IV/레벨(커스텀 IV 패널 시드용) — 마스터=15/15/15, 그外=defaultIVs(랭크1)
 export function defaultsFor(speciesId: string, league: League): { ivs: IVs; level: number } {
   const cap = CP[league];
-  if (league === "master") return { ivs: [15, 15, 15], level: 50 };
+  if (cap >= 10000) return { ivs: [15, 15, 15], level: 50 };  // 마스터/마스터메가 = 무제한(L50)
   const p = pokemonById(speciesId) || pokemonById(speciesId.replace("_shadow", ""));
   const dv = p && p.defaultIVs && p.defaultIVs["cp" + cap];
   if (dv) return { ivs: [dv[1], dv[2], dv[3]], level: dv[0] };
@@ -135,7 +143,7 @@ function maxLevelForCap(p: any, cap: number): number {
   return best;
 }
 
-function makePoke(c: Cfg, i: number, battle: any): any {
+function makePoke(c: Cfg, i: number, battle: any, league: League): any {
   const id = resolveId(c.speciesId, c.shadow);
   const p = new Pokemon(id, i, battle);
   const cap = battle.getCP();
@@ -156,7 +164,7 @@ function makePoke(c: Cfg, i: number, battle: any): any {
   }
 
   // 무브
-  const rec = recommendedMoveset(id, leagueOf(cap));
+  const rec = recommendedMoveset(id, league);
   const fast = c.fast || rec.fast;
   if (fast) p.selectMove("fast", fast);
   // 차지무브: 사용자가 하나라도 지정하면 그 배열(빈 슬롯=단일무브 존중), 아니면 추천.
@@ -167,12 +175,14 @@ function makePoke(c: Cfg, i: number, battle: any): any {
   if (chargedWanted[0]) p.selectMove("charged", chargedWanted[0], 0);
   else p.selectMove("charged", "none", 0);
   if (chargedWanted[1]) p.selectMove("charged", chargedWanted[1], 1);
+  // 3번째 차지(메가 전용 스페셜 어택) — 엔진 extra-charged 슬롯(index 2). selectMove가
+  // extraChargedMovePool에 없으면 addNewMove로 주입(gamemaster 무브 정의만 있으면 됨).
+  if (chargedWanted[2]) p.selectMove("charged", chargedWanted[2], 2);
 
   p.setShields(typeof c.shields === "number" ? c.shields : 1);
   return p;
 }
 
-function leagueOf(cap: number): League { return cap <= 1500 ? "great" : cap <= 2500 ? "ultra" : "master"; }
 
 function pokeSummary(p: any) {
   return {
@@ -218,8 +228,8 @@ export function runBattle(a: Cfg, b: Cfg, league: League) {
   const cap = CP[league];
   const battle: any = new Battle();
   battle.setCP(cap);
-  const pa = makePoke(a, 0, battle);
-  const pb = makePoke(b, 1, battle);
+  const pa = makePoke(a, 0, battle, league);
+  const pb = makePoke(b, 1, battle, league);
   battle.setNewPokemon(pa, 0, false);
   battle.setNewPokemon(pb, 1, false);
   battle.setDecisionMethod("default");
@@ -248,8 +258,8 @@ export function runMulti(a: Cfg, league: League, shields = 1, limit = 100, oppBe
     try {
       const battle: any = new Battle();
       battle.setCP(cap);
-      const pa = makePoke({ ...a, shields }, 0, battle);
-      const pb = makePoke({ speciesId: opp.s, fast: opp.m[0], charged: opp.m.slice(1), shields, bestBuddy: oppBestBuddy }, 1, battle);
+      const pa = makePoke({ ...a, shields }, 0, battle, league);
+      const pb = makePoke({ speciesId: opp.s, fast: opp.m[0], charged: opp.m.slice(1), shields, bestBuddy: oppBestBuddy }, 1, battle, league);
       battle.setNewPokemon(pa, 0, false);
       battle.setNewPokemon(pb, 1, false);
       battle.setDecisionMethod("default");
@@ -281,8 +291,8 @@ export function runMatrix(league: League, speciesIds?: string[], shields = 1, li
       try {
         const battle: any = new Battle();
         battle.setCP(cap);
-        const pa = makePoke(cfgs[i], 0, battle);
-        const pb = makePoke(cfgs[j], 1, battle);
+        const pa = makePoke(cfgs[i], 0, battle, league);
+        const pb = makePoke(cfgs[j], 1, battle, league);
         battle.setNewPokemon(pa, 0, false);
         battle.setNewPokemon(pb, 1, false);
         battle.setDecisionMethod("default");

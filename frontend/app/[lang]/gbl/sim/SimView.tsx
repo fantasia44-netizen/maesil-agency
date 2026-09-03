@@ -11,6 +11,7 @@ import {
   runBattle, runMulti, runMatrix, pokemonList, recommendedMoveset, moveInfo, metaList, defaultsFor,
   setSeason, CP, type League, type Cfg, type PokeInfo, type SeasonNum,
 } from "./pvpoke";
+import { leagueShort, leagueName } from "../contentI18n";
 import type { SimDict } from "./dict";
 import type { Locale } from "../../../../lib/i18n";
 import { shareDataUrl } from "../raid/raidShareUtil";
@@ -471,7 +472,11 @@ export default function SimView({ lang, t }: { lang: Locale; t: SimDict }) {
   useEffect(() => { setReady(true); }, []);
 
   // 시즌 전환: 엔진 데이터 스왑을 동기로 먼저 수행한 뒤 상태 갱신(→ list 재계산이 새 데이터로 실행됨).
-  const changeSeason = (s: SeasonNum) => { if (s === season) return; setSeason(s); setSeasonNum(s); };
+  const changeSeason = (s: SeasonNum) => {
+    if (s === season) return;
+    setSeason(s); setSeasonNum(s);
+    if (s === 27 && league.endsWith("_mega")) setLeague(league.replace("_mega", "") as League); // 메가는 s28 전용
+  };
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
@@ -499,15 +504,27 @@ export default function SimView({ lang, t }: { lang: Locale; t: SimDict }) {
           {t.seasonNote}
         </div>
       )}
-      {/* 리그 탭 */}
-      <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 10 }}>
-        {(["great", "ultra", "master"] as League[]).map((lg) => (
+      {/* 리그 탭 — 코어 3리그 */}
+      <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: season === 28 ? 6 : 10, flexWrap: "wrap" }}>
+        {(["great", "ultra", "master"] as const).map((lg) => (
           <button key={lg} onClick={() => setLeague(lg)}
             style={{ padding: "0.42rem 1rem", borderRadius: 999, border: "none", fontSize: "0.84rem", fontWeight: 800, cursor: "pointer", background: league === lg ? "#0f172a" : "#e8eef7", color: league === lg ? "#fff" : "#475569" }}>
             {t.leagues[lg]}
           </button>
         ))}
       </div>
+      {/* 메가 리그 3종 — s28 전용(별도 행). 매트릭스·팀분석이 메가 메타로 계산됨 */}
+      {season === 28 && (
+        <div style={{ display: "flex", gap: 6, justifyContent: "center", alignItems: "center", marginBottom: 10, flexWrap: "wrap" }}>
+          <span style={{ fontSize: "0.62rem", fontWeight: 900, color: "#fff", background: "linear-gradient(90deg,#db2777,#7c3aed)", borderRadius: 8, padding: "3px 8px" }}>MEGA</span>
+          {(["great_mega", "ultra_mega", "master_mega"] as League[]).map((lg) => (
+            <button key={lg} onClick={() => setLeague(lg)}
+              style={{ padding: "0.42rem 0.95rem", borderRadius: 999, border: league === lg ? "1px solid #a855f7" : "none", fontSize: "0.82rem", fontWeight: 800, cursor: "pointer", background: league === lg ? "rgba(168,85,247,.16)" : "#e8eef7", color: league === lg ? "#7c3aed" : "#475569" }}>
+              {leagueShort(lang, lg)}
+            </button>
+          ))}
+        </div>
+      )}
       {/* 모드 탭 */}
       <div style={{ display: "flex", gap: 4, background: "#e8eef7", padding: 4, borderRadius: 12, marginBottom: 14 }}>
         {(["single", "multi", "matrix", "team"] as const).map((m) => (
@@ -663,7 +680,7 @@ function MatrixMode({ lang, t, league }: { lang: Locale; t: SimDict; league: Lea
       </div>
       {res && <><div style={{ overflowX: "auto", paddingBottom: 6, display: "flex", justifyContent: "center" }}>
         <div ref={shotRef} style={{ background: "#fff", padding: "16px", borderRadius: 14, border: "1.5px solid #e6ebf5" }}>
-        <div style={{ fontSize: "0.9rem", fontWeight: 900, color: "#0f172a", textAlign: "center", marginBottom: 10 }}>{t.matrixH} · {t.leagues[league]}</div>
+        <div style={{ fontSize: "0.9rem", fontWeight: 900, color: "#0f172a", textAlign: "center", marginBottom: 10 }}>{t.matrixH} · {leagueName(lang, league)}</div>
         <table style={{ borderCollapse: "separate", borderSpacing: 0, margin: "0 auto" }}>
           <thead>
             <tr>
@@ -743,7 +760,7 @@ function TeamMode({ list, lang, t, league }: { list: PokeInfo[]; lang: Locale; t
       </div>
       {res && <><div style={{ overflowX: "auto", display: "flex", justifyContent: "center" }}>
         <div ref={shotRef} style={{ background: "#fff", padding: "16px", borderRadius: 14, border: "1.5px solid #e6ebf5", minWidth: 340 }}>
-        <div style={{ fontSize: "0.9rem", fontWeight: 900, color: "#0f172a", textAlign: "center", marginBottom: 10 }}>{t.vsMetaH} · {t.leagues[league]}</div>
+        <div style={{ fontSize: "0.9rem", fontWeight: 900, color: "#0f172a", textAlign: "center", marginBottom: 10 }}>{t.vsMetaH} · {leagueName(lang, league)}</div>
         <table style={{ borderCollapse: "separate", borderSpacing: 0, margin: "0 auto", width: "100%" }}>
           <thead>
             <tr>
