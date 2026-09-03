@@ -430,7 +430,7 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
             <>
               <PokemonShare {...shareBase} fastMove={d.moveset[0] ? moveLabel(lang, d.moveset[0]) : undefined}
                 chargedMoves={d.moveset.slice(1).map((mid) => ({ name: moveLabel(lang, mid) }))} />
-              <h2 style={h2}>{pk.movesetH}</h2>
+              <h2 style={h2}>{name} {pk.movesetH}</h2>
               <div style={cardStyle}><div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{d.moveset.map((mid) => <MoveChip key={mid} lang={lang} id={mid} />)}</div></div>
             </>
           );
@@ -441,12 +441,12 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
           const chRaw = d.mv.chargedAll && d.mv.chargedAll.length ? d.mv.chargedAll : d.mv.charged.map((c) => ({ id: c.id, energy: c.energy }));
           const charged: ChargedOpt[] = chRaw.map((c) => ({ ...disp(c.id), energy: c.energy, rec: recCharged.has(c.id) }));
           return <MovesetShare share={shareBase} fasts={fasts} charged={charged} defaultFastId={d.mv.fast.id}
-            movesetH={pk.movesetH} h2Style={h2} cardStyle={cardStyle}
+            movesetH={`${name} ${pk.movesetH}`} h2Style={h2} cardStyle={cardStyle}
             panelLabels={{ fastLabel: pk.fastLabel, chargedHint: pk.chargedHint, energyUnit: pk.energyUnit, hitsUnit: pk.hitsUnit, fastTurns: pk.fastTurns, recTag: pk.recTag, altFastHint: pk.altFastHint }} />;
         })()}
 
         {/* 카운터 (이 포켓몬에게 강한 상대) — 상단 배치 */}
-        <h2 style={h2}>{pk.countersH}</h2>
+        <h2 style={h2}>🛡️ {name} {pk.countersH}</h2>
         <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>{pk.countersP}</p>
         {d.counters.length ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -455,7 +455,7 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
         ) : <p style={{ fontSize: "0.82rem", color: "#94a3b8" }}>{pk.noData}</p>}
 
         {/* 잘 잡는 상대 */}
-        <h2 style={h2}>{pk.winsH}</h2>
+        <h2 style={h2}>⚔️ {name} {pk.winsH}</h2>
         <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>{pk.winsP}</p>
         {d.wins.length ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
