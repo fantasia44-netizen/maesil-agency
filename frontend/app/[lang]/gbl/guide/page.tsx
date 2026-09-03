@@ -9,6 +9,9 @@ import { formDexById } from "../sprite";
 
 const PUB_IV = Object.values(IV_ANALYSIS).filter((e) => e.published);
 const ivSprite = (dex: number) => `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png`;
+// season 문자열은 "시즌 27 (…)" 한국어 저장 → 로케일별 "시즌" 접두 현지화.
+const locSeason = (lang: Locale, s: string) =>
+  lang === "ja" ? s.replace("시즌", "シーズン") : lang === "zh-TW" ? s.replace("시즌", "賽季") : lang === "en" ? s.replace("시즌", "Season") : s;
 const IV_H: Record<Locale, string> = {
   ko: "🔬 타협개체 심층 분석", en: "🔬 Compromise-IV deep dives", ja: "🔬 妥協個体の詳細分析", "zh-TW": "🔬 妥協個體深入分析",
 };
@@ -62,7 +65,7 @@ export default function GuideIndex({ params }: { params: { lang: string } }) {
                   <img src={ivSprite(formDexById(e.sim.speciesId, e.dex))} alt="" width={42} height={42} style={{ imageRendering: "pixelated", flexShrink: 0 }} />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a" }}>{e.name[lang] || e.name.en}</div>
-                    <div style={{ fontSize: "0.7rem", color: "#7c3aed", fontWeight: 700 }}>{e.season}</div>
+                    <div style={{ fontSize: "0.7rem", color: "#7c3aed", fontWeight: 700 }}>{locSeason(lang, e.season)}</div>
                   </div>
                 </Link>
               ))}
