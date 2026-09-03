@@ -123,6 +123,63 @@ export const GUIDES: Record<string, Guide> = {
       ],
     },
   },
+  "moveset": {
+    updated: "2026-09-03",
+    keywords: {
+      ko: ["포켓몬고 기술배치", "PvP 추천 기술배치", "포켓몬고 무브셋", "빠른기술 차지기술", "기술 고르는 법", "포켓몬고 베이팅", "DPT EPT"],
+      en: ["Pokémon GO moveset", "best PvP moveset", "fast move charged move", "how to choose moves", "Pokémon GO baiting", "DPT EPT DPE"],
+      ja: ["ポケモンGO 技構成", "PvP 技構成", "ノーマルアタック ゲージ技", "技の選び方", "ポケモンGO ベイト", "DPT EPT"],
+      "zh-TW": ["寶可夢GO 招式配置", "PvP 招式配置", "一般招式 特殊招式", "招式選擇法", "寶可夢GO 誘騙", "DPT EPT"],
+    },
+    ko: {
+      title: "포켓몬GO 추천 기술배치 고르는 법 — 빠른기술·차지기술·베이팅",
+      desc: "포켓몬 GO PvP 기술배치(무브셋)를 고르는 기준을 정리했습니다. 빠른 기술의 DPT·EPT·턴수, 차지 기술의 에너지·데미지·효과, 자속·커버리지, 실드 베이팅까지 — 데이터로 어떤 기술이 왜 추천되는지.",
+      sections: [
+        { p: "포켓몬 GO 배틀리그에서는 같은 포켓몬이라도 기술배치에 따라 성능이 완전히 달라집니다. 기술배치는 보통 빠른 기술 1개 + 차지 기술 2개 조합이고, 각각을 고르는 기준이 분명합니다. 아래 기준을 알면 각 포켓몬 상세의 '추천 기술배치'가 왜 그렇게 나오는지도 이해됩니다." },
+        { h: "빠른 기술 — DPT·EPT·턴수", p: "빠른 기술은 두 수치로 봅니다. DPT(턴당 데미지)는 딜, EPT(턴당 에너지)는 차지 기술을 얼마나 빨리 채우는가입니다. 대부분의 PvP는 EPT(에너지 발전)가 높은 기술을 선호합니다 — 차지 기술을 자주 써야 압박이 되니까요. 또 기술마다 1~4턴 길이가 달라(예: 머드샷 1턴, 카운터 2턴), 짧을수록 입력·CMP·타이밍에서 유리합니다." },
+        { h: "차지 기술 — 에너지·데미지·효과", p: "차지 기술은 에너지 비용, 데미지, 부가 효과(상대 방어↓·내 공격↑ 등)로 평가합니다. 보통 저코스트 1개(35에너지 이하 — 자주 쏴서 베이팅·압박) + 고코스트 1개(메인 딜, 강한 한 방)를 섞습니다. DPE(에너지당 데미지)가 높을수록 효율적입니다." },
+        { h: "자속(STAB)과 커버리지", p: "자기 타입과 같은 기술은 자속 보너스 ×1.2를 받아 기본 우선입니다. 다만 두 차지 기술의 타입을 다르게 가져가 '커버리지'를 확보하면, 자속 기술을 반감하는 상대의 약점을 다른 타입으로 찌를 수 있습니다. 자속 메인 + 커버리지 서브가 정석입니다." },
+        { h: "베이팅(실드 유도)", p: "저코스트 차지 기술을 먼저 던져 상대 실드를 유도(bait)하고, 실드가 빠지면 고코스트 기술로 큰 데미지를 넣는 게 베이팅입니다. 그래서 저코스트 차지 기술은 '딜'뿐 아니라 '실드 빼는 도구'로 가치가 큽니다. 상대 실드 개수(0/1/2)에 따라 어떤 기술부터 쓸지가 달라집니다." },
+        { h: "실전 — 추천 기술배치 확인", p: "위 기준을 개별 포켓몬에 적용한 결과가 각 포켓몬 상세 페이지의 '추천 기술배치'입니다. 공개 시뮬레이션(PvPoke) 기준으로 계산했고, 빠른 기술을 바꾸면 차지 기술의 타수도 다시 계산됩니다. 리그별로 다르니 실드 시나리오별 시뮬 결과와 함께 확인하세요." },
+      ],
+    },
+    en: {
+      title: "How to Choose the Best PvP Moveset — Fast, Charged & Baiting",
+      desc: "The criteria for picking a Pokémon GO PvP moveset. Fast-move DPT/EPT/turns, charged-move energy/damage/effects, STAB & coverage, and shield baiting — how the data decides which moves are recommended.",
+      sections: [
+        { p: "In Pokémon GO Battle League the same Pokémon performs completely differently depending on its moveset. A moveset is usually one fast move + two charged moves, and there are clear criteria for each. Knowing them explains why each Pokémon detail page recommends the moves it does." },
+        { h: "Fast move — DPT, EPT, turns", p: "Judge a fast move by two numbers: DPT (damage per turn) is damage, EPT (energy per turn) is how fast it fills your charged moves. Most PvP favors high-EPT moves — you want to throw charged moves often to apply pressure. Fast moves are also 1–4 turns long (e.g. Mud Shot 1 turn, Counter 2 turns); shorter is better for input, CMP and timing." },
+        { h: "Charged move — energy, damage, effect", p: "Judge charged moves by energy cost, damage, and side effects (lower foe defense, raise own attack, etc.). Usually you mix one cheap move (≤35 energy — thrown often to bait/pressure) with one expensive move (main damage, a big hit). Higher DPE (damage per energy) is more efficient." },
+        { h: "STAB & coverage", p: "Moves matching the Pokémon's type get the STAB bonus ×1.2 and are the default priority. But giving your two charged moves different types secures 'coverage', letting you hit opponents that resist your STAB with a different type. STAB main + coverage secondary is the standard." },
+        { h: "Baiting (drawing shields)", p: "Baiting means throwing a cheap charged move first to draw the opponent's shield, then landing your expensive move for big damage once the shield is gone. So a cheap charged move is valuable not just for damage but as a shield-removal tool. Which move to throw first changes with the opponent's shield count (0/1/2)." },
+        { h: "In practice — see the recommended moveset", p: "Applying these criteria to each Pokémon gives the 'recommended moveset' on every Pokémon detail page. It's computed from public simulation (PvPoke), and switching the fast move recomputes the charged-move counts. It differs by league, so check it alongside the per-shield sim results." },
+      ],
+    },
+    ja: {
+      title: "ポケモンGO 技構成の選び方 — ノーマル・ゲージ技・ベイト",
+      desc: "ポケモンGO PvPの技構成の選び方を整理。ノーマルアタックのDPT・EPT・ターン数、ゲージ技のエネルギー・威力・効果、タイプ一致・範囲、そしてシールドベイトまで — データがどの技を推奨するか。",
+      sections: [
+        { p: "ポケモンGOバトルリーグでは同じポケモンでも技構成で性能がまったく変わります。技構成は通常ノーマルアタック1つ+ゲージ技2つで、それぞれ選ぶ基準が明確です。これを知ると、各ポケモン詳細の「推奨技構成」がなぜそうなるのかも分かります。" },
+        { h: "ノーマルアタック — DPT・EPT・ターン数", p: "ノーマルアタックは2つの数値で見ます。DPT(1ターンあたりダメージ)は火力、EPT(1ターンあたりエネルギー)はゲージ技をどれだけ速く溜めるかです。多くのPvPはEPT(エネルギー生成)が高い技を好みます — ゲージ技を頻繁に撃つほど圧をかけられるからです。また技ごとに1〜4ターンの長さがあり(例:マッドショット1ターン、カウンター2ターン)、短いほど入力・CMP・タイミングで有利です。" },
+        { h: "ゲージ技 — エネルギー・威力・効果", p: "ゲージ技はエネルギー消費、威力、追加効果(相手の防御↓・自分の攻撃↑など)で評価します。通常は低コスト1つ(35エネルギー以下 — 頻繁に撃ってベイト・圧)+高コスト1つ(メイン火力の大技)を混ぜます。DPE(エネルギーあたりダメージ)が高いほど効率的です。" },
+        { h: "タイプ一致(STAB)と範囲", p: "自分と同じタイプの技はタイプ一致ボーナス×1.2を受け、基本優先です。ただし2つのゲージ技のタイプを分けて「範囲(カバレッジ)」を確保すると、一致技を半減する相手の弱点を別タイプで突けます。一致メイン+範囲サブが定石です。" },
+        { h: "ベイト(シールド誘導)", p: "低コストのゲージ技を先に撃って相手のシールドを誘い(ベイト)、シールドが切れたら高コスト技で大ダメージを入れるのがベイトです。だから低コストゲージ技は「火力」だけでなく「シールドを剥がす道具」として価値があります。相手のシールド数(0/1/2)でどの技から撃つかが変わります。" },
+        { h: "実戦 — 推奨技構成を確認", p: "この基準を各ポケモンに当てはめた結果が、各ポケモン詳細ページの「推奨技構成」です。公開シミュ(PvPoke)基準で計算し、ノーマルアタックを変えるとゲージ技の回数も再計算されます。リーグごとに違うので、シールド別のシミュ結果と一緒に確認してください。" },
+      ],
+    },
+    "zh-TW": {
+      title: "寶可夢GO 招式配置選擇法 — 一般·特殊招式·誘騙",
+      desc: "整理寶可夢GO PvP招式配置的選擇標準。一般招式的DPT·EPT·回合數、特殊招式的能量·威力·效果、本系與打點，以及護盾誘騙——數據如何決定推薦招式。",
+      sections: [
+        { p: "在寶可夢GO對戰聯盟，同一隻寶可夢因招式配置不同，表現天差地別。招式配置通常是一般招式1個+特殊招式2個，各有明確的選擇標準。了解後，也能明白每隻寶可夢詳細頁的「推薦招式配置」為何如此。" },
+        { h: "一般招式 — DPT·EPT·回合數", p: "一般招式看兩個數值：DPT(每回合傷害)是輸出，EPT(每回合能量)是充特殊招式的速度。多數PvP偏好高EPT(能量生成)的招式——越常放特殊招式越能施壓。招式也有1〜4回合長度(例：泥巴射擊1回合、地球上投2回合)，越短在輸入·CMP·時機上越有利。" },
+        { h: "特殊招式 — 能量·威力·效果", p: "特殊招式以能量消耗、威力與附加效果(降對手防禦·升自身攻擊等)評估。通常混搭低消耗1個(35能量以下——常放來誘騙·施壓)+高消耗1個(主要輸出的大招)。DPE(每能量傷害)越高越有效率。" },
+        { h: "本系(STAB)與打點", p: "與寶可夢同屬性的招式享有本系加成×1.2，是基本優先。但把兩個特殊招式的屬性分開以取得「打點(範圍)」，就能用別的屬性攻擊那些抵抗本系招式的對手弱點。本系主招+打點副招是標準配置。" },
+        { h: "誘騙(引誘護盾)", p: "誘騙是先放低消耗特殊招式引誘對手開盾，等護盾用完再用高消耗招式打大傷害。所以低消耗特殊招式不只是輸出，更是「拆盾工具」。依對手護盾數(0/1/2)，先放哪個招式會不同。" },
+        { h: "實戰 — 查看推薦招式配置", p: "把這些標準套用到各寶可夢，就是每隻寶可夢詳細頁的「推薦招式配置」。以公開模擬(PvPoke)為準計算，切換一般招式時特殊招式次數也會重算。各聯盟不同，請搭配各護盾模擬結果一起看。" },
+      ],
+    },
+  },
   "pogo-pvp-calc": {
     updated: "2026-09-02",
     keywords: {

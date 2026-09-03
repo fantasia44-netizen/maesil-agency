@@ -22,6 +22,7 @@ export const TOOL_CHIP: Record<Locale, { raidTier: string; tierList: string; ivC
 type ToolKey = keyof Omit<(typeof TOOL_CHIP)["ko"], "header">;
 export const GUIDE_RELATED_TOOLS: Record<string, { path: string; key: ToolKey }[]> = {
   "type-chart": [{ path: "/gbl/raid", key: "raidTier" }, { path: "/gbl/tier/master", key: "tierList" }],
+  "moveset": [{ path: "/gbl/sim", key: "sim" }, { path: "/gbl/tier/master", key: "tierList" }, { path: "/gbl/cmp/master", key: "cmp" }],
   "cct": [{ path: "/gbl/sim", key: "sim" }, { path: "/gbl/tier/master", key: "tierList" }],
   "pogo-pvp-calc": [{ path: "/gbl/sim", key: "sim" }, { path: "/gbl/cmp/master", key: "cmp" }],
   "iv-optimization": [{ path: "/gbl/iv", key: "ivChecker" }, { path: "/gbl/meta/master", key: "meta" }],
