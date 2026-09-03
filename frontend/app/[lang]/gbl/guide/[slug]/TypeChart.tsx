@@ -12,19 +12,25 @@ const TYPE_COLOR: Record<string, string> = {
 };
 
 const LB: Record<Locale, { weak: string; resist: string; immune: string; se: string; none: string; header: string; note: string }> = {
-  ko: { weak: "약점 ×1.6", resist: "반감 ×0.625", immune: "무효 ×0.39", se: "공격 강점", none: "없음",
-        header: "타입별 약점·상성표 (포켓몬 GO 배율)", note: "GO는 원작과 배율이 다릅니다 — 효과굉장 ×1.6, 반감 ×0.625, 무효(원작 0배) ×0.39. 이중타입은 곱연산(이중약점 ×2.56, 이중반감 ×0.39)." },
-  en: { weak: "Weak ×1.6", resist: "Resist ×0.625", immune: "Immune ×0.39", se: "Strong vs", none: "none",
-        header: "Type weakness chart (Pokémon GO multipliers)", note: "GO differs from the main series — super effective ×1.6, resisted ×0.625, immune (0× in main) ×0.39. Dual types multiply (double weak ×2.56, double resist ×0.39)." },
-  ja: { weak: "弱点 ×1.6", resist: "半減 ×0.625", immune: "無効 ×0.39", se: "攻撃で有利", none: "なし",
-        header: "タイプ相性・弱点表（ポケモンGO倍率）", note: "GOは原作と倍率が異なります — 効果ばつぐん ×1.6、いまひとつ ×0.625、無効（原作0倍）×0.39。複合タイプは掛け算（二重弱点 ×2.56、二重半減 ×0.39）。" },
-  "zh-TW": { weak: "弱點 ×1.6", resist: "抵抗 ×0.625", immune: "無效 ×0.39", se: "攻擊剋制", none: "無",
-        header: "屬性弱點·相剋表（Pokémon GO 倍率）", note: "GO 與本傳倍率不同 — 效果絕佳 ×1.6、抵抗 ×0.625、無效（本傳0倍）×0.39。雙屬性為相乘（雙重弱點 ×2.56、雙重抵抗 ×0.39）。" },
+  ko: { weak: "약점 ×1.6", resist: "반감 ×0.625", immune: "이중반감 ×0.39", se: "공격 강점", none: "없음",
+        header: "타입별 약점·상성표 (포켓몬 GO 배율)", note: "GO는 원작과 배율이 다릅니다 — 효과굉장 ×1.6, 반감 ×0.625. 원작에서 '무효(0배)'인 관계도 GO에선 ×0.39(이중반감급)로, 완전 무효가 없습니다. 이중타입은 곱연산(이중약점 ×2.56, 이중반감 ×0.39)." },
+  en: { weak: "Weak ×1.6", resist: "Resist ×0.625", immune: "Double resist ×0.39", se: "Strong vs", none: "none",
+        header: "Type weakness chart (Pokémon GO multipliers)", note: "GO differs from the main series — super effective ×1.6, resisted ×0.625. Even main-series immunities (0×) are ×0.39 in GO — a double-resist, so there is no true immunity. Dual types multiply (double weak ×2.56, double resist ×0.39)." },
+  ja: { weak: "弱点 ×1.6", resist: "半減 ×0.625", immune: "二重半減 ×0.39", se: "攻撃で有利", none: "なし",
+        header: "タイプ相性・弱点表（ポケモンGO倍率）", note: "GOは原作と倍率が異なります — 効果ばつぐん ×1.6、いまひとつ ×0.625。原作で「無効（0倍）」の関係もGOでは×0.39＝二重半減級で、完全無効はありません。複合タイプは掛け算（二重弱点 ×2.56、二重半減 ×0.39）。" },
+  "zh-TW": { weak: "弱點 ×1.6", resist: "抵抗 ×0.625", immune: "雙重抵抗 ×0.39", se: "攻擊剋制", none: "無",
+        header: "屬性弱點·相剋表（Pokémon GO 倍率）", note: "GO 與本傳倍率不同 — 效果絕佳 ×1.6、抵抗 ×0.625。本傳中「無效（0倍）」在GO也是×0.39＝雙重抵抗級，沒有完全無效。雙屬性為相乘（雙重弱點 ×2.56、雙重抵抗 ×0.39）。" },
 };
 
 function Badge({ t, lang }: { t: string; lang: Locale }) {
   const c = TYPE_COLOR[t] || "#94a3b8";
-  return <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#fff", background: c, padding: "2px 8px", borderRadius: 7, whiteSpace: "nowrap", display: "inline-block" }}>{typeLabel(lang, t)}</span>;
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "0.68rem", fontWeight: 700, color: "#fff", background: c, padding: "2px 8px 2px 4px", borderRadius: 999, whiteSpace: "nowrap" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={`/gbl/types/${t}.svg`} alt="" width={14} height={14} style={{ display: "block" }} />
+      {typeLabel(lang, t)}
+    </span>
+  );
 }
 
 function Row({ label, color, types, lang, none }: { label: string; color: string; types: string[]; lang: Locale; none: string }) {

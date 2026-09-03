@@ -25,6 +25,9 @@ export const ALL_TYPES = Object.keys(DEF_WEAK);
 const mono = (atk: string, def: string): number =>
   DEF_IMMUNE[def]?.includes(atk) ? 0.390625 : DEF_WEAK[def]?.includes(atk) ? 1.6 : DEF_RESIST[def]?.includes(atk) ? 0.625 : 1;
 
+// 단일 타입 상성 배율(공격 타입 → 방어 타입). 매트릭스 표용.
+export const typeMult = (atk: string, def: string): number => mono(atk, def);
+
 const mult = (atk: string, types: string[]): number => types.reduce((m, d) => m * mono(atk, d), 1);
 
 // 방어 프로필 — 이 몬이 반감/이중반감(무효)하는 공격 타입, 약점 타입.

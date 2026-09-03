@@ -9,6 +9,7 @@ import { GUIDES, guideContent, guideKeywords } from "../guides";
 import { getGuideArticle } from "../dict";
 import JsonLd from "../../JsonLd";
 import TypeChart from "./TypeChart";
+import TypeMatrix from "./TypeMatrix";
 
 const SITE = "https://gblnote.com";
 const GUIDE_LABEL: Record<string, string> = { ko: "가이드", en: "Guide", ja: "ガイド", "zh-TW": "攻略" };
@@ -92,8 +93,8 @@ export default function GuidePage({ params }: { params: { lang: string; slug: st
               {i === 1 && <div style={{ marginTop: 14 }}><AdSlot /></div>}
             </section>
           ))}
-          {/* 타입 상성 가이드 — 18타입 시각 약점표 삽입(섹션은 텍스트 전용이라 slug 조건부) */}
-          {params.slug === "type-chart" && <TypeChart lang={lang} />}
+          {/* 타입 상성 가이드 — 18타입 시각 약점표 + 전체 매트릭스(다운로드/공유). 섹션은 텍스트 전용이라 slug 조건부 삽입 */}
+          {params.slug === "type-chart" && <><TypeMatrix lang={lang} /><TypeChart lang={lang} /></>}
         </article>
 
         <CoupangAd />
