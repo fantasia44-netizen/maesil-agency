@@ -6,7 +6,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import DATA from "../../../gbl_data.json";
 import DETAIL from "../../../gbl_detail.json";
+import DETAIL_S28 from "../../../gbl_detail_s28.json";
 import PKNAMES from "../../../pokedex_names.json";
+import { formDexById } from "../../../sprite";
 import MOVENAMES from "../../../pvp_move_names.json";
 import AdSlot from "../../../AdSlot";
 import CoupangAd from "../../../CoupangAd";
@@ -25,7 +27,8 @@ export const revalidate = 600;
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 const STATIC_TOP = 20; // 리그별 상위 N종 사전생성(+sitemap). 나머지는 링크 시 온디맨드.
 
-const LEAGUE_KEYS = ["master", "great", "ultra"];
+// 메가 리그(s28+)는 gbl_detail_s28.json에서만 존재 → DET에 병합. 코어 3리그는 기존 gbl_detail(s27).
+const LEAGUE_KEYS = ["master", "great", "ultra", "great_mega", "ultra_mega", "master_mega"];
 
 type Mon = { id: string; dex: number; ko: string; types: string[]; shadow: boolean; sprite?: string };
 type Move = { ko: string; en: string; ja?: string; type: string; kind: string };
@@ -56,7 +59,7 @@ const spriteDexOf = (id: string, fallbackDex?: number) => {
   const mt = spriteUrl(m).match(/(\d+)\.png/);
   if (mt) return mt[1];
   const base = MON[id.replace(/_shadow$/, "")];
-  return String(m?.dex || base?.dex || fallbackDex || 0);
+  return String(formDexById(id, m?.dex || base?.dex || fallbackDex || 0));
 };
 // 한글 조사 자동 선택(받침 유무). 이름이 자음으로 끝나면(자시안) 은/을, 모음이면(가이오가) 는/를.
 const hasBatchim = (w: string) => { const c = (w || "").trim().slice(-1).charCodeAt(0); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 !== 0; };
@@ -66,7 +69,10 @@ type Opp = { id: string; r: number };
 type Mv = { fast: { id: string; gain: number; turns: number }; charged: { id: string; energy: number; counts: number[] }[];
   fasts?: { id: string; gain: number; turns: number }[]; chargedAll?: { id: string; energy: number }[] };
 type Detail = { id: string; score: number; tier: string; moveset: string[]; mv: Mv | null; counters: Opp[]; wins: Opp[]; scores: number[]; stats: Record<string, number>; ko?: string; en?: string; ja?: string; dex?: number; types?: string[] };
-const DET = DETAIL as unknown as Record<string, Detail[]>;
+const DET = { ...(DETAIL as unknown as Record<string, Detail[]>) };
+// 메가 3리그는 s28 스냅샷에서 병합(코어 리그는 s27 유지).
+for (const k of ["great_mega", "ultra_mega", "master_mega"])
+  DET[k] = (DETAIL_S28 as unknown as Record<string, Detail[]>)[k] || [];
 const findDetail = (league: string, id: string) => (DET[league] || []).find((d) => d.id === id);
 // 상대(카운터/이기는 상대) id → 로케일별 이름. 상세 엔트리(ko/en/ja 보유)를 전 리그에서 인덱싱.
 const NAMEIDX: Record<string, { ko?: string; en?: string; ja?: string; dex?: number }> = {};
@@ -141,8 +147,11 @@ const BORDER = "#e3e8f2";
 
 function Sprite({ id, size = 40 }: { id: string; size?: number }) {
   const m = MON[id];
+  // 메가 등 MON 미등록 상대는 상세 인덱스(NAMEIDX)의 dex + 폼 보정으로 스프라이트 해석.
+  const dex = m?.dex ?? NAMEIDX[id]?.dex;
+  const src = spriteUrl(m) || (dex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${formDexById(id, dex)}.png` : "");
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={spriteUrl(m)} alt={m?.ko || id} width={size} height={size} style={{ imageRendering: "pixelated" }} />;
+  return <img src={src} alt={m?.ko || id} width={size} height={size} style={{ imageRendering: "pixelated" }} />;
 }
 
 function TypeBadges({ lang, types }: { lang: Locale; types: string[] }) {
@@ -282,7 +291,7 @@ export default async function PokemonDetail({ params }: { params: { lang: string
             <span style={{ width: 64, height: 64, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
               ...(isShadow ? { background: "radial-gradient(circle, #a855f7ee 0%, #7c3aed99 42%, transparent 72%)", borderRadius: "50%" } : {}) }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={spriteUrl(m) || (hdex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${hdex}.png` : "")} alt={name} width={64} height={64} style={{ imageRendering: "pixelated" }} />
+              <img src={spriteUrl(m) || (hdex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${formDexById(d.id, hdex)}.png` : "")} alt={name} width={64} height={64} style={{ imageRendering: "pixelated" }} />
             </span>
             <div>
               <h1 style={{ margin: 0, fontSize: "1.4rem", fontWeight: 900, color: "#0f172a" }}>
