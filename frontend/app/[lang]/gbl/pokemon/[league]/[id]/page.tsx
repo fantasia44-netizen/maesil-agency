@@ -69,7 +69,9 @@ const spriteDexOf = (id: string, fallbackDex?: number) => {
   const mt = spriteUrl(m).match(/(\d+)\.png/);
   if (mt) return mt[1];
   const base = MON[id.replace(/_shadow$/, "")];
-  return String(formDexById(id, m?.dex || base?.dex || fallbackDex || 0));
+  // 메가/원시 등 MON 미등록 상대(공유카드 이기는/지는 상대)는 상세 인덱스(NAMEIDX)의 dex로 폼 해석.
+  const dex = m?.dex || base?.dex || NAMEIDX[id]?.dex || fallbackDex || 0;
+  return String(formDexById(id, dex));
 };
 // 한글 조사 자동 선택(받침 유무). 이름이 자음으로 끝나면(자시안) 은/을, 모음이면(가이오가) 는/를.
 const hasBatchim = (w: string) => { const c = (w || "").trim().slice(-1).charCodeAt(0); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 !== 0; };
