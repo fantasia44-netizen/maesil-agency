@@ -3,7 +3,8 @@
 --   /gbl/...          → ko (기본, 프리픽스 없음)
 --   /en/gbl/...       → en
 --   /ja/gbl/...       → ja
--- 실행: maesil-hub(public 스키마) Supabase SQL Editor. 재실행 안전.
+--   /zh-TW/gbl/...    → zh-TW (대만·번체)
+-- 실행: maesil-hub(public 스키마) Supabase SQL Editor. 재실행 안전. (zh-TW 추가분 재실행 필요)
 
 CREATE OR REPLACE FUNCTION public.gbl_traffic_langs(days int DEFAULT 30)
 RETURNS TABLE(lang text, pageviews bigint, uniques bigint, sessions bigint)
@@ -11,6 +12,7 @@ LANGUAGE sql STABLE AS $$
   SELECT CASE
            WHEN path LIKE '/en/%' OR path = '/en' THEN 'en'
            WHEN path LIKE '/ja/%' OR path = '/ja' THEN 'ja'
+           WHEN path LIKE '/zh-TW/%' OR path = '/zh-TW' THEN 'zh-TW'
            ELSE 'ko'
          END AS lang,
          count(*),

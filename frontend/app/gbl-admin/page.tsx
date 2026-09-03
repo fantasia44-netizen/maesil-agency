@@ -407,8 +407,8 @@ export default function GblAdmin() {
             {!traffic.langs || traffic.langs.length === 0 ? (
               <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음 (SQL 072 실행 여부 확인)</div>
             ) : (() => {
-              const LABEL: Record<string, string> = { ko: "🇰🇷 한국어", en: "🇺🇸 English", ja: "🇯🇵 日本語" };
-              const COLOR: Record<string, string> = { ko: "#3b5bdb", en: "#0891b2", ja: "#db2777" };
+              const LABEL: Record<string, string> = { ko: "🇰🇷 한국어", en: "🇺🇸 English", ja: "🇯🇵 日本語", "zh-TW": "🇹🇼 繁體中文" };
+              const COLOR: Record<string, string> = { ko: "#3b5bdb", en: "#0891b2", ja: "#db2777", "zh-TW": "#16a34a" };
               const totalPv = traffic.langs.reduce((a, l) => a + l.pageviews, 0) || 1;
               return (
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
