@@ -18,6 +18,7 @@ import { getDict } from "../../dictionaries";
 import { getTier } from "./dict";
 import { tierAnalysis } from "../../leagueAnalysis";
 import { currentSeason, seasonBySlug, selectableSeasons, seasonShort, statusOf } from "../../seasons";
+import { formDexById } from "../../sprite";
 
 export const revalidate = 600;
 
@@ -38,8 +39,14 @@ const LEAGUES: Record<string, { ko: string; short: string }> = {
   master: { ko: "마스터리그", short: "마스터" },
   great: { ko: "슈퍼리그", short: "슈퍼" },
   ultra: { ko: "하이퍼리그", short: "하이퍼" },
+  great_mega: { ko: "슈퍼리그 (메가)", short: "슈퍼 메가" },
+  ultra_mega: { ko: "하이퍼리그 (메가)", short: "하이퍼 메가" },
+  master_mega: { ko: "마스터리그 (메가)", short: "마스터 메가" },
 };
 const LEAGUE_KEYS = Object.keys(LEAGUES);
+const CORE_KEYS = ["great", "ultra", "master"];
+const MEGA_KEYS = ["great_mega", "ultra_mega", "master_mega"];
+const isMegaLeague = (lg: string) => lg.endsWith("_mega");
 
 type Mon = { id: string; dex: number; ko: string; types: string[]; shadow: boolean; sprite?: string };
 type Move = { ko: string; en: string; ja?: string; type: string; kind: string };
@@ -153,8 +160,10 @@ export default async function TierPage({ params, searchParams }: { params: { lan
   const L = (p: string) => localizePath(lang, p);
 
   // 시즌 해석 + 해당 시즌 티어 상세 선택
-  const season = resolveSeason(searchParams?.s);
-  const seasonDet = (DETAIL_BY_SLUG[season.slug] || DETAIL) as Record<string, Detail[]>;
+  // 메가 리그는 s28+ 스냅샷에만 존재 → 항상 s28 데이터·시즌 고정(시즌 선택기 비노출).
+  const isMega = isMegaLeague(params.league);
+  const season = isMega ? (seasonBySlug("s28") ?? currentSeason()) : resolveSeason(searchParams?.s);
+  const seasonDet = (isMega ? DETAIL_S28 : (DETAIL_BY_SLUG[season.slug] || DETAIL)) as Record<string, Detail[]>;
   const seasons = selectableSeasons(TIER_SEASON_SLUGS);
   const list = (seasonDet[params.league] || []).slice(0, 100);  // 티어표는 상위 100종(CMP·조회는 200종까지)
   const pick = await getPickRates(params.league, season, season.slug === currentSeason().slug);
@@ -185,22 +194,28 @@ export default async function TierPage({ params, searchParams }: { params: { lan
           <Link href={L(`/gbl/meta/${params.league}`)} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>{t.navMeta}</Link>
         </div>
 
-        {/* 리그 크로스링크 */}
-        <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
-          {LEAGUE_KEYS.map((k) => {
-            const on = k === params.league;
-            return (
-              <Link key={k} href={L(`/gbl/tier/${k}`)}
-                style={{ padding: "6px 13px", borderRadius: 16, fontSize: "0.8rem", fontWeight: 700, textDecoration: "none",
-                  border: `1px solid ${on ? "#4f8cff" : BORDER}`, background: on ? "rgba(79,140,255,.16)" : CARD, color: on ? "#3b5bdb" : "#64748b" }}>
-                {leagueName(lang, k)}
-              </Link>
-            );
-          })}
-        </div>
+        {/* 리그 크로스링크 — 코어 3리그 + 메가 3리그(별도 행) */}
+        {[CORE_KEYS, MEGA_KEYS].map((group, gi) => (
+          <div key={gi} style={{ display: "flex", gap: 6, marginBottom: gi === 0 ? 6 : 12, flexWrap: "wrap", alignItems: "center" }}>
+            {gi === 1 && <span style={{ fontSize: "0.68rem", fontWeight: 800, color: "#fff", background: "linear-gradient(90deg,#db2777,#7c3aed)", borderRadius: 8, padding: "3px 8px" }}>MEGA</span>}
+            {group.map((k) => {
+              const on = k === params.league;
+              const megaOn = gi === 1;
+              return (
+                <Link key={k} href={L(`/gbl/tier/${k}`)}
+                  style={{ padding: "6px 13px", borderRadius: 16, fontSize: "0.8rem", fontWeight: 700, textDecoration: "none",
+                    border: `1px solid ${on ? (megaOn ? "#a855f7" : "#4f8cff") : BORDER}`,
+                    background: on ? (megaOn ? "rgba(168,85,247,.16)" : "rgba(79,140,255,.16)") : CARD,
+                    color: on ? (megaOn ? "#7c3aed" : "#3b5bdb") : "#64748b" }}>
+                  {leagueName(lang, k)}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
 
-        {/* 시즌 선택 (현재/다음/이전) — 서버렌더 링크, force-dynamic이라 SEO 안전 */}
-        {seasons.length > 1 && (
+        {/* 시즌 선택 (현재/다음/이전) — 메가는 s28 고정이라 미노출 */}
+        {seasons.length > 1 && !isMega && (
           <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
             {seasons.map((s) => {
               const on = s.slug === season.slug;
@@ -250,7 +265,7 @@ export default async function TierPage({ params, searchParams }: { params: { lan
             footerTag={t.shareFooter}
             trackLabel="pvp-tier"
             items={list.slice(0, 12).map((d) => ({
-              dex: (MON[d.id]?.sprite?.match(/(\d+)\.png/)?.[1]) || String(d.dex || MON[d.id]?.dex || ""),
+              dex: (MON[d.id]?.sprite?.match(/(\d+)\.png/)?.[1]) || String(formDexById(d.id, d.dex || MON[d.id]?.dex || 0) || ""),
               name: dispNameOf(lang, d),
               main: String(d.score),
               sub: pick[d.id] != null ? `${t.actualLabel} ${pick[d.id]}%` : `${d.tier}`,
@@ -285,7 +300,7 @@ export default async function TierPage({ params, searchParams }: { params: { lan
                         <span style={{ width: 36, height: 36, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
                           ...(isShadow ? { background: "radial-gradient(circle, #a855f7ee 0%, #7c3aed99 42%, transparent 72%)", borderRadius: "50%" } : {}) }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={spriteUrl(MON[d.id]) || (dex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png` : "")} alt={dispName} width={36} height={36} style={{ imageRendering: "pixelated" }} />
+                          <img src={spriteUrl(MON[d.id]) || (dex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${formDexById(d.id, dex)}.png` : "")} alt={dispName} width={36} height={36} style={{ imageRendering: "pixelated" }} />
                         </span>
                         <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a" }}>{dispName}</span>
                         <span style={{ display: "flex", gap: 3 }}>

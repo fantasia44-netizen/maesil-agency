@@ -28,7 +28,10 @@ SEASON_BRANCH = {"": "master", "s28": "twilight-trails"}
 BRANCH = SEASON_BRANCH.get(SEASON, "master")
 SUFFIX = f"_{SEASON}" if SEASON else ""
 
-PVPOKE = f"https://raw.githubusercontent.com/pvpoke/pvpoke/{BRANCH}/src/data/rankings/all/overall"
+RANK_BASE = f"https://raw.githubusercontent.com/pvpoke/pvpoke/{BRANCH}/src/data/rankings"
+# 메가 랭킹은 시즌 브랜치(twilight-trails)에서 2500/10000이 미산출(score=null 스텁)이라
+# 산출 완료된 master 브랜치에서 받는다. 메가 로스터는 브랜치 간 안정적.
+MEGA_RANK_BASE = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/rankings"
 GAMEMASTER = f"https://raw.githubusercontent.com/pvpoke/pvpoke/{BRANCH}/src/data/gamemaster.json"
 # PokeMiners 다국어 i18n (pokemon_name_XXXX / move_name_XXXX 병렬 키 구조)
 I18N = {
@@ -36,7 +39,13 @@ I18N = {
     "en": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Texts/Latest%20APK/JSON/i18n_english.json",
     "ja": "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Texts/Latest%20APK/JSON/i18n_japanese.json",
 }
-FILES = {"great": "rankings-1500.json", "ultra": "rankings-2500.json", "master": "rankings-10000.json"}
+# 리그키 → (PvPoke 포맷, CP별 랭킹파일). all=일반, mega=메가 허용 메타.
+BASE_SOURCES = {"great": ("all", "rankings-1500.json"), "ultra": ("all", "rankings-2500.json"), "master": ("all", "rankings-10000.json")}
+MEGA_SOURCES = {"great_mega": ("mega", "rankings-1500.json"), "ultra_mega": ("mega", "rankings-2500.json"), "master_mega": ("mega", "rankings-10000.json")}
+# 메가 리그는 s28+ 시즌 스냅샷에만 포함(현재 s27 base엔 게임 내 메가 리그가 없음).
+SOURCES = dict(BASE_SOURCES)
+if SEASON:
+    SOURCES.update(MEGA_SOURCES)
 TOP_N = 200  # 리그별 상위 N종(CMP·조회 커버리지: 썬더·성원숭 등 100~200위권 포함)
 
 
@@ -189,17 +198,27 @@ def main() -> None:
     print(f"i18n keys: ko={len(names['ko'])} en={len(names['en'])} ja={len(names['ja'])}")
 
     out = {}
-    for league, fn in FILES.items():
-        ranks = [r for r in fetch(f"{PVPOKE}/{fn}") if r.get("score", 0) > 0][:TOP_N]
-        mx = max(r.get("score", 0) for r in ranks)
+    for league, (fmt, fn) in SOURCES.items():
+        try:
+            base = MEGA_RANK_BASE if fmt == "mega" else RANK_BASE
+            raw = fetch(f"{base}/{fmt}/overall/{fn}")
+        except Exception as e:
+            print(f"[skip] {league} ({fmt}/{fn}): {e}")
+            continue
+        # score가 null인 엔트리(메가 일부 랭킹에 존재) 방어 — .get은 키가 있으면 default 대신 null 반환.
+        ranks = [r for r in raw if (r.get("score") or 0) > 0][:TOP_N]
+        if not ranks:
+            print(f"[skip] {league}: 랭킹 0종")
+            continue
+        mx = max((r.get("score") or 0) for r in ranks)
         mons = []
         for r in ranks:
             dko, den, dja, ddex, dtypes = disp_names(r["speciesId"], sp, pdko, names)
             mons.append({
                 "id": r["speciesId"],
                 "ko": dko, "en": den, "ja": dja, "dex": ddex, "types": dtypes,  # 자체 내장(gbl_data 미커버 대비)
-                "score": round(r.get("score", 0)),
-                "tier": tier_of(r.get("score", 0), mx),
+                "score": round(r.get("score") or 0),
+                "tier": tier_of(r.get("score") or 0, mx),
                 "moveset": r.get("moveset", []),
                 "mv": moveset_detail(r.get("moveset", []), MV, sp.get(r["speciesId"])),  # 빠른기술 획득·턴 + 차지별 타수 + 전체 기술풀
                 # 매치업 레이팅(500=대등, >500 우세, <500 열세)
