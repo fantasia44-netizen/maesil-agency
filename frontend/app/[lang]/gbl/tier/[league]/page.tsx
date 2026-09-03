@@ -138,7 +138,7 @@ export function generateMetadata({ params, searchParams }: { params: { lang: str
       title: `${lgName} ${t.ogTitle}`,
       description: `${lgName} ${t.ogDesc}`,
       url: localizePath(lang, `/gbl/tier/${params.league}`),
-      images: ["/gbl-og.png"],
+      images: [`https://gblnote.com${localizePath(lang, `/gbl/tier/${params.league}/opengraph-image`)}`],
       type: "website",
     },
   };

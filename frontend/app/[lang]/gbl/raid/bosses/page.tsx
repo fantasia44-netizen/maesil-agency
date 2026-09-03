@@ -143,7 +143,7 @@ export function generateMetadata({ params }: { params: { lang: string } }): Meta
     description: t.metaDesc,
     keywords: t.metaKeywords,
     alternates: { canonical: localizePath(lang, PATH), languages: hreflangLanguages(PATH) },
-    openGraph: { title: t.ogTitle, description: t.ogDesc, url: localizePath(lang, PATH), images: ["/gbl-og.png"], type: "website" },
+    openGraph: { title: t.ogTitle, description: t.ogDesc, url: localizePath(lang, PATH), images: [`https://gblnote.com${localizePath(lang, PATH + "/opengraph-image")}`], type: "website" },
   };
 }
 

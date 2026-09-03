@@ -86,7 +86,7 @@ export function generateMetadata({ params, searchParams }: { params: { lang: str
       title: `${tName} ${d.ogTitle}`,
       description: `${tName} ${d.ogDesc}`,
       url: localizePath(lang, `/gbl/raid/${params.type}`),
-      images: ["/gbl-og.png"],
+      images: [`https://gblnote.com${localizePath(lang, `/gbl/raid/${params.type}/opengraph-image`)}`],
       type: "website",
     },
   };

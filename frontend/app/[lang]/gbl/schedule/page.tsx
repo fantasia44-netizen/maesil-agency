@@ -23,7 +23,7 @@ export function generateMetadata({ params }: { params: { lang: string } }): Meta
     description: sub(t.metaDesc),
     keywords: t.metaKeywords.map(sub),
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
-    openGraph: { title: sub(t.ogTitle), description: sub(t.ogDesc), url: localizePath(lang, path), images: ["/gbl-og.png"], type: "website" },
+    openGraph: { title: sub(t.ogTitle), description: sub(t.ogDesc), url: localizePath(lang, path), images: [`https://gblnote.com${localizePath(lang, path + "/opengraph-image")}`], type: "website" },
   };
 }
 
