@@ -113,7 +113,7 @@ export default function TypeMatrix({ lang }: { lang: Locale }) {
                 {ALL_TYPES.map((def) => {
                   const cs = cellOf(typeMult(atk, def));
                   return (
-                    <div key={def} style={{ width: CELL, height: CELL, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #e2e8f0", background: cs ? cs.bg : "#e2e8f0", boxSizing: "border-box" }}>
+                    <div key={def} style={{ width: CELL, height: CELL, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #cbd5e1", background: cs ? cs.bg : "#ffffff", boxSizing: "border-box" }}>
                       {cs && <span style={{ fontSize: 9, fontWeight: 800, color: cs.color }}>{cs.label}</span>}
                     </div>
                   );
