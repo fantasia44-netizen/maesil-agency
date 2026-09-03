@@ -21,6 +21,55 @@ export function guideKeywords(lang: string, g: Guide): string[] {
 }
 
 export const GUIDES: Record<string, Guide> = {
+  "type-chart": {
+    updated: "2026-09-03",
+    keywords: {
+      ko: ["포켓몬고 타입 상성표", "포켓몬고 약점표", "포켓몬고 타입 약점", "포켓몬고 상성", "포켓몬고 이중약점", "포켓몬고 타입 배율"],
+      en: ["Pokémon GO type chart", "Pokémon GO weakness chart", "Pokémon GO type effectiveness", "Pokémon GO type weaknesses", "Pokémon GO double weakness", "GO type multipliers"],
+      ja: ["ポケモンGO タイプ相性表", "ポケモンGO 弱点表", "ポケモンGO タイプ弱点", "ポケモンGO 相性", "ポケモンGO 二重弱点", "GO タイプ倍率"],
+      "zh-TW": ["寶可夢GO 屬性相剋表", "寶可夢GO 弱點表", "寶可夢GO 屬性弱點", "寶可夢GO 相剋", "寶可夢GO 雙重弱點", "GO 屬性倍率"],
+    },
+    ko: {
+      title: "포켓몬GO 타입 상성·약점표 — 18타입 한눈에 (GO 배율 기준)",
+      desc: "포켓몬 GO 배틀리그·레이드의 18타입 약점·반감·무효·공격 강점을 한 표로 정리했습니다. 원작과 다른 GO 배율(효과굉장 ×1.6, 반감 ×0.625, 이중약점 ×2.56, 무효 ×0.39) 기준입니다.",
+      sections: [
+        { p: "타입 상성은 배틀리그(PvP)든 레이드(PvE)든 승패의 핵심입니다. 상대의 약점을 찌르는 기술은 데미지가 크게 오르고, 반감·무효 관계면 크게 줄어듭니다. 아래에 18타입 각각의 약점·반감·무효·공격 강점을 표로 정리했으니, 교체 타이밍과 기술 선택에 활용하세요." },
+        { h: "GO 배율은 원작과 다릅니다", p: "포켓몬 GO는 원작(2배·0.5배·0배)과 달리 — 효과굉장(약점) ×1.6, 반감 ×0.625, 원작에서 '무효(0배)'인 관계도 GO에서는 ×0.390625로 완전 무효가 없습니다. 자속(STAB)은 ×1.2입니다. (자세한 계산은 'PvP 계산법' 가이드 참고)" },
+        { h: "이중타입은 곱연산", p: "타입이 둘인 포켓몬은 각 타입 배율을 곱합니다. 양쪽 다 약점인 공격은 이중약점 ×2.56(1.6×1.6), 양쪽 다 반감이면 ×0.39(0.625×0.625)입니다. 그래서 같은 '약점'이라도 이중약점 상대에겐 데미지가 훨씬 큽니다." },
+        { h: "표 보는 법", p: "아래 각 타입 카드는 방어 기준입니다 — 빨강 '약점 ×1.6'은 이 타입이 맞으면 아픈 공격 타입, 파랑 '반감 ×0.625'은 이 타입이 잘 버티는 공격, 회색 '무효 ×0.39'는 거의 안 통하는 공격입니다. 초록 '공격 강점'은 반대로 이 타입 기술이 효과굉장으로 찌르는 상대 타입입니다." },
+      ],
+    },
+    en: {
+      title: "Pokémon GO Type Chart & Weakness Table — All 18 Types (GO Multipliers)",
+      desc: "The weaknesses, resistances, immunities and offensive coverage of all 18 types for Pokémon GO's Battle League and raids, in one chart — using GO's multipliers (super-effective ×1.6, resist ×0.625, double weak ×2.56, immune ×0.39).",
+      sections: [
+        { p: "Type matchups decide battles in both PvP (Battle League) and PvE (raids). Hitting a weakness boosts damage a lot; a resisted or immune matchup cuts it hard. Below is every one of the 18 types with its weaknesses, resistances, immunities and offensive coverage — use it for switch timing and move choices." },
+        { h: "GO multipliers differ from the main games", p: "Unlike the main series (×2 / ×0.5 / ×0), Pokémon GO uses super-effective ×1.6, resisted ×0.625, and even 'immune (×0)' relationships deal ×0.390625 — there is no true immunity. STAB is ×1.2. (See the 'PvP damage math' guide for full details.)" },
+        { h: "Dual types multiply", p: "A dual-type Pokémon multiplies each type's factor. An attack that both types are weak to is doubly super-effective ×2.56 (1.6×1.6); one both resist is ×0.39 (0.625×0.625). So the same 'weakness' hits far harder against a double-weak target." },
+        { h: "How to read the chart", p: "Each type card below is defensive — red 'Weak ×1.6' are the attack types that hurt it, blue 'Resist ×0.625' are what it tanks well, grey 'Immune ×0.39' barely does anything. Green 'Strong vs' is the reverse: the types this type's moves hit super-effectively." },
+      ],
+    },
+    ja: {
+      title: "ポケモンGO タイプ相性・弱点表 — 全18タイプ一覧（GO倍率）",
+      desc: "ポケモンGOのバトルリーグ・レイド向けに、全18タイプの弱点・半減・無効・攻撃有利を1つの表に整理。原作と異なるGO倍率（効果抜群×1.6、半減×0.625、二重弱点×2.56、無効×0.39）基準です。",
+      sections: [
+        { p: "タイプ相性はPvP（バトルリーグ）でもPvE（レイド）でも勝敗の核心です。弱点を突く技はダメージが大きく上がり、半減・無効ならは大きく下がります。以下に全18タイプの弱点・半減・無効・攻撃有利を表にまとめたので、交代タイミングや技選びに活用してください。" },
+        { h: "GO倍率は原作と異なります", p: "原作（×2・×0.5・×0）と違い、ポケモンGOは効果抜群×1.6、半減×0.625、原作で「無効（×0）」の関係もGOでは×0.390625で完全無効はありません。タイプ一致（STAB）は×1.2です。（詳しい計算は「PvP計算」ガイド参照）" },
+        { h: "複合タイプは掛け算", p: "2タイプのポケモンは各タイプの倍率を掛けます。両タイプとも弱点の攻撃は二重弱点×2.56（1.6×1.6）、両方半減なら×0.39（0.625×0.625）。同じ「弱点」でも二重弱点相手にはダメージが大きくなります。" },
+        { h: "表の見方", p: "以下の各タイプカードは防御基準です — 赤「弱点×1.6」はこのタイプに刺さる攻撃タイプ、青「半減×0.625」はよく耐える攻撃、灰「無効×0.39」はほぼ通らない攻撃です。緑「攻撃で有利」は逆に、このタイプの技が効果抜群で突く相手タイプです。" },
+      ],
+    },
+    "zh-TW": {
+      title: "寶可夢GO 屬性相剋·弱點表 — 全18屬性一覽（GO倍率）",
+      desc: "為寶可夢GO對戰聯盟·團體戰整理全18屬性的弱點·抵抗·無效·攻擊剋制於一表。採用與原作不同的GO倍率（效果絕佳×1.6、抵抗×0.625、雙重弱點×2.56、無效×0.39）。",
+      sections: [
+        { p: "屬性相剋在PvP（對戰聯盟）與PvE（團體戰）都是勝敗核心。攻擊弱點傷害大增，抵抗·無效則大減。以下整理全18屬性的弱點·抵抗·無效·攻擊剋制，供換場時機與招式選擇參考。" },
+        { h: "GO倍率與原作不同", p: "與原作（×2・×0.5・×0）不同，寶可夢GO為效果絕佳×1.6、抵抗×0.625，原作中「無效（×0）」在GO也是×0.390625，沒有完全無效。本系（STAB）為×1.2。（詳細計算見「PvP計算」指南）" },
+        { h: "雙屬性為相乘", p: "雙屬性寶可夢將各屬性倍率相乘。兩屬性皆弱的攻擊為雙重弱點×2.56（1.6×1.6），兩者皆抵抗則×0.39（0.625×0.625）。因此同樣是「弱點」，對雙重弱點目標傷害大得多。" },
+        { h: "看表方式", p: "以下各屬性卡以防禦為基準 — 紅「弱點×1.6」是剋制此屬性的攻擊屬性，藍「抵抗×0.625」是能扛的攻擊，灰「無效×0.39」幾乎無傷。綠「攻擊剋制」相反，是此屬性招式效果絕佳的對象屬性。" },
+      ],
+    },
+  },
   "pogo-pvp-calc": {
     updated: "2026-09-02",
     keywords: {
