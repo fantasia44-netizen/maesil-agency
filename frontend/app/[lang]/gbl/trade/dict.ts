@@ -25,8 +25,8 @@ const ko: TradeDict = {
   shareBtn: "공유하기", saveBtn: "저장", building: "생성 중…",
   cardTitle: "포켓몬 교환", emptySlot: "위에서 포켓몬을 추가하세요", tapShiny: "탭하면 삭제", shareTitle: "포켓몬 GO 교환 목록",
   footerGuide: "가이드", footerPrivacy: "개인정보처리방침",
-  metaTitle: "포켓몬고 교환 목록 메이커 · 코스튬·이로치 지원 | GBL Note",
-  metaDesc: "포켓몬 GO 교환 목록 이미지를 만드세요. 원하는 것·줄 수 있는 것·이로치·코스튬·다이맥스·트레이너 코드까지. 카페·오픈채팅 공유용 이미지 생성기.",
+  metaTitle: "포켓몬고 이로치·색이 다른 포켓몬 교환 목록 메이커 | GBL Note",
+  metaDesc: "포켓몬 GO 이로치(색이 다른 포켓몬) 교환 목록 이미지를 만드세요. 원하는 것·줄 수 있는 것·코스튬·다이맥스·트레이너 코드까지. 카페·오픈채팅 공유용 이미지 생성기.",
   ogTitle: "포켓몬고 교환 목록 메이커", ogDesc: "코스튬·이로치 넣어 교환 목록 이미지 만들기",
 };
 
@@ -42,8 +42,8 @@ const en: TradeDict = {
   shareBtn: "Share", saveBtn: "Save", building: "Generating…",
   cardTitle: "POKÉMON TRADE", emptySlot: "Add Pokémon above", tapShiny: "Tap to remove", shareTitle: "Pokémon GO Trade List",
   footerGuide: "Guides", footerPrivacy: "Privacy Policy",
-  metaTitle: "Pokémon GO Trade List Maker · Costumes & Shiny | GBL Note",
-  metaDesc: "Make a Pokémon GO trade-list image. Wanted, can-offer, shinies, costumes, Dynamax, and trainer code. A shareable image generator for your community.",
+  metaTitle: "Pokémon GO Shiny Trade List Maker · Costumes | GBL Note",
+  metaDesc: "Make a Pokémon GO shiny trade list image. Wanted, can-offer, shinies, costumes, Dynamax, and trainer code. A shareable image generator for your community.",
   ogTitle: "Pokémon GO Trade List Maker", ogDesc: "Make trade-list images with costumes & shinies",
 };
 
@@ -59,8 +59,8 @@ const ja: TradeDict = {
   shareBtn: "共有", saveBtn: "保存", building: "生成中…",
   cardTitle: "ポケモン交換", emptySlot: "上からポケモンを追加", tapShiny: "タップで削除", shareTitle: "ポケモンGO 交換リスト",
   footerGuide: "ガイド", footerPrivacy: "プライバシーポリシー",
-  metaTitle: "ポケモンGO 交換リストメーカー · コスチューム・色違い対応 | GBL Note",
-  metaDesc: "ポケモンGOの交換リスト画像を作成。欲しい・出せる・色違い・コスチューム・ダイマックス・トレーナーコードまで。コミュニティ共有用の画像ジェネレーター。",
+  metaTitle: "ポケモンGO 色違い交換・交換リストメーカー | GBL Note",
+  metaDesc: "ポケモンGOの色違い交換リスト画像を作成。欲しい・出せる・色違い・コスチューム・ダイマックス・トレーナーコードまで。コミュニティ共有用の画像ジェネレーター。",
   ogTitle: "ポケモンGO 交換リストメーカー", ogDesc: "コスチューム・色違いを入れて交換リスト画像を作成",
 };
 
@@ -76,8 +76,8 @@ const zhTW: TradeDict = {
   shareBtn: "分享", saveBtn: "儲存", building: "產生中…",
   cardTitle: "寶可夢交換", emptySlot: "從上方加入寶可夢", tapShiny: "點擊即刪除", shareTitle: "寶可夢 GO 交換清單",
   footerGuide: "攻略", footerPrivacy: "隱私權政策",
-  metaTitle: "寶可夢GO 交換清單產生器 · 支援造型·異色 | GBL Note",
-  metaDesc: "製作寶可夢 GO 交換清單圖片。想要的·可以給的·異色·造型·極巨化·訓練家代碼一應俱全。社團·開放聊天室分享用圖片產生器。",
+  metaTitle: "寶可夢GO 異色交換·交換清單產生器 | GBL Note",
+  metaDesc: "製作寶可夢 GO 異色交換清單圖片。想要的·可以給的·異色·造型·極巨化·訓練家代碼一應俱全。社團·開放聊天室分享用圖片產生器。",
   ogTitle: "寶可夢GO 交換清單產生器", ogDesc: "加入造型·異色製作交換清單圖片",
 };
 
