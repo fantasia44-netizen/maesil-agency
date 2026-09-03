@@ -70,6 +70,63 @@ export const GUIDES: Record<string, Guide> = {
       ],
     },
   },
+  "cct": {
+    updated: "2026-09-03",
+    keywords: {
+      ko: ["포켓몬고 CCT", "CCT 계산법", "포켓몬고 평할", "차지무브 타이밍", "CCT 턴수 표", "TPE 기술", "포켓몬고 패스트무브 턴"],
+      en: ["Pokémon GO CCT", "Circle Control Tactic", "charged move timing", "fast move timing", "CCT turn table", "TPE technique", "Pokémon GO PvP timing"],
+      ja: ["ポケモンGO CCT", "サークルコントロール", "チャージ技 タイミング", "通常攻撃 ターン", "CCT 計算", "TPE テクニック", "ポケモンGO PvP タイミング"],
+      "zh-TW": ["寶可夢GO CCT", "大招時機", "平A時機", "CCT 計算", "TPE 技巧", "寶可夢GO PvP 時機", "循環控制"],
+    },
+    ko: {
+      title: "포켓몬GO CCT 타이밍 완벽 정리 — 상대 평할 차단 차지 타이밍 (+TPE)",
+      desc: "배틀리그 고급 테크닉 CCT(Circle Control Tactic)를 매치업별 표로 정리했습니다. 내 평타·상대 평타 턴수에 맞춰 몇 번째 평타 뒤에 차지를 눌러야 상대에게 여분의 평타(평할)를 안 주는지, 그리고 신기술 TPE까지.",
+      sections: [
+        { p: "CCT(Circle Control Tactic)는 차지무브 타이밍을 조절해 상대에게 여분의 평타(속칭 '평할')를 주지 않는 배틀리그 고급 테크닉입니다. 차지무브를 쓰면 상대 패스트무브(평타)의 쿨타임이 리셋되는데, 아무 때나 누르면 이 리셋 때문에 상대가 평타를 한 대 더 공짜로 얻습니다. 내 평타와 상대 평타의 턴수에 맞춰 '정해진 번째 평타' 뒤에 차지를 눌러 이 손해를 0으로 막는 게 CCT입니다." },
+        { h: "원리 — 차지무브는 상대 평타 쿨을 리셋한다", p: "포켓몬 GO의 1턴은 0.5초이고, 패스트무브는 기술마다 1~4턴 길이가 다릅니다(예: 머드샷 1턴, 카운터 2턴, 볼트체인지 4턴). 두 포켓몬의 평타 길이가 다르면 서로의 '턴 시계'가 어긋나는데, 이때 차지무브가 상대 평타 쿨을 리셋하면서 타이밍에 따라 상대가 평타 1대를 더 넣을 여지가 생깁니다. 반대로 상대 평타가 막 나간(쿨 0) 순간에 차지를 누르면 리셋해도 0이라 손해가 없습니다." },
+        { h: "표 보는 법 — 몇 번째 평타 뒤에 차지?", p: "위 표는 '내 평타 턴수 × 상대 평타 턴수'별로, 내 평타를 몇 번째 친 뒤에 차지무브를 눌러야 평할이 안 나는지를 보여줍니다. 예를 들어 내 평타가 2턴이고 상대가 3턴이면 1·4·7번째 평타 뒤에 차지하면 됩니다. 같은 턴수(미러)거나 상대가 1턴이면 언제 눌러도 안전합니다. 실전에서 카운트를 놓쳤다면 내 포켓몬이 받는 데미지 틱을 지표로 삼을 수도 있습니다." },
+        { h: "공식 — 최소공배수 기반", p: "표는 암기용이지만 원리는 간단합니다. 반복 주기 P = 상대 턴수 ÷ 최대공약수(내 턴수, 상대 턴수)이고, 그 주기마다 안전한 평타가 되풀이됩니다. 그래서 매치업마다 '홀수 번째', '1·4·7', '2·5·8'처럼 규칙적인 수열이 나옵니다. 이 페이지의 도구는 이 공식을 그대로 계산해 매치업만 고르면 답을 보여줍니다." },
+        { h: "TPE — 한 단계 더 나아간 신기술", p: "TPE는 최근 소개된 더 진보된 테크닉으로, 차지무브를 '0턴'처럼 끼워넣어 상대가 그 턴의 평타조차 넣지 못하게 하는 방식입니다(내 평타 카운트 중 첫 턴에 차지 입력, 카운트를 놓치면 데미지 틱=3번째 턴을 지표로). 4턴 대 4턴, 3턴 대 3턴, 2턴 대 2턴, 2턴 대 4턴 상황에서 쓸 수 있지만, 입력 타이밍이 매우 빡빡해 실전 성공률은 낮은 편입니다." },
+        { h: "출처", p: "CCT 턴수 표는 포켓몬 GO 배틀리그 커뮤니티에서 정리·공유된 계산법을 기반으로 하고, TPE 테크닉은 @atmarkpgo가 소개한 영상 자료를 참고했습니다. 본 페이지는 해당 테크닉을 4개 언어로 정리한 해설과, 매치업별 타이밍을 자동 산출하는 도구입니다." },
+      ],
+    },
+    en: {
+      title: "Pokémon GO CCT Timing Guide — Deny the Opponent's Free Fast Move (+TPE)",
+      desc: "The advanced Battle League technique CCT (Circle Control Tactic) as a matchup table — tap your charged move after the right fast-move count so the opponent never gets a free fast move, plus the newer TPE technique.",
+      sections: [
+        { p: "CCT (Circle Control Tactic) is an advanced Battle League technique: you time your charged move so the opponent never gets an extra 'free' fast move. Throwing a charged move resets the cooldown of the opponent's fast move, and if you tap it at the wrong moment that reset lets them squeeze in one more fast move for free. CCT means tapping your charge after a specific fast-move count — based on both fast-move lengths — so that loss becomes zero." },
+        { h: "The mechanic — a charged move resets the opponent's fast-move cooldown", p: "One turn in Pokémon GO is 0.5s, and fast moves are 1–4 turns long (e.g. Mud Shot 1 turn, Counter 2 turns, Volt Switch 4 turns). When two Pokémon have different fast-move lengths their 'turn clocks' drift apart, and a charged move resetting the opponent's fast-move cooldown can hand them an extra fast move depending on timing. Tap the charge right when their fast move just fired (cooldown 0) and the reset does nothing — no loss." },
+        { h: "Reading the table — after which fast move do I charge?", p: "The table above shows, for each 'my fast-move turns × opponent fast-move turns', after how many of your fast moves you should tap the charged move to avoid giving up a free one. For example, if your fast move is 2 turns and the opponent's is 3, charge after your 1st, 4th, 7th fast move. If both are the same length (mirror) or the opponent is 1-turn, you're safe anytime. If you lose count mid-battle, the damage tick on your own Pokémon can serve as an indicator." },
+        { h: "The formula — based on the least common multiple", p: "The table is for memorizing, but the rule is simple. The repeat period P = opponent turns ÷ greatest-common-divisor(my turns, opponent turns), and a safe fast move recurs every period. That is why each matchup gives a clean sequence like 'odd numbers', '1·4·7' or '2·5·8'. The tool on this page runs that formula directly — just pick the matchup." },
+        { h: "TPE — one step further", p: "TPE is a newer, more advanced technique that inserts the charged move as a 'turn 0' so the opponent can't even land the fast move on that turn (tap the charge on the first turn of your fast-move count; if you miss the count, the damage tick = the 3rd turn as an indicator). It applies to 4-vs-4, 3-vs-3, 2-vs-2 and 2-vs-4 turn matchups, but the input window is very tight, so it is hard to land in practice." },
+        { h: "Credits", p: "The CCT turn table is based on the calculation method compiled and shared by the Pokémon GO Battle League community, and the TPE technique references material introduced by @atmarkpgo. This page is a four-language explainer of those techniques plus a tool that computes the timing for each matchup automatically." },
+      ],
+    },
+    ja: {
+      title: "ポケモンGO CCT タイミング完全ガイド — 相手の献上を防ぐチャージ (+TPE)",
+      desc: "バトルリーグの上級テクニックCCT（Circle Control Tactic）をマッチアップ表で整理。自分と相手の通常攻撃ターン数に応じて何回目の通常攻撃の後にチャージすれば相手に献上しないか、さらに新技TPEも解説します。",
+      sections: [
+        { p: "CCT（Circle Control Tactic）は、チャージ技のタイミングを調整して相手に余分な通常攻撃（いわゆる「献上」）を与えないバトルリーグの上級テクニックです。チャージ技を撃つと相手の通常攻撃のクールタイムがリセットされ、適当なタイミングで押すとそのリセットのせいで相手が通常攻撃を1回タダで得ます。自分と相手の通常攻撃ターン数に合わせて「決まった回数目」の後にチャージを押し、この損を0にするのがCCTです。" },
+        { h: "原理 — チャージ技は相手の通常攻撃クールをリセットする", p: "ポケモンGOの1ターンは0.5秒で、通常攻撃は技ごとに1〜4ターンの長さがあります（例：マッドショット1ターン、カウンター2ターン、ボルトチェンジ4ターン）。2匹の通常攻撃の長さが違うと互いの「ターン時計」がずれ、チャージ技が相手の通常攻撃クールをリセットする際、タイミングによって相手が通常攻撃を1回多く入れる余地が生まれます。逆に相手の通常攻撃が撃たれた直後（クール0）にチャージを押せば、リセットしても0なので損はありません。" },
+        { h: "表の見方 — 何回目の通常攻撃の後にチャージ？", p: "上の表は「自分の通常ターン数 × 相手の通常ターン数」ごとに、自分の通常攻撃を何回目に撃った後でチャージ技を押せば献上しないかを示します。例えば自分の通常が2ターンで相手が3ターンなら、1・4・7回目の後にチャージ。同じターン数（ミラー）や相手が1ターンならいつでも安全です。実戦でカウントを見失ったら、自分のポケモンが受けるダメージのタイミングを指標にできます。" },
+        { h: "公式 — 最小公倍数ベース", p: "表は暗記用ですが原理は単純です。繰り返し周期 P = 相手ターン数 ÷ 最大公約数(自分ターン数, 相手ターン数) で、その周期ごとに安全な通常攻撃が繰り返します。だから各マッチアップで「奇数回目」「1・4・7」「2・5・8」のような規則的な数列になります。このページのツールはこの公式をそのまま計算し、マッチアップを選ぶだけで答えを表示します。" },
+        { h: "TPE — さらに一歩進んだ新技", p: "TPEは最近紹介されたより高度なテクニックで、チャージ技を「0ターン」のように差し込み、相手にそのターンの通常攻撃すら入れさせない方式です（自分の通常カウントの最初のターンにチャージ入力、カウントを見失ったらダメージのタイミング＝3ターン目を指標に）。4対4、3対3、2対2、2対4ターンの状況で使えますが、入力タイミングが非常にシビアで実戦成功率は低めです。" },
+        { h: "出典", p: "CCTターン表はポケモンGOバトルリーグのコミュニティで整理・共有された計算法を基にし、TPEテクニックは@atmarkpgoが紹介した映像資料を参考にしています。本ページはそれらのテクニックを4言語で整理した解説と、マッチアップごとのタイミングを自動計算するツールです。" },
+      ],
+    },
+    "zh-TW": {
+      title: "寶可夢GO CCT 時機完全指南 — 阻止對手免費平A (+TPE)",
+      desc: "將對戰聯盟高階技巧CCT（Circle Control Tactic）整理成對戰表——依我方與對手平A回合數，在第幾次平A後放大招才不會送對手免費平A，並介紹新技巧TPE。",
+      sections: [
+        { p: "CCT（Circle Control Tactic）是對戰聯盟的高階技巧：調整大招時機，讓對手拿不到多餘的免費平A。放大招會重置對手平A的冷卻，若隨意亂放，這個重置會讓對手多賺一次免費平A。CCT就是依我方與對手的平A回合數，在「特定次數」的平A後才放大招，把這個損失歸零。" },
+        { h: "原理 — 大招會重置對手平A的冷卻", p: "寶可夢GO一回合為0.5秒，平A依招式有1〜4回合長度（例：泥巴射擊1回合、地球上投2回合、伏特替換4回合）。兩隻寶可夢平A長度不同時，彼此的「回合時鐘」會錯開；此時大招重置對手平A冷卻，會依時機讓對手多打一次平A。反之，在對手平A剛打出（冷卻0）的瞬間放大招，重置後仍是0，就沒有損失。" },
+        { h: "看表方式 — 第幾次平A後放大招？", p: "上表依「我方平A回合數 × 對手平A回合數」，列出你要在第幾次平A後放大招才不會送對手免費平A。例如我方平A為2回合、對手為3回合，就在第1·4·7次平A後放大招。同回合數（鏡像）或對手為1回合時隨時安全。實戰若數錯，可用自己寶可夢受到傷害的節奏當指標。" },
+        { h: "公式 — 以最小公倍數為基礎", p: "表是給你背的，但原理很簡單。重複週期 P = 對手回合數 ÷ 最大公因數(我方回合數, 對手回合數)，每個週期會重複出現安全的平A。因此每個對戰都得到「奇數次」「1·4·7」「2·5·8」這類規律數列。本頁工具直接套用這個公式，只要選對戰就給答案。" },
+        { h: "TPE — 更進一步的新技巧", p: "TPE是近期介紹的更進階技巧，把大招當成「第0回合」插入，讓對手連那一回合的平A都打不出（在自己平A計數的第一回合放大招；若數錯，以傷害節奏＝第3回合當指標）。可用於4對4、3對3、2對2、2對4回合的情況，但輸入時機非常嚴苛，實戰成功率偏低。" },
+        { h: "來源", p: "CCT回合表以寶可夢GO對戰聯盟社群整理·分享的計算法為基礎，TPE技巧參考@atmarkpgo介紹的影片資料。本頁是將這些技巧以四種語言整理的解說，並附上自動計算各對戰時機的工具。" },
+      ],
+    },
+  },
   "pogo-pvp-calc": {
     updated: "2026-09-02",
     keywords: {

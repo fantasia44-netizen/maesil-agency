@@ -11,6 +11,10 @@ import JsonLd from "../../JsonLd";
 import TypeChart from "./TypeChart";
 import TypeMatrix from "./TypeMatrix";
 import DualType from "./DualType";
+import CctGuide from "./CctGuide";
+
+// 전용 OG(opengraph-image.tsx)를 가진 슬러그 — 리다이렉트 없는 직접 URL로 연결.
+const OG_SLUGS = new Set(["type-chart", "cct"]);
 
 const SITE = "https://gblnote.com";
 const GUIDE_LABEL: Record<string, string> = { ko: "가이드", en: "Guide", ja: "ガイド", "zh-TW": "攻略" };
@@ -28,8 +32,8 @@ export function generateMetadata({ params }: { params: { lang: string; slug: str
   const t = getGuideArticle(lang);
   const c = guideContent(lang, g);
   const path = `/gbl/guide/${params.slug}`;
-  // type-chart는 전용 OG(opengraph-image.tsx)를 리다이렉트 없는 직접 URL로 연결. 나머지는 기본 이미지.
-  const ogImg = params.slug === "type-chart"
+  // 전용 OG를 가진 슬러그는 리다이렉트 없는 직접 URL로 연결. 나머지는 기본 이미지.
+  const ogImg = OG_SLUGS.has(params.slug)
     ? `https://gblnote.com${localizePath(lang, `${path}/opengraph-image`)}`
     : "/gbl-og.png";
   return {
@@ -38,7 +42,7 @@ export function generateMetadata({ params }: { params: { lang: string; slug: str
     keywords: guideKeywords(lang, g),
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
     openGraph: { title: c.title, description: c.desc, url: localizePath(lang, path), images: [ogImg], type: "article" },
-    ...(params.slug === "type-chart" ? { twitter: { card: "summary_large_image" as const, title: c.title, description: c.desc, images: [ogImg] } } : {}),
+    ...(OG_SLUGS.has(params.slug) ? { twitter: { card: "summary_large_image" as const, title: c.title, description: c.desc, images: [ogImg] } } : {}),
   };
 }
 
@@ -101,6 +105,7 @@ export default function GuidePage({ params }: { params: { lang: string; slug: st
           ))}
           {/* 타입 상성 가이드 — 18타입 시각 약점표 + 전체 매트릭스(다운로드/공유). 섹션은 텍스트 전용이라 slug 조건부 삽입 */}
           {params.slug === "type-chart" && <><TypeMatrix lang={lang} /><TypeChart lang={lang} /><DualType lang={lang} /></>}
+          {params.slug === "cct" && <CctGuide lang={lang} />}
         </article>
 
         <CoupangAd />
