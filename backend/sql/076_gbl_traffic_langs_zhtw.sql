@@ -1,10 +1,7 @@
--- 072_gbl_traffic_langs.sql — 언어별 유입 집계
--- 공개 콘텐츠는 언어별 "번역"이라 트래픽만 언어별로 나뉨. gbl_visits.path 프리픽스로 언어 도출(별도 컬럼 불필요).
---   /gbl/...          → ko (기본, 프리픽스 없음)
---   /en/gbl/...       → en
---   /ja/gbl/...       → ja
--- 실행: maesil-hub(public 스키마) Supabase SQL Editor. 재실행 안전.
--- ※ zh-TW(대만/번체) 분류는 076_gbl_traffic_langs_zhtw.sql에서 추가(이 함수 재정의).
+-- 076_gbl_traffic_langs_zhtw.sql — 언어별 유입 집계에 대만어(zh-TW) 추가
+-- 072가 /en·/ja만 분류하고 /zh-TW는 ELSE(ko)로 잘못 집계하던 문제 수정.
+--   /zh-TW/gbl/...    → zh-TW (대만·번체)
+-- 실행: maesil-hub(public 스키마) Supabase SQL Editor. CREATE OR REPLACE라 재실행 안전.
 
 CREATE OR REPLACE FUNCTION public.gbl_traffic_langs(days int DEFAULT 30)
 RETURNS TABLE(lang text, pageviews bigint, uniques bigint, sessions bigint)
@@ -12,6 +9,7 @@ LANGUAGE sql STABLE AS $$
   SELECT CASE
            WHEN path LIKE '/en/%' OR path = '/en' THEN 'en'
            WHEN path LIKE '/ja/%' OR path = '/ja' THEN 'ja'
+           WHEN path LIKE '/zh-TW/%' OR path = '/zh-TW' THEN 'zh-TW'
            ELSE 'ko'
          END AS lang,
          count(*),
