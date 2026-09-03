@@ -22,6 +22,7 @@ import JsonLd from "../../../JsonLd";
 import { typeLabel } from "../../../typeLabels";
 import { getPoke } from "./dict";
 import { buildAnalysis, HEADINGS } from "./analysis";
+import { currentSeason, seasonBySlug } from "../../../seasons";
 
 export const revalidate = 600;
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
@@ -81,14 +82,26 @@ type Opp = { id: string; r: number };
 type Mv = { fast: { id: string; gain: number; turns: number }; charged: { id: string; energy: number; counts: number[] }[];
   fasts?: { id: string; gain: number; turns: number }[]; chargedAll?: { id: string; energy: number }[] };
 type Detail = { id: string; score: number; tier: string; moveset: string[]; mv: Mv | null; counters: Opp[]; wins: Opp[]; scores: number[]; stats: Record<string, number>; ko?: string; en?: string; ja?: string; dex?: number; types?: string[] };
-const DET = { ...(DETAIL as unknown as Record<string, Detail[]>) };
-// 메가 3리그는 s28 스냅샷에서 병합(코어 리그는 s27 유지).
-for (const k of ["great_mega", "ultra_mega", "master_mega"])
-  DET[k] = (DETAIL_S28 as unknown as Record<string, Detail[]>)[k] || [];
-const findDetail = (league: string, id: string) => (DET[league] || []).find((d) => d.id === id);
-// 상대(카운터/이기는 상대) id → 로케일별 이름. 상세 엔트리(ko/en/ja 보유)를 전 리그에서 인덱싱.
+// 시즌별 상세 스냅샷(티어/CMP와 동일 시리즈). 상세페이지도 시즌을 반영해야 티어(s28 미리보기)와 일치.
+const DET_BY_SLUG: Record<string, Record<string, Detail[]>> = {
+  s27: DETAIL as unknown as Record<string, Detail[]>,
+  s28: DETAIL_S28 as unknown as Record<string, Detail[]>,
+};
+const DETAIL_SEASON_SLUGS = Object.keys(DET_BY_SLUG);
+// 시즌 해석 — searchParams.s(유효 시즌만), 기본=현재 시즌.
+function resolveSeasonSlug(s?: string): string {
+  const sel = seasonBySlug(s);
+  if (sel && DETAIL_SEASON_SLUGS.includes(sel.slug)) return sel.slug;
+  const cur = currentSeason().slug;
+  return DETAIL_SEASON_SLUGS.includes(cur) ? cur : "s27";
+}
+// 리그·시즌별 상세 스냅샷 — 메가 리그는 s28 전용, 코어 리그는 선택 시즌 반영.
+const detFor = (league: string, slug: string): Record<string, Detail[]> =>
+  league.endsWith("_mega") ? DET_BY_SLUG.s28 : (DET_BY_SLUG[slug] || DET_BY_SLUG.s27);
+const findDetail = (league: string, id: string, slug: string) => (detFor(league, slug)[league] || []).find((d) => d.id === id);
+// 상대(카운터/이기는 상대) id → 로케일별 이름. 이름·dex는 시즌 무관 → 전 시즌·전 리그 유니온 인덱싱.
 const NAMEIDX: Record<string, { ko?: string; en?: string; ja?: string; dex?: number }> = {};
-for (const arr of Object.values(DET)) for (const e of arr) if (!NAMEIDX[e.id]) NAMEIDX[e.id] = { ko: e.ko, en: e.en, ja: e.ja, dex: e.dex };
+for (const snap of Object.values(DET_BY_SLUG)) for (const arr of Object.values(snap)) for (const e of arr) if (!NAMEIDX[e.id]) NAMEIDX[e.id] = { ko: e.ko, en: e.en, ja: e.ja, dex: e.dex };
 const locName = (lang: Locale, id: string) => {
   const e = NAMEIDX[id];
   if (lang === "zh-TW") { const zh = zhMon(e?.dex ?? MON[id]?.dex); if (zh) return zh; }
@@ -128,13 +141,13 @@ async function getMetaInfo(league: string): Promise<MetaInfo> {
 export function generateStaticParams() {
   const params: { league: string; id: string }[] = [];
   for (const league of LEAGUE_KEYS)
-    for (const d of (DET[league] || []).slice(0, STATIC_TOP)) params.push({ league, id: d.id });
+    for (const d of (detFor(league, currentSeason().slug)[league] || []).slice(0, STATIC_TOP)) params.push({ league, id: d.id });
   return params;
 }
 
-export function generateMetadata({ params }: { params: { lang: string; league: string; id: string } }): Metadata {
+export function generateMetadata({ params, searchParams }: { params: { lang: string; league: string; id: string }; searchParams?: { s?: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
-  const d = findDetail(params.league, params.id);
+  const d = findDetail(params.league, params.id, resolveSeasonSlug(searchParams?.s));
   if (!LEAGUE_KEYS.includes(params.league) || !d) return { title: "GBL Note" };
   const lgName = leagueName(lang, params.league);
   const name = dispName(lang, d);
@@ -187,13 +200,13 @@ function MoveChip({ lang, id }: { lang: Locale; id: string }) {
 }
 
 // 카운터/매치업 상대 카드(상세로 링크). rating = 이 페이지 주인공 기준 배틀 레이팅(500=대등).
-function OppRow({ lang, league, id, rating, ratingTitle }: { lang: Locale; league: string; id: string; rating: number; ratingTitle: string }) {
+function OppRow({ lang, league, id, rating, ratingTitle, seasonQ = "" }: { lang: Locale; league: string; id: string; rating: number; ratingTitle: string; seasonQ?: string }) {
   const m = MON[id];
   const types = m?.types || [];
   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
   const rc = rating >= 500 ? "#16a34a" : "#dc2626";
   return (
-    <Link href={localizePath(lang, `/gbl/pokemon/${league}/${id}`)} style={{ textDecoration: "none",
+    <Link href={localizePath(lang, `/gbl/pokemon/${league}/${id}`) + seasonQ} style={{ textDecoration: "none",
       display: "flex", alignItems: "center", gap: 8, background: `linear-gradient(100deg, ${c1}20, #ffffff 80%)`,
       border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "6px 10px" }}>
       <Sprite id={id} size={32} />
@@ -206,13 +219,16 @@ function OppRow({ lang, league, id, rating, ratingTitle }: { lang: Locale; leagu
   );
 }
 
-export default async function PokemonDetail({ params }: { params: { lang: string; league: string; id: string } }) {
+export default async function PokemonDetail({ params, searchParams }: { params: { lang: string; league: string; id: string }; searchParams?: { s?: string } }) {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
-  const d = findDetail(params.league, params.id);
+  const seasonSlug = resolveSeasonSlug(searchParams?.s);
+  const d = findDetail(params.league, params.id, seasonSlug);
   if (!LEAGUE_KEYS.includes(params.league) || !d) notFound();
 
   const pk = getPoke(lang);
   const L = (p: string) => localizePath(lang, p);
+  // 시즌 쿼리 — 비현재 시즌(코어)일 때 내부 링크(카운터·티어·CMP)에 붙여 시즌 유지. 메가는 항상 s28라 불필요.
+  const seasonQ = (!params.league.endsWith("_mega") && seasonSlug !== currentSeason().slug) ? `?s=${seasonSlug}` : "";
   const lgName = leagueName(lang, params.league);
   const m = MON[d.id];
   const isShadow = d.id.endsWith("_shadow");
@@ -240,7 +256,7 @@ export default async function PokemonDetail({ params }: { params: { lang: string
     if (rp != null && rp >= 5 && (beatsMetaPct == null || rp > beatsMetaPct)) { beatsMetaPct = rp; beatsMetaName = locName(lang, w.id); }
   }
   // 이론 순위 = 리그 score 정렬 리스트(DET)에서의 위치(1-base). 실측 순위와 괴리 수치화용.
-  const theoryIdx = (DET[params.league] || []).findIndex((x) => x.id === d.id);
+  const theoryIdx = (detFor(params.league, seasonSlug)[params.league] || []).findIndex((x) => x.id === d.id);
   const topCounter = d.counters[0];
   const analysis = buildAnalysis({
     lang, leagueName: lgName, tier: d.tier, scores: d.scores || [], types,
@@ -292,8 +308,8 @@ export default async function PokemonDetail({ params }: { params: { lang: string
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
         <div style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <Link href={L("/gbl")} style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>← GBL Note</Link>
-          <Link href={L(`/gbl/tier/${params.league}`)} style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>{pk.navTier}</Link>
-          <Link href={L(`/gbl/cmp/${params.league}`)} style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>{pk.navCmp}</Link>
+          <Link href={L(`/gbl/tier/${params.league}`) + seasonQ} style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>{pk.navTier}</Link>
+          <Link href={L(`/gbl/cmp/${params.league}`) + seasonQ} style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>{pk.navCmp}</Link>
           <Link href={L(`/gbl/meta/${params.league}`)} style={{ fontSize: "0.8rem", color: "#3b5bdb", textDecoration: "none" }}>{pk.navMeta}</Link>
         </div>
 
@@ -413,7 +429,7 @@ export default async function PokemonDetail({ params }: { params: { lang: string
         <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>{pk.countersP}</p>
         {d.counters.length ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {d.counters.map((c) => <OppRow key={c.id} lang={lang} league={params.league} id={c.id} rating={c.r} ratingTitle={ratingTitle} />)}
+            {d.counters.map((c) => <OppRow key={c.id} lang={lang} league={params.league} id={c.id} rating={c.r} ratingTitle={ratingTitle} seasonQ={seasonQ} />)}
           </div>
         ) : <p style={{ fontSize: "0.82rem", color: "#94a3b8" }}>{pk.noData}</p>}
 
@@ -422,7 +438,7 @@ export default async function PokemonDetail({ params }: { params: { lang: string
         <p style={{ margin: "0 0 8px", fontSize: "0.78rem", color: "#64748b" }}>{pk.winsP}</p>
         {d.wins.length ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {d.wins.map((w) => <OppRow key={w.id} lang={lang} league={params.league} id={w.id} rating={w.r} ratingTitle={ratingTitle} />)}
+            {d.wins.map((w) => <OppRow key={w.id} lang={lang} league={params.league} id={w.id} rating={w.r} ratingTitle={ratingTitle} seasonQ={seasonQ} />)}
           </div>
         ) : <p style={{ fontSize: "0.82rem", color: "#94a3b8" }}>{pk.noData}</p>}
 

@@ -121,6 +121,8 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
   const isMega = isMegaLeague(params.league);
   const season = isMega ? (seasonBySlug("s28") ?? currentSeason()) : resolveSeason(searchParams?.s);
   const seasonDet = (isMega ? DETAIL_S28 : (DETAIL_BY_SLUG[season.slug] || DETAIL)) as Record<string, Detail[]>;
+  // 상세페이지 링크에 시즌 전달(코어 리그 비현재 시즌). 메가는 상세가 항상 s28.
+  const detQ = (!isMega && season.slug !== currentSeason().slug) ? `?s=${season.slug}` : "";
   const seasons = selectableSeasons(CMP_SEASON_SLUGS);
   const list = (seasonDet[params.league] || []).filter((d) => d.stats && d.stats.atk)
     .sort((a, b) => (b.stats.atk || 0) - (a.stats.atk || 0));
@@ -241,7 +243,7 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
               const atk = d.stats.atk || 0;
               const w = maxAtk > minAtk ? Math.round(((atk - minAtk) / (maxAtk - minAtk)) * 100) : 100;
               return (
-                <Link key={d.id} href={L(`/gbl/pokemon/${params.league}/${d.id}`)}
+                <Link key={d.id} href={L(`/gbl/pokemon/${params.league}/${d.id}`) + detQ}
                   style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: 8,
                     background: `linear-gradient(100deg, ${c1}1f, #ffffff 82%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "6px 10px" }}>
                   <span style={{ fontSize: "0.76rem", fontWeight: 800, color: i < 3 ? "#dc2626" : "#94a3b8", minWidth: 24 }}>#{i + 1}</span>

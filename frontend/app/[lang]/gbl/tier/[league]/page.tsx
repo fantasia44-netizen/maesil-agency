@@ -175,6 +175,8 @@ export default async function TierPage({ params, searchParams }: { params: { lan
   const isMega = isMegaLeague(params.league);
   const season = isMega ? (seasonBySlug("s28") ?? currentSeason()) : resolveSeason(searchParams?.s);
   const seasonDet = (isMega ? DETAIL_S28 : (DETAIL_BY_SLUG[season.slug] || DETAIL)) as Record<string, Detail[]>;
+  // 상세페이지 링크에 시즌 전달(코어 리그 비현재 시즌) — 상세도 같은 시즌 데이터로 맞춤. 메가는 상세가 항상 s28.
+  const detQ = (!isMega && season.slug !== currentSeason().slug) ? `?s=${season.slug}` : "";
   const seasons = selectableSeasons(TIER_SEASON_SLUGS);
   const list = (seasonDet[params.league] || []).slice(0, 100);  // 티어표는 상위 100종(CMP·조회는 200종까지)
   const pick = await getPickRates(params.league, season, season.slug === currentSeason().slug);
@@ -306,7 +308,7 @@ export default async function TierPage({ params, searchParams }: { params: { lan
                   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
                   const c2 = TYPE_COLOR[types[1]] || c1;
                   return (
-                    <Link key={d.id} href={L(`/gbl/pokemon/${params.league}/${d.id}`)} style={{ textDecoration: "none", color: "inherit", display: "block", background: `linear-gradient(100deg, ${c1}26 0%, ${c2}18 42%, #ffffff 88%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
+                    <Link key={d.id} href={L(`/gbl/pokemon/${params.league}/${d.id}`) + detQ} style={{ textDecoration: "none", color: "inherit", display: "block", background: `linear-gradient(100deg, ${c1}26 0%, ${c2}18 42%, #ffffff 88%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <span style={{ width: 36, height: 36, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
                           ...(isShadow ? { background: "radial-gradient(circle, #a855f7ee 0%, #7c3aed99 42%, transparent 72%)", borderRadius: "50%" } : {}) }}>
