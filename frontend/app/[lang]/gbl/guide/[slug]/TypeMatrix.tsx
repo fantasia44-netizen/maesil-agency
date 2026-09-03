@@ -57,7 +57,7 @@ export default function TypeMatrix({ lang }: { lang: Locale }) {
   // 고정폭 요소 캡처(overflow 밖). skipFonts=폰트임베딩 hang 방지. 12초 타임아웃으로 버튼 영구멈춤 방지.
   const capture = async () => {
     const el = ref.current as HTMLElement;
-    const p = toPng(el, { pixelRatio: 2, backgroundColor: "#0f172a", skipFonts: true, width: el.scrollWidth, height: el.scrollHeight });
+    const p = toPng(el, { pixelRatio: 2, backgroundColor: "#f8fafc", skipFonts: true, width: el.scrollWidth, height: el.scrollHeight });
     return Promise.race([p, new Promise<string>((_, rej) => setTimeout(() => rej(new Error("capture timeout")), 12000))]);
   };
   const onSave = async () => { if (busy) return; setBusy(true); try { saveDataUrl(await capture(), "gbl-type-chart.png"); } catch { /* noop */ } setBusy(false); };
@@ -73,20 +73,20 @@ export default function TypeMatrix({ lang }: { lang: Locale }) {
       </div>
       <div style={{ fontSize: "0.68rem", color: "#94a3b8", textAlign: "center", marginBottom: 6 }}>{t.scroll}</div>
       <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", borderRadius: 14 }}>
-        <div ref={ref} style={{ background: "#0f172a", padding: 14, width: boardW, boxSizing: "border-box" }}>
+        <div ref={ref} style={{ background: "#f8fafc", padding: 14, width: boardW, boxSizing: "border-box", border: "1px solid #e3e8f2", borderRadius: 14 }}>
           {/* 헤더: 타이틀 */}
           <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 8 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/gbl-icon.png" alt="" width={26} height={26} />
             <div>
-              <div style={{ color: "#fff", fontWeight: 900, fontSize: "0.98rem", lineHeight: 1.1 }}>{t.title}</div>
-              <div style={{ color: "#818cf8", fontWeight: 800, fontSize: "0.66rem", letterSpacing: 1 }}>{t.sub} · gblnote.com</div>
+              <div style={{ color: "#0f172a", fontWeight: 900, fontSize: "0.98rem", lineHeight: 1.1 }}>{t.title}</div>
+              <div style={{ color: "#6366f1", fontWeight: 800, fontSize: "0.66rem", letterSpacing: 1 }}>{t.sub} · gblnote.com</div>
             </div>
           </div>
           {/* 축 안내 — 왼쪽=공격(빨강) / 위=방어(파랑) */}
           <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap" }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#7f1d1d", color: "#fecaca", fontWeight: 800, fontSize: "0.66rem", borderRadius: 6, padding: "2px 8px" }}>⚔️ ← {t.atkAxis}</span>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#1e3a8a", color: "#bfdbfe", fontWeight: 800, fontSize: "0.66rem", borderRadius: 6, padding: "2px 8px" }}>🛡️ ↑ {t.defAxis}</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#fee2e2", color: "#b91c1c", fontWeight: 800, fontSize: "0.66rem", borderRadius: 6, padding: "2px 8px" }}>⚔️ ← {t.atkAxis}</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#dbeafe", color: "#1d4ed8", fontWeight: 800, fontSize: "0.66rem", borderRadius: 6, padding: "2px 8px" }}>🛡️ ↑ {t.defAxis}</span>
           </div>
 
           {/* 표 */}
@@ -98,7 +98,7 @@ export default function TypeMatrix({ lang }: { lang: Locale }) {
             </div>
             <div style={{ display: "flex" }}>
               {/* 코너: 공격 라벨 */}
-              <div style={{ width: CORNER, flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", paddingBottom: 3, position: "sticky", left: 0, background: "#0f172a", zIndex: 2 }}>
+              <div style={{ width: CORNER, flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", paddingBottom: 3, position: "sticky", left: 0, background: "#f8fafc", zIndex: 2 }}>
                 <span style={{ color: "#f87171", fontWeight: 900, fontSize: "0.6rem", lineHeight: 1 }}>⚔️</span>
                 <span style={{ color: "#f87171", fontWeight: 900, fontSize: "0.56rem", lineHeight: 1.1 }}>{lang === "ko" ? "공격" : lang === "ja" ? "攻" : lang === "zh-TW" ? "攻" : "ATK"}↓</span>
               </div>
@@ -109,11 +109,11 @@ export default function TypeMatrix({ lang }: { lang: Locale }) {
             {/* 공격 타입 행들 — 첫 열(공격 아이콘) sticky로 가로 스크롤 시 유지 */}
             {ALL_TYPES.map((atk) => (
               <div key={atk} style={{ display: "flex", alignItems: "center" }}>
-                <div style={{ width: CORNER, flexShrink: 0, display: "flex", justifyContent: "center", alignItems: "center", position: "sticky", left: 0, background: "#0f172a", zIndex: 1, borderRight: "2px solid #7f1d1d" }}><Ico t={atk} size={ICO} /></div>
+                <div style={{ width: CORNER, flexShrink: 0, display: "flex", justifyContent: "center", alignItems: "center", position: "sticky", left: 0, background: "#f8fafc", zIndex: 1, borderRight: "2px solid #fca5a5" }}><Ico t={atk} size={ICO} /></div>
                 {ALL_TYPES.map((def) => {
                   const cs = cellOf(typeMult(atk, def));
                   return (
-                    <div key={def} style={{ width: CELL, height: CELL, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #1e293b", background: cs ? cs.bg : "#e2e8f0", boxSizing: "border-box" }}>
+                    <div key={def} style={{ width: CELL, height: CELL, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #e2e8f0", background: cs ? cs.bg : "#e2e8f0", boxSizing: "border-box" }}>
                       {cs && <span style={{ fontSize: 9, fontWeight: 800, color: cs.color }}>{cs.label}</span>}
                     </div>
                   );
@@ -124,11 +124,11 @@ export default function TypeMatrix({ lang }: { lang: Locale }) {
 
           {/* 범례 + 자속 */}
           <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: "6px 14px", alignItems: "center" }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#e2e8f0", fontSize: "0.72rem", fontWeight: 700 }}><span style={{ width: 22, height: 15, borderRadius: 4, background: "#dc2626", display: "inline-block" }} />{t.se}</span>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#e2e8f0", fontSize: "0.72rem", fontWeight: 700 }}><span style={{ width: 22, height: 15, borderRadius: 4, background: "#16a34a", display: "inline-block" }} />{t.nve}</span>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#e2e8f0", fontSize: "0.72rem", fontWeight: 700 }}><span style={{ width: 22, height: 15, borderRadius: 4, background: "#334155", display: "inline-block", border: "1px solid #475569" }} />{t.dr}</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#334155", fontSize: "0.72rem", fontWeight: 700 }}><span style={{ width: 22, height: 15, borderRadius: 4, background: "#dc2626", display: "inline-block" }} />{t.se}</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#334155", fontSize: "0.72rem", fontWeight: 700 }}><span style={{ width: 22, height: 15, borderRadius: 4, background: "#16a34a", display: "inline-block" }} />{t.nve}</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "#334155", fontSize: "0.72rem", fontWeight: 700 }}><span style={{ width: 22, height: 15, borderRadius: 4, background: "#334155", display: "inline-block", border: "1px solid #475569" }} />{t.dr}</span>
           </div>
-          <div style={{ marginTop: 6, color: "#94a3b8", fontSize: "0.68rem", fontWeight: 600 }}>{t.stab}</div>
+          <div style={{ marginTop: 6, color: "#64748b", fontSize: "0.68rem", fontWeight: 600 }}>{t.stab}</div>
         </div>
       </div>
     </div>

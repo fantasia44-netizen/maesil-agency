@@ -72,7 +72,7 @@ export default function CctGuide({ lang }: { lang: Locale }) {
 
   const capture = async () => {
     const el = ref.current as HTMLElement;
-    const p = toPng(el, { pixelRatio: 2, backgroundColor: "#0f172a", skipFonts: true, width: el.scrollWidth, height: el.scrollHeight });
+    const p = toPng(el, { pixelRatio: 2, backgroundColor: "#f8fafc", skipFonts: true, width: el.scrollWidth, height: el.scrollHeight });
     return Promise.race([p, new Promise<string>((_, rej) => setTimeout(() => rej(new Error("timeout")), 12000))]);
   };
   const onSave = async () => { if (busy) return; setBusy(true); try { saveDataUrl(await capture(), "gbl-cct-table.png"); } catch { /* noop */ } setBusy(false); };
@@ -93,23 +93,23 @@ export default function CctGuide({ lang }: { lang: Locale }) {
       <div style={{ background: "#ffffff", border: "1px solid #e3e8f2", borderRadius: 14, padding: "14px 14px 16px" }}>
         <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#0f172a", marginBottom: 10 }}>{t.pick}</div>
         {[{ lab: t.myFast, val: my, set: setMy, accent: "#dc2626" }, { lab: t.oppFast, val: opp, set: setOpp, accent: "#2563eb" }].map((row) => (
-          <div key={row.lab} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-            <span style={{ fontSize: "0.74rem", fontWeight: 700, color: "#475569", minWidth: 118 }}>{row.lab}</span>
+          <div key={row.lab} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
+            <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#475569", flex: "1 1 100%", marginBottom: 2 }}>{row.lab}</span>
             {TURNS.map((n) => (
               <button key={n} onClick={() => row.set(n)}
-                style={{ width: 40, height: 36, borderRadius: 9, cursor: "pointer", fontWeight: 800, fontSize: "0.9rem",
+                style={{ flex: "1 1 0", minWidth: 0, height: 38, borderRadius: 9, cursor: "pointer", fontWeight: 800, fontSize: "0.9rem",
                   border: row.val === n ? `2px solid ${row.accent}` : "1px solid #cbd5e1",
                   background: row.val === n ? row.accent : "#f8fafc", color: row.val === n ? "#fff" : "#475569" }}>{n}</button>
             ))}
           </div>
         ))}
         {/* 결과 */}
-        <div style={{ marginTop: 10, padding: "12px 14px", borderRadius: 11, background: "linear-gradient(90deg,#0f172a,#1e293b)", color: "#fff" }}>
-          <div style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 700, marginBottom: 3 }}>
+        <div style={{ marginTop: 10, padding: "12px 14px", borderRadius: 11, background: "linear-gradient(90deg,#4f46e5,#7c3aed)", color: "#fff" }}>
+          <div style={{ fontSize: "0.72rem", color: "#c7d2fe", fontWeight: 700, marginBottom: 3 }}>
             {my}{t.turnU} → {opp}{t.turnU}
           </div>
           <div style={{ fontSize: "1.05rem", fontWeight: 900, lineHeight: 1.35 }}>
-            {sel.any ? t.any : (<><span style={{ color: "#94a3b8", fontWeight: 700 }}>{t.tapPre}</span><span style={{ color: "#fbbf24" }}>{seqStr(sel.seq)}</span><span style={{ color: "#94a3b8", fontWeight: 700 }}>{t.tapSuf}</span></>)}
+            {sel.any ? t.any : (<><span style={{ color: "#e0e7ff", fontWeight: 700 }}>{t.tapPre}</span><span style={{ color: "#fde047" }}>{seqStr(sel.seq)}</span><span style={{ color: "#e0e7ff", fontWeight: 700 }}>{t.tapSuf}</span></>)}
           </div>
         </div>
       </div>
@@ -122,43 +122,43 @@ export default function CctGuide({ lang }: { lang: Locale }) {
 
       {/* 캡처 보드: 전체 표 */}
       <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", borderRadius: 14 }}>
-        <div ref={ref} style={{ background: "#0f172a", padding: 16, minWidth: 320, boxSizing: "border-box" }}>
+        <div ref={ref} style={{ background: "#f8fafc", padding: 16, minWidth: 320, boxSizing: "border-box", border: "1px solid #e3e8f2", borderRadius: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 10 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/gbl-icon.png" alt="" width={26} height={26} />
             <div>
-              <div style={{ color: "#fff", fontWeight: 900, fontSize: "0.98rem", lineHeight: 1.1 }}>{t.title}</div>
-              <div style={{ color: "#818cf8", fontWeight: 800, fontSize: "0.66rem", letterSpacing: 1 }}>{t.sub} · gblnote.com</div>
+              <div style={{ color: "#0f172a", fontWeight: 900, fontSize: "0.98rem", lineHeight: 1.1 }}>{t.title}</div>
+              <div style={{ color: "#6366f1", fontWeight: 800, fontSize: "0.66rem", letterSpacing: 1 }}>{t.sub} · gblnote.com</div>
             </div>
           </div>
 
           {/* 축 라벨 */}
           <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#7f1d1d", color: "#fecaca", fontWeight: 800, fontSize: "0.64rem", borderRadius: 6, padding: "2px 8px" }}>⚔️ ↓ {t.myFast}</span>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#1e3a8a", color: "#bfdbfe", fontWeight: 800, fontSize: "0.64rem", borderRadius: 6, padding: "2px 8px" }}>🛡️ → {t.oppFast}</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#fee2e2", color: "#b91c1c", fontWeight: 800, fontSize: "0.64rem", borderRadius: 6, padding: "2px 8px" }}>⚔️ ↓ {t.myFast}</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#dbeafe", color: "#1d4ed8", fontWeight: 800, fontSize: "0.64rem", borderRadius: 6, padding: "2px 8px" }}>🛡️ → {t.oppFast}</span>
           </div>
 
           {/* 표: 행=내 평타, 열=상대 평타 */}
-          <div style={{ display: "inline-block", border: "1px solid #1e293b", borderRadius: 8, overflow: "hidden" }}>
+          <div style={{ display: "inline-block", border: "1px solid #dbe2ee", borderRadius: 8, overflow: "hidden" }}>
             {/* 헤더행 */}
             <div style={{ display: "flex" }}>
-              <div style={{ width: 44, height: 34, background: "#111827", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontSize: "0.6rem", fontWeight: 800, borderRight: "1px solid #1e293b", borderBottom: "1px solid #1e293b" }}>{t.corner}</div>
+              <div style={{ width: 44, height: 34, background: "#eef2f7", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: "0.6rem", fontWeight: 800, borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0" }}>{t.corner}</div>
               {TURNS.map((b) => (
-                <div key={b} style={{ width: COL, height: 34, display: "flex", alignItems: "center", justifyContent: "center", background: opp === b ? "#1e3a8a" : "#0b1220", color: opp === b ? "#fff" : "#93c5fd", fontWeight: 800, fontSize: "0.78rem", borderRight: "1px solid #1e293b", borderBottom: "1px solid #1e293b" }}>{b}{t.turnU}</div>
+                <div key={b} style={{ width: COL, height: 34, display: "flex", alignItems: "center", justifyContent: "center", background: opp === b ? "#2563eb" : "#eff4fb", color: opp === b ? "#fff" : "#2563eb", fontWeight: 800, fontSize: "0.78rem", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0" }}>{b}{t.turnU}</div>
               ))}
             </div>
             {/* 데이터행 */}
             {TURNS.map((a) => (
               <div key={a} style={{ display: "flex" }}>
-                <div style={{ width: 44, height: 40, display: "flex", alignItems: "center", justifyContent: "center", background: my === a ? "#7f1d1d" : "#0b1220", color: my === a ? "#fff" : "#fca5a5", fontWeight: 800, fontSize: "0.78rem", borderRight: "1px solid #1e293b", borderBottom: "1px solid #1e293b" }}>{a}{t.turnU}</div>
+                <div style={{ width: 44, height: 40, display: "flex", alignItems: "center", justifyContent: "center", background: my === a ? "#dc2626" : "#fdf0f0", color: my === a ? "#fff" : "#dc2626", fontWeight: 800, fontSize: "0.78rem", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0" }}>{a}{t.turnU}</div>
                 {TURNS.map((b) => {
                   const on = my === a && opp === b;
                   const isAny = cctSeq(a, b).any;
                   return (
                     <div key={b} style={{ width: COL, height: 40, display: "flex", alignItems: "center", justifyContent: "center",
-                      background: on ? "#fbbf24" : isAny ? "#0f172a" : "#111827",
-                      color: on ? "#0f172a" : isAny ? "#475569" : "#e2e8f0",
-                      fontWeight: on ? 900 : 700, fontSize: "0.74rem", borderRight: "1px solid #1e293b", borderBottom: "1px solid #1e293b", boxSizing: "border-box" }}>
+                      background: on ? "#fbbf24" : isAny ? "#f1f5f9" : "#ffffff",
+                      color: on ? "#0f172a" : isAny ? "#94a3b8" : "#334155",
+                      fontWeight: on ? 900 : 700, fontSize: "0.74rem", borderRight: "1px solid #e6ebf3", borderBottom: "1px solid #e6ebf3", boxSizing: "border-box" }}>
                       {cellText(a, b)}
                     </div>
                   );
