@@ -13,6 +13,7 @@ import {
 } from "./pvpoke";
 import type { SimDict } from "./dict";
 import type { Locale } from "../../../../lib/i18n";
+import { shareDataUrl } from "../raid/raidShareUtil";
 
 const PKN = PKNAMES as unknown as Record<string, { ko: string; en: string; ja: string }>;
 const MN = MOVENAMES as unknown as Record<string, { ko: string; ja: string; en: string }>;
@@ -432,15 +433,8 @@ async function downloadNode(node: HTMLElement | null, filename: string) {
 async function shareNode(node: HTMLElement | null, filename: string, title: string) {
   if (!node) return;
   const dataUrl = await toJpeg(node, { ...CAP_OPTS, quality: 0.95 });
-  const nav = navigator as any;
-  try {
-    const blob = await (await fetch(dataUrl)).blob();
-    const file = new File([blob], filename, { type: "image/jpeg" });
-    if (typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title, text: "gblnote.com" }); return;
-    }
-  } catch { /* fall through */ }
-  const a = document.createElement("a"); a.href = dataUrl; a.download = filename; a.click();
+  // 모바일=파일공유 / PC=링크복사. 이미지 저장은 별도 '저장'(💾) 버튼.
+  await shareDataUrl(dataUrl, null, filename, title, "gblnote.com");
 }
 // 캡처 대상에 넣는 브랜딩 푸터(유입 유도)
 function BrandFooter({ label }: { label: string }) {

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { track } from "../../../../../lib/track";
 import { monSprite, formDex } from "../../sprite";
-import { loadLogo, drawBrandFooter } from "../raidShareUtil";
+import { loadLogo, drawBrandFooter, shareDataUrl } from "../raidShareUtil";
 import ShareModal from "../../ShareModal";
 import CpTable from "../bosses/CpTable";
 import STATSJSON from "../../pokedex_stats.json";
@@ -191,16 +191,8 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
   const shareCard = async () => {
     track("share", "/gbl/raid/schedule", "raid-calendar");
     if (!cardImage) return;
-    const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
-    try {
-      let file = cardFile;
-      if (!file) { const blob = await (await fetch(cardImage)).blob(); file = new File([blob], imgFileName(cur.m), { type: "image/png" }); }
-      if (file && typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: tpl(t.imgShareTitle, { m: cur.m, month: monthName(cur.m) }), text: "gblnote.com" });
-        return;
-      }
-      saveCard();
-    } catch (e) { if (e instanceof DOMException && e.name === "AbortError") return; saveCard(); }
+    // 모바일=파일공유 / PC=링크복사. 이미지 저장은 별도 '저장' 버튼(saveCard).
+    await shareDataUrl(cardImage, cardFile, imgFileName(cur.m), tpl(t.imgShareTitle, { m: cur.m, month: monthName(cur.m) }), "gblnote.com");
   };
 
   // 달력 그리드

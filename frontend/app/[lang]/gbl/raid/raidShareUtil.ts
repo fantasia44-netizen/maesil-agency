@@ -126,18 +126,62 @@ export function saveDataUrl(dataUrl: string, filename: string) {
   a.href = dataUrl; a.download = filename; a.click();
 }
 
-export async function shareDataUrl(dataUrl: string, file: File | null, filename: string, title: string, text: string) {
+// 화면 하단 토스트 — 공유 유틸 자체 피드백(컴포넌트별 상태 배선 없이 전역 일관).
+function shareToast(msg: string) {
+  if (typeof document === "undefined") return;
+  const el = document.createElement("div");
+  el.textContent = msg;
+  el.setAttribute("role", "status");
+  Object.assign(el.style, {
+    position: "fixed", left: "50%", bottom: "34px", transform: "translateX(-50%)",
+    background: "#0f172a", color: "#fff", fontSize: "14px", fontWeight: "700",
+    padding: "10px 18px", borderRadius: "999px", zIndex: "100000",
+    boxShadow: "0 8px 24px rgba(15,23,42,.35)", opacity: "0", transition: "opacity .18s",
+    maxWidth: "88vw", textAlign: "center",
+  } as Partial<CSSStyleDeclaration>);
+  document.body.appendChild(el);
+  requestAnimationFrame(() => { el.style.opacity = "1"; });
+  setTimeout(() => { el.style.opacity = "0"; setTimeout(() => el.remove(), 250); }, 1700);
+}
+
+const _COPIED: Record<string, string> = { ko: "링크 복사됨!", en: "Link copied!", ja: "リンクをコピーしました", "zh-TW": "已複製連結" };
+function copiedMsg(): string {
+  const l = (typeof document !== "undefined" ? document.documentElement.lang : "") || "";
+  if (l.startsWith("ja")) return _COPIED.ja;
+  if (l.startsWith("zh")) return _COPIED["zh-TW"];
+  if (l.startsWith("en")) return _COPIED.en;
+  return _COPIED.ko;
+}
+
+async function copyLink(url: string) {
+  try { await navigator.clipboard.writeText(url); shareToast(copiedMsg()); }
+  catch { window.prompt(copiedMsg(), url); }
+}
+
+// 공유 동작 통일:
+//  - 모바일: 네이티브 파일 공유(카톡/인스타 등에 이미지 바로 공유).
+//  - PC(데스크톱): 링크 복사 + 토스트. (PC는 navigator.share가 있어도 파일공유 시트가
+//    빈 채로 열렸다 닫히는 문제가 있어 링크복사로 통일. 이미지 저장은 별도 '저장' 버튼.)
+export async function shareDataUrl(dataUrl: string, file: File | null, filename: string, title: string, text: string, link?: string) {
+  const url = link || (typeof window !== "undefined" ? window.location.href : "https://gblnote.com");
+  const isMobile = typeof navigator !== "undefined" && /Android|iPhone|iPad|iPod|Mobile|Silk/i.test(navigator.userAgent);
   const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
-  try {
-    let f = file;
-    if (!f) { const blob = await (await fetch(dataUrl)).blob(); f = new File([blob], filename, { type: "image/png" }); }
-    if (f && typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [f] })) {
-      await navigator.share({ files: [f], title, text });
-      return;
+  if (isMobile && typeof navigator.share === "function") {
+    try {
+      let f = file;
+      if (!f) {
+        const blob = await (await fetch(dataUrl)).blob();
+        const mime = dataUrl.startsWith("data:image/jpeg") ? "image/jpeg" : "image/png";
+        f = new File([blob], filename, { type: mime });
+      }
+      if (f && nav.canShare && nav.canShare({ files: [f] })) {
+        await navigator.share({ files: [f], title, text });
+        return;
+      }
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") return;
+      // 파일 공유 실패 → 링크 복사로 폴백
     }
-    saveDataUrl(dataUrl, filename);
-  } catch (e) {
-    if (e instanceof DOMException && e.name === "AbortError") return;
-    saveDataUrl(dataUrl, filename);
   }
+  await copyLink(url);
 }

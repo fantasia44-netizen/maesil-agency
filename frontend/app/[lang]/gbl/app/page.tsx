@@ -849,14 +849,16 @@ export default function GblPage() {
     if (!cardImage) return;
     track("share", "/gbl/app", "stats-card");
     const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
-    // 미리 만들어 둔 파일 사용(없으면 즉석 생성) — iOS는 async 지연 시 공유창이 막히므로 파일이 준비된 경우 곧바로 호출
+    // PC는 파일공유 시트가 빈 채로 열렸다 닫히는 문제 → 모바일에서만 네이티브 공유 시도.
+    // (개인 전적 카드는 공개 링크가 없어 PC에선 이미지 저장 안내가 링크복사보다 유용.)
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile|Silk/i.test(navigator.userAgent);
     let file = cardFile;
     try {
       if (!file) {
         const blob = await (await fetch(cardImage)).blob();
         file = new File([blob], "gbl-record.png", { type: "image/png" });
       }
-      if (file && typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
+      if (isMobile && file && typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: t.shareTitle, text: t.shareText });
         return;
       }

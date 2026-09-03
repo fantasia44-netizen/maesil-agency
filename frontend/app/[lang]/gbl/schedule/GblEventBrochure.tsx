@@ -7,6 +7,7 @@ import { pokeSprite, monSprite } from "../sprite";
 import type { Locale } from "../../../../lib/i18n";
 import type { GblEvent } from "./gblEvents";
 import type { ScheduleDict } from "./dict";
+import { shareDataUrl } from "../raid/raidShareUtil";
 
 const INK = "#0f172a", SUB = "#64748b";
 const PANEL = "#f7f5fd", BORDER = "#e9d5ff";
@@ -63,14 +64,7 @@ export default function GblEventBrochure({ ev, lang, t, onClose, onDismiss }: { 
     if (!cardRef.current || busy) return; setBusy(true);
     try {
       const dataUrl = await toJpeg(cardRef.current, { ...baseOpts(), pixelRatio: 1.5, quality: 0.9 });
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], "gblnote-gbl-event.jpg", { type: "image/jpeg" });
-      const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
-      if (typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: lx(ev.title), text: "gblnote.com" });
-      } else {
-        const a = document.createElement("a"); a.href = dataUrl; a.download = "gblnote-gbl-event.jpg"; a.click();
-      }
+      await shareDataUrl(dataUrl, null, "gblnote-gbl-event.jpg", lx(ev.title), "gblnote.com");   // 모바일=파일공유 / PC=링크복사
     } catch (e) { if (e instanceof DOMException && e.name === "AbortError") { /* 취소 */ } else console.error(e); }
     finally { setBusy(false); }
   };

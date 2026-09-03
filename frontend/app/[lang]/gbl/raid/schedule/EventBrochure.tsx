@@ -7,6 +7,7 @@ import { TYPE_COLOR, typeLabel } from "../../typeLabels";
 import type { Locale } from "../../../../../lib/i18n";
 import type { Brochure } from "./eventBrochures";
 import PKNAMES from "../../pokedex_names.json";
+import { shareDataUrl } from "../raidShareUtil";
 
 // UI 뼈대 다국어(이벤트 카피는 데이터=한국어 유지). 몬 이름은 dex로 pokedex_names에서 로케일별 보완.
 const _PK = PKNAMES as Record<string, Record<string, string>>;
@@ -106,14 +107,7 @@ export default function EventBrochure({ b, lang, onClose, onDismiss }: { b: Broc
         const bytes = Math.ceil((dataUrl.length - dataUrl.indexOf(",") - 1) * 3 / 4);  // base64 길이→바이트 근사
         if (bytes <= TARGET) break;
       }
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], `gblnote-${b.dateKey}.jpg`, { type: "image/jpeg" });
-      const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
-      if (typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: b.title, text: "gblnote.com" });
-      } else {
-        const a = document.createElement("a"); a.href = dataUrl; a.download = `gblnote-${b.dateKey}.jpg`; a.click();
-      }
+      await shareDataUrl(dataUrl, null, `gblnote-${b.dateKey}.jpg`, b.title, "gblnote.com");   // 모바일=파일공유 / PC=링크복사
     } catch (e) { if (e instanceof DOMException && e.name === "AbortError") { /* 사용자 취소 */ } else console.error(e); }
     finally { setBusy(false); }
   };

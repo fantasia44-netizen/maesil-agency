@@ -10,6 +10,7 @@ import type { Locale } from "../../../../lib/i18n";
 import { getTrade, type TradeDict } from "./dict";
 import { BG_SWATCHES, resolveBg, bgLabel } from "./backgrounds";
 import { track } from "../../../../lib/track";
+import { shareDataUrl } from "../raid/raidShareUtil";
 
 type PKN_T = Record<string, { ko: string; en: string; ja: string }>;
 const NAMES = PKN as unknown as PKN_T;
@@ -115,12 +116,7 @@ export default function TradeMaker({ lang, t }: { lang: Locale; t: TradeDict }) 
     track("share", "/gbl/trade", "trade");
     try {
       const dataUrl = await toJpeg(cardRef.current, { ...baseOpts(), pixelRatio: 1.6, quality: 0.92 });
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], "gblnote-trade.jpg", { type: "image/jpeg" });
-      const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean };
-      if (typeof navigator.share === "function" && nav.canShare && nav.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: ct.shareTitle, text: "gblnote.com" });
-      } else { const a = document.createElement("a"); a.href = dataUrl; a.download = "gblnote-trade.jpg"; a.click(); }
+      await shareDataUrl(dataUrl, null, "gblnote-trade.jpg", ct.shareTitle, "gblnote.com");   // 모바일=파일공유 / PC=링크복사
     } catch (e) { if (e instanceof DOMException && e.name === "AbortError") { /* 취소 */ } else console.error(e); }
     finally { setBusy(false); }
   };
