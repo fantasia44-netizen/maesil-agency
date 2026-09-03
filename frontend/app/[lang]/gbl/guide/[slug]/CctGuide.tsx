@@ -22,12 +22,12 @@ function cctSeq(a: number, b: number): { any: boolean; seq: number[] } {
 }
 
 const LB: Record<Locale, {
-  title: string; sub: string; myFast: string; oppFast: string; turnU: string;
+  title: string; sub: string; myFast: string; oppFast: string; turnU: string; corner: string;
   any: string; anyShort: string; pick: string; tapPre: string; tapSuf: string;
   note: string; foot: string; share: string; download: string;
 }> = {
   ko: {
-    title: "CCT 타이밍 표", sub: "Circle Control Tactic", myFast: "내 평타 (턴수)", oppFast: "상대 평타 (턴수)", turnU: "턴",
+    title: "CCT 타이밍 표", sub: "Circle Control Tactic", myFast: "내 평타 (턴수)", oppFast: "상대 평타 (턴수)", turnU: "턴", corner: "내\\상대",
     any: "아무때나 차지해도 평할 없음", anyShort: "아무때나", pick: "내 평타 × 상대 평타를 고르세요",
     tapPre: "→ ", tapSuf: " 번째 평타를 친 뒤 차지 (평할 0)",
     note: "차지무브는 상대 평타 쿨을 리셋합니다. 타이밍이 어긋나면 상대가 평타 1대를 공짜로 얻어요(=평할). 표의 숫자 번째 평타 뒤에 차지를 누르면 평할을 0으로 막습니다.",
@@ -35,7 +35,7 @@ const LB: Record<Locale, {
     share: "공유", download: "저장",
   },
   en: {
-    title: "CCT Timing Table", sub: "Circle Control Tactic", myFast: "My fast move (turns)", oppFast: "Opponent fast move (turns)", turnU: "turn",
+    title: "CCT Timing Table", sub: "Circle Control Tactic", myFast: "My fast move (turns)", oppFast: "Opponent fast move (turns)", turnU: "turn", corner: "me\\opp",
     any: "Charge anytime — no free move given", anyShort: "anytime", pick: "Pick your fast move × opponent's fast move",
     tapPre: "→ charge after fast move ", tapSuf: " (no free move)",
     note: "A charged move resets the opponent's fast-move cooldown. Mistime it and they get a free fast move. Tap your charge move after the listed fast-move counts to give up none.",
@@ -43,7 +43,7 @@ const LB: Record<Locale, {
     share: "Share", download: "Save",
   },
   ja: {
-    title: "CCT タイミング表", sub: "Circle Control Tactic", myFast: "自分の通常 (ターン)", oppFast: "相手の通常 (ターン)", turnU: "ターン",
+    title: "CCT タイミング表", sub: "Circle Control Tactic", myFast: "自分の通常 (ターン)", oppFast: "相手の通常 (ターン)", turnU: "ターン", corner: "自\\相",
     any: "いつチャージしても献上なし", anyShort: "いつでも", pick: "自分の通常 × 相手の通常 を選択",
     tapPre: "→ ", tapSuf: " 回目の通常攻撃の後にチャージ（献上0）",
     note: "チャージは相手の通常攻撃のクールをリセットします。タイミングを外すと相手に通常攻撃1回を献上。表の回数の後にチャージすれば0に抑えられます。",
@@ -51,7 +51,7 @@ const LB: Record<Locale, {
     share: "共有", download: "保存",
   },
   "zh-TW": {
-    title: "CCT 時機表", sub: "Circle Control Tactic", myFast: "我方平A (回合)", oppFast: "對手平A (回合)", turnU: "回合",
+    title: "CCT 時機表", sub: "Circle Control Tactic", myFast: "我方平A (回合)", oppFast: "對手平A (回合)", turnU: "回合", corner: "我\\對",
     any: "隨時放大招都不會送平A", anyShort: "隨時", pick: "選擇 我方平A × 對手平A",
     tapPre: "→ 第 ", tapSuf: " 次平A後接大招（送0）",
     note: "大招會重置對手平A的冷卻。時機錯了就送對手一次免費平A。在表列的平A次數後放大招即可歸零。",
@@ -141,7 +141,7 @@ export default function CctGuide({ lang }: { lang: Locale }) {
           <div style={{ display: "inline-block", border: "1px solid #1e293b", borderRadius: 8, overflow: "hidden" }}>
             {/* 헤더행 */}
             <div style={{ display: "flex" }}>
-              <div style={{ width: 44, height: 34, background: "#111827", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontSize: "0.6rem", fontWeight: 800, borderRight: "1px solid #1e293b", borderBottom: "1px solid #1e293b" }}>내\상대</div>
+              <div style={{ width: 44, height: 34, background: "#111827", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontSize: "0.6rem", fontWeight: 800, borderRight: "1px solid #1e293b", borderBottom: "1px solid #1e293b" }}>{t.corner}</div>
               {TURNS.map((b) => (
                 <div key={b} style={{ width: 72, height: 34, display: "flex", alignItems: "center", justifyContent: "center", background: opp === b ? "#1e3a8a" : "#0b1220", color: opp === b ? "#fff" : "#93c5fd", fontWeight: 800, fontSize: "0.78rem", borderRight: "1px solid #1e293b", borderBottom: "1px solid #1e293b" }}>{b}{t.turnU}</div>
               ))}
