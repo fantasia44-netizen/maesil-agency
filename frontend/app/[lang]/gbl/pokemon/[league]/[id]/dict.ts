@@ -30,7 +30,7 @@ const ko: PokeDict = {
   rolesNote: "선봉=초반 유리 · 마무리=후반 뒷심 · 교체=스왑 대응 · 차지=차지기술 압박 · 공격=딜링 · 일관성=상성 안정성 (0~100)",
   explainer: "추천 기술배치는 공개 전투 시뮬레이션(PvPoke) 기준이며, 카운터·잘 잡는 상대는 시뮬 매치업 결과를 바탕으로 정리했습니다. 실측 픽률은 GBL Note 사용자들이 실제로 만난 상대를 익명 집계한 값입니다.",
   explainerTierWord: "티어", recordLink: "내 전적 기록하기 →", privacy: "개인정보처리방침",
-  metaTitle: "분석 · 티어·추천기술·카운터 | GBL Note", metaDesc: "티어와 추천 기술배치, 약점 카운터·주요 승패 매치업, 그리고 유저 실측 픽률(최근 30일)까지. 이론 시뮬 + 실전 데이터로 지금 이 리그에서 어떻게 쓰이는지 확인하세요.",
+  metaTitle: "기술배치·카운터·티어 공략 | GBL Note", metaDesc: "추천 기술배치와 약점 카운터, 티어·주요 승패 매치업, 그리고 유저 실측 픽률(최근 30일)까지. 이론 시뮬 + 실전 데이터로 지금 이 리그에서 어떻게 쓰이는지 확인하세요.",
   ogDescSuffix: "카운터·추천 기술·실측 픽률", ogTitleSuffix: "카운터·기술배치",
   share: {
     movesetH: "추천 기술배치 · 스킬 타수", statsH: "종족값", atk: "공격", def: "방어", hp: "체력",
@@ -52,7 +52,7 @@ const en: PokeDict = {
   rolesNote: "Lead=early edge · Closer=late-game · Switch=swap response · Charger=charge pressure · Attacker=damage · Consistency=matchup stability (0–100)",
   explainer: "Recommended movesets are based on public battle simulation (PvPoke); counters and favorable matchups come from sim results. Pick rates are anonymous aggregates of opponents GBL Note users actually faced.",
   explainerTierWord: "-tier", recordLink: "Log my battles →", privacy: "Privacy Policy",
-  metaTitle: "PvP Guide · Moves, Counters & Tier | GBL Note", metaDesc: "Tier and recommended moveset, weak-spot counters, key win/loss matchups, and real user pick rate (last 30 days). See how it's actually used in this league — sim theory + real battle data.",
+  metaTitle: "Best Moveset · Counters · Tier | GBL Note", metaDesc: "Recommended moveset and weak-spot counters, tier, key win/loss matchups, and real user pick rate (last 30 days). See how it's actually used in this league — sim theory + real battle data.",
   ogDescSuffix: "counters · recommended moves · real pick rate", ogTitleSuffix: "Counters & Moveset",
   share: {
     movesetH: "Recommended Moveset · Counts", statsH: "Base stats", atk: "Atk", def: "Def", hp: "HP",
@@ -74,7 +74,7 @@ const ja: PokeDict = {
   rolesNote: "先発=序盤有利 · 締め=終盤 · 交代=スワップ対応 · ゲージ=ゲージ圧 · 攻撃=火力 · 一貫性=相性安定 (0〜100)",
   explainer: "推奨技構成は公開バトルシミュ(PvPoke)基準、カウンター・有利対面はシミュ結果を元に整理。ピック率はGBL Note利用者が実際に遭遇した相手の匿名集計です。",
   explainerTierWord: "ティア", recordLink: "自分の戦績を記録 →", privacy: "プライバシーポリシー",
-  metaTitle: "評価 · 技構成・カウンター・ティア | GBL Note", metaDesc: "ティアと推奨技構成、弱点カウンター、主要な有利・不利対面、そして実測ピック率(直近30日)まで。理論シミュ+実戦データで、このリーグでの実際の使われ方を確認。",
+  metaTitle: "技構成・カウンター・ティア攻略 | GBL Note", metaDesc: "推奨技構成と弱点カウンター、ティア、主要な有利・不利対面、そして実測ピック率(直近30日)まで。理論シミュ+実戦データで、このリーグでの実際の使われ方を確認。",
   ogDescSuffix: "カウンター・推奨技・実測ピック率", ogTitleSuffix: "カウンター・技構成",
   share: {
     movesetH: "推奨技構成 · 発動回数", statsH: "種族値", atk: "こうげき", def: "ぼうぎょ", hp: "HP",
@@ -96,7 +96,7 @@ const zhTW: PokeDict = {
   rolesNote: "先鋒=前期優勢 · 收尾=後期續航 · 換場=換場應對 · 放招=特殊招式壓迫 · 攻擊=輸出 · 穩定性=相性穩定（0~100）",
   explainer: "推薦招式配置以公開對戰模擬(PvPoke)為準，剋星·佔優對手依模擬對面結果整理。實測使用率是 GBL Note 使用者實際遇到對手的匿名統計。",
   explainerTierWord: "強度", recordLink: "記錄我的戰績 →", privacy: "隱私權政策",
-  metaTitle: "分析 · 招式配置·剋星·強度 | GBL Note", metaDesc: "強度與推薦招式配置、弱點剋星、主要勝負對面，以及玩家實測使用率（近30天）。用模擬理論＋實戰數據，確認這隻在此聯盟的實際用法。",
+  metaTitle: "招式配置·剋星·強度攻略 | GBL Note", metaDesc: "推薦招式配置與弱點剋星、強度、主要勝負對面，以及玩家實測使用率（近30天）。用模擬理論＋實戰數據，確認這隻在此聯盟的實際用法。",
   ogDescSuffix: "剋星·推薦招式·實測使用率", ogTitleSuffix: "剋星·招式配置",
   share: {
     movesetH: "推薦招式配置 · 招式次數", statsH: "種族值", atk: "攻擊", def: "防禦", hp: "HP",
