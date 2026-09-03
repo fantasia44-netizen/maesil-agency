@@ -64,6 +64,16 @@ CPM42 = 0.8003
 SM_CPM = CPM42 / CPM40  # 슈퍼메가 자기 +2레벨 → 공격 스탯 배수(약 1.013)
 SUPER_MEGA_DEX: set[int] = set()  # main()에서 게임마스터로 채움(레벨4 보유 메가 dex)
 
+# 슈퍼메가 스페셜 어택(공식 뉴스, 메가진화 시 추가되는 전용기의 기본기). (dex, 메가변형 M/X/Y) → moveId.
+# _PLUS 강화 변형은 아직 게임데이터에 PvE 수치가 없어(미출시), 메가피날레 미리보기에선 표시만
+# 스페셜기로 교체(랭킹=타입버프 근사 유지). 공식 반영 시 _PLUS 수치로 재계산 예정.
+SM_SPECIAL = {
+    (149, "M"): "OUTRAGE", (150, "X"): "DYNAMIC_PUNCH", (150, "Y"): "FUTURE_SIGHT",
+    (658, "M"): "SURF", (652, "M"): "SEED_BOMB", (655, "M"): "MYSTICAL_FIRE",
+    (26, "X"): "VOLT_TACKLE", (26, "Y"): "ZAP_CANNON", (865, "M"): "DRILL_PECK",
+    (306, "M"): "BRICK_BREAK", (121, "M"): "LIQUIDATION", (71, "M"): "ACID_SPRAY", (687, "M"): "PSYBEAM",
+}
+
 # 전설 전용/시그니처 기술 — PvPoke eliteMoves에 없어도 * 레거시(특수기) 마킹. 참고사이트 관례와 일치.
 EXTRA_LEGACY = {
     "ICE_BURN", "FREEZE_SHOCK",            # 화이트/블랙 큐레무
@@ -317,11 +327,17 @@ def main():
             dps = v["dps"]
             tdo = dps * survive                      # 총 딜량 = DPS × 버티는시간
             er = (dps ** 3 * tdo) ** 0.25            # 종합점수(ER): 딜³×총딜량, 포켓배틀러 Overall식
+            charged_id, is_legacy = v["charged"], v["legacy"]
+            # 슈퍼메가: 해당 타입 티어에선 표시 기술을 스페셜 어택으로 교체(랭킹/수치는 유지).
+            if is_super_mega:
+                sp = SM_SPECIAL.get((dex, mega))
+                if sp and (pve(sp, MV, False) or {}).get("type") == bt:
+                    charged_id, is_legacy = sp, True   # 스페셜기=전용·이벤트 기술 → * 표기
             rows.append({
                 "type": bt, "dps": round(dps, 1), "tdo": round(tdo), "er": round(er, 1),
                 "name": nm["ko"], "nameEn": nm["en"], "nameJa": nm["ja"],
                 "dex": dex, "shadow": shadow, "mega": mega, "primal": primal, "types": types_list,
-                "legacy": v["legacy"], "upcoming": upcoming, "fast": v["fast"], "charged": v["charged"],
+                "legacy": is_legacy, "upcoming": upcoming, "fast": v["fast"], "charged": charged_id,
                 "atk": round(atk), "def": round(deff), "hp": round(hp),
             })
 

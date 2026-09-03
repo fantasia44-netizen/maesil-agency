@@ -47,7 +47,12 @@ const RAID_VERSIONS: { slug: string; isNew?: boolean; label: Record<string, stri
   { slug: "current", label: { ko: "현재", en: "Current", ja: "現在", "zh-TW": "目前" } },
 ];
 const RAID_VER_NOTE: Record<string, Record<string, string>> = {
-  megafinale: { ko: "🌙 슈퍼메가 버프 반영 미리보기", en: "🌙 Super Mega buff preview", ja: "🌙 スーパーメガ強化プレビュー", "zh-TW": "🌙 超級Mega強化預覽" },
+  megafinale: {
+    ko: "🌙 슈퍼메가 버프·스페셜 어택 미리보기 — 공식 반영 전 예상치라 수치·기술이 추후 변경될 수 있습니다.",
+    en: "🌙 Super Mega buff & special-attack preview — provisional estimates; values/moves may change on official release.",
+    ja: "🌙 スーパーメガ強化・専用技プレビュー — 公式反映前の予測値のため数値・技は変更される場合があります。",
+    "zh-TW": "🌙 超級Mega強化·專用技預覽 — 官方實裝前為預估值，數值·招式可能變動。",
+  },
 };
 
 const TYPE_COLOR: Record<string, string> = {
