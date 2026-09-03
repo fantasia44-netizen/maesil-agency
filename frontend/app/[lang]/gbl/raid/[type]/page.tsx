@@ -10,6 +10,7 @@ import MOVENAMES from "../../pvp_move_names.json";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 import ListShare from "../../ListShare";
+import { GUIDE_CHIP } from "../../guideLinks";
 import { monSprite, formDex } from "../../sprite";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
 import { typeLabel } from "../../typeLabels";
@@ -274,6 +275,10 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
             {d.explainerBody}{" "}
             <Link href={L("/gbl/raid")} style={{ color: "#3b5bdb", fontWeight: 600 }}>{d.otherTypes}</Link>
           </p>
+          <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 6 }}>
+            <span style={{ fontSize: "0.78rem", fontWeight: 800, color: "#0f172a", alignSelf: "center" }}>{GUIDE_CHIP[lang].header}</span>
+            <Link href={L("/gbl/guide/type-chart")} style={{ fontSize: "0.8rem", fontWeight: 600, color: "#3b5bdb", textDecoration: "none", background: "#eef2fb", border: `1px solid ${BORDER}`, borderRadius: 999, padding: "4px 12px" }}>{GUIDE_CHIP[lang].typeChart}</Link>
+          </div>
         </div>
 
         <CoupangAd />

@@ -6,6 +6,7 @@ import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, localeMeta, type Locale } from "../../../../../lib/i18n";
 import { GUIDES, guideContent, guideKeywords } from "../guides";
+import { TOOL_CHIP, GUIDE_RELATED_TOOLS } from "../../guideLinks";
 import { getGuideArticle } from "../dict";
 import JsonLd from "../../JsonLd";
 import TypeChart from "./TypeChart";
@@ -117,6 +118,16 @@ export default function GuidePage({ params }: { params: { lang: string; slug: st
               <Link key={s} href={L(`/gbl/guide/${s}`)} style={{ fontSize: "0.86rem", color: "#3b5bdb", textDecoration: "none" }}>· {guideContent(lang, gg).title}</Link>
             ))}
           </div>
+          {GUIDE_RELATED_TOOLS[params.slug] && (
+            <div style={{ marginTop: 14 }}>
+              <div style={{ fontSize: "0.86rem", fontWeight: 800, color: "#0f172a", marginBottom: 6 }}>{TOOL_CHIP[lang].header}</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {GUIDE_RELATED_TOOLS[params.slug].map((tl) => (
+                  <Link key={tl.path} href={L(tl.path)} style={{ fontSize: "0.82rem", fontWeight: 600, color: "#3b5bdb", textDecoration: "none", background: "#eef2fb", border: `1px solid ${BORDER}`, borderRadius: 999, padding: "4px 12px" }}>{TOOL_CHIP[lang][tl.key]}</Link>
+                ))}
+              </div>
+            </div>
+          )}
           <div style={{ marginTop: 12, fontSize: "0.82rem", color: "#475569" }}>
             {t.metaPre}<Link href={L("/gbl/meta/master")} style={{ color: "#3b5bdb", fontWeight: 600 }}>{t.metaMeta}</Link>{t.metaMid}
             <Link href={L("/gbl/tier/master")} style={{ color: "#3b5bdb", fontWeight: 600 }}>{t.metaTier}</Link>{t.metaSuf}

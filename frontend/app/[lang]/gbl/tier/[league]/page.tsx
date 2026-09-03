@@ -10,6 +10,7 @@ import PKNAMES from "../../pokedex_names.json";
 import MOVENAMES from "../../pvp_move_names.json";
 import AdSlot from "../../AdSlot";
 import ListShare from "../../ListShare";
+import { GUIDE_CHIP } from "../../guideLinks";
 import CoupangAd from "../../CoupangAd";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
 import { leagueName, localName } from "../../contentI18n";
@@ -348,6 +349,11 @@ export default async function TierPage({ params, searchParams }: { params: { lan
             {t.explainerBody}{" "}
             <Link href={L("/gbl/login")} style={{ color: "#3b5bdb", fontWeight: 600 }}>{t.loginLink}</Link>
           </p>
+          <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 6 }}>
+            <span style={{ fontSize: "0.78rem", fontWeight: 800, color: "#0f172a", alignSelf: "center" }}>{GUIDE_CHIP[lang].header}</span>
+            <Link href={L("/gbl/guide/league-cp")} style={{ fontSize: "0.8rem", fontWeight: 600, color: "#3b5bdb", textDecoration: "none", background: "#eef2fb", border: `1px solid ${BORDER}`, borderRadius: 999, padding: "4px 12px" }}>{GUIDE_CHIP[lang].leagueCp}</Link>
+            <Link href={L("/gbl/guide/type-chart")} style={{ fontSize: "0.8rem", fontWeight: 600, color: "#3b5bdb", textDecoration: "none", background: "#eef2fb", border: `1px solid ${BORDER}`, borderRadius: 999, padding: "4px 12px" }}>{GUIDE_CHIP[lang].typeChart}</Link>
+          </div>
         </div>
 
         <CoupangAd />
