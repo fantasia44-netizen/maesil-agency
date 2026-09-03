@@ -8,7 +8,8 @@ import { toPng } from "html-to-image";
 import { shareDataUrl, saveDataUrl } from "../../raid/raidShareUtil";
 import type { Locale } from "../../../../../lib/i18n";
 
-const TURNS = [1, 2, 3, 4] as const;
+const TURNS = [1, 2, 3, 4, 5] as const; // 5턴 = 불태우기(Incinerate)
+const COL = 60; // 표 열 폭(5칸이 모바일에 들어가도록)
 
 function gcd(a: number, b: number): number { return b ? gcd(b, a % b) : a; }
 // 매치업 결과: {any:true} = P=1(아무때나) / 아니면 처음 3개 시퀀스
@@ -31,7 +32,7 @@ const LB: Record<Locale, {
     any: "아무때나 차지해도 평할 없음", anyShort: "아무때나", pick: "내 평타 × 상대 평타를 고르세요",
     tapPre: "→ ", tapSuf: " 번째 평타를 친 뒤 차지 (평할 0)",
     note: "차지무브는 상대 평타 쿨을 리셋합니다. 타이밍이 어긋나면 상대가 평타 1대를 공짜로 얻어요(=평할). 표의 숫자 번째 평타 뒤에 차지를 누르면 평할을 0으로 막습니다.",
-    foot: "※ 실제 GBL 패스트무브는 1~4턴입니다. 미러(같은 턴수)와 상대 1턴은 언제 눌러도 안전.",
+    foot: "※ GBL 패스트무브는 1~5턴(5턴 = 불태우기). 미러(같은 턴수)와 상대 1턴은 언제 눌러도 안전.",
     share: "공유", download: "저장",
   },
   en: {
@@ -39,7 +40,7 @@ const LB: Record<Locale, {
     any: "Charge anytime — no free move given", anyShort: "anytime", pick: "Pick your fast move × opponent's fast move",
     tapPre: "→ charge after fast move ", tapSuf: " (no free move)",
     note: "A charged move resets the opponent's fast-move cooldown. Mistime it and they get a free fast move. Tap your charge move after the listed fast-move counts to give up none.",
-    foot: "※ Real GBL fast moves are 1–4 turns. Mirror (same turns) and a 1-turn opponent are safe anytime.",
+    foot: "※ GBL fast moves are 1–5 turns (5 turns = Incinerate). Mirror (same turns) and a 1-turn opponent are safe anytime.",
     share: "Share", download: "Save",
   },
   ja: {
@@ -47,7 +48,7 @@ const LB: Record<Locale, {
     any: "いつチャージしても献上なし", anyShort: "いつでも", pick: "自分の通常 × 相手の通常 を選択",
     tapPre: "→ ", tapSuf: " 回目の通常攻撃の後にチャージ（献上0）",
     note: "チャージは相手の通常攻撃のクールをリセットします。タイミングを外すと相手に通常攻撃1回を献上。表の回数の後にチャージすれば0に抑えられます。",
-    foot: "※ 実際のGBL通常攻撃は1〜4ターン。ミラー（同ターン）と相手1ターンはいつでも安全。",
+    foot: "※ GBL通常攻撃は1〜5ターン（5ターン=やきつくす）。ミラー（同ターン）と相手1ターンはいつでも安全。",
     share: "共有", download: "保存",
   },
   "zh-TW": {
@@ -55,7 +56,7 @@ const LB: Record<Locale, {
     any: "隨時放大招都不會送平A", anyShort: "隨時", pick: "選擇 我方平A × 對手平A",
     tapPre: "→ 第 ", tapSuf: " 次平A後接大招（送0）",
     note: "大招會重置對手平A的冷卻。時機錯了就送對手一次免費平A。在表列的平A次數後放大招即可歸零。",
-    foot: "※ 實際GBL平A為1〜4回合。鏡像（同回合）與對手1回合隨時安全。",
+    foot: "※ GBL平A為1〜5回合（5回合=燒盡）。鏡像（同回合）與對手1回合隨時安全。",
     share: "分享", download: "儲存",
   },
 };
@@ -143,7 +144,7 @@ export default function CctGuide({ lang }: { lang: Locale }) {
             <div style={{ display: "flex" }}>
               <div style={{ width: 44, height: 34, background: "#111827", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontSize: "0.6rem", fontWeight: 800, borderRight: "1px solid #1e293b", borderBottom: "1px solid #1e293b" }}>{t.corner}</div>
               {TURNS.map((b) => (
-                <div key={b} style={{ width: 72, height: 34, display: "flex", alignItems: "center", justifyContent: "center", background: opp === b ? "#1e3a8a" : "#0b1220", color: opp === b ? "#fff" : "#93c5fd", fontWeight: 800, fontSize: "0.78rem", borderRight: "1px solid #1e293b", borderBottom: "1px solid #1e293b" }}>{b}{t.turnU}</div>
+                <div key={b} style={{ width: COL, height: 34, display: "flex", alignItems: "center", justifyContent: "center", background: opp === b ? "#1e3a8a" : "#0b1220", color: opp === b ? "#fff" : "#93c5fd", fontWeight: 800, fontSize: "0.78rem", borderRight: "1px solid #1e293b", borderBottom: "1px solid #1e293b" }}>{b}{t.turnU}</div>
               ))}
             </div>
             {/* 데이터행 */}
@@ -154,7 +155,7 @@ export default function CctGuide({ lang }: { lang: Locale }) {
                   const on = my === a && opp === b;
                   const isAny = cctSeq(a, b).any;
                   return (
-                    <div key={b} style={{ width: 72, height: 40, display: "flex", alignItems: "center", justifyContent: "center",
+                    <div key={b} style={{ width: COL, height: 40, display: "flex", alignItems: "center", justifyContent: "center",
                       background: on ? "#fbbf24" : isAny ? "#0f172a" : "#111827",
                       color: on ? "#0f172a" : isAny ? "#475569" : "#e2e8f0",
                       fontWeight: on ? 900 : 700, fontSize: "0.74rem", borderRight: "1px solid #1e293b", borderBottom: "1px solid #1e293b", boxSizing: "border-box" }}>

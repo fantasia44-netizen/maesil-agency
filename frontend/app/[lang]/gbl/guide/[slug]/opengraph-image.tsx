@@ -73,7 +73,7 @@ function cctImage() {
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 28, fontWeight: 800, color: "#c4b5fd", letterSpacing: 4 }}>CIRCLE CONTROL TACTIC</div>
           <div style={{ fontSize: 82, fontWeight: 900, color: "#fff", lineHeight: 1.02 }}>CCT Timing</div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "#a5b4fc", marginTop: 6 }}>Deny the free fast move · +TPE</div>
+          <div style={{ fontSize: 32, fontWeight: 700, color: "#a5b4fc", marginTop: 6 }}>Deny the free fast move</div>
         </div>
         {/* 턴 셀 타임라인 */}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
