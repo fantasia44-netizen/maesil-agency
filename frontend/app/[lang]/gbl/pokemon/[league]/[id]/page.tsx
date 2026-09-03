@@ -145,7 +145,24 @@ export function generateStaticParams() {
   return params;
 }
 
-export function generateMetadata({ params, searchParams }: { params: { lang: string; league: string; id: string }; searchParams?: { s?: string } }): Metadata {
+// SERP 스니펫 CTR용 동적 설명 — 실제 티어·추천기술·1위 카운터(시뮬 기반, 전 몬 항상 참).
+// 실측 픽률은 데이터 있는 몬(현재 100종 미만)만 조건부로 붙임 — 없는 몬에 "실측" 표기하면 거짓 스니펫이 되므로.
+// 무브셋 없으면 null → 정적 metaDesc 폴백.
+function dynMetaDesc(lang: Locale, d: Detail, name: string, lgName: string, pr?: number): string | null {
+  const fast = d.moveset?.[0] ? moveLabel(lang, d.moveset[0]) : "";
+  if (!fast) return null;
+  const ch = d.moveset?.[1] ? moveLabel(lang, d.moveset[1]) : "";
+  const moves = ch ? `${fast}+${ch}` : fast;
+  const topC = d.counters?.[0]?.id ? locName(lang, d.counters[0].id) : "";
+  const t = d.tier;
+  const hasPick = typeof pr === "number" && pr > 0;
+  if (lang === "en") return `${name} in ${lgName}: ${t}-tier. Best moveset ${moves}${topC ? `, top counter ${topC}` : ""}. Weaknesses, win/loss matchups & 0/1/2-shield sim${hasPick ? `, real pick rate ${pr}%` : ""}.`;
+  if (lang === "ja") return `${name} ${lgName} ${t}ティア。推奨技構成 ${moves}${topC ? `、主要カウンター ${topC}` : ""}。弱点・有利不利対面・0/1/2ゲージのシミュ結果${hasPick ? `・実測ピック率${pr}%` : ""}。`;
+  if (lang === "zh-TW") return `${name} ${lgName} ${t}級。推薦招式配置 ${moves}${topC ? `、主要剋星 ${topC}` : ""}。弱點·勝負對面·0/1/2護盾模擬結果${hasPick ? `·實測使用率${pr}%` : ""}。`;
+  return `${name} ${lgName} ${t}티어. 추천 기술배치 ${moves}${topC ? `, 주요 카운터 ${topC}` : ""}. 약점·승패 매치업·0/1/2실드 시뮬 결과${hasPick ? `·실측 픽률 ${pr}%` : ""}까지.`;
+}
+
+export async function generateMetadata({ params, searchParams }: { params: { lang: string; league: string; id: string }; searchParams?: { s?: string } }): Promise<Metadata> {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const d = findDetail(params.league, params.id, resolveSeasonSlug(searchParams?.s));
   if (!LEAGUE_KEYS.includes(params.league) || !d) return { title: "GBL Note" };
@@ -153,9 +170,13 @@ export function generateMetadata({ params, searchParams }: { params: { lang: str
   const name = dispName(lang, d);
   const pk = getPoke(lang);
   const path = `/gbl/pokemon/${params.league}/${params.id}`;
+  // 실측 픽률은 리그별 캐시(revalidate 3600, 상세 본문과 동일 소스) — 데이터 있는 몬만 조건부 노출.
+  let pr: number | undefined;
+  try { pr = (await getMetaInfo(params.league)).rate[d.id]; } catch { /* 폴백 */ }
+  const desc = dynMetaDesc(lang, d, name, lgName, pr) || `${name} · ${lgName} — ${pk.metaDesc}`;
   return {
     title: `${name} ${lgName} ${pk.metaTitle.replace(" | GBL Note", "")} | GBL Note`,
-    description: `${name} · ${lgName} — ${pk.metaDesc}`,
+    description: desc,
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
     openGraph: {
       title: `${name} ${lgName} ${pk.ogTitleSuffix}`,

@@ -47,7 +47,7 @@ const en: IvDict = {
   explainerBody: "In PvP (GBL), within the league CP cap (Great 1500, Ultra 2500), a higher stat product (Attack × Defense × HP) is stronger. With a CP cap, a lower Attack base lets the Pokémon reach a higher level, gaining Defense and HP, so it ranks higher. Master League has no cap, so 15/15/15 is always #1.",
   shareBtn: "📸 Save/Share this IV ranking", imgBuilding: "Generating image…", imgShare: "📤 Share", imgSave: "💾 Save", imgClose: "Close", imgFooter: "Pokémon GO PvP IV Ranks", imgTopLabel: "Top {n}",
   footerGuide: "Guides", footerPrivacy: "Privacy Policy",
-  metaTitle: "Pokémon GO PvP IV Rank Checker · Best IVs | GBL Note",
+  metaTitle: "Pokémon GO PvP IV Checker · IV Ranking by League | GBL Note",
   metaDesc: "Pokémon GO PvP (Battle League) IV rank checker. Find any Pokémon's best IVs for Great, Ultra and Master League by stat product. Pokédex supported.",
   ogTitle: "Pokémon GO PvP IV Rank Checker", ogDesc: "Best IVs by league, ranked by stat product",
 };
