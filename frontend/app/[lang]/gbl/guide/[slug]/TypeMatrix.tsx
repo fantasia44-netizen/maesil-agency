@@ -16,16 +16,16 @@ const TYPE_COLOR: Record<string, string> = {
 };
 
 const LB: Record<Locale, { title: string; sub: string; defAxis: string; atkAxis: string; se: string; nve: string; dr: string; stab: string; download: string; share: string; scroll: string }> = {
-  ko: { title: "포켓몬 GO 타입 상성표", sub: "Type Chart", defAxis: "방어 타입 →", atkAxis: "공격 타입 ↓",
+  ko: { title: "포켓몬 GO 타입 상성표", sub: "Type Chart", defAxis: "방어 타입 (맞는 쪽)", atkAxis: "공격 타입 (때리는 쪽)",
         se: "효과굉장 ×1.6", nve: "반감 ×0.625", dr: "이중반감 ×0.39", stab: "자속(STAB) ×1.2 · 이중타입은 곱연산(이중약점 ×2.56)",
         download: "저장", share: "공유", scroll: "← 좌우로 넘겨보세요 →" },
-  en: { title: "Pokémon GO Type Chart", sub: "Type Chart", defAxis: "Defending →", atkAxis: "Attacking ↓",
+  en: { title: "Pokémon GO Type Chart", sub: "Type Chart", defAxis: "Defending (hit)", atkAxis: "Attacking (hits)",
         se: "Super ×1.6", nve: "Resist ×0.625", dr: "Double resist ×0.39", stab: "STAB ×1.2 · dual types multiply (double weak ×2.56)",
         download: "Save", share: "Share", scroll: "← scroll horizontally →" },
-  ja: { title: "ポケモンGO タイプ相性表", sub: "Type Chart", defAxis: "防御タイプ →", atkAxis: "攻撃タイプ ↓",
+  ja: { title: "ポケモンGO タイプ相性表", sub: "Type Chart", defAxis: "防御タイプ (受ける側)", atkAxis: "攻撃タイプ (与える側)",
         se: "抜群 ×1.6", nve: "半減 ×0.625", dr: "二重半減 ×0.39", stab: "タイプ一致 ×1.2 · 複合は掛け算（二重弱点 ×2.56）",
         download: "保存", share: "共有", scroll: "← 左右にスクロール →" },
-  "zh-TW": { title: "寶可夢GO 屬性相剋表", sub: "Type Chart", defAxis: "防禦屬性 →", atkAxis: "攻擊屬性 ↓",
+  "zh-TW": { title: "寶可夢GO 屬性相剋表", sub: "Type Chart", defAxis: "防禦屬性 (被打)", atkAxis: "攻擊屬性 (出手)",
         se: "絕佳 ×1.6", nve: "抵抗 ×0.625", dr: "雙重抵抗 ×0.39", stab: "本系 ×1.2 · 雙屬性相乘（雙重弱點 ×2.56）",
         download: "儲存", share: "分享", scroll: "← 左右滑動 →" },
 };
@@ -51,7 +51,8 @@ export default function TypeMatrix({ lang }: { lang: Locale }) {
   const t = LB[lang] || LB.en;
   const ref = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(false);
-  const CELL = 40, ICO = 30;
+  const CELL = 34, ICO = 24, CORNER = 42;
+  const boardW = CORNER + ALL_TYPES.length * CELL + 32; // 캡처 고정폭
 
   // 고정폭 요소 캡처(overflow 밖). skipFonts=폰트임베딩 hang 방지. 12초 타임아웃으로 버튼 영구멈춤 방지.
   const capture = async () => {
@@ -72,36 +73,48 @@ export default function TypeMatrix({ lang }: { lang: Locale }) {
       </div>
       <div style={{ fontSize: "0.68rem", color: "#94a3b8", textAlign: "center", marginBottom: 6 }}>{t.scroll}</div>
       <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", borderRadius: 14 }}>
-        <div ref={ref} style={{ background: "#0f172a", padding: 16, width: 800, boxSizing: "border-box" }}>
+        <div ref={ref} style={{ background: "#0f172a", padding: 14, width: boardW, boxSizing: "border-box" }}>
           {/* 헤더: 타이틀 */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 8 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/gbl-icon.png" alt="" width={30} height={30} />
+            <img src="/gbl-icon.png" alt="" width={26} height={26} />
             <div>
-              <div style={{ color: "#fff", fontWeight: 900, fontSize: "1.05rem", lineHeight: 1.1 }}>{t.title}</div>
-              <div style={{ color: "#818cf8", fontWeight: 800, fontSize: "0.72rem", letterSpacing: 1 }}>{t.sub} · gblnote.com</div>
+              <div style={{ color: "#fff", fontWeight: 900, fontSize: "0.98rem", lineHeight: 1.1 }}>{t.title}</div>
+              <div style={{ color: "#818cf8", fontWeight: 800, fontSize: "0.66rem", letterSpacing: 1 }}>{t.sub} · gblnote.com</div>
             </div>
-            <div style={{ marginLeft: "auto", fontSize: "0.66rem", color: "#93c5fd", fontWeight: 700 }}>{t.defAxis}</div>
+          </div>
+          {/* 축 안내 — 왼쪽=공격(빨강) / 위=방어(파랑) */}
+          <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#7f1d1d", color: "#fecaca", fontWeight: 800, fontSize: "0.66rem", borderRadius: 6, padding: "2px 8px" }}>⚔️ ← {t.atkAxis}</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#1e3a8a", color: "#bfdbfe", fontWeight: 800, fontSize: "0.66rem", borderRadius: 6, padding: "2px 8px" }}>🛡️ ↑ {t.defAxis}</span>
           </div>
 
           {/* 표 */}
           <div style={{ display: "inline-block" }}>
-            {/* 방어 타입 헤더행 */}
+            {/* 방어 타입 바 + 방어 아이콘 헤더행 */}
+            <div style={{ display: "flex", marginBottom: 3 }}>
+              <div style={{ width: CORNER, flexShrink: 0 }} />
+              <div style={{ width: ALL_TYPES.length * CELL, background: "linear-gradient(90deg,#1d4ed8,#2563eb)", color: "#fff", fontWeight: 800, fontSize: "0.66rem", textAlign: "center", borderRadius: 5, padding: "2px 0" }}>🛡️ {t.defAxis} ↓</div>
+            </div>
             <div style={{ display: "flex" }}>
-              <div style={{ width: ICO + 8, flexShrink: 0 }} />
+              {/* 코너: 공격 라벨 */}
+              <div style={{ width: CORNER, flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", paddingBottom: 3, position: "sticky", left: 0, background: "#0f172a", zIndex: 2 }}>
+                <span style={{ color: "#f87171", fontWeight: 900, fontSize: "0.6rem", lineHeight: 1 }}>⚔️</span>
+                <span style={{ color: "#f87171", fontWeight: 900, fontSize: "0.56rem", lineHeight: 1.1 }}>{lang === "ko" ? "공격" : lang === "ja" ? "攻" : lang === "zh-TW" ? "攻" : "ATK"}↓</span>
+              </div>
               {ALL_TYPES.map((d) => (
-                <div key={d} style={{ width: CELL, display: "flex", justifyContent: "center", paddingBottom: 4 }}><Ico t={d} size={ICO} /></div>
+                <div key={d} style={{ width: CELL, display: "flex", justifyContent: "center", paddingBottom: 3 }}><Ico t={d} size={ICO} /></div>
               ))}
             </div>
-            {/* 공격 타입 행들 */}
+            {/* 공격 타입 행들 — 첫 열(공격 아이콘) sticky로 가로 스크롤 시 유지 */}
             {ALL_TYPES.map((atk) => (
               <div key={atk} style={{ display: "flex", alignItems: "center" }}>
-                <div style={{ width: ICO + 8, flexShrink: 0, display: "flex", justifyContent: "flex-start" }}><Ico t={atk} size={ICO} /></div>
+                <div style={{ width: CORNER, flexShrink: 0, display: "flex", justifyContent: "center", alignItems: "center", position: "sticky", left: 0, background: "#0f172a", zIndex: 1, borderRight: "2px solid #7f1d1d" }}><Ico t={atk} size={ICO} /></div>
                 {ALL_TYPES.map((def) => {
                   const cs = cellOf(typeMult(atk, def));
                   return (
                     <div key={def} style={{ width: CELL, height: CELL, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #1e293b", background: cs ? cs.bg : "#e2e8f0", boxSizing: "border-box" }}>
-                      {cs && <span style={{ fontSize: 9.5, fontWeight: 800, color: cs.color }}>{cs.label}</span>}
+                      {cs && <span style={{ fontSize: 9, fontWeight: 800, color: cs.color }}>{cs.label}</span>}
                     </div>
                   );
                 })}
