@@ -525,6 +525,55 @@ def admin_traffic(days: int = 30, admin: UserContext = Depends(require_admin)) -
     }
 
 
+@router.get("/admin/traffic/export")
+def admin_traffic_export(days: int = 30, admin: UserContext = Depends(require_admin)):
+    """트래픽 상세 데이터를 멀티시트 XLSX로 — 리서치·평가용. super_admin 전용."""
+    import io
+    from fastapi.responses import Response
+    from openpyxl import Workbook
+    db = _db()
+    days = max(1, min(days, 90))
+    daily = db.rpc("gbl_traffic_daily", {"days": days}).execute().data or []
+    summ = db.rpc("gbl_traffic_summary", {"days": days}).execute().data or []
+    paths = db.rpc("gbl_traffic_paths", {"days": days, "lim": 1000}).execute().data or []
+    refs = db.rpc("gbl_traffic_refs", {"days": days, "lim": 1000}).execute().data or []
+    try:
+        shares = db.rpc("gbl_traffic_shares", {"days": days, "lim": 200}).execute().data or []
+    except Exception:
+        shares = []
+    try:
+        langs = db.rpc("gbl_traffic_langs", {"days": days}).execute().data or []
+    except Exception:
+        langs = []
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "요약"
+    ws.append(["항목", "값"])
+    for k, v in (summ[0] if summ else {}).items():
+        ws.append([k, v])
+
+    def add_sheet(title, rows, cols):
+        s = wb.create_sheet(title)
+        s.append(cols)
+        for r in rows:
+            s.append([r.get(c) for c in cols])
+
+    add_sheet("일별", daily, ["day", "pageviews", "uniques", "new_visitors", "sessions"])
+    add_sheet("페이지", paths, ["path", "views"])
+    add_sheet("유입경로", refs, ["ref", "views"])
+    add_sheet("언어별", langs, ["lang", "pageviews", "uniques", "sessions"])
+    add_sheet("공유·다운로드", shares, ["label", "shares", "downloads", "total"])
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    return Response(
+        content=buf.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="gbl-traffic-{days}d.xlsx"'},
+    )
+
+
 # ── 자랑 갤러리 게시판 ────────────────────────────────────────────
 _GALLERY_BUCKET = "gbl-gallery"
 _bucket_ready = False

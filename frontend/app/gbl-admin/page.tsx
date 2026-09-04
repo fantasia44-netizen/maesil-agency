@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiFetch } from "../../lib/api";
+import { apiFetch, apiDownload } from "../../lib/api";
 
 type GblUser = {
   id: string; email: string; display_name: string | null; matches: number;
@@ -30,20 +30,6 @@ type Traffic = {
 
 type DbStatus = { hub_configured: boolean; maesil_total: number | null; maesil_hub: number | null };
 
-// CSV 내보내기 — 관리자 상세 데이터 다운로드(화면 표시 top-N 넘어 state 전체 배열). Excel 한글 위해 BOM.
-function toCsv(rows: Record<string, unknown>[]): string {
-  if (!rows.length) return "";
-  const cols = Object.keys(rows[0]);
-  const esc = (v: unknown) => { const s = v == null ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
-  return [cols.join(","), ...rows.map((r) => cols.map((c) => esc(r[c])).join(","))].join("\n");
-}
-function dlCsv(name: string, rows: Record<string, unknown>[]) {
-  if (typeof document === "undefined" || !rows.length) return;
-  const blob = new Blob(["﻿" + toCsv(rows)], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a"); a.href = url; a.download = name; a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
 
 type BoardPost = { id: number; board: string; author: string; title: string; answered: boolean; is_private: boolean; reply_count: number; created_at: string };
 
@@ -200,6 +186,7 @@ export default function GblAdmin() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [db, setDb] = useState<DbStatus | null>(null);
   const [traffic, setTraffic] = useState<Traffic | null>(null);
+  const [dlErr, setDlErr] = useState("");
   const [period, setPeriod] = useState(30);
   const [inquiries, setInquiries] = useState<BoardPost[]>([]);
   const [chats, setChats] = useState<BoardPost[]>([]);
@@ -357,20 +344,14 @@ export default function GblAdmin() {
               </div>
             ))}
           </div>
-          {/* 상세 데이터 다운로드(CSV) — 화면 top-N 넘어 state 전체 배열, 리서치·평가용 */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12, alignItems: "center" }}>
-            <span style={{ fontSize: "0.74rem", fontWeight: 800, color: "#0f172a" }}>📥 상세 데이터(CSV)</span>
-            {[
-              { l: `일별 ${traffic.daily.length}`, rows: traffic.daily, n: `gbl-daily-${traffic.days}d` },
-              { l: `전체 페이지 ${traffic.paths.length}`, rows: traffic.paths, n: `gbl-pages-${traffic.days}d` },
-              { l: `유입경로 ${traffic.refs.length}`, rows: traffic.refs, n: `gbl-refs-${traffic.days}d` },
-              { l: `언어별 ${traffic.langs?.length ?? 0}`, rows: traffic.langs ?? [], n: `gbl-langs-${traffic.days}d` },
-              { l: `공유·다운로드 ${traffic.shares?.length ?? 0}`, rows: traffic.shares ?? [], n: `gbl-shares-${traffic.days}d` },
-            ].map((b) => (
-              <button key={b.n} onClick={() => dlCsv(`${b.n}.csv`, b.rows as unknown as Record<string, unknown>[])}
-                disabled={!b.rows.length}
-                style={{ fontSize: "0.72rem", fontWeight: 700, color: b.rows.length ? "#3b5bdb" : "#94a3b8", background: "#eef2fb", border: "1px solid #dbe2ee", borderRadius: 8, padding: "4px 10px", cursor: b.rows.length ? "pointer" : "default" }}>⬇ {b.l}</button>
-            ))}
+          {/* 상세 데이터 다운로드 — 멀티시트 XLSX 1개(요약·일별·페이지·유입경로·언어별·공유). 리서치·평가용 */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12, alignItems: "center" }}>
+            <button onClick={() => { setDlErr(""); apiDownload(`/api/gbl/admin/traffic/export?days=${traffic.days}`, `gbl-traffic-${traffic.days}d.xlsx`).catch((e) => setDlErr(String((e as Error)?.message || e))); }}
+              style={{ fontSize: "0.78rem", fontWeight: 800, color: "#fff", background: "linear-gradient(90deg,#16a34a,#059669)", border: "none", borderRadius: 9, padding: "7px 16px", cursor: "pointer" }}>
+              📥 전체 데이터 다운로드 (XLSX · {traffic.days}일)
+            </button>
+            <span style={{ fontSize: "0.7rem", color: "#94a3b8" }}>시트 6개: 요약·일별·페이지·유입경로·언어별·공유</span>
+            {dlErr && <span style={{ fontSize: "0.7rem", color: "#dc2626" }}>다운로드 실패: {dlErr}</span>}
           </div>
           {traffic.daily.length > 0 && <TrafficChart daily={traffic.daily} />}
           {traffic.daily.length > 0 && (

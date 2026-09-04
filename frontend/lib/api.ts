@@ -97,6 +97,19 @@ export async function apiFetch<T = unknown>(
   return (await res.json()) as T;
 }
 
+// 인증 바이너리 다운로드(관리자 XLSX 등) — 토큰 붙여 fetch → blob → 저장.
+export async function apiDownload(path: string, filename: string): Promise<void> {
+  if (typeof document === "undefined") return;
+  const token = getToken();
+  const res = await fetch(`${BASE}${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  if (!res.ok) throw new Error(`${res.status} 다운로드 실패`);
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 // 본인 닉네임(display_name) 변경 + localStorage 갱신
 export async function updateNickname(name: string): Promise<string> {
   const data = await apiFetch<{ ok: boolean; display_name: string }>(
