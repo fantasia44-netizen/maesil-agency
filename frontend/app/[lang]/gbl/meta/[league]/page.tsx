@@ -4,9 +4,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import DATA from "../../gbl_data.json";
-import PKN from "../../pokedex_names.json";
-import { monSlugId } from "../../monSlug";
+import { MON, monName, spriteUrl } from "../monNames";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../../../lib/i18n";
@@ -24,33 +22,7 @@ const isMega = (k: string) => k.endsWith("_mega");
 const lgFull = (lang: Locale, k: string) => isMega(k) ? leagueName(lang, k.slice(0, -5)) + MEGA_SUF[lang] : leagueName(lang, k);
 const lgShortM = (lang: Locale, k: string) => isMega(k) ? leagueShort(lang, k.slice(0, -5)) + MEGA_SUF[lang] : leagueShort(lang, k);
 
-type Mon = { id: string; dex: number; ko: string; en?: string; shadow: boolean; sprite?: string };
-const DS = DATA as unknown as { leagues: Record<string, { pokemon: Mon[] }> };
-const MON: Record<string, Mon> = {};
-for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) MON[m.id] = m;
-const PKNAMES = PKN as unknown as Record<string, { ko: string; en: string; ja: string }>;
-// 비메타몬(전 도감) 보충 — 기록엔 slug로 저장되므로 표시용 이름/스프라이트도 전 도감에서 해석(입력과 동일 slug)
-{
-  // 지역폼(알로라/가라르/히스이)은 base와 dex가 같으므로 id(slug) 기준 — base 폼 항상 유지
-  for (const [dexStr, nm] of Object.entries(PKNAMES)) {
-    const dex = Number(dexStr); if (!dex || !nm.en) continue;
-    for (const shadow of [false, true]) {
-      const id = monSlugId(nm.en, shadow);
-      if (MON[id]) continue;  // 메타에 같은 slug 있으면 스킵
-      MON[id] = { id, dex, ko: nm.ko, en: nm.en, shadow };
-    }
-  }
-}
-const spriteUrl = (m?: Mon) =>
-  m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
-// 로케일별 포켓몬명 — MON은 ko(+en), ja는 pokedex_names(dex)로 보완.
-const monName = (lang: Locale, id: string) => {
-  const m = MON[id]; if (!m) return id;
-  if (lang === "en") return m.en || PKNAMES[String(m.dex)]?.en || m.ko;
-  if (lang === "ja") return PKNAMES[String(m.dex)]?.ja || m.en || m.ko;
-  if (lang === "zh-TW") return (PKNAMES[String(m.dex)] as Record<string,string>)?.["zh-TW"] || m.en || m.ko;
-  return m.ko;
-};
+// 이름·스프라이트는 monNames.ts에서 import — 메가/원시 폼(mewtwo_mega_x 등) 이름·폼 스프라이트까지 해석.
 
 type MetaMon = { speciesId: string; count: number };
 type MetaDeck = { deck: string[]; count: number };
