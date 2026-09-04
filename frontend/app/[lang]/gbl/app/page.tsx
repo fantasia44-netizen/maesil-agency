@@ -15,7 +15,7 @@ import AdSlot from "../AdSlot";
 import CoupangAd from "../CoupangAd";
 import ShareModal from "../ShareModal";
 import { track } from "../../../../lib/track";
-import { currentFormats, FORMAT_BY_KEY, todayISO, type Format } from "../formats";
+import { currentFormats, FORMAT_BY_KEY, ALL_FORMATS, todayISO, type Format } from "../formats";
 import { isLocale, defaultLocale, localizePath, type Locale } from "../../../../lib/i18n";
 import { leagueName } from "../contentI18n";
 import { getApp, type AppDict } from "./dict";
@@ -1431,11 +1431,11 @@ export default function GblPage() {
                   </div>
                   {wlrRow(s.total, s.w, s.l, s.d)}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
-                    {["great", "ultra", "master"].filter((lg) => s.leagues[lg]).map((lg) => {
-                      const x = s.leagues[lg]; const r = winRate(x.w, x.l);
+                    {ALL_FORMATS.filter((f) => s.leagues[f.key]).map((f) => {
+                      const x = s.leagues[f.key]; const r = winRate(x.w, x.l);
                       return (
-                        <span key={lg} style={{ fontSize: "0.7rem", fontWeight: 700, color: "#475569", background: "#f1f5f9", borderRadius: 7, padding: "3px 8px" }}>
-                          {leagueName(lang, lg)} {x.w}{t.winSuffix}{x.l}{t.lossSuffix} <span style={{ color: rateColor(r) }}>{r ?? "-"}%</span>
+                        <span key={f.key} style={{ fontSize: "0.7rem", fontWeight: 700, color: f.cup ? "#7c3aed" : "#475569", background: f.cup ? "#f5f3ff" : "#f1f5f9", borderRadius: 7, padding: "3px 8px" }}>
+                          {f.cup ? f.label : leagueName(lang, f.base)} {x.w}{t.winSuffix}{x.l}{t.lossSuffix} <span style={{ color: rateColor(r) }}>{r ?? "-"}%</span>
                         </span>
                       );
                     })}
