@@ -142,8 +142,10 @@ export default async function GblLandingPage({ params }: { params: { lang: strin
         </div>
       </div>
 
-      {/* ── #6 GBL Note 자체 분석(원본 3종) — SSR 초기 HTML에 노출(원본성 신호) ── */}
-      <div style={{ background: "linear-gradient(180deg,#f7f9fd,#f7f9fd)", padding: "0.25rem 1rem 0.5rem" }}>
+      <GblLandingClient />
+
+      {/* ── #6 GBL Note 자체 분석(원본 3종) — SSR 노출(원본성 신호). 브랜드 로고 히어로 아래 배치 ── */}
+      <div style={{ background: "linear-gradient(180deg,#f7f9fd,#f7f9fd)", padding: "0.5rem 1rem 0.5rem" }}>
         <div style={{ maxWidth: 1040, margin: "0 auto" }}>
           <h2 style={{ margin: "0.6rem 0 8px", fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>{SIGNATURE[lang].h}</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>
@@ -159,8 +161,6 @@ export default async function GblLandingPage({ params }: { params: { lang: strin
           </div>
         </div>
       </div>
-
-      <GblLandingClient />
 
       {/* ── 서버렌더 실측 TOP5 스트립(크롤러가 읽는 고유 데이터 + 내부링크) — 인터랙티브 랜딩 아래 배치 ── */}
       {cols.length > 0 && (
