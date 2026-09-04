@@ -235,13 +235,17 @@ export default function MetaHubClient() {
         <div style={{ marginTop: 26, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.9rem 1rem" }}>
           <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>{t.detailH}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {["master", "great", "ultra"].map((k) => (
+            {["master", "great", "ultra", "master_mega", "great_mega", "ultra_mega"].map((k) => {
+              const mega = k.endsWith("_mega");
+              const lbl = mega ? leagueShort(lang, k.slice(0, -5)) + ({ ko: " (메가)", en: " (Mega)", ja: "（メガ）", "zh-TW": "（超級）" }[lang] || " (Mega)") : leagueShort(lang, k);
+              return (
               <span key={k} style={{ display: "flex", gap: 6 }}>
-                <Link href={L(`/gbl/meta/${k}`)} style={{ fontSize: "0.78rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 600 }}>{leagueShort(lang, k)}{t.detailSuffix}</Link>
+                <Link href={L(`/gbl/meta/${k}`)} style={{ fontSize: "0.78rem", color: mega ? "#db2777" : "#3b5bdb", textDecoration: "none", fontWeight: 600 }}>{lbl}{t.detailSuffix}</Link>
                 <span style={{ color: "#cbd5e1" }}>·</span>
                 <Link href={L(`/gbl/tier/${k}`)} style={{ fontSize: "0.78rem", color: "#7c3aed", textDecoration: "none", fontWeight: 600 }}>{t.tierTable}</Link>
               </span>
-            ))}
+              );
+            })}
           </div>
           <div style={{ marginTop: 8, fontSize: "0.76rem" }}>
             <Link href={L("/gbl/guide")} style={{ color: "#64748b", textDecoration: "none" }}>{t.guide}</Link>

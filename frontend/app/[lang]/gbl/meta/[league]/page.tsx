@@ -17,7 +17,12 @@ export const revalidate = 600; // 1시간마다 정적 재생성(크롤 가능 +
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
-const LEAGUE_KEYS = ["master", "great", "ultra"];
+const LEAGUE_KEYS = ["master", "great", "ultra", "master_mega", "great_mega", "ultra_mega"];
+// 메가 리그 라벨(base 리그명 + 메가 접미, 4개국어). 색인은 안 함(데이터 성숙 전 thin 방지) — 뷰만.
+const MEGA_SUF: Record<Locale, string> = { ko: " (메가)", en: " (Mega)", ja: "（メガ）", "zh-TW": "（超級）" };
+const isMega = (k: string) => k.endsWith("_mega");
+const lgFull = (lang: Locale, k: string) => isMega(k) ? leagueName(lang, k.slice(0, -5)) + MEGA_SUF[lang] : leagueName(lang, k);
+const lgShortM = (lang: Locale, k: string) => isMega(k) ? leagueShort(lang, k.slice(0, -5)) + MEGA_SUF[lang] : leagueShort(lang, k);
 
 type Mon = { id: string; dex: number; ko: string; en?: string; shadow: boolean; sprite?: string };
 const DS = DATA as unknown as { leagues: Record<string, { pokemon: Mon[] }> };
@@ -69,12 +74,14 @@ export function generateMetadata({ params }: { params: { lang: string; league: s
   if (!LEAGUE_KEYS.includes(params.league)) return { title: "GBL Note" };
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getLeagueMeta(lang);
-  const lg = leagueName(lang, params.league);
+  const lg = lgFull(lang, params.league);
   const sub = (s: string) => s.replace(/\{lg\}/g, lg);
   const path = `/gbl/meta/${params.league}`;
   return {
     title: sub(t.metaTitle),
     description: sub(t.metaDesc),
+    // 메가 리그는 실측 데이터 성숙 전까지 noindex(thin 방지) — 뷰·내부링크는 정상.
+    ...(isMega(params.league) ? { robots: { index: false, follow: true } } : {}),
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
     openGraph: {
       title: sub(t.ogTitle),
@@ -101,7 +108,7 @@ export default async function LeagueMetaPage({ params }: { params: { lang: strin
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getLeagueMeta(lang);
   const L = (p: string) => localizePath(lang, p);
-  const lgName = leagueName(lang, params.league);
+  const lgName = lgFull(lang, params.league);
   const sub = (s: string) => s.replace(/\{lg\}/g, lgName);
 
   const meta = await getMeta(params.league);
@@ -136,7 +143,7 @@ export default async function LeagueMetaPage({ params }: { params: { lang: strin
               <Link key={k} href={L(`/gbl/meta/${k}`)}
                 style={{ padding: "6px 13px", borderRadius: 16, fontSize: "0.8rem", fontWeight: 700, textDecoration: "none",
                   border: `1px solid ${on ? "#4f8cff" : BORDER}`, background: on ? "rgba(79,140,255,.16)" : CARD, color: on ? "#3b5bdb" : "#64748b" }}>
-                {leagueShort(lang, k)}{t.chipSuffix}
+                {lgShortM(lang, k)}{t.chipSuffix}
               </Link>
             );
           })}

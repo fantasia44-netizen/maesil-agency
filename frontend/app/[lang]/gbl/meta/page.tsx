@@ -14,7 +14,10 @@ export const revalidate = 600; // 10분마다 재집계(크롤 가능 + 서버 �
 
 const SITE = "https://gblnote.com";
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
-const LEAGUES = ["master", "great", "ultra"];
+const LEAGUES = ["master", "great", "ultra", "master_mega", "great_mega", "ultra_mega"];
+// 메가 리그 라벨(base + 접미, 4개국어). 데이터 없으면 total>0 필터로 자동 제외되므로 thin 아님.
+const MEGA_SUF: Record<string, string> = { ko: " (메가)", en: " (Mega)", ja: "（メガ）", "zh-TW": "（超級）" };
+const lgFull = (lang: string, k: string) => k.endsWith("_mega") ? leagueName(lang as never, k.slice(0, -5)) + (MEGA_SUF[lang] || " (Mega)") : leagueName(lang as never, k);
 
 type MetaMon = { speciesId: string; count: number };
 type Meta = { total: number; wins: number; losses: number; top_mons: MetaMon[]; top_decks: unknown[] };
@@ -174,10 +177,10 @@ export default async function GblMetaHub({ params }: { params: { lang: string } 
               return (
                 <section key={lg} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "1rem 1.1rem" }}>
                   <h2 style={{ margin: "0 0 8px", fontSize: "1.02rem", fontWeight: 800, color: "#0f172a" }}>
-                    {leagueName(lang, lg)}
+                    {lgFull(lang, lg)}
                   </h2>
                   <p style={{ margin: "0 0 12px", fontSize: "0.8rem", color: "#475569", lineHeight: 1.65 }}>
-                    {c.line(leagueName(lang, lg), meta.total, n1, p1, n2, p2)}
+                    {c.line(lgFull(lang, lg), meta.total, n1, p1, n2, p2)}
                   </p>
                   <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 4 }}>
                     {top.map((mm, i) => {
