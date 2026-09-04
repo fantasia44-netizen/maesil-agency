@@ -97,13 +97,19 @@ for (const [dexStr, nm] of Object.entries(PKNAMES)) {
 }
 // 메가/원시 폼(gbl_forms.json) — 메가 컵 상대 검색용. 그림자는 위에서 이미 생성됨.
 const _forms = FORMS as unknown as { id: string; ko: string; en: string; ja: string; dex: number; types: string[] }[];
+// GO 메가 전용 기술 — 베이스 무브풀(dex 키)에 없는 메가 폼 고유기. 예) 메가뮤츠X = 카운터(격투).
+// dex 기준 mon_movepools가 못 잡으므로 폼 id별로 보충. 필요 시 여기 추가.
+const MEGA_EXTRA_MOVES: Record<string, { fast?: string[]; charged?: string[] }> = {
+  mewtwo_mega_x: { fast: ["COUNTER"] },
+};
 const FORM_MONS: Mon[] = [];
 for (const f of _forms) {
   if (MON_BY_ID[f.id]) continue;
-  // 메가/원시 폼도 스킬목록이 뜨도록 베이스 종족(dex) 학습기술을 주입(GO PvP상 메가는 베이스와 동일 기술).
+  // 메가/원시 폼도 스킬목록이 뜨도록 베이스 종족(dex) 학습기술을 주입(대부분 메가=베이스 기술).
   const mp = _MP[String(f.dex)];
-  const fast = mp ? mp.fast.filter((x) => _mkeys.has(x)) : [];
-  const charged = mp ? mp.charged.filter((x) => _mkeys.has(x)) : [];
+  const ex = MEGA_EXTRA_MOVES[f.id] || {};
+  const fast = [...new Set([...(mp ? mp.fast : []), ...(ex.fast || [])])].filter((x) => _mkeys.has(x));
+  const charged = [...new Set([...(mp ? mp.charged : []), ...(ex.charged || [])])].filter((x) => _mkeys.has(x));
   const m: Mon = { id: f.id, dex: f.dex, ko: f.ko, en: f.en, ja: f.ja, types: f.types || [], shadow: false, fast, charged, form: true };
   MON_BY_ID[f.id] = m;
   FORM_MONS.push(m);
