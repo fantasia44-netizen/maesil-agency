@@ -65,7 +65,7 @@ export default function About({ params }: { params: { lang: string } }) {
         {/* 데이터 방법론 3구분(E-E-A-T — "복사가 아니라 수집·계산·해석"을 명시) */}
         <h2 style={H2}>{t.methH}</h2>
         <div style={{ display: "grid", gap: 10, margin: "0.5rem 0 0.5rem" }}>
-          {([[t.methExtL, t.methExt, "#3b5bdb"], [t.methOwnL, t.methOwn, "#7c3aed"], [t.methAnaL, t.methAna, "#0891b2"]] as const).map(([label, body, c]) => (
+          {([[t.methExtL, t.methExt, "#3b5bdb"], [t.methOwnL, t.methOwn, "#7c3aed"], [t.methAnaL, t.methAna, "#0891b2"], [t.methQaL, t.methQa, "#15803d"]] as const).map(([label, body, c]) => (
             <div key={label} style={{ background: "#fff", border: "1px solid #e3e8f2", borderLeft: `4px solid ${c}`, borderRadius: 12, padding: "0.85rem 1rem" }}>
               <div style={{ fontSize: "0.92rem", fontWeight: 800, color: "#0f172a", marginBottom: 4 }}>{label}</div>
               <p style={{ margin: 0, fontSize: "0.86rem", color: "#475569", lineHeight: 1.7 }}>{body}</p>

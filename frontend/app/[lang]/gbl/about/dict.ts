@@ -9,7 +9,7 @@ export type AboutDict = {
   whatMetaB: string; whatMetaRest: string;
   dataH: string;
   dataA: string; dataB: string; dataC: string;
-  methH: string; methExtL: string; methExt: string; methOwnL: string; methOwn: string; methAnaL: string; methAna: string;
+  methH: string; methExtL: string; methExt: string; methOwnL: string; methOwn: string; methAnaL: string; methAna: string; methQaL: string; methQa: string;
   usageH: string;
   usageA: string; usageB: string; usageC: string; usageLink: string; usageD: string;
   startCta: string;
@@ -44,6 +44,8 @@ const ko: AboutDict = {
   methOwn: "사용자들이 실제 대전에서 만난 상대를 개인정보 제거 후 익명 집계 → 리그별 실측 픽률(최근 30일). 다른 사이트가 복제할 수 없는 원본입니다.",
   methAnaL: "GBL Note 자체 분석",
   methAna: "이론 티어와 실측 픽률을 비교하고, 카운터·주요 매치업을 정리합니다. (타협개체·CMP·Breakpoint 심층 분석 확대 예정)",
+  methQaL: "데이터 검증 · 품질 규칙",
+  methQa: "자동 계산 결과를 그대로 내보내지 않고, 품질 규칙을 통과한 값만 표시합니다. 최근 30일 실측 표본이 부족한 포켓몬은 실측 평가를 억지로 만들지 않고 시뮬레이션·타입 상성 기준임을 명시하며, 각 분석에는 기준 시즌과 데이터 출처를 함께 표기합니다. 무브풀은 현재 시즌 게임 데이터를 기준으로 맞춥니다.",
   usageH: "이용 안내",
   usageA: "기록 기능은 무료이며, 서비스 운영을 위해 광고가 포함될 수 있습니다. GBL Note는 팬이 만든 ",
   usageB: "비공식",
@@ -84,6 +86,8 @@ const en: AboutDict = {
   methOwn: "Opponents users actually faced, anonymized with identifiers removed, aggregated into per-league live pick rates (last 30 days). Original data other sites cannot replicate.",
   methAnaL: "GBL Note's own analysis",
   methAna: "We compare theoretical tiers against live pick rates and lay out counters and key matchups. (Compromise-IV, CMP and breakpoint deep-dives coming.)",
+  methQaL: "Data validation & quality rules",
+  methQa: "We don't ship raw computed output as-is — only values that pass our quality rules are shown. For Pokémon without enough field sample in the last 30 days, we don't fabricate a live-meta verdict; we clearly state the analysis is simulation- and type-based instead, and every analysis labels its base season and data source. Movepools are kept in sync with the current season's game data.",
   usageH: "Usage notes",
   usageA: "The logging features are free, and ads may be included to keep the service running. GBL Note is a fan-made ",
   usageB: "unofficial",
@@ -124,6 +128,8 @@ const ja: AboutDict = {
   methOwn: "ユーザーが実際に対戦した相手を個人情報を除いて匿名集計 → リーグ別の実測ピック率(直近30日)。他サイトが複製できない独自データです。",
   methAnaL: "GBL Note 独自の分析",
   methAna: "理論ティアと実測ピック率を比較し、カウンター・主要対面を整理します。(妥協個体・CMP・ブレイクポイントの深掘りは拡大予定)",
+  methQaL: "データ検証・品質ルール",
+  methQa: "自動計算の結果をそのまま出すのではなく、品質ルールを通過した値のみ表示します。直近30日の実測サンプルが不足するポケモンは実測評価を無理に作らず、シミュレーション・タイプ相性を基準としていることを明記し、各分析には基準シーズンとデータ出典を併記します。技プールは現在シーズンのゲームデータに合わせます。",
   usageH: "ご利用にあたって",
   usageA: "記録機能は無料で、サービス運営のため広告が含まれる場合があります。GBL Note はファンが作った",
   usageB: "非公式",
@@ -164,6 +170,8 @@ const zhTW: AboutDict = {
   methOwn: "將使用者實際對戰遇到的對手去除個資後匿名彙整 → 各聯盟實測使用率（近30日）。是其他網站無法複製的原創資料。",
   methAnaL: "GBL Note 自有分析",
   methAna: "比較理論強度與實測使用率，整理剋星與主要對面。（折衷個體·CMP·Breakpoint 深入分析將擴充）",
+  methQaL: "資料驗證 · 品質規則",
+  methQa: "不會直接輸出自動計算的結果，只顯示通過品質規則的數值。近30日實測樣本不足的寶可夢，不會硬做出實測評價，而是明確標示分析以模擬與屬性相性為基準，且每份分析都會標註基準賽季與資料出處。招式池會與當前賽季的遊戲資料同步。",
   usageH: "使用說明",
   usageA: "記錄功能免費，為維持服務營運可能包含廣告。GBL Note 是粉絲製作的 ",
   usageB: "非官方",
