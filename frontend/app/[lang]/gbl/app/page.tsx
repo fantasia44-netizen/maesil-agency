@@ -9,7 +9,7 @@ import PKN from "../pokedex_names.json";
 import { currentSeason, seasonForDate, SEASONS as REG_SEASONS } from "../seasons";
 import MOVEPOOLS from "../mon_movepools.json";
 import FORMS from "../gbl_forms.json";
-import MEGA_MP from "../mega_movepools.json";
+import CUR_MP_DATA from "../movepools_current.json";
 import MOVENAMES from "../pvp_move_names.json";
 import { monSlug as _slug } from "../monSlug";
 import AdSlot from "../AdSlot";
@@ -70,45 +70,50 @@ const PKNAMES = PKN as unknown as Record<string, { ko: string; en: string; ja: s
 // 상대 검색 pool — 실측은 비메타몬(니로우 등)도 만나므로 전 도감(~1025)+그림자에서 검색 가능해야 함.
 // 메타몬(타입·기술 리치)을 우선 배치(흔한 상대 먼저), 나머지 dex는 경량 엔트리로 보충.
 // 지역폼(알로라/가라르/히스이)은 base와 dex가 같으므로 중복제거는 dex가 아닌 id(slug) 기준 — base 폼이 항상 유지됨.
+// 무브풀 리졸버 — movepools_current(detail=현재 시즌 게임마스터, 483종, 전용기·신규 메타기 포함)를
+// id 기준 우선, 없으면 mon_movepools(dex 베이스) 폴백. 모두 렌더가능(_mkeys)만.
+// 메가 전용기(카운터/화룡점정 등) + 구 mon_movepools 누락(개굴닌자 세차게휘두르기 등)을 한 번에 해결.
+const _MP = MOVEPOOLS as unknown as Record<string, { fast: string[]; charged: string[] }>;
+const _CUR = CUR_MP_DATA as unknown as Record<string, { fast: string[]; charged: string[] }>;
+const _mkeys = new Set(Object.keys(DS.moves || {}));
+const movesFor = (id: string, dex: number) => {
+  const c = _CUR[id]; const mp = _MP[String(dex)];
+  return {
+    fast: (c ? c.fast : (mp ? mp.fast : [])).filter((x) => _mkeys.has(x)),
+    charged: (c ? c.charged : (mp ? mp.charged : [])).filter((x) => _mkeys.has(x)),
+  };
+};
 const _metaMons: Mon[] = [];
 const _seen = new Set<string>();
 for (const lg of Object.values(DS.leagues)) for (const m of lg.pokemon) {
   if (_seen.has(m.id)) continue;
-  _seen.add(m.id); _metaMons.push(m);
+  _seen.add(m.id);
+  if (_CUR[m.id]) { const mv = movesFor(m.id, m.dex); m.fast = mv.fast; m.charged = mv.charged; }  // 메타몬도 최신 무브풀 반영
+  _metaMons.push(m);
 }
-// 비메타몬 기술풀 — GameMaster에서 추출한 dex별 학습기술(mon_movepools), 메타데이터(moves) 보유분으로 필터
-const _MP = MOVEPOOLS as unknown as Record<string, { fast: string[]; charged: string[] }>;
-const _mkeys = new Set(Object.keys(DS.moves || {}));
 const _extraMons: Mon[] = [];
 for (const [dexStr, nm] of Object.entries(PKNAMES)) {
   const dex = Number(dexStr);
   if (!dex || !nm.en) continue;
   const base = _slug(nm.en);
-  const mp = _MP[String(dex)];
-  const fast = mp ? mp.fast.filter((x) => _mkeys.has(x)) : [];
-  const charged = mp ? mp.charged.filter((x) => _mkeys.has(x)) : [];
   for (const shadow of [false, true]) {
     const id = shadow ? `${base}_shadow` : base;
     if (_seen.has(id) || MON_BY_ID[id]) continue;  // 같은 slug이 메타/기존에 있으면 스킵(지역폼은 slug 달라 base 별도 유지)
     _seen.add(id);
-    const m: Mon = { id, dex, ko: nm.ko, en: nm.en, types: [], shadow, fast: [...fast], charged: [...charged] };
+    const mv = movesFor(id, dex);          // 현재 무브풀(id 우선, 없으면 dex 폴백) — 섀도우 id도 자동 처리
+    const m: Mon = { id, dex, ko: nm.ko, en: nm.en, types: [], shadow, fast: mv.fast, charged: mv.charged };
     _extraMons.push(m);
     MON_BY_ID[id] = m;                      // 표시용 resolver 확장(메타몬은 위에서 이미 등록됨)
   }
 }
 // 메가/원시 폼(gbl_forms.json) — 메가 컵 상대 검색용. 그림자는 위에서 이미 생성됨.
 const _forms = FORMS as unknown as { id: string; ko: string; en: string; ja: string; dex: number; types: string[] }[];
-// 메가/원시 폼 무브풀 — sim 게임마스터 기준(mega_movepools.json, 전용기 포함·전수 정확).
-// 베이스 dex 무브풀은 폼 전용기(카운터=메가뮤츠X, 화룡점정=메가레쿠쟈 등)를 못 잡으므로 이걸 우선 사용.
-const _MEGA_MP = MEGA_MP as unknown as Record<string, { fast: string[]; charged: string[] }>;
+// 메가/원시 폼 — movesFor가 폼 id(메가뮤츠X 등)로 현재 무브풀(전용기 포함) 우선 조회, 없으면 dex 폴백.
 const FORM_MONS: Mon[] = [];
 for (const f of _forms) {
   if (MON_BY_ID[f.id]) continue;
-  const mm = _MEGA_MP[f.id];               // 폼 전용 무브풀(있으면 우선)
-  const mp = _MP[String(f.dex)];           // 폴백: 베이스 종족 무브풀
-  const fast = (mm ? mm.fast : (mp ? mp.fast : [])).filter((x) => _mkeys.has(x));
-  const charged = (mm ? mm.charged : (mp ? mp.charged : [])).filter((x) => _mkeys.has(x));
-  const m: Mon = { id: f.id, dex: f.dex, ko: f.ko, en: f.en, ja: f.ja, types: f.types || [], shadow: false, fast, charged, form: true };
+  const mv = movesFor(f.id, f.dex);
+  const m: Mon = { id: f.id, dex: f.dex, ko: f.ko, en: f.en, ja: f.ja, types: f.types || [], shadow: false, fast: mv.fast, charged: mv.charged, form: true };
   MON_BY_ID[f.id] = m;
   FORM_MONS.push(m);
 }
