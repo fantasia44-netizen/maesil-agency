@@ -108,7 +108,9 @@ def _format_email_html(event: dict, analysis: "dev_agent.ErrorAnalysis | None" =
     msg = event.get("message") or ""
     created = event.get("created_at") or ""
 
-    subject = f"[maesil-agency · {sev}] {program} — {title[:80]}"
+    # subject는 게이트웨이 제약(≤200자·개행 불가) — title 개행/연속공백을 접어 안전하게(send_email에서 최종 방어).
+    subject_title = " ".join(str(title).split())[:80]
+    subject = f"[maesil-agency · {sev}] {program} — {subject_title}"
     color = {"CRITICAL": "#b91c1c", "ERROR": "#dc2626", "WARNING": "#d97706", "INFO": "#2563eb"}.get(sev, "#dc2626")
 
     safe_title = html_lib.escape(title)

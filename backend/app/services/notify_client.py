@@ -41,6 +41,9 @@ def send_email(to: str, subject: str, html: str, source: str = SOURCE, timeout: 
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
     }
+    # 게이트웨이 제약(subject ≤200자·개행 불가) 방어 — 개행/탭/연속공백을 단일 공백으로
+    # 접고 200자로 컷. 호출자가 에러 메시지·로그라인(개행 포함)을 subject로 넣어도 400 방지.
+    subject = " ".join(str(subject).split())[:200]
     payload = {"to": to, "subject": subject, "html": html, "source": source}
 
     try:
