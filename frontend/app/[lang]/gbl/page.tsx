@@ -70,6 +70,44 @@ const HERO: Record<Locale, { h1: string; mission: string; funnel: string[] }> = 
 const CARD = "#ffffff";
 const BORDER = "#e3e8f2";
 
+// #6 — "GBL Note 자체 분석"(여기서만 볼 수 있는 원본 3종)을 초기 HTML에 명시.
+// 크롤러가 정문에서 "레이드 DB"가 아니라 "원본 분석 + 도구 + DB"로 사이트 성격을 읽게 함.
+type SigItem = { t: string; d: string; href: string };
+const SIGNATURE: Record<Locale, { h: string; items: SigItem[] }> = {
+  ko: {
+    h: "GBL Note 자체 분석 — 여기서만 볼 수 있는 것",
+    items: [
+      { t: "🔬 타협개체 심층 분석", d: "상위 100종을 전수 시뮬해 육성 타협선(CMP·베이트)을 계산한 자체 분석", href: "/gbl/iv" },
+      { t: "🎯 CCT 평할 계산 가이드", d: "턴 타이밍(평할)을 GCD·LCM으로 계산하는 자체 제작 가이드+계산기", href: "/gbl/guide/cct" },
+      { t: "📊 실측 메타", d: "유저가 실제 대전에서 만난 상대를 익명 집계한 원본 데이터(시뮬 아님)", href: "/gbl/meta" },
+    ],
+  },
+  en: {
+    h: "GBL Note originals — what you'll only find here",
+    items: [
+      { t: "🔬 Compromise-IV deep dive", d: "Our own analysis: the full top-100 simulated to compute build compromise lines (CMP · bait)", href: "/gbl/iv" },
+      { t: "🎯 CCT timing guide", d: "Our own guide + calculator for fast-move timing (CCT) via GCD/LCM", href: "/gbl/guide/cct" },
+      { t: "📊 Live meta", d: "Original data: the opponents users actually faced, anonymized — not simulation", href: "/gbl/meta" },
+    ],
+  },
+  ja: {
+    h: "GBL Note 独自分析 — ここでしか見られないもの",
+    items: [
+      { t: "🔬 妥協個体 深掘り分析", d: "上位100種を全数シミュして育成の妥協ライン(CMP・ベイト)を算出した独自分析", href: "/gbl/iv" },
+      { t: "🎯 CCT 平割り計算ガイド", d: "ターンタイミング(平割り)をGCD・LCMで計算する自作ガイド+計算機", href: "/gbl/guide/cct" },
+      { t: "📊 実測メタ", d: "ユーザーが実際に対戦した相手を匿名集計した独自データ(シミュではない)", href: "/gbl/meta" },
+    ],
+  },
+  "zh-TW": {
+    h: "GBL Note 自有分析 — 只有這裡看得到",
+    items: [
+      { t: "🔬 折衷個體深入分析", d: "將前100種全數模擬、算出養成折衷線(CMP·誘餌)的自有分析", href: "/gbl/iv" },
+      { t: "🎯 CCT 平割計算指南", d: "以 GCD·LCM 計算招式時機(平割)的自製指南+計算機", href: "/gbl/guide/cct" },
+      { t: "📊 實測 Meta", d: "將玩家實際對戰遇到的對手匿名彙整的原創資料(非模擬)", href: "/gbl/meta" },
+    ],
+  },
+};
+
 export default async function GblLandingPage({ params }: { params: { lang: string } }) {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const L = (p: string) => localizePath(lang, p);
@@ -101,6 +139,24 @@ export default async function GblLandingPage({ params }: { params: { lang: strin
               }}>{hero.funnel[i]}</Link>
             ))}
           </nav>
+        </div>
+      </div>
+
+      {/* ── #6 GBL Note 자체 분석(원본 3종) — SSR 초기 HTML에 노출(원본성 신호) ── */}
+      <div style={{ background: "linear-gradient(180deg,#f7f9fd,#f7f9fd)", padding: "0.25rem 1rem 0.5rem" }}>
+        <div style={{ maxWidth: 1040, margin: "0 auto" }}>
+          <h2 style={{ margin: "0.6rem 0 8px", fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>{SIGNATURE[lang].h}</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>
+            {SIGNATURE[lang].items.map((it) => (
+              <Link key={it.href} href={L(it.href)} style={{
+                display: "block", background: "#fff", border: `1px solid ${BORDER}`, borderLeft: "4px solid #7c3aed",
+                borderRadius: 10, padding: "0.7rem 0.9rem", textDecoration: "none",
+              }}>
+                <div style={{ fontSize: "0.86rem", fontWeight: 800, color: "#0f172a", marginBottom: 3 }}>{it.t}</div>
+                <div style={{ fontSize: "0.76rem", color: "#64748b", lineHeight: 1.5 }}>{it.d}</div>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
