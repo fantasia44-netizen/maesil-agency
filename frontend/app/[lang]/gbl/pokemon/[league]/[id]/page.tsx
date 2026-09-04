@@ -289,6 +289,13 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
   });
   const aH = HEADINGS[lang] || HEADINGS.en;
   const aTitle = lang === "en" ? "GBL Note Analysis" : lang === "ja" ? "GBL Note 分析" : lang === "zh-TW" ? "GBL Note 分析" : "GBL Note 분석";
+  // 분석 기준 라인(#4) — 데이터 소스(시뮬+실측)·표본 기간·기준 시즌을 명시(전부 사실, 검토/큐레이션 신호).
+  const _season = seasonBySlug(seasonSlug) || currentSeason();
+  const _sName = _season.name[lang] || _season.name.en;
+  const analysisBasis = lang === "en" ? `Basis: PvPoke simulation · last-30-day field meta · S${_season.num} ${_sName}`
+    : lang === "ja" ? `分析基準：PvPokeシミュレーション · 直近30日の実測メタ · S${_season.num} ${_sName}`
+    : lang === "zh-TW" ? `分析基準：PvPoke 模擬 · 近30日實測 Meta · S${_season.num} ${_sName}`
+    : `분석 기준: PvPoke 시뮬레이션 · 최근 30일 실측 메타 · S${_season.num} ${_sName}`;
   const hasAnalysis = analysis.strengths.length > 0 || analysis.weaknesses.length > 0 || !!analysis.verdict;
   const ratingTitle = lang === "en" ? "Battle rating (500=even, higher = this Pokémon favored)"
     : lang === "ja" ? "バトルレーティング(500=互角、高いほどこのポケモンが有利)"
@@ -385,7 +392,15 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
         {/* 데이터 파생 분석 — 강점/약점/평가 3구조(크롤러가 분석 문서로 인식) */}
         {hasAnalysis && (
           <div style={{ marginTop: 14, background: `linear-gradient(180deg, ${c1}0d, #ffffff 60%)`, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.9rem 1.05rem" }}>
-            <h2 style={{ margin: "0 0 6px", fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>{aTitle}</h2>
+            <h2 style={{ margin: "0 0 2px", fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>{aTitle}</h2>
+            {/* 분석 기준 명시(#4) — "긁은 DB"가 아니라 두 데이터 소스 조합·해석임을 첫 화면에서 노출 */}
+            <p style={{ margin: "0 0 6px", fontSize: "0.72rem", color: "#94a3b8", lineHeight: 1.5 }}>{analysisBasis}</p>
+            {/* 표본 부족 정직 표기(#3) — 실측 없을 때 억지평가 대신 시뮬/타입 기준임을 명확히 */}
+            {analysis.thinNote && (
+              <p style={{ margin: "0 0 8px", padding: "6px 10px", background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, fontSize: "0.76rem", color: "#9a3412", lineHeight: 1.55 }}>
+                {analysis.thinNote}
+              </p>
+            )}
             {analysis.strengths.length > 0 && (
               <>
                 <h3 style={{ margin: "10px 0 4px", fontSize: "0.86rem", fontWeight: 800, color: "#15803d" }}>✔ {aH.strengths}</h3>

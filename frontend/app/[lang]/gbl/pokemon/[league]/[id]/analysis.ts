@@ -42,6 +42,8 @@ type Phr = {
   underrated: (tier: string, pr: number) => string;
   common: (lg: string, pr: number) => string;
   neutral: (lg: string, tier: string) => string;
+  simVerdict: (tier: string, beats?: string) => string;  // 실측 표본 부족 → 시뮬/타입 기준 평가
+  thinSample: string;                                     // "표본 부족" 정직 라벨(최근 30일 기준)
   // 역할 성향
   role: Record<RoleKey, string>;
   roleShort: string[];                         // 역할 짧은 이름(ROLE_KEYS 순서)
@@ -76,6 +78,8 @@ const PH: Record<Locale, Phr> = {
       : pr < 10 ? `실측 픽률 ${pr}%로 ${lg}에서 일정 수준 쓰이는 선택지입니다.`
       : `실측 픽률 ${pr}%로 ${lg}에서 자주 확인되는 메타 픽입니다.`,
     neutral: (lg, tier) => `${lg} ${tier}티어 평가로, 기술 구성과 파티 시너지에 따라 실전 활용도가 갈립니다.`,
+    simVerdict: (tier, beats) => `최근 30일 실측에서는 거의 확인되지 않았습니다. 이론상 ${tier}티어 평가로${beats ? `, ${beats} 등의 매치업에서 우위를 기대할 수 있습니다` : ` 기술 구성과 파티 시너지에 따라 활용도가 갈립니다`}.`,
+    thinSample: "실측 표본 부족 — 최근 30일 GBL Note 실측에서 충분히 확인되지 않아, 아래 분석은 시뮬레이션·타입 상성 기준입니다.",
     role: {
       lead: "역할 점수상 선봉(리드)에서 가장 강해 초반 주도권을 잡는 데 적합합니다.",
       closer: "실드를 소진한 후반, 마무리(클로저) 역할에서 진가를 발휘합니다.",
@@ -110,6 +114,8 @@ const PH: Record<Locale, Phr> = {
       : pr < 10 ? `At a ${pr}% real pick rate, it sees moderate use in ${lg}.`
       : `At a ${pr}% real pick rate, it's a frequently-seen meta pick in ${lg}.`,
     neutral: (lg, tier) => `Rated ${tier}-tier in ${lg}; its real value swings on moveset and team synergy.`,
+    simVerdict: (tier, beats) => `It's barely seen in the last 30 days of field data. On paper it's ${tier}-tier${beats ? `, with an edge expected in matchups like ${beats}` : `, with real value swinging on moveset and team synergy`}.`,
+    thinSample: "Limited field sample — not seen enough in the last 30 days of GBL Note data, so the analysis below is based on simulation and type matchups.",
     role: {
       lead: "Its role scores peak on Lead, making it well-suited to seizing early tempo.",
       closer: "It shines as a Closer late-game, once shields are spent.",
@@ -144,6 +150,8 @@ const PH: Record<Locale, Phr> = {
       : pr < 10 ? `実測ピック率${pr}%で、${lg}である程度使われる選択肢です。`
       : `実測ピック率${pr}%で、${lg}で頻繁に確認されるメタピックです。`,
     neutral: (lg, tier) => `${lg}${tier}ティア評価で、技構成とパーティ相性で実戦価値が変わります。`,
+    simVerdict: (tier, beats) => `直近30日の実測ではほとんど確認されていません。理論上は${tier}ティア評価で${beats ? `、${beats}などの対面で有利が期待できます` : `、技構成とパーティ相性で活用度が変わります`}。`,
+    thinSample: "実測サンプル不足 — 直近30日のGBL Note実測で十分に確認されず、以下の分析はシミュレーション・タイプ相性を基準としています。",
     role: {
       lead: "役割スコア上は先発が最も高く、序盤の主導権を握るのに適します。",
       closer: "シールドを使い切った終盤、締め(クローザー)役で真価を発揮します。",
@@ -178,6 +186,8 @@ const PH: Record<Locale, Phr> = {
       : pr < 10 ? `以${pr}%的實測使用率，在${lg}中有一定程度的使用。`
       : `以${pr}%的實測使用率，是${lg}中經常出現的Meta選擇。`,
     neutral: (lg, tier) => `${lg}${tier}強度評價，實戰價值取決於招式配置與隊伍相性。`,
+    simVerdict: (tier, beats) => `近30日實測中幾乎未見。理論上評為${tier}級${beats ? `，在${beats}等對面可期待優勢` : `，實戰價值取決於招式配置與隊伍相性`}。`,
+    thinSample: "實測樣本不足 — 近30日 GBL Note 實測中未充分確認，以下分析以模擬與屬性相性為基準。",
     role: {
       lead: "角色評分以先鋒最高，適合搶下前期主導權。",
       closer: "在護盾耗盡的後期，以收尾角色發揮真正價值。",
@@ -259,18 +269,27 @@ export function buildAnalysis(ctx: AnalysisCtx): AnalysisOut {
   if (ctx.atk >= bulk + 35) weaknesses.push(p.glass); // 유리대포=얇은 내구
   if (ctx.topCounterName) weaknesses.push(ctx.topCounterRank ? p.cautionRanked(ctx.topCounterName, ctx.topCounterRank) : p.caution(ctx.topCounterName));
 
-  // ── 평가(verdict) — 티어×실측 + 이론vs실측 괴리 ──
+  // ── 평가(verdict) + 표본 처리 ──
+  // 실측 유의 표본 = 픽률 ≥1%(0%로 반올림되는 몬은 표본부족으로 간주). 상위권(rank≤10)은 항상 검증픽.
+  // 표본 부족 시 실측 억지평가를 만들지 않고 시뮬/타입 기준임을 명시(정직성 = 검토·큐레이션 신호).
+  const hasSample = (ctx.pickRate != null && ctx.pickRate >= 1) || (ctx.pickRank != null && ctx.pickRank <= 10);
+  let thinNote: string | undefined;
   const v: string[] = [];
   if (ctx.pickRank != null && ctx.pickRank <= 10) v.push(p.provenTop(ctx.leagueName, ctx.pickRate ?? 0));
-  else if (top && (ctx.pickRate == null || ctx.pickRate < 3)) v.push(p.hiddenPick(ctx.tier));
-  else if (low && ctx.pickRate != null && ctx.pickRate >= 2) v.push(p.underrated(ctx.tier, ctx.pickRate));
-  else if (ctx.pickRate != null) v.push(p.common(ctx.leagueName, ctx.pickRate));
-  else v.push(p.neutral(ctx.leagueName, ctx.tier));
-  if (ctx.theoryRank && ctx.pickRank) {
+  else if (hasSample) {
+    if (top && (ctx.pickRate == null || ctx.pickRate < 3)) v.push(p.hiddenPick(ctx.tier));
+    else if (low && ctx.pickRate != null && ctx.pickRate >= 2) v.push(p.underrated(ctx.tier, ctx.pickRate));
+    else v.push(p.common(ctx.leagueName, ctx.pickRate ?? 0));
+  } else {
+    v.push(p.simVerdict(ctx.tier, ctx.beatsNames));
+    thinNote = p.thinSample;
+  }
+  // 이론vs실측 괴리는 실측 표본이 있을 때만 언급(표본부족 몬에 순위괴리 서술은 무의미).
+  if (hasSample && ctx.theoryRank && ctx.pickRank) {
     const gap = ctx.pickRank - ctx.theoryRank;
     if (gap >= 12) v.push(p.rankTheoryHigh(ctx.theoryRank, ctx.pickRank));
     else if (gap <= -12) v.push(p.rankUsageHigh(ctx.theoryRank, ctx.pickRank));
   }
 
-  return { strengths, weaknesses, verdict: v.join(" ") };
+  return { strengths, weaknesses, verdict: v.join(" "), thinNote };
 }
