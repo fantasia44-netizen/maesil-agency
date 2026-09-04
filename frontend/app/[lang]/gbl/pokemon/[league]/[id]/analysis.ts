@@ -70,7 +70,11 @@ const PH: Record<Locale, Phr> = {
     provenTop: (lg, pr) => `실측 픽률 ${pr}%로 현재 ${lg}에서 실제로 자주 만나는 검증된 픽입니다.`,
     hiddenPick: (tier) => `이론상 ${tier}티어 상위 평가지만 실측 등장률은 아직 낮아, 상대가 덜 대비하는 기습 카드로 쓸 여지가 있습니다.`,
     underrated: (tier, pr) => `티어 평가는 ${tier}로 높지 않지만 실전에서 ${pr}% 꾸준히 목격되는, 실측이 이론보다 앞서는 픽입니다.`,
-    common: (lg, pr) => `실측 픽률 ${pr}%로 ${lg}에서 무난히 통용되는 선택지입니다.`,
+    common: (lg, pr) =>
+      pr <= 0 ? `최근 실측 표본에서는 거의 확인되지 않아, ${lg}에서 실전 채용은 제한적입니다.`
+      : pr < 4 ? `실측 픽률 ${pr}%로 ${lg}에서 드물게 등장하는 선택지입니다.`
+      : pr < 10 ? `실측 픽률 ${pr}%로 ${lg}에서 일정 수준 쓰이는 선택지입니다.`
+      : `실측 픽률 ${pr}%로 ${lg}에서 자주 확인되는 메타 픽입니다.`,
     neutral: (lg, tier) => `${lg} ${tier}티어 평가로, 기술 구성과 파티 시너지에 따라 실전 활용도가 갈립니다.`,
     role: {
       lead: "역할 점수상 선봉(리드)에서 가장 강해 초반 주도권을 잡는 데 적합합니다.",
@@ -100,7 +104,11 @@ const PH: Record<Locale, Phr> = {
     provenTop: (lg, pr) => `At a ${pr}% real pick rate, it's a proven pick you'll actually run into often in ${lg} right now.`,
     hiddenPick: (tier) => `It's rated ${tier}-tier on paper but still shows a low real pick rate, leaving room to use it as a surprise pick opponents underprepare for.`,
     underrated: (tier, pr) => `Its ${tier}-tier rating isn't high, yet it's seen ${pr}% in real play — a case where field data runs ahead of theory.`,
-    common: (lg, pr) => `With a ${pr}% real pick rate, it's a solid, widely-used option in ${lg}.`,
+    common: (lg, pr) =>
+      pr <= 0 ? `It's barely seen in recent field samples, so real adoption in ${lg} is limited.`
+      : pr < 4 ? `At a ${pr}% real pick rate, it's a niche sighting in ${lg}.`
+      : pr < 10 ? `At a ${pr}% real pick rate, it sees moderate use in ${lg}.`
+      : `At a ${pr}% real pick rate, it's a frequently-seen meta pick in ${lg}.`,
     neutral: (lg, tier) => `Rated ${tier}-tier in ${lg}; its real value swings on moveset and team synergy.`,
     role: {
       lead: "Its role scores peak on Lead, making it well-suited to seizing early tempo.",
@@ -130,7 +138,11 @@ const PH: Record<Locale, Phr> = {
     provenTop: (lg, pr) => `実測ピック率${pr}%で、現在の${lg}で実際によく遭遇する実戦検証済みのピックです。`,
     hiddenPick: (tier) => `理論上は${tier}ティア上位評価ですが実測登場率はまだ低く、相手が対策しにくい奇襲枠として使う余地があります。`,
     underrated: (tier, pr) => `ティア評価は${tier}と高くないものの、実戦では${pr}%と着実に目撃される、実測が理論を上回るピックです。`,
-    common: (lg, pr) => `実測ピック率${pr}%で、${lg}で無難に通用する選択肢です。`,
+    common: (lg, pr) =>
+      pr <= 0 ? `直近の実測サンプルではほとんど確認されず、${lg}での実戦採用は限定的です。`
+      : pr < 4 ? `実測ピック率${pr}%で、${lg}ではまれに見かける選択肢です。`
+      : pr < 10 ? `実測ピック率${pr}%で、${lg}である程度使われる選択肢です。`
+      : `実測ピック率${pr}%で、${lg}で頻繁に確認されるメタピックです。`,
     neutral: (lg, tier) => `${lg}${tier}ティア評価で、技構成とパーティ相性で実戦価値が変わります。`,
     role: {
       lead: "役割スコア上は先発が最も高く、序盤の主導権を握るのに適します。",
@@ -160,7 +172,11 @@ const PH: Record<Locale, Phr> = {
     provenTop: (lg, pr) => `以${pr}%的實測使用率，是目前${lg}中實際常遇到、經過實戰驗證的選擇。`,
     hiddenPick: (tier) => `理論上評為${tier}強度上位，但實測登場率仍低，可作為對手較少準備的奇襲選擇。`,
     underrated: (tier, pr) => `強度評價${tier}並不算高，實戰卻穩定出現${pr}%，是實測領先理論的選擇。`,
-    common: (lg, pr) => `以${pr}%的實測使用率，是${lg}中通用穩健的選項。`,
+    common: (lg, pr) =>
+      pr <= 0 ? `近期實測樣本中幾乎未見，於${lg}的實戰採用相當有限。`
+      : pr < 4 ? `以${pr}%的實測使用率，是${lg}中偶爾出現的選項。`
+      : pr < 10 ? `以${pr}%的實測使用率，在${lg}中有一定程度的使用。`
+      : `以${pr}%的實測使用率，是${lg}中經常出現的Meta選擇。`,
     neutral: (lg, tier) => `${lg}${tier}強度評價，實戰價值取決於招式配置與隊伍相性。`,
     role: {
       lead: "角色評分以先鋒最高，適合搶下前期主導權。",
