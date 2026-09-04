@@ -498,13 +498,13 @@ def admin_traffic(days: int = 30, admin: UserContext = Depends(require_admin)) -
         daily = db.rpc("gbl_traffic_daily", {"days": days}).execute().data or []
         summ = db.rpc("gbl_traffic_summary", {"days": days}).execute().data or []
         active = db.rpc("gbl_traffic_active", {}).execute().data or []
-        paths = db.rpc("gbl_traffic_paths", {"days": 7, "lim": 15}).execute().data or []
-        refs = db.rpc("gbl_traffic_refs", {"days": 7, "lim": 15}).execute().data or []
+        paths = db.rpc("gbl_traffic_paths", {"days": days, "lim": 300}).execute().data or []
+        refs = db.rpc("gbl_traffic_refs", {"days": days, "lim": 300}).execute().data or []
     except Exception as e:
         logger.error("gbl traffic 실패: %s", e)
         raise HTTPException(500, "트래픽 조회 실패 (SQL 068 실행 여부 확인)")
     try:
-        shares = db.rpc("gbl_traffic_shares", {"days": days, "lim": 20}).execute().data or []
+        shares = db.rpc("gbl_traffic_shares", {"days": days, "lim": 100}).execute().data or []
     except Exception as e:
         logger.warning("gbl traffic shares 실패(068 재실행 필요): %s", e)
         shares = []

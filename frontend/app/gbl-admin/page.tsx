@@ -30,6 +30,21 @@ type Traffic = {
 
 type DbStatus = { hub_configured: boolean; maesil_total: number | null; maesil_hub: number | null };
 
+// CSV 내보내기 — 관리자 상세 데이터 다운로드(화면 표시 top-N 넘어 state 전체 배열). Excel 한글 위해 BOM.
+function toCsv(rows: Record<string, unknown>[]): string {
+  if (!rows.length) return "";
+  const cols = Object.keys(rows[0]);
+  const esc = (v: unknown) => { const s = v == null ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  return [cols.join(","), ...rows.map((r) => cols.map((c) => esc(r[c])).join(","))].join("\n");
+}
+function dlCsv(name: string, rows: Record<string, unknown>[]) {
+  if (typeof document === "undefined" || !rows.length) return;
+  const blob = new Blob(["﻿" + toCsv(rows)], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 type BoardPost = { id: number; board: string; author: string; title: string; answered: boolean; is_private: boolean; reply_count: number; created_at: string };
 
 type DailyRow = { day: string; pageviews: number; uniques: number; new_visitors: number; returning_visitors?: number; sessions: number };
@@ -342,6 +357,21 @@ export default function GblAdmin() {
               </div>
             ))}
           </div>
+          {/* 상세 데이터 다운로드(CSV) — 화면 top-N 넘어 state 전체 배열, 리서치·평가용 */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12, alignItems: "center" }}>
+            <span style={{ fontSize: "0.74rem", fontWeight: 800, color: "#0f172a" }}>📥 상세 데이터(CSV)</span>
+            {[
+              { l: `일별 ${traffic.daily.length}`, rows: traffic.daily, n: `gbl-daily-${traffic.days}d` },
+              { l: `전체 페이지 ${traffic.paths.length}`, rows: traffic.paths, n: `gbl-pages-${traffic.days}d` },
+              { l: `유입경로 ${traffic.refs.length}`, rows: traffic.refs, n: `gbl-refs-${traffic.days}d` },
+              { l: `언어별 ${traffic.langs?.length ?? 0}`, rows: traffic.langs ?? [], n: `gbl-langs-${traffic.days}d` },
+              { l: `공유·다운로드 ${traffic.shares?.length ?? 0}`, rows: traffic.shares ?? [], n: `gbl-shares-${traffic.days}d` },
+            ].map((b) => (
+              <button key={b.n} onClick={() => dlCsv(`${b.n}.csv`, b.rows as unknown as Record<string, unknown>[])}
+                disabled={!b.rows.length}
+                style={{ fontSize: "0.72rem", fontWeight: 700, color: b.rows.length ? "#3b5bdb" : "#94a3b8", background: "#eef2fb", border: "1px solid #dbe2ee", borderRadius: 8, padding: "4px 10px", cursor: b.rows.length ? "pointer" : "default" }}>⬇ {b.l}</button>
+            ))}
+          </div>
           {traffic.daily.length > 0 && <TrafficChart daily={traffic.daily} />}
           {traffic.daily.length > 0 && (
             <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.9rem", marginBottom: 12, overflowX: "auto" }}>
@@ -378,7 +408,7 @@ export default function GblAdmin() {
           )}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>
             <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem" }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>상위 페이지 (7일)</div>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>상위 페이지 ({traffic.days}일)</div>
               {traffic.paths.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음</div> : traffic.paths.slice(0, 8).map((p, i) => (
                 <div key={i} style={{ display: "flex", gap: 8, fontSize: "0.76rem", padding: "3px 0" }}>
                   <span style={{ color: "#94a3b8", minWidth: 14 }}>{i + 1}</span>
@@ -388,7 +418,7 @@ export default function GblAdmin() {
               ))}
             </div>
             <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem" }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>유입 경로 (7일)</div>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>유입 경로 ({traffic.days}일)</div>
               {traffic.refs.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음</div> : traffic.refs.slice(0, 8).map((r, i) => (
                 <div key={i} style={{ display: "flex", gap: 8, fontSize: "0.76rem", padding: "3px 0" }}>
                   <span style={{ color: "#94a3b8", minWidth: 14 }}>{i + 1}</span>
