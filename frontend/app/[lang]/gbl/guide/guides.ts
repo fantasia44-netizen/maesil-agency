@@ -302,7 +302,7 @@ export const GUIDES: Record<string, Guide> = {
     updated: "2026-08-19",
     keywords: {
       ko: ["슈퍼리그 CP", "하이퍼리그 CP", "마스터리그", "포켓몬고 리그 제한", "GBL CP 제한"],
-      en: ["Great League CP", "Ultra League CP", "Master League", "Pokémon GO league limits", "GBL CP cap"],
+      en: ["master league cp limit", "great league cp limit", "ultra league cp limit", "Pokémon GO CP limits", "GBL CP cap"],
       ja: ["スーパーリーグ CP", "ハイパーリーグ CP", "マスターリーグ", "ポケモンGO リーグ 制限", "GBL CP制限"],
       "zh-TW": ["超級聯盟 CP", "高級聯盟 CP", "大師聯盟", "寶可夢GO 聯盟 限制", "GBL CP 限制"],
     },
@@ -318,8 +318,8 @@ export const GUIDES: Record<string, Guide> = {
       ],
     },
     en: {
-      title: "CP Limits by League — Great, Ultra, Master",
-      desc: "The CP limits in Pokémon GO's Go Battle League — Great League (1500), Ultra League (2500), and Master League (no cap) — and what makes each distinct.",
+      title: "Great, Ultra & Master League CP Limits — Pokémon GO",
+      desc: "Pokémon GO Battle League CP limits: Great League CP limit 1500, Ultra League 2500, Master League no cap — and what makes each distinct.",
       sections: [
         { p: "GBL's three leagues each set a different CP (Combat Power) ceiling on the Pokémon that can enter. That single cap makes each league's strategy and go-to Pokémon completely different." },
         { h: "Great League — CP 1500 or below", p: "With the lowest cap, type matchups, movesets, and bulk matter more than total base stats. Pokémon with well-balanced stats within that low CP shine, and for IVs a spread with low Attack but high Defense and HP is often the stronger choice. The low barrier to entry makes it the league we recommend for beginners." },
