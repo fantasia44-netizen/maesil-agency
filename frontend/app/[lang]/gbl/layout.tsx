@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: { lang: string } })
     title: m.title,
     description: m.description,
     manifest: "/gbl-manifest.json",
-    appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "GBL Note" },
+    appleWebApp: { capable: true, statusBarStyle: "default", title: "GBL Note" },
     icons: { apple: "/gbl-icon.png", icon: "/gbl-icon.png", shortcut: "/gbl-icon.png" },
     openGraph: {
       title: m.ogTitle,
@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: { params: { lang: string } })
 }
 
 export const viewport: Viewport = {
-  themeColor: "#0b1020",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
 };
