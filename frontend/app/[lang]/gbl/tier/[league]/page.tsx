@@ -44,7 +44,6 @@ const LEAGUES: Record<string, { ko: string; short: string }> = {
   ultra_mega: { ko: "하이퍼리그 (메가)", short: "하이퍼 메가" },
   master_mega: { ko: "마스터리그 (메가)", short: "마스터 메가" },
 };
-const LEAGUE_KEYS = Object.keys(LEAGUES);
 const CORE_KEYS = ["great", "ultra", "master"];
 const MEGA_KEYS = ["great_mega", "ultra_mega", "master_mega"];
 const isMegaLeague = (lg: string) => lg.endsWith("_mega");
@@ -117,8 +116,10 @@ async function getPickRates(league: string, season: { start: string; end: string
   }
 }
 
+// 빌드 프리렌더 안 함 — layout force-dynamic로 런타임 SSR되므로 프리렌더 HTML은 버려짐(낭비).
+// 각 프리렌더가 백엔드를 호출 → 배포 지연 원인. 온디맨드 SSR로 대체(dynamicParams 기본 true).
 export function generateStaticParams() {
-  return LEAGUE_KEYS.map((league) => ({ league }));
+  return [] as { league: string }[];
 }
 
 export function generateMetadata({ params, searchParams }: { params: { lang: string; league: string }; searchParams?: { s?: string } }): Metadata {

@@ -26,7 +26,6 @@ import { currentSeason, seasonBySlug } from "../../../seasons";
 
 export const revalidate = 600;
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
-const STATIC_TOP = 20; // 리그별 상위 N종 사전생성(+sitemap). 나머지는 링크 시 온디맨드.
 
 // 메가 리그(s28+)는 gbl_detail_s28.json에서만 존재 → DET에 병합. 코어 3리그는 기존 gbl_detail(s27).
 const LEAGUE_KEYS = ["master", "great", "ultra", "great_mega", "ultra_mega", "master_mega"];
@@ -138,11 +137,12 @@ async function getMetaInfo(league: string): Promise<MetaInfo> {
   }
 }
 
+// 빌드 프리렌더 안 함(빈 배열) — 상위 layout이 force-dynamic이라 런타임에 매 요청 SSR되므로
+// 빌드 때 프리렌더한 HTML은 어차피 안 쓰이고 버려짐(순수 낭비). 게다가 각 프리렌더가
+// DB-무거운 /api/gbl/meta를 호출해 배포시간을 리그 수에 비례해 늘렸음(메가 3리그 추가 후 2배).
+// dynamicParams 기본 true → 모든 URL은 요청 시 온디맨드 SSR(+Cloudflare 엣지 캐시). sitemap은 독립(app/sitemap.ts).
 export function generateStaticParams() {
-  const params: { league: string; id: string }[] = [];
-  for (const league of LEAGUE_KEYS)
-    for (const d of (detFor(league, currentSeason().slug)[league] || []).slice(0, STATIC_TOP)) params.push({ league, id: d.id });
-  return params;
+  return [] as { league: string; id: string }[];
 }
 
 // SERP 스니펫 CTR용 동적 설명 — 실제 티어·추천기술·1위 카운터(시뮬 기반, 전 몬 항상 참).

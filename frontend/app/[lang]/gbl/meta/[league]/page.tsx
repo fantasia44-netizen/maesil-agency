@@ -38,8 +38,10 @@ async function getMeta(league: string): Promise<Meta | null> {
   }
 }
 
+// 빌드 프리렌더 안 함 — layout force-dynamic로 런타임 SSR되므로 프리렌더 HTML은 버려짐(낭비).
+// 각 프리렌더가 DB-무거운 /api/gbl/meta ×3 호출 → 배포 지연 원인. 온디맨드 SSR로 대체(dynamicParams 기본 true).
 export function generateStaticParams() {
-  return LEAGUE_KEYS.map((league) => ({ league }));
+  return [] as { league: string }[];
 }
 
 export function generateMetadata({ params }: { params: { lang: string; league: string } }): Metadata {
