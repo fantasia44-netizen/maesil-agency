@@ -3,7 +3,7 @@ const ko = {
   meta: {
     title: "GBL Note — 포켓몬GO 레이드·배틀·티어·CP 올인원",
     description: "포켓몬 GO 레이드 딜러 티어·보스 100% CP·레이드 일정, 배틀리그 티어·실측 메타, 내 전적 기록까지. 포켓몬고 종합 정보·도구.",
-    ogTitle: "GBL Note — 포켓몬GO 올인원",
+    ogTitle: "GBL Note — 포켓몬GO 레이드·배틀·티어·CP 올인원",
     ogDescription: "레이드 딜러·보스 CP·레이드 일정 + 배틀 티어·실측 메타 + 내 전적. 포켓몬고 종합툴.",
   },
   landing: {

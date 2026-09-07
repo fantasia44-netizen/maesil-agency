@@ -5,7 +5,7 @@ const ja: Dict = {
   meta: {
     title: "GBL Note — ポケモンGO レイド・バトル・ティア・CP オールインワン",
     description: "ポケモンGOのレイドアタッカーティア・ボス100%CP・レイドスケジュール、バトルリーグのティア・実測メタ、自分の戦績まで。ポケモンGO総合ツール。",
-    ogTitle: "GBL Note — ポケモンGO オールインワン",
+    ogTitle: "GBL Note — ポケモンGO レイド・バトル・ティア・CP オールインワン",
     ogDescription: "レイドアタッカー・ボスCP・レイド日程＋バトルティア・実測メタ＋戦績。ポケモンGO総合ツール。",
   },
   landing: {

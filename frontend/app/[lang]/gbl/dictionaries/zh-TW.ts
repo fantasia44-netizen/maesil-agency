@@ -5,7 +5,7 @@ const zhTW: Dict = {
   meta: {
     title: "GBL Note — 寶可夢GO 團體戰·對戰·強度·CP 一站式",
     description: "寶可夢 GO 團體戰攻擊手強度、頭目 100% CP、團體戰時程，對戰聯盟強度表、實測環境，還有個人戰績記錄。寶可夢GO 綜合資訊與工具。",
-    ogTitle: "GBL Note — 寶可夢GO 一站式工具",
+    ogTitle: "GBL Note — 寶可夢GO 團體戰·對戰·強度·CP 一站式",
     ogDescription: "團體戰攻擊手·頭目CP·時程 + 對戰強度·實測環境 + 個人戰績。寶可夢GO 綜合工具。",
   },
   landing: {
