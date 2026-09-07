@@ -15,8 +15,17 @@ export function track(event: "pageview" | "share" | "download", path?: string, l
   if (typeof window === "undefined") return;
   if (getUser()?.role === "super_admin") return; // 관리자(오너) 본인 방문은 통계 제외
   let ref = "";
-  if (event === "pageview" && document.referrer) {
-    try { const h = new URL(document.referrer).host; if (h && h !== location.host) ref = h; } catch { /* noop */ }
+  if (event === "pageview") {
+    // 설치형 실행(홈화면 PWA·데스크톱 PWA·Play스토어 TWA)은 referrer가 비어 '직접'과 섞임 →
+    // display-mode/standalone 신호로 감지해 "(앱)"으로 별도 태깅(직접 링크 방문과 구분).
+    const asApp =
+      (typeof window.matchMedia === "function" && window.matchMedia("(display-mode: standalone)").matches) ||
+      (navigator as unknown as { standalone?: boolean }).standalone === true ||
+      document.referrer.startsWith("android-app://");
+    if (asApp) ref = "(앱)";
+    else if (document.referrer) {
+      try { const h = new URL(document.referrer).host; if (h && h !== location.host) ref = h; } catch { /* noop */ }
+    }
   }
   const body = JSON.stringify({
     event,

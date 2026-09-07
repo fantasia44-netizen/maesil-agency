@@ -91,7 +91,8 @@ $$;
 CREATE OR REPLACE FUNCTION public.gbl_traffic_refs(days int DEFAULT 7, lim int DEFAULT 15)
 RETURNS TABLE(ref text, views bigint)
 LANGUAGE sql STABLE AS $$
-  SELECT coalesce(nullif(ref,''), '(직접/앱)'), count(*) FROM public.gbl_visits
+  -- 빈 ref = 직접 링크(설치형 실행은 track.ts가 "(앱)"으로 태깅해 분리됨).
+  SELECT coalesce(nullif(ref,''), '(직접)'), count(*) FROM public.gbl_visits
   WHERE event = 'pageview' AND day >= ((now() AT TIME ZONE 'utc')::date - days)
   GROUP BY 1 ORDER BY count(*) DESC LIMIT lim;
 $$;
