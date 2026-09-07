@@ -2,13 +2,21 @@
 // 정문(대표 URL)에서 크롤러가 GBL Note 고유 데이터와 내부링크를 바로 읽게 함.
 // 인터랙티브 랜딩 UI는 <GblLandingClient/>가 담당.
 import Link from "next/link";
-import { isLocale, defaultLocale, localizePath, type Locale } from "../../../lib/i18n";
+import type { Metadata } from "next";
+import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../lib/i18n";
 import { leagueName } from "./contentI18n";
 import { monName } from "./meta/monNames";
 import GblLandingClient from "./GblLandingClient";
 import { CORE_FORMATS, MEGA_FORMATS, activeCups, todayISO, type Format } from "./formats";
 
 export const revalidate = 600;
+
+// 홈 canonical + hreflang — 홈은 layout 메타만 써서 canonical이 누락됐었음(하위 페이지는 각자 설정).
+// GSC '사용자가 선택한 표준이 없는 중복 페이지' 방지 + 4개국어 hreflang 클러스터링(redirect되는 /ko/ 안 가리킴).
+export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+  const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
+  return { alternates: { canonical: localizePath(lang, "/gbl"), languages: hreflangLanguages("/gbl") } };
+}
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 // 코어 3리그 + 메가(메가마리 등) + 진행 중 컵. 데이터 없는 포맷은 아래서 자동 숨김(total>0).
