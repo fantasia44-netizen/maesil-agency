@@ -513,7 +513,11 @@ def admin_traffic(days: int = 30, admin: UserContext = Depends(require_admin)) -
     except Exception as e:
         logger.warning("gbl traffic langs 실패(072 실행 필요): %s", e)
         langs = []
-    app = _app_metrics(db, days)
+    try:
+        app = _app_metrics(db, days)
+    except Exception as e:
+        logger.warning("gbl app metrics 실패: %s", e)
+        app = {"installs": 0, "installable": 0, "app_pageviews": 0, "direct_pageviews": 0}
     return {
         "days": days,
         "daily": daily,
@@ -601,7 +605,10 @@ def admin_traffic_export(days: int = 30, admin: UserContext = Depends(require_ad
     add_sheet("공유·다운로드", shares, ["label", "shares", "downloads", "total"])
 
     # 앱·설치 지표 — 설치앱 실행 vs 직접 링크 구분 + 설치율
-    app = _app_metrics(db, days)
+    try:
+        app = _app_metrics(db, days)
+    except Exception:
+        app = {"installs": 0, "installable": 0, "app_pageviews": 0, "direct_pageviews": 0}
     def _pct(a, b):
         return round(a / b * 100, 1) if b else 0.0
     total_dv = app["app_pageviews"] + app["direct_pageviews"]
