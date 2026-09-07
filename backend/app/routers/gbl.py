@@ -473,7 +473,7 @@ def track(body: TrackIn, request: Request):
     except HTTPException:
         return
     ev = (body.event or "pageview")
-    if ev not in ("pageview", "share", "download"):
+    if ev not in ("pageview", "share", "download", "install", "installable"):
         ev = "pageview"
     try:
         _db().table("gbl_visits").insert({
@@ -513,6 +513,7 @@ def admin_traffic(days: int = 30, admin: UserContext = Depends(require_admin)) -
     except Exception as e:
         logger.warning("gbl traffic langs 실패(072 실행 필요): %s", e)
         langs = []
+    app = _app_metrics(db, days)
     return {
         "days": days,
         "daily": daily,
@@ -522,6 +523,40 @@ def admin_traffic(days: int = 30, admin: UserContext = Depends(require_admin)) -
         "refs": refs,
         "shares": shares,
         "langs": langs,
+        "app": app,
+    }
+
+
+def _app_metrics(db, days: int) -> dict:
+    """앱 지표(설치율·앱 실행 비중) — 직접 count 쿼리(SQL 마이그레이션 불필요).
+    install=설치 완료, installable=설치가능 노출(세션당1·주로 Android), app_pageviews=설치앱 실행 뷰(ref='(앱)').
+    설치율 두 종류: 노출대비(installs/installable), 방문자대비(installs/uniques)."""
+    from datetime import date, timedelta
+    cutoff = (date.today() - timedelta(days=max(1, min(days, 90)))).isoformat()
+
+    _SENTINEL = object()
+
+    def _cnt(event: str, ref=_SENTINEL) -> int:
+        try:
+            q = db.table("gbl_visits").select("*", count="exact").gte("day", cutoff).eq("event", event).limit(1)
+            if ref is None:
+                q = q.is_("ref", "null")   # 순수 직접(referrer 없음)
+            elif ref is not _SENTINEL:
+                q = q.eq("ref", ref)
+            return q.execute().count or 0
+        except Exception as e:
+            logger.warning("app metric count 실패(event=%s ref=%r): %s", event, ref, e)
+            return 0
+
+    installs = _cnt("install")
+    installable = _cnt("installable")
+    app_pv = _cnt("pageview", "(앱)")
+    direct_pv = _cnt("pageview", None)  # 순수 직접(referrer 없음, 앱 아님)
+    return {
+        "installs": installs,
+        "installable": installable,
+        "app_pageviews": app_pv,
+        "direct_pageviews": direct_pv,
     }
 
 
@@ -564,6 +599,20 @@ def admin_traffic_export(days: int = 30, admin: UserContext = Depends(require_ad
     add_sheet("유입경로", refs, ["ref", "views"])
     add_sheet("언어별", langs, ["lang", "pageviews", "uniques", "sessions"])
     add_sheet("공유·다운로드", shares, ["label", "shares", "downloads", "total"])
+
+    # 앱·설치 지표 — 설치앱 실행 vs 직접 링크 구분 + 설치율
+    app = _app_metrics(db, days)
+    def _pct(a, b):
+        return round(a / b * 100, 1) if b else 0.0
+    total_dv = app["app_pageviews"] + app["direct_pageviews"]
+    aps = wb.create_sheet("앱·설치")
+    aps.append(["항목", "값", "비고"])
+    aps.append(["설치 완료 (install)", app["installs"], "홈화면/데스크톱 PWA·Play스토어 TWA 설치"])
+    aps.append(["설치가능 노출 (installable)", app["installable"], "세션당 1회·주로 Android Chrome"])
+    aps.append(["설치율 — 노출 대비 (%)", _pct(app["installs"], app["installable"]), "installs / installable"])
+    aps.append(["앱 실행 페이지뷰", app["app_pageviews"], "설치된 앱(standalone)으로 본 뷰"])
+    aps.append(["직접 링크 페이지뷰", app["direct_pageviews"], "referrer 없는 순수 직접 방문"])
+    aps.append(["앱 실행 비중 (%)", _pct(app["app_pageviews"], total_dv), "앱 / (앱+직접)"])
 
     buf = io.BytesIO()
     wb.save(buf)

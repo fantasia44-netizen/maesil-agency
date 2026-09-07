@@ -26,6 +26,7 @@ type Traffic = {
   refs: { ref: string; views: number }[];
   shares?: { label: string; shares: number; downloads: number; total: number }[];
   langs?: { lang: string; pageviews: number; uniques: number; sessions: number }[];
+  app?: { installs: number; installable: number; app_pageviews: number; direct_pageviews: number };
 };
 
 type DbStatus = { hub_configured: boolean; maesil_total: number | null; maesil_hub: number | null };
@@ -350,7 +351,7 @@ export default function GblAdmin() {
               style={{ fontSize: "0.78rem", fontWeight: 800, color: "#fff", background: "linear-gradient(90deg,#16a34a,#059669)", border: "none", borderRadius: 9, padding: "7px 16px", cursor: "pointer" }}>
               📥 전체 데이터 다운로드 (XLSX · {traffic.days}일)
             </button>
-            <span style={{ fontSize: "0.7rem", color: "#94a3b8" }}>시트 6개: 요약·일별·페이지·유입경로·언어별·공유</span>
+            <span style={{ fontSize: "0.7rem", color: "#94a3b8" }}>시트 7개: 요약·일별·페이지·유입경로·언어별·공유·앱설치</span>
             {dlErr && <span style={{ fontSize: "0.7rem", color: "#dc2626" }}>다운로드 실패: {dlErr}</span>}
           </div>
           {traffic.daily.length > 0 && <TrafficChart daily={traffic.daily} />}
@@ -409,6 +410,38 @@ export default function GblAdmin() {
               ))}
             </div>
           </div>
+
+          {/* 📱 앱 설치 & 실행 — 설치앱 vs 직접 링크 구분 + 설치율 */}
+          {traffic.app && (() => {
+            const a = traffic.app!;
+            const totDv = a.app_pageviews + a.direct_pageviews;
+            const instRate = a.installable ? Math.round((a.installs / a.installable) * 100) : 0;
+            const appShare = totDv ? Math.round((a.app_pageviews / totDv) * 100) : 0;
+            const tile = (label: string, val: React.ReactNode, sub: string, c: string) => (
+              <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 10, padding: "0.7rem 0.85rem" }}>
+                <div style={{ fontSize: "1.15rem", fontWeight: 800, color: c }}>{val}</div>
+                <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#0f172a", marginTop: 2 }}>{label}</div>
+                <div style={{ fontSize: "0.66rem", color: "#94a3b8", marginTop: 1 }}>{sub}</div>
+              </div>
+            );
+            return (
+              <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem", marginTop: 10 }}>
+                <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>
+                  📱 앱 설치 &amp; 실행 ({traffic.days}일) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 설치앱(standalone) vs 직접 링크</span>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 8 }}>
+                  {tile("설치 완료", a.installs, "PWA·TWA 설치", "#16a34a")}
+                  {tile("설치율", `${instRate}%`, "설치가능 노출 대비", "#7c3aed")}
+                  {tile("앱으로 실행", a.app_pageviews.toLocaleString(), "standalone 페이지뷰", "#0891b2")}
+                  {tile("직접 링크", a.direct_pageviews.toLocaleString(), "referrer 없는 방문", "#3b5bdb")}
+                  {tile("앱 실행 비중", `${appShare}%`, "앱 / (앱+직접)", "#db2777")}
+                </div>
+                <div style={{ fontSize: "0.68rem", color: "#94a3b8", marginTop: 8, lineHeight: 1.5 }}>
+                  설치가능 노출 {a.installable.toLocaleString()}건(주로 Android Chrome). 지표는 <b>이 기능 배포 이후</b>부터 집계 — 초기엔 값이 작습니다.
+                </div>
+              </div>
+            );
+          })()}
 
           {/* 언어별 유입 (경로 프리픽스 /en·/ja 기준) */}
           <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem", marginTop: 10 }}>
