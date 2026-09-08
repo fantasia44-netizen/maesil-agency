@@ -7,6 +7,7 @@ import DATA from "../../gbl_data.json";
 import DETAIL from "../../gbl_detail.json";
 import DETAIL_S28 from "../../gbl_detail_s28.json";
 import PKNAMES from "../../pokedex_names.json";
+import MOVENAMES from "../../pvp_move_names.json";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
 import ListShare from "../../ListShare";
@@ -65,7 +66,32 @@ const dispNameOf = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?
   return localName(lang, d, nameOf(d.id));
 };
 
-type Detail = { id: string; tier: string; stats: Record<string, number>; ko?: string; dex?: number; types?: string[] };
+type ChargedMv = { id: string; energy: number; counts: number[] };
+type Detail = { id: string; tier: string; stats: Record<string, number>; ko?: string; dex?: number; types?: string[];
+  moveset?: string[]; mv?: { fast: { id: string; gain: number; turns: number }; charged: ChargedMv[];
+    fasts?: { id: string; gain: number; turns: number }[]; chargedAll?: { id: string; energy: number }[] } };
+
+// 기술명·타입색 — 포켓몬 상세와 동일 규칙(_PLUS 강화기술 → +표기, gbl_data 미보유는 pvp_move_names 폴백).
+type Move = { ko: string; en: string; ja?: string; type: string; kind: string };
+const MOVES = (DATA as unknown as { moves: Record<string, Move> }).moves;
+const MNAMES = MOVENAMES as Record<string, Record<string, string>>;
+const baseMoveId = (id: string) => (MOVES[id] ? id : id.replace(/_PLUS$/, ""));
+const moveLabel = (lang: Locale, id: string): string => {
+  const bid = baseMoveId(id); const plus = bid !== id ? "+" : ""; const mv = MOVES[bid];
+  if (mv) return (lang === "ko" ? mv.ko : lang === "ja" ? (mv.ja || mv.en || mv.ko) : lang === "zh-TW" ? (MNAMES[bid]?.["zh-TW"] || mv.en || mv.ko) : (mv.en || mv.ko)) + plus;
+  const mn = MNAMES[bid];
+  if (mn) return ((lang === "en" ? mn.en : lang === "ja" ? mn.ja : lang === "zh-TW" ? mn["zh-TW"] : mn.ko) || mn.en || mn.ko || id) + plus;
+  return id + plus;
+};
+const moveColor = (id: string) => TYPE_COLOR[MOVES[baseMoveId(id)]?.type] || "#94a3b8";
+// 타수 계산(에너지 이월) — 포켓몬 상세 tausSeq와 동일. 오버라이드 빠른기술로 차지 타수 재계산 시 사용.
+const tausSeq = (cost: number, gain: number, n = 5): number[] => {
+  if (!gain) return Array(n).fill(0); let energy = 0; const seq: number[] = [];
+  for (let i = 0; i < n; i++) { const need = cost - energy; const t = need > 0 ? Math.ceil(need / gain) : 0; energy += t * gain - cost; seq.push(t); }
+  return seq;
+};
+// 예외 몬 빠른기술 오버라이드(자동이 안 맞는 몬만) — 예: { metagross: "BULLET_PUNCH" }. 비어두면 전부 자동(PvPoke 추천).
+const FAST_OVERRIDE: Record<string, string> = {};
 const TYPE_COLOR: Record<string, string> = {
   normal: "#9fa19f", fire: "#e62829", water: "#2980ef", electric: "#d9a900", grass: "#3fa129",
   ice: "#37b6c9", fighting: "#ff8000", poison: "#9141cb", ground: "#915121", flying: "#6c93e0",
@@ -126,14 +152,25 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
   const seasons = selectableSeasons(CMP_SEASON_SLUGS);
   const list = (seasonDet[params.league] || []).filter((d) => d.stats && d.stats.atk)
     .sort((a, b) => (b.stats.atk || 0) - (a.stats.atk || 0));
-  const maxAtk = list[0]?.stats.atk || 1;
-  const minAtk = list[list.length - 1]?.stats.atk || 0;
 
   // 데이터 파생 CMP 분석(상위 공격 우선권 해석)
   const byId: Record<string, Detail> = {};
   for (const d of list) byId[d.id] = d;
   const nameById = (id: string) => (byId[id] ? dispNameOf(lang, byId[id]) : (MON[id]?.ko || id));
   const cmpText = cmpAnalysis(lang, lgName, list.map((d) => ({ id: d.id, atk: d.stats.atk || 0 })), nameById);
+
+  // 타수 단위(로케일) + 몬별 추천기술·타수 조립. 기본 자동(d.mv), FAST_OVERRIDE 지정 몬만 그 빠른기술로 타수 재계산.
+  const hitsUnit = ({ ko: "타", en: "", ja: "回", "zh-TW": "次" } as Record<string, string>)[lang] ?? "타";
+  const buildMoves = (d: Detail) => {
+    if (!d.mv) return null;
+    const ov = FAST_OVERRIDE[d.id];
+    const gain = ov ? (d.mv.fasts?.find((f) => f.id === ov)?.gain ?? d.mv.fast.gain) : d.mv.fast.gain;
+    const charged = d.mv.charged.map((c) => ({
+      label: moveLabel(lang, c.id), color: moveColor(c.id),
+      counts: ov ? tausSeq(c.energy, gain) : c.counts,
+    }));
+    return { fast: { label: moveLabel(lang, ov || d.mv.fast.id), color: moveColor(ov || d.mv.fast.id) }, charged };
+  };
 
   const wrap: React.CSSProperties = {
     minHeight: "100dvh",
@@ -234,35 +271,49 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
         {list.length === 0 ? (
           <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem 1rem" }}>데이터 준비 중입니다.</div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 5, marginTop: 14 }}>
-            {list.map((d, i) => {
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(228px, 1fr))", gap: 8, marginTop: 14 }}>
+            {list.slice(0, 36).map((d, i) => {
               const types = (d.types && d.types.length) ? d.types : (MON[d.id]?.types || []);
               const dex = d.dex || MON[d.id]?.dex;
               const dispName = dispNameOf(lang, d);
               const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
               const atk = d.stats.atk || 0;
-              const w = maxAtk > minAtk ? Math.round(((atk - minAtk) / (maxAtk - minAtk)) * 100) : 100;
+              const mv = buildMoves(d);
               return (
                 <Link key={d.id} href={L(`/gbl/pokemon/${params.league}/${d.id}`) + detQ}
-                  style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: 8,
-                    background: `linear-gradient(100deg, ${c1}1f, #ffffff 82%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "6px 10px" }}>
-                  <span style={{ fontSize: "0.76rem", fontWeight: 800, color: i < 3 ? "#dc2626" : "#94a3b8", minWidth: 24 }}>#{i + 1}</span>
-                  <span style={{ width: 32, height: 32, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
-                    ...(d.id.endsWith("_shadow") ? { background: "radial-gradient(circle, #a855f7ee 0%, #7c3aed99 42%, transparent 72%)", borderRadius: "50%" } : {}) }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={spriteUrl(MON[d.id]) || (dex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${formDexById(d.id, dex)}.png` : "")} alt={dispName} width={32} height={32} style={{ imageRendering: "pixelated" }} />
-                  </span>
-                  <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a", minWidth: 84 }}>{dispName}</span>
-                  <span style={{ display: "flex", gap: 3 }}>
-                    {types.map((t) => (
-                      <span key={t} style={{ fontSize: "0.6rem", fontWeight: 700, color: "#fff", background: TYPE_COLOR[t] || "#94a3b8", padding: "1px 6px", borderRadius: 6 }}>{typeLabel(lang, t)}</span>
-                    ))}
-                  </span>
-                  <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 6, background: TIER_COLOR[d.tier], color: "#fff", fontWeight: 800, fontSize: "0.66rem", marginLeft: 4 }}>{d.tier}</span>
-                  <div style={{ flex: 1, height: 7, background: "#e5eaf3", borderRadius: 4, overflow: "hidden", marginLeft: 4, minWidth: 40 }}>
-                    <div style={{ width: `${w}%`, height: "100%", background: "linear-gradient(90deg,#ef4444,#f59e0b)" }} />
+                  style={{ textDecoration: "none", color: "inherit", display: "flex", flexDirection: "column", gap: 5,
+                    background: `linear-gradient(160deg, ${c1}14, #ffffff 62%)`, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
+                  {/* 순위·스프라이트·이름·티어·공격력 */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: "0.72rem", fontWeight: 800, color: i < 3 ? "#dc2626" : "#94a3b8", minWidth: 20 }}>#{i + 1}</span>
+                    <span style={{ width: 30, height: 30, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                      ...(d.id.endsWith("_shadow") ? { background: "radial-gradient(circle, #a855f7ee 0%, #7c3aed99 42%, transparent 72%)", borderRadius: "50%" } : {}) }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={spriteUrl(MON[d.id]) || (dex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${formDexById(d.id, dex)}.png` : "")} alt={dispName} width={30} height={30} style={{ imageRendering: "pixelated" }} />
+                    </span>
+                    <span style={{ flex: 1, fontSize: "0.82rem", fontWeight: 800, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{dispName}</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 18, height: 18, borderRadius: 5, background: TIER_COLOR[d.tier], color: "#fff", fontWeight: 800, fontSize: "0.62rem" }}>{d.tier}</span>
+                    <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "#0891b2", minWidth: 42, textAlign: "right" }}>{atk.toFixed(1)}</span>
                   </div>
-                  <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "#0f172a", minWidth: 46, textAlign: "right" }}>{atk.toFixed(1)}</span>
+                  {/* 타입 배지 */}
+                  <div style={{ display: "flex", gap: 3 }}>
+                    {types.map((t) => (
+                      <span key={t} style={{ fontSize: "0.58rem", fontWeight: 700, color: "#fff", background: TYPE_COLOR[t] || "#94a3b8", padding: "1px 6px", borderRadius: 5 }}>{typeLabel(lang, t)}</span>
+                    ))}
+                  </div>
+                  {/* 추천 기술 + 타수(자동, 오버라이드 반영) */}
+                  {mv && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 1 }}>
+                      <span style={{ alignSelf: "flex-start", fontSize: "0.66rem", fontWeight: 700, color: "#fff", background: mv.fast.color, padding: "1px 7px", borderRadius: 6 }}>{mv.fast.label}</span>
+                      {mv.charged.map((c, ci) => (
+                        <div key={ci} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "0.68rem" }}>
+                          <span style={{ width: 7, height: 7, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
+                          <span style={{ color: "#334155", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 92 }}>{c.label}</span>
+                          <span style={{ marginLeft: "auto", fontFamily: "ui-monospace, monospace", color: "#94a3b8", fontWeight: 700, letterSpacing: "-0.3px" }}>{c.counts.join("·")}{hitsUnit && <span style={{ fontSize: "0.6rem" }}>{hitsUnit}</span>}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </Link>
               );
             })}
