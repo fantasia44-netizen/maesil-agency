@@ -493,7 +493,7 @@ def track(body: TrackIn, request: Request):
 def admin_traffic(days: int = 30, admin: UserContext = Depends(require_admin)) -> dict:
     """방문/순방문자/세션/체류/이탈/유입 통계. super_admin 전용."""
     db = _db()
-    days = max(1, min(days, 90))
+    days = max(0, min(days, 90))
     try:
         daily = db.rpc("gbl_traffic_daily", {"days": days}).execute().data or []
         summ = db.rpc("gbl_traffic_summary", {"days": days}).execute().data or []
@@ -536,7 +536,7 @@ def _app_metrics(db, days: int) -> dict:
     install=설치 완료, installable=설치가능 노출(세션당1·주로 Android), app_pageviews=설치앱 실행 뷰(ref='(앱)').
     설치율 두 종류: 노출대비(installs/installable), 방문자대비(installs/uniques)."""
     from datetime import date, timedelta
-    cutoff = (date.today() - timedelta(days=max(1, min(days, 90)))).isoformat()
+    cutoff = (date.today() - timedelta(days=max(0, min(days, 90)))).isoformat()
 
     _SENTINEL = object()
 
@@ -571,7 +571,7 @@ def admin_traffic_export(days: int = 30, admin: UserContext = Depends(require_ad
     from fastapi.responses import Response
     from openpyxl import Workbook
     db = _db()
-    days = max(1, min(days, 90))
+    days = max(0, min(days, 90))
     daily = db.rpc("gbl_traffic_daily", {"days": days}).execute().data or []
     summ = db.rpc("gbl_traffic_summary", {"days": days}).execute().data or []
     paths = db.rpc("gbl_traffic_paths", {"days": days, "lim": 1000}).execute().data or []

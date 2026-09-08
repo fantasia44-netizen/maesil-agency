@@ -317,11 +317,11 @@ export default function GblAdmin() {
             <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>📈 방문 통계 <span style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 600 }}>(자체 집계)</span></span>
             {/* 기간 선택기 */}
             <span style={{ display: "flex", gap: 4, background: "#f1f5f9", borderRadius: 8, padding: 3 }}>
-              {[7, 30, 60].map((d) => (
+              {[0, 7, 30, 60].map((d) => (
                 <button key={d} onClick={() => changePeriod(d)}
                   style={{ border: "none", cursor: "pointer", fontSize: "0.72rem", fontWeight: 700, borderRadius: 6, padding: "3px 10px",
                     background: period === d ? "#3b5bdb" : "transparent", color: period === d ? "#fff" : "#64748b" }}>
-                  {d}일
+                  {d === 0 ? "오늘" : `${d}일`}
                 </button>
               ))}
             </span>
@@ -390,7 +390,7 @@ export default function GblAdmin() {
           )}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>
             <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem" }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>상위 페이지 ({traffic.days}일)</div>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>상위 페이지 ({traffic.days === 0 ? "오늘" : `${traffic.days}일`})</div>
               {traffic.paths.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음</div> : traffic.paths.slice(0, 8).map((p, i) => (
                 <div key={i} style={{ display: "flex", gap: 8, fontSize: "0.76rem", padding: "3px 0" }}>
                   <span style={{ color: "#94a3b8", minWidth: 14 }}>{i + 1}</span>
@@ -400,7 +400,7 @@ export default function GblAdmin() {
               ))}
             </div>
             <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem" }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>유입 경로 ({traffic.days}일)</div>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>유입 경로 ({traffic.days === 0 ? "오늘" : `${traffic.days}일`})</div>
               {traffic.refs.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음</div> : traffic.refs.slice(0, 8).map((r, i) => (
                 <div key={i} style={{ display: "flex", gap: 8, fontSize: "0.76rem", padding: "3px 0" }}>
                   <span style={{ color: "#94a3b8", minWidth: 14 }}>{i + 1}</span>
@@ -427,7 +427,7 @@ export default function GblAdmin() {
             return (
               <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem", marginTop: 10 }}>
                 <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>
-                  📱 앱 설치 &amp; 실행 ({traffic.days}일) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 설치앱(standalone) vs 직접 링크</span>
+                  📱 앱 설치 &amp; 실행 ({traffic.days === 0 ? "오늘" : `${traffic.days}일`}) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 설치앱(standalone) vs 직접 링크</span>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 8 }}>
                   {tile("설치 완료", a.installs, "PWA·TWA 설치", "#16a34a")}
@@ -446,7 +446,7 @@ export default function GblAdmin() {
           {/* 언어별 유입 (경로 프리픽스 /en·/ja 기준) */}
           <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem", marginTop: 10 }}>
             <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>
-              🌐 언어별 유입 ({traffic.days}일) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 공개 페이지뷰</span>
+              🌐 언어별 유입 ({traffic.days === 0 ? "오늘" : `${traffic.days}일`}) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 공개 페이지뷰</span>
             </div>
             {!traffic.langs || traffic.langs.length === 0 ? (
               <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음 (SQL 072 실행 여부 확인)</div>
@@ -480,7 +480,7 @@ export default function GblAdmin() {
           {/* 카드 유형별 공유·다운로드 — 어떤 콘텐츠가 바이럴을 주도하는지 */}
           <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem", marginTop: 10 }}>
             <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>
-              📤 카드 유형별 공유·다운로드 ({traffic.days}일) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 바이럴 주도 콘텐츠</span>
+              📤 카드 유형별 공유·다운로드 ({traffic.days === 0 ? "오늘" : `${traffic.days}일`}) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 바이럴 주도 콘텐츠</span>
             </div>
             {!traffic.shares || traffic.shares.length === 0 ? (
               <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>아직 데이터 없음 (SQL 068 재실행 필요)</div>
