@@ -10,7 +10,7 @@ import PKNAMES from "../../pokedex_names.json";
 import MOVENAMES from "../../pvp_move_names.json";
 import AdSlot from "../../AdSlot";
 import CoupangAd from "../../CoupangAd";
-import ListShare from "../../ListShare";
+import CmpShareDense from "./CmpShareDense";
 import { formDexById } from "../../sprite";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
 import { leagueName, localName } from "../../contentI18n";
@@ -150,7 +150,8 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
   // 상세페이지 링크에 시즌 전달(코어 리그 비현재 시즌). 메가는 상세가 항상 s28.
   const detQ = (!isMega && season.slug !== currentSeason().slug) ? `?s=${season.slug}` : "";
   const seasons = selectableSeasons(CMP_SEASON_SLUGS);
-  const list = (seasonDet[params.league] || []).filter((d) => d.stats && d.stats.atk)
+  // 그림자 제외 — CMP(공격력)는 그림자=일반 동일 순위라 중복. 일반형만 노출.
+  const list = (seasonDet[params.league] || []).filter((d) => d.stats && d.stats.atk && !d.id.endsWith("_shadow"))
     .sort((a, b) => (b.stats.atk || 0) - (a.stats.atk || 0));
 
   // 데이터 파생 CMP 분석(상위 공격 우선권 해석)
@@ -248,7 +249,7 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
         )}
 
         {list.length > 0 && (
-          <ListShare
+          <CmpShareDense
             title={`${lgName} ${t.shareTitleSuffix}`}
             subtitle={t.shareSubtitle}
             path={`/gbl/cmp/${params.league}`}
@@ -256,15 +257,19 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
             buttonLabel={t.shareButton}
             filename={`gbl-${params.league}-cmp.png`}
             footerTag={t.shareFooter}
-            trackLabel="cmp-rank"
-            items={list.slice(0, 12).map((d) => ({
-              dex: String(formDexById(d.id, d.dex || MON[d.id]?.dex || 0)),
-              name: dispNameOf(lang, d),
-              main: (d.stats.atk || 0).toFixed(1),
-              sub: `${d.tier}`,
-              types: (d.types && d.types.length) ? d.types : (MON[d.id]?.types || []),
-              shadow: d.id.endsWith("_shadow"),
-            }))}
+            hitsUnit={hitsUnit}
+            items={list.slice(0, 36).map((d) => {
+              const mv = buildMoves(d);
+              return {
+                dex: String(formDexById(d.id, d.dex || MON[d.id]?.dex || 0)),
+                name: dispNameOf(lang, d),
+                atk: (d.stats.atk || 0).toFixed(1),
+                tier: d.tier,
+                types: (d.types && d.types.length) ? d.types : (MON[d.id]?.types || []),
+                fast: mv ? mv.fast : { label: "", color: "#94a3b8" },
+                charged: mv ? mv.charged : [],
+              };
+            })}
           />
         )}
 
@@ -272,7 +277,7 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
           <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem 1rem" }}>데이터 준비 중입니다.</div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(228px, 1fr))", gap: 8, marginTop: 14 }}>
-            {list.slice(0, 36).map((d, i) => {
+            {list.slice(0, 72).map((d, i) => {
               const types = (d.types && d.types.length) ? d.types : (MON[d.id]?.types || []);
               const dex = d.dex || MON[d.id]?.dex;
               const dispName = dispNameOf(lang, d);
