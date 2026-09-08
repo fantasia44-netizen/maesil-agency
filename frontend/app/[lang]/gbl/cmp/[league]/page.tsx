@@ -57,13 +57,21 @@ const spriteUrl = (m?: Mon) =>
   m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
 const nameOf = (id: string) => MON[id]?.ko || id;
 // zh-TW 포켓몬명 — 데이터 엔트리에 zh-TW가 없어 dex로 pokedex_names에서 보완.
+// 동명 폼 구분 라벨 — 데이터상 ko가 base명 하나라(우라오스/케르디오) CMP표에 폼이 안 구분됨. 접미사로 표기.
+const FORM_LABEL: Record<string, Record<string, string>> = {
+  urshifu_rapid_strike: { ko: " (연격)", en: " (Rapid Strike)", ja: "（連撃）", "zh-TW": "（連擊）" },
+  urshifu_single_strike: { ko: " (일격)", en: " (Single Strike)", ja: "（一撃）", "zh-TW": "（一擊）" },
+  keldeo_resolute: { ko: " (각오)", en: " (Resolute)", ja: "（覚悟）", "zh-TW": "（覺悟）" },
+  keldeo_ordinary: { ko: " (평범)", en: " (Ordinary)", ja: "（いつも）", "zh-TW": "（平常）" },
+};
 const dispNameOf = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?: string; dex?: number }) => {
+  const suf = FORM_LABEL[d.id]?.[lang] || "";
   if (lang === "zh-TW") {
     const dex = d.dex ?? MON[d.id]?.dex;
     const zh = dex != null ? (PKNAMES as Record<string, Record<string, string>>)[String(dex)]?.["zh-TW"] : undefined;
-    if (zh) return zh;
+    if (zh) return zh + suf;
   }
-  return localName(lang, d, nameOf(d.id));
+  return localName(lang, d, nameOf(d.id)) + suf;
 };
 
 type ChargedMv = { id: string; energy: number; counts: number[] };
