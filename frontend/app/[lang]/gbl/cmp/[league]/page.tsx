@@ -90,8 +90,14 @@ const tausSeq = (cost: number, gain: number, n = 5): number[] => {
   for (let i = 0; i < n; i++) { const need = cost - energy; const t = need > 0 ? Math.ceil(need / gain) : 0; energy += t * gain - cost; seq.push(t); }
   return seq;
 };
-// 예외 몬 빠른기술 오버라이드(자동이 안 맞는 몬만) — 예: { metagross: "BULLET_PUNCH" }. 비어두면 전부 자동(PvPoke 추천).
-const FAST_OVERRIDE: Record<string, string> = {};
+// 추가 빠른기술 변형 — 기본 추천 빠른기술 외에 "함께 보여줄" 빠른기술(그 기준 타수도 계산). 몬id → [추가 fast id들].
+const FAST_EXTRA: Record<string, string[]> = {
+  mewtwo_mega_x: ["COUNTER"],       // 사이코커터 + 카운터(기본기 카운터용)
+  groudon_primal: ["MUD_SHOT"],     // 드래곤테일 + 머드샷
+  garchomp_mega: ["MUD_SHOT"],      // 드래곤테일 + 머드샷
+  kyurem_black: ["SHADOW_CLAW"],    // 드래곤테일 + 섀도크루
+  metagross_mega: ["FURY_CUTTER"],  // 섀도크루 + 연속자르기
+};
 const TYPE_COLOR: Record<string, string> = {
   normal: "#9fa19f", fire: "#e62829", water: "#2980ef", electric: "#d9a900", grass: "#3fa129",
   ice: "#37b6c9", fighting: "#ff8000", poison: "#9141cb", ground: "#915121", flying: "#6c93e0",
@@ -164,13 +170,17 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
   const hitsUnit = ({ ko: "타", en: "", ja: "回", "zh-TW": "次" } as Record<string, string>)[lang] ?? "타";
   const buildMoves = (d: Detail) => {
     if (!d.mv) return null;
-    const ov = FAST_OVERRIDE[d.id];
-    const gain = ov ? (d.mv.fasts?.find((f) => f.id === ov)?.gain ?? d.mv.fast.gain) : d.mv.fast.gain;
-    const charged = d.mv.charged.map((c) => ({
-      label: moveLabel(lang, c.id), color: moveColor(c.id),
-      counts: ov ? tausSeq(c.energy, gain) : c.counts,
-    }));
-    return { fast: { label: moveLabel(lang, ov || d.mv.fast.id), color: moveColor(ov || d.mv.fast.id) }, charged };
+    const mv = d.mv;
+    const fastById = new Map((mv.fasts && mv.fasts.length ? mv.fasts : [mv.fast]).map((f) => [f.id, f]));
+    const ids = [mv.fast.id, ...(FAST_EXTRA[d.id] || [])];
+    return ids.map((fid) => {
+      const gain = fastById.get(fid)?.gain ?? mv.fast.gain;
+      const isDef = fid === mv.fast.id;
+      return {
+        fast: { label: moveLabel(lang, fid), color: moveColor(fid) },
+        charged: mv.charged.map((c) => ({ label: moveLabel(lang, c.id), color: moveColor(c.id), counts: isDef ? c.counts : tausSeq(c.energy, gain) })),
+      };
+    });
   };
 
   const wrap: React.CSSProperties = {
@@ -266,8 +276,7 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
                 atk: (d.stats.atk || 0).toFixed(1),
                 tier: d.tier,
                 types: (d.types && d.types.length) ? d.types : (MON[d.id]?.types || []),
-                fast: mv ? mv.fast : { label: "", color: "#94a3b8" },
-                charged: mv ? mv.charged : [],
+                variants: mv || [],
               };
             })}
           />
@@ -306,11 +315,11 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
                       <span key={t} style={{ fontSize: "0.58rem", fontWeight: 700, color: "#fff", background: TYPE_COLOR[t] || "#94a3b8", padding: "1px 6px", borderRadius: 5 }}>{typeLabel(lang, t)}</span>
                     ))}
                   </div>
-                  {/* 추천 기술 + 타수(자동, 오버라이드 반영) */}
-                  {mv && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 1 }}>
-                      <span style={{ alignSelf: "flex-start", fontSize: "0.66rem", fontWeight: 700, color: "#fff", background: mv.fast.color, padding: "1px 7px", borderRadius: 6 }}>{mv.fast.label}</span>
-                      {mv.charged.map((c, ci) => (
+                  {/* 추천 기술 + 타수(자동) — FAST_EXTRA 지정 몬은 추가 빠른기술 변형도 함께 */}
+                  {mv && mv.map((v, vi) => (
+                    <div key={vi} style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: vi === 0 ? 1 : 4, ...(vi > 0 ? { paddingTop: 4, borderTop: "1px dashed #e3e8f2" } : {}) }}>
+                      <span style={{ alignSelf: "flex-start", fontSize: "0.66rem", fontWeight: 700, color: "#fff", background: v.fast.color, padding: "1px 7px", borderRadius: 6 }}>{v.fast.label}</span>
+                      {v.charged.map((c, ci) => (
                         <div key={ci} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "0.68rem" }}>
                           <span style={{ width: 7, height: 7, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
                           <span style={{ color: "#334155", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 92 }}>{c.label}</span>
@@ -318,7 +327,7 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
                         </div>
                       ))}
                     </div>
-                  )}
+                  ))}
                 </Link>
               );
             })}
