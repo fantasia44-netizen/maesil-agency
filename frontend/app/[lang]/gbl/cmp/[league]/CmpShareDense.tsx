@@ -9,7 +9,7 @@ import ShareModal from "../../ShareModal";
 
 // CMP 3열 고밀도 공유 카드 — 순위·타입·티어·공격력 + 추천 빠른기술 + 차지기술별 타수.
 // 웹 그리드와 동일 데이터(page.tsx에서 조립해 prop 전달). Canvas로 렌더(스프라이트/공유는 raidShareUtil 재활용).
-export type CmpMoveDisp = { label: string; color: string };
+export type CmpMoveDisp = { label: string; color: string; turns: number };
 export type CmpVariant = { fast: CmpMoveDisp; charged: { label: string; color: string; counts: number[] }[] };
 export type CmpShareItem = {
   dex: string; name: string; atk: string; tier: string; types: string[]; variants: CmpVariant[];
@@ -35,10 +35,10 @@ function trunc(ctx: CanvasRenderingContext2D, s: string, maxW: number): string {
 }
 
 export default function CmpShareDense({
-  title, subtitle, path, items, buttonLabel, filename, footerTag, hitsUnit, accent = "#0891b2",
+  title, subtitle, path, items, buttonLabel, filename, footerTag, hitsUnit, turnUnit, accent = "#0891b2",
 }: {
   title: string; subtitle: string; path: string; items: CmpShareItem[];
-  buttonLabel: string; filename: string; footerTag: string; hitsUnit: string; accent?: string;
+  buttonLabel: string; filename: string; footerTag: string; hitsUnit: string; turnUnit: string; accent?: string;
 }) {
   const params = useParams();
   const lang: Locale = isLocale(params?.lang as string) ? (params!.lang as Locale) : defaultLocale;
@@ -108,10 +108,11 @@ export default function CmpShareDense({
         let yc = y + HEADER;
         it.variants.forEach((v, vi) => {
           if (vi) { yc += VGAP; ctx.strokeStyle = "#eef2f8"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x + 18, yc - VGAP / 2); ctx.lineTo(x + w - 16, yc - VGAP / 2); ctx.stroke(); }
+          const fastTxt = `${v.fast.label} ${v.fast.turns}${turnUnit}`;
           ctx.textAlign = "left"; ctx.font = "700 21px system-ui, sans-serif";
-          const fw = ctx.measureText(v.fast.label).width + 20;
+          const fw = ctx.measureText(fastTxt).width + 20;
           ctx.fillStyle = v.fast.color; ctx.beginPath(); ctx.roundRect(x + 18, yc, fw, 28, 8); ctx.fill();
-          ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.fillText(v.fast.label, x + 18 + fw / 2, yc + 20);
+          ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.fillText(fastTxt, x + 18 + fw / 2, yc + 20);
           yc += ROW;
           v.charged.forEach((ch) => {
             ctx.fillStyle = ch.color; ctx.beginPath(); ctx.arc(x + 26, yc + 8, 5, 0, Math.PI * 2); ctx.fill();

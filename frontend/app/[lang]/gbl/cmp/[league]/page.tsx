@@ -176,17 +176,18 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
 
   // 타수 단위(로케일) + 몬별 추천기술·타수 조립. 기본 자동(d.mv), FAST_OVERRIDE 지정 몬만 그 빠른기술로 타수 재계산.
   const hitsUnit = ({ ko: "타", en: "", ja: "回", "zh-TW": "次" } as Record<string, string>)[lang] ?? "타";
+  const turnUnit = ({ ko: "턴", en: "T", ja: "T", "zh-TW": "回" } as Record<string, string>)[lang] ?? "턴";
   const buildMoves = (d: Detail) => {
     if (!d.mv) return null;
     const mv = d.mv;
     const fastById = new Map((mv.fasts && mv.fasts.length ? mv.fasts : [mv.fast]).map((f) => [f.id, f]));
     const ids = [mv.fast.id, ...(FAST_EXTRA[d.id] || [])];
     return ids.map((fid) => {
-      const gain = fastById.get(fid)?.gain ?? mv.fast.gain;
+      const f = fastById.get(fid);
       const isDef = fid === mv.fast.id;
       return {
-        fast: { label: moveLabel(lang, fid), color: moveColor(fid) },
-        charged: mv.charged.map((c) => ({ label: moveLabel(lang, c.id), color: moveColor(c.id), counts: isDef ? c.counts : tausSeq(c.energy, gain) })),
+        fast: { label: moveLabel(lang, fid), color: moveColor(fid), turns: f?.turns ?? mv.fast.turns },
+        charged: mv.charged.map((c) => ({ label: moveLabel(lang, c.id), color: moveColor(c.id), counts: isDef ? c.counts : tausSeq(c.energy, f?.gain ?? mv.fast.gain) })),
       };
     });
   };
@@ -276,6 +277,7 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
             filename={`gbl-${params.league}-cmp.png`}
             footerTag={t.shareFooter}
             hitsUnit={hitsUnit}
+            turnUnit={turnUnit}
             items={list.slice(0, 36).map((d) => {
               const mv = buildMoves(d);
               return {
@@ -326,7 +328,7 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
                   {/* 추천 기술 + 타수(자동) — FAST_EXTRA 지정 몬은 추가 빠른기술 변형도 함께 */}
                   {mv && mv.map((v, vi) => (
                     <div key={vi} style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: vi === 0 ? 1 : 4, ...(vi > 0 ? { paddingTop: 4, borderTop: "1px dashed #e3e8f2" } : {}) }}>
-                      <span style={{ alignSelf: "flex-start", fontSize: "0.66rem", fontWeight: 700, color: "#fff", background: v.fast.color, padding: "1px 7px", borderRadius: 6 }}>{v.fast.label}</span>
+                      <span style={{ alignSelf: "flex-start", fontSize: "0.66rem", fontWeight: 700, color: "#fff", background: v.fast.color, padding: "1px 7px", borderRadius: 6 }}>{v.fast.label} <span style={{ opacity: 0.9, fontWeight: 800 }}>{v.fast.turns}{turnUnit}</span></span>
                       {v.charged.map((c, ci) => (
                         <div key={ci} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "0.68rem" }}>
                           <span style={{ width: 7, height: 7, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
