@@ -12,6 +12,8 @@ export type TcgDict = {
   funnel: { path: string; label: string }[];
   // 정문 독창성 신호 — "여기서만 보는 원본" 3종(크롤러가 사이트 성격을 '카드DB'가 아닌 '원본 분석+도구'로 읽게)
   signature: { h: string; items: { t: string; d: string; href: string }[] };
+  // 대화형 도구 — 홈 전면 노출용(덱빌더·카운터·팩시뮬·가이드). 심사자/크롤러가 '실기능 서비스'로 인식하게.
+  tools: { h: string; items: { icon: string; t: string; d: string; href: string }[] };
   footerNote: string;
 };
 
@@ -49,6 +51,15 @@ const ko: TcgDict = {
       { t: "🏆 대회 승률 기반 덱 티어", d: "감이 아니라 실제 대회 결과 승률로 산출한 덱 티어표", href: "/tcg/tier" },
       { t: "🎯 대표 덱 심층 공략", d: "덱리스트·플레이 순서·상대별 대응·교체 옵션까지 다룬 원본 공략", href: "/tcg/decks" },
       { t: "📊 메타 환경 분석", d: "타입 분포·상위 집중도·오버퍼포머까지 데이터로 읽는 현재 메타", href: "/tcg/meta" },
+    ],
+  },
+  tools: {
+    h: "직접 써보는 도구",
+    items: [
+      { icon: "🃏", t: "덱 빌더", d: "20장 덱을 만들고 필요한 팩까지 확인·공유", href: "/tcg/deck-builder" },
+      { icon: "⚔️", t: "카운터 검색", d: "실제 대회 매치업으로 상대 덱 카운터 찾기", href: "/tcg/counters" },
+      { icon: "🎰", t: "팩 시뮬레이터", d: "공개 확률로 1/10/100팩 오픈 테스트", href: "/tcg/pack-sim" },
+      { icon: "📘", t: "초보·전략 가이드", d: "시작 규칙·덱 고르는 법·타입 상성 정리", href: "/tcg/guides" },
     ],
   },
   footerNote: "카드 데이터: 커뮤니티 공개 데이터셋 · 팬 제작 비공식 사이트",
@@ -90,6 +101,15 @@ const en: TcgDict = {
       { t: "📊 Meta analysis", d: "The current meta read by data — type distribution, concentration, overperformers", href: "/tcg/meta" },
     ],
   },
+  tools: {
+    h: "Tools you can try",
+    items: [
+      { icon: "🃏", t: "Deck Builder", d: "Build a 20-card deck, see the packs you need, and share it", href: "/tcg/deck-builder" },
+      { icon: "⚔️", t: "Counter Search", d: "Find counters to a deck from real tournament matchups", href: "/tcg/counters" },
+      { icon: "🎰", t: "Pack Simulator", d: "Open 1 / 10 / 100 packs at the real pull rates", href: "/tcg/pack-sim" },
+      { icon: "📘", t: "Beginner & Strategy Guides", d: "Rules, how to pick a deck, and type matchups", href: "/tcg/guides" },
+    ],
+  },
   footerNote: "Card data: community open dataset · unofficial fan-made site",
 };
 
@@ -129,6 +149,15 @@ const ja: TcgDict = {
       { t: "📊 メタ環境分析", d: "タイプ分布·集中度·オーバーパフォーマーまでデータで読む現環境", href: "/tcg/meta" },
     ],
   },
+  tools: {
+    h: "自分で試せるツール",
+    items: [
+      { icon: "🃏", t: "デッキビルダー", d: "20枚デッキを作り、必要なパックまで確認·共有", href: "/tcg/deck-builder" },
+      { icon: "⚔️", t: "カウンター検索", d: "実際の大会マッチアップで相手デッキの対策を探す", href: "/tcg/counters" },
+      { icon: "🎰", t: "パック開封シミュ", d: "公開確率で1/10/100パックを開封テスト", href: "/tcg/pack-sim" },
+      { icon: "📘", t: "初心者·戦略ガイド", d: "開始ルール·デッキ選び·タイプ相性を整理", href: "/tcg/guides" },
+    ],
+  },
   footerNote: "カードデータ: コミュニティ公開データセット · ファン制作の非公式サイト",
 };
 
@@ -166,6 +195,15 @@ const zhTW: TcgDict = {
       { t: "🏆 勝率為基礎的牌組強度", d: "並非憑感覺，而是以實際賽事結果勝率算出的牌組強度", href: "/tcg/tier" },
       { t: "🎯 代表牌組深入攻略", d: "牌表·出牌順序·對面對策·替換選項的原創攻略", href: "/tcg/decks" },
       { t: "📊 環境分析", d: "以數據解讀當前環境 — 屬性分布·集中度·超常發揮", href: "/tcg/meta" },
+    ],
+  },
+  tools: {
+    h: "可親自試用的工具",
+    items: [
+      { icon: "🃏", t: "牌組製作", d: "組20張牌組，查看需要的卡包並分享", href: "/tcg/deck-builder" },
+      { icon: "⚔️", t: "剋星搜尋", d: "以實際賽事對戰找出剋制對手牌組的牌組", href: "/tcg/counters" },
+      { icon: "🎰", t: "開包模擬器", d: "以公開機率開1/10/100包測試", href: "/tcg/pack-sim" },
+      { icon: "📘", t: "新手·策略指南", d: "起步規則·選牌組·屬性相剋整理", href: "/tcg/guides" },
     ],
   },
   footerNote: "卡片數據：社群公開資料集 · 粉絲製作非官方網站",

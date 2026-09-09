@@ -41,6 +41,27 @@ export default function TcgLandingPage({ params }: { params: { lang: string } })
         </div>
       </div>
 
+      {/* ── 직접 써보는 대화형 도구(실기능 서비스 신호 — 심사자/크롤러가 'DB복사'가 아님을 홈에서 즉시 인식) ── */}
+      <div style={{ background: "#fff", padding: "1.2rem 1rem 0.4rem" }}>
+        <div style={{ maxWidth: 1040, margin: "0 auto" }}>
+          <h2 style={{ margin: "0 0 10px", fontSize: "1rem", fontWeight: 800, color: "#0f172a" }}>{t.tools.h}</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10 }}>
+            {t.tools.items.map((it) => (
+              <Link key={it.href} href={L(it.href)} style={{
+                display: "flex", alignItems: "flex-start", gap: 10, background: "#fff",
+                border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.85rem 1rem", textDecoration: "none",
+              }}>
+                <span style={{ fontSize: "1.5rem", lineHeight: 1, flexShrink: 0 }}>{it.icon}</span>
+                <span style={{ minWidth: 0 }}>
+                  <span style={{ display: "block", fontSize: "0.92rem", fontWeight: 800, color: "#b91c1c", marginBottom: 2 }}>{it.t}</span>
+                  <span style={{ display: "block", fontSize: "0.78rem", color: "#64748b", lineHeight: 1.5 }}>{it.d}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ── 자체 분석 원본 3종(원본성 신호) ── */}
       <div style={{ background: "#fef7f5", padding: "1rem 1rem 1.6rem" }}>
         <div style={{ maxWidth: 1040, margin: "0 auto" }}>

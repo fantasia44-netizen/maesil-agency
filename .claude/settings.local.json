@@ -335,7 +335,22 @@
       "Bash(curl -s -o /dev/null -w \"deck-builder: %{http_code}\\\\n\" http://localhost:3000/tcg/deck-builder)",
       "Bash(curl -s -o /dev/null -w \"tcg home: %{http_code}\\\\n\" http://localhost:3000/tcg)",
       "Read(//c/maesil-agency/frontend/**)",
-      "Bash(cd /c/maesil-agency/frontend/app/'[lang]'/tcg && grep -nE \"権利.*ブラウザ|權利.*瀏覽器|下記の\\(連絡|お問\\)|下方\\(聯絡|電子\\)|연락처로 주세요\" legal.ts)"
+      "Bash(cd /c/maesil-agency/frontend/app/'[lang]'/tcg && grep -nE \"権利.*ブラウザ|權利.*瀏覽器|下記の\\(連絡|お問\\)|下方\\(聯絡|電子\\)|연락처로 주세요\" legal.ts)",
+      "Bash(curl -s -H \"Host: tcgnote.net\" http://localhost:3000/tcg/guides)",
+      "Bash(curl -s -H \"Host: tcgnote.net\" http://localhost:3001/tcg/guides)",
+      "Bash(curl -s -H \"Host: tcgnote.net\" http://localhost:3001/tcg/cards/b3-79)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} -> %{redirect_url}\\\\n\" -H \"Host: tcgnote.net\" http://localhost:3001/ko/tcg/guides)",
+      "Bash(curl -s -H \"Host: tcgnote.net\" http://localhost:3001/en/tcg/guides/getting-started)",
+      "Bash(curl -s -H \"Host: tcgnote.net\" http://localhost:3001/robots.txt)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(cd /c/maesil-agency/frontend && echo \"=== env 파일 목록 ===\" && ls -a | grep -iE \"\\\\.env\" ; echo \"=== TCG 관련 env 정의\\(값 마스킹\\) ===\" && grep -rhiE \"NEXT_PUBLIC_TCG_\\(ADSENSE_CLIENT|GA_ID|NAVER_VERIFY|INDEX_CARDS\\)\" .env* 2>/dev/null | sed -E 's/\\(=.{0,6}\\).*/\\\\1***/' || echo \"\\(로컬 env 파일에 TCG 변수 정의 없음\\)\")",
+      "Bash(curl -s --max-time 15 https://tcgnote.net/tcg)",
+      "Bash(echo \"--- exit: $? \\(빈 출력=신호 없음 or 도메인 미연결\\) ---\")",
+      "Bash(curl -s -o /dev/null -w \"tcgnote.net/tcg → %{http_code}\\\\n\" --max-time 15 https://tcgnote.net/tcg)",
+      "Bash(curl -s --max-time 15 https://tcgnote.net/ads.txt)",
+      "Bash(curl -s -o /dev/null -w \"guides → %{http_code}\\\\n\" --max-time 15 https://tcgnote.net/tcg/guides)",
+      "Bash(node -e \"const c=require\\('./app/[lang]/tcg/data/cards.json'\\); console.log\\('총',c.length,'장'\\); console.log\\('hp키 가진 카드 수:', c.filter\\(x=>'hp' in x\\).length\\); console.log\\('샘플:', JSON.stringify\\(c[0]\\)\\);\")",
+      "Bash(curl -s --max-time 20 https://tcgnote.net/tcg/cards)"
     ]
   }
 }
