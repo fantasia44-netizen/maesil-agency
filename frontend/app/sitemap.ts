@@ -74,6 +74,7 @@ function tcgPaths(): [string, CF, number][] {
     ...TCG_GUIDES.map((g) => [`/tcg/guides/${g.slug}`, "monthly", 0.6] as [string, CF, number]),
     // /tcg/cards(카드 DB 유틸)는 린 런치 동안 noindex → 사이트맵 제외. 승인 후 추가 검토.
     ["/tcg/about", "monthly", 0.4],
+    ["/tcg/contact", "monthly", 0.4],
     ["/tcg/privacy", "yearly", 0.3],
     ["/tcg/terms", "yearly", 0.3],
   ];

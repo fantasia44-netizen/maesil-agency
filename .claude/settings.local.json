@@ -334,7 +334,8 @@
       "Bash(curl -s \"http://localhost:3000/gbl/iv\" -o /dev/null -w \"IV HTTP %{http_code}\\\\n\")",
       "Bash(curl -s -o /dev/null -w \"deck-builder: %{http_code}\\\\n\" http://localhost:3000/tcg/deck-builder)",
       "Bash(curl -s -o /dev/null -w \"tcg home: %{http_code}\\\\n\" http://localhost:3000/tcg)",
-      "Read(//c/maesil-agency/frontend/**)"
+      "Read(//c/maesil-agency/frontend/**)",
+      "Bash(cd /c/maesil-agency/frontend/app/'[lang]'/tcg && grep -nE \"権利.*ブラウザ|權利.*瀏覽器|下記の\\(連絡|お問\\)|下方\\(聯絡|電子\\)|연락처로 주세요\" legal.ts)"
     ]
   }
 }
