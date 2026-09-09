@@ -26,8 +26,10 @@ export default function TcgNav() {
   return (
     <header style={{ position: "sticky", top: 0, zIndex: 40, background: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)", borderBottom: "1px solid #fbd8d8" }}>
       <nav style={{ maxWidth: 1040, margin: "0 auto", display: "flex", alignItems: "center", gap: 6, padding: "0.55rem 1rem", flexWrap: "wrap" }}>
-        <Link href={L("/tcg")} style={{ fontWeight: 900, fontSize: "1rem", color: "#dc2626", textDecoration: "none", letterSpacing: "-0.4px", marginRight: 6 }}>
-          🎴 {t.brand}
+        <Link href={L("/tcg")} style={{ display: "flex", alignItems: "center", gap: 7, fontWeight: 900, fontSize: "1rem", color: "#dc2626", textDecoration: "none", letterSpacing: "-0.4px", marginRight: 6, flexShrink: 0 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/tcg-icon.png" alt="" width={26} height={26} style={{ objectFit: "contain" }} />
+          <span>{t.brand}</span>
         </Link>
         <div style={{ display: "flex", gap: 2, flexWrap: "wrap", flex: 1 }}>
           {t.nav.map((n) => {

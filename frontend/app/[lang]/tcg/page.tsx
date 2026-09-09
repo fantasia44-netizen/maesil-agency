@@ -24,6 +24,11 @@ export default function TcgLandingPage({ params }: { params: { lang: string } })
       {/* ── SSR 미션 히어로 ── */}
       <div style={{ background: "linear-gradient(180deg,#fee6e6,#fef7f5)", padding: "1.6rem 1rem 0.6rem" }}>
         <div style={{ maxWidth: 1040, margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/tcg-icon.png" alt="TCG Note" width={40} height={40} style={{ objectFit: "contain" }} />
+            <span style={{ fontSize: "1.35rem", fontWeight: 900, color: "#dc2626", letterSpacing: "-0.5px" }}>{t.brand}</span>
+          </div>
           <h1 style={{ margin: "0 0 8px", fontSize: "clamp(1.2rem,4.5vw,1.6rem)", fontWeight: 900, color: "#b91c1c", letterSpacing: "-0.5px", lineHeight: 1.25 }}>
             {t.hero.h1}
           </h1>
