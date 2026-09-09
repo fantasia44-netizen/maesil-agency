@@ -31,4 +31,42 @@ function localize(cardName) {
   };
 }
 
-module.exports = { localize };
+// 덱 아키타입명(복합) 현지화 — "Mega Lucario ex Lucario" 등 여러 포켓몬 결합명.
+// 그리디 파싱: [접두] 베이스(최대3어) [X/Y변형] [ex] 를 반복. 한 컴포넌트라도 매칭 실패 시 null(영어 유지).
+function locComp(pfxLoc, base, variant, ex) {
+  const suf = ex ? "ex" : "";
+  return {
+    ko: (pfxLoc ? pfxLoc.ko : "") + base.ko + variant + (ex ? " ex" : ""),
+    ja: (pfxLoc ? pfxLoc.ja : "") + base.ja + variant + suf,
+    tw: (pfxLoc ? pfxLoc.tw : "") + base.tw + variant + suf,
+  };
+}
+function localizeDeckName(name) {
+  const words = norm(name).split(/\s+/).filter(Boolean);
+  const comps = [];
+  let i = 0;
+  while (i < words.length) {
+    let pfxLoc = null, j = i;
+    for (const [en, loc] of PFX) {
+      const pw = en.trim().split(/\s+/);
+      if (words.slice(j, j + pw.length).join(" ") === en.trim()) { pfxLoc = loc; j += pw.length; break; }
+    }
+    let base = null, blen = 0;
+    for (let len = Math.min(3, words.length - j); len >= 1; len--) {
+      const cand = words.slice(j, j + len).join(" ").toLowerCase();
+      if (NAME[cand] && NAME[cand].ko) { base = NAME[cand]; blen = len; break; }
+    }
+    if (!base) return null;
+    j += blen;
+    let variant = "";
+    if (words[j] && /^[XY]$/.test(words[j])) { variant = " " + words[j]; j++; }
+    let ex = false;
+    if (words[j] && words[j].toLowerCase() === "ex") { ex = true; j++; }
+    comps.push(locComp(pfxLoc, base, variant, ex));
+    i = j;
+  }
+  if (!comps.length) return null;
+  return { ko: comps.map((c) => c.ko).join(" "), ja: comps.map((c) => c.ja).join(" "), "zh-TW": comps.map((c) => c.tw).join(" ") };
+}
+
+module.exports = { localize, localizeDeckName };

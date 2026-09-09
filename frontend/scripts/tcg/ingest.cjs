@@ -4,7 +4,7 @@
 // 산출: app/[lang]/tcg/data/meta.json, matchups.json  (언어 무관 공유 데이터)
 const fs = require("fs");
 const path = require("path");
-const { localize } = require("./localizeName.cjs"); // 덱리스트 카드명 현지화
+const { localize, localizeDeckName } = require("./localizeName.cjs"); // 카드명·덱명 현지화
 
 const API = "https://play.limitlesstcg.com/api";
 // API 매너 — 앱 식별. 공격적 캐시(이 스크립트를 크론으로 시간당 1회) + 폴라이트 딜레이.
@@ -110,7 +110,7 @@ async function main() {
     const share = players ? d.count / players : 0;
     const wl = wilsonLower(d.wins, n);
     return {
-      id: d.id, name: d.name, icons: d.icons,
+      id: d.id, name: d.name, nm: localizeDeckName(d.name), icons: d.icons,
       count: d.count, share: +(share * 100).toFixed(2),
       wins: d.wins, losses: d.losses, ties: d.ties, n,
       winrate: +(winrate * 100).toFixed(1), wilsonLo: +(wl * 100).toFixed(1),
@@ -141,7 +141,7 @@ async function main() {
 
   // 대표덱 상세 — 랭크덱별 대표 덱리스트 + 통계(대표덱 페이지 /tcg/decks/[id])
   const deckDetails = decks.filter((d) => RANKED.includes(d.tier)).map((d) => ({
-    id: d.id, name: d.name, icons: d.icons, tier: d.tier, share: d.share, winrate: d.winrate, wilsonLo: d.wilsonLo, n: d.n,
+    id: d.id, name: d.name, nm: d.nm, icons: d.icons, tier: d.tier, share: d.share, winrate: d.winrate, wilsonLo: d.wilsonLo, n: d.n,
     decklist: locDecklist(bestList[d.id]?.decklist),
     sampleFrom: bestList[d.id] ? { wins: bestList[d.id].wins, losses: bestList[d.id].losses } : null,
   }));

@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-09T09:16:21.168Z",
+ "generatedAt": "2026-09-09T09:50:49.244Z",
  "source": "Limitless TCG (play.limitlesstcg.com) — 대회 standings/pairings 자체 집계",
  "windowDays": 30,
  "minPlayers": 16,
@@ -10,6 +10,11 @@
   {
    "id": "mega-lucario-ex-b3-lucario-a2",
    "name": "Mega Lucario ex Lucario",
+   "nm": {
+    "ko": "메가 루카리오 ex 루카리오",
+    "ja": "メガルカリオex ルカリオ",
+    "zh-TW": "超級路卡利歐ex 路卡利歐"
+   },
    "icons": [
     "lucario-mega",
     "lucario"
@@ -27,6 +32,11 @@
   {
    "id": "mega-altaria-ex-b1-espeon-b3a",
    "name": "Mega Altaria ex Espeon",
+   "nm": {
+    "ko": "메가 파비코리 ex 에브이",
+    "ja": "メガチルタリスex エーフィ",
+    "zh-TW": "超級七夕青鳥ex 太陽伊布"
+   },
    "icons": [
     "altaria-mega",
     "espeon"
@@ -44,6 +54,11 @@
   {
    "id": "suicune-ex-a4a-baxcalibur-b2a",
    "name": "Suicune ex Baxcalibur",
+   "nm": {
+    "ko": "스이쿤 ex 드닐레이브",
+    "ja": "スイクンex セグレイブ",
+    "zh-TW": "水君ex 戟脊龍"
+   },
    "icons": [
     "suicune",
     "baxcalibur"
@@ -61,6 +76,11 @@
   {
    "id": "butterfree-b3b-mega-sceptile-ex-b3",
    "name": "Butterfree Mega Sceptile ex",
+   "nm": {
+    "ko": "버터플 메가 나무킹 ex",
+    "ja": "バタフリー メガジュカインex",
+    "zh-TW": "巴大蝶 超級蜥蜴王ex"
+   },
    "icons": [
     "butterfree",
     "sceptile-mega"
@@ -78,6 +98,11 @@
   {
    "id": "vespiquen-ex-b4-shuckle-ex-a4",
    "name": "Vespiquen ex Shuckle ex",
+   "nm": {
+    "ko": "비퀸 ex 단단지 ex",
+    "ja": "ビークインex ツボツボex",
+    "zh-TW": "蜂女王ex 壺壺ex"
+   },
    "icons": [
     "vespiquen",
     "shuckle"
@@ -95,6 +120,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-hoopa-ex-b4",
    "name": "Team Rocket's Weezing ex Hoopa ex",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 후파 ex",
+    "ja": "ロケット団のマタドガスex フーパex",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 胡帕ex"
+   },
    "icons": [
     "weezing",
     "hoopa-unbound"
@@ -112,6 +142,11 @@
   {
    "id": "mega-blaziken-ex-b1",
    "name": "Mega Blaziken ex",
+   "nm": {
+    "ko": "메가 번치코 ex",
+    "ja": "メガバシャーモex",
+    "zh-TW": "超級火焰雞ex"
+   },
    "icons": [
     "blaziken-mega"
    ],
@@ -128,6 +163,11 @@
   {
    "id": "hydreigon-mega-absol-ex-b1",
    "name": "Hydreigon Mega Absol ex",
+   "nm": {
+    "ko": "삼삼드래 메가 앱솔 ex",
+    "ja": "サザンドラ メガアブソルex",
+    "zh-TW": "三首惡龍 超級阿勃梭魯ex"
+   },
    "icons": [
     "hydreigon",
     "absol-mega"
@@ -145,6 +185,11 @@
   {
    "id": "mega-sceptile-ex-b3-greninja-a1",
    "name": "Mega Sceptile ex Greninja",
+   "nm": {
+    "ko": "메가 나무킹 ex 개굴닌자",
+    "ja": "メガジュカインex ゲッコウガ",
+    "zh-TW": "超級蜥蜴王ex 甲賀忍蛙"
+   },
    "icons": [
     "sceptile-mega",
     "greninja"
@@ -162,6 +207,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-alolan-ninetales-ex-b2",
    "name": "Team Rocket's Raticate ex Alolan Ninetales ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 알로라 나인테일 ex",
+    "ja": "ロケット団のラッタex アローラキュウコンex",
+    "zh-TW": "火箭隊的拉達ex 阿羅拉九尾ex"
+   },
    "icons": [
     "raticate",
     "ninetales-alola"
@@ -179,6 +229,11 @@
   {
    "id": "mega-charizard-y-ex-b1a-entei-ex-a4a",
    "name": "Mega Charizard Y ex Entei ex",
+   "nm": {
+    "ko": "메가 리자몽 Y ex 앤테이 ex",
+    "ja": "メガリザードン Yex エンテイex",
+    "zh-TW": "超級噴火龍 Yex 炎帝ex"
+   },
    "icons": [
     "charizard-mega-y",
     "entei"
@@ -196,6 +251,11 @@
   {
    "id": "hoopa-ex-b4-mega-absol-ex-b1",
    "name": "Hoopa ex Mega Absol ex",
+   "nm": {
+    "ko": "후파 ex 메가 앱솔 ex",
+    "ja": "フーパex メガアブソルex",
+    "zh-TW": "胡帕ex 超級阿勃梭魯ex"
+   },
    "icons": [
     "hoopa-unbound",
     "absol-mega"
@@ -213,6 +273,11 @@
   {
    "id": "magnezone-ex-b3-magnezone-b1a",
    "name": "Magnezone ex Magnezone",
+   "nm": {
+    "ko": "자포코일 ex 자포코일",
+    "ja": "ジバコイルex ジバコイル",
+    "zh-TW": "自爆磁怪ex 自爆磁怪"
+   },
    "icons": [
     "magnezone",
     "magnezone"
@@ -230,6 +295,11 @@
   {
    "id": "mega-manectric-ex-b2b-heliolisk-b4",
    "name": "Mega Manectric ex Heliolisk",
+   "nm": {
+    "ko": "메가 썬더볼트 ex 일레도리자드",
+    "ja": "メガライボルトex エレザード",
+    "zh-TW": "超級雷電獸ex 光電傘蜥"
+   },
    "icons": [
     "manectric-mega",
     "heliolisk"
@@ -247,6 +317,11 @@
   {
    "id": "mega-altaria-ex-b1-greninja-a1",
    "name": "Mega Altaria ex Greninja",
+   "nm": {
+    "ko": "메가 파비코리 ex 개굴닌자",
+    "ja": "メガチルタリスex ゲッコウガ",
+    "zh-TW": "超級七夕青鳥ex 甲賀忍蛙"
+   },
    "icons": [
     "altaria-mega",
     "greninja"
@@ -264,6 +339,11 @@
   {
    "id": "magnezone-b1a-miraidon-ex-b3a",
    "name": "Magnezone Miraidon ex",
+   "nm": {
+    "ko": "자포코일 미라이돈  ex",
+    "ja": "ジバコイル ミライドンex",
+    "zh-TW": "自爆磁怪 密勒頓ex"
+   },
    "icons": [
     "magnezone",
     "miraidon"
@@ -281,6 +361,11 @@
   {
    "id": "dedenne-ex-b3b-indeedee-ex-b1",
    "name": "Dedenne ex Indeedee ex",
+   "nm": {
+    "ko": "데덴네 ex 에써르 ex",
+    "ja": "デデンネex イエッサンex",
+    "zh-TW": "咚咚鼠ex 愛管侍ex"
+   },
    "icons": [
     "dedenne",
     "indeedee"
@@ -298,6 +383,11 @@
   {
    "id": "mega-altaria-ex-b1",
    "name": "Mega Altaria ex",
+   "nm": {
+    "ko": "메가 파비코리 ex",
+    "ja": "メガチルタリスex",
+    "zh-TW": "超級七夕青鳥ex"
+   },
    "icons": [
     "altaria-mega"
    ],
@@ -314,6 +404,11 @@
   {
    "id": "milotic-ex-b3b-eevee-ex-a3b",
    "name": "Milotic ex Eevee ex",
+   "nm": {
+    "ko": "밀로틱 ex 이브이 ex",
+    "ja": "ミロカロスex イーブイex",
+    "zh-TW": "美納斯ex 伊布ex"
+   },
    "icons": [
     "milotic",
     "eevee"
@@ -331,6 +426,11 @@
   {
    "id": "mega-blaziken-ex-b1-greninja-a1",
    "name": "Mega Blaziken ex Greninja",
+   "nm": {
+    "ko": "메가 번치코 ex 개굴닌자",
+    "ja": "メガバシャーモex ゲッコウガ",
+    "zh-TW": "超級火焰雞ex 甲賀忍蛙"
+   },
    "icons": [
     "blaziken-mega",
     "greninja"
@@ -348,6 +448,11 @@
   {
    "id": "dragonair-mega-rayquaza-ex-b4",
    "name": "Dragonair Mega Rayquaza ex",
+   "nm": {
+    "ko": "신뇽 메가 레쿠쟈 ex",
+    "ja": "ハクリュー メガレックウザex",
+    "zh-TW": "哈克龍 超級烈空坐ex"
+   },
    "icons": [
     "dragonair",
     "rayquaza-mega"
@@ -365,6 +470,11 @@
   {
    "id": "garchomp-b4a",
    "name": "Garchomp",
+   "nm": {
+    "ko": "한카리아스",
+    "ja": "ガブリアス",
+    "zh-TW": "烈咬陸鯊"
+   },
    "icons": [
     "garchomp"
    ],
@@ -381,6 +491,11 @@
   {
    "id": "mega-charizard-x-ex-b2b-mega-charizard-y-ex-b1a",
    "name": "Mega Charizard X ex Mega Charizard Y ex",
+   "nm": {
+    "ko": "메가 리자몽 X ex 메가 리자몽 Y ex",
+    "ja": "メガリザードン Xex メガリザードン Yex",
+    "zh-TW": "超級噴火龍 Xex 超級噴火龍 Yex"
+   },
    "icons": [
     "charizard-mega-x",
     "charizard-mega-y"
@@ -398,6 +513,11 @@
   {
    "id": "mega-sharpedo-ex-b4-gyarados-a4",
    "name": "Mega Sharpedo ex Gyarados",
+   "nm": {
+    "ko": "메가 샤크니아 ex 갸라도스",
+    "ja": "メガサメハダーex ギャラドス",
+    "zh-TW": "超級巨牙鯊ex 暴鯉龍"
+   },
    "icons": [
     "sharpedo-mega",
     "gyarados"
@@ -415,6 +535,11 @@
   {
    "id": "whimsicott-ex-b1-ariados-b1a",
    "name": "Whimsicott ex Ariados",
+   "nm": {
+    "ko": "엘풍 ex 아리아도스",
+    "ja": "エルフーンex アリアドス",
+    "zh-TW": "風妖精ex 阿利多斯"
+   },
    "icons": [
     "whimsicott",
     "ariados"
@@ -432,6 +557,11 @@
   {
    "id": "meowscarada-ex-b2a-meowscarada-a2b",
    "name": "Meowscarada ex Meowscarada",
+   "nm": {
+    "ko": "마스카나 ex 마스카나",
+    "ja": "マスカーニャex マスカーニャ",
+    "zh-TW": "魔幻假面喵ex 魔幻假面喵"
+   },
    "icons": [
     "meowscarada",
     "meowscarada"
@@ -449,6 +579,11 @@
   {
    "id": "hoopa-ex-b4-mega-sableye-ex-b3b",
    "name": "Hoopa ex Mega Sableye ex",
+   "nm": {
+    "ko": "후파 ex 메가 깜까미 ex",
+    "ja": "フーパex メガヤミラミex",
+    "zh-TW": "胡帕ex 超級勾魂眼ex"
+   },
    "icons": [
     "hoopa-unbound",
     "sableye-mega"
@@ -466,6 +601,11 @@
   {
    "id": "mega-manectric-ex-b2b-team-rockets-electrode-b4a",
    "name": "Mega Manectric ex Team Rocket's Electrode",
+   "nm": {
+    "ko": "메가 썬더볼트 ex 로켓단의 붐볼",
+    "ja": "メガライボルトex ロケット団のマルマイン",
+    "zh-TW": "超級雷電獸ex 火箭隊的頑皮雷彈"
+   },
    "icons": [
     "manectric-mega",
     "electrode"
@@ -483,6 +623,11 @@
   {
    "id": "jumpluff-ex-a4a-team-rockets-electrode-b4a",
    "name": "Jumpluff ex Team Rocket's Electrode",
+   "nm": {
+    "ko": "솜솜코 ex 로켓단의 붐볼",
+    "ja": "ワタッコex ロケット団のマルマイン",
+    "zh-TW": "毽子棉ex 火箭隊的頑皮雷彈"
+   },
    "icons": [
     "jumpluff",
     "electrode"
@@ -500,6 +645,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-mega-absol-ex-b1",
    "name": "Team Rocket's Weezing ex Mega Absol ex",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 메가 앱솔 ex",
+    "ja": "ロケット団のマタドガスex メガアブソルex",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 超級阿勃梭魯ex"
+   },
    "icons": [
     "weezing",
     "absol-mega"
@@ -517,6 +667,11 @@
   {
    "id": "mega-altaria-ex-b1-igglybuff-a4a",
    "name": "Mega Altaria ex Igglybuff",
+   "nm": {
+    "ko": "메가 파비코리 ex 푸푸린",
+    "ja": "メガチルタリスex ププリン",
+    "zh-TW": "超級七夕青鳥ex 寶寶丁"
+   },
    "icons": [
     "altaria-mega",
     "igglybuff"
@@ -534,6 +689,11 @@
   {
    "id": "mega-altaria-ex-chingling-b1",
    "name": "Mega Altaria ex Chingling",
+   "nm": {
+    "ko": "메가 파비코리 ex 랑딸랑",
+    "ja": "メガチルタリスex リーシャン",
+    "zh-TW": "超級七夕青鳥ex 鈴鐺響"
+   },
    "icons": [
     "altaria-mega",
     "chingling"
@@ -551,6 +711,11 @@
   {
    "id": "team-rockets-slowking-ex-b4a-sylveon-ex-a3b",
    "name": "Team Rocket's Slowking ex Sylveon ex",
+   "nm": {
+    "ko": "로켓단의 야도킹 ex 님피아 ex",
+    "ja": "ロケット団のヤドキングex ニンフィアex",
+    "zh-TW": "火箭隊的呆呆王ex 仙子伊布ex"
+   },
    "icons": [
     "slowking",
     "sylveon"
@@ -568,6 +733,11 @@
   {
    "id": "team-rockets-weezing-ex-team-rockets-magmar-b4a",
    "name": "Team Rocket's Weezing ex Team Rocket's Magmar",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 로켓단의 마그마",
+    "ja": "ロケット団のマタドガスex ロケット団のブーバー",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 火箭隊的鴨嘴火獸"
+   },
    "icons": [
     "weezing",
     "magmar"
@@ -585,6 +755,11 @@
   {
    "id": "indeedee-ex-b1-giratina-ex-a2b",
    "name": "Indeedee ex Giratina ex",
+   "nm": {
+    "ko": "에써르 ex 기라티나 ex",
+    "ja": "イエッサンex ギラティナex",
+    "zh-TW": "愛管侍ex 騎拉帝納ex"
+   },
    "icons": [
     "indeedee",
     "giratina"
@@ -602,6 +777,11 @@
   {
    "id": "beautifly-dustox-b4",
    "name": "Beautifly Dustox",
+   "nm": {
+    "ko": "뷰티플라이 독케일",
+    "ja": "アゲハント ドクケイル",
+    "zh-TW": "狩獵鳳蝶 毒粉蛾"
+   },
    "icons": [
     "beautifly",
     "dustox"
@@ -619,6 +799,11 @@
   {
    "id": "chandelure-b2-oricorio-b4",
    "name": "Chandelure Oricorio",
+   "nm": {
+    "ko": "샹델라 춤추새",
+    "ja": "シャンデラ オドリドリ",
+    "zh-TW": "水晶燈火靈 花舞鳥"
+   },
    "icons": [
     "chandelure",
     "oricorio"
@@ -636,6 +821,11 @@
   {
    "id": "hoopa-ex-b4-greninja-a1",
    "name": "Hoopa ex Greninja",
+   "nm": {
+    "ko": "후파 ex 개굴닌자",
+    "ja": "フーパex ゲッコウガ",
+    "zh-TW": "胡帕ex 甲賀忍蛙"
+   },
    "icons": [
     "hoopa-unbound",
     "greninja"
@@ -653,6 +843,11 @@
   {
    "id": "zoroark-ex-b3-mega-absol-ex-b1",
    "name": "Zoroark ex Mega Absol ex",
+   "nm": {
+    "ko": "조로아크 ex 메가 앱솔 ex",
+    "ja": "ゾロアークex メガアブソルex",
+    "zh-TW": "索羅亞克ex 超級阿勃梭魯ex"
+   },
    "icons": [
     "zoroark",
     "absol-mega"
@@ -670,6 +865,11 @@
   {
    "id": "miraidon-ex-b3a-magnezone-b1a",
    "name": "Miraidon ex Magnezone",
+   "nm": {
+    "ko": "미라이돈  ex 자포코일",
+    "ja": "ミライドンex ジバコイル",
+    "zh-TW": "密勒頓ex 自爆磁怪"
+   },
    "icons": [
     "miraidon",
     "magnezone"
@@ -687,6 +887,11 @@
   {
    "id": "team-rockets-slowking-ex-b4a-meloetta-b2",
    "name": "Team Rocket's Slowking ex Meloetta",
+   "nm": {
+    "ko": "로켓단의 야도킹 ex 메로엣타",
+    "ja": "ロケット団のヤドキングex メロエッタ",
+    "zh-TW": "火箭隊的呆呆王ex 美洛耶塔"
+   },
    "icons": [
     "slowking",
     "meloetta"
@@ -704,6 +909,11 @@
   {
    "id": "garchomp-b4a-goomy-b1",
    "name": "Garchomp Goomy",
+   "nm": {
+    "ko": "한카리아스 미끄메라",
+    "ja": "ガブリアス ヌメラ",
+    "zh-TW": "烈咬陸鯊 黏黏寶"
+   },
    "icons": [
     "garchomp",
     "goomy"
@@ -721,6 +931,11 @@
   {
    "id": "garchomp-b4a-greninja-a1",
    "name": "Garchomp Greninja",
+   "nm": {
+    "ko": "한카리아스 개굴닌자",
+    "ja": "ガブリアス ゲッコウガ",
+    "zh-TW": "烈咬陸鯊 甲賀忍蛙"
+   },
    "icons": [
     "garchomp",
     "greninja"
@@ -738,6 +953,11 @@
   {
    "id": "zoroark-ex-b3-team-rockets-weezing-ex-b4a",
    "name": "Zoroark ex Team Rocket's Weezing ex",
+   "nm": {
+    "ko": "조로아크 ex 로켓단의 또도가스 ex",
+    "ja": "ゾロアークex ロケット団のマタドガスex",
+    "zh-TW": "索羅亞克ex 火箭隊的雙彈瓦斯ex"
+   },
    "icons": [
     "zoroark",
     "weezing"
@@ -755,6 +975,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-zoroark-ex-b3",
    "name": "Team Rocket's Weezing ex Zoroark ex",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 조로아크 ex",
+    "ja": "ロケット団のマタドガスex ゾロアークex",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 索羅亞克ex"
+   },
    "icons": [
     "weezing",
     "zoroark"
@@ -772,6 +997,11 @@
   {
    "id": "mega-kangaskhan-ex-b2-happiny-b4a",
    "name": "Mega Kangaskhan ex Happiny",
+   "nm": {
+    "ko": "메가 캥카 ex 핑복",
+    "ja": "メガガルーラex ピンプク",
+    "zh-TW": "超級袋獸ex 小福蛋"
+   },
    "icons": [
     "kangaskhan-mega",
     "happiny"
@@ -789,6 +1019,11 @@
   {
    "id": "mega-altaria-ex-b1-gourgeist-b2",
    "name": "Mega Altaria ex Gourgeist",
+   "nm": {
+    "ko": "메가 파비코리 ex 펌킨인",
+    "ja": "メガチルタリスex パンプジン",
+    "zh-TW": "超級七夕青鳥ex 南瓜怪人"
+   },
    "icons": [
     "altaria-mega",
     "gourgeist"
@@ -806,6 +1041,11 @@
   {
    "id": "mega-altaria-ex-b1-happiny-b4a",
    "name": "Mega Altaria ex Happiny",
+   "nm": {
+    "ko": "메가 파비코리 ex 핑복",
+    "ja": "メガチルタリスex ピンプク",
+    "zh-TW": "超級七夕青鳥ex 小福蛋"
+   },
    "icons": [
     "altaria-mega",
     "happiny"
@@ -823,6 +1063,11 @@
   {
    "id": "mega-venusaur-ex-b1a",
    "name": "Mega Venusaur ex",
+   "nm": {
+    "ko": "메가 이상해꽃 ex",
+    "ja": "メガフシギバナex",
+    "zh-TW": "超級妙蛙花ex"
+   },
    "icons": [
     "venusaur-mega"
    ],
@@ -839,6 +1084,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-jolteon-ex-b1",
    "name": "Team Rocket's Raticate ex Jolteon ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 쥬피썬더 ex",
+    "ja": "ロケット団のラッタex サンダースex",
+    "zh-TW": "火箭隊的拉達ex 雷伊布ex"
+   },
    "icons": [
     "raticate",
     "jolteon"
@@ -856,6 +1106,7 @@
   {
    "id": "mega-blaziken-ex-b1-castform-sunny-form-b3",
    "name": "Mega Blaziken ex Castform Sunny Form",
+   "nm": null,
    "icons": [
     "blaziken-mega",
     "castform-sunny"
@@ -873,6 +1124,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-mega-lucario-ex-b3",
    "name": "Team Rocket's Raticate ex Mega Lucario ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 메가 루카리오 ex",
+    "ja": "ロケット団のラッタex メガルカリオex",
+    "zh-TW": "火箭隊的拉達ex 超級路卡利歐ex"
+   },
    "icons": [
     "raticate",
     "lucario-mega"
@@ -890,6 +1146,11 @@
   {
    "id": "hydreigon-b1-mega-sableye-ex-b3b",
    "name": "Hydreigon Mega Sableye ex",
+   "nm": {
+    "ko": "삼삼드래 메가 깜까미 ex",
+    "ja": "サザンドラ メガヤミラミex",
+    "zh-TW": "三首惡龍 超級勾魂眼ex"
+   },
    "icons": [
     "hydreigon",
     "sableye-mega"
@@ -907,6 +1168,11 @@
   {
    "id": "mega-lucario-ex-b3-hitmonchan-ex-b1",
    "name": "Mega Lucario ex Hitmonchan ex",
+   "nm": {
+    "ko": "메가 루카리오 ex 홍수몬 ex",
+    "ja": "メガルカリオex エビワラーex",
+    "zh-TW": "超級路卡利歐ex 快拳郎ex"
+   },
    "icons": [
     "lucario-mega",
     "hitmonchan"
@@ -924,6 +1190,11 @@
   {
    "id": "heliolisk-b4-team-rockets-zapdos-ex-b4a",
    "name": "Heliolisk Team Rocket's Zapdos ex",
+   "nm": {
+    "ko": "일레도리자드 로켓단의 썬더 ex",
+    "ja": "エレザード ロケット団のサンダーex",
+    "zh-TW": "光電傘蜥 火箭隊的閃電鳥ex"
+   },
    "icons": [
     "heliolisk",
     "zapdos"
@@ -941,6 +1212,11 @@
   {
    "id": "flygon-ex-b3",
    "name": "Flygon ex",
+   "nm": {
+    "ko": "플라이곤 ex",
+    "ja": "フライゴンex",
+    "zh-TW": "沙漠蜻蜓ex"
+   },
    "icons": [
     "flygon"
    ],
@@ -957,6 +1233,11 @@
   {
    "id": "mega-charizard-x-ex-b2b-team-rockets-moltres-ex-b4a",
    "name": "Mega Charizard X ex Team Rocket's Moltres ex",
+   "nm": {
+    "ko": "메가 리자몽 X ex 로켓단의 파이어 ex",
+    "ja": "メガリザードン Xex ロケット団のファイヤーex",
+    "zh-TW": "超級噴火龍 Xex 火箭隊的火焰鳥ex"
+   },
    "icons": [
     "charizard-mega-x",
     "moltres"
@@ -974,6 +1255,11 @@
   {
    "id": "garchomp-happiny-b4a",
    "name": "Garchomp Happiny",
+   "nm": {
+    "ko": "한카리아스 핑복",
+    "ja": "ガブリアス ピンプク",
+    "zh-TW": "烈咬陸鯊 小福蛋"
+   },
    "icons": [
     "garchomp",
     "happiny"
@@ -991,6 +1277,11 @@
   {
    "id": "mega-lucario-ex-b3",
    "name": "Mega Lucario ex",
+   "nm": {
+    "ko": "메가 루카리오 ex",
+    "ja": "メガルカリオex",
+    "zh-TW": "超級路卡利歐ex"
+   },
    "icons": [
     "lucario-mega"
    ],
@@ -1007,6 +1298,11 @@
   {
    "id": "greninja-a1-mega-absol-ex-b1",
    "name": "Greninja Mega Absol ex",
+   "nm": {
+    "ko": "개굴닌자 메가 앱솔 ex",
+    "ja": "ゲッコウガ メガアブソルex",
+    "zh-TW": "甲賀忍蛙 超級阿勃梭魯ex"
+   },
    "icons": [
     "greninja",
     "absol-mega"
@@ -1024,6 +1320,11 @@
   {
    "id": "greninja-a1-oricorio-a3",
    "name": "Greninja Oricorio",
+   "nm": {
+    "ko": "개굴닌자 춤추새",
+    "ja": "ゲッコウガ オドリドリ",
+    "zh-TW": "甲賀忍蛙 花舞鳥"
+   },
    "icons": [
     "greninja",
     "oricorio-pom-pom"
@@ -1041,6 +1342,11 @@
   {
    "id": "mega-sceptile-ex-sceptile-b3",
    "name": "Mega Sceptile ex Sceptile",
+   "nm": {
+    "ko": "메가 나무킹 ex 나무킹",
+    "ja": "メガジュカインex ジュカイン",
+    "zh-TW": "超級蜥蜴王ex 蜥蜴王"
+   },
    "icons": [
     "sceptile-mega",
     "sceptile"
@@ -1058,6 +1364,11 @@
   {
    "id": "mega-lucario-ex-b3-igglybuff-a4a",
    "name": "Mega Lucario ex Igglybuff",
+   "nm": {
+    "ko": "메가 루카리오 ex 푸푸린",
+    "ja": "メガルカリオex ププリン",
+    "zh-TW": "超級路卡利歐ex 寶寶丁"
+   },
    "icons": [
     "lucario-mega",
     "igglybuff"
@@ -1075,6 +1386,11 @@
   {
    "id": "mega-blastoise-ex-b1a-eiscue-b1",
    "name": "Mega Blastoise ex Eiscue",
+   "nm": {
+    "ko": "메가 거북왕 ex 빙큐보",
+    "ja": "メガカメックスex コオリッポ",
+    "zh-TW": "超級水箭龜ex 冰砌鵝"
+   },
    "icons": [
     "blastoise-mega",
     "eiscue"
@@ -1092,6 +1408,11 @@
   {
    "id": "mega-blaziken-ex-b1-entei-ex-a4a",
    "name": "Mega Blaziken ex Entei ex",
+   "nm": {
+    "ko": "메가 번치코 ex 앤테이 ex",
+    "ja": "メガバシャーモex エンテイex",
+    "zh-TW": "超級火焰雞ex 炎帝ex"
+   },
    "icons": [
     "blaziken-mega",
     "entei"
@@ -1109,6 +1430,11 @@
   {
    "id": "mega-sharpedo-ex-b4-chien-pao-ex-b2a",
    "name": "Mega Sharpedo ex Chien-Pao ex",
+   "nm": {
+    "ko": "메가 샤크니아 ex 파오젠 ex",
+    "ja": "メガサメハダーex パオジアンex",
+    "zh-TW": "超級巨牙鯊ex 古劍豹ex"
+   },
    "icons": [
     "sharpedo-mega",
     "chien-pao"
@@ -1126,6 +1452,11 @@
   {
    "id": "hoopa-ex-b4-team-rockets-weezing-ex-b4a",
    "name": "Hoopa ex Team Rocket's Weezing ex",
+   "nm": {
+    "ko": "후파 ex 로켓단의 또도가스 ex",
+    "ja": "フーパex ロケット団のマタドガスex",
+    "zh-TW": "胡帕ex 火箭隊的雙彈瓦斯ex"
+   },
    "icons": [
     "hoopa-unbound",
     "weezing"
@@ -1143,6 +1474,11 @@
   {
    "id": "garchomp-b4a-mantyke-a4a",
    "name": "Garchomp Mantyke",
+   "nm": {
+    "ko": "한카리아스 타만타",
+    "ja": "ガブリアス タマンタ",
+    "zh-TW": "烈咬陸鯊 小球飛魚"
+   },
    "icons": [
     "garchomp",
     "mantyke"
@@ -1160,6 +1496,11 @@
   {
    "id": "flutter-mane-ex-b3a",
    "name": "Flutter Mane ex",
+   "nm": {
+    "ko": "날개치는머리 ex",
+    "ja": "ハバタクカミex",
+    "zh-TW": "振翼髮ex"
+   },
    "icons": [
     "flutter-mane"
    ],
@@ -1176,6 +1517,11 @@
   {
    "id": "giratina-ex-a2b-darkrai-ex-a2",
    "name": "Giratina ex Darkrai ex",
+   "nm": {
+    "ko": "기라티나 ex 다크라이 ex",
+    "ja": "ギラティナex ダークライex",
+    "zh-TW": "騎拉帝納ex 達克萊伊ex"
+   },
    "icons": [
     "giratina",
     "darkrai"
@@ -1193,6 +1539,7 @@
   {
    "id": "team-rockets-raticate-ex-b4a-terapagos-ex-b3a",
    "name": "Team Rocket's Raticate ex Terapagos ex",
+   "nm": null,
    "icons": [
     "raticate",
     "terapagos"
@@ -1210,6 +1557,11 @@
   {
    "id": "team-rockets-raticate-ex-team-rockets-weezing-ex-b4a",
    "name": "Team Rocket's Raticate ex Team Rocket's Weezing ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 로켓단의 또도가스 ex",
+    "ja": "ロケット団のラッタex ロケット団のマタドガスex",
+    "zh-TW": "火箭隊的拉達ex 火箭隊的雙彈瓦斯ex"
+   },
    "icons": [
     "raticate",
     "weezing"
@@ -1227,6 +1579,11 @@
   {
    "id": "suicune-ex-a4a-greninja-ex-b1",
    "name": "Suicune ex Greninja ex",
+   "nm": {
+    "ko": "스이쿤 ex 개굴닌자 ex",
+    "ja": "スイクンex ゲッコウガex",
+    "zh-TW": "水君ex 甲賀忍蛙ex"
+   },
    "icons": [
     "suicune",
     "greninja"
@@ -1244,6 +1601,11 @@
   {
    "id": "team-rockets-articuno-ex-b4a",
    "name": "Team Rocket's Articuno ex",
+   "nm": {
+    "ko": "로켓단의 프리져 ex",
+    "ja": "ロケット団のフリーザーex",
+    "zh-TW": "火箭隊的急凍鳥ex"
+   },
    "icons": [
     "articuno"
    ],
@@ -1260,6 +1622,11 @@
   {
    "id": "garchomp-b4a-munchlax-b3b",
    "name": "Garchomp Munchlax",
+   "nm": {
+    "ko": "한카리아스 먹고자",
+    "ja": "ガブリアス ゴンベ",
+    "zh-TW": "烈咬陸鯊 小卡比獸"
+   },
    "icons": [
     "garchomp",
     "munchlax"
@@ -1277,6 +1644,11 @@
   {
    "id": "garchomp-a2-goomy-b1",
    "name": "Garchomp Goomy",
+   "nm": {
+    "ko": "한카리아스 미끄메라",
+    "ja": "ガブリアス ヌメラ",
+    "zh-TW": "烈咬陸鯊 黏黏寶"
+   },
    "icons": [
     "garchomp",
     "goomy"
@@ -1294,6 +1666,11 @@
   {
    "id": "garchomp-b4a-meowth-b2",
    "name": "Garchomp Meowth",
+   "nm": {
+    "ko": "한카리아스 나옹",
+    "ja": "ガブリアス ニャース",
+    "zh-TW": "烈咬陸鯊 喵喵"
+   },
    "icons": [
     "garchomp",
     "meowth"
@@ -1311,6 +1688,11 @@
   {
    "id": "mega-lucario-ex-b3-greninja-a1",
    "name": "Mega Lucario ex Greninja",
+   "nm": {
+    "ko": "메가 루카리오 ex 개굴닌자",
+    "ja": "メガルカリオex ゲッコウガ",
+    "zh-TW": "超級路卡利歐ex 甲賀忍蛙"
+   },
    "icons": [
     "lucario-mega",
     "greninja"
@@ -1328,6 +1710,11 @@
   {
    "id": "koraidon-ex-great-tusk-b3a",
    "name": "Koraidon ex Great Tusk",
+   "nm": {
+    "ko": "코라이돈 ex 위대한엄니",
+    "ja": "コライドンex イダイナキバ",
+    "zh-TW": "故勒頓ex 雄偉牙"
+   },
    "icons": [
     "koraidon",
     "great-tusk"
@@ -1345,6 +1732,11 @@
   {
    "id": "mega-sharpedo-ex-b4-milotic-ex-b3b",
    "name": "Mega Sharpedo ex Milotic ex",
+   "nm": {
+    "ko": "메가 샤크니아 ex 밀로틱 ex",
+    "ja": "メガサメハダーex ミロカロスex",
+    "zh-TW": "超級巨牙鯊ex 美納斯ex"
+   },
    "icons": [
     "sharpedo-mega",
     "milotic"
@@ -1362,6 +1754,11 @@
   {
    "id": "gourgeist-b2-houndstone-b2a",
    "name": "Gourgeist Houndstone",
+   "nm": {
+    "ko": "펌킨인 묘두기",
+    "ja": "パンプジン ハカドッグ",
+    "zh-TW": "南瓜怪人 墓揚犬"
+   },
    "icons": [
     "gourgeist",
     "houndstone"
@@ -1379,6 +1776,11 @@
   {
    "id": "mega-ampharos-ex-b1-greninja-a1",
    "name": "Mega Ampharos ex Greninja",
+   "nm": {
+    "ko": "메가 전룡 ex 개굴닌자",
+    "ja": "メガデンリュウex ゲッコウガ",
+    "zh-TW": "超級電龍ex 甲賀忍蛙"
+   },
    "icons": [
     "ampharos-mega",
     "greninja"
@@ -1396,6 +1798,7 @@
   {
    "id": "mega-kangaskhan-ex-teal-mask-ogerpon-ex-b2",
    "name": "Mega Kangaskhan ex Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "kangaskhan-mega",
     "ogerpon"
@@ -1413,6 +1816,11 @@
   {
    "id": "entei-ex-a4a",
    "name": "Entei ex",
+   "nm": {
+    "ko": "앤테이 ex",
+    "ja": "エンテイex",
+    "zh-TW": "炎帝ex"
+   },
    "icons": [
     "entei"
    ],
@@ -1429,6 +1837,11 @@
   {
    "id": "umbreon-ex-a4-greninja-a1",
    "name": "Umbreon ex Greninja",
+   "nm": {
+    "ko": "블래키 ex 개굴닌자",
+    "ja": "ブラッキーex ゲッコウガ",
+    "zh-TW": "月亮伊布ex 甲賀忍蛙"
+   },
    "icons": [
     "umbreon",
     "greninja"
@@ -1446,6 +1859,11 @@
   {
    "id": "team-rockets-electrode-b4a-luxray-b4",
    "name": "Team Rocket's Electrode Luxray",
+   "nm": {
+    "ko": "로켓단의 붐볼 렌트라",
+    "ja": "ロケット団のマルマイン レントラー",
+    "zh-TW": "火箭隊的頑皮雷彈 倫琴貓"
+   },
    "icons": [
     "electrode",
     "luxray"
@@ -1463,6 +1881,11 @@
   {
    "id": "mega-diancie-ex-carbink-b3b",
    "name": "Mega Diancie ex Carbink",
+   "nm": {
+    "ko": "메가 디안시 ex 멜리시",
+    "ja": "メガディアンシーex メレシー",
+    "zh-TW": "超級蒂安希ex 小碎鑽"
+   },
    "icons": [
     "diancie-mega",
     "carbink"
@@ -1480,6 +1903,11 @@
   {
    "id": "flareon-ex-a3b-flareon-b4",
    "name": "Flareon ex Flareon",
+   "nm": {
+    "ko": "부스터 ex 부스터",
+    "ja": "ブースターex ブースター",
+    "zh-TW": "火伊布ex 火伊布"
+   },
    "icons": [
     "flareon",
     "flareon"
@@ -1497,6 +1925,11 @@
   {
    "id": "mega-sharpedo-ex-b4-team-rockets-articuno-ex-b4a",
    "name": "Mega Sharpedo ex Team Rocket's Articuno ex",
+   "nm": {
+    "ko": "메가 샤크니아 ex 로켓단의 프리져 ex",
+    "ja": "メガサメハダーex ロケット団のフリーザーex",
+    "zh-TW": "超級巨牙鯊ex 火箭隊的急凍鳥ex"
+   },
    "icons": [
     "sharpedo-mega",
     "articuno"
@@ -1514,6 +1947,11 @@
   {
    "id": "mega-gardevoir-ex-gardevoir-b2",
    "name": "Mega Gardevoir ex Gardevoir",
+   "nm": {
+    "ko": "메가 가디안 ex 가디안",
+    "ja": "メガサーナイトex サーナイト",
+    "zh-TW": "超級沙奈朵ex 沙奈朵"
+   },
    "icons": [
     "gardevoir-mega",
     "gardevoir"
@@ -1531,6 +1969,11 @@
   {
    "id": "mega-gardevoir-ex-b2-mega-diancie-ex-b3b",
    "name": "Mega Gardevoir ex Mega Diancie ex",
+   "nm": {
+    "ko": "메가 가디안 ex 메가 디안시 ex",
+    "ja": "メガサーナイトex メガディアンシーex",
+    "zh-TW": "超級沙奈朵ex 超級蒂安希ex"
+   },
    "icons": [
     "gardevoir-mega",
     "diancie-mega"
@@ -1548,6 +1991,11 @@
   {
    "id": "mega-ampharos-ex-b1-team-rockets-electrode-b4a",
    "name": "Mega Ampharos ex Team Rocket's Electrode",
+   "nm": {
+    "ko": "메가 전룡 ex 로켓단의 붐볼",
+    "ja": "メガデンリュウex ロケット団のマルマイン",
+    "zh-TW": "超級電龍ex 火箭隊的頑皮雷彈"
+   },
    "icons": [
     "ampharos-mega",
     "electrode"
@@ -1565,6 +2013,11 @@
   {
    "id": "mega-lucario-ex-b3-team-rockets-raticate-ex-b4a",
    "name": "Mega Lucario ex Team Rocket's Raticate ex",
+   "nm": {
+    "ko": "메가 루카리오 ex 로켓단의 레트라 ex",
+    "ja": "メガルカリオex ロケット団のラッタex",
+    "zh-TW": "超級路卡利歐ex 火箭隊的拉達ex"
+   },
    "icons": [
     "lucario-mega",
     "raticate"
@@ -1582,6 +2035,11 @@
   {
    "id": "mega-blaziken-ex-b1-skeledirge-b2a",
    "name": "Mega Blaziken ex Skeledirge",
+   "nm": {
+    "ko": "메가 번치코 ex 라우드본",
+    "ja": "メガバシャーモex ラウドボーン",
+    "zh-TW": "超級火焰雞ex 骨紋巨聲鱷"
+   },
    "icons": [
     "blaziken-mega",
     "skeledirge"
@@ -1599,6 +2057,11 @@
   {
    "id": "zoroark-ex-b3-mega-sableye-ex-b3b",
    "name": "Zoroark ex Mega Sableye ex",
+   "nm": {
+    "ko": "조로아크 ex 메가 깜까미 ex",
+    "ja": "ゾロアークex メガヤミラミex",
+    "zh-TW": "索羅亞克ex 超級勾魂眼ex"
+   },
    "icons": [
     "zoroark",
     "sableye-mega"
@@ -1616,6 +2079,11 @@
   {
    "id": "garchomp-ex-a2a-garchomp-b4a",
    "name": "Garchomp ex Garchomp",
+   "nm": {
+    "ko": "한카리아스 ex 한카리아스",
+    "ja": "ガブリアスex ガブリアス",
+    "zh-TW": "烈咬陸鯊ex 烈咬陸鯊"
+   },
    "icons": [
     "garchomp",
     "garchomp"
@@ -1633,6 +2101,11 @@
   {
    "id": "mega-pidgeot-ex-p-b-pidgeot-a1",
    "name": "Mega Pidgeot ex Pidgeot",
+   "nm": {
+    "ko": "메가 피죤투 ex 피죤투",
+    "ja": "メガピジョットex ピジョット",
+    "zh-TW": "超級大比鳥ex 大比鳥"
+   },
    "icons": [
     "pidgeot-mega",
     "pidgeot"
@@ -1650,6 +2123,11 @@
   {
    "id": "mega-sableye-ex-b3b-mega-absol-ex-b1",
    "name": "Mega Sableye ex Mega Absol ex",
+   "nm": {
+    "ko": "메가 깜까미 ex 메가 앱솔 ex",
+    "ja": "メガヤミラミex メガアブソルex",
+    "zh-TW": "超級勾魂眼ex 超級阿勃梭魯ex"
+   },
    "icons": [
     "sableye-mega",
     "absol-mega"
@@ -1667,6 +2145,11 @@
   {
    "id": "magcargo-a4",
    "name": "Magcargo",
+   "nm": {
+    "ko": "마그카르고",
+    "ja": "マグカルゴ",
+    "zh-TW": "熔岩蝸牛"
+   },
    "icons": [
     "magcargo"
    ],
@@ -1683,6 +2166,11 @@
   {
    "id": "milotic-ex-b3b-igglybuff-a4a",
    "name": "Milotic ex Igglybuff",
+   "nm": {
+    "ko": "밀로틱 ex 푸푸린",
+    "ja": "ミロカロスex ププリン",
+    "zh-TW": "美納斯ex 寶寶丁"
+   },
    "icons": [
     "milotic",
     "igglybuff"
@@ -1700,6 +2188,11 @@
   {
    "id": "team-rockets-electrode-team-rockets-zapdos-ex-b4a",
    "name": "Team Rocket's Electrode Team Rocket's Zapdos ex",
+   "nm": {
+    "ko": "로켓단의 붐볼 로켓단의 썬더 ex",
+    "ja": "ロケット団のマルマイン ロケット団のサンダーex",
+    "zh-TW": "火箭隊的頑皮雷彈 火箭隊的閃電鳥ex"
+   },
    "icons": [
     "electrode",
     "zapdos"
@@ -1717,6 +2210,11 @@
   {
    "id": "vaporeon-ex-b3-greninja-ex-b1",
    "name": "Vaporeon ex Greninja ex",
+   "nm": {
+    "ko": "샤미드 ex 개굴닌자 ex",
+    "ja": "シャワーズex ゲッコウガex",
+    "zh-TW": "水伊布ex 甲賀忍蛙ex"
+   },
    "icons": [
     "vaporeon",
     "greninja"
@@ -1734,6 +2232,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-mega-kangaskhan-ex-b2",
    "name": "Team Rocket's Raticate ex Mega Kangaskhan ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 메가 캥카 ex",
+    "ja": "ロケット団のラッタex メガガルーラex",
+    "zh-TW": "火箭隊的拉達ex 超級袋獸ex"
+   },
    "icons": [
     "raticate",
     "kangaskhan-mega"
@@ -1751,6 +2254,11 @@
   {
    "id": "rotom-ex-b4",
    "name": "Rotom ex",
+   "nm": {
+    "ko": "로토무 ex",
+    "ja": "ロトムex",
+    "zh-TW": "洛托姆ex"
+   },
    "icons": [
     "rotom"
    ],
@@ -1767,6 +2275,11 @@
   {
    "id": "magnezone-heliolisk-b1a",
    "name": "Magnezone Heliolisk",
+   "nm": {
+    "ko": "자포코일 일레도리자드",
+    "ja": "ジバコイル エレザード",
+    "zh-TW": "自爆磁怪 光電傘蜥"
+   },
    "icons": [
     "magnezone",
     "heliolisk"
@@ -1784,6 +2297,11 @@
   {
    "id": "indeedee-ex-b1-stoutland-a3a",
    "name": "Indeedee ex Stoutland",
+   "nm": {
+    "ko": "에써르 ex 바랜드",
+    "ja": "イエッサンex ムーランド",
+    "zh-TW": "愛管侍ex 長毛狗"
+   },
    "icons": [
     "indeedee",
     "stoutland"
@@ -1801,6 +2319,11 @@
   {
    "id": "milotic-ex-b3b-chien-pao-ex-b2a",
    "name": "Milotic ex Chien-Pao ex",
+   "nm": {
+    "ko": "밀로틱 ex 파오젠 ex",
+    "ja": "ミロカロスex パオジアンex",
+    "zh-TW": "美納斯ex 古劍豹ex"
+   },
    "icons": [
     "milotic",
     "chien-pao"
@@ -1818,6 +2341,7 @@
   {
    "id": "vespiquen-ex-b4-teal-mask-ogerpon-ex-b2",
    "name": "Vespiquen ex Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "vespiquen",
     "ogerpon"
@@ -1835,6 +2359,11 @@
   {
    "id": "giratina-ex-a2b-indeedee-ex-b1",
    "name": "Giratina ex Indeedee ex",
+   "nm": {
+    "ko": "기라티나 ex 에써르 ex",
+    "ja": "ギラティナex イエッサンex",
+    "zh-TW": "騎拉帝納ex 愛管侍ex"
+   },
    "icons": [
     "giratina",
     "indeedee"
@@ -1852,6 +2381,11 @@
   {
    "id": "mega-steelix-ex-b1a-indeedee-ex-b1",
    "name": "Mega Steelix ex Indeedee ex",
+   "nm": {
+    "ko": "메가 강철톤 ex 에써르 ex",
+    "ja": "メガハガネールex イエッサンex",
+    "zh-TW": "超級大鋼蛇ex 愛管侍ex"
+   },
    "icons": [
     "steelix-mega",
     "indeedee"
@@ -1869,6 +2403,11 @@
   {
    "id": "decidueye-ex-a3-team-rockets-electrode-b4a",
    "name": "Decidueye ex Team Rocket's Electrode",
+   "nm": {
+    "ko": "모크나이퍼 ex 로켓단의 붐볼",
+    "ja": "ジュナイパーex ロケット団のマルマイン",
+    "zh-TW": "狙射樹梟ex 火箭隊的頑皮雷彈"
+   },
    "icons": [
     "decidueye",
     "electrode"
@@ -1886,6 +2425,11 @@
   {
    "id": "mega-gallade-ex-b4-gallade-b3",
    "name": "Mega Gallade ex Gallade",
+   "nm": {
+    "ko": "메가 엘레이드 ex 엘레이드",
+    "ja": "メガエルレイドex エルレイド",
+    "zh-TW": "超級艾路雷朵ex 艾路雷朵"
+   },
    "icons": [
     "gallade-mega",
     "gallade"
@@ -1903,6 +2447,11 @@
   {
    "id": "haxorus-b2b-dragonair-b4",
    "name": "Haxorus Dragonair",
+   "nm": {
+    "ko": "액스라이즈 신뇽",
+    "ja": "オノノクス ハクリュー",
+    "zh-TW": "雙斧戰龍 哈克龍"
+   },
    "icons": [
     "haxorus",
     "dragonair"
@@ -1920,6 +2469,11 @@
   {
    "id": "rotom-ex-b4-oricorio-a3",
    "name": "Rotom ex Oricorio",
+   "nm": {
+    "ko": "로토무 ex 춤추새",
+    "ja": "ロトムex オドリドリ",
+    "zh-TW": "洛托姆ex 花舞鳥"
+   },
    "icons": [
     "rotom",
     "oricorio-pom-pom"
@@ -1937,6 +2491,11 @@
   {
    "id": "mega-lucario-ex-lucario-b3",
    "name": "Mega Lucario ex Lucario",
+   "nm": {
+    "ko": "메가 루카리오 ex 루카리오",
+    "ja": "メガルカリオex ルカリオ",
+    "zh-TW": "超級路卡利歐ex 路卡利歐"
+   },
    "icons": [
     "lucario-mega",
     "lucario"
@@ -1954,6 +2513,11 @@
   {
    "id": "dragonair-b4-altaria-a4a",
    "name": "Dragonair Altaria",
+   "nm": {
+    "ko": "신뇽 파비코리",
+    "ja": "ハクリュー チルタリス",
+    "zh-TW": "哈克龍 七夕青鳥"
+   },
    "icons": [
     "dragonair",
     "altaria"
@@ -1971,6 +2535,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-indeedee-ex-b1",
    "name": "Team Rocket's Raticate ex Indeedee ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 에써르 ex",
+    "ja": "ロケット団のラッタex イエッサンex",
+    "zh-TW": "火箭隊的拉達ex 愛管侍ex"
+   },
    "icons": [
     "raticate",
     "indeedee"
@@ -1988,6 +2557,7 @@
   {
    "id": "mega-sceptile-ex-b3-teal-mask-ogerpon-ex-b2",
    "name": "Mega Sceptile ex Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "sceptile-mega",
     "ogerpon"
@@ -2005,6 +2575,11 @@
   {
    "id": "flygon-ex-b3-sylveon-ex-a3b",
    "name": "Flygon ex Sylveon ex",
+   "nm": {
+    "ko": "플라이곤 ex 님피아 ex",
+    "ja": "フライゴンex ニンフィアex",
+    "zh-TW": "沙漠蜻蜓ex 仙子伊布ex"
+   },
    "icons": [
     "flygon",
     "sylveon"
@@ -2022,6 +2597,11 @@
   {
    "id": "garchomp-a2-greninja-a1",
    "name": "Garchomp Greninja",
+   "nm": {
+    "ko": "한카리아스 개굴닌자",
+    "ja": "ガブリアス ゲッコウガ",
+    "zh-TW": "烈咬陸鯊 甲賀忍蛙"
+   },
    "icons": [
     "garchomp",
     "greninja"
@@ -2039,6 +2619,11 @@
   {
    "id": "indeedee-ex-b1-oricorio-a3",
    "name": "Indeedee ex Oricorio",
+   "nm": {
+    "ko": "에써르 ex 춤추새",
+    "ja": "イエッサンex オドリドリ",
+    "zh-TW": "愛管侍ex 花舞鳥"
+   },
    "icons": [
     "indeedee",
     "oricorio-pom-pom"
@@ -2056,6 +2641,11 @@
   {
    "id": "wailord-ex-b4-indeedee-ex-b1",
    "name": "Wailord ex Indeedee ex",
+   "nm": {
+    "ko": "고래왕 ex 에써르 ex",
+    "ja": "ホエルオーex イエッサンex",
+    "zh-TW": "吼鯨王ex 愛管侍ex"
+   },
    "icons": [
     "wailord",
     "indeedee"
@@ -2073,6 +2663,7 @@
   {
    "id": "porygon-z-a2-teal-mask-ogerpon-ex-b2",
    "name": "Porygon-Z Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "porygon-z",
     "ogerpon"
@@ -2090,6 +2681,11 @@
   {
    "id": "mega-ampharos-ex-b1-ampharos-a4",
    "name": "Mega Ampharos ex Ampharos",
+   "nm": {
+    "ko": "메가 전룡 ex 전룡",
+    "ja": "メガデンリュウex デンリュウ",
+    "zh-TW": "超級電龍ex 電龍"
+   },
    "icons": [
     "ampharos-mega",
     "ampharos"
@@ -2107,6 +2703,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-mega-altaria-ex-b1",
    "name": "Team Rocket's Raticate ex Mega Altaria ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 메가 파비코리 ex",
+    "ja": "ロケット団のラッタex メガチルタリスex",
+    "zh-TW": "火箭隊的拉達ex 超級七夕青鳥ex"
+   },
    "icons": [
     "raticate",
     "altaria-mega"
@@ -2124,6 +2725,11 @@
   {
    "id": "mega-altaria-ex-indeedee-ex-b1",
    "name": "Mega Altaria ex Indeedee ex",
+   "nm": {
+    "ko": "메가 파비코리 ex 에써르 ex",
+    "ja": "メガチルタリスex イエッサンex",
+    "zh-TW": "超級七夕青鳥ex 愛管侍ex"
+   },
    "icons": [
     "altaria-mega",
     "indeedee"
@@ -2141,6 +2747,11 @@
   {
    "id": "team-rockets-zapdos-ex-b4a-heliolisk-b4",
    "name": "Team Rocket's Zapdos ex Heliolisk",
+   "nm": {
+    "ko": "로켓단의 썬더 ex 일레도리자드",
+    "ja": "ロケット団のサンダーex エレザード",
+    "zh-TW": "火箭隊的閃電鳥ex 光電傘蜥"
+   },
    "icons": [
     "zapdos",
     "heliolisk"
@@ -2158,6 +2769,11 @@
   {
    "id": "beedrill-ex-a2b-team-rockets-raticate-ex-b4a",
    "name": "Beedrill ex Team Rocket's Raticate ex",
+   "nm": {
+    "ko": "독침붕 ex 로켓단의 레트라 ex",
+    "ja": "スピアーex ロケット団のラッタex",
+    "zh-TW": "大針蜂ex 火箭隊的拉達ex"
+   },
    "icons": [
     "beedrill",
     "raticate"
@@ -2175,6 +2791,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-tyrantrum-b2",
    "name": "Team Rocket's Raticate ex Tyrantrum",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 견고라스",
+    "ja": "ロケット団のラッタex ガチゴラス",
+    "zh-TW": "火箭隊的拉達ex 怪顎龍"
+   },
    "icons": [
     "raticate",
     "tyrantrum"
@@ -2192,6 +2813,11 @@
   {
    "id": "growlithe-b3b-lillipup-b3",
    "name": "Growlithe Lillipup",
+   "nm": {
+    "ko": "가디 요테리",
+    "ja": "ガーディ ヨーテリー",
+    "zh-TW": "卡蒂狗 小約克"
+   },
    "icons": [
     "growlithe",
     "lillipup"
@@ -2209,6 +2835,11 @@
   {
    "id": "mega-altaria-ex-b1-oricorio-b4",
    "name": "Mega Altaria ex Oricorio",
+   "nm": {
+    "ko": "메가 파비코리 ex 춤추새",
+    "ja": "メガチルタリスex オドリドリ",
+    "zh-TW": "超級七夕青鳥ex 花舞鳥"
+   },
    "icons": [
     "altaria-mega",
     "oricorio"
@@ -2226,6 +2857,11 @@
   {
    "id": "magnezone-b1a-mega-lucario-ex-b3",
    "name": "Magnezone Mega Lucario ex",
+   "nm": {
+    "ko": "자포코일 메가 루카리오 ex",
+    "ja": "ジバコイル メガルカリオex",
+    "zh-TW": "自爆磁怪 超級路卡利歐ex"
+   },
    "icons": [
     "magnezone",
     "lucario-mega"
@@ -2243,6 +2879,11 @@
   {
    "id": "magnezone-b1a-team-rockets-electrode-b4a",
    "name": "Magnezone Team Rocket's Electrode",
+   "nm": {
+    "ko": "자포코일 로켓단의 붐볼",
+    "ja": "ジバコイル ロケット団のマルマイン",
+    "zh-TW": "自爆磁怪 火箭隊的頑皮雷彈"
+   },
    "icons": [
     "magnezone",
     "electrode"
@@ -2260,6 +2901,11 @@
   {
    "id": "team-rockets-articuno-ex-gholdengo-b4a",
    "name": "Team Rocket's Articuno ex Gholdengo",
+   "nm": {
+    "ko": "로켓단의 프리져 ex 타부자고",
+    "ja": "ロケット団のフリーザーex サーフゴー",
+    "zh-TW": "火箭隊的急凍鳥ex 賽富豪"
+   },
    "icons": [
     "articuno",
     "gholdengo"
@@ -2277,6 +2923,11 @@
   {
    "id": "luxray-b4-zeraora-a3a",
    "name": "Luxray Zeraora",
+   "nm": {
+    "ko": "렌트라 제라오라",
+    "ja": "レントラー ゼラオラ",
+    "zh-TW": "倫琴貓 捷拉奧拉"
+   },
    "icons": [
     "luxray",
     "zeraora"
@@ -2294,6 +2945,11 @@
   {
    "id": "team-rockets-moltres-ex-b4a-mega-houndoom-ex-p-b",
    "name": "Team Rocket's Moltres ex Mega Houndoom ex",
+   "nm": {
+    "ko": "로켓단의 파이어 ex 메가 헬가 ex",
+    "ja": "ロケット団のファイヤーex メガヘルガーex",
+    "zh-TW": "火箭隊的火焰鳥ex 超級黑魯加ex"
+   },
    "icons": [
     "moltres",
     "houndoom-mega"
@@ -2311,6 +2967,11 @@
   {
    "id": "dragonair-b4-haxorus-b2b",
    "name": "Dragonair Haxorus",
+   "nm": {
+    "ko": "신뇽 액스라이즈",
+    "ja": "ハクリュー オノノクス",
+    "zh-TW": "哈克龍 雙斧戰龍"
+   },
    "icons": [
     "dragonair",
     "haxorus"
@@ -2328,6 +2989,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-mega-sableye-ex-b3b",
    "name": "Team Rocket's Weezing ex Mega Sableye ex",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 메가 깜까미 ex",
+    "ja": "ロケット団のマタドガスex メガヤミラミex",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 超級勾魂眼ex"
+   },
    "icons": [
     "weezing",
     "sableye-mega"
@@ -2345,6 +3011,11 @@
   {
    "id": "mega-charizard-y-ex-b1a-team-rockets-moltres-ex-b4a",
    "name": "Mega Charizard Y ex Team Rocket's Moltres ex",
+   "nm": {
+    "ko": "메가 리자몽 Y ex 로켓단의 파이어 ex",
+    "ja": "メガリザードン Yex ロケット団のファイヤーex",
+    "zh-TW": "超級噴火龍 Yex 火箭隊的火焰鳥ex"
+   },
    "icons": [
     "charizard-mega-y",
     "moltres"
@@ -2362,6 +3033,11 @@
   {
    "id": "blacephalon-ex-b2",
    "name": "Blacephalon ex",
+   "nm": {
+    "ko": "두파팡 ex",
+    "ja": "ズガドーンex",
+    "zh-TW": "砰頭小丑ex"
+   },
    "icons": [
     "blacephalon"
    ],
@@ -2378,6 +3054,11 @@
   {
    "id": "mega-kangaskhan-ex-b2",
    "name": "Mega Kangaskhan ex",
+   "nm": {
+    "ko": "메가 캥카 ex",
+    "ja": "メガガルーラex",
+    "zh-TW": "超級袋獸ex"
+   },
    "icons": [
     "kangaskhan-mega"
    ],
@@ -2394,6 +3075,11 @@
   {
    "id": "mega-kangaskhan-ex-b2-zeraora-a3a",
    "name": "Mega Kangaskhan ex Zeraora",
+   "nm": {
+    "ko": "메가 캥카 ex 제라오라",
+    "ja": "メガガルーラex ゼラオラ",
+    "zh-TW": "超級袋獸ex 捷拉奧拉"
+   },
    "icons": [
     "kangaskhan-mega",
     "zeraora"
@@ -2411,6 +3097,7 @@
   {
    "id": "mega-houndoom-ex-p-b-castform-sunny-form-b3",
    "name": "Mega Houndoom ex Castform Sunny Form",
+   "nm": null,
    "icons": [
     "houndoom-mega",
     "castform-sunny"
@@ -2428,6 +3115,11 @@
   {
    "id": "magnezone-b1a-heliolisk-b4",
    "name": "Magnezone Heliolisk",
+   "nm": {
+    "ko": "자포코일 일레도리자드",
+    "ja": "ジバコイル エレザード",
+    "zh-TW": "自爆磁怪 光電傘蜥"
+   },
    "icons": [
     "magnezone",
     "heliolisk"
@@ -2445,6 +3137,11 @@
   {
    "id": "mega-sceptile-ex-b3",
    "name": "Mega Sceptile ex",
+   "nm": {
+    "ko": "메가 나무킹 ex",
+    "ja": "メガジュカインex",
+    "zh-TW": "超級蜥蜴王ex"
+   },
    "icons": [
     "sceptile-mega"
    ],
@@ -2461,6 +3158,11 @@
   {
    "id": "espeon-ex-a4-giratina-ex-a2b",
    "name": "Espeon ex Giratina ex",
+   "nm": {
+    "ko": "에브이 ex 기라티나 ex",
+    "ja": "エーフィex ギラティナex",
+    "zh-TW": "太陽伊布ex 騎拉帝納ex"
+   },
    "icons": [
     "espeon",
     "giratina"
@@ -2478,6 +3180,11 @@
   {
    "id": "rotom-ex-b4-zeraora-a3a",
    "name": "Rotom ex Zeraora",
+   "nm": {
+    "ko": "로토무 ex 제라오라",
+    "ja": "ロトムex ゼラオラ",
+    "zh-TW": "洛托姆ex 捷拉奧拉"
+   },
    "icons": [
     "rotom",
     "zeraora"
@@ -2495,6 +3202,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-hydreigon-b1",
    "name": "Team Rocket's Weezing ex Hydreigon",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 삼삼드래",
+    "ja": "ロケット団のマタドガスex サザンドラ",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 三首惡龍"
+   },
    "icons": [
     "weezing",
     "hydreigon"
@@ -2512,6 +3224,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-crawdaunt-a4",
    "name": "Team Rocket's Raticate ex Crawdaunt",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 가재장군",
+    "ja": "ロケット団のラッタex シザリガー",
+    "zh-TW": "火箭隊的拉達ex 鐵螯龍蝦"
+   },
    "icons": [
     "raticate",
     "crawdaunt"
@@ -2529,6 +3246,11 @@
   {
    "id": "team-rockets-slowking-ex-b4a-indeedee-ex-b1",
    "name": "Team Rocket's Slowking ex Indeedee ex",
+   "nm": {
+    "ko": "로켓단의 야도킹 ex 에써르 ex",
+    "ja": "ロケット団のヤドキングex イエッサンex",
+    "zh-TW": "火箭隊的呆呆王ex 愛管侍ex"
+   },
    "icons": [
     "slowking",
     "indeedee"
@@ -2546,6 +3268,11 @@
   {
    "id": "garchomp-a2",
    "name": "Garchomp",
+   "nm": {
+    "ko": "한카리아스",
+    "ja": "ガブリアス",
+    "zh-TW": "烈咬陸鯊"
+   },
    "icons": [
     "garchomp"
    ],
@@ -2562,6 +3289,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-darkrai-ex-a2",
    "name": "Team Rocket's Weezing ex Darkrai ex",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 다크라이 ex",
+    "ja": "ロケット団のマタドガスex ダークライex",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 達克萊伊ex"
+   },
    "icons": [
     "weezing",
     "darkrai"
@@ -2579,6 +3311,11 @@
   {
    "id": "luxray-a2-sylveon-b3b",
    "name": "Luxray Sylveon",
+   "nm": {
+    "ko": "렌트라 님피아",
+    "ja": "レントラー ニンフィア",
+    "zh-TW": "倫琴貓 仙子伊布"
+   },
    "icons": [
     "luxray",
     "sylveon"
@@ -2596,6 +3333,11 @@
   {
    "id": "glimmora-kingambit-b3a",
    "name": "Glimmora Kingambit",
+   "nm": {
+    "ko": "킬라플로르 대도각참",
+    "ja": "キラフロル ドドゲザン",
+    "zh-TW": "晶光花 仆斬將軍"
+   },
    "icons": [
     "glimmora",
     "kingambit"
@@ -2613,6 +3355,11 @@
   {
    "id": "dragonite-ex-a3b",
    "name": "Dragonite ex",
+   "nm": {
+    "ko": "망나뇽 ex",
+    "ja": "カイリューex",
+    "zh-TW": "快龍ex"
+   },
    "icons": [
     "dragonite"
    ],
@@ -2629,6 +3376,11 @@
   {
    "id": "team-rockets-articuno-ex-b4a-articuno-ex-a1",
    "name": "Team Rocket's Articuno ex Articuno ex",
+   "nm": {
+    "ko": "로켓단의 프리져 ex 프리져 ex",
+    "ja": "ロケット団のフリーザーex フリーザーex",
+    "zh-TW": "火箭隊的急凍鳥ex 急凍鳥ex"
+   },
    "icons": [
     "articuno",
     "articuno"
@@ -2646,6 +3398,11 @@
   {
    "id": "hisuian-goodra-b3b",
    "name": "Hisuian Goodra",
+   "nm": {
+    "ko": "히스이 미끄래곤",
+    "ja": "ヒスイヌメルゴン",
+    "zh-TW": "洗翠黏美龍"
+   },
    "icons": [
     "goodra-hisui"
    ],
@@ -2662,6 +3419,7 @@
   {
    "id": "serperior-a1a-teal-mask-ogerpon-ex-b2",
    "name": "Serperior Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "serperior",
     "ogerpon"
@@ -2679,6 +3437,11 @@
   {
    "id": "luxray-b4-team-rockets-electrode-b4a",
    "name": "Luxray Team Rocket's Electrode",
+   "nm": {
+    "ko": "렌트라 로켓단의 붐볼",
+    "ja": "レントラー ロケット団のマルマイン",
+    "zh-TW": "倫琴貓 火箭隊的頑皮雷彈"
+   },
    "icons": [
     "luxray",
     "electrode"
@@ -2696,6 +3459,11 @@
   {
    "id": "decidueye-ex-a3-pheromosa-a3a",
    "name": "Decidueye ex Pheromosa",
+   "nm": {
+    "ko": "모크나이퍼 ex 페로코체",
+    "ja": "ジュナイパーex フェローチェ",
+    "zh-TW": "狙射樹梟ex 費洛美螂"
+   },
    "icons": [
     "decidueye",
     "pheromosa"
@@ -2713,6 +3481,7 @@
   {
    "id": "dragonite-ex-a3b-walking-wake-b3a",
    "name": "Dragonite ex Walking Wake",
+   "nm": null,
    "icons": [
     "dragonite",
     "walking-wake"
@@ -2730,6 +3499,11 @@
   {
    "id": "dragonair-b4-garchomp-b4a",
    "name": "Dragonair Garchomp",
+   "nm": {
+    "ko": "신뇽 한카리아스",
+    "ja": "ハクリュー ガブリアス",
+    "zh-TW": "哈克龍 烈咬陸鯊"
+   },
    "icons": [
     "dragonair",
     "garchomp"
@@ -2747,6 +3521,11 @@
   {
    "id": "greninja-a1-team-rockets-zapdos-ex-b4a",
    "name": "Greninja Team Rocket's Zapdos ex",
+   "nm": {
+    "ko": "개굴닌자 로켓단의 썬더 ex",
+    "ja": "ゲッコウガ ロケット団のサンダーex",
+    "zh-TW": "甲賀忍蛙 火箭隊的閃電鳥ex"
+   },
    "icons": [
     "greninja",
     "zapdos"
@@ -2764,6 +3543,11 @@
   {
    "id": "mega-sceptile-ex-b3-shuckle-ex-a4",
    "name": "Mega Sceptile ex Shuckle ex",
+   "nm": {
+    "ko": "메가 나무킹 ex 단단지 ex",
+    "ja": "メガジュカインex ツボツボex",
+    "zh-TW": "超級蜥蜴王ex 壺壺ex"
+   },
    "icons": [
     "sceptile-mega",
     "shuckle"
@@ -2781,6 +3565,11 @@
   {
    "id": "sylveon-b3b-snorlax-ex-a3b",
    "name": "Sylveon Snorlax ex",
+   "nm": {
+    "ko": "님피아 잠만보 ex",
+    "ja": "ニンフィア カビゴンex",
+    "zh-TW": "仙子伊布 卡比獸ex"
+   },
    "icons": [
     "sylveon",
     "snorlax"
@@ -2798,6 +3587,11 @@
   {
    "id": "bellibolt-ex-b2a-zeraora-a3a",
    "name": "Bellibolt ex Zeraora",
+   "nm": {
+    "ko": "찌리배리 ex 제라오라",
+    "ja": "ハラバリーex ゼラオラ",
+    "zh-TW": "電肚蛙ex 捷拉奧拉"
+   },
    "icons": [
     "bellibolt",
     "zeraora"
@@ -2815,6 +3609,11 @@
   {
    "id": "wishiwashi-ex-a3-indeedee-ex-b1",
    "name": "Wishiwashi ex Indeedee ex",
+   "nm": {
+    "ko": "약어리 ex 에써르 ex",
+    "ja": "ヨワシex イエッサンex",
+    "zh-TW": "弱丁魚ex 愛管侍ex"
+   },
    "icons": [
     "wishiwashi-school",
     "indeedee"
@@ -2832,6 +3631,7 @@
   {
    "id": "mega-lucario-ex-b3-teal-mask-ogerpon-ex-b2",
    "name": "Mega Lucario ex Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "lucario-mega",
     "ogerpon"
@@ -2849,6 +3649,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-porygon-z-a2",
    "name": "Team Rocket's Raticate ex Porygon-Z",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 폴리곤Z",
+    "ja": "ロケット団のラッタex ポリゴンＺ",
+    "zh-TW": "火箭隊的拉達ex 多邊獸Ｚ"
+   },
    "icons": [
     "raticate",
     "porygon-z"
@@ -2866,6 +3671,11 @@
   {
    "id": "mega-lopunny-ex-b1a",
    "name": "Mega Lopunny ex",
+   "nm": {
+    "ko": "메가 이어롭 ex",
+    "ja": "メガミミロップex",
+    "zh-TW": "超級長耳兔ex"
+   },
    "icons": [
     "lopunny-mega"
    ],
@@ -2882,6 +3692,11 @@
   {
    "id": "jolteon-ex-b1-mega-manectric-ex-b2b",
    "name": "Jolteon ex Mega Manectric ex",
+   "nm": {
+    "ko": "쥬피썬더 ex 메가 썬더볼트 ex",
+    "ja": "サンダースex メガライボルトex",
+    "zh-TW": "雷伊布ex 超級雷電獸ex"
+   },
    "icons": [
     "jolteon",
     "manectric-mega"
@@ -2899,6 +3714,11 @@
   {
    "id": "mega-altaria-ex-b1-team-rockets-hypno-b4a",
    "name": "Mega Altaria ex Team Rocket's Hypno",
+   "nm": {
+    "ko": "메가 파비코리 ex 로켓단의 슬리퍼",
+    "ja": "メガチルタリスex ロケット団のスリーパー",
+    "zh-TW": "超級七夕青鳥ex 火箭隊的引夢貘人"
+   },
    "icons": [
     "altaria-mega",
     "hypno"
@@ -2916,6 +3736,11 @@
   {
    "id": "mega-altaria-ex-b1-wynaut-b4",
    "name": "Mega Altaria ex Wynaut",
+   "nm": {
+    "ko": "메가 파비코리 ex 마자",
+    "ja": "メガチルタリスex ソーナノ",
+    "zh-TW": "超級七夕青鳥ex 小果然"
+   },
    "icons": [
     "altaria-mega",
     "wynaut"
@@ -2933,6 +3758,11 @@
   {
    "id": "team-rockets-tinkaton-b4a-wynaut-b4",
    "name": "Team Rocket's Tinkaton Wynaut",
+   "nm": {
+    "ko": "로켓단의 두드리짱 마자",
+    "ja": "ロケット団のデカヌチャン ソーナノ",
+    "zh-TW": "火箭隊的巨鍛匠 小果然"
+   },
    "icons": [
     "tinkaton",
     "wynaut"
@@ -2950,6 +3780,11 @@
   {
    "id": "milotic-ex-b3b-vaporeon-ex-b3",
    "name": "Milotic ex Vaporeon ex",
+   "nm": {
+    "ko": "밀로틱 ex 샤미드 ex",
+    "ja": "ミロカロスex シャワーズex",
+    "zh-TW": "美納斯ex 水伊布ex"
+   },
    "icons": [
     "milotic",
     "vaporeon"
@@ -2967,6 +3802,11 @@
   {
    "id": "espeon-ex-a4-sylveon-ex-a3b",
    "name": "Espeon ex Sylveon ex",
+   "nm": {
+    "ko": "에브이 ex 님피아 ex",
+    "ja": "エーフィex ニンフィアex",
+    "zh-TW": "太陽伊布ex 仙子伊布ex"
+   },
    "icons": [
     "espeon",
     "sylveon"
@@ -2984,6 +3824,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-paldean-clodsire-ex-a2b",
    "name": "Team Rocket's Weezing ex Paldean Clodsire ex",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 팔데아 토오 ex",
+    "ja": "ロケット団のマタドガスex パルデアドオーex",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 帕底亞土王ex"
+   },
    "icons": [
     "weezing",
     "clodsire"
@@ -3001,6 +3846,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-guzzlord-ex-a3a",
    "name": "Team Rocket's Raticate ex Guzzlord ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 악식킹 ex",
+    "ja": "ロケット団のラッタex アクジキングex",
+    "zh-TW": "火箭隊的拉達ex 惡食大王ex"
+   },
    "icons": [
     "raticate",
     "guzzlord"
@@ -3018,6 +3868,11 @@
   {
    "id": "garchomp-b4a-chien-pao-ex-b2a",
    "name": "Garchomp Chien-Pao ex",
+   "nm": {
+    "ko": "한카리아스 파오젠 ex",
+    "ja": "ガブリアス パオジアンex",
+    "zh-TW": "烈咬陸鯊 古劍豹ex"
+   },
    "icons": [
     "garchomp",
     "chien-pao"
@@ -3035,6 +3890,11 @@
   {
    "id": "alolan-ninetales-ex-b2-wugtrio-ex-a2b",
    "name": "Alolan Ninetales ex Wugtrio ex",
+   "nm": {
+    "ko": "알로라 나인테일 ex 바닥트리오 ex",
+    "ja": "アローラキュウコンex ウミトリオex",
+    "zh-TW": "阿羅拉九尾ex 三海地鼠ex"
+   },
    "icons": [
     "ninetales-alola",
     "wugtrio"
@@ -3052,6 +3912,11 @@
   {
    "id": "mega-scizor-ex-revavroom-b2b",
    "name": "Mega Scizor ex Revavroom",
+   "nm": {
+    "ko": "메가 핫삼 ex 부르르룸",
+    "ja": "メガハッサムex ブロロローム",
+    "zh-TW": "超級巨鉗螳螂ex 普隆隆姆"
+   },
    "icons": [
     "scizor-mega",
     "revavroom"
@@ -3069,6 +3934,11 @@
   {
    "id": "banette-a3-gholdengo-b4a",
    "name": "Banette Gholdengo",
+   "nm": {
+    "ko": "다크펫 타부자고",
+    "ja": "ジュペッタ サーフゴー",
+    "zh-TW": "詛咒娃娃 賽富豪"
+   },
    "icons": [
     "banette",
     "gholdengo"
@@ -3086,6 +3956,11 @@
   {
    "id": "greninja-a1-mega-kangaskhan-ex-b2",
    "name": "Greninja Mega Kangaskhan ex",
+   "nm": {
+    "ko": "개굴닌자 메가 캥카 ex",
+    "ja": "ゲッコウガ メガガルーラex",
+    "zh-TW": "甲賀忍蛙 超級袋獸ex"
+   },
    "icons": [
     "greninja",
     "kangaskhan-mega"
@@ -3103,6 +3978,11 @@
   {
    "id": "team-rockets-slowking-ex-b4a-giratina-ex-a2b",
    "name": "Team Rocket's Slowking ex Giratina ex",
+   "nm": {
+    "ko": "로켓단의 야도킹 ex 기라티나 ex",
+    "ja": "ロケット団のヤドキングex ギラティナex",
+    "zh-TW": "火箭隊的呆呆王ex 騎拉帝納ex"
+   },
    "icons": [
     "slowking",
     "giratina"
@@ -3120,6 +4000,7 @@
   {
    "id": "serperior-b4a-teal-mask-ogerpon-ex-b2",
    "name": "Serperior Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "serperior",
     "ogerpon"
@@ -3137,6 +4018,7 @@
   {
    "id": "team-rockets-weezing-ex-b4a-teal-mask-ogerpon-ex-b2",
    "name": "Team Rocket's Weezing ex Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "weezing",
     "ogerpon"
@@ -3154,6 +4036,11 @@
   {
    "id": "milotic-ex-b3b-mega-sharpedo-ex-b4",
    "name": "Milotic ex Mega Sharpedo ex",
+   "nm": {
+    "ko": "밀로틱 ex 메가 샤크니아 ex",
+    "ja": "ミロカロスex メガサメハダーex",
+    "zh-TW": "美納斯ex 超級巨牙鯊ex"
+   },
    "icons": [
     "milotic",
     "sharpedo-mega"
@@ -3171,6 +4058,11 @@
   {
    "id": "decidueye-ex-a3-ariados-b1a",
    "name": "Decidueye ex Ariados",
+   "nm": {
+    "ko": "모크나이퍼 ex 아리아도스",
+    "ja": "ジュナイパーex アリアドス",
+    "zh-TW": "狙射樹梟ex 阿利多斯"
+   },
    "icons": [
     "decidueye",
     "ariados"
@@ -3188,6 +4080,11 @@
   {
    "id": "team-rockets-articuno-ex-b4a-froslass-b3b",
    "name": "Team Rocket's Articuno ex Froslass",
+   "nm": {
+    "ko": "로켓단의 프리져 ex 눈여아",
+    "ja": "ロケット団のフリーザーex ユキメノコ",
+    "zh-TW": "火箭隊的急凍鳥ex 雪妖女"
+   },
    "icons": [
     "articuno",
     "froslass"
@@ -3205,6 +4102,11 @@
   {
    "id": "leafeon-ex-a2a-serperior-b4a",
    "name": "Leafeon ex Serperior",
+   "nm": {
+    "ko": "리피아 ex 샤로다",
+    "ja": "リーフィアex ジャローダ",
+    "zh-TW": "葉伊布ex 君主蛇"
+   },
    "icons": [
     "leafeon",
     "serperior"
@@ -3222,6 +4124,11 @@
   {
    "id": "leafeon-ex-a2a-serperior-a1a",
    "name": "Leafeon ex Serperior",
+   "nm": {
+    "ko": "리피아 ex 샤로다",
+    "ja": "リーフィアex ジャローダ",
+    "zh-TW": "葉伊布ex 君主蛇"
+   },
    "icons": [
     "leafeon",
     "serperior"
@@ -3239,6 +4146,11 @@
   {
    "id": "vaporeon-ex-b3-milotic-ex-b3b",
    "name": "Vaporeon ex Milotic ex",
+   "nm": {
+    "ko": "샤미드 ex 밀로틱 ex",
+    "ja": "シャワーズex ミロカロスex",
+    "zh-TW": "水伊布ex 美納斯ex"
+   },
    "icons": [
     "vaporeon",
     "milotic"
@@ -3256,6 +4168,11 @@
   {
    "id": "gholdengo-ex-b2a-dialga-ex-a2",
    "name": "Gholdengo ex Dialga ex",
+   "nm": {
+    "ko": "타부자고 ex 디아루가 ex",
+    "ja": "サーフゴーex ディアルガex",
+    "zh-TW": "賽富豪ex 帝牙盧卡ex"
+   },
    "icons": [
     "gholdengo",
     "dialga"
@@ -3273,6 +4190,11 @@
   {
    "id": "ho-oh-ex-lugia-ex-a4",
    "name": "Ho-Oh ex Lugia ex",
+   "nm": {
+    "ko": "칠색조 ex 루기아 ex",
+    "ja": "ホウオウex ルギアex",
+    "zh-TW": "鳳王ex 洛奇亞ex"
+   },
    "icons": [
     "ho-oh",
     "lugia"
@@ -3290,6 +4212,11 @@
   {
    "id": "koraidon-ex-b3a-furfrou-b4a",
    "name": "Koraidon ex Furfrou",
+   "nm": {
+    "ko": "코라이돈 ex 트리미앙",
+    "ja": "コライドンex トリミアン",
+    "zh-TW": "故勒頓ex 多麗米亞"
+   },
    "icons": [
     "koraidon",
     "furfrou"
@@ -3307,6 +4234,11 @@
   {
    "id": "mega-lopunny-ex-b1a-greninja-a1",
    "name": "Mega Lopunny ex Greninja",
+   "nm": {
+    "ko": "메가 이어롭 ex 개굴닌자",
+    "ja": "メガミミロップex ゲッコウガ",
+    "zh-TW": "超級長耳兔ex 甲賀忍蛙"
+   },
    "icons": [
     "lopunny-mega",
     "greninja"
@@ -3324,6 +4256,11 @@
   {
    "id": "decidueye-ex-a3-decidueye-a3a",
    "name": "Decidueye ex Decidueye",
+   "nm": {
+    "ko": "모크나이퍼 ex 모크나이퍼",
+    "ja": "ジュナイパーex ジュナイパー",
+    "zh-TW": "狙射樹梟ex 狙射樹梟"
+   },
    "icons": [
     "decidueye",
     "decidueye"
@@ -3341,6 +4278,11 @@
   {
    "id": "mega-charizard-x-ex-b2b-entei-ex-a4a",
    "name": "Mega Charizard X ex Entei ex",
+   "nm": {
+    "ko": "메가 리자몽 X ex 앤테이 ex",
+    "ja": "メガリザードン Xex エンテイex",
+    "zh-TW": "超級噴火龍 Xex 炎帝ex"
+   },
    "icons": [
     "charizard-mega-x",
     "entei"
@@ -3358,6 +4300,11 @@
   {
    "id": "dragonite-ex-a3b-dragonite-a1",
    "name": "Dragonite ex Dragonite",
+   "nm": {
+    "ko": "망나뇽 ex 망나뇽",
+    "ja": "カイリューex カイリュー",
+    "zh-TW": "快龍ex 快龍"
+   },
    "icons": [
     "dragonite",
     "dragonite"
@@ -3375,6 +4322,11 @@
   {
    "id": "togekiss-a4-meowth-b2",
    "name": "Togekiss Meowth",
+   "nm": {
+    "ko": "토게키스 나옹",
+    "ja": "トゲキッス ニャース",
+    "zh-TW": "波克基斯 喵喵"
+   },
    "icons": [
     "togekiss",
     "meowth"
@@ -3392,6 +4344,11 @@
   {
    "id": "samurott-b4-greninja-a1",
    "name": "Samurott Greninja",
+   "nm": {
+    "ko": "대검귀 개굴닌자",
+    "ja": "ダイケンキ ゲッコウガ",
+    "zh-TW": "大劍鬼 甲賀忍蛙"
+   },
    "icons": [
     "samurott",
     "greninja"
@@ -3409,6 +4366,11 @@
   {
    "id": "magnezone-ex-b3-magnezone-a2",
    "name": "Magnezone ex Magnezone",
+   "nm": {
+    "ko": "자포코일 ex 자포코일",
+    "ja": "ジバコイルex ジバコイル",
+    "zh-TW": "自爆磁怪ex 自爆磁怪"
+   },
    "icons": [
     "magnezone",
     "magnezone"
@@ -3426,6 +4388,11 @@
   {
    "id": "mega-gardevoir-ex-b2-giratina-ex-a2b",
    "name": "Mega Gardevoir ex Giratina ex",
+   "nm": {
+    "ko": "메가 가디안 ex 기라티나 ex",
+    "ja": "メガサーナイトex ギラティナex",
+    "zh-TW": "超級沙奈朵ex 騎拉帝納ex"
+   },
    "icons": [
     "gardevoir-mega",
     "giratina"
@@ -3443,6 +4410,11 @@
   {
    "id": "mega-sharpedo-ex-b4-gyarados-ex-a1a",
    "name": "Mega Sharpedo ex Gyarados ex",
+   "nm": {
+    "ko": "메가 샤크니아 ex 갸라도스 ex",
+    "ja": "メガサメハダーex ギャラドスex",
+    "zh-TW": "超級巨牙鯊ex 暴鯉龍ex"
+   },
    "icons": [
     "sharpedo-mega",
     "gyarados"
@@ -3460,6 +4432,11 @@
   {
    "id": "greninja-a1-mega-sableye-ex-b3b",
    "name": "Greninja Mega Sableye ex",
+   "nm": {
+    "ko": "개굴닌자 메가 깜까미 ex",
+    "ja": "ゲッコウガ メガヤミラミex",
+    "zh-TW": "甲賀忍蛙 超級勾魂眼ex"
+   },
    "icons": [
     "greninja",
     "sableye-mega"
@@ -3477,6 +4454,11 @@
   {
    "id": "arceus-ex-a2a-pichu-a4",
    "name": "Arceus ex Pichu",
+   "nm": {
+    "ko": "아르세우스 ex 피츄",
+    "ja": "アルセウスex ピチュー",
+    "zh-TW": "阿爾宙斯ex 皮丘"
+   },
    "icons": [
     "arceus",
     "pichu"
@@ -3494,6 +4476,11 @@
   {
    "id": "greninja-a1-decidueye-ex-a3",
    "name": "Greninja Decidueye ex",
+   "nm": {
+    "ko": "개굴닌자 모크나이퍼 ex",
+    "ja": "ゲッコウガ ジュナイパーex",
+    "zh-TW": "甲賀忍蛙 狙射樹梟ex"
+   },
    "icons": [
     "greninja",
     "decidueye"
@@ -3511,6 +4498,11 @@
   {
    "id": "arceus-ex-crobat-a2a",
    "name": "Arceus ex Crobat",
+   "nm": {
+    "ko": "아르세우스 ex 크로뱃",
+    "ja": "アルセウスex クロバット",
+    "zh-TW": "阿爾宙斯ex 叉字蝠"
+   },
    "icons": [
     "arceus",
     "crobat"
@@ -3528,6 +4520,11 @@
   {
    "id": "team-rockets-slowking-ex-b4a-unown-a4",
    "name": "Team Rocket's Slowking ex Unown",
+   "nm": {
+    "ko": "로켓단의 야도킹 ex 안농",
+    "ja": "ロケット団のヤドキングex アンノーン",
+    "zh-TW": "火箭隊的呆呆王ex 未知圖騰"
+   },
    "icons": [
     "slowking",
     "unown"
@@ -3545,6 +4542,11 @@
   {
    "id": "flygon-ex-b3-dragonair-b4",
    "name": "Flygon ex Dragonair",
+   "nm": {
+    "ko": "플라이곤 ex 신뇽",
+    "ja": "フライゴンex ハクリュー",
+    "zh-TW": "沙漠蜻蜓ex 哈克龍"
+   },
    "icons": [
     "flygon",
     "dragonair"
@@ -3562,6 +4564,11 @@
   {
    "id": "mega-sharpedo-ex-b4-mega-gyarados-ex-b1",
    "name": "Mega Sharpedo ex Mega Gyarados ex",
+   "nm": {
+    "ko": "메가 샤크니아 ex 메가 갸라도스 ex",
+    "ja": "メガサメハダーex メガギャラドスex",
+    "zh-TW": "超級巨牙鯊ex 超級暴鯉龍ex"
+   },
    "icons": [
     "sharpedo-mega",
     "gyarados-mega"
@@ -3579,6 +4586,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-galarian-obstagoon-b2",
    "name": "Team Rocket's Weezing ex Galarian Obstagoon",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 가라르 가로막구리",
+    "ja": "ロケット団のマタドガスex ガラルタチフサグマ",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 伽勒爾堵攔熊"
+   },
    "icons": [
     "weezing",
     "obstagoon"
@@ -3596,6 +4608,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-hoopa-ex-b4",
    "name": "Team Rocket's Raticate ex Hoopa ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 후파 ex",
+    "ja": "ロケット団のラッタex フーパex",
+    "zh-TW": "火箭隊的拉達ex 胡帕ex"
+   },
    "icons": [
     "raticate",
     "hoopa-unbound"
@@ -3613,6 +4630,11 @@
   {
    "id": "indeedee-ex-b1-dedenne-ex-b3b",
    "name": "Indeedee ex Dedenne ex",
+   "nm": {
+    "ko": "에써르 ex 데덴네 ex",
+    "ja": "イエッサンex デデンネex",
+    "zh-TW": "愛管侍ex 咚咚鼠ex"
+   },
    "icons": [
     "indeedee",
     "dedenne"
@@ -3630,6 +4652,11 @@
   {
    "id": "snorlax-ex-a3b-sylveon-b3b",
    "name": "Snorlax ex Sylveon",
+   "nm": {
+    "ko": "잠만보 ex 님피아",
+    "ja": "カビゴンex ニンフィア",
+    "zh-TW": "卡比獸ex 仙子伊布"
+   },
    "icons": [
     "snorlax",
     "sylveon"
@@ -3647,6 +4674,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-banette-a3",
    "name": "Team Rocket's Raticate ex Banette",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 다크펫",
+    "ja": "ロケット団のラッタex ジュペッタ",
+    "zh-TW": "火箭隊的拉達ex 詛咒娃娃"
+   },
    "icons": [
     "raticate",
     "banette"
@@ -3664,6 +4696,11 @@
   {
    "id": "serperior-b4a-shaymin-a2",
    "name": "Serperior Shaymin",
+   "nm": {
+    "ko": "샤로다 쉐이미",
+    "ja": "ジャローダ シェイミ",
+    "zh-TW": "君主蛇 謝米"
+   },
    "icons": [
     "serperior",
     "shaymin"
@@ -3681,6 +4718,11 @@
   {
    "id": "porygon-z-rampardos-a2",
    "name": "Porygon-Z Rampardos",
+   "nm": {
+    "ko": "폴리곤Z 램펄드",
+    "ja": "ポリゴンＺ ラムパルド",
+    "zh-TW": "多邊獸Ｚ 戰槌龍"
+   },
    "icons": [
     "porygon-z",
     "rampardos"
@@ -3698,6 +4740,11 @@
   {
    "id": "mega-metagross-ex-b4",
    "name": "Mega Metagross ex",
+   "nm": {
+    "ko": "메가 메타그로스 ex",
+    "ja": "メガメタグロスex",
+    "zh-TW": "超級巨金怪ex"
+   },
    "icons": [
     "metagross-mega"
    ],
@@ -3714,6 +4761,11 @@
   {
    "id": "crobat-ex-a4-weezing-a1",
    "name": "Crobat ex Weezing",
+   "nm": {
+    "ko": "크로뱃 ex 또도가스",
+    "ja": "クロバットex マタドガス",
+    "zh-TW": "叉字蝠ex 雙彈瓦斯"
+   },
    "icons": [
     "crobat",
     "weezing"
@@ -3731,6 +4783,11 @@
   {
    "id": "aerodactyl-ex-a1a-rampardos-a2",
    "name": "Aerodactyl ex Rampardos",
+   "nm": {
+    "ko": "프테라 ex 램펄드",
+    "ja": "プテラex ラムパルド",
+    "zh-TW": "化石翼龍ex 戰槌龍"
+   },
    "icons": [
     "aerodactyl",
     "rampardos"
@@ -3748,6 +4805,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-dustox-b4",
    "name": "Team Rocket's Weezing ex Dustox",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 독케일",
+    "ja": "ロケット団のマタドガスex ドクケイル",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 毒粉蛾"
+   },
    "icons": [
     "weezing",
     "dustox"
@@ -3765,6 +4827,11 @@
   {
    "id": "toxtricity-ex-b2-heliolisk-b4",
    "name": "Toxtricity ex Heliolisk",
+   "nm": {
+    "ko": "스트린더 ex 일레도리자드",
+    "ja": "ストリンダーex エレザード",
+    "zh-TW": "顫弦蠑螈ex 光電傘蜥"
+   },
    "icons": [
     "toxtricity",
     "heliolisk"
@@ -3782,6 +4849,11 @@
   {
    "id": "mega-altaria-ex-b1-bonsly-b3",
    "name": "Mega Altaria ex Bonsly",
+   "nm": {
+    "ko": "메가 파비코리 ex 꼬지지",
+    "ja": "メガチルタリスex ウソハチ",
+    "zh-TW": "超級七夕青鳥ex 盆才怪"
+   },
    "icons": [
     "altaria-mega",
     "bonsly"
@@ -3799,6 +4871,7 @@
   {
    "id": "meowscarada-ex-b2a-teal-mask-ogerpon-ex-b2",
    "name": "Meowscarada ex Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "meowscarada",
     "ogerpon"
@@ -3816,6 +4889,11 @@
   {
    "id": "milotic-ex-b3b-mega-gyarados-ex-b1",
    "name": "Milotic ex Mega Gyarados ex",
+   "nm": {
+    "ko": "밀로틱 ex 메가 갸라도스 ex",
+    "ja": "ミロカロスex メガギャラドスex",
+    "zh-TW": "美納斯ex 超級暴鯉龍ex"
+   },
    "icons": [
     "milotic",
     "gyarados-mega"
@@ -3833,6 +4911,11 @@
   {
    "id": "milotic-ex-b3b-team-rockets-articuno-ex-b4a",
    "name": "Milotic ex Team Rocket's Articuno ex",
+   "nm": {
+    "ko": "밀로틱 ex 로켓단의 프리져 ex",
+    "ja": "ミロカロスex ロケット団のフリーザーex",
+    "zh-TW": "美納斯ex 火箭隊的急凍鳥ex"
+   },
    "icons": [
     "milotic",
     "articuno"
@@ -3850,6 +4933,11 @@
   {
    "id": "mega-blaziken-ex-blaziken-b1",
    "name": "Mega Blaziken ex Blaziken",
+   "nm": {
+    "ko": "메가 번치코 ex 번치코",
+    "ja": "メガバシャーモex バシャーモ",
+    "zh-TW": "超級火焰雞ex 火焰雞"
+   },
    "icons": [
     "blaziken-mega",
     "blaziken"
@@ -3867,6 +4955,11 @@
   {
    "id": "mega-lucario-ex-b3-palossand-b3b",
    "name": "Mega Lucario ex Palossand",
+   "nm": {
+    "ko": "메가 루카리오 ex 모래성이당",
+    "ja": "メガルカリオex シロデスナ",
+    "zh-TW": "超級路卡利歐ex 噬沙堡爺"
+   },
    "icons": [
     "lucario-mega",
     "palossand"
@@ -3884,6 +4977,11 @@
   {
    "id": "mega-houndoom-ex-p-b-turtonator-a3",
    "name": "Mega Houndoom ex Turtonator",
+   "nm": {
+    "ko": "메가 헬가 ex 폭거북스",
+    "ja": "メガヘルガーex バクガメス",
+    "zh-TW": "超級黑魯加ex 爆焰龜獸"
+   },
    "icons": [
     "houndoom-mega",
     "turtonator"
@@ -3901,6 +4999,11 @@
   {
    "id": "mega-lucario-ex-b3-excadrill-b4",
    "name": "Mega Lucario ex Excadrill",
+   "nm": {
+    "ko": "메가 루카리오 ex 몰드류",
+    "ja": "メガルカリオex ドリュウズ",
+    "zh-TW": "超級路卡利歐ex 龍頭地鼠"
+   },
    "icons": [
     "lucario-mega",
     "excadrill"
@@ -3918,6 +5021,11 @@
   {
    "id": "mega-sharpedo-ex-b4-suicune-ex-a4a",
    "name": "Mega Sharpedo ex Suicune ex",
+   "nm": {
+    "ko": "메가 샤크니아 ex 스이쿤 ex",
+    "ja": "メガサメハダーex スイクンex",
+    "zh-TW": "超級巨牙鯊ex 水君ex"
+   },
    "icons": [
     "sharpedo-mega",
     "suicune"
@@ -3935,6 +5043,11 @@
   {
    "id": "mega-rayquaza-ex-dragonair-b4",
    "name": "Mega Rayquaza ex Dragonair",
+   "nm": {
+    "ko": "메가 레쿠쟈 ex 신뇽",
+    "ja": "メガレックウザex ハクリュー",
+    "zh-TW": "超級烈空坐ex 哈克龍"
+   },
    "icons": [
     "rayquaza-mega",
     "dragonair"
@@ -3952,6 +5065,7 @@
   {
    "id": "flygon-ex-b3-teal-mask-ogerpon-ex-b2",
    "name": "Flygon ex Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "flygon",
     "ogerpon"
@@ -3969,6 +5083,11 @@
   {
    "id": "decidueye-ex-a3-spiritomb-a2",
    "name": "Decidueye ex Spiritomb",
+   "nm": {
+    "ko": "모크나이퍼 ex 화강돌",
+    "ja": "ジュナイパーex ミカルゲ",
+    "zh-TW": "狙射樹梟ex 花岩怪"
+   },
    "icons": [
     "decidueye",
     "spiritomb"
@@ -3986,6 +5105,11 @@
   {
    "id": "milotic-ex-b3b-garchomp-a2",
    "name": "Milotic ex Garchomp",
+   "nm": {
+    "ko": "밀로틱 ex 한카리아스",
+    "ja": "ミロカロスex ガブリアス",
+    "zh-TW": "美納斯ex 烈咬陸鯊"
+   },
    "icons": [
     "milotic",
     "garchomp"
@@ -4003,6 +5127,11 @@
   {
    "id": "mega-sceptile-ex-b3-pheromosa-a3a",
    "name": "Mega Sceptile ex Pheromosa",
+   "nm": {
+    "ko": "메가 나무킹 ex 페로코체",
+    "ja": "メガジュカインex フェローチェ",
+    "zh-TW": "超級蜥蜴王ex 費洛美螂"
+   },
    "icons": [
     "sceptile-mega",
     "pheromosa"
@@ -4020,6 +5149,11 @@
   {
    "id": "entei-ex-a4a-delphox-b4a",
    "name": "Entei ex Delphox",
+   "nm": {
+    "ko": "앤테이 ex 마폭시",
+    "ja": "エンテイex マフォクシー",
+    "zh-TW": "炎帝ex 妖火紅狐"
+   },
    "icons": [
     "entei",
     "delphox"
@@ -4037,6 +5171,11 @@
   {
    "id": "hoopa-ex-b4-galarian-obstagoon-b2",
    "name": "Hoopa ex Galarian Obstagoon",
+   "nm": {
+    "ko": "후파 ex 가라르 가로막구리",
+    "ja": "フーパex ガラルタチフサグマ",
+    "zh-TW": "胡帕ex 伽勒爾堵攔熊"
+   },
    "icons": [
     "hoopa-unbound",
     "obstagoon"
@@ -4054,6 +5193,11 @@
   {
    "id": "milotic-ex-b3b-palkia-ex-a2",
    "name": "Milotic ex Palkia ex",
+   "nm": {
+    "ko": "밀로틱 ex 펄기아 ex",
+    "ja": "ミロカロスex パルキアex",
+    "zh-TW": "美納斯ex 帕路奇亞ex"
+   },
    "icons": [
     "milotic",
     "palkia"
@@ -4071,6 +5215,11 @@
   {
    "id": "magneton-a1-lugia-ex-a4",
    "name": "Magneton Lugia ex",
+   "nm": {
+    "ko": "레어코일 루기아 ex",
+    "ja": "レアコイル ルギアex",
+    "zh-TW": "三合一磁怪 洛奇亞ex"
+   },
    "icons": [
     "magneton",
     "lugia"
@@ -4088,6 +5237,11 @@
   {
    "id": "jolteon-ex-b1-jolteon-a3b",
    "name": "Jolteon ex Jolteon",
+   "nm": {
+    "ko": "쥬피썬더 ex 쥬피썬더",
+    "ja": "サンダースex サンダース",
+    "zh-TW": "雷伊布ex 雷伊布"
+   },
    "icons": [
     "jolteon",
     "jolteon"
@@ -4105,6 +5259,11 @@
   {
    "id": "mega-medicham-ex-p-b",
    "name": "Mega Medicham ex",
+   "nm": {
+    "ko": "메가 요가램 ex",
+    "ja": "メガチャーレムex",
+    "zh-TW": "超級恰雷姆ex"
+   },
    "icons": [
     "medicham-mega"
    ],
@@ -4121,6 +5280,11 @@
   {
    "id": "luxray-a2-zeraora-a3a",
    "name": "Luxray Zeraora",
+   "nm": {
+    "ko": "렌트라 제라오라",
+    "ja": "レントラー ゼラオラ",
+    "zh-TW": "倫琴貓 捷拉奧拉"
+   },
    "icons": [
     "luxray",
     "zeraora"
@@ -4138,6 +5302,11 @@
   {
    "id": "mega-blaziken-ex-b1-team-rockets-moltres-ex-b4a",
    "name": "Mega Blaziken ex Team Rocket's Moltres ex",
+   "nm": {
+    "ko": "메가 번치코 ex 로켓단의 파이어 ex",
+    "ja": "メガバシャーモex ロケット団のファイヤーex",
+    "zh-TW": "超級火焰雞ex 火箭隊的火焰鳥ex"
+   },
    "icons": [
     "blaziken-mega",
     "moltres"
@@ -4155,6 +5324,7 @@
   {
    "id": "mega-lopunny-ex-b1a-teal-mask-ogerpon-ex-b2",
    "name": "Mega Lopunny ex Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "lopunny-mega",
     "ogerpon"
@@ -4172,6 +5342,11 @@
   {
    "id": "serperior-b4a",
    "name": "Serperior",
+   "nm": {
+    "ko": "샤로다",
+    "ja": "ジャローダ",
+    "zh-TW": "君主蛇"
+   },
    "icons": [
     "serperior"
    ],
@@ -4188,6 +5363,11 @@
   {
    "id": "garchomp-b4a-snorlax-b3b",
    "name": "Garchomp Snorlax",
+   "nm": {
+    "ko": "한카리아스 잠만보",
+    "ja": "ガブリアス カビゴン",
+    "zh-TW": "烈咬陸鯊 卡比獸"
+   },
    "icons": [
     "garchomp",
     "snorlax"
@@ -4205,6 +5385,11 @@
   {
    "id": "snorlax-ex-a3b-ho-oh-ex-a4",
    "name": "Snorlax ex Ho-Oh ex",
+   "nm": {
+    "ko": "잠만보 ex 칠색조 ex",
+    "ja": "カビゴンex ホウオウex",
+    "zh-TW": "卡比獸ex 鳳王ex"
+   },
    "icons": [
     "snorlax",
     "ho-oh"
@@ -4222,6 +5407,11 @@
   {
    "id": "mega-manectric-ex-b2b-heliolisk-b1a",
    "name": "Mega Manectric ex Heliolisk",
+   "nm": {
+    "ko": "메가 썬더볼트 ex 일레도리자드",
+    "ja": "メガライボルトex エレザード",
+    "zh-TW": "超級雷電獸ex 光電傘蜥"
+   },
    "icons": [
     "manectric-mega",
     "heliolisk"
@@ -4239,6 +5429,11 @@
   {
    "id": "mega-kangaskhan-ex-b2-tauros-ex-b1",
    "name": "Mega Kangaskhan ex Tauros ex",
+   "nm": {
+    "ko": "메가 캥카 ex 켄타로스 ex",
+    "ja": "メガガルーラex ケンタロスex",
+    "zh-TW": "超級袋獸ex 肯泰羅ex"
+   },
    "icons": [
     "kangaskhan-mega",
     "tauros"
@@ -4256,6 +5451,11 @@
   {
    "id": "mega-audino-ex-b3-indeedee-ex-b1",
    "name": "Mega Audino ex Indeedee ex",
+   "nm": {
+    "ko": "메가 다부니 ex 에써르 ex",
+    "ja": "メガタブンネex イエッサンex",
+    "zh-TW": "超級差不多娃娃ex 愛管侍ex"
+   },
    "icons": [
     "audino-mega",
     "indeedee"
@@ -4273,6 +5473,11 @@
   {
    "id": "serperior-a1a-mega-heracross-ex-p-b",
    "name": "Serperior Mega Heracross ex",
+   "nm": {
+    "ko": "샤로다 메가 헤라크로스 ex",
+    "ja": "ジャローダ メガヘラクロスex",
+    "zh-TW": "君主蛇 超級赫拉克羅斯ex"
+   },
    "icons": [
     "serperior",
     "heracross-mega"
@@ -4290,6 +5495,11 @@
   {
    "id": "mega-medicham-ex-p-b-spiritomb-a2",
    "name": "Mega Medicham ex Spiritomb",
+   "nm": {
+    "ko": "메가 요가램 ex 화강돌",
+    "ja": "メガチャーレムex ミカルゲ",
+    "zh-TW": "超級恰雷姆ex 花岩怪"
+   },
    "icons": [
     "medicham-mega",
     "spiritomb"
@@ -4307,6 +5517,11 @@
   {
    "id": "mega-charizard-y-ex-b1a-moltres-ex-a1",
    "name": "Mega Charizard Y ex Moltres ex",
+   "nm": {
+    "ko": "메가 리자몽 Y ex 파이어 ex",
+    "ja": "メガリザードン Yex ファイヤーex",
+    "zh-TW": "超級噴火龍 Yex 火焰鳥ex"
+   },
    "icons": [
     "charizard-mega-y",
     "moltres"
@@ -4324,6 +5539,11 @@
   {
    "id": "mega-blastoise-ex-b1a-zapdos-ex-a1",
    "name": "Mega Blastoise ex Zapdos ex",
+   "nm": {
+    "ko": "메가 거북왕 ex 썬더 ex",
+    "ja": "メガカメックスex サンダーex",
+    "zh-TW": "超級水箭龜ex 閃電鳥ex"
+   },
    "icons": [
     "blastoise-mega",
     "zapdos"
@@ -4341,6 +5561,11 @@
   {
    "id": "mega-sceptile-ex-b3-butterfree-b3b",
    "name": "Mega Sceptile ex Butterfree",
+   "nm": {
+    "ko": "메가 나무킹 ex 버터플",
+    "ja": "メガジュカインex バタフリー",
+    "zh-TW": "超級蜥蜴王ex 巴大蝶"
+   },
    "icons": [
     "sceptile-mega",
     "butterfree"
@@ -4358,6 +5583,11 @@
   {
    "id": "magnezone-ex-b3-miraidon-ex-b3a",
    "name": "Magnezone ex Miraidon ex",
+   "nm": {
+    "ko": "자포코일 ex 미라이돈  ex",
+    "ja": "ジバコイルex ミライドンex",
+    "zh-TW": "自爆磁怪ex 密勒頓ex"
+   },
    "icons": [
     "magnezone",
     "miraidon"
@@ -4375,6 +5605,11 @@
   {
    "id": "mega-gyarados-ex-b1-articuno-ex-a1",
    "name": "Mega Gyarados ex Articuno ex",
+   "nm": {
+    "ko": "메가 갸라도스 ex 프리져 ex",
+    "ja": "メガギャラドスex フリーザーex",
+    "zh-TW": "超級暴鯉龍ex 急凍鳥ex"
+   },
    "icons": [
     "gyarados-mega",
     "articuno"
@@ -4392,6 +5627,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-suicune-ex-a4a",
    "name": "Team Rocket's Raticate ex Suicune ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 스이쿤 ex",
+    "ja": "ロケット団のラッタex スイクンex",
+    "zh-TW": "火箭隊的拉達ex 水君ex"
+   },
    "icons": [
     "raticate",
     "suicune"
@@ -4409,6 +5649,11 @@
   {
    "id": "delphox-b4a-entei-ex-a4a",
    "name": "Delphox Entei ex",
+   "nm": {
+    "ko": "마폭시 앤테이 ex",
+    "ja": "マフォクシー エンテイex",
+    "zh-TW": "妖火紅狐 炎帝ex"
+   },
    "icons": [
     "delphox",
     "entei"
@@ -4426,6 +5671,11 @@
   {
    "id": "mega-gardevoir-ex-b2-gardevoir-a1",
    "name": "Mega Gardevoir ex Gardevoir",
+   "nm": {
+    "ko": "메가 가디안 ex 가디안",
+    "ja": "メガサーナイトex サーナイト",
+    "zh-TW": "超級沙奈朵ex 沙奈朵"
+   },
    "icons": [
     "gardevoir-mega",
     "gardevoir"
@@ -4443,6 +5693,11 @@
   {
    "id": "crobat-ex-a4-darkrai-ex-a2",
    "name": "Crobat ex Darkrai ex",
+   "nm": {
+    "ko": "크로뱃 ex 다크라이 ex",
+    "ja": "クロバットex ダークライex",
+    "zh-TW": "叉字蝠ex 達克萊伊ex"
+   },
    "icons": [
     "crobat",
     "darkrai"
@@ -4460,6 +5715,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-igglybuff-a4a",
    "name": "Team Rocket's Weezing ex Igglybuff",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 푸푸린",
+    "ja": "ロケット団のマタドガスex ププリン",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 寶寶丁"
+   },
    "icons": [
     "weezing",
     "igglybuff"
@@ -4477,6 +5737,11 @@
   {
    "id": "mega-blastoise-ex-b1a",
    "name": "Mega Blastoise ex",
+   "nm": {
+    "ko": "메가 거북왕 ex",
+    "ja": "メガカメックスex",
+    "zh-TW": "超級水箭龜ex"
+   },
    "icons": [
     "blastoise-mega"
    ],
@@ -4493,6 +5758,11 @@
   {
    "id": "dustox-b4-team-rockets-magmar-b4a",
    "name": "Dustox Team Rocket's Magmar",
+   "nm": {
+    "ko": "독케일 로켓단의 마그마",
+    "ja": "ドクケイル ロケット団のブーバー",
+    "zh-TW": "毒粉蛾 火箭隊的鴨嘴火獸"
+   },
    "icons": [
     "dustox",
     "magmar"
@@ -4510,6 +5780,11 @@
   {
    "id": "flygon-ex-b3-goomy-b1",
    "name": "Flygon ex Goomy",
+   "nm": {
+    "ko": "플라이곤 ex 미끄메라",
+    "ja": "フライゴンex ヌメラ",
+    "zh-TW": "沙漠蜻蜓ex 黏黏寶"
+   },
    "icons": [
     "flygon",
     "goomy"
@@ -4527,6 +5802,11 @@
   {
    "id": "garchomp-b4a-hitmontop-a4",
    "name": "Garchomp Hitmontop",
+   "nm": {
+    "ko": "한카리아스 카포에라",
+    "ja": "ガブリアス カポエラー",
+    "zh-TW": "烈咬陸鯊 戰舞郎"
+   },
    "icons": [
     "garchomp",
     "hitmontop"
@@ -4544,6 +5824,11 @@
   {
    "id": "typhlosion-ex-b4-typhlosion-a4",
    "name": "Typhlosion ex Typhlosion",
+   "nm": {
+    "ko": "블레이범 ex 블레이범",
+    "ja": "バクフーンex バクフーン",
+    "zh-TW": "火爆獸ex 火爆獸"
+   },
    "icons": [
     "typhlosion",
     "typhlosion"
@@ -4561,6 +5846,11 @@
   {
    "id": "chandelure-b2",
    "name": "Chandelure",
+   "nm": {
+    "ko": "샹델라",
+    "ja": "シャンデラ",
+    "zh-TW": "水晶燈火靈"
+   },
    "icons": [
     "chandelure"
    ],
@@ -4577,6 +5867,11 @@
   {
    "id": "team-rockets-raticate-ex-team-rockets-moltres-ex-b4a",
    "name": "Team Rocket's Raticate ex Team Rocket's Moltres ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 로켓단의 파이어 ex",
+    "ja": "ロケット団のラッタex ロケット団のファイヤーex",
+    "zh-TW": "火箭隊的拉達ex 火箭隊的火焰鳥ex"
+   },
    "icons": [
     "raticate",
     "moltres"
@@ -4594,6 +5889,11 @@
   {
    "id": "mega-metagross-ex-b4-orthworm-b2a",
    "name": "Mega Metagross ex Orthworm",
+   "nm": {
+    "ko": "메가 메타그로스 ex 꿈트렁",
+    "ja": "メガメタグロスex ミミズズ",
+    "zh-TW": "超級巨金怪ex 拖拖蚓"
+   },
    "icons": [
     "metagross-mega",
     "orthworm"
@@ -4611,6 +5911,11 @@
   {
    "id": "solgaleo-ex-a3-snorlax-b3b",
    "name": "Solgaleo ex Snorlax",
+   "nm": {
+    "ko": "솔가레오 ex 잠만보",
+    "ja": "ソルガレオex カビゴン",
+    "zh-TW": "索爾迦雷歐ex 卡比獸"
+   },
    "icons": [
     "solgaleo",
     "snorlax"
@@ -4628,6 +5933,7 @@
   {
    "id": "mega-altaria-ex-b1-teal-mask-ogerpon-ex-b2",
    "name": "Mega Altaria ex Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "altaria-mega",
     "ogerpon"
@@ -4645,6 +5951,11 @@
   {
    "id": "flutter-mane-ex-b3a-greninja-a1",
    "name": "Flutter Mane ex Greninja",
+   "nm": {
+    "ko": "날개치는머리 ex 개굴닌자",
+    "ja": "ハバタクカミex ゲッコウガ",
+    "zh-TW": "振翼髮ex 甲賀忍蛙"
+   },
    "icons": [
     "flutter-mane",
     "greninja"
@@ -4662,6 +5973,11 @@
   {
    "id": "mega-mawile-ex-b2",
    "name": "Mega Mawile ex",
+   "nm": {
+    "ko": "메가 입치트 ex",
+    "ja": "メガクチートex",
+    "zh-TW": "超級大嘴娃ex"
+   },
    "icons": [
     "mawile-mega"
    ],
@@ -4678,6 +5994,11 @@
   {
    "id": "pawmot-a2b",
    "name": "Pawmot",
+   "nm": {
+    "ko": "빠르모트",
+    "ja": "パーモット",
+    "zh-TW": "巴布土撥"
+   },
    "icons": [
     "pawmot"
    ],
@@ -4694,6 +6015,11 @@
   {
    "id": "garchomp-a2-mantyke-a4a",
    "name": "Garchomp Mantyke",
+   "nm": {
+    "ko": "한카리아스 타만타",
+    "ja": "ガブリアス タマンタ",
+    "zh-TW": "烈咬陸鯊 小球飛魚"
+   },
    "icons": [
     "garchomp",
     "mantyke"
@@ -4711,6 +6037,11 @@
   {
    "id": "mega-swampert-ex-b2-greninja-a1",
    "name": "Mega Swampert ex Greninja",
+   "nm": {
+    "ko": "메가 대짱이 ex 개굴닌자",
+    "ja": "メガラグラージex ゲッコウガ",
+    "zh-TW": "超級巨沼怪ex 甲賀忍蛙"
+   },
    "icons": [
     "swampert-mega",
     "greninja"
@@ -4728,6 +6059,11 @@
   {
    "id": "mega-kangaskhan-ex-b2-pichu-a4",
    "name": "Mega Kangaskhan ex Pichu",
+   "nm": {
+    "ko": "메가 캥카 ex 피츄",
+    "ja": "メガガルーラex ピチュー",
+    "zh-TW": "超級袋獸ex 皮丘"
+   },
    "icons": [
     "kangaskhan-mega",
     "pichu"
@@ -4745,6 +6081,11 @@
   {
    "id": "incineroar-ex-a3-mega-charizard-y-ex-b1a",
    "name": "Incineroar ex Mega Charizard Y ex",
+   "nm": {
+    "ko": "어흥염 ex 메가 리자몽 Y ex",
+    "ja": "ガオガエンex メガリザードン Yex",
+    "zh-TW": "熾焰咆哮虎ex 超級噴火龍 Yex"
+   },
    "icons": [
     "incineroar",
     "charizard-mega-y"
@@ -4762,6 +6103,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-nihilego-a3a",
    "name": "Team Rocket's Weezing ex Nihilego",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 텅비드",
+    "ja": "ロケット団のマタドガスex ウツロイド",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 虛吾伊德"
+   },
    "icons": [
     "weezing",
     "nihilego"
@@ -4779,6 +6125,11 @@
   {
    "id": "nidoking-a1-munchlax-b3b",
    "name": "Nidoking Munchlax",
+   "nm": {
+    "ko": "니드킹 먹고자",
+    "ja": "ニドキング ゴンベ",
+    "zh-TW": "尼多王 小卡比獸"
+   },
    "icons": [
     "nidoking",
     "munchlax"
@@ -4796,6 +6147,11 @@
   {
    "id": "charizard-ex-a1-mega-charizard-y-ex-b1a",
    "name": "Charizard ex Mega Charizard Y ex",
+   "nm": {
+    "ko": "리자몽 ex 메가 리자몽 Y ex",
+    "ja": "リザードンex メガリザードン Yex",
+    "zh-TW": "噴火龍ex 超級噴火龍 Yex"
+   },
    "icons": [
     "charizard",
     "charizard-mega-y"
@@ -4813,6 +6169,11 @@
   {
    "id": "dragonite-b4-greninja-a1",
    "name": "Dragonite Greninja",
+   "nm": {
+    "ko": "망나뇽 개굴닌자",
+    "ja": "カイリュー ゲッコウガ",
+    "zh-TW": "快龍 甲賀忍蛙"
+   },
    "icons": [
     "dragonite",
     "greninja"
@@ -4830,6 +6191,11 @@
   {
    "id": "mega-gardevoir-ex-b2-mewtwo-ex-a1",
    "name": "Mega Gardevoir ex Mewtwo ex",
+   "nm": {
+    "ko": "메가 가디안 ex 뮤츠 ex",
+    "ja": "メガサーナイトex ミュウツーex",
+    "zh-TW": "超級沙奈朵ex 超夢ex"
+   },
    "icons": [
     "gardevoir-mega",
     "mewtwo"
@@ -4847,6 +6213,7 @@
   {
    "id": "lilligant-b1-teal-maskogerpon-b4",
    "name": "Lilligant Teal MaskOgerpon",
+   "nm": null,
    "icons": [
     "lilligant",
     null
@@ -4864,6 +6231,11 @@
   {
    "id": "leafeon-ex-a2a-giratina-ex-a2b",
    "name": "Leafeon ex Giratina ex",
+   "nm": {
+    "ko": "리피아 ex 기라티나 ex",
+    "ja": "リーフィアex ギラティナex",
+    "zh-TW": "葉伊布ex 騎拉帝納ex"
+   },
    "icons": [
     "leafeon",
     "giratina"
@@ -4881,6 +6253,11 @@
   {
    "id": "flutter-mane-ex-b3a-mega-altaria-ex-b1",
    "name": "Flutter Mane ex Mega Altaria ex",
+   "nm": {
+    "ko": "날개치는머리 ex 메가 파비코리 ex",
+    "ja": "ハバタクカミex メガチルタリスex",
+    "zh-TW": "振翼髮ex 超級七夕青鳥ex"
+   },
    "icons": [
     "flutter-mane",
     "altaria-mega"
@@ -4898,6 +6275,11 @@
   {
    "id": "garchomp-b4a-cleffa-a4",
    "name": "Garchomp Cleffa",
+   "nm": {
+    "ko": "한카리아스 삐",
+    "ja": "ガブリアス ピィ",
+    "zh-TW": "烈咬陸鯊 皮寶寶"
+   },
    "icons": [
     "garchomp",
     "cleffa"
@@ -4915,6 +6297,11 @@
   {
    "id": "mega-lopunny-ex-b1a-lucario-a2",
    "name": "Mega Lopunny ex Lucario",
+   "nm": {
+    "ko": "메가 이어롭 ex 루카리오",
+    "ja": "メガミミロップex ルカリオ",
+    "zh-TW": "超級長耳兔ex 路卡利歐"
+   },
    "icons": [
     "lopunny-mega",
     "lucario"
@@ -4932,6 +6319,11 @@
   {
    "id": "buzzwole-ex-celesteela-a3a",
    "name": "Buzzwole ex Celesteela",
+   "nm": {
+    "ko": "매시붕 ex 철화구야",
+    "ja": "マッシブーンex テッカグヤ",
+    "zh-TW": "爆肌蚊ex 鐵火輝夜"
+   },
    "icons": [
     "buzzwole",
     "celesteela"
@@ -4949,6 +6341,11 @@
   {
    "id": "mega-steelix-ex-b1a-galarian-perrserker-b2",
    "name": "Mega Steelix ex Galarian Perrserker",
+   "nm": {
+    "ko": "메가 강철톤 ex 가라르 나이킹",
+    "ja": "メガハガネールex ガラルニャイキング",
+    "zh-TW": "超級大鋼蛇ex 伽勒爾喵頭目"
+   },
    "icons": [
     "steelix-mega",
     "perrserker"
@@ -4966,6 +6363,11 @@
   {
    "id": "decidueye-ex-a3-heliolisk-b4",
    "name": "Decidueye ex Heliolisk",
+   "nm": {
+    "ko": "모크나이퍼 ex 일레도리자드",
+    "ja": "ジュナイパーex エレザード",
+    "zh-TW": "狙射樹梟ex 光電傘蜥"
+   },
    "icons": [
     "decidueye",
     "heliolisk"
@@ -4983,6 +6385,11 @@
   {
    "id": "magnezone-b1a-oricorio-a3",
    "name": "Magnezone Oricorio",
+   "nm": {
+    "ko": "자포코일 춤추새",
+    "ja": "ジバコイル オドリドリ",
+    "zh-TW": "自爆磁怪 花舞鳥"
+   },
    "icons": [
     "magnezone",
     "oricorio-pom-pom"
@@ -5000,6 +6407,11 @@
   {
    "id": "glimmora-b3a-darkrai-ex-a2",
    "name": "Glimmora Darkrai ex",
+   "nm": {
+    "ko": "킬라플로르 다크라이 ex",
+    "ja": "キラフロル ダークライex",
+    "zh-TW": "晶光花 達克萊伊ex"
+   },
    "icons": [
     "glimmora",
     "darkrai"
@@ -5017,6 +6429,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-oricorio-a3",
    "name": "Team Rocket's Weezing ex Oricorio",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 춤추새",
+    "ja": "ロケット団のマタドガスex オドリドリ",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 花舞鳥"
+   },
    "icons": [
     "weezing",
     "oricorio-pom-pom"
@@ -5034,6 +6451,7 @@
   {
    "id": "tsareena-a3b-teal-mask-ogerpon-ex-b2",
    "name": "Tsareena Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "tsareena",
     "ogerpon"
@@ -5051,6 +6469,11 @@
   {
    "id": "leafeon-ex-a2a-indeedee-ex-b1",
    "name": "Leafeon ex Indeedee ex",
+   "nm": {
+    "ko": "리피아 ex 에써르 ex",
+    "ja": "リーフィアex イエッサンex",
+    "zh-TW": "葉伊布ex 愛管侍ex"
+   },
    "icons": [
     "leafeon",
     "indeedee"
@@ -5068,6 +6491,11 @@
   {
    "id": "team-rockets-electrode-b4a-pawmot-b3a",
    "name": "Team Rocket's Electrode Pawmot",
+   "nm": {
+    "ko": "로켓단의 붐볼 빠르모트",
+    "ja": "ロケット団のマルマイン パーモット",
+    "zh-TW": "火箭隊的頑皮雷彈 巴布土撥"
+   },
    "icons": [
     "electrode",
     "pawmot"
@@ -5085,6 +6513,11 @@
   {
    "id": "indeedee-ex-b1-team-rockets-tinkaton-b4a",
    "name": "Indeedee ex Team Rocket's Tinkaton",
+   "nm": {
+    "ko": "에써르 ex 로켓단의 두드리짱",
+    "ja": "イエッサンex ロケット団のデカヌチャン",
+    "zh-TW": "愛管侍ex 火箭隊的巨鍛匠"
+   },
    "icons": [
     "indeedee",
     "tinkaton"
@@ -5102,6 +6535,11 @@
   {
    "id": "mega-venusaur-ex-b1a-venusaur-a1",
    "name": "Mega Venusaur ex Venusaur",
+   "nm": {
+    "ko": "메가 이상해꽃 ex 이상해꽃",
+    "ja": "メガフシギバナex フシギバナ",
+    "zh-TW": "超級妙蛙花ex 妙蛙花"
+   },
    "icons": [
     "venusaur-mega",
     "venusaur"
@@ -5119,6 +6557,11 @@
   {
    "id": "rampardos-a2",
    "name": "Rampardos",
+   "nm": {
+    "ko": "램펄드",
+    "ja": "ラムパルド",
+    "zh-TW": "戰槌龍"
+   },
    "icons": [
     "rampardos"
    ],
@@ -5135,6 +6578,11 @@
   {
    "id": "mismagius-ex-a2-hatterene-b3",
    "name": "Mismagius ex Hatterene",
+   "nm": {
+    "ko": "무우마직 ex 브리무음",
+    "ja": "ムウマージex ブリムオン",
+    "zh-TW": "夢妖魔ex 布莉姆溫"
+   },
    "icons": [
     "mismagius",
     "hatterene"
@@ -5152,6 +6600,11 @@
   {
    "id": "milotic-ex-b3b-silvally-b4",
    "name": "Milotic ex Silvally",
+   "nm": {
+    "ko": "밀로틱 ex 실버디",
+    "ja": "ミロカロスex シルヴァディ",
+    "zh-TW": "美納斯ex 銀伴戰獸"
+   },
    "icons": [
     "milotic",
     "silvally"
@@ -5169,6 +6622,11 @@
   {
    "id": "gholdengo-ex-b2a-gholdengo-b4a",
    "name": "Gholdengo ex Gholdengo",
+   "nm": {
+    "ko": "타부자고 ex 타부자고",
+    "ja": "サーフゴーex サーフゴー",
+    "zh-TW": "賽富豪ex 賽富豪"
+   },
    "icons": [
     "gholdengo",
     "gholdengo"
@@ -5186,6 +6644,7 @@
   {
    "id": "haxorus-b2b-archaludon-b4a",
    "name": "Haxorus Archaludon",
+   "nm": null,
    "icons": [
     "haxorus",
     "archaludon"
@@ -5203,6 +6662,11 @@
   {
    "id": "hydreigon-b1-zoroark-a4a",
    "name": "Hydreigon Zoroark",
+   "nm": {
+    "ko": "삼삼드래 조로아크",
+    "ja": "サザンドラ ゾロアーク",
+    "zh-TW": "三首惡龍 索羅亞克"
+   },
    "icons": [
     "hydreigon",
     "zoroark"
@@ -5220,6 +6684,11 @@
   {
    "id": "mega-diancie-ex-b3b-mega-gardevoir-ex-b2",
    "name": "Mega Diancie ex Mega Gardevoir ex",
+   "nm": {
+    "ko": "메가 디안시 ex 메가 가디안 ex",
+    "ja": "メガディアンシーex メガサーナイトex",
+    "zh-TW": "超級蒂安希ex 超級沙奈朵ex"
+   },
    "icons": [
     "diancie-mega",
     "gardevoir-mega"
@@ -5237,6 +6706,11 @@
   {
    "id": "mega-houndoom-ex-p-b-houndoom-b4",
    "name": "Mega Houndoom ex Houndoom",
+   "nm": {
+    "ko": "메가 헬가 ex 헬가",
+    "ja": "メガヘルガーex ヘルガー",
+    "zh-TW": "超級黑魯加ex 黑魯加"
+   },
    "icons": [
     "houndoom-mega",
     "houndoom"
@@ -5254,6 +6728,11 @@
   {
    "id": "hoopa-ex-b4-decidueye-ex-a3",
    "name": "Hoopa ex Decidueye ex",
+   "nm": {
+    "ko": "후파 ex 모크나이퍼 ex",
+    "ja": "フーパex ジュナイパーex",
+    "zh-TW": "胡帕ex 狙射樹梟ex"
+   },
    "icons": [
     "hoopa-unbound",
     "decidueye"
@@ -5271,6 +6750,11 @@
   {
    "id": "gourgeist-b2-galarian-cursola-a4a",
    "name": "Gourgeist Galarian Cursola",
+   "nm": {
+    "ko": "펌킨인 가라르 산호르곤",
+    "ja": "パンプジン ガラルサニゴーン",
+    "zh-TW": "南瓜怪人 伽勒爾魔靈珊瑚"
+   },
    "icons": [
     "gourgeist",
     "cursola"
@@ -5288,6 +6772,11 @@
   {
    "id": "lanturn-ex-a4-raikou-ex-a4a",
    "name": "Lanturn ex Raikou ex",
+   "nm": {
+    "ko": "랜턴 ex 라이코 ex",
+    "ja": "ランターンex ライコウex",
+    "zh-TW": "電燈怪ex 雷公ex"
+   },
    "icons": [
     "lanturn",
     "raikou"
@@ -5305,6 +6794,11 @@
   {
    "id": "machamp-b2-zygarde-ex-p-b",
    "name": "Machamp Zygarde ex",
+   "nm": {
+    "ko": "괴력몬 지가르데 ex",
+    "ja": "カイリキー ジガルデex",
+    "zh-TW": "怪力 基格爾德ex"
+   },
    "icons": [
     "machamp",
     "zygarde"
@@ -5322,6 +6816,11 @@
   {
    "id": "indeedee-ex-delcatty-b1",
    "name": "Indeedee ex Delcatty",
+   "nm": {
+    "ko": "에써르 ex 델케티",
+    "ja": "イエッサンex エネコロロ",
+    "zh-TW": "愛管侍ex 優雅貓"
+   },
    "icons": [
     "indeedee",
     "delcatty"
@@ -5339,6 +6838,11 @@
   {
    "id": "team-rockets-electrode-b4a-pawmot-a2b",
    "name": "Team Rocket's Electrode Pawmot",
+   "nm": {
+    "ko": "로켓단의 붐볼 빠르모트",
+    "ja": "ロケット団のマルマイン パーモット",
+    "zh-TW": "火箭隊的頑皮雷彈 巴布土撥"
+   },
    "icons": [
     "electrode",
     "pawmot"
@@ -5356,6 +6860,11 @@
   {
    "id": "mega-sharpedo-ex-b4-mamoswine-a2",
    "name": "Mega Sharpedo ex Mamoswine",
+   "nm": {
+    "ko": "메가 샤크니아 ex 맘모꾸리",
+    "ja": "メガサメハダーex マンムー",
+    "zh-TW": "超級巨牙鯊ex 象牙豬"
+   },
    "icons": [
     "sharpedo-mega",
     "mamoswine"
@@ -5373,6 +6882,11 @@
   {
    "id": "espeon-b3a-igglybuff-a4a",
    "name": "Espeon Igglybuff",
+   "nm": {
+    "ko": "에브이 푸푸린",
+    "ja": "エーフィ ププリン",
+    "zh-TW": "太陽伊布 寶寶丁"
+   },
    "icons": [
     "espeon",
     "igglybuff"
@@ -5390,6 +6904,11 @@
   {
    "id": "jolteon-ex-b1-zeraora-a3a",
    "name": "Jolteon ex Zeraora",
+   "nm": {
+    "ko": "쥬피썬더 ex 제라오라",
+    "ja": "サンダースex ゼラオラ",
+    "zh-TW": "雷伊布ex 捷拉奧拉"
+   },
    "icons": [
     "jolteon",
     "zeraora"
@@ -5407,6 +6926,11 @@
   {
    "id": "greninja-ex-b1-vaporeon-ex-b3",
    "name": "Greninja ex Vaporeon ex",
+   "nm": {
+    "ko": "개굴닌자 ex 샤미드 ex",
+    "ja": "ゲッコウガex シャワーズex",
+    "zh-TW": "甲賀忍蛙ex 水伊布ex"
+   },
    "icons": [
     "greninja",
     "vaporeon"
@@ -5424,6 +6948,11 @@
   {
    "id": "milotic-ex-b3b-dustox-b4",
    "name": "Milotic ex Dustox",
+   "nm": {
+    "ko": "밀로틱 ex 독케일",
+    "ja": "ミロカロスex ドクケイル",
+    "zh-TW": "美納斯ex 毒粉蛾"
+   },
    "icons": [
     "milotic",
     "dustox"
@@ -5441,6 +6970,11 @@
   {
    "id": "wailord-ex-b4-suicune-ex-a4a",
    "name": "Wailord ex Suicune ex",
+   "nm": {
+    "ko": "고래왕 ex 스이쿤 ex",
+    "ja": "ホエルオーex スイクンex",
+    "zh-TW": "吼鯨王ex 水君ex"
+   },
    "icons": [
     "wailord",
     "suicune"
@@ -5458,6 +6992,11 @@
   {
    "id": "armarouge-ex-b2a-sylveon-b3b",
    "name": "Armarouge ex Sylveon",
+   "nm": {
+    "ko": "카디나르마 ex 님피아",
+    "ja": "グレンアルマex ニンフィア",
+    "zh-TW": "紅蓮鎧騎ex 仙子伊布"
+   },
    "icons": [
     "armarouge",
     "sylveon"
@@ -5475,6 +7014,11 @@
   {
    "id": "crobat-ex-a4-mega-sableye-ex-b3b",
    "name": "Crobat ex Mega Sableye ex",
+   "nm": {
+    "ko": "크로뱃 ex 메가 깜까미 ex",
+    "ja": "クロバットex メガヤミラミex",
+    "zh-TW": "叉字蝠ex 超級勾魂眼ex"
+   },
    "icons": [
     "crobat",
     "sableye-mega"
@@ -5492,6 +7036,11 @@
   {
    "id": "mega-altaria-ex-b1-magnezone-b1a",
    "name": "Mega Altaria ex Magnezone",
+   "nm": {
+    "ko": "메가 파비코리 ex 자포코일",
+    "ja": "メガチルタリスex ジバコイル",
+    "zh-TW": "超級七夕青鳥ex 自爆磁怪"
+   },
    "icons": [
     "altaria-mega",
     "magnezone"
@@ -5509,6 +7058,11 @@
   {
    "id": "milotic-ex-b3b-suicune-ex-a4a",
    "name": "Milotic ex Suicune ex",
+   "nm": {
+    "ko": "밀로틱 ex 스이쿤 ex",
+    "ja": "ミロカロスex スイクンex",
+    "zh-TW": "美納斯ex 水君ex"
+   },
    "icons": [
     "milotic",
     "suicune"
@@ -5526,6 +7080,11 @@
   {
    "id": "mega-kangaskhan-ex-b2-mantyke-a4a",
    "name": "Mega Kangaskhan ex Mantyke",
+   "nm": {
+    "ko": "메가 캥카 ex 타만타",
+    "ja": "メガガルーラex タマンタ",
+    "zh-TW": "超級袋獸ex 小球飛魚"
+   },
    "icons": [
     "kangaskhan-mega",
     "mantyke"
@@ -5543,6 +7102,11 @@
   {
    "id": "eevee-ex-a3b-vaporeon-ex-b3",
    "name": "Eevee ex Vaporeon ex",
+   "nm": {
+    "ko": "이브이 ex 샤미드 ex",
+    "ja": "イーブイex シャワーズex",
+    "zh-TW": "伊布ex 水伊布ex"
+   },
    "icons": [
     "eevee",
     "vaporeon"
@@ -5560,6 +7124,11 @@
   {
    "id": "miltank-a4a",
    "name": "Miltank",
+   "nm": {
+    "ko": "밀탱크",
+    "ja": "ミルタンク",
+    "zh-TW": "大奶罐"
+   },
    "icons": [
     "miltank"
    ],
@@ -5576,6 +7145,11 @@
   {
    "id": "mega-lucario-ex-b3-snorlax-b3b",
    "name": "Mega Lucario ex Snorlax",
+   "nm": {
+    "ko": "메가 루카리오 ex 잠만보",
+    "ja": "メガルカリオex カビゴン",
+    "zh-TW": "超級路卡利歐ex 卡比獸"
+   },
    "icons": [
     "lucario-mega",
     "snorlax"
@@ -5593,6 +7167,11 @@
   {
    "id": "indeedee-ex-b1-mega-diancie-ex-b3b",
    "name": "Indeedee ex Mega Diancie ex",
+   "nm": {
+    "ko": "에써르 ex 메가 디안시 ex",
+    "ja": "イエッサンex メガディアンシーex",
+    "zh-TW": "愛管侍ex 超級蒂安希ex"
+   },
    "icons": [
     "indeedee",
     "diancie-mega"
@@ -5610,6 +7189,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-ceruledge-ex-p-b",
    "name": "Team Rocket's Raticate ex Ceruledge ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 파라블레이즈 ex",
+    "ja": "ロケット団のラッタex ソウブレイズex",
+    "zh-TW": "火箭隊的拉達ex 蒼炎刃鬼ex"
+   },
    "icons": [
     "raticate",
     "ceruledge"
@@ -5627,6 +7211,11 @@
   {
    "id": "mega-altaria-ex-goomy-b1",
    "name": "Mega Altaria ex Goomy",
+   "nm": {
+    "ko": "메가 파비코리 ex 미끄메라",
+    "ja": "メガチルタリスex ヌメラ",
+    "zh-TW": "超級七夕青鳥ex 黏黏寶"
+   },
    "icons": [
     "altaria-mega",
     "goomy"
@@ -5644,6 +7233,11 @@
   {
    "id": "garchomp-ex-a2a-mega-lucario-ex-b3",
    "name": "Garchomp ex Mega Lucario ex",
+   "nm": {
+    "ko": "한카리아스 ex 메가 루카리오 ex",
+    "ja": "ガブリアスex メガルカリオex",
+    "zh-TW": "烈咬陸鯊ex 超級路卡利歐ex"
+   },
    "icons": [
     "garchomp",
     "lucario-mega"
@@ -5661,6 +7255,11 @@
   {
    "id": "luxray-b4-oricorio-a3",
    "name": "Luxray Oricorio",
+   "nm": {
+    "ko": "렌트라 춤추새",
+    "ja": "レントラー オドリドリ",
+    "zh-TW": "倫琴貓 花舞鳥"
+   },
    "icons": [
     "luxray",
     "oricorio-pom-pom"
@@ -5678,6 +7277,11 @@
   {
    "id": "serperior-b4a-chingling-b1",
    "name": "Serperior Chingling",
+   "nm": {
+    "ko": "샤로다 랑딸랑",
+    "ja": "ジャローダ リーシャン",
+    "zh-TW": "君主蛇 鈴鐺響"
+   },
    "icons": [
     "serperior",
     "chingling"
@@ -5695,6 +7299,11 @@
   {
    "id": "mega-venusaur-ex-b1a-exeggutor-a1",
    "name": "Mega Venusaur ex Exeggutor",
+   "nm": {
+    "ko": "메가 이상해꽃 ex 나시",
+    "ja": "メガフシギバナex ナッシー",
+    "zh-TW": "超級妙蛙花ex 椰蛋樹"
+   },
    "icons": [
     "venusaur-mega",
     "exeggutor"
@@ -5712,6 +7321,11 @@
   {
    "id": "mega-blastoise-ex-b1a-suicune-ex-a4a",
    "name": "Mega Blastoise ex Suicune ex",
+   "nm": {
+    "ko": "메가 거북왕 ex 스이쿤 ex",
+    "ja": "メガカメックスex スイクンex",
+    "zh-TW": "超級水箭龜ex 水君ex"
+   },
    "icons": [
     "blastoise-mega",
     "suicune"
@@ -5729,6 +7343,11 @@
   {
    "id": "mega-sharpedo-ex-b4-palkia-ex-a2",
    "name": "Mega Sharpedo ex Palkia ex",
+   "nm": {
+    "ko": "메가 샤크니아 ex 펄기아 ex",
+    "ja": "メガサメハダーex パルキアex",
+    "zh-TW": "超級巨牙鯊ex 帕路奇亞ex"
+   },
    "icons": [
     "sharpedo-mega",
     "palkia"
@@ -5746,6 +7365,11 @@
   {
    "id": "mega-sableye-ex-b3b-scrafty-b2",
    "name": "Mega Sableye ex Scrafty",
+   "nm": {
+    "ko": "메가 깜까미 ex 곤율거니",
+    "ja": "メガヤミラミex ズルズキン",
+    "zh-TW": "超級勾魂眼ex 頭巾混混"
+   },
    "icons": [
     "sableye-mega",
     "scrafty"
@@ -5763,6 +7387,11 @@
   {
    "id": "milotic-ex-b3b-mega-kangaskhan-ex-b2",
    "name": "Milotic ex Mega Kangaskhan ex",
+   "nm": {
+    "ko": "밀로틱 ex 메가 캥카 ex",
+    "ja": "ミロカロスex メガガルーラex",
+    "zh-TW": "美納斯ex 超級袋獸ex"
+   },
    "icons": [
     "milotic",
     "kangaskhan-mega"
@@ -5780,6 +7409,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-ho-oh-ex-a4",
    "name": "Team Rocket's Raticate ex Ho-Oh ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 칠색조 ex",
+    "ja": "ロケット団のラッタex ホウオウex",
+    "zh-TW": "火箭隊的拉達ex 鳳王ex"
+   },
    "icons": [
     "raticate",
     "ho-oh"
@@ -5797,6 +7431,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-mega-scizor-ex-b2b",
    "name": "Team Rocket's Raticate ex Mega Scizor ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 메가 핫삼 ex",
+    "ja": "ロケット団のラッタex メガハッサムex",
+    "zh-TW": "火箭隊的拉達ex 超級巨鉗螳螂ex"
+   },
    "icons": [
     "raticate",
     "scizor-mega"
@@ -5814,6 +7453,11 @@
   {
    "id": "guzzlord-b2",
    "name": "Guzzlord",
+   "nm": {
+    "ko": "악식킹",
+    "ja": "アクジキング",
+    "zh-TW": "惡食大王"
+   },
    "icons": [
     "guzzlord"
    ],
@@ -5830,6 +7474,11 @@
   {
    "id": "team-rockets-electrode-b4a-luxray-a2",
    "name": "Team Rocket's Electrode Luxray",
+   "nm": {
+    "ko": "로켓단의 붐볼 렌트라",
+    "ja": "ロケット団のマルマイン レントラー",
+    "zh-TW": "火箭隊的頑皮雷彈 倫琴貓"
+   },
    "icons": [
     "electrode",
     "luxray"
@@ -5847,6 +7496,11 @@
   {
    "id": "mega-houndoom-ex-p-b-houndoom-a2a",
    "name": "Mega Houndoom ex Houndoom",
+   "nm": {
+    "ko": "메가 헬가 ex 헬가",
+    "ja": "メガヘルガーex ヘルガー",
+    "zh-TW": "超級黑魯加ex 黑魯加"
+   },
    "icons": [
     "houndoom-mega",
     "houndoom"
@@ -5864,6 +7518,11 @@
   {
    "id": "mega-lopunny-ex-b1a-primeape-a1",
    "name": "Mega Lopunny ex Primeape",
+   "nm": {
+    "ko": "메가 이어롭 ex 성원숭",
+    "ja": "メガミミロップex オコリザル",
+    "zh-TW": "超級長耳兔ex 火爆猴"
+   },
    "icons": [
     "lopunny-mega",
     "primeape"
@@ -5881,6 +7540,11 @@
   {
    "id": "mega-houndoom-ex-p-b-magby-a4",
    "name": "Mega Houndoom ex Magby",
+   "nm": {
+    "ko": "메가 헬가 ex 마그비",
+    "ja": "メガヘルガーex ブビィ",
+    "zh-TW": "超級黑魯加ex 鴨嘴寶寶"
+   },
    "icons": [
     "houndoom-mega",
     "magby"
@@ -5898,6 +7562,11 @@
   {
    "id": "dragonite-ex-a3b-hisuian-goodra-b3b",
    "name": "Dragonite ex Hisuian Goodra",
+   "nm": {
+    "ko": "망나뇽 ex 히스이 미끄래곤",
+    "ja": "カイリューex ヒスイヌメルゴン",
+    "zh-TW": "快龍ex 洗翠黏美龍"
+   },
    "icons": [
     "dragonite",
     "goodra-hisui"
@@ -5915,6 +7584,11 @@
   {
    "id": "iron-bundle-ex-b3a-vaporeon-ex-b3",
    "name": "Iron Bundle ex Vaporeon ex",
+   "nm": {
+    "ko": "무쇠보따리 ex 샤미드 ex",
+    "ja": "テツノツツミex シャワーズex",
+    "zh-TW": "鐵包袱ex 水伊布ex"
+   },
    "icons": [
     "iron-bundle",
     "vaporeon"
@@ -5932,6 +7606,11 @@
   {
    "id": "team-rockets-zapdos-ex-b4a-indeedee-ex-b1",
    "name": "Team Rocket's Zapdos ex Indeedee ex",
+   "nm": {
+    "ko": "로켓단의 썬더 ex 에써르 ex",
+    "ja": "ロケット団のサンダーex イエッサンex",
+    "zh-TW": "火箭隊的閃電鳥ex 愛管侍ex"
+   },
    "icons": [
     "zapdos",
     "indeedee"
@@ -5949,6 +7628,11 @@
   {
    "id": "garchomp-ex-a2a-koraidon-ex-b3a",
    "name": "Garchomp ex Koraidon ex",
+   "nm": {
+    "ko": "한카리아스 ex 코라이돈 ex",
+    "ja": "ガブリアスex コライドンex",
+    "zh-TW": "烈咬陸鯊ex 故勒頓ex"
+   },
    "icons": [
     "garchomp",
     "koraidon"
@@ -5966,6 +7650,7 @@
   {
    "id": "mega-metagross-ex-b4-teal-mask-ogerpon-ex-b2",
    "name": "Mega Metagross ex Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "metagross-mega",
     "ogerpon"
@@ -5983,6 +7668,11 @@
   {
    "id": "crobat-a2a-mega-absol-ex-b1",
    "name": "Crobat Mega Absol ex",
+   "nm": {
+    "ko": "크로뱃 메가 앱솔 ex",
+    "ja": "クロバット メガアブソルex",
+    "zh-TW": "叉字蝠 超級阿勃梭魯ex"
+   },
    "icons": [
     "crobat",
     "absol-mega"
@@ -6000,6 +7690,11 @@
   {
    "id": "jolteon-ex-b1-team-rockets-zapdos-ex-b4a",
    "name": "Jolteon ex Team Rocket's Zapdos ex",
+   "nm": {
+    "ko": "쥬피썬더 ex 로켓단의 썬더 ex",
+    "ja": "サンダースex ロケット団のサンダーex",
+    "zh-TW": "雷伊布ex 火箭隊的閃電鳥ex"
+   },
    "icons": [
     "jolteon",
     "zapdos"
@@ -6017,6 +7712,11 @@
   {
    "id": "suicune-ex-a4a-vaporeon-ex-b3",
    "name": "Suicune ex Vaporeon ex",
+   "nm": {
+    "ko": "스이쿤 ex 샤미드 ex",
+    "ja": "スイクンex シャワーズex",
+    "zh-TW": "水君ex 水伊布ex"
+   },
    "icons": [
     "suicune",
     "vaporeon"
@@ -6034,6 +7734,11 @@
   {
    "id": "serperior-b4a-mega-heracross-ex-p-b",
    "name": "Serperior Mega Heracross ex",
+   "nm": {
+    "ko": "샤로다 메가 헤라크로스 ex",
+    "ja": "ジャローダ メガヘラクロスex",
+    "zh-TW": "君主蛇 超級赫拉克羅斯ex"
+   },
    "icons": [
     "serperior",
     "heracross-mega"
@@ -6051,6 +7756,11 @@
   {
    "id": "hitmonchan-ex-b1-mega-gallade-ex-b4",
    "name": "Hitmonchan ex Mega Gallade ex",
+   "nm": {
+    "ko": "홍수몬 ex 메가 엘레이드 ex",
+    "ja": "エビワラーex メガエルレイドex",
+    "zh-TW": "快拳郎ex 超級艾路雷朵ex"
+   },
    "icons": [
     "hitmonchan",
     "gallade-mega"
@@ -6068,6 +7778,11 @@
   {
    "id": "team-rockets-raticate-ex-team-rockets-tinkaton-b4a",
    "name": "Team Rocket's Raticate ex Team Rocket's Tinkaton",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 로켓단의 두드리짱",
+    "ja": "ロケット団のラッタex ロケット団のデカヌチャン",
+    "zh-TW": "火箭隊的拉達ex 火箭隊的巨鍛匠"
+   },
    "icons": [
     "raticate",
     "tinkaton"
@@ -6085,6 +7800,11 @@
   {
    "id": "team-rockets-articuno-ex-b4a-inteleon-b3",
    "name": "Team Rocket's Articuno ex Inteleon",
+   "nm": {
+    "ko": "로켓단의 프리져 ex 인텔리레온",
+    "ja": "ロケット団のフリーザーex インテレオン",
+    "zh-TW": "火箭隊的急凍鳥ex 千面避役"
+   },
    "icons": [
     "articuno",
     "inteleon"
@@ -6102,6 +7822,11 @@
   {
    "id": "mega-manectric-ex-b2b-pichu-a4",
    "name": "Mega Manectric ex Pichu",
+   "nm": {
+    "ko": "메가 썬더볼트 ex 피츄",
+    "ja": "メガライボルトex ピチュー",
+    "zh-TW": "超級雷電獸ex 皮丘"
+   },
    "icons": [
     "manectric-mega",
     "pichu"
@@ -6119,6 +7844,11 @@
   {
    "id": "alolan-ninetales-ex-b2-crawdaunt-a4",
    "name": "Alolan Ninetales ex Crawdaunt",
+   "nm": {
+    "ko": "알로라 나인테일 ex 가재장군",
+    "ja": "アローラキュウコンex シザリガー",
+    "zh-TW": "阿羅拉九尾ex 鐵螯龍蝦"
+   },
    "icons": [
     "ninetales-alola",
     "crawdaunt"
@@ -6136,6 +7866,11 @@
   {
    "id": "probopass-ex-a2a-magby-a4",
    "name": "Probopass ex Magby",
+   "nm": {
+    "ko": "대코파스 ex 마그비",
+    "ja": "ダイノーズex ブビィ",
+    "zh-TW": "大朝北鼻ex 鴨嘴寶寶"
+   },
    "icons": [
     "probopass",
     "magby"
@@ -6153,6 +7888,11 @@
   {
    "id": "mega-altaria-ex-b1-iron-valiant-b3a",
    "name": "Mega Altaria ex Iron Valiant",
+   "nm": {
+    "ko": "메가 파비코리 ex 무쇠무인",
+    "ja": "メガチルタリスex テツノブジン",
+    "zh-TW": "超級七夕青鳥ex 鐵武者"
+   },
    "icons": [
     "altaria-mega",
     "iron-valiant"
@@ -6170,6 +7910,11 @@
   {
    "id": "togekiss-a4-meloetta-b2",
    "name": "Togekiss Meloetta",
+   "nm": {
+    "ko": "토게키스 메로엣타",
+    "ja": "トゲキッス メロエッタ",
+    "zh-TW": "波克基斯 美洛耶塔"
+   },
    "icons": [
     "togekiss",
     "meloetta"
@@ -6187,6 +7932,11 @@
   {
    "id": "mega-kangaskhan-ex-b2-darkrai-ex-a2",
    "name": "Mega Kangaskhan ex Darkrai ex",
+   "nm": {
+    "ko": "메가 캥카 ex 다크라이 ex",
+    "ja": "メガガルーラex ダークライex",
+    "zh-TW": "超級袋獸ex 達克萊伊ex"
+   },
    "icons": [
     "kangaskhan-mega",
     "darkrai"
@@ -6204,6 +7954,11 @@
   {
    "id": "mega-scizor-ex-b2b-scizor-a4",
    "name": "Mega Scizor ex Scizor",
+   "nm": {
+    "ko": "메가 핫삼 ex 핫삼",
+    "ja": "メガハッサムex ハッサム",
+    "zh-TW": "超級巨鉗螳螂ex 巨鉗螳螂"
+   },
    "icons": [
     "scizor-mega",
     "scizor"
@@ -6221,6 +7976,11 @@
   {
    "id": "naganadel-guzzlord-ex-a3a",
    "name": "Naganadel Guzzlord ex",
+   "nm": {
+    "ko": "아고용 악식킹 ex",
+    "ja": "アーゴヨン アクジキングex",
+    "zh-TW": "四顎針龍 惡食大王ex"
+   },
    "icons": [
     "naganadel",
     "guzzlord"
@@ -6238,6 +7998,11 @@
   {
    "id": "mega-gallade-ex-b4-koraidon-ex-b3a",
    "name": "Mega Gallade ex Koraidon ex",
+   "nm": {
+    "ko": "메가 엘레이드 ex 코라이돈 ex",
+    "ja": "メガエルレイドex コライドンex",
+    "zh-TW": "超級艾路雷朵ex 故勒頓ex"
+   },
    "icons": [
     "gallade-mega",
     "koraidon"
@@ -6255,6 +8020,11 @@
   {
    "id": "pidgeot-ex-a1a",
    "name": "Pidgeot ex",
+   "nm": {
+    "ko": "피죤투 ex",
+    "ja": "ピジョットex",
+    "zh-TW": "大比鳥ex"
+   },
    "icons": [
     "pidgeot"
    ],
@@ -6271,6 +8041,11 @@
   {
    "id": "mega-sharpedo-ex-walrein-b4",
    "name": "Mega Sharpedo ex Walrein",
+   "nm": {
+    "ko": "메가 샤크니아 ex 씨카이저",
+    "ja": "メガサメハダーex トドゼルガ",
+    "zh-TW": "超級巨牙鯊ex 帝牙海獅"
+   },
    "icons": [
     "sharpedo-mega",
     "walrein"
@@ -6288,6 +8063,11 @@
   {
    "id": "garchomp-ex-a2a-garchomp-a2",
    "name": "Garchomp ex Garchomp",
+   "nm": {
+    "ko": "한카리아스 ex 한카리아스",
+    "ja": "ガブリアスex ガブリアス",
+    "zh-TW": "烈咬陸鯊ex 烈咬陸鯊"
+   },
    "icons": [
     "garchomp",
     "garchomp"
@@ -6305,6 +8085,11 @@
   {
    "id": "pachirisu-ex-a2-dedenne-ex-b3b",
    "name": "Pachirisu ex Dedenne ex",
+   "nm": {
+    "ko": "파치리스 ex 데덴네 ex",
+    "ja": "パチリスex デデンネex",
+    "zh-TW": "帕奇利茲ex 咚咚鼠ex"
+   },
    "icons": [
     "pachirisu",
     "dedenne"
@@ -6322,6 +8107,11 @@
   {
    "id": "mega-gallade-ex-b4",
    "name": "Mega Gallade ex",
+   "nm": {
+    "ko": "메가 엘레이드 ex",
+    "ja": "メガエルレイドex",
+    "zh-TW": "超級艾路雷朵ex"
+   },
    "icons": [
     "gallade-mega"
    ],
@@ -6338,6 +8128,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-hypno-a1",
    "name": "Team Rocket's Weezing ex Hypno",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 슬리퍼",
+    "ja": "ロケット団のマタドガスex スリーパー",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 引夢貘人"
+   },
    "icons": [
     "weezing",
     "hypno"
@@ -6355,6 +8150,11 @@
   {
    "id": "mega-gallade-ex-b4-hitmontop-a4",
    "name": "Mega Gallade ex Hitmontop",
+   "nm": {
+    "ko": "메가 엘레이드 ex 카포에라",
+    "ja": "メガエルレイドex カポエラー",
+    "zh-TW": "超級艾路雷朵ex 戰舞郎"
+   },
    "icons": [
     "gallade-mega",
     "hitmontop"
@@ -6372,6 +8172,11 @@
   {
    "id": "team-rockets-tinkaton-b4a-kartana-b2b",
    "name": "Team Rocket's Tinkaton Kartana",
+   "nm": {
+    "ko": "로켓단의 두드리짱 종이신도",
+    "ja": "ロケット団のデカヌチャン カミツルギ",
+    "zh-TW": "火箭隊的巨鍛匠 紙御劍"
+   },
    "icons": [
     "tinkaton",
     "kartana"
@@ -6389,6 +8194,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-entei-ex-a4a",
    "name": "Team Rocket's Weezing ex Entei ex",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 앤테이 ex",
+    "ja": "ロケット団のマタドガスex エンテイex",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 炎帝ex"
+   },
    "icons": [
     "weezing",
     "entei"
@@ -6406,6 +8216,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-dragonite-a1",
    "name": "Team Rocket's Raticate ex Dragonite",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 망나뇽",
+    "ja": "ロケット団のラッタex カイリュー",
+    "zh-TW": "火箭隊的拉達ex 快龍"
+   },
    "icons": [
     "raticate",
     "dragonite"
@@ -6423,6 +8238,11 @@
   {
    "id": "greninja-ex-b1-suicune-ex-a4a",
    "name": "Greninja ex Suicune ex",
+   "nm": {
+    "ko": "개굴닌자 ex 스이쿤 ex",
+    "ja": "ゲッコウガex スイクンex",
+    "zh-TW": "甲賀忍蛙ex 水君ex"
+   },
    "icons": [
     "greninja",
     "suicune"
@@ -6440,6 +8260,11 @@
   {
    "id": "persian-a1-chandelure-b1",
    "name": "Persian Chandelure",
+   "nm": {
+    "ko": "페르시온 샹델라",
+    "ja": "ペルシアン シャンデラ",
+    "zh-TW": "貓老大 水晶燈火靈"
+   },
    "icons": [
     "persian",
     "chandelure"
@@ -6457,6 +8282,11 @@
   {
    "id": "gholdengo-ex-b2a-charcadet-p-b",
    "name": "Gholdengo ex Charcadet",
+   "nm": {
+    "ko": "타부자고 ex 카르본",
+    "ja": "サーフゴーex カルボウ",
+    "zh-TW": "賽富豪ex 炭小侍"
+   },
    "icons": [
     "gholdengo",
     "charcadet"
@@ -6474,6 +8304,11 @@
   {
    "id": "entei-ex-a4a-mega-blaziken-ex-b1",
    "name": "Entei ex Mega Blaziken ex",
+   "nm": {
+    "ko": "앤테이 ex 메가 번치코 ex",
+    "ja": "エンテイex メガバシャーモex",
+    "zh-TW": "炎帝ex 超級火焰雞ex"
+   },
    "icons": [
     "entei",
     "blaziken-mega"
@@ -6491,6 +8326,11 @@
   {
    "id": "leafeon-ex-a2a-accelgor-b4",
    "name": "Leafeon ex Accelgor",
+   "nm": {
+    "ko": "리피아 ex 어지리더",
+    "ja": "リーフィアex アギルダー",
+    "zh-TW": "葉伊布ex 敏捷蟲"
+   },
    "icons": [
     "leafeon",
     "accelgor"
@@ -6508,6 +8348,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-igglybuff-a4a",
    "name": "Team Rocket's Raticate ex Igglybuff",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 푸푸린",
+    "ja": "ロケット団のラッタex ププリン",
+    "zh-TW": "火箭隊的拉達ex 寶寶丁"
+   },
    "icons": [
     "raticate",
     "igglybuff"
@@ -6525,6 +8370,11 @@
   {
    "id": "mega-gardevoir-ex-b2-ceruledge-b2a",
    "name": "Mega Gardevoir ex Ceruledge",
+   "nm": {
+    "ko": "메가 가디안 ex 파라블레이즈",
+    "ja": "メガサーナイトex ソウブレイズ",
+    "zh-TW": "超級沙奈朵ex 蒼炎刃鬼"
+   },
    "icons": [
     "gardevoir-mega",
     "ceruledge"
@@ -6542,6 +8392,11 @@
   {
    "id": "mega-kangaskhan-ex-b2-oricorio-a3",
    "name": "Mega Kangaskhan ex Oricorio",
+   "nm": {
+    "ko": "메가 캥카 ex 춤추새",
+    "ja": "メガガルーラex オドリドリ",
+    "zh-TW": "超級袋獸ex 花舞鳥"
+   },
    "icons": [
     "kangaskhan-mega",
     "oricorio-pom-pom"
@@ -6559,6 +8414,11 @@
   {
    "id": "team-rockets-raticate-ex-garchomp-b4a",
    "name": "Team Rocket's Raticate ex Garchomp",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 한카리아스",
+    "ja": "ロケット団のラッタex ガブリアス",
+    "zh-TW": "火箭隊的拉達ex 烈咬陸鯊"
+   },
    "icons": [
     "raticate",
     "garchomp"
@@ -6576,6 +8436,11 @@
   {
    "id": "magnezone-a2-lugia-ex-a4",
    "name": "Magnezone Lugia ex",
+   "nm": {
+    "ko": "자포코일 루기아 ex",
+    "ja": "ジバコイル ルギアex",
+    "zh-TW": "自爆磁怪 洛奇亞ex"
+   },
    "icons": [
     "magnezone",
     "lugia"
@@ -6593,6 +8458,11 @@
   {
    "id": "team-rockets-weezing-ex-team-rockets-muk-b4a",
    "name": "Team Rocket's Weezing ex Team Rocket's Muk",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 로켓단의 질뻐기",
+    "ja": "ロケット団のマタドガスex ロケット団のベトベトン",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 火箭隊的臭臭泥"
+   },
    "icons": [
     "weezing",
     "muk"
@@ -6610,6 +8480,11 @@
   {
    "id": "milotic-ex-b3b-garchomp-b4a",
    "name": "Milotic ex Garchomp",
+   "nm": {
+    "ko": "밀로틱 ex 한카리아스",
+    "ja": "ミロカロスex ガブリアス",
+    "zh-TW": "美納斯ex 烈咬陸鯊"
+   },
    "icons": [
     "milotic",
     "garchomp"
@@ -6627,6 +8502,11 @@
   {
    "id": "meowscarada-a2b-decidueye-ex-a3",
    "name": "Meowscarada Decidueye ex",
+   "nm": {
+    "ko": "마스카나 모크나이퍼 ex",
+    "ja": "マスカーニャ ジュナイパーex",
+    "zh-TW": "魔幻假面喵 狙射樹梟ex"
+   },
    "icons": [
     "meowscarada",
     "decidueye"
@@ -6644,6 +8524,11 @@
   {
    "id": "team-rockets-slowking-ex-b4a-mega-gardevoir-ex-b2",
    "name": "Team Rocket's Slowking ex Mega Gardevoir ex",
+   "nm": {
+    "ko": "로켓단의 야도킹 ex 메가 가디안 ex",
+    "ja": "ロケット団のヤドキングex メガサーナイトex",
+    "zh-TW": "火箭隊的呆呆王ex 超級沙奈朵ex"
+   },
    "icons": [
     "slowking",
     "gardevoir-mega"
@@ -6661,6 +8546,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-mega-manectric-ex-b2b",
    "name": "Team Rocket's Raticate ex Mega Manectric ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 메가 썬더볼트 ex",
+    "ja": "ロケット団のラッタex メガライボルトex",
+    "zh-TW": "火箭隊的拉達ex 超級雷電獸ex"
+   },
    "icons": [
     "raticate",
     "manectric-mega"
@@ -6678,6 +8568,11 @@
   {
    "id": "ho-oh-ex-a4-mega-rayquaza-ex-b4",
    "name": "Ho-Oh ex Mega Rayquaza ex",
+   "nm": {
+    "ko": "칠색조 ex 메가 레쿠쟈 ex",
+    "ja": "ホウオウex メガレックウザex",
+    "zh-TW": "鳳王ex 超級烈空坐ex"
+   },
    "icons": [
     "ho-oh",
     "rayquaza-mega"
@@ -6695,6 +8590,11 @@
   {
    "id": "garchomp-b4a-mime-jr-b4",
    "name": "Garchomp Mime Jr.",
+   "nm": {
+    "ko": "한카리아스 흉내내",
+    "ja": "ガブリアス マネネ",
+    "zh-TW": "烈咬陸鯊 魔尼尼"
+   },
    "icons": [
     "garchomp",
     "mime-jr"
@@ -6712,6 +8612,11 @@
   {
    "id": "team-rockets-raticate-ex-team-rockets-persian-b4a",
    "name": "Team Rocket's Raticate ex Team Rocket's Persian",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 로켓단의 페르시온",
+    "ja": "ロケット団のラッタex ロケット団のペルシアン",
+    "zh-TW": "火箭隊的拉達ex 火箭隊的貓老大"
+   },
    "icons": [
     "raticate",
     "persian"
@@ -6729,6 +8634,11 @@
   {
    "id": "dragonite-ex-a3b-haxorus-b2b",
    "name": "Dragonite ex Haxorus",
+   "nm": {
+    "ko": "망나뇽 ex 액스라이즈",
+    "ja": "カイリューex オノノクス",
+    "zh-TW": "快龍ex 雙斧戰龍"
+   },
    "icons": [
     "dragonite",
     "haxorus"
@@ -6746,6 +8656,11 @@
   {
    "id": "magneton-a1-giratina-ex-a2b",
    "name": "Magneton Giratina ex",
+   "nm": {
+    "ko": "레어코일 기라티나 ex",
+    "ja": "レアコイル ギラティナex",
+    "zh-TW": "三合一磁怪 騎拉帝納ex"
+   },
    "icons": [
     "magneton",
     "giratina"
@@ -6763,6 +8678,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-flygon-ex-b3",
    "name": "Team Rocket's Raticate ex Flygon ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 플라이곤 ex",
+    "ja": "ロケット団のラッタex フライゴンex",
+    "zh-TW": "火箭隊的拉達ex 沙漠蜻蜓ex"
+   },
    "icons": [
     "raticate",
     "flygon"
@@ -6780,6 +8700,11 @@
   {
    "id": "mega-lopunny-ex-b1a-furfrou-b4",
    "name": "Mega Lopunny ex Furfrou",
+   "nm": {
+    "ko": "메가 이어롭 ex 트리미앙",
+    "ja": "メガミミロップex トリミアン",
+    "zh-TW": "超級長耳兔ex 多麗米亞"
+   },
    "icons": [
     "lopunny-mega",
     "furfrou"
@@ -6797,6 +8722,11 @@
   {
    "id": "guzzlord-ex-a3a-indeedee-ex-b1",
    "name": "Guzzlord ex Indeedee ex",
+   "nm": {
+    "ko": "악식킹 ex 에써르 ex",
+    "ja": "アクジキングex イエッサンex",
+    "zh-TW": "惡食大王ex 愛管侍ex"
+   },
    "icons": [
     "guzzlord",
     "indeedee"
@@ -6814,6 +8744,11 @@
   {
    "id": "bastiodon-a2",
    "name": "Bastiodon",
+   "nm": {
+    "ko": "바리톱스",
+    "ja": "トリデプス",
+    "zh-TW": "護城龍"
+   },
    "icons": [
     "bastiodon"
    ],
@@ -6830,6 +8765,11 @@
   {
    "id": "mega-sharpedo-ex-b4-greninja-a1",
    "name": "Mega Sharpedo ex Greninja",
+   "nm": {
+    "ko": "메가 샤크니아 ex 개굴닌자",
+    "ja": "メガサメハダーex ゲッコウガ",
+    "zh-TW": "超級巨牙鯊ex 甲賀忍蛙"
+   },
    "icons": [
     "sharpedo-mega",
     "greninja"
@@ -6847,6 +8787,11 @@
   {
    "id": "pikachu-ex-a1-pichu-a4",
    "name": "Pikachu ex Pichu",
+   "nm": {
+    "ko": "피카츄 ex 피츄",
+    "ja": "ピカチュウex ピチュー",
+    "zh-TW": "皮卡丘ex 皮丘"
+   },
    "icons": [
     "pikachu",
     "pichu"
@@ -6864,6 +8809,11 @@
   {
    "id": "mega-gyarados-ex-b1-mantyke-a4a",
    "name": "Mega Gyarados ex Mantyke",
+   "nm": {
+    "ko": "메가 갸라도스 ex 타만타",
+    "ja": "メガギャラドスex タマンタ",
+    "zh-TW": "超級暴鯉龍ex 小球飛魚"
+   },
    "icons": [
     "gyarados-mega",
     "mantyke"
@@ -6881,6 +8831,11 @@
   {
    "id": "alolan-ninetales-ex-b2-mega-sharpedo-ex-b4",
    "name": "Alolan Ninetales ex Mega Sharpedo ex",
+   "nm": {
+    "ko": "알로라 나인테일 ex 메가 샤크니아 ex",
+    "ja": "アローラキュウコンex メガサメハダーex",
+    "zh-TW": "阿羅拉九尾ex 超級巨牙鯊ex"
+   },
    "icons": [
     "ninetales-alola",
     "sharpedo-mega"
@@ -6898,6 +8853,11 @@
   {
    "id": "mega-blaziken-ex-turtonator-b1",
    "name": "Mega Blaziken ex Turtonator",
+   "nm": {
+    "ko": "메가 번치코 ex 폭거북스",
+    "ja": "メガバシャーモex バクガメス",
+    "zh-TW": "超級火焰雞ex 爆焰龜獸"
+   },
    "icons": [
     "blaziken-mega",
     "turtonator"
@@ -6915,6 +8875,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-mega-houndoom-ex-p-b",
    "name": "Team Rocket's Raticate ex Mega Houndoom ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 메가 헬가 ex",
+    "ja": "ロケット団のラッタex メガヘルガーex",
+    "zh-TW": "火箭隊的拉達ex 超級黑魯加ex"
+   },
    "icons": [
     "raticate",
     "houndoom-mega"
@@ -6932,6 +8897,11 @@
   {
    "id": "gholdengo-ex-orthworm-b2a",
    "name": "Gholdengo ex Orthworm",
+   "nm": {
+    "ko": "타부자고 ex 꿈트렁",
+    "ja": "サーフゴーex ミミズズ",
+    "zh-TW": "賽富豪ex 拖拖蚓"
+   },
    "icons": [
     "gholdengo",
     "orthworm"
@@ -6949,6 +8919,11 @@
   {
    "id": "sylveon-ex-a3b-garchomp-b4a",
    "name": "Sylveon ex Garchomp",
+   "nm": {
+    "ko": "님피아 ex 한카리아스",
+    "ja": "ニンフィアex ガブリアス",
+    "zh-TW": "仙子伊布ex 烈咬陸鯊"
+   },
    "icons": [
     "sylveon",
     "garchomp"
@@ -6966,6 +8941,11 @@
   {
    "id": "rotom-ex-b4-smeargle-b2",
    "name": "Rotom ex Smeargle",
+   "nm": {
+    "ko": "로토무 ex 루브도",
+    "ja": "ロトムex ドーブル",
+    "zh-TW": "洛托姆ex 圖圖犬"
+   },
    "icons": [
     "rotom",
     "smeargle"
@@ -6983,6 +8963,11 @@
   {
    "id": "mega-lucario-ex-b3-mega-lopunny-ex-b1a",
    "name": "Mega Lucario ex Mega Lopunny ex",
+   "nm": {
+    "ko": "메가 루카리오 ex 메가 이어롭 ex",
+    "ja": "メガルカリオex メガミミロップex",
+    "zh-TW": "超級路卡利歐ex 超級長耳兔ex"
+   },
    "icons": [
     "lucario-mega",
     "lopunny-mega"
@@ -7000,6 +8985,11 @@
   {
    "id": "palossand-b3b-koraidon-ex-b3a",
    "name": "Palossand Koraidon ex",
+   "nm": {
+    "ko": "모래성이당 코라이돈 ex",
+    "ja": "シロデスナ コライドンex",
+    "zh-TW": "噬沙堡爺 故勒頓ex"
+   },
    "icons": [
     "palossand",
     "koraidon"
@@ -7017,6 +9007,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-giratina-ex-a2b",
    "name": "Team Rocket's Weezing ex Giratina ex",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 기라티나 ex",
+    "ja": "ロケット団のマタドガスex ギラティナex",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 騎拉帝納ex"
+   },
    "icons": [
     "weezing",
     "giratina"
@@ -7034,6 +9029,11 @@
   {
    "id": "mega-kangaskhan-ex-b2-porygon-z-a2",
    "name": "Mega Kangaskhan ex Porygon-Z",
+   "nm": {
+    "ko": "메가 캥카 ex 폴리곤Z",
+    "ja": "メガガルーラex ポリゴンＺ",
+    "zh-TW": "超級袋獸ex 多邊獸Ｚ"
+   },
    "icons": [
     "kangaskhan-mega",
     "porygon-z"
@@ -7051,6 +9051,11 @@
   {
    "id": "team-rockets-slowking-ex-b4a-magneton-b3",
    "name": "Team Rocket's Slowking ex Magneton",
+   "nm": {
+    "ko": "로켓단의 야도킹 ex 레어코일",
+    "ja": "ロケット団のヤドキングex レアコイル",
+    "zh-TW": "火箭隊的呆呆王ex 三合一磁怪"
+   },
    "icons": [
     "slowking",
     "magneton"
@@ -7068,6 +9073,11 @@
   {
    "id": "greninja-a1-giratina-ex-a2b",
    "name": "Greninja Giratina ex",
+   "nm": {
+    "ko": "개굴닌자 기라티나 ex",
+    "ja": "ゲッコウガ ギラティナex",
+    "zh-TW": "甲賀忍蛙 騎拉帝納ex"
+   },
    "icons": [
     "greninja",
     "giratina"
@@ -7085,6 +9095,11 @@
   {
    "id": "charizard-ex-a2b",
    "name": "Charizard ex",
+   "nm": {
+    "ko": "리자몽 ex",
+    "ja": "リザードンex",
+    "zh-TW": "噴火龍ex"
+   },
    "icons": [
     "charizard"
    ],
@@ -7101,6 +9116,11 @@
   {
    "id": "decidueye-ex-a3-miltank-b2b",
    "name": "Decidueye ex Miltank",
+   "nm": {
+    "ko": "모크나이퍼 ex 밀탱크",
+    "ja": "ジュナイパーex ミルタンク",
+    "zh-TW": "狙射樹梟ex 大奶罐"
+   },
    "icons": [
     "decidueye",
     "miltank"
@@ -7118,6 +9138,7 @@
   {
    "id": "dragonair-b4-archaludon-b4a",
    "name": "Dragonair Archaludon",
+   "nm": null,
    "icons": [
     "dragonair",
     "archaludon"
@@ -7135,6 +9156,11 @@
   {
    "id": "alolan-ninetales-ex-b2-team-rockets-raticate-ex-b4a",
    "name": "Alolan Ninetales ex Team Rocket's Raticate ex",
+   "nm": {
+    "ko": "알로라 나인테일 ex 로켓단의 레트라 ex",
+    "ja": "アローラキュウコンex ロケット団のラッタex",
+    "zh-TW": "阿羅拉九尾ex 火箭隊的拉達ex"
+   },
    "icons": [
     "ninetales-alola",
     "raticate"
@@ -7152,6 +9178,11 @@
   {
    "id": "mega-altaria-ex-b1-team-rockets-raticate-ex-b4a",
    "name": "Mega Altaria ex Team Rocket's Raticate ex",
+   "nm": {
+    "ko": "메가 파비코리 ex 로켓단의 레트라 ex",
+    "ja": "メガチルタリスex ロケット団のラッタex",
+    "zh-TW": "超級七夕青鳥ex 火箭隊的拉達ex"
+   },
    "icons": [
     "altaria-mega",
     "raticate"
@@ -7169,6 +9200,11 @@
   {
    "id": "mega-blaziken-ex-heatmor-b1",
    "name": "Mega Blaziken ex Heatmor",
+   "nm": {
+    "ko": "메가 번치코 ex 앤티골",
+    "ja": "メガバシャーモex クイタラン",
+    "zh-TW": "超級火焰雞ex 熔蟻獸"
+   },
    "icons": [
     "blaziken-mega",
     "heatmor"
@@ -7186,6 +9222,11 @@
   {
    "id": "mega-ampharos-ex-b1-oricorio-a3",
    "name": "Mega Ampharos ex Oricorio",
+   "nm": {
+    "ko": "메가 전룡 ex 춤추새",
+    "ja": "メガデンリュウex オドリドリ",
+    "zh-TW": "超級電龍ex 花舞鳥"
+   },
    "icons": [
     "ampharos-mega",
     "oricorio-pom-pom"
@@ -7203,6 +9244,11 @@
   {
    "id": "incineroar-ex-a3-team-rockets-moltres-ex-b4a",
    "name": "Incineroar ex Team Rocket's Moltres ex",
+   "nm": {
+    "ko": "어흥염 ex 로켓단의 파이어 ex",
+    "ja": "ガオガエンex ロケット団のファイヤーex",
+    "zh-TW": "熾焰咆哮虎ex 火箭隊的火焰鳥ex"
+   },
    "icons": [
     "incineroar",
     "moltres"
@@ -7220,6 +9266,11 @@
   {
    "id": "mega-sharpedo-ex-b4-iron-bundle-ex-b3a",
    "name": "Mega Sharpedo ex Iron Bundle ex",
+   "nm": {
+    "ko": "메가 샤크니아 ex 무쇠보따리 ex",
+    "ja": "メガサメハダーex テツノツツミex",
+    "zh-TW": "超級巨牙鯊ex 鐵包袱ex"
+   },
    "icons": [
     "sharpedo-mega",
     "iron-bundle"
@@ -7237,6 +9288,11 @@
   {
    "id": "starmie-ex-articuno-ex-a1",
    "name": "Starmie ex Articuno ex",
+   "nm": {
+    "ko": "아쿠스타 ex 프리져 ex",
+    "ja": "スターミーex フリーザーex",
+    "zh-TW": "寶石海星ex 急凍鳥ex"
+   },
    "icons": [
     "starmie",
     "articuno"
@@ -7254,6 +9310,11 @@
   {
    "id": "hoopa-ex-b4-darkrai-ex-a2",
    "name": "Hoopa ex Darkrai ex",
+   "nm": {
+    "ko": "후파 ex 다크라이 ex",
+    "ja": "フーパex ダークライex",
+    "zh-TW": "胡帕ex 達克萊伊ex"
+   },
    "icons": [
     "hoopa-unbound",
     "darkrai"
@@ -7271,6 +9332,7 @@
   {
    "id": "terapagos-ex-b3a-team-rockets-raticate-ex-b4a",
    "name": "Terapagos ex Team Rocket's Raticate ex",
+   "nm": null,
    "icons": [
     "terapagos",
     "raticate"
@@ -7288,6 +9350,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-stoutland-a3a",
    "name": "Team Rocket's Raticate ex Stoutland",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 바랜드",
+    "ja": "ロケット団のラッタex ムーランド",
+    "zh-TW": "火箭隊的拉達ex 長毛狗"
+   },
    "icons": [
     "raticate",
     "stoutland"
@@ -7305,6 +9372,11 @@
   {
    "id": "team-rockets-slowking-ex-b4a-gourgeist-b2",
    "name": "Team Rocket's Slowking ex Gourgeist",
+   "nm": {
+    "ko": "로켓단의 야도킹 ex 펌킨인",
+    "ja": "ロケット団のヤドキングex パンプジン",
+    "zh-TW": "火箭隊的呆呆王ex 南瓜怪人"
+   },
    "icons": [
     "slowking",
     "gourgeist"
@@ -7322,6 +9394,11 @@
   {
    "id": "team-rockets-zapdos-ex-b4a-pichu-a4",
    "name": "Team Rocket's Zapdos ex Pichu",
+   "nm": {
+    "ko": "로켓단의 썬더 ex 피츄",
+    "ja": "ロケット団のサンダーex ピチュー",
+    "zh-TW": "火箭隊的閃電鳥ex 皮丘"
+   },
    "icons": [
     "zapdos",
     "pichu"
@@ -7339,6 +9416,11 @@
   {
    "id": "mega-kangaskhan-ex-b2-hoopa-ex-b4",
    "name": "Mega Kangaskhan ex Hoopa ex",
+   "nm": {
+    "ko": "메가 캥카 ex 후파 ex",
+    "ja": "メガガルーラex フーパex",
+    "zh-TW": "超級袋獸ex 胡帕ex"
+   },
    "icons": [
     "kangaskhan-mega",
     "hoopa-unbound"
@@ -7356,6 +9438,11 @@
   {
    "id": "jumpluff-ex-a4a-oricorio-a3",
    "name": "Jumpluff ex Oricorio",
+   "nm": {
+    "ko": "솜솜코 ex 춤추새",
+    "ja": "ワタッコex オドリドリ",
+    "zh-TW": "毽子棉ex 花舞鳥"
+   },
    "icons": [
     "jumpluff",
     "oricorio-pom-pom"
@@ -7373,6 +9460,11 @@
   {
    "id": "mega-lucario-ex-bonsly-b3",
    "name": "Mega Lucario ex Bonsly",
+   "nm": {
+    "ko": "메가 루카리오 ex 꼬지지",
+    "ja": "メガルカリオex ウソハチ",
+    "zh-TW": "超級路卡利歐ex 盆才怪"
+   },
    "icons": [
     "lucario-mega",
     "bonsly"
@@ -7390,6 +9482,11 @@
   {
    "id": "hydreigon-b1-hoopa-ex-b4",
    "name": "Hydreigon Hoopa ex",
+   "nm": {
+    "ko": "삼삼드래 후파 ex",
+    "ja": "サザンドラ フーパex",
+    "zh-TW": "三首惡龍 胡帕ex"
+   },
    "icons": [
     "hydreigon",
     "hoopa-unbound"
@@ -7407,6 +9504,11 @@
   {
    "id": "greninja-a1-team-rockets-articuno-ex-b4a",
    "name": "Greninja Team Rocket's Articuno ex",
+   "nm": {
+    "ko": "개굴닌자 로켓단의 프리져 ex",
+    "ja": "ゲッコウガ ロケット団のフリーザーex",
+    "zh-TW": "甲賀忍蛙 火箭隊的急凍鳥ex"
+   },
    "icons": [
     "greninja",
     "articuno"
@@ -7424,6 +9526,11 @@
   {
    "id": "wailord-b1-gholdengo-b4a",
    "name": "Wailord Gholdengo",
+   "nm": {
+    "ko": "고래왕 타부자고",
+    "ja": "ホエルオー サーフゴー",
+    "zh-TW": "吼鯨王 賽富豪"
+   },
    "icons": [
     "wailord",
     "gholdengo"
@@ -7441,6 +9548,11 @@
   {
    "id": "magnezone-b1a-zapdos-ex-a1",
    "name": "Magnezone Zapdos ex",
+   "nm": {
+    "ko": "자포코일 썬더 ex",
+    "ja": "ジバコイル サンダーex",
+    "zh-TW": "自爆磁怪 閃電鳥ex"
+   },
    "icons": [
     "magnezone",
     "zapdos"
@@ -7458,6 +9570,11 @@
   {
    "id": "team-rockets-articuno-ex-team-rockets-lapras-b4a",
    "name": "Team Rocket's Articuno ex Team Rocket's Lapras",
+   "nm": {
+    "ko": "로켓단의 프리져 ex 로켓단의 라프라스",
+    "ja": "ロケット団のフリーザーex ロケット団のラプラス",
+    "zh-TW": "火箭隊的急凍鳥ex 火箭隊的拉普拉斯"
+   },
    "icons": [
     "articuno",
     "lapras"
@@ -7475,6 +9592,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-greninja-a1",
    "name": "Team Rocket's Raticate ex Greninja",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 개굴닌자",
+    "ja": "ロケット団のラッタex ゲッコウガ",
+    "zh-TW": "火箭隊的拉達ex 甲賀忍蛙"
+   },
    "icons": [
     "raticate",
     "greninja"
@@ -7492,6 +9614,11 @@
   {
    "id": "wigglytuff-ex-a1-delcatty-b1",
    "name": "Wigglytuff ex Delcatty",
+   "nm": {
+    "ko": "푸크린 ex 델케티",
+    "ja": "プクリンex エネコロロ",
+    "zh-TW": "胖可丁ex 優雅貓"
+   },
    "icons": [
     "wigglytuff",
     "delcatty"
@@ -7509,6 +9636,11 @@
   {
    "id": "gardevoir-b2-mega-diancie-ex-b3b",
    "name": "Gardevoir Mega Diancie ex",
+   "nm": {
+    "ko": "가디안 메가 디안시 ex",
+    "ja": "サーナイト メガディアンシーex",
+    "zh-TW": "沙奈朵 超級蒂安希ex"
+   },
    "icons": [
     "gardevoir",
     "diancie-mega"
@@ -7526,6 +9658,11 @@
   {
    "id": "rotom-ex-mime-jr-b4",
    "name": "Rotom ex Mime Jr.",
+   "nm": {
+    "ko": "로토무 ex 흉내내",
+    "ja": "ロトムex マネネ",
+    "zh-TW": "洛托姆ex 魔尼尼"
+   },
    "icons": [
     "rotom",
     "mime-jr"
@@ -7543,6 +9680,11 @@
   {
    "id": "blacephalon-ex-b2-nihilego-a3a",
    "name": "Blacephalon ex Nihilego",
+   "nm": {
+    "ko": "두파팡 ex 텅비드",
+    "ja": "ズガドーンex ウツロイド",
+    "zh-TW": "砰頭小丑ex 虛吾伊德"
+   },
    "icons": [
     "blacephalon",
     "nihilego"
@@ -7560,6 +9702,11 @@
   {
    "id": "garchomp-a2-meowth-b2",
    "name": "Garchomp Meowth",
+   "nm": {
+    "ko": "한카리아스 나옹",
+    "ja": "ガブリアス ニャース",
+    "zh-TW": "烈咬陸鯊 喵喵"
+   },
    "icons": [
     "garchomp",
     "meowth"
@@ -7577,6 +9724,11 @@
   {
    "id": "koraidon-ex-b3a-furfrou-b4",
    "name": "Koraidon ex Furfrou",
+   "nm": {
+    "ko": "코라이돈 ex 트리미앙",
+    "ja": "コライドンex トリミアン",
+    "zh-TW": "故勒頓ex 多麗米亞"
+   },
    "icons": [
     "koraidon",
     "furfrou"
@@ -7594,6 +9746,11 @@
   {
    "id": "aerodactyl-ex-a1a-lucario-a2",
    "name": "Aerodactyl ex Lucario",
+   "nm": {
+    "ko": "프테라 ex 루카리오",
+    "ja": "プテラex ルカリオ",
+    "zh-TW": "化石翼龍ex 路卡利歐"
+   },
    "icons": [
     "aerodactyl",
     "lucario"
@@ -7611,6 +9768,11 @@
   {
    "id": "dragonite-a1",
    "name": "Dragonite",
+   "nm": {
+    "ko": "망나뇽",
+    "ja": "カイリュー",
+    "zh-TW": "快龍"
+   },
    "icons": [
     "dragonite"
    ],
@@ -7627,6 +9789,11 @@
   {
    "id": "team-rockets-tinkaton-b4a",
    "name": "Team Rocket's Tinkaton",
+   "nm": {
+    "ko": "로켓단의 두드리짱",
+    "ja": "ロケット団のデカヌチャン",
+    "zh-TW": "火箭隊的巨鍛匠"
+   },
    "icons": [
     "tinkaton"
    ],
@@ -7643,6 +9810,11 @@
   {
    "id": "mega-blastoise-ex-b1a-snorlax-ex-a3b",
    "name": "Mega Blastoise ex Snorlax ex",
+   "nm": {
+    "ko": "메가 거북왕 ex 잠만보 ex",
+    "ja": "メガカメックスex カビゴンex",
+    "zh-TW": "超級水箭龜ex 卡比獸ex"
+   },
    "icons": [
     "blastoise-mega",
     "snorlax"
@@ -7660,6 +9832,11 @@
   {
    "id": "mega-charizard-y-ex-charizard-b1a",
    "name": "Mega Charizard Y ex Charizard",
+   "nm": {
+    "ko": "메가 리자몽 Y ex 리자몽",
+    "ja": "メガリザードン Yex リザードン",
+    "zh-TW": "超級噴火龍 Yex 噴火龍"
+   },
    "icons": [
     "charizard-mega-y",
     "charizard"
@@ -7677,6 +9854,11 @@
   {
    "id": "team-rockets-tinkaton-b4a-skarmory-a2",
    "name": "Team Rocket's Tinkaton Skarmory",
+   "nm": {
+    "ko": "로켓단의 두드리짱 무장조",
+    "ja": "ロケット団のデカヌチャン エアームド",
+    "zh-TW": "火箭隊的巨鍛匠 盔甲鳥"
+   },
    "icons": [
     "tinkaton",
     "skarmory"
@@ -7694,6 +9876,11 @@
   {
    "id": "team-rockets-hypno-b4a-giratina-ex-a2b",
    "name": "Team Rocket's Hypno Giratina ex",
+   "nm": {
+    "ko": "로켓단의 슬리퍼 기라티나 ex",
+    "ja": "ロケット団のスリーパー ギラティナex",
+    "zh-TW": "火箭隊的引夢貘人 騎拉帝納ex"
+   },
    "icons": [
     "hypno",
     "giratina"
@@ -7711,6 +9898,11 @@
   {
    "id": "mega-gyarados-ex-b1-manaphy-a2",
    "name": "Mega Gyarados ex Manaphy",
+   "nm": {
+    "ko": "메가 갸라도스 ex 마나피",
+    "ja": "メガギャラドスex マナフィ",
+    "zh-TW": "超級暴鯉龍ex 瑪納霏"
+   },
    "icons": [
     "gyarados-mega",
     "manaphy"
@@ -7728,6 +9920,11 @@
   {
    "id": "suicune-ex-a4a-greninja-a1",
    "name": "Suicune ex Greninja",
+   "nm": {
+    "ko": "스이쿤 ex 개굴닌자",
+    "ja": "スイクンex ゲッコウガ",
+    "zh-TW": "水君ex 甲賀忍蛙"
+   },
    "icons": [
     "suicune",
     "greninja"
@@ -7745,6 +9942,11 @@
   {
    "id": "team-rockets-slowking-ex-b4a-mimikyu-ex-b2",
    "name": "Team Rocket's Slowking ex Mimikyu ex",
+   "nm": {
+    "ko": "로켓단의 야도킹 ex 따라큐 ex",
+    "ja": "ロケット団のヤドキングex ミミッキュex",
+    "zh-TW": "火箭隊的呆呆王ex 謎擬Ｑex"
+   },
    "icons": [
     "slowking",
     "mimikyu"
@@ -7762,6 +9964,11 @@
   {
    "id": "indeedee-ex-b1-dragonite-a1",
    "name": "Indeedee ex Dragonite",
+   "nm": {
+    "ko": "에써르 ex 망나뇽",
+    "ja": "イエッサンex カイリュー",
+    "zh-TW": "愛管侍ex 快龍"
+   },
    "icons": [
     "indeedee",
     "dragonite"
@@ -7779,6 +9986,11 @@
   {
    "id": "indeedee-ex-b1-mismagius-a4a",
    "name": "Indeedee ex Mismagius",
+   "nm": {
+    "ko": "에써르 ex 무우마직",
+    "ja": "イエッサンex ムウマージ",
+    "zh-TW": "愛管侍ex 夢妖魔"
+   },
    "icons": [
     "indeedee",
     "mismagius"
@@ -7796,6 +10008,11 @@
   {
    "id": "arceus-ex-a2a-miraidon-ex-b3a",
    "name": "Arceus ex Miraidon ex",
+   "nm": {
+    "ko": "아르세우스 ex 미라이돈  ex",
+    "ja": "アルセウスex ミライドンex",
+    "zh-TW": "阿爾宙斯ex 密勒頓ex"
+   },
    "icons": [
     "arceus",
     "miraidon"
@@ -7813,6 +10030,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-mega-slowbro-ex-b2b",
    "name": "Team Rocket's Raticate ex Mega Slowbro ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 메가 야도란 ex",
+    "ja": "ロケット団のラッタex メガヤドランex",
+    "zh-TW": "火箭隊的拉達ex 超級呆殼獸ex"
+   },
    "icons": [
     "raticate",
     "slowbro-mega"
@@ -7830,6 +10052,11 @@
   {
    "id": "mega-altaria-ex-b1-furfrou-b1a",
    "name": "Mega Altaria ex Furfrou",
+   "nm": {
+    "ko": "메가 파비코리 ex 트리미앙",
+    "ja": "メガチルタリスex トリミアン",
+    "zh-TW": "超級七夕青鳥ex 多麗米亞"
+   },
    "icons": [
     "altaria-mega",
     "furfrou"
@@ -7847,6 +10074,11 @@
   {
    "id": "rotom-ex-heliolisk-b4",
    "name": "Rotom ex Heliolisk",
+   "nm": {
+    "ko": "로토무 ex 일레도리자드",
+    "ja": "ロトムex エレザード",
+    "zh-TW": "洛托姆ex 光電傘蜥"
+   },
    "icons": [
     "rotom",
     "heliolisk"
@@ -7864,6 +10096,11 @@
   {
    "id": "jolteon-ex-b1-raichu-b4",
    "name": "Jolteon ex Raichu",
+   "nm": {
+    "ko": "쥬피썬더 ex 라이츄",
+    "ja": "サンダースex ライチュウ",
+    "zh-TW": "雷伊布ex 雷丘"
+   },
    "icons": [
     "jolteon",
     "raichu"
@@ -7881,6 +10118,11 @@
   {
    "id": "snorlax-ex-a3b-tyrantrum-b2",
    "name": "Snorlax ex Tyrantrum",
+   "nm": {
+    "ko": "잠만보 ex 견고라스",
+    "ja": "カビゴンex ガチゴラス",
+    "zh-TW": "卡比獸ex 怪顎龍"
+   },
    "icons": [
     "snorlax",
     "tyrantrum"
@@ -7898,6 +10140,11 @@
   {
    "id": "iron-bundle-ex-iron-valiant-b3a",
    "name": "Iron Bundle ex Iron Valiant",
+   "nm": {
+    "ko": "무쇠보따리 ex 무쇠무인",
+    "ja": "テツノツツミex テツノブジン",
+    "zh-TW": "鐵包袱ex 鐵武者"
+   },
    "icons": [
     "iron-bundle",
     "iron-valiant"
@@ -7915,6 +10162,11 @@
   {
    "id": "team-rockets-weezing-ex-b4a-butterfree-b3b",
    "name": "Team Rocket's Weezing ex Butterfree",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 버터플",
+    "ja": "ロケット団のマタドガスex バタフリー",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 巴大蝶"
+   },
    "icons": [
     "weezing",
     "butterfree"
@@ -7932,6 +10184,11 @@
   {
    "id": "garchomp-b4a-elekid-a4",
    "name": "Garchomp Elekid",
+   "nm": {
+    "ko": "한카리아스 에레키드",
+    "ja": "ガブリアス エレキッド",
+    "zh-TW": "烈咬陸鯊 電擊怪"
+   },
    "icons": [
     "garchomp",
     "elekid"
@@ -7949,6 +10206,11 @@
   {
    "id": "team-rockets-weezing-ex-team-rockets-houndoom-b4a",
    "name": "Team Rocket's Weezing ex Team Rocket's Houndoom",
+   "nm": {
+    "ko": "로켓단의 또도가스 ex 로켓단의 헬가",
+    "ja": "ロケット団のマタドガスex ロケット団のヘルガー",
+    "zh-TW": "火箭隊的雙彈瓦斯ex 火箭隊的黑魯加"
+   },
    "icons": [
     "weezing",
     "houndoom"
@@ -7966,6 +10228,11 @@
   {
    "id": "hisuian-zoroark-ex-butterfree-b3b",
    "name": "Hisuian Zoroark ex Butterfree",
+   "nm": {
+    "ko": "히스이 조로아크 ex 버터플",
+    "ja": "ヒスイゾロアークex バタフリー",
+    "zh-TW": "洗翠索羅亞克ex 巴大蝶"
+   },
    "icons": [
     "zoroark-hisui",
     "butterfree"
@@ -7983,6 +10250,11 @@
   {
    "id": "suicune-ex-a4a-gholdengo-b4a",
    "name": "Suicune ex Gholdengo",
+   "nm": {
+    "ko": "스이쿤 ex 타부자고",
+    "ja": "スイクンex サーフゴー",
+    "zh-TW": "水君ex 賽富豪"
+   },
    "icons": [
     "suicune",
     "gholdengo"
@@ -8000,6 +10272,11 @@
   {
    "id": "luxray-a2-team-rockets-electrode-b4a",
    "name": "Luxray Team Rocket's Electrode",
+   "nm": {
+    "ko": "렌트라 로켓단의 붐볼",
+    "ja": "レントラー ロケット団のマルマイン",
+    "zh-TW": "倫琴貓 火箭隊的頑皮雷彈"
+   },
    "icons": [
     "luxray",
     "electrode"
@@ -8017,6 +10294,11 @@
   {
    "id": "flygon-ex-b3-indeedee-ex-b1",
    "name": "Flygon ex Indeedee ex",
+   "nm": {
+    "ko": "플라이곤 ex 에써르 ex",
+    "ja": "フライゴンex イエッサンex",
+    "zh-TW": "沙漠蜻蜓ex 愛管侍ex"
+   },
    "icons": [
     "flygon",
     "indeedee"
@@ -8034,6 +10316,11 @@
   {
    "id": "milotic-ex-b3b-oricorio-a3",
    "name": "Milotic ex Oricorio",
+   "nm": {
+    "ko": "밀로틱 ex 춤추새",
+    "ja": "ミロカロスex オドリドリ",
+    "zh-TW": "美納斯ex 花舞鳥"
+   },
    "icons": [
     "milotic",
     "oricorio-pom-pom"
@@ -8051,6 +10338,7 @@
   {
    "id": "teal-mask-ogerpon-ex-b2-rampardos-a2",
    "name": "Teal Mask Ogerpon ex Rampardos",
+   "nm": null,
    "icons": [
     "ogerpon",
     "rampardos"
@@ -8068,6 +10356,11 @@
   {
    "id": "magnezone-b1a-team-rockets-persian-b4a",
    "name": "Magnezone Team Rocket's Persian",
+   "nm": {
+    "ko": "자포코일 로켓단의 페르시온",
+    "ja": "ジバコイル ロケット団のペルシアン",
+    "zh-TW": "自爆磁怪 火箭隊的貓老大"
+   },
    "icons": [
     "magnezone",
     "persian"
@@ -8085,6 +10378,11 @@
   {
    "id": "darkrai-ex-a2-hoopa-ex-b4",
    "name": "Darkrai ex Hoopa ex",
+   "nm": {
+    "ko": "다크라이 ex 후파 ex",
+    "ja": "ダークライex フーパex",
+    "zh-TW": "達克萊伊ex 胡帕ex"
+   },
    "icons": [
     "darkrai",
     "hoopa-unbound"
@@ -8102,6 +10400,7 @@
   {
    "id": "jumpluff-ex-a4a-teal-mask-ogerpon-ex-b2",
    "name": "Jumpluff ex Teal Mask Ogerpon ex",
+   "nm": null,
    "icons": [
     "jumpluff",
     "ogerpon"
@@ -8119,6 +10418,11 @@
   {
    "id": "iron-bundle-ex-b3a-iron-bundle-b3b",
    "name": "Iron Bundle ex Iron Bundle",
+   "nm": {
+    "ko": "무쇠보따리 ex 무쇠보따리",
+    "ja": "テツノツツミex テツノツツミ",
+    "zh-TW": "鐵包袱ex 鐵包袱"
+   },
    "icons": [
     "iron-bundle",
     "iron-bundle"
@@ -8136,6 +10440,11 @@
   {
    "id": "haxorus-b2b-igglybuff-a4a",
    "name": "Haxorus Igglybuff",
+   "nm": {
+    "ko": "액스라이즈 푸푸린",
+    "ja": "オノノクス ププリン",
+    "zh-TW": "雙斧戰龍 寶寶丁"
+   },
    "icons": [
     "haxorus",
     "igglybuff"
@@ -8153,6 +10462,11 @@
   {
    "id": "mega-gengar-ex-b2b-galarian-cursola-a4a",
    "name": "Mega Gengar ex Galarian Cursola",
+   "nm": {
+    "ko": "메가 팬텀 ex 가라르 산호르곤",
+    "ja": "メガゲンガーex ガラルサニゴーン",
+    "zh-TW": "超級耿鬼ex 伽勒爾魔靈珊瑚"
+   },
    "icons": [
     "gengar-mega",
     "cursola"
@@ -8170,6 +10484,11 @@
   {
    "id": "banette-a3-araquanid-b4",
    "name": "Banette Araquanid",
+   "nm": {
+    "ko": "다크펫 깨비물거미",
+    "ja": "ジュペッタ オニシズクモ",
+    "zh-TW": "詛咒娃娃 滴蛛霸"
+   },
    "icons": [
     "banette",
     "araquanid"
@@ -8187,6 +10506,11 @@
   {
    "id": "mega-absol-ex-b1-team-rockets-magmar-b4a",
    "name": "Mega Absol ex Team Rocket's Magmar",
+   "nm": {
+    "ko": "메가 앱솔 ex 로켓단의 마그마",
+    "ja": "メガアブソルex ロケット団のブーバー",
+    "zh-TW": "超級阿勃梭魯ex 火箭隊的鴨嘴火獸"
+   },
    "icons": [
     "absol-mega",
     "magmar"
@@ -8204,6 +10528,11 @@
   {
    "id": "mega-lucario-ex-b3-team-rockets-weezing-ex-b4a",
    "name": "Mega Lucario ex Team Rocket's Weezing ex",
+   "nm": {
+    "ko": "메가 루카리오 ex 로켓단의 또도가스 ex",
+    "ja": "メガルカリオex ロケット団のマタドガスex",
+    "zh-TW": "超級路卡利歐ex 火箭隊的雙彈瓦斯ex"
+   },
    "icons": [
     "lucario-mega",
     "weezing"
@@ -8221,6 +10550,11 @@
   {
    "id": "mega-gyarados-ex-b1-gholdengo-b4a",
    "name": "Mega Gyarados ex Gholdengo",
+   "nm": {
+    "ko": "메가 갸라도스 ex 타부자고",
+    "ja": "メガギャラドスex サーフゴー",
+    "zh-TW": "超級暴鯉龍ex 賽富豪"
+   },
    "icons": [
     "gyarados-mega",
     "gholdengo"
@@ -8238,6 +10572,11 @@
   {
    "id": "mega-charizard-x-ex-b2b-charizard-b1a",
    "name": "Mega Charizard X ex Charizard",
+   "nm": {
+    "ko": "메가 리자몽 X ex 리자몽",
+    "ja": "メガリザードン Xex リザードン",
+    "zh-TW": "超級噴火龍 Xex 噴火龍"
+   },
    "icons": [
     "charizard-mega-x",
     "charizard"
@@ -8255,6 +10594,11 @@
   {
    "id": "mega-altaria-ex-b1-altaria-a4a",
    "name": "Mega Altaria ex Altaria",
+   "nm": {
+    "ko": "메가 파비코리 ex 파비코리",
+    "ja": "メガチルタリスex チルタリス",
+    "zh-TW": "超級七夕青鳥ex 七夕青鳥"
+   },
    "icons": [
     "altaria-mega",
     "altaria"
@@ -8272,6 +10616,11 @@
   {
    "id": "magikarp-a1",
    "name": "Magikarp",
+   "nm": {
+    "ko": "잉어킹",
+    "ja": "コイキング",
+    "zh-TW": "鯉魚王"
+   },
    "icons": [
     "magikarp"
    ],
@@ -8288,6 +10637,11 @@
   {
    "id": "mega-lucario-ex-b3-marowak-b4a",
    "name": "Mega Lucario ex Marowak",
+   "nm": {
+    "ko": "메가 루카리오 ex 텅구리",
+    "ja": "メガルカリオex ガラガラ",
+    "zh-TW": "超級路卡利歐ex 嘎啦嘎啦"
+   },
    "icons": [
     "lucario-mega",
     "marowak"
@@ -8305,6 +10659,11 @@
   {
    "id": "team-rockets-zapdos-ex-b4a-greninja-a1",
    "name": "Team Rocket's Zapdos ex Greninja",
+   "nm": {
+    "ko": "로켓단의 썬더 ex 개굴닌자",
+    "ja": "ロケット団のサンダーex ゲッコウガ",
+    "zh-TW": "火箭隊的閃電鳥ex 甲賀忍蛙"
+   },
    "icons": [
     "zapdos",
     "greninja"
@@ -8322,6 +10681,11 @@
   {
    "id": "hoopa-ex-b4-umbreon-ex-a4",
    "name": "Hoopa ex Umbreon ex",
+   "nm": {
+    "ko": "후파 ex 블래키 ex",
+    "ja": "フーパex ブラッキーex",
+    "zh-TW": "胡帕ex 月亮伊布ex"
+   },
    "icons": [
     "hoopa-unbound",
     "umbreon"
@@ -8339,6 +10703,11 @@
   {
    "id": "dedenne-ex-b3b-happiny-b4a",
    "name": "Dedenne ex Happiny",
+   "nm": {
+    "ko": "데덴네 ex 핑복",
+    "ja": "デデンネex ピンプク",
+    "zh-TW": "咚咚鼠ex 小福蛋"
+   },
    "icons": [
     "dedenne",
     "happiny"
@@ -8356,6 +10725,11 @@
   {
    "id": "mega-metagross-ex-b4-indeedee-ex-b1",
    "name": "Mega Metagross ex Indeedee ex",
+   "nm": {
+    "ko": "메가 메타그로스 ex 에써르 ex",
+    "ja": "メガメタグロスex イエッサンex",
+    "zh-TW": "超級巨金怪ex 愛管侍ex"
+   },
    "icons": [
     "metagross-mega",
     "indeedee"
@@ -8373,6 +10747,11 @@
   {
    "id": "dragonite-a1-goomy-b1",
    "name": "Dragonite Goomy",
+   "nm": {
+    "ko": "망나뇽 미끄메라",
+    "ja": "カイリュー ヌメラ",
+    "zh-TW": "快龍 黏黏寶"
+   },
    "icons": [
     "dragonite",
     "goomy"
@@ -8390,6 +10769,11 @@
   {
    "id": "alolan-ninetales-ex-b2-gholdengo-b4a",
    "name": "Alolan Ninetales ex Gholdengo",
+   "nm": {
+    "ko": "알로라 나인테일 ex 타부자고",
+    "ja": "アローラキュウコンex サーフゴー",
+    "zh-TW": "阿羅拉九尾ex 賽富豪"
+   },
    "icons": [
     "ninetales-alola",
     "gholdengo"
@@ -8407,6 +10791,11 @@
   {
    "id": "mega-sharpedo-ex-araquanid-b4",
    "name": "Mega Sharpedo ex Araquanid",
+   "nm": {
+    "ko": "메가 샤크니아 ex 깨비물거미",
+    "ja": "メガサメハダーex オニシズクモ",
+    "zh-TW": "超級巨牙鯊ex 滴蛛霸"
+   },
    "icons": [
     "sharpedo-mega",
     "araquanid"
@@ -8424,6 +10813,11 @@
   {
    "id": "typhlosion-a4-team-rockets-magmar-b4a",
    "name": "Typhlosion Team Rocket's Magmar",
+   "nm": {
+    "ko": "블레이범 로켓단의 마그마",
+    "ja": "バクフーン ロケット団のブーバー",
+    "zh-TW": "火爆獸 火箭隊的鴨嘴火獸"
+   },
    "icons": [
     "typhlosion",
     "magmar"
@@ -8441,6 +10835,11 @@
   {
    "id": "team-rockets-slowking-ex-b4a-shiinotic-a3a",
    "name": "Team Rocket's Slowking ex Shiinotic",
+   "nm": {
+    "ko": "로켓단의 야도킹 ex 마셰이드",
+    "ja": "ロケット団のヤドキングex マシェード",
+    "zh-TW": "火箭隊的呆呆王ex 燈罩夜菇"
+   },
    "icons": [
     "slowking",
     "shiinotic"
@@ -8458,6 +10857,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-seaking-b3b",
    "name": "Team Rocket's Raticate ex Seaking",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 왕콘치",
+    "ja": "ロケット団のラッタex アズマオウ",
+    "zh-TW": "火箭隊的拉達ex 金魚王"
+   },
    "icons": [
     "raticate",
     "seaking"
@@ -8475,6 +10879,11 @@
   {
    "id": "mega-houndoom-ex-p-b-iron-moth-b3a",
    "name": "Mega Houndoom ex Iron Moth",
+   "nm": {
+    "ko": "메가 헬가 ex 무쇠독나방",
+    "ja": "メガヘルガーex テツノドクガ",
+    "zh-TW": "超級黑魯加ex 鐵毒蛾"
+   },
    "icons": [
     "houndoom-mega",
     "iron-moth"
@@ -8492,6 +10901,11 @@
   {
    "id": "mega-manectric-ex-b2b-zeraora-a3a",
    "name": "Mega Manectric ex Zeraora",
+   "nm": {
+    "ko": "메가 썬더볼트 ex 제라오라",
+    "ja": "メガライボルトex ゼラオラ",
+    "zh-TW": "超級雷電獸ex 捷拉奧拉"
+   },
    "icons": [
     "manectric-mega",
     "zeraora"
@@ -8509,6 +10923,11 @@
   {
    "id": "flygon-ex-b3-munchlax-b3b",
    "name": "Flygon ex Munchlax",
+   "nm": {
+    "ko": "플라이곤 ex 먹고자",
+    "ja": "フライゴンex ゴンベ",
+    "zh-TW": "沙漠蜻蜓ex 小卡比獸"
+   },
    "icons": [
     "flygon",
     "munchlax"
@@ -8526,6 +10945,7 @@
   {
    "id": "delphox-b4a-castform-sunny-form-b3",
    "name": "Delphox Castform Sunny Form",
+   "nm": null,
    "icons": [
     "delphox",
     "castform-sunny"
@@ -8543,6 +10963,11 @@
   {
    "id": "skarmory-a2-team-rockets-tinkaton-b4a",
    "name": "Skarmory Team Rocket's Tinkaton",
+   "nm": {
+    "ko": "무장조 로켓단의 두드리짱",
+    "ja": "エアームド ロケット団のデカヌチャン",
+    "zh-TW": "盔甲鳥 火箭隊的巨鍛匠"
+   },
    "icons": [
     "skarmory",
     "tinkaton"
@@ -8560,6 +10985,11 @@
   {
    "id": "dragonair-b4-miraidon-ex-b3a",
    "name": "Dragonair Miraidon ex",
+   "nm": {
+    "ko": "신뇽 미라이돈  ex",
+    "ja": "ハクリュー ミライドンex",
+    "zh-TW": "哈克龍 密勒頓ex"
+   },
    "icons": [
     "dragonair",
     "miraidon"
@@ -8577,6 +11007,11 @@
   {
    "id": "team-rockets-zapdos-ex-team-rockets-electrode-b4a",
    "name": "Team Rocket's Zapdos ex Team Rocket's Electrode",
+   "nm": {
+    "ko": "로켓단의 썬더 ex 로켓단의 붐볼",
+    "ja": "ロケット団のサンダーex ロケット団のマルマイン",
+    "zh-TW": "火箭隊的閃電鳥ex 火箭隊的頑皮雷彈"
+   },
    "icons": [
     "zapdos",
     "electrode"
@@ -8594,6 +11029,11 @@
   {
    "id": "tinkaton-ex-a2b-skarmory-b4",
    "name": "Tinkaton ex Skarmory",
+   "nm": {
+    "ko": "두드리짱 ex 무장조",
+    "ja": "デカヌチャンex エアームド",
+    "zh-TW": "巨鍛匠ex 盔甲鳥"
+   },
    "icons": [
     "tinkaton",
     "skarmory"
@@ -8611,6 +11051,11 @@
   {
    "id": "mega-slowbro-ex-b2b-mantyke-a4a",
    "name": "Mega Slowbro ex Mantyke",
+   "nm": {
+    "ko": "메가 야도란 ex 타만타",
+    "ja": "メガヤドランex タマンタ",
+    "zh-TW": "超級呆殼獸ex 小球飛魚"
+   },
    "icons": [
     "slowbro-mega",
     "mantyke"
@@ -8628,6 +11073,11 @@
   {
    "id": "bellibolt-ex-b2a-team-rockets-electrode-b4a",
    "name": "Bellibolt ex Team Rocket's Electrode",
+   "nm": {
+    "ko": "찌리배리 ex 로켓단의 붐볼",
+    "ja": "ハラバリーex ロケット団のマルマイン",
+    "zh-TW": "電肚蛙ex 火箭隊的頑皮雷彈"
+   },
    "icons": [
     "bellibolt",
     "electrode"
@@ -8645,6 +11095,11 @@
   {
    "id": "mewtwo-ex-gardevoir-a1",
    "name": "Mewtwo ex Gardevoir",
+   "nm": {
+    "ko": "뮤츠 ex 가디안",
+    "ja": "ミュウツーex サーナイト",
+    "zh-TW": "超夢ex 沙奈朵"
+   },
    "icons": [
     "mewtwo",
     "gardevoir"
@@ -8662,6 +11117,11 @@
   {
    "id": "heliolisk-b4-zapdos-ex-a1",
    "name": "Heliolisk Zapdos ex",
+   "nm": {
+    "ko": "일레도리자드 썬더 ex",
+    "ja": "エレザード サンダーex",
+    "zh-TW": "光電傘蜥 閃電鳥ex"
+   },
    "icons": [
     "heliolisk",
     "zapdos"
@@ -8679,6 +11139,11 @@
   {
    "id": "serperior-a1a-oricorio-a3",
    "name": "Serperior Oricorio",
+   "nm": {
+    "ko": "샤로다 춤추새",
+    "ja": "ジャローダ オドリドリ",
+    "zh-TW": "君主蛇 花舞鳥"
+   },
    "icons": [
     "serperior",
     "oricorio-pom-pom"
@@ -8696,6 +11161,11 @@
   {
    "id": "beedrill-ex-a2b-bonsly-b3",
    "name": "Beedrill ex Bonsly",
+   "nm": {
+    "ko": "독침붕 ex 꼬지지",
+    "ja": "スピアーex ウソハチ",
+    "zh-TW": "大針蜂ex 盆才怪"
+   },
    "icons": [
     "beedrill",
     "bonsly"
@@ -8713,6 +11183,11 @@
   {
    "id": "guzzlord-ex-a3a-darkrai-ex-a2",
    "name": "Guzzlord ex Darkrai ex",
+   "nm": {
+    "ko": "악식킹 ex 다크라이 ex",
+    "ja": "アクジキングex ダークライex",
+    "zh-TW": "惡食大王ex 達克萊伊ex"
+   },
    "icons": [
     "guzzlord",
     "darkrai"
@@ -8730,6 +11205,11 @@
   {
    "id": "team-rockets-moltres-ex-b4a-mega-blaziken-ex-b1",
    "name": "Team Rocket's Moltres ex Mega Blaziken ex",
+   "nm": {
+    "ko": "로켓단의 파이어 ex 메가 번치코 ex",
+    "ja": "ロケット団のファイヤーex メガバシャーモex",
+    "zh-TW": "火箭隊的火焰鳥ex 超級火焰雞ex"
+   },
    "icons": [
     "moltres",
     "blaziken-mega"
@@ -8747,6 +11227,11 @@
   {
    "id": "garchomp-furfrou-b4a",
    "name": "Garchomp Furfrou",
+   "nm": {
+    "ko": "한카리아스 트리미앙",
+    "ja": "ガブリアス トリミアン",
+    "zh-TW": "烈咬陸鯊 多麗米亞"
+   },
    "icons": [
     "garchomp",
     "furfrou"
@@ -8764,6 +11249,11 @@
   {
    "id": "weavile-ex-darkrai-ex-a2",
    "name": "Weavile ex Darkrai ex",
+   "nm": {
+    "ko": "포푸니라 ex 다크라이 ex",
+    "ja": "マニューラex ダークライex",
+    "zh-TW": "瑪狃拉ex 達克萊伊ex"
+   },
    "icons": [
     "weavile",
     "darkrai"
@@ -8781,6 +11271,11 @@
   {
    "id": "team-rockets-raticate-ex-b4a-alolan-raichu-ex-a3",
    "name": "Team Rocket's Raticate ex Alolan Raichu ex",
+   "nm": {
+    "ko": "로켓단의 레트라 ex 알로라 라이츄 ex",
+    "ja": "ロケット団のラッタex アローラライチュウex",
+    "zh-TW": "火箭隊的拉達ex 阿羅拉雷丘ex"
+   },
    "icons": [
     "raticate",
     "raichu-alola"
@@ -8798,6 +11293,11 @@
   {
    "id": "garchomp-a2-munchlax-b3b",
    "name": "Garchomp Munchlax",
+   "nm": {
+    "ko": "한카리아스 먹고자",
+    "ja": "ガブリアス ゴンベ",
+    "zh-TW": "烈咬陸鯊 小卡比獸"
+   },
    "icons": [
     "garchomp",
     "munchlax"
@@ -8815,6 +11315,11 @@
   {
    "id": "mega-swampert-ex-b2-munchlax-b3b",
    "name": "Mega Swampert ex Munchlax",
+   "nm": {
+    "ko": "메가 대짱이 ex 먹고자",
+    "ja": "メガラグラージex ゴンベ",
+    "zh-TW": "超級巨沼怪ex 小卡比獸"
+   },
    "icons": [
     "swampert-mega",
     "munchlax"
@@ -8832,6 +11337,11 @@
   {
    "id": "mega-houndoom-ex-p-b-team-rockets-moltres-ex-b4a",
    "name": "Mega Houndoom ex Team Rocket's Moltres ex",
+   "nm": {
+    "ko": "메가 헬가 ex 로켓단의 파이어 ex",
+    "ja": "メガヘルガーex ロケット団のファイヤーex",
+    "zh-TW": "超級黑魯加ex 火箭隊的火焰鳥ex"
+   },
    "icons": [
     "houndoom-mega",
     "moltres"
@@ -8849,6 +11359,11 @@
   {
    "id": "guzzlord-ex-a3a-team-rockets-raticate-ex-b4a",
    "name": "Guzzlord ex Team Rocket's Raticate ex",
+   "nm": {
+    "ko": "악식킹 ex 로켓단의 레트라 ex",
+    "ja": "アクジキングex ロケット団のラッタex",
+    "zh-TW": "惡食大王ex 火箭隊的拉達ex"
+   },
    "icons": [
     "guzzlord",
     "raticate"
@@ -8866,6 +11381,11 @@
   {
    "id": "mega-lopunny-ex-b1a-pidgeot-a1",
    "name": "Mega Lopunny ex Pidgeot",
+   "nm": {
+    "ko": "메가 이어롭 ex 피죤투",
+    "ja": "メガミミロップex ピジョット",
+    "zh-TW": "超級長耳兔ex 大比鳥"
+   },
    "icons": [
     "lopunny-mega",
     "pidgeot"
@@ -8883,6 +11403,7 @@
   {
    "id": "rapidash-ex-b1-castform-sunny-form-b3",
    "name": "Rapidash ex Castform Sunny Form",
+   "nm": null,
    "icons": [
     "rapidash",
     "castform-sunny"
@@ -8900,6 +11421,11 @@
   {
    "id": "delphox-b4a-pichu-a4",
    "name": "Delphox Pichu",
+   "nm": {
+    "ko": "마폭시 피츄",
+    "ja": "マフォクシー ピチュー",
+    "zh-TW": "妖火紅狐 皮丘"
+   },
    "icons": [
     "delphox",
     "pichu"
@@ -8917,6 +11443,11 @@
   {
    "id": "vaporeon-ex-b3-indeedee-ex-b1",
    "name": "Vaporeon ex Indeedee ex",
+   "nm": {
+    "ko": "샤미드 ex 에써르 ex",
+    "ja": "シャワーズex イエッサンex",
+    "zh-TW": "水伊布ex 愛管侍ex"
+   },
    "icons": [
     "vaporeon",
     "indeedee"
@@ -8934,6 +11465,11 @@
   {
    "id": "indeedee-ex-b1-banette-a3",
    "name": "Indeedee ex Banette",
+   "nm": {
+    "ko": "에써르 ex 다크펫",
+    "ja": "イエッサンex ジュペッタ",
+    "zh-TW": "愛管侍ex 詛咒娃娃"
+   },
    "icons": [
     "indeedee",
     "banette"
@@ -8951,6 +11487,11 @@
   {
    "id": "mega-absol-ex-b1-darkrai-ex-a2",
    "name": "Mega Absol ex Darkrai ex",
+   "nm": {
+    "ko": "메가 앱솔 ex 다크라이 ex",
+    "ja": "メガアブソルex ダークライex",
+    "zh-TW": "超級阿勃梭魯ex 達克萊伊ex"
+   },
    "icons": [
     "absol-mega",
     "darkrai"
@@ -8968,6 +11509,11 @@
   {
    "id": "slurpuff-alcremie-a3b",
    "name": "Slurpuff Alcremie",
+   "nm": {
+    "ko": "나루림 마휘핑",
+    "ja": "ペロリーム マホイップ",
+    "zh-TW": "胖甜妮 霜奶仙"
+   },
    "icons": [
     "slurpuff",
     "alcremie"
@@ -8985,6 +11531,7 @@
   {
    "id": "mega-swampert-ex-b2-archaludon-b4a",
    "name": "Mega Swampert ex Archaludon",
+   "nm": null,
    "icons": [
     "swampert-mega",
     "archaludon"
@@ -9002,6 +11549,11 @@
   {
    "id": "flygon-ex-b3-giratina-ex-a2b",
    "name": "Flygon ex Giratina ex",
+   "nm": {
+    "ko": "플라이곤 ex 기라티나 ex",
+    "ja": "フライゴンex ギラティナex",
+    "zh-TW": "沙漠蜻蜓ex 騎拉帝納ex"
+   },
    "icons": [
     "flygon",
     "giratina"
@@ -9019,6 +11571,11 @@
   {
    "id": "team-rockets-electrode-b4a-greninja-a1",
    "name": "Team Rocket's Electrode Greninja",
+   "nm": {
+    "ko": "로켓단의 붐볼 개굴닌자",
+    "ja": "ロケット団のマルマイン ゲッコウガ",
+    "zh-TW": "火箭隊的頑皮雷彈 甲賀忍蛙"
+   },
    "icons": [
     "electrode",
     "greninja"
@@ -9036,6 +11593,11 @@
   {
    "id": "mega-venusaur-ex-b1a-igglybuff-a4a",
    "name": "Mega Venusaur ex Igglybuff",
+   "nm": {
+    "ko": "메가 이상해꽃 ex 푸푸린",
+    "ja": "メガフシギバナex ププリン",
+    "zh-TW": "超級妙蛙花ex 寶寶丁"
+   },
    "icons": [
     "venusaur-mega",
     "igglybuff"
@@ -9053,6 +11615,11 @@
   {
    "id": "jolteon-ex-b1-team-rockets-electrode-b4a",
    "name": "Jolteon ex Team Rocket's Electrode",
+   "nm": {
+    "ko": "쥬피썬더 ex 로켓단의 붐볼",
+    "ja": "サンダースex ロケット団のマルマイン",
+    "zh-TW": "雷伊布ex 火箭隊的頑皮雷彈"
+   },
    "icons": [
     "jolteon",
     "electrode"
@@ -9070,6 +11637,11 @@
   {
    "id": "mega-manectric-ex-b2b-igglybuff-a4a",
    "name": "Mega Manectric ex Igglybuff",
+   "nm": {
+    "ko": "메가 썬더볼트 ex 푸푸린",
+    "ja": "メガライボルトex ププリン",
+    "zh-TW": "超級雷電獸ex 寶寶丁"
+   },
    "icons": [
     "manectric-mega",
     "igglybuff"
@@ -9087,6 +11659,11 @@
   {
    "id": "hydreigon-b1-darkrai-ex-a2",
    "name": "Hydreigon Darkrai ex",
+   "nm": {
+    "ko": "삼삼드래 다크라이 ex",
+    "ja": "サザンドラ ダークライex",
+    "zh-TW": "三首惡龍 達克萊伊ex"
+   },
    "icons": [
     "hydreigon",
     "darkrai"
@@ -9104,6 +11681,11 @@
   {
    "id": "dedenne-ex-b3b-pichu-a4",
    "name": "Dedenne ex Pichu",
+   "nm": {
+    "ko": "데덴네 ex 피츄",
+    "ja": "デデンネex ピチュー",
+    "zh-TW": "咚咚鼠ex 皮丘"
+   },
    "icons": [
     "dedenne",
     "pichu"
@@ -9121,6 +11703,11 @@
   {
    "id": "mega-sharpedo-ex-b4-arboliva-b2a",
    "name": "Mega Sharpedo ex Arboliva",
+   "nm": {
+    "ko": "메가 샤크니아 ex 올리르바",
+    "ja": "メガサメハダーex オリーヴァ",
+    "zh-TW": "超級巨牙鯊ex 奧利瓦"
+   },
    "icons": [
     "sharpedo-mega",
     "arboliva"
@@ -9138,6 +11725,11 @@
   {
    "id": "alolan-ninetales-ex-b2-alolan-ninetales-a3",
    "name": "Alolan Ninetales ex Alolan Ninetales",
+   "nm": {
+    "ko": "알로라 나인테일 ex 알로라 나인테일",
+    "ja": "アローラキュウコンex アローラキュウコン",
+    "zh-TW": "阿羅拉九尾ex 阿羅拉九尾"
+   },
    "icons": [
     "ninetales-alola",
     "ninetales-alola"
@@ -9155,6 +11747,11 @@
   {
    "id": "leafeon-ex-a2a-eevee-ex-a3b",
    "name": "Leafeon ex Eevee ex",
+   "nm": {
+    "ko": "리피아 ex 이브이 ex",
+    "ja": "リーフィアex イーブイex",
+    "zh-TW": "葉伊布ex 伊布ex"
+   },
    "icons": [
     "leafeon",
     "eevee"
@@ -9172,6 +11769,11 @@
   {
    "id": "snorlax-ex-a3b-indeedee-ex-b1",
    "name": "Snorlax ex Indeedee ex",
+   "nm": {
+    "ko": "잠만보 ex 에써르 ex",
+    "ja": "カビゴンex イエッサンex",
+    "zh-TW": "卡比獸ex 愛管侍ex"
+   },
    "icons": [
     "snorlax",
     "indeedee"
@@ -9189,6 +11791,11 @@
   {
    "id": "garchomp-ex-a2a",
    "name": "Garchomp ex",
+   "nm": {
+    "ko": "한카리아스 ex",
+    "ja": "ガブリアスex",
+    "zh-TW": "烈咬陸鯊ex"
+   },
    "icons": [
     "garchomp"
    ],

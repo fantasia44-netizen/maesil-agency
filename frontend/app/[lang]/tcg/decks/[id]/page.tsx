@@ -12,9 +12,11 @@ import { isLocale, defaultLocale, localizePath, hreflangLanguages, locales, type
 export const revalidate = 3600;
 
 type Card = { count: number; set: string; number: string; name: string; nm?: Record<string, string> };
-type Deck = { id: string; name: string; icons: string[]; tier: string; share: number; winrate: number; wilsonLo: number; n: number; decklist: { pokemon: Card[]; trainer: Card[]; energy: string[] } | null; sampleFrom: { wins: number; losses: number } | null };
+type Deck = { id: string; name: string; nm?: Record<string, string>; icons: string[]; tier: string; share: number; winrate: number; wilsonLo: number; n: number; decklist: { pokemon: Card[]; trainer: Card[]; energy: string[] } | null; sampleFrom: { wins: number; losses: number } | null };
 const DECK_LIST = DECKS as Deck[];
 const NAME_BY_ID: Record<string, string> = Object.fromEntries((META.decks as { id: string; name: string }[]).map((d) => [d.id, d.name]));
+const NM_BY_ID: Record<string, Record<string, string> | undefined> = Object.fromEntries((META.decks as { id: string; nm?: Record<string, string> }[]).map((d) => [d.id, d.nm]));
+const dName = (id: string, name: string, lang: string) => (NM_BY_ID[id] && NM_BY_ID[id]![lang]) || name;
 const MU = MATCHUPS as Record<string, Record<string, { w: number; l: number }>>;
 
 export function generateStaticParams() {
@@ -57,7 +59,7 @@ export function generateMetadata({ params }: { params: { lang: string; id: strin
   const a = getDeckAnalysis(params.id, lang);
   if (!deck || !a) return {};
   const path = `/tcg/decks/${params.id}`;
-  const title = `${deck.name} — ${a.playstyle} · ${lang === "ko" ? "덱 공략·상성" : lang === "ja" ? "デッキ攻略・相性" : lang === "zh-TW" ? "牌組攻略·對戰" : "Deck Guide · Matchups"} | TCG Note`;
+  const title = `${dName(deck.id, deck.name, lang)} — ${a.playstyle} · ${lang === "ko" ? "덱 공략·상성" : lang === "ja" ? "デッキ攻略・相性" : lang === "zh-TW" ? "牌組攻略·對戰" : "Deck Guide · Matchups"} | TCG Note`;
   return {
     title, description: a.summary,
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
@@ -76,7 +78,7 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
 
   // 매치업 — 승률 계산 + 상대명, 표본 8+ 필터, 승률 정렬
   const rows = Object.entries(MU[deck.id] || {})
-    .map(([oid, r]) => ({ oid, name: NAME_BY_ID[oid] || oid, w: r.w, l: r.l, n: r.w + r.l, wr: r.w + r.l ? Math.round((r.w / (r.w + r.l)) * 100) : 0 }))
+    .map(([oid, r]) => ({ oid, name: dName(oid, NAME_BY_ID[oid] || oid, lang), w: r.w, l: r.l, n: r.w + r.l, wr: r.w + r.l ? Math.round((r.w / (r.w + r.l)) * 100) : 0 }))
     .filter((x) => x.n >= 8)
     .sort((x, y) => y.wr - x.wr);
 
@@ -89,7 +91,7 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
       {/* 헤더 + 통계 */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 6 }}>
         <span style={{ background: TIER_COLOR[deck.tier] || "#64748b", color: "#fff", borderRadius: 7, padding: "2px 11px", fontSize: "1rem", fontWeight: 900 }}>{deck.tier}</span>
-        <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.2 }}>{deck.name}</h1>
+        <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.2 }}>{dName(deck.id, deck.name, lang)}</h1>
       </div>
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: "0.85rem", color: "#475569", marginBottom: 14 }}>
         <span>{t.share} <b style={{ color: "#dc2626" }}>{deck.share}%</b></span>

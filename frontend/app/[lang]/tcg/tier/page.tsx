@@ -8,7 +8,7 @@ import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale }
 export const revalidate = 3600;
 const PATH = "/tcg/tier";
 
-type Deck = { id: string; name: string; icons: string[]; count: number; share: number; wins: number; losses: number; ties: number; n: number; winrate: number; wilsonLo: number; tier: string };
+type Deck = { id: string; name: string; nm?: Record<string, string>; icons: string[]; count: number; share: number; wins: number; losses: number; ties: number; n: number; winrate: number; wilsonLo: number; tier: string };
 const DECKS = (META.decks as Deck[]);
 
 // 로케일별 문구
@@ -91,6 +91,7 @@ export default function TierPage({ params }: { params: { lang: string } }) {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = TL[lang];
   const L = (p: string) => localizePath(lang, p);
+  const dn = (d: Deck) => (d.nm && d.nm[lang]) || d.name; // 덱명 현지화
 
   const ranked = DECKS.filter((d) => d.tier !== "?" && d.tier !== "D");
   const tiers = ["S", "A", "B", "C"] as const;
@@ -139,7 +140,7 @@ export default function TierPage({ params }: { params: { lang: string } }) {
               <tbody>
                 {byTier[tr].map((d) => (
                   <tr key={d.id} style={{ borderTop: "1px solid #f6e0e0" }}>
-                    <td style={{ padding: "7px 8px", fontWeight: 600, color: "#0f172a" }}>{d.name}</td>
+                    <td style={{ padding: "7px 8px", fontWeight: 600, color: "#0f172a" }}>{dn(d)}</td>
                     <td style={{ padding: "7px 8px", textAlign: "right", fontWeight: 700, color: "#dc2626", fontVariantNumeric: "tabular-nums" }}>{d.share}%</td>
                     <td style={{ padding: "7px 8px", textAlign: "right", fontVariantNumeric: "tabular-nums", color: d.winrate >= 50 ? "#16a34a" : "#dc2626", fontWeight: 700 }}>{d.winrate}%</td>
                     <td style={{ padding: "7px 8px", textAlign: "right", fontVariantNumeric: "tabular-nums", color: "#94a3b8" }}>{d.n.toLocaleString()}</td>
@@ -159,7 +160,7 @@ export default function TierPage({ params }: { params: { lang: string } }) {
             <p style={{ margin: "0 0 8px", fontSize: "0.76rem", color: "#4d7c5a", lineHeight: 1.5 }}>{t.overP}</p>
             {over.map((d) => (
               <div key={d.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem", padding: "3px 0", color: "#0f172a" }}>
-                <span style={{ fontWeight: 600 }}>{d.name}</span>
+                <span style={{ fontWeight: 600 }}>{dn(d)}</span>
                 <span style={{ fontVariantNumeric: "tabular-nums", color: "#15803d", fontWeight: 700 }}>{d.winrate}% · {d.share}%</span>
               </div>
             ))}
@@ -171,7 +172,7 @@ export default function TierPage({ params }: { params: { lang: string } }) {
             <p style={{ margin: "0 0 8px", fontSize: "0.76rem", color: "#a15757", lineHeight: 1.5 }}>{t.trapP}</p>
             {traps.map((d) => (
               <div key={d.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem", padding: "3px 0", color: "#0f172a" }}>
-                <span style={{ fontWeight: 600 }}>{d.name}</span>
+                <span style={{ fontWeight: 600 }}>{dn(d)}</span>
                 <span style={{ fontVariantNumeric: "tabular-nums", color: "#b91c1c", fontWeight: 700 }}>{d.winrate}% · {d.share}%</span>
               </div>
             ))}

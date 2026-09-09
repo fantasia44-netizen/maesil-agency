@@ -7,7 +7,7 @@ import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale }
 
 export const revalidate = 3600;
 const PATH = "/tcg/decks";
-type MDeck = { id: string; name: string; tier: string; share: number; winrate: number };
+type MDeck = { id: string; name: string; nm?: Record<string, string>; tier: string; share: number; winrate: number };
 const BY_ID: Record<string, MDeck> = Object.fromEntries((META.decks as MDeck[]).map((d) => [d.id, d]));
 const TIER_COLOR: Record<string, string> = { S: "#dc2626", A: "#ea580c", B: "#ca8a04", C: "#16a34a" };
 
@@ -45,7 +45,7 @@ export default function DecksIndexPage({ params }: { params: { lang: string } })
               <span style={{ background: TIER_COLOR[m.tier] || "#64748b", color: "#fff", borderRadius: 6, padding: "1px 8px", fontSize: "0.78rem", fontWeight: 900 }}>{m.tier}</span>
               <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#dc2626" }}>{a!.playstyle}</span>
             </div>
-            <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a", marginBottom: 4 }}>{m.name}</div>
+            <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a", marginBottom: 4 }}>{(m.nm && m.nm[lang]) || m.name}</div>
             <div style={{ fontSize: "0.78rem", color: "#64748b", lineHeight: 1.5, marginBottom: 6 }}>{a!.summary.length > 70 ? a!.summary.slice(0, 70) + "…" : a!.summary}</div>
             <div style={{ display: "flex", gap: 12, fontSize: "0.78rem", color: "#475569" }}>
               <span>{t.share} <b style={{ color: "#dc2626" }}>{m.share}%</b></span>

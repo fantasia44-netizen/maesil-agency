@@ -9,7 +9,8 @@ import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale }
 export const revalidate = 3600;
 const PATH = "/tcg/meta";
 
-type MDeck = { id: string; name: string; tier: string; share: number; winrate: number; n: number };
+type MDeck = { id: string; name: string; nm?: Record<string, string>; tier: string; share: number; winrate: number; n: number };
+const dnOf = (lang: string, d?: { name: string; nm?: Record<string, string> }) => (d ? (d.nm && d.nm[lang]) || d.name : "");
 const DECKS_STAT = META.decks as MDeck[];
 type DDeck = { id: string; share: number; decklist: { energy?: string[] } | null };
 const DECK_LISTS = DECKS as DDeck[];
@@ -118,7 +119,7 @@ export default function MetaPage({ params }: { params: { lang: string } }) {
       {/* 한줄 읽기 */}
       <section style={{ background: "#fef6f5", border: "1px solid #fbd8d8", borderRadius: 12, padding: "0.9rem 1.1rem", marginBottom: 16 }}>
         <h2 style={{ margin: "0 0 5px", fontSize: "0.92rem", fontWeight: 800, color: "#b91c1c" }}>{t.readH}</h2>
-        <p style={{ margin: 0, fontSize: "0.9rem", color: "#0f172a", lineHeight: 1.75 }}>{t.read(top[0]?.name, top5share, over?.name)}</p>
+        <p style={{ margin: 0, fontSize: "0.9rem", color: "#0f172a", lineHeight: 1.75 }}>{t.read(dnOf(lang, top[0]), top5share, over ? dnOf(lang, over) : undefined)}</p>
       </section>
 
       {/* 집중도 */}
@@ -156,7 +157,7 @@ export default function MetaPage({ params }: { params: { lang: string } }) {
           {top.slice(0, 8).map((d, i) => (
             <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.84rem", padding: "3px 0", borderTop: i ? "1px solid #f9e8e8" : "none" }}>
               <span style={{ minWidth: 20, color: "#cbd5e1", fontWeight: 800 }}>{i + 1}</span>
-              <span style={{ flex: 1, fontWeight: 600, color: "#0f172a" }}>{d.name}</span>
+              <span style={{ flex: 1, fontWeight: 600, color: "#0f172a" }}>{dnOf(lang, d)}</span>
               <span style={{ color: "#dc2626", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{d.share}%</span>
               <span style={{ minWidth: 46, textAlign: "right", color: d.winrate >= 50 ? "#16a34a" : "#dc2626", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{d.winrate}%</span>
             </div>
