@@ -3,7 +3,7 @@
 // 사장님 검수·보강 대상. 새 덱 추가 = 여기 항목 추가 → 자동으로 페이지 생성.
 import { type Locale } from "../../../../lib/i18n";
 
-export type DeckAnalysis = { playstyle: string; summary: string; gamePlan: string; keyCards: string[] };
+export type DeckAnalysis = { playstyle: string; summary: string; gamePlan: string; keyCards: string[]; techCards?: string[] };
 
 const A: Record<string, Partial<Record<Locale, DeckAnalysis>>> = {
   // ── Mega Lucario ex / Lucario — 격투 어그로 (S, 메타 정점) ──
@@ -13,24 +13,28 @@ const A: Record<string, Partial<Record<Locale, DeckAnalysis>>> = {
       summary: "현재 메타 점유율 1위의 격투 속공 덱. 초반부터 압박을 걸어 상대가 자리를 잡기 전에 포인트를 몰아치는 것이 핵심입니다.",
       gamePlan: "리오르–루카리오 라인을 빠르게 세우고 메가 루카리오 ex로 2~3턴 안에 공격을 시작합니다. 상대 벤치를 지목·강제교체(사브리나·사이러스 등)로 원하는 대상을 앞으로 끌어내 급소를 노리고, 컨트롤 덱이 안정되기 전에 게임을 끝내는 레이스형 운영이 정석입니다.",
       keyCards: ["메가 루카리오 ex — 주력 어태커", "리오르/루카리오 — 진화 세팅", "박사의 연구 — 드로우 엔진", "사브리나·X 스피드 — 지목·기동"],
+      techCards: ["추가 지목 카드 — 벤치 저격 강화", "데미지 보정 카드 — 핵심 HP선 원킬 조정", "선공권·기동 카드 — 미러전·컨트롤 대비"],
     },
     en: {
       playstyle: "Fighting Aggro",
       summary: "The #1 meta-share deck: a fast Fighting aggro build that wins by applying pressure before the opponent stabilizes.",
       gamePlan: "Set up the Riolu–Lucario line quickly and start attacking with Mega Lucario ex by turn 2–3. Use gust/switch effects to drag the target you want into the active spot, and race prize points before control decks find their footing.",
       keyCards: ["Mega Lucario ex — main attacker", "Riolu/Lucario — evolution setup", "Professor's Research — draw engine", "Sabrina · X Speed — gust & mobility"],
+      techCards: ["Extra gust — stronger bench sniping", "Damage boosters — hit key OHKO thresholds", "Going-first / mobility — for the mirror and vs control"],
     },
     ja: {
       playstyle: "闘 アグロ",
       summary: "現環境の使用率トップ。闘タイプの速攻デッキで、相手が構える前に圧をかけてポイントを取り切るのが要です。",
       gamePlan: "リオル–ルカリオのラインを素早く並べ、2〜3ターンでメガルカリオexの攻撃を開始。ベンチ指名・強制入れ替え(サブリナ等)で狙った相手を引きずり出し、コントロールが安定する前に決めるレース型が基本です。",
       keyCards: ["メガルカリオex — 主力アタッカー", "リオル/ルカリオ — 進化セット", "博士の研究 — ドローエンジン", "サブリナ・Xスピード — 指名・機動"],
+      techCards: ["追加の指名カード — ベンチ狙撃を強化", "ダメージ補正カード — 重要HPラインを調整", "先攻・機動カード — ミラー/コントロール対策"],
     },
     "zh-TW": {
       playstyle: "格鬥快攻",
       summary: "目前使用率第一的格鬥快攻牌組。核心是從前期就施壓，在對手站穩之前搶下分數。",
       gamePlan: "快速鋪好利歐路–路卡利歐進化線，第2~3回合就用超級路卡利歐ex開始進攻。用指名·強制交換(莎娜等)把想打的目標拉到前排，趕在控制牌組穩住之前結束比賽。",
       keyCards: ["超級路卡利歐ex — 主力攻擊手", "利歐路/路卡利歐 — 進化鋪陳", "博士的研究 — 抽牌引擎", "莎娜·X速度 — 指名·機動"],
+      techCards: ["額外指名卡 — 強化備位狙擊", "傷害加成卡 — 湊出關鍵一擊斬線", "先手·機動卡 — 應對鏡像/控制"],
     },
   },
   // ── Mega Altaria ex / Espeon — 컨트롤·버프 (S) ──

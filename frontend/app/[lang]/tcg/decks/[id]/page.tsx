@@ -31,24 +31,24 @@ const L10N: Record<Locale, {
   share: string; win: string; sample: string; tierWord: string;
   listH: string; pokemon: string; trainer: string; energy: string; fromRecord: string;
   matchupH: string; matchupP: string; vsCol: string; wrCol: string; recCol: string; best: string; worst: string;
-  planH: string; keyH: string; src: string; back: string; minNote: string;
+  planH: string; keyH: string; techH: string; updated: string; src: string; back: string; minNote: string;
 }> = {
   ko: { share: "점유율", win: "승률", sample: "표본", tierWord: "티어",
     listH: "🎴 대표 덱리스트", pokemon: "포켓몬", trainer: "트레이너", energy: "에너지", fromRecord: "출전 성적",
     matchupH: "⚔️ 상성 (실제 대회 데이터)", matchupP: "이 덱이 각 상대 덱을 만났을 때 실제 승률입니다(표본 8경기 이상).", vsCol: "상대 덱", wrCol: "승률", recCol: "전적", best: "유리", worst: "불리",
-    planH: "🎯 운영 전략", keyH: "핵심 카드", src: "통계 출처: Limitless TCG · 대회 결과 자체 집계", back: "← 전체 덱 티어", minNote: "표본이 적은 상대는 제외" },
+    planH: "🎯 운영 전략", keyH: "핵심 카드", techH: "🔄 대체·테크 카드", updated: "최근 업데이트", src: "통계 출처: Limitless TCG · 대회 결과 자체 집계", back: "← 전체 덱 티어", minNote: "표본이 적은 상대는 제외" },
   en: { share: "Share", win: "Win %", sample: "N", tierWord: "Tier",
     listH: "🎴 Representative decklist", pokemon: "Pokémon", trainer: "Trainer", energy: "Energy", fromRecord: "Record",
     matchupH: "⚔️ Matchups (real tournament data)", matchupP: "Actual win rate when this deck faced each opponent (min 8 games).", vsCol: "Opponent", wrCol: "Win %", recCol: "Record", best: "Favored", worst: "Unfavored",
-    planH: "🎯 Game plan", keyH: "Key cards", src: "Stats: Limitless TCG · aggregated by us", back: "← All deck tiers", minNote: "Low-sample opponents excluded" },
+    planH: "🎯 Game plan", keyH: "Key cards", techH: "🔄 Tech / flex cards", updated: "Updated", src: "Stats: Limitless TCG · aggregated by us", back: "← All deck tiers", minNote: "Low-sample opponents excluded" },
   ja: { share: "使用率", win: "勝率", sample: "N", tierWord: "ティア",
     listH: "🎴 代表デッキリスト", pokemon: "ポケモン", trainer: "トレーナー", energy: "エネルギー", fromRecord: "戦績",
     matchupH: "⚔️ 相性(実際の大会データ)", matchupP: "このデッキが各相手と対戦した実際の勝率(8試合以上)。", vsCol: "相手デッキ", wrCol: "勝率", recCol: "戦績", best: "有利", worst: "不利",
-    planH: "🎯 立ち回り", keyH: "キーカード", src: "統計出典: Limitless TCG · 自前集計", back: "← デッキティア一覧", minNote: "サンプル僅少の相手は除外" },
+    planH: "🎯 立ち回り", keyH: "キーカード", techH: "🔄 入れ替え候補", updated: "更新", src: "統計出典: Limitless TCG · 自前集計", back: "← デッキティア一覧", minNote: "サンプル僅少の相手は除外" },
   "zh-TW": { share: "使用率", win: "勝率", sample: "N", tierWord: "強度",
     listH: "🎴 代表牌組", pokemon: "寶可夢", trainer: "訓練家", energy: "能量", fromRecord: "戰績",
     matchupH: "⚔️ 對戰(實際賽事數據)", matchupP: "此牌組對上各對手的實際勝率(至少8場)。", vsCol: "對手牌組", wrCol: "勝率", recCol: "戰績", best: "有利", worst: "不利",
-    planH: "🎯 操作策略", keyH: "關鍵卡", src: "數據來源: Limitless TCG · 自行彙整", back: "← 全部牌組強度", minNote: "樣本過少的對手已排除" },
+    planH: "🎯 操作策略", keyH: "關鍵卡", techH: "🔄 替換·彈性卡", updated: "更新", src: "數據來源: Limitless TCG · 自行彙整", back: "← 全部牌組強度", minNote: "樣本過少的對手已排除" },
 };
 
 export function generateMetadata({ params }: { params: { lang: string; id: string } }): Metadata {
@@ -95,6 +95,7 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
         <span>{t.share} <b style={{ color: "#b4258f" }}>{deck.share}%</b></span>
         <span>{t.win} <b style={{ color: deck.winrate >= 50 ? "#16a34a" : "#dc2626" }}>{deck.winrate}%</b></span>
         <span>{t.sample} <b>{deck.n.toLocaleString()}</b></span>
+        <span style={{ color: "#94a3b8" }}>{t.updated} {new Date(META.generatedAt).toISOString().slice(0, 10)}</span>
       </div>
 
       {/* 원본 전략 */}
@@ -107,6 +108,14 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
             <h2 style={{ margin: "0 0 4px", fontSize: "0.9rem", fontWeight: 800, color: "#a01f7f" }}>{t.keyH}</h2>
             <ul style={{ margin: 0, paddingLeft: 18, fontSize: "0.85rem", color: "#475569", lineHeight: 1.7 }}>
               {a.keyCards.map((k, i) => <li key={i}>{k}</li>)}
+            </ul>
+          </>
+        )}
+        {a.techCards && a.techCards.length > 0 && (
+          <>
+            <h2 style={{ margin: "10px 0 4px", fontSize: "0.9rem", fontWeight: 800, color: "#a01f7f" }}>{t.techH}</h2>
+            <ul style={{ margin: 0, paddingLeft: 18, fontSize: "0.85rem", color: "#475569", lineHeight: 1.7 }}>
+              {a.techCards.map((k, i) => <li key={i}>{k}</li>)}
             </ul>
           </>
         )}
