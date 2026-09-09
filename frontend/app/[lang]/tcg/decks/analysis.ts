@@ -195,6 +195,87 @@ const A: Record<string, Partial<Record<Locale, DeckAnalysis>>> = {
       keyCards: ["超級火焰雞ex — 主力攻擊手", "火稚雞/力壯雞 — 進化線", "火能量·加速訓練家"],
     },
   },
+  // ── Mega Sceptile ex / Greninja — 풀·물 템포 (A) ──
+  "mega-sceptile-ex-b3-greninja-a1": {
+    ko: {
+      playstyle: "풀·물 템포",
+      summary: "메가 나무킹 ex의 화력에 개굴닌자의 벤치 견제를 더한 템포 덱. A티어 중 승률이 높은 편입니다.",
+      gamePlan: "개굴닌자로 상대 벤치에 데미지를 흘려 미리 압박을 만들고, 메가 나무킹 ex로 앞선을 정리합니다. 벤치 견제로 상대의 진화·세팅을 방해하며 템포 우위를 유지하는 것이 핵심입니다.",
+      keyCards: ["메가 나무킹 ex — 주력 화력", "개굴닌자 — 벤치 견제", "박사의 연구 — 전개"],
+    },
+    en: {
+      playstyle: "Grass-Water Tempo",
+      summary: "A tempo deck adding Greninja's bench pressure to Mega Sceptile ex's damage. Among the higher win rates in A-tier.",
+      gamePlan: "Chip the opponent's bench with Greninja to set up pressure early, then clean the active with Mega Sceptile ex. Disrupt their evolutions and setup with bench damage while keeping the tempo lead.",
+      keyCards: ["Mega Sceptile ex — main damage", "Greninja — bench pressure", "Professor's Research — development"],
+    },
+    ja: {
+      playstyle: "草・水 テンポ",
+      summary: "メガジュカインexの火力にゲッコウガのベンチ牽制を加えたテンポデッキ。Aティアの中では勝率が高めです。",
+      gamePlan: "ゲッコウガで相手ベンチにダメージを与えて先に圧をつくり、メガジュカインexで前を処理します。ベンチ牽制で相手の進化・準備を妨げつつテンポ優位を保つのが要です。",
+      keyCards: ["メガジュカインex — 主力火力", "ゲッコウガ — ベンチ牽制", "博士の研究 — 展開"],
+    },
+    "zh-TW": {
+      playstyle: "草·水 節奏",
+      summary: "在超級蜥蜴王ex火力上加入甲賀忍蛙備位牽制的節奏牌組。在A級中勝率偏高。",
+      gamePlan: "用甲賀忍蛙對對手備位造成傷害、提前施壓，再以超級蜥蜴王ex處理前排。以備位牽制妨礙對手進化·佈置，維持節奏優勢是關鍵。",
+      keyCards: ["超級蜥蜴王ex — 主力火力", "甲賀忍蛙 — 備位牽制", "博士的研究 — 展開"],
+    },
+  },
+  // ── Hydreigon / Mega Absol ex — 악 미드레인지 (B) ──
+  "hydreigon-mega-absol-ex-b1": {
+    ko: {
+      playstyle: "악 미드레인지",
+      summary: "삼삼드래와 메가 앱솔 ex를 축으로 하는 악타입 미드레인지. 승률은 50% 안팎이라 매치업 이해가 승부를 가릅니다.",
+      gamePlan: "상황에 맞는 어태커를 골라 교환에서 손해를 안 보며 중반을 지배합니다. 극단적 속공도 극단적 컨트롤도 아닌 균형형이라, 상대 덱을 읽고 유리한 교환을 선택하는 판단이 중요합니다.",
+      keyCards: ["삼삼드래 — 안정적 어태커", "메가 앱솔 ex — 핵심 화력", "지목·드로우 트레이너"],
+    },
+    en: {
+      playstyle: "Dark Midrange",
+      summary: "A Dark midrange deck built around Hydreigon and Mega Absol ex. Around a 50% win rate — matchup knowledge decides games.",
+      gamePlan: "Pick the right attacker for the situation and dominate the mid-game by winning trades. Neither pure aggro nor pure control — reading the opponent and choosing favorable trades is what matters.",
+      keyCards: ["Hydreigon — reliable attacker", "Mega Absol ex — key damage", "Gust / draw trainers"],
+    },
+    ja: {
+      playstyle: "悪 ミッドレンジ",
+      summary: "サザンドラとメガアブソルexを軸にした悪タイプのミッドレンジ。勝率は50%前後で、相性理解が勝敗を分けます。",
+      gamePlan: "状況に合ったアタッカーを選び、交換で損をせず中盤を支配します。極端な速攻でもコントロールでもないバランス型なので、相手を読んで有利な交換を選ぶ判断が重要です。",
+      keyCards: ["サザンドラ — 安定アタッカー", "メガアブソルex — 主力火力", "指名・ドロートレーナー"],
+    },
+    "zh-TW": {
+      playstyle: "惡系中速",
+      summary: "以三首惡龍與超級阿勃梭魯ex為軸的惡系中速牌組。勝率約五五波，對戰理解決定勝負。",
+      gamePlan: "依情況選對攻擊手，靠交換不吃虧來主宰中盤。既非純快攻也非純控制的平衡型，讀懂對手、選擇有利交換的判斷最重要。",
+      keyCards: ["三首惡龍 — 穩定攻擊手", "超級阿勃梭魯ex — 主力火力", "指名·抽牌訓練家"],
+    },
+  },
+  // ── Magnezone / Miraidon ex — 번개 (B, 오버퍼포머 승률↑) ──
+  "magnezone-b1a-miraidon-ex-b3a": {
+    ko: {
+      playstyle: "번개 (오버퍼포머)",
+      summary: "점유율은 낮지만 승률이 60%대로 눈에 띄는 번개 덱. 미라이돈 ex의 에너지 가속과 자포코일로 빠르게 화력을 폭발시킵니다.",
+      gamePlan: "미라이돈 ex로 번개 에너지를 가속해 자포코일 등 주력을 남보다 빨리 가동합니다. 낮은 점유율 대비 높은 승률은 '아직 덜 알려진 강덱'이라는 신호 — 메타가 대비하기 전에 선점 가치가 큽니다.",
+      keyCards: ["미라이돈 ex — 에너지 가속", "자포코일 — 주력 화력", "번개 에너지 · 드로우"],
+    },
+    en: {
+      playstyle: "Lightning (Overperformer)",
+      summary: "A Lightning deck that stands out with a ~60% win rate despite low share. Miraidon ex accelerates energy so Magnezone bursts damage fast.",
+      gamePlan: "Use Miraidon ex to ramp Lightning energy and bring Magnezone online ahead of the field. A high win rate at low share signals an under-the-radar strong deck — real value in picking it up before the meta adapts.",
+      keyCards: ["Miraidon ex — energy acceleration", "Magnezone — main damage", "Lightning Energy · draw"],
+    },
+    ja: {
+      playstyle: "雷(オーバーパフォーマー)",
+      summary: "使用率は低いが勝率60%台で目立つ雷デッキ。ミライドンexのエネ加速とジバコイルで一気に火力を爆発させます。",
+      gamePlan: "ミライドンexで雷エネを加速し、ジバコイル等の主力を早期起動します。低使用率×高勝率は「まだ知られていない強デッキ」のサイン — 環境が対策する前に先取りする価値があります。",
+      keyCards: ["ミライドンex — エネ加速", "ジバコイル — 主力火力", "雷エネルギー・ドロー"],
+    },
+    "zh-TW": {
+      playstyle: "雷(超常發揮)",
+      summary: "使用率低但勝率達六成的顯眼雷系牌組。以密勒頓ex的能量加速與自爆磁怪一口氣爆發火力。",
+      gamePlan: "用密勒頓ex加速雷能量，讓自爆磁怪等主力比對手更早啟動。低使用率×高勝率是「尚未被熟知的強牌」訊號 — 在環境針對之前搶先使用很有價值。",
+      keyCards: ["密勒頓ex — 能量加速", "自爆磁怪 — 主力火力", "雷能量·抽牌"],
+    },
+  },
 };
 
 export function getDeckAnalysis(id: string, lang: Locale): DeckAnalysis | null {

@@ -1,54 +1,48 @@
 import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
 import DETAIL from "./[lang]/gbl/gbl_detail.json";
 import RAIDS from "./[lang]/gbl/gbl_raids.json";
 import { GUIDES } from "./[lang]/gbl/guide/guides";
 import { IV_ANALYSIS } from "./[lang]/gbl/iv/analysis/registry";
+import { analyzedDeckIds } from "./[lang]/tcg/decks/analysis";
 import { locales, localeMeta, localizePath, defaultLocale } from "../lib/i18n";
 
-// gblnote.com 공개 SEO 사이트맵. 검색엔진이 리그별 실측 메타·티어·포켓몬 상세를 발견하도록.
-// 각 경로를 ko/en/ja 3개 URL로 발행하고, 항목마다 hreflang(alternates.languages)로 상호연결.
-const BASE = "https://gblnote.com";
+// 호스트별 사이트맵 — gblnote.com=/gbl 트리, tcgnote.net=/tcg 트리(같은 배포, 도메인 분리).
+// 각 경로를 4개 로케일 URL로 발행 + hreflang 상호연결. headers()로 요청 호스트에 따라 분기(동적).
 const LEAGUES = ["master", "great", "ultra"];
 const RAID_TYPES = Object.keys((RAIDS as unknown as { types: Record<string, unknown> }).types);
-const POKE_TOP = 200; // 리그별 전 종(200) 포켓몬 상세 사이트맵 포함 — 도메인 성숙 후 롱테일 전면 색인
+const POKE_TOP = 200;
 const DET = DETAIL as unknown as Record<string, { id: string }[]>;
 
 type CF = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+function build(base: string, paths: [string, CF, number][]): MetadataRoute.Sitemap {
   const lastModified = new Date();
-
-  // 하나의 "맨몸" 경로(/gbl/...)를 로케일별 URL로 확장 + hreflang 상호연결.
   const langs = (path: string): Record<string, string> => {
     const out: Record<string, string> = {};
-    for (const l of locales) out[localeMeta[l].htmlLang] = `${BASE}${localizePath(l, path)}`;
-    out["x-default"] = `${BASE}${localizePath(defaultLocale, path)}`;
+    for (const l of locales) out[localeMeta[l].htmlLang] = `${base}${localizePath(l, path)}`;
+    out["x-default"] = `${base}${localizePath(defaultLocale, path)}`;
     return out;
   };
   const entry = (path: string, changeFrequency: CF, priority: number): MetadataRoute.Sitemap =>
-    locales.map((l) => ({
-      url: `${BASE}${localizePath(l, path)}`,
-      lastModified,
-      changeFrequency,
-      priority,
-      alternates: { languages: langs(path) },
-    }));
+    locales.map((l) => ({ url: `${base}${localizePath(l, path)}`, lastModified, changeFrequency, priority, alternates: { languages: langs(path) } }));
+  return paths.flatMap(([path, cf, pri]) => entry(path, cf, pri));
+}
 
-  const paths: [string, CF, number][] = [
+// gblnote.com — 리그별 실측 메타·티어·포켓몬 상세 등.
+function gblPaths(): [string, CF, number][] {
+  return [
     ["/gbl", "weekly", 1],
     ["/gbl/meta", "daily", 0.9],
     ...LEAGUES.map((l) => [`/gbl/meta/${l}`, "daily", 0.9] as [string, CF, number]),
     ...LEAGUES.map((l) => [`/gbl/tier/${l}`, "weekly", 0.8] as [string, CF, number]),
     ...LEAGUES.map((l) => [`/gbl/cmp/${l}`, "weekly", 0.7] as [string, CF, number]),
     ["/gbl/iv", "weekly", 0.8],
-    // 타협개체 심층 분석(발행된 몬만) — 독창 콘텐츠라 우선순위 상향
     ...Object.entries(IV_ANALYSIS).filter(([, e]) => e.published).map(([id]) => [`/gbl/iv/${id}`, "monthly", 0.7] as [string, CF, number]),
     ["/gbl/sim", "weekly", 0.8],
     ["/gbl/trade", "weekly", 0.7],
     ["/gbl/events", "daily", 0.8],
-    ...LEAGUES.flatMap((l) =>
-      (DET[l] || []).slice(0, POKE_TOP).map((d) => [`/gbl/pokemon/${l}/${d.id}`, "weekly", 0.6] as [string, CF, number]),
-    ),
+    ...LEAGUES.flatMap((l) => (DET[l] || []).slice(0, POKE_TOP).map((d) => [`/gbl/pokemon/${l}/${d.id}`, "weekly", 0.6] as [string, CF, number])),
     ["/gbl/raid", "weekly", 0.9],
     ["/gbl/raid/bosses", "daily", 0.8],
     ["/gbl/raid/schedule", "daily", 0.8],
@@ -62,6 +56,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ["/gbl/privacy", "yearly", 0.3],
     ["/gbl/terms", "yearly", 0.3],
   ];
+}
 
-  return paths.flatMap(([path, cf, pri]) => entry(path, cf, pri));
+// tcgnote.net — 덱 티어·대표 덱(원본 분석 있는 것만)·정책. 얕은 롱테일(전체 카드/덱)은 미포함.
+function tcgPaths(): [string, CF, number][] {
+  return [
+    ["/tcg", "weekly", 1],
+    ["/tcg/tier", "daily", 0.9],
+    ["/tcg/decks", "weekly", 0.8],
+    ...analyzedDeckIds().map((id) => [`/tcg/decks/${id}`, "weekly", 0.7] as [string, CF, number]),
+    ["/tcg/about", "monthly", 0.4],
+    ["/tcg/privacy", "yearly", 0.3],
+    ["/tcg/terms", "yearly", 0.3],
+  ];
+}
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const host = (headers().get("host") || "").toLowerCase();
+  if (host.includes("tcgnote")) return build("https://tcgnote.net", tcgPaths());
+  return build("https://gblnote.com", gblPaths());
 }
