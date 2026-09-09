@@ -2,8 +2,9 @@
 // 카드 검색·브라우저 — 이름 검색 + 세트·타입 필터 + 팩 찾기. 클라이언트 필터.
 // 데이터: cards.json(전 카드·최신 B4a까지). 타입/HP는 있는 카드만 표시. 카드명 영어(데이터 한계).
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import CARDS from "../data/cards.json";
-import { type Locale } from "../../../../lib/i18n";
+import { localizePath, type Locale } from "../../../../lib/i18n";
 
 type Card = { s: string; n: number; name: string; r: string; packs: string[]; nm?: Record<string, string>; e?: string; w?: string };
 const DATA = CARDS as Card[];
@@ -71,7 +72,7 @@ export default function CardsClient({ lang }: { lang: Locale }) {
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 8 }}>
           {filtered.slice(0, LIMIT).map((c) => (
-            <div key={`${c.s}-${c.n}`} style={{ background: "#fff", border: "1px solid #fbd8d8", borderRadius: 10, padding: "0.6rem 0.8rem" }}>
+            <Link key={`${c.s}-${c.n}`} href={localizePath(lang, `/tcg/cards/${c.s.toLowerCase()}-${c.n}`)} style={{ display: "block", textDecoration: "none", background: "#fff", border: "1px solid #fbd8d8", borderRadius: 10, padding: "0.6rem 0.8rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
                 {c.e && <span style={{ width: 9, height: 9, borderRadius: 999, background: ELEMENT_COLOR[c.e], flexShrink: 0 }} />}
                 <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameOf(c)}</span>
@@ -85,7 +86,7 @@ export default function CardsClient({ lang }: { lang: Locale }) {
               {c.packs.length > 0 && (
                 <div style={{ marginTop: 4, fontSize: "0.68rem", color: "#dc2626" }}>{t.pack}: {c.packs.join(", ")}</div>
               )}
-            </div>
+            </Link>
           ))}
         </div>
       )}
