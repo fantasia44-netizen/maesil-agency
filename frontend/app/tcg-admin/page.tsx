@@ -38,14 +38,15 @@ const ROADMAP: { section: string; items: { t: string; status: "done" | "wip" | "
   ] },
   { section: "도구·가이드", items: [
     { t: "카드 검색 도구", status: "done" },
-    { t: "덱 빌더", status: "todo" },
-    { t: "팩 확률 분석(pullRates)", status: "todo" },
+    { t: "카운터 검색(상대 덱→이기는 덱)", status: "done" },
+    { t: "팩 오픈 시뮬레이터(pullRates)", status: "done" },
+    { t: "덱 빌더(20장·2카피·메타덱 시작·공유)", status: "done" },
     { t: "초보/전략 가이드", status: "todo" },
   ] },
   { section: "데이터 파이프라인", items: [
     { t: "Limitless 대회 통계 인제스트(티어·매치업)", status: "done" },
     { t: "카드 데이터셋 인제스트(전 세트)", status: "done" },
-    { t: "카드명 현지화(영→ko/ja/zh)", status: "todo" },
+    { t: "카드명 현지화(영→ko/ja/zh) 91%", status: "done" },
     { t: "롱테일 카드 페이지(승인 후 공개·noindex)", status: "todo" },
   ] },
 ];
