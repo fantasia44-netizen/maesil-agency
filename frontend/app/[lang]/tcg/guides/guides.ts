@@ -210,6 +210,204 @@ export const GUIDES: Guide[] = [
       },
     },
   },
+  {
+    slug: "deck-builder-guide",
+    icon: "🃏",
+    i18n: {
+      ko: {
+        title: "덱 빌더 사용법 — 메타 덱에서 시작해 20장 완성하기",
+        summary: "TCG Note 덱 빌더로 규칙에 맞는 20장 덱을 만들고, 필요한 팩까지 확인해 공유하는 방법을 단계별로 정리했습니다.",
+        sections: [
+          { h: "이 도구가 하는 일", p: "덱 빌더는 포켓포켓 덱 규칙(정확히 20장, 같은 이름 최대 2장)을 자동으로 지켜주는 도구입니다. 카드를 담는 동안 20장을 넘기거나 같은 카드를 3장째 넣으려 하면 막아주고, 덱의 속성(타입) 분포와 '이 카드들이 나오는 팩'을 실시간으로 계산해 보여줍니다. 규칙을 외울 필요 없이 완성 가능한 덱만 만들어집니다." },
+          { h: "메타 덱에서 시작하기", p: "처음부터 짜기 막막하면 상단의 템플릿에서 대회 상위 메타 덱을 불러오세요. 실제 대회 성적이 좋은 덱리스트가 그대로 들어오고, 거기서 카드를 빼고 넣으며 내 취향대로 손보면 됩니다. 초보에게 가장 빠른 길은 검증된 덱을 불러와 조금씩 바꿔보는 것입니다." },
+          { h: "처음부터 직접 짜기", p: "아래 카드 풀에서 이름 검색과 타입 필터로 원하는 카드를 찾아 담습니다. 메인 어태커의 진화 라인을 2장씩 갖추고, 카드를 뽑아주는 서포트·아이템을 더하면 기본 골격이 됩니다. 담을 때마다 상단 요약에서 20장 중 몇 장인지, 속성이 한쪽으로 쏠리지 않는지 바로 확인할 수 있습니다." },
+          { h: "필요 팩 확인 & 공유", p: "덱을 다 짜면 '이 덱을 완성하려면 어떤 팩을 까야 하는지'가 정리됩니다 — 팩 시뮬레이터와 이어서, 젬을 쓰기 전에 목표 팩을 정할 수 있습니다. 덱은 브라우저에 자동 저장되고, 공유 버튼을 누르면 덱 구성이 담긴 링크가 복사돼 친구에게 그대로 보낼 수 있습니다." },
+        ],
+        cta: [
+          { label: "🃏 덱 빌더 열기", href: "/tcg/deck-builder" },
+          { label: "🏆 덱 티어표", href: "/tcg/tier" },
+          { label: "🎰 팩 시뮬레이터", href: "/tcg/pack-sim" },
+        ],
+      },
+      en: {
+        title: "How to Use the Deck Builder — Start From a Meta Deck",
+        summary: "A step-by-step guide to building a rules-legal 20-card deck in the TCG Note Deck Builder, checking the packs you need, and sharing it.",
+        sections: [
+          { h: "What this tool does", p: "The Deck Builder enforces Pocket's deck rules for you — exactly 20 cards, and at most 2 copies of any single name. As you add cards it blocks a 21st card or a 3rd copy, and it computes your deck's type spread and the packs those cards come from in real time. You don't have to memorize the rules; only completable decks get built." },
+          { h: "Start from a meta deck", p: "If building from scratch feels daunting, load a top tournament meta deck from the template menu. A decklist with a strong real-world record drops in, and you tweak it from there by swapping cards to taste. The fastest path for a beginner is to load a proven deck and adjust it gradually." },
+          { h: "Build from scratch", p: "In the card pool below, use name search and type filters to find and add the cards you want. Run 2 copies of your main attacker's evolution line, then add Supporters/Items that draw cards to form the skeleton. The summary panel shows how many of 20 you've filled and whether your types are lopsided as you go." },
+          { h: "Check packs & share", p: "Once built, the tool lays out which packs you'd need to open to complete the deck — pairing with the Pack Simulator so you can pick target packs before spending gems. Your deck auto-saves in the browser, and the share button copies a link containing the full list to send to a friend as-is." },
+        ],
+        cta: [
+          { label: "🃏 Open the Deck Builder", href: "/tcg/deck-builder" },
+          { label: "🏆 Deck tier list", href: "/tcg/tier" },
+          { label: "🎰 Pack Simulator", href: "/tcg/pack-sim" },
+        ],
+      },
+      ja: {
+        title: "デッキビルダーの使い方 — メタデッキから20枚を完成",
+        summary: "TCG Note のデッキビルダーでルールに沿った20枚デッキを作り、必要なパックまで確認して共有する手順をまとめました。",
+        sections: [
+          { h: "このツールの機能", p: "デッキビルダーはポケポケのデッキルール(ちょうど20枚、同名は最大2枚)を自動で守ります。カードを入れる途中で21枚目や3枚目を入れようとすると止め、デッキのタイプ分布と『そのカードが出るパック』をリアルタイムで計算します。ルールを覚えなくても、完成できるデッキだけが作られます。" },
+          { h: "メタデッキから始める", p: "一から組むのが難しければ、上部のテンプレートから大会上位のメタデッキを読み込みましょう。実際に好成績のデッキリストがそのまま入り、そこからカードを入れ替えて好みに調整します。初心者の最短ルートは、実績あるデッキを読み込んで少しずつ変えることです。" },
+          { h: "一から自分で組む", p: "下のカードプールで名前検索とタイプフィルターから欲しいカードを探して入れます。メインアタッカーの進化ラインを2枚ずつ揃え、ドローできるサポート・グッズを足すと骨格ができます。入れるたびに上部の要約で20枚中何枚か、タイプが偏っていないかをすぐ確認できます。" },
+          { h: "必要パック確認 & 共有", p: "組み終えると『このデッキを完成させるにはどのパックを開ければいいか』が整理されます — パック開封シミュと連携し、石を使う前に狙うパックを決められます。デッキはブラウザに自動保存され、共有ボタンで構成入りのリンクがコピーされ、そのまま友達に送れます。" },
+        ],
+        cta: [
+          { label: "🃏 デッキビルダーを開く", href: "/tcg/deck-builder" },
+          { label: "🏆 デッキティア表", href: "/tcg/tier" },
+          { label: "🎰 パック開封シミュ", href: "/tcg/pack-sim" },
+        ],
+      },
+      "zh-TW": {
+        title: "牌組製作使用方法 — 從主流牌組開始組出20張",
+        summary: "以 TCG Note 牌組製作組出符合規則的20張牌組、確認需要的卡包並分享的逐步指南。",
+        sections: [
+          { h: "這個工具的功能", p: "牌組製作會自動遵守 Pocket 的牌組規則 — 剛好20張、同名卡最多2張。加卡時若想放第21張或第3張同名卡會被擋下，並即時計算牌組的屬性分布與『這些卡出自哪些卡包』。不必背規則，只會組出能完成的牌組。" },
+          { h: "從主流牌組開始", p: "若從頭組覺得困難，可從上方範本載入賽事上位主流牌組。實際成績好的牌表會直接載入，再從中換卡調成自己喜好。新手最快的方式是載入經驗證的牌組再逐步調整。" },
+          { h: "從頭自己組", p: "在下方卡池用名稱搜尋與屬性篩選找出想要的卡加入。主攻手的進化系列各放2張，再加入能抽牌的支援·物品即成骨架。每次加卡都能在上方摘要立即看到20張中已放幾張、屬性是否偏一邊。" },
+          { h: "確認卡包 & 分享", p: "組好後工具會列出『要完成這副牌組需開哪些卡包』— 與開包模擬器連動，讓你在花寶石前先決定目標卡包。牌組會自動存在瀏覽器，分享鈕會複製含完整牌表的連結，可直接傳給朋友。" },
+        ],
+        cta: [
+          { label: "🃏 開啟牌組製作", href: "/tcg/deck-builder" },
+          { label: "🏆 牌組強度表", href: "/tcg/tier" },
+          { label: "🎰 開包模擬器", href: "/tcg/pack-sim" },
+        ],
+      },
+    },
+  },
+  {
+    slug: "counter-search-guide",
+    icon: "⚔️",
+    i18n: {
+      ko: {
+        title: "카운터 검색 사용법 — 상대 덱을 이기는 덱 찾기",
+        summary: "상대 덱을 고르면 실제 대회 매치업 승률로 그 덱을 이기는 카운터를 찾아주는 도구입니다. 감이 아니라 실측 데이터로 상성을 읽는 법을 정리했습니다.",
+        sections: [
+          { h: "이 도구가 하는 일", p: "카운터 검색은 '요즘 이 덱이 많이 보이는데 뭘로 이기지?'에 답하는 도구입니다. 상대 덱을 하나 고르면, 실제 대회에서 그 덱과 맞붙었을 때 승률이 높았던 덱들을 카운터로 정렬해 보여줍니다. 특정 덱을 저격하는 덱을 미리 준비할 때 씁니다." },
+          { h: "감이 아니라 실측 매치업", p: "여기서 보여주는 카운터는 개인 의견이 아니라 대회 페어링(대전 기록) 데이터에서 계산한 매치업 승률입니다. 각 카운터에는 승률과 함께 표본(경기 수)이 표시되므로, '실제로 여러 번 이겨온 상성'인지 '표본이 적어 우연일 수 있는 상성'인지 구분해서 볼 수 있습니다." },
+          { h: "사용 순서", p: "① 상대(대비하고 싶은) 덱을 선택합니다. ② 그 덱을 이기는 카운터 목록이 승률순으로 나옵니다. ③ 마음에 드는 카운터를 눌러 덱 상세 공략으로 이어가면, 실제 덱리스트·플레이 순서·다른 상대별 대응까지 확인할 수 있습니다." },
+          { h: "타입 상성과 함께 보기", p: "카운터 승률은 결과(누가 이겼나)를 보여주고, 그 이유의 상당 부분은 타입 약점(+20)에서 옵니다. 카운터 검색으로 '이기는 덱'을 찾은 뒤 타입 상성 가이드로 '왜 이기는지'를 이해하면, 새 카드가 나와 데이터가 아직 없을 때도 스스로 상성을 예측할 수 있습니다." },
+        ],
+        cta: [
+          { label: "⚔️ 카운터 검색 열기", href: "/tcg/counters" },
+          { label: "⚡ 타입 상성 가이드", href: "/tcg/guides/type-matchups" },
+          { label: "🏆 덱 티어표", href: "/tcg/tier" },
+        ],
+      },
+      en: {
+        title: "How to Use Counter Search — Find a Deck That Beats Theirs",
+        summary: "Pick an opponent's deck and this tool surfaces counters by real tournament matchup win rate. Here's how to read matchups from data, not gut feeling.",
+        sections: [
+          { h: "What this tool does", p: "Counter Search answers 'this deck is everywhere right now — what beats it?' Pick one opponent deck and it ranks the decks that had the highest win rate against it in real tournaments. Use it to prepare a deck that targets a specific popular archetype." },
+          { h: "Real matchups, not opinion", p: "The counters shown aren't personal opinion — they're matchup win rates computed from tournament pairing (game-record) data. Each counter shows its win rate alongside the sample (number of games), so you can tell a 'proven, repeatedly-won matchup' from one that 'might be luck on a small sample.'" },
+          { h: "How to use it", p: "① Select the opponent deck you want to prepare against. ② A list of counters appears, sorted by win rate. ③ Click a counter you like to open its full deck guide, where you can see the actual decklist, play sequence, and answers to other matchups." },
+          { h: "Read it with type matchups", p: "Counter win rates show the result (who won); much of the reason comes from type weakness (+20). After Counter Search finds a deck that wins, use the Type Matchups guide to understand why it wins — so you can predict matchups yourself even when a new card has no data yet." },
+        ],
+        cta: [
+          { label: "⚔️ Open Counter Search", href: "/tcg/counters" },
+          { label: "⚡ Type Matchups guide", href: "/tcg/guides/type-matchups" },
+          { label: "🏆 Deck tier list", href: "/tcg/tier" },
+        ],
+      },
+      ja: {
+        title: "カウンター検索の使い方 — 相手デッキに勝てるデッキを探す",
+        summary: "相手デッキを選ぶと、実際の大会マッチアップ勝率でそれに勝てるカウンターを提示するツールです。感覚ではなく実測データで相性を読む方法をまとめました。",
+        sections: [
+          { h: "このツールの機能", p: "カウンター検索は『最近このデッキが多いけど何で勝つ?』に答えるツールです。相手デッキを1つ選ぶと、実際の大会でそのデッキと当たった際に勝率が高かったデッキをカウンターとして並べます。特定デッキを狙い撃つデッキを事前に用意するときに使います。" },
+          { h: "感覚ではなく実測マッチアップ", p: "ここで示すカウンターは個人の意見ではなく、大会ペアリング(対戦記録)データから計算したマッチアップ勝率です。各カウンターには勝率と共に標本(試合数)が表示されるので、『実際に何度も勝ってきた相性』か『標本が少なく偶然かもしれない相性』かを見分けられます。" },
+          { h: "使う手順", p: "①対策したい相手デッキを選択。②そのデッキに勝つカウンターが勝率順に表示。③気になるカウンターを押すとデッキ詳細攻略へ進み、実際のデッキリスト·立ち回り·他対面の対応まで確認できます。" },
+          { h: "タイプ相性と一緒に見る", p: "カウンター勝率は結果(誰が勝ったか)を示し、その理由の多くはタイプ弱点(+20)から来ます。カウンター検索で『勝てるデッキ』を見つけた後、タイプ相性ガイドで『なぜ勝つか』を理解すれば、新カードでデータがまだ無いときも自分で相性を予測できます。" },
+        ],
+        cta: [
+          { label: "⚔️ カウンター検索を開く", href: "/tcg/counters" },
+          { label: "⚡ タイプ相性ガイド", href: "/tcg/guides/type-matchups" },
+          { label: "🏆 デッキティア表", href: "/tcg/tier" },
+        ],
+      },
+      "zh-TW": {
+        title: "剋星搜尋使用方法 — 找出能贏對手牌組的牌組",
+        summary: "選擇對手牌組，此工具以實際賽事對戰勝率提示能贏它的剋星。這裡整理如何用實測數據而非憑感覺看相剋。",
+        sections: [
+          { h: "這個工具的功能", p: "剋星搜尋回答『最近這副牌組很多，要用什麼贏?』選一個對手牌組，它會把在實際賽事中對上它勝率高的牌組列為剋星。用來事先準備狙擊特定流行牌型的牌組。" },
+          { h: "實測對戰，不是意見", p: "此處顯示的剋星並非個人意見，而是從賽事對戰(對局記錄)數據計算的對戰勝率。每個剋星都會顯示勝率與樣本(對局數)，讓你分辨『實際多次贏過的相剋』與『樣本少可能是運氣的相剋』。" },
+          { h: "使用步驟", p: "①選擇想對策的對手牌組。②能贏它的剋星依勝率排序顯示。③點選中意的剋星進入牌組詳細攻略，可看到實際牌表·出牌順序·對其他對面的對應。" },
+          { h: "與屬性相剋一起看", p: "剋星勝率顯示結果(誰贏)，原因很大部分來自屬性弱點(+20)。用剋星搜尋找到『能贏的牌組』後，再用屬性相剋指南理解『為何贏』，即使新卡尚無數據時也能自行預測相剋。" },
+        ],
+        cta: [
+          { label: "⚔️ 開啟剋星搜尋", href: "/tcg/counters" },
+          { label: "⚡ 屬性相剋指南", href: "/tcg/guides/type-matchups" },
+          { label: "🏆 牌組強度表", href: "/tcg/tier" },
+        ],
+      },
+    },
+  },
+  {
+    slug: "reading-tier-winrate",
+    icon: "📊",
+    i18n: {
+      ko: {
+        title: "덱 티어표·승률 읽는 법 — 표본과 Wilson 보정",
+        summary: "TCG Note 티어는 왜 단순 승률이 아니라 표본과 Wilson 하한으로 산출하는지, 티어표와 승률·표본 숫자를 어떻게 읽어야 속지 않는지 정리했습니다.",
+        sections: [
+          { h: "티어는 대회 승률로 산출합니다", p: "TCG Note의 덱 티어는 개인의 감이나 인기 투표가 아니라 실제 대회 결과의 승률로 계산합니다. 최근 일정 기간·일정 규모 이상의 대회를 모아 각 덱의 사용률·승률·표본 수·상대별 매치업을 집계하고, 갱신일과 원출처(Limitless TCG)를 함께 표시합니다." },
+          { h: "승률만 보면 속습니다", p: "승률이 높다고 무조건 강한 게 아닙니다. 2경기 중 2승이면 승률 100%지만 이건 우연일 가능성이 큽니다. 반대로 500경기에서 55%는 훨씬 믿을 만한 강함입니다. 즉 승률은 반드시 '몇 경기에서 나온 승률인가(표본 수)'와 함께 봐야 합니다." },
+          { h: "Wilson 95% 하한이란", p: "그래서 TCG Note는 단순 승률 대신 Wilson 95% 신뢰구간의 하한값으로 티어를 매깁니다. 쉽게 말해 '표본을 감안했을 때 이 덱의 실제 실력이 최소 이 정도는 된다'는 보수적인 하한선입니다. 표본이 적으면 하한이 크게 낮아져 소표본의 반짝 승률이 과대평가되지 않고, 표본이 쌓일수록 하한이 실제 승률에 가까워집니다." },
+          { h: "실전에서 읽는 법", p: "S·A 티어는 '표본도 충분하고 하한 승률도 높은' 덱이라고 보면 됩니다. 덱을 고를 때는 티어(하한)와 함께 원승률·표본 수를 같이 보고, 표본이 아주 적은 덱은 아직 '검증 중'으로 취급하세요. 갱신일을 확인해 최신 메타가 반영됐는지도 함께 보면 좋습니다." },
+        ],
+        cta: [
+          { label: "🏆 덱 티어표 보기", href: "/tcg/tier" },
+          { label: "📊 메타 환경 분석", href: "/tcg/meta" },
+          { label: "🎯 덱 고르는 법", href: "/tcg/guides/pick-a-deck" },
+        ],
+      },
+      en: {
+        title: "How to Read the Tier List & Win Rates — Sample Size and Wilson",
+        summary: "Why TCG Note tiers use sample size and a Wilson lower bound instead of raw win rate, and how to read the tier table and win-rate/sample numbers without being fooled.",
+        sections: [
+          { h: "Tiers come from tournament win rates", p: "TCG Note's deck tiers are computed from real tournament win rates — not gut feeling or a popularity vote. We aggregate recent tournaments above a size threshold to compute each deck's usage, win rate, sample size and per-opponent matchups, shown with the update date and source (Limitless TCG)." },
+          { h: "Win rate alone will fool you", p: "A high win rate isn't automatically strong. Going 2-0 in 2 games is a 100% win rate, but that's likely luck. By contrast, 55% over 500 games is far more trustworthy strength. In short, always read a win rate together with 'over how many games' — the sample size." },
+          { h: "What the Wilson 95% lower bound is", p: "So instead of raw win rate, TCG Note ranks tiers by the lower bound of the Wilson 95% confidence interval. Plainly: 'accounting for the sample, this deck's true strength is at least this much' — a conservative floor. A small sample drops the floor sharply so a lucky small-sample streak isn't overrated, and as games accumulate the floor rises toward the real win rate." },
+          { h: "How to read it in practice", p: "Treat S/A tiers as decks with both a solid sample and a high floor win rate. When choosing a deck, read the tier (the floor) alongside the raw win rate and sample size, and treat very-small-sample decks as still 'under review.' Checking the update date to confirm the latest meta is included helps too." },
+        ],
+        cta: [
+          { label: "🏆 View the tier list", href: "/tcg/tier" },
+          { label: "📊 Meta analysis", href: "/tcg/meta" },
+          { label: "🎯 How to pick a deck", href: "/tcg/guides/pick-a-deck" },
+        ],
+      },
+      ja: {
+        title: "デッキティア表・勝率の読み方 — 標本とウィルソン補正",
+        summary: "TCG Note のティアがなぜ単純勝率ではなく標本とウィルソン下限で算出されるのか、ティア表と勝率・標本の数字をどう読めば騙されないかをまとめました。",
+        sections: [
+          { h: "ティアは大会勝率で算出", p: "TCG Note のデッキティアは個人の感覚や人気投票ではなく、実際の大会結果の勝率で計算します。直近の一定期間・一定規模以上の大会を集め、各デッキの使用率・勝率・標本数・相手別マッチアップを集計し、更新日と出典(Limitless TCG)を併記します。" },
+          { h: "勝率だけ見ると騙される", p: "勝率が高い=強い、とは限りません。2試合2勝なら勝率100%ですが、これは偶然の可能性が大きいです。逆に500試合で55%ははるかに信頼できる強さです。つまり勝率は必ず『何試合での勝率か(標本数)』と一緒に見る必要があります。" },
+          { h: "ウィルソン95%下限とは", p: "そこで TCG Note は単純勝率ではなくウィルソン95%信頼区間の下限値でティアを付けます。簡単に言えば『標本を踏まえると、このデッキの実力は最低でもこの程度』という保守的な下限線です。標本が少ないと下限が大きく下がり、小標本の一時的な勝率が過大評価されず、標本が増えるほど下限は実際の勝率に近づきます。" },
+          { h: "実戦での読み方", p: "S・Aティアは『標本も十分で下限勝率も高い』デッキと見てよいです。デッキを選ぶ際はティア(下限)と共に元勝率・標本数も見て、標本が極端に少ないデッキはまだ『検証中』として扱いましょう。更新日を確認し最新環境が反映されているかも合わせて見るとよいです。" },
+        ],
+        cta: [
+          { label: "🏆 デッキティア表を見る", href: "/tcg/tier" },
+          { label: "📊 メタ環境分析", href: "/tcg/meta" },
+          { label: "🎯 デッキの選び方", href: "/tcg/guides/pick-a-deck" },
+        ],
+      },
+      "zh-TW": {
+        title: "牌組強度表·勝率的看法 — 樣本與 Wilson 修正",
+        summary: "為何 TCG Note 強度以樣本與 Wilson 下限算出而非單純勝率，以及如何看強度表與勝率·樣本數字才不會被騙。",
+        sections: [
+          { h: "強度以賽事勝率算出", p: "TCG Note 的牌組強度以實際賽事結果勝率計算，而非憑感覺或人氣投票。彙整近期一定期間·一定規模以上的賽事，計算各牌組的使用率·勝率·樣本數·對手別對戰，並標示更新日與來源(Limitless TCG)。" },
+          { h: "只看勝率會被騙", p: "勝率高不代表一定強。2場2勝是100%勝率，但很可能是運氣。相對地500場55%是可信得多的強度。也就是說，勝率一定要和『在幾場中得出(樣本數)』一起看。" },
+          { h: "什麼是 Wilson 95% 下限", p: "因此 TCG Note 以 Wilson 95% 信賴區間的下限值而非單純勝率來排強度。簡單說就是『考量樣本後，這副牌組的真實實力至少有這麼多』的保守下限。樣本少時下限會大幅降低，使小樣本的一時勝率不被高估；樣本累積越多，下限越接近實際勝率。" },
+          { h: "實戰中的看法", p: "可把 S·A 視為『樣本充足且下限勝率也高』的牌組。選牌組時將強度(下限)與原勝率·樣本數一起看，樣本極少的牌組視為仍在『驗證中』。確認更新日、看是否已反映最新環境也有幫助。" },
+        ],
+        cta: [
+          { label: "🏆 查看牌組強度表", href: "/tcg/tier" },
+          { label: "📊 環境分析", href: "/tcg/meta" },
+          { label: "🎯 如何選牌組", href: "/tcg/guides/pick-a-deck" },
+        ],
+      },
+    },
+  },
 ];
 
 export function guideBySlug(slug: string): Guide | undefined {
