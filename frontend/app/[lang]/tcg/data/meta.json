@@ -1,0 +1,9206 @@
+{
+ "generatedAt": "2026-09-09T07:47:06.393Z",
+ "source": "Limitless TCG (play.limitlesstcg.com) — 대회 standings/pairings 자체 집계",
+ "windowDays": 30,
+ "minPlayers": 16,
+ "sampleTournaments": 60,
+ "samplePlayers": 5416,
+ "sampleMatches": 13809,
+ "decks": [
+  {
+   "id": "mega-lucario-ex-b3-lucario-a2",
+   "name": "Mega Lucario ex Lucario",
+   "icons": [
+    "lucario-mega",
+    "lucario"
+   ],
+   "count": 462,
+   "share": 8.53,
+   "wins": 1391,
+   "losses": 1313,
+   "ties": 81,
+   "n": 2704,
+   "winrate": 51.4,
+   "wilsonLo": 49.6,
+   "tier": "S"
+  },
+  {
+   "id": "mega-altaria-ex-b1-espeon-b3a",
+   "name": "Mega Altaria ex Espeon",
+   "icons": [
+    "altaria-mega",
+    "espeon"
+   ],
+   "count": 282,
+   "share": 5.21,
+   "wins": 932,
+   "losses": 839,
+   "ties": 52,
+   "n": 1771,
+   "winrate": 52.6,
+   "wilsonLo": 50.3,
+   "tier": "S"
+  },
+  {
+   "id": "suicune-ex-a4a-baxcalibur-b2a",
+   "name": "Suicune ex Baxcalibur",
+   "icons": [
+    "suicune",
+    "baxcalibur"
+   ],
+   "count": 271,
+   "share": 5,
+   "wins": 771,
+   "losses": 777,
+   "ties": 55,
+   "n": 1548,
+   "winrate": 49.8,
+   "wilsonLo": 47.3,
+   "tier": "A"
+  },
+  {
+   "id": "butterfree-b3b-mega-sceptile-ex-b3",
+   "name": "Butterfree Mega Sceptile ex",
+   "icons": [
+    "butterfree",
+    "sceptile-mega"
+   ],
+   "count": 269,
+   "share": 4.97,
+   "wins": 851,
+   "losses": 757,
+   "ties": 50,
+   "n": 1608,
+   "winrate": 52.9,
+   "wilsonLo": 50.5,
+   "tier": "A"
+  },
+  {
+   "id": "vespiquen-ex-b4-shuckle-ex-a4",
+   "name": "Vespiquen ex Shuckle ex",
+   "icons": [
+    "vespiquen",
+    "shuckle"
+   ],
+   "count": 265,
+   "share": 4.89,
+   "wins": 817,
+   "losses": 744,
+   "ties": 51,
+   "n": 1561,
+   "winrate": 52.3,
+   "wilsonLo": 49.9,
+   "tier": "A"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-hoopa-ex-b4",
+   "name": "Team Rocket's Weezing ex Hoopa ex",
+   "icons": [
+    "weezing",
+    "hoopa-unbound"
+   ],
+   "count": 230,
+   "share": 4.25,
+   "wins": 650,
+   "losses": 636,
+   "ties": 48,
+   "n": 1286,
+   "winrate": 50.5,
+   "wilsonLo": 47.8,
+   "tier": "A"
+  },
+  {
+   "id": "mega-blaziken-ex-b1",
+   "name": "Mega Blaziken ex",
+   "icons": [
+    "blaziken-mega"
+   ],
+   "count": 199,
+   "share": 3.67,
+   "wins": 583,
+   "losses": 524,
+   "ties": 50,
+   "n": 1107,
+   "winrate": 52.7,
+   "wilsonLo": 49.7,
+   "tier": "A"
+  },
+  {
+   "id": "hydreigon-mega-absol-ex-b1",
+   "name": "Hydreigon Mega Absol ex",
+   "icons": [
+    "hydreigon",
+    "absol-mega"
+   ],
+   "count": 193,
+   "share": 3.56,
+   "wins": 543,
+   "losses": 555,
+   "ties": 40,
+   "n": 1098,
+   "winrate": 49.5,
+   "wilsonLo": 46.5,
+   "tier": "B"
+  },
+  {
+   "id": "mega-sceptile-ex-b3-greninja-a1",
+   "name": "Mega Sceptile ex Greninja",
+   "icons": [
+    "sceptile-mega",
+    "greninja"
+   ],
+   "count": 136,
+   "share": 2.51,
+   "wins": 434,
+   "losses": 382,
+   "ties": 30,
+   "n": 816,
+   "winrate": 53.2,
+   "wilsonLo": 49.8,
+   "tier": "A"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-alolan-ninetales-ex-b2",
+   "name": "Team Rocket's Raticate ex Alolan Ninetales ex",
+   "icons": [
+    "raticate",
+    "ninetales-alola"
+   ],
+   "count": 100,
+   "share": 1.85,
+   "wins": 194,
+   "losses": 303,
+   "ties": 13,
+   "n": 497,
+   "winrate": 39,
+   "wilsonLo": 34.8,
+   "tier": "C"
+  },
+  {
+   "id": "mega-charizard-y-ex-b1a-entei-ex-a4a",
+   "name": "Mega Charizard Y ex Entei ex",
+   "icons": [
+    "charizard-mega-y",
+    "entei"
+   ],
+   "count": 96,
+   "share": 1.77,
+   "wins": 283,
+   "losses": 256,
+   "ties": 18,
+   "n": 539,
+   "winrate": 52.5,
+   "wilsonLo": 48.3,
+   "tier": "B"
+  },
+  {
+   "id": "hoopa-ex-b4-mega-absol-ex-b1",
+   "name": "Hoopa ex Mega Absol ex",
+   "icons": [
+    "hoopa-unbound",
+    "absol-mega"
+   ],
+   "count": 96,
+   "share": 1.77,
+   "wins": 256,
+   "losses": 270,
+   "ties": 13,
+   "n": 526,
+   "winrate": 48.7,
+   "wilsonLo": 44.4,
+   "tier": "C"
+  },
+  {
+   "id": "magnezone-ex-b3-magnezone-b1a",
+   "name": "Magnezone ex Magnezone",
+   "icons": [
+    "magnezone",
+    "magnezone"
+   ],
+   "count": 91,
+   "share": 1.68,
+   "wins": 249,
+   "losses": 263,
+   "ties": 17,
+   "n": 512,
+   "winrate": 48.6,
+   "wilsonLo": 44.3,
+   "tier": "C"
+  },
+  {
+   "id": "mega-manectric-ex-b2b-heliolisk-b4",
+   "name": "Mega Manectric ex Heliolisk",
+   "icons": [
+    "manectric-mega",
+    "heliolisk"
+   ],
+   "count": 90,
+   "share": 1.66,
+   "wins": 271,
+   "losses": 258,
+   "ties": 15,
+   "n": 529,
+   "winrate": 51.2,
+   "wilsonLo": 47,
+   "tier": "B"
+  },
+  {
+   "id": "mega-altaria-ex-b1-greninja-a1",
+   "name": "Mega Altaria ex Greninja",
+   "icons": [
+    "altaria-mega",
+    "greninja"
+   ],
+   "count": 80,
+   "share": 1.48,
+   "wins": 214,
+   "losses": 229,
+   "ties": 13,
+   "n": 443,
+   "winrate": 48.3,
+   "wilsonLo": 43.7,
+   "tier": "C"
+  },
+  {
+   "id": "magnezone-b1a-miraidon-ex-b3a",
+   "name": "Magnezone Miraidon ex",
+   "icons": [
+    "magnezone",
+    "miraidon"
+   ],
+   "count": 76,
+   "share": 1.4,
+   "wins": 273,
+   "losses": 177,
+   "ties": 32,
+   "n": 450,
+   "winrate": 60.7,
+   "wilsonLo": 56.1,
+   "tier": "B"
+  },
+  {
+   "id": "dedenne-ex-b3b-indeedee-ex-b1",
+   "name": "Dedenne ex Indeedee ex",
+   "icons": [
+    "dedenne",
+    "indeedee"
+   ],
+   "count": 71,
+   "share": 1.31,
+   "wins": 254,
+   "losses": 196,
+   "ties": 16,
+   "n": 450,
+   "winrate": 56.4,
+   "wilsonLo": 51.8,
+   "tier": "B"
+  },
+  {
+   "id": "mega-altaria-ex-b1",
+   "name": "Mega Altaria ex",
+   "icons": [
+    "altaria-mega"
+   ],
+   "count": 71,
+   "share": 1.31,
+   "wins": 233,
+   "losses": 214,
+   "ties": 19,
+   "n": 447,
+   "winrate": 52.1,
+   "wilsonLo": 47.5,
+   "tier": "B"
+  },
+  {
+   "id": "milotic-ex-b3b-eevee-ex-a3b",
+   "name": "Milotic ex Eevee ex",
+   "icons": [
+    "milotic",
+    "eevee"
+   ],
+   "count": 65,
+   "share": 1.2,
+   "wins": 212,
+   "losses": 190,
+   "ties": 16,
+   "n": 402,
+   "winrate": 52.7,
+   "wilsonLo": 47.9,
+   "tier": "B"
+  },
+  {
+   "id": "mega-blaziken-ex-b1-greninja-a1",
+   "name": "Mega Blaziken ex Greninja",
+   "icons": [
+    "blaziken-mega",
+    "greninja"
+   ],
+   "count": 61,
+   "share": 1.13,
+   "wins": 206,
+   "losses": 169,
+   "ties": 19,
+   "n": 375,
+   "winrate": 54.9,
+   "wilsonLo": 49.9,
+   "tier": "B"
+  },
+  {
+   "id": "dragonair-mega-rayquaza-ex-b4",
+   "name": "Dragonair Mega Rayquaza ex",
+   "icons": [
+    "dragonair",
+    "rayquaza-mega"
+   ],
+   "count": 61,
+   "share": 1.13,
+   "wins": 144,
+   "losses": 168,
+   "ties": 10,
+   "n": 312,
+   "winrate": 46.2,
+   "wilsonLo": 40.7,
+   "tier": "C"
+  },
+  {
+   "id": "garchomp-b4a",
+   "name": "Garchomp",
+   "icons": [
+    "garchomp"
+   ],
+   "count": 59,
+   "share": 1.09,
+   "wins": 118,
+   "losses": 185,
+   "ties": 8,
+   "n": 303,
+   "winrate": 38.9,
+   "wilsonLo": 33.6,
+   "tier": "C"
+  },
+  {
+   "id": "mega-charizard-x-ex-b2b-mega-charizard-y-ex-b1a",
+   "name": "Mega Charizard X ex Mega Charizard Y ex",
+   "icons": [
+    "charizard-mega-x",
+    "charizard-mega-y"
+   ],
+   "count": 46,
+   "share": 0.85,
+   "wins": 133,
+   "losses": 121,
+   "ties": 9,
+   "n": 254,
+   "winrate": 52.4,
+   "wilsonLo": 46.2,
+   "tier": "C"
+  },
+  {
+   "id": "mega-sharpedo-ex-b4-gyarados-a4",
+   "name": "Mega Sharpedo ex Gyarados",
+   "icons": [
+    "sharpedo-mega",
+    "gyarados"
+   ],
+   "count": 38,
+   "share": 0.7,
+   "wins": 124,
+   "losses": 104,
+   "ties": 12,
+   "n": 228,
+   "winrate": 54.4,
+   "wilsonLo": 47.9,
+   "tier": "C"
+  },
+  {
+   "id": "whimsicott-ex-b1-ariados-b1a",
+   "name": "Whimsicott ex Ariados",
+   "icons": [
+    "whimsicott",
+    "ariados"
+   ],
+   "count": 38,
+   "share": 0.7,
+   "wins": 67,
+   "losses": 105,
+   "ties": 0,
+   "n": 172,
+   "winrate": 39,
+   "wilsonLo": 32,
+   "tier": "C"
+  },
+  {
+   "id": "meowscarada-ex-b2a-meowscarada-a2b",
+   "name": "Meowscarada ex Meowscarada",
+   "icons": [
+    "meowscarada",
+    "meowscarada"
+   ],
+   "count": 36,
+   "share": 0.66,
+   "wins": 114,
+   "losses": 123,
+   "ties": 6,
+   "n": 237,
+   "winrate": 48.1,
+   "wilsonLo": 41.8,
+   "tier": "C"
+  },
+  {
+   "id": "hoopa-ex-b4-mega-sableye-ex-b3b",
+   "name": "Hoopa ex Mega Sableye ex",
+   "icons": [
+    "hoopa-unbound",
+    "sableye-mega"
+   ],
+   "count": 34,
+   "share": 0.63,
+   "wins": 111,
+   "losses": 98,
+   "ties": 7,
+   "n": 209,
+   "winrate": 53.1,
+   "wilsonLo": 46.3,
+   "tier": "C"
+  },
+  {
+   "id": "mega-manectric-ex-b2b-team-rockets-electrode-b4a",
+   "name": "Mega Manectric ex Team Rocket's Electrode",
+   "icons": [
+    "manectric-mega",
+    "electrode"
+   ],
+   "count": 34,
+   "share": 0.63,
+   "wins": 67,
+   "losses": 118,
+   "ties": 4,
+   "n": 185,
+   "winrate": 36.2,
+   "wilsonLo": 29.6,
+   "tier": "C"
+  },
+  {
+   "id": "jumpluff-ex-a4a-team-rockets-electrode-b4a",
+   "name": "Jumpluff ex Team Rocket's Electrode",
+   "icons": [
+    "jumpluff",
+    "electrode"
+   ],
+   "count": 34,
+   "share": 0.63,
+   "wins": 82,
+   "losses": 108,
+   "ties": 5,
+   "n": 190,
+   "winrate": 43.2,
+   "wilsonLo": 36.3,
+   "tier": "C"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-mega-absol-ex-b1",
+   "name": "Team Rocket's Weezing ex Mega Absol ex",
+   "icons": [
+    "weezing",
+    "absol-mega"
+   ],
+   "count": 33,
+   "share": 0.61,
+   "wins": 83,
+   "losses": 95,
+   "ties": 5,
+   "n": 178,
+   "winrate": 46.6,
+   "wilsonLo": 39.4,
+   "tier": "C"
+  },
+  {
+   "id": "mega-altaria-ex-b1-igglybuff-a4a",
+   "name": "Mega Altaria ex Igglybuff",
+   "icons": [
+    "altaria-mega",
+    "igglybuff"
+   ],
+   "count": 32,
+   "share": 0.59,
+   "wins": 89,
+   "losses": 96,
+   "ties": 7,
+   "n": 185,
+   "winrate": 48.1,
+   "wilsonLo": 41,
+   "tier": "C"
+  },
+  {
+   "id": "mega-altaria-ex-chingling-b1",
+   "name": "Mega Altaria ex Chingling",
+   "icons": [
+    "altaria-mega",
+    "chingling"
+   ],
+   "count": 31,
+   "share": 0.57,
+   "wins": 89,
+   "losses": 96,
+   "ties": 6,
+   "n": 185,
+   "winrate": 48.1,
+   "wilsonLo": 41,
+   "tier": "C"
+  },
+  {
+   "id": "team-rockets-slowking-ex-b4a-sylveon-ex-a3b",
+   "name": "Team Rocket's Slowking ex Sylveon ex",
+   "icons": [
+    "slowking",
+    "sylveon"
+   ],
+   "count": 29,
+   "share": 0.54,
+   "wins": 44,
+   "losses": 73,
+   "ties": 1,
+   "n": 117,
+   "winrate": 37.6,
+   "wilsonLo": 29.4,
+   "tier": "C"
+  },
+  {
+   "id": "team-rockets-weezing-ex-team-rockets-magmar-b4a",
+   "name": "Team Rocket's Weezing ex Team Rocket's Magmar",
+   "icons": [
+    "weezing",
+    "magmar"
+   ],
+   "count": 29,
+   "share": 0.54,
+   "wins": 58,
+   "losses": 104,
+   "ties": 0,
+   "n": 162,
+   "winrate": 35.8,
+   "wilsonLo": 28.8,
+   "tier": "C"
+  },
+  {
+   "id": "indeedee-ex-b1-giratina-ex-a2b",
+   "name": "Indeedee ex Giratina ex",
+   "icons": [
+    "indeedee",
+    "giratina"
+   ],
+   "count": 29,
+   "share": 0.54,
+   "wins": 89,
+   "losses": 70,
+   "ties": 17,
+   "n": 159,
+   "winrate": 56,
+   "wilsonLo": 48.2,
+   "tier": "C"
+  },
+  {
+   "id": "beautifly-dustox-b4",
+   "name": "Beautifly Dustox",
+   "icons": [
+    "beautifly",
+    "dustox"
+   ],
+   "count": 28,
+   "share": 0.52,
+   "wins": 73,
+   "losses": 72,
+   "ties": 7,
+   "n": 145,
+   "winrate": 50.3,
+   "wilsonLo": 42.3,
+   "tier": "C"
+  },
+  {
+   "id": "chandelure-b2-oricorio-b4",
+   "name": "Chandelure Oricorio",
+   "icons": [
+    "chandelure",
+    "oricorio"
+   ],
+   "count": 28,
+   "share": 0.52,
+   "wins": 64,
+   "losses": 91,
+   "ties": 1,
+   "n": 155,
+   "winrate": 41.3,
+   "wilsonLo": 33.8,
+   "tier": "C"
+  },
+  {
+   "id": "hoopa-ex-b4-greninja-a1",
+   "name": "Hoopa ex Greninja",
+   "icons": [
+    "hoopa-unbound",
+    "greninja"
+   ],
+   "count": 27,
+   "share": 0.5,
+   "wins": 66,
+   "losses": 83,
+   "ties": 2,
+   "n": 149,
+   "winrate": 44.3,
+   "wilsonLo": 36.6,
+   "tier": "D"
+  },
+  {
+   "id": "zoroark-ex-b3-mega-absol-ex-b1",
+   "name": "Zoroark ex Mega Absol ex",
+   "icons": [
+    "zoroark",
+    "absol-mega"
+   ],
+   "count": 27,
+   "share": 0.5,
+   "wins": 77,
+   "losses": 73,
+   "ties": 4,
+   "n": 150,
+   "winrate": 51.3,
+   "wilsonLo": 43.4,
+   "tier": "D"
+  },
+  {
+   "id": "miraidon-ex-b3a-magnezone-b1a",
+   "name": "Miraidon ex Magnezone",
+   "icons": [
+    "miraidon",
+    "magnezone"
+   ],
+   "count": 26,
+   "share": 0.48,
+   "wins": 102,
+   "losses": 75,
+   "ties": 2,
+   "n": 177,
+   "winrate": 57.6,
+   "wilsonLo": 50.3,
+   "tier": "D"
+  },
+  {
+   "id": "team-rockets-slowking-ex-b4a-meloetta-b2",
+   "name": "Team Rocket's Slowking ex Meloetta",
+   "icons": [
+    "slowking",
+    "meloetta"
+   ],
+   "count": 24,
+   "share": 0.44,
+   "wins": 58,
+   "losses": 71,
+   "ties": 0,
+   "n": 129,
+   "winrate": 45,
+   "wilsonLo": 36.6,
+   "tier": "D"
+  },
+  {
+   "id": "garchomp-b4a-goomy-b1",
+   "name": "Garchomp Goomy",
+   "icons": [
+    "garchomp",
+    "goomy"
+   ],
+   "count": 24,
+   "share": 0.44,
+   "wins": 39,
+   "losses": 65,
+   "ties": 3,
+   "n": 104,
+   "winrate": 37.5,
+   "wilsonLo": 28.8,
+   "tier": "D"
+  },
+  {
+   "id": "garchomp-b4a-greninja-a1",
+   "name": "Garchomp Greninja",
+   "icons": [
+    "garchomp",
+    "greninja"
+   ],
+   "count": 24,
+   "share": 0.44,
+   "wins": 52,
+   "losses": 69,
+   "ties": 3,
+   "n": 121,
+   "winrate": 43,
+   "wilsonLo": 34.5,
+   "tier": "D"
+  },
+  {
+   "id": "zoroark-ex-b3-team-rockets-weezing-ex-b4a",
+   "name": "Zoroark ex Team Rocket's Weezing ex",
+   "icons": [
+    "zoroark",
+    "weezing"
+   ],
+   "count": 23,
+   "share": 0.42,
+   "wins": 52,
+   "losses": 62,
+   "ties": 4,
+   "n": 114,
+   "winrate": 45.6,
+   "wilsonLo": 36.8,
+   "tier": "D"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-zoroark-ex-b3",
+   "name": "Team Rocket's Weezing ex Zoroark ex",
+   "icons": [
+    "weezing",
+    "zoroark"
+   ],
+   "count": 22,
+   "share": 0.41,
+   "wins": 58,
+   "losses": 70,
+   "ties": 1,
+   "n": 128,
+   "winrate": 45.3,
+   "wilsonLo": 37,
+   "tier": "D"
+  },
+  {
+   "id": "mega-kangaskhan-ex-b2-happiny-b4a",
+   "name": "Mega Kangaskhan ex Happiny",
+   "icons": [
+    "kangaskhan-mega",
+    "happiny"
+   ],
+   "count": 21,
+   "share": 0.39,
+   "wins": 44,
+   "losses": 54,
+   "ties": 5,
+   "n": 98,
+   "winrate": 44.9,
+   "wilsonLo": 35.4,
+   "tier": "D"
+  },
+  {
+   "id": "mega-altaria-ex-b1-gourgeist-b2",
+   "name": "Mega Altaria ex Gourgeist",
+   "icons": [
+    "altaria-mega",
+    "gourgeist"
+   ],
+   "count": 21,
+   "share": 0.39,
+   "wins": 54,
+   "losses": 59,
+   "ties": 4,
+   "n": 113,
+   "winrate": 47.8,
+   "wilsonLo": 38.8,
+   "tier": "D"
+  },
+  {
+   "id": "mega-altaria-ex-b1-happiny-b4a",
+   "name": "Mega Altaria ex Happiny",
+   "icons": [
+    "altaria-mega",
+    "happiny"
+   ],
+   "count": 19,
+   "share": 0.35,
+   "wins": 62,
+   "losses": 51,
+   "ties": 8,
+   "n": 113,
+   "winrate": 54.9,
+   "wilsonLo": 45.7,
+   "tier": "D"
+  },
+  {
+   "id": "mega-venusaur-ex-b1a",
+   "name": "Mega Venusaur ex",
+   "icons": [
+    "venusaur-mega"
+   ],
+   "count": 19,
+   "share": 0.35,
+   "wins": 45,
+   "losses": 60,
+   "ties": 3,
+   "n": 105,
+   "winrate": 42.9,
+   "wilsonLo": 33.8,
+   "tier": "D"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-jolteon-ex-b1",
+   "name": "Team Rocket's Raticate ex Jolteon ex",
+   "icons": [
+    "raticate",
+    "jolteon"
+   ],
+   "count": 18,
+   "share": 0.33,
+   "wins": 23,
+   "losses": 57,
+   "ties": 0,
+   "n": 80,
+   "winrate": 28.7,
+   "wilsonLo": 20,
+   "tier": "D"
+  },
+  {
+   "id": "mega-blaziken-ex-b1-castform-sunny-form-b3",
+   "name": "Mega Blaziken ex Castform Sunny Form",
+   "icons": [
+    "blaziken-mega",
+    "castform-sunny"
+   ],
+   "count": 18,
+   "share": 0.33,
+   "wins": 51,
+   "losses": 56,
+   "ties": 2,
+   "n": 107,
+   "winrate": 47.7,
+   "wilsonLo": 38.4,
+   "tier": "D"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-mega-lucario-ex-b3",
+   "name": "Team Rocket's Raticate ex Mega Lucario ex",
+   "icons": [
+    "raticate",
+    "lucario-mega"
+   ],
+   "count": 16,
+   "share": 0.3,
+   "wins": 41,
+   "losses": 46,
+   "ties": 4,
+   "n": 87,
+   "winrate": 47.1,
+   "wilsonLo": 37,
+   "tier": "D"
+  },
+  {
+   "id": "hydreigon-b1-mega-sableye-ex-b3b",
+   "name": "Hydreigon Mega Sableye ex",
+   "icons": [
+    "hydreigon",
+    "sableye-mega"
+   ],
+   "count": 15,
+   "share": 0.28,
+   "wins": 51,
+   "losses": 47,
+   "ties": 4,
+   "n": 98,
+   "winrate": 52,
+   "wilsonLo": 42.3,
+   "tier": "D"
+  },
+  {
+   "id": "mega-lucario-ex-b3-hitmonchan-ex-b1",
+   "name": "Mega Lucario ex Hitmonchan ex",
+   "icons": [
+    "lucario-mega",
+    "hitmonchan"
+   ],
+   "count": 15,
+   "share": 0.28,
+   "wins": 41,
+   "losses": 47,
+   "ties": 2,
+   "n": 88,
+   "winrate": 46.6,
+   "wilsonLo": 36.5,
+   "tier": "D"
+  },
+  {
+   "id": "heliolisk-b4-team-rockets-zapdos-ex-b4a",
+   "name": "Heliolisk Team Rocket's Zapdos ex",
+   "icons": [
+    "heliolisk",
+    "zapdos"
+   ],
+   "count": 15,
+   "share": 0.28,
+   "wins": 28,
+   "losses": 46,
+   "ties": 3,
+   "n": 74,
+   "winrate": 37.8,
+   "wilsonLo": 27.6,
+   "tier": "D"
+  },
+  {
+   "id": "flygon-ex-b3",
+   "name": "Flygon ex",
+   "icons": [
+    "flygon"
+   ],
+   "count": 14,
+   "share": 0.26,
+   "wins": 23,
+   "losses": 42,
+   "ties": 0,
+   "n": 65,
+   "winrate": 35.4,
+   "wilsonLo": 24.9,
+   "tier": "D"
+  },
+  {
+   "id": "mega-charizard-x-ex-b2b-team-rockets-moltres-ex-b4a",
+   "name": "Mega Charizard X ex Team Rocket's Moltres ex",
+   "icons": [
+    "charizard-mega-x",
+    "moltres"
+   ],
+   "count": 14,
+   "share": 0.26,
+   "wins": 24,
+   "losses": 41,
+   "ties": 0,
+   "n": 65,
+   "winrate": 36.9,
+   "wilsonLo": 26.2,
+   "tier": "D"
+  },
+  {
+   "id": "garchomp-happiny-b4a",
+   "name": "Garchomp Happiny",
+   "icons": [
+    "garchomp",
+    "happiny"
+   ],
+   "count": 14,
+   "share": 0.26,
+   "wins": 35,
+   "losses": 41,
+   "ties": 1,
+   "n": 76,
+   "winrate": 46.1,
+   "wilsonLo": 35.3,
+   "tier": "D"
+  },
+  {
+   "id": "mega-lucario-ex-b3",
+   "name": "Mega Lucario ex",
+   "icons": [
+    "lucario-mega"
+   ],
+   "count": 13,
+   "share": 0.24,
+   "wins": 46,
+   "losses": 39,
+   "ties": 3,
+   "n": 85,
+   "winrate": 54.1,
+   "wilsonLo": 43.6,
+   "tier": "D"
+  },
+  {
+   "id": "greninja-a1-mega-absol-ex-b1",
+   "name": "Greninja Mega Absol ex",
+   "icons": [
+    "greninja",
+    "absol-mega"
+   ],
+   "count": 13,
+   "share": 0.24,
+   "wins": 29,
+   "losses": 36,
+   "ties": 1,
+   "n": 65,
+   "winrate": 44.6,
+   "wilsonLo": 33.2,
+   "tier": "D"
+  },
+  {
+   "id": "greninja-a1-oricorio-a3",
+   "name": "Greninja Oricorio",
+   "icons": [
+    "greninja",
+    "oricorio-pom-pom"
+   ],
+   "count": 13,
+   "share": 0.24,
+   "wins": 40,
+   "losses": 35,
+   "ties": 3,
+   "n": 75,
+   "winrate": 53.3,
+   "wilsonLo": 42.2,
+   "tier": "D"
+  },
+  {
+   "id": "mega-sceptile-ex-sceptile-b3",
+   "name": "Mega Sceptile ex Sceptile",
+   "icons": [
+    "sceptile-mega",
+    "sceptile"
+   ],
+   "count": 13,
+   "share": 0.24,
+   "wins": 28,
+   "losses": 40,
+   "ties": 1,
+   "n": 68,
+   "winrate": 41.2,
+   "wilsonLo": 30.3,
+   "tier": "D"
+  },
+  {
+   "id": "mega-lucario-ex-b3-igglybuff-a4a",
+   "name": "Mega Lucario ex Igglybuff",
+   "icons": [
+    "lucario-mega",
+    "igglybuff"
+   ],
+   "count": 12,
+   "share": 0.22,
+   "wins": 27,
+   "losses": 36,
+   "ties": 4,
+   "n": 63,
+   "winrate": 42.9,
+   "wilsonLo": 31.4,
+   "tier": "D"
+  },
+  {
+   "id": "mega-blastoise-ex-b1a-eiscue-b1",
+   "name": "Mega Blastoise ex Eiscue",
+   "icons": [
+    "blastoise-mega",
+    "eiscue"
+   ],
+   "count": 12,
+   "share": 0.22,
+   "wins": 32,
+   "losses": 29,
+   "ties": 4,
+   "n": 61,
+   "winrate": 52.5,
+   "wilsonLo": 40.2,
+   "tier": "D"
+  },
+  {
+   "id": "mega-blaziken-ex-b1-entei-ex-a4a",
+   "name": "Mega Blaziken ex Entei ex",
+   "icons": [
+    "blaziken-mega",
+    "entei"
+   ],
+   "count": 11,
+   "share": 0.2,
+   "wins": 14,
+   "losses": 50,
+   "ties": 1,
+   "n": 64,
+   "winrate": 21.9,
+   "wilsonLo": 13.5,
+   "tier": "D"
+  },
+  {
+   "id": "mega-sharpedo-ex-b4-chien-pao-ex-b2a",
+   "name": "Mega Sharpedo ex Chien-Pao ex",
+   "icons": [
+    "sharpedo-mega",
+    "chien-pao"
+   ],
+   "count": 11,
+   "share": 0.2,
+   "wins": 32,
+   "losses": 27,
+   "ties": 3,
+   "n": 59,
+   "winrate": 54.2,
+   "wilsonLo": 41.7,
+   "tier": "D"
+  },
+  {
+   "id": "hoopa-ex-b4-team-rockets-weezing-ex-b4a",
+   "name": "Hoopa ex Team Rocket's Weezing ex",
+   "icons": [
+    "hoopa-unbound",
+    "weezing"
+   ],
+   "count": 11,
+   "share": 0.2,
+   "wins": 29,
+   "losses": 30,
+   "ties": 1,
+   "n": 59,
+   "winrate": 49.2,
+   "wilsonLo": 36.8,
+   "tier": "D"
+  },
+  {
+   "id": "garchomp-b4a-mantyke-a4a",
+   "name": "Garchomp Mantyke",
+   "icons": [
+    "garchomp",
+    "mantyke"
+   ],
+   "count": 11,
+   "share": 0.2,
+   "wins": 17,
+   "losses": 30,
+   "ties": 1,
+   "n": 47,
+   "winrate": 36.2,
+   "wilsonLo": 24,
+   "tier": "D"
+  },
+  {
+   "id": "flutter-mane-ex-b3a",
+   "name": "Flutter Mane ex",
+   "icons": [
+    "flutter-mane"
+   ],
+   "count": 11,
+   "share": 0.2,
+   "wins": 31,
+   "losses": 31,
+   "ties": 2,
+   "n": 62,
+   "winrate": 50,
+   "wilsonLo": 37.9,
+   "tier": "D"
+  },
+  {
+   "id": "giratina-ex-a2b-darkrai-ex-a2",
+   "name": "Giratina ex Darkrai ex",
+   "icons": [
+    "giratina",
+    "darkrai"
+   ],
+   "count": 11,
+   "share": 0.2,
+   "wins": 25,
+   "losses": 37,
+   "ties": 1,
+   "n": 62,
+   "winrate": 40.3,
+   "wilsonLo": 29,
+   "tier": "D"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-terapagos-ex-b3a",
+   "name": "Team Rocket's Raticate ex Terapagos ex",
+   "icons": [
+    "raticate",
+    "terapagos"
+   ],
+   "count": 11,
+   "share": 0.2,
+   "wins": 21,
+   "losses": 26,
+   "ties": 2,
+   "n": 47,
+   "winrate": 44.7,
+   "wilsonLo": 31.4,
+   "tier": "D"
+  },
+  {
+   "id": "team-rockets-raticate-ex-team-rockets-weezing-ex-b4a",
+   "name": "Team Rocket's Raticate ex Team Rocket's Weezing ex",
+   "icons": [
+    "raticate",
+    "weezing"
+   ],
+   "count": 10,
+   "share": 0.18,
+   "wins": 15,
+   "losses": 34,
+   "ties": 0,
+   "n": 49,
+   "winrate": 30.6,
+   "wilsonLo": 19.5,
+   "tier": "D"
+  },
+  {
+   "id": "suicune-ex-a4a-greninja-ex-b1",
+   "name": "Suicune ex Greninja ex",
+   "icons": [
+    "suicune",
+    "greninja"
+   ],
+   "count": 10,
+   "share": 0.18,
+   "wins": 15,
+   "losses": 24,
+   "ties": 0,
+   "n": 39,
+   "winrate": 38.5,
+   "wilsonLo": 24.9,
+   "tier": "D"
+  },
+  {
+   "id": "team-rockets-articuno-ex-b4a",
+   "name": "Team Rocket's Articuno ex",
+   "icons": [
+    "articuno"
+   ],
+   "count": 10,
+   "share": 0.18,
+   "wins": 13,
+   "losses": 27,
+   "ties": 0,
+   "n": 40,
+   "winrate": 32.5,
+   "wilsonLo": 20.1,
+   "tier": "D"
+  },
+  {
+   "id": "garchomp-b4a-munchlax-b3b",
+   "name": "Garchomp Munchlax",
+   "icons": [
+    "garchomp",
+    "munchlax"
+   ],
+   "count": 10,
+   "share": 0.18,
+   "wins": 16,
+   "losses": 25,
+   "ties": 1,
+   "n": 41,
+   "winrate": 39,
+   "wilsonLo": 25.7,
+   "tier": "D"
+  },
+  {
+   "id": "garchomp-a2-goomy-b1",
+   "name": "Garchomp Goomy",
+   "icons": [
+    "garchomp",
+    "goomy"
+   ],
+   "count": 10,
+   "share": 0.18,
+   "wins": 17,
+   "losses": 30,
+   "ties": 1,
+   "n": 47,
+   "winrate": 36.2,
+   "wilsonLo": 24,
+   "tier": "D"
+  },
+  {
+   "id": "garchomp-b4a-meowth-b2",
+   "name": "Garchomp Meowth",
+   "icons": [
+    "garchomp",
+    "meowth"
+   ],
+   "count": 9,
+   "share": 0.17,
+   "wins": 20,
+   "losses": 27,
+   "ties": 0,
+   "n": 47,
+   "winrate": 42.6,
+   "wilsonLo": 29.5,
+   "tier": "D"
+  },
+  {
+   "id": "mega-lucario-ex-b3-greninja-a1",
+   "name": "Mega Lucario ex Greninja",
+   "icons": [
+    "lucario-mega",
+    "greninja"
+   ],
+   "count": 9,
+   "share": 0.17,
+   "wins": 22,
+   "losses": 24,
+   "ties": 0,
+   "n": 46,
+   "winrate": 47.8,
+   "wilsonLo": 34.1,
+   "tier": "D"
+  },
+  {
+   "id": "koraidon-ex-great-tusk-b3a",
+   "name": "Koraidon ex Great Tusk",
+   "icons": [
+    "koraidon",
+    "great-tusk"
+   ],
+   "count": 9,
+   "share": 0.17,
+   "wins": 13,
+   "losses": 23,
+   "ties": 1,
+   "n": 36,
+   "winrate": 36.1,
+   "wilsonLo": 22.5,
+   "tier": "D"
+  },
+  {
+   "id": "mega-sharpedo-ex-b4-milotic-ex-b3b",
+   "name": "Mega Sharpedo ex Milotic ex",
+   "icons": [
+    "sharpedo-mega",
+    "milotic"
+   ],
+   "count": 9,
+   "share": 0.17,
+   "wins": 20,
+   "losses": 30,
+   "ties": 0,
+   "n": 50,
+   "winrate": 40,
+   "wilsonLo": 27.6,
+   "tier": "D"
+  },
+  {
+   "id": "gourgeist-b2-houndstone-b2a",
+   "name": "Gourgeist Houndstone",
+   "icons": [
+    "gourgeist",
+    "houndstone"
+   ],
+   "count": 8,
+   "share": 0.15,
+   "wins": 10,
+   "losses": 27,
+   "ties": 2,
+   "n": 37,
+   "winrate": 27,
+   "wilsonLo": 15.4,
+   "tier": "D"
+  },
+  {
+   "id": "mega-ampharos-ex-b1-greninja-a1",
+   "name": "Mega Ampharos ex Greninja",
+   "icons": [
+    "ampharos-mega",
+    "greninja"
+   ],
+   "count": 8,
+   "share": 0.15,
+   "wins": 11,
+   "losses": 21,
+   "ties": 0,
+   "n": 32,
+   "winrate": 34.4,
+   "wilsonLo": 20.4,
+   "tier": "D"
+  },
+  {
+   "id": "mega-kangaskhan-ex-teal-mask-ogerpon-ex-b2",
+   "name": "Mega Kangaskhan ex Teal Mask Ogerpon ex",
+   "icons": [
+    "kangaskhan-mega",
+    "ogerpon"
+   ],
+   "count": 8,
+   "share": 0.15,
+   "wins": 21,
+   "losses": 22,
+   "ties": 1,
+   "n": 43,
+   "winrate": 48.8,
+   "wilsonLo": 34.6,
+   "tier": "D"
+  },
+  {
+   "id": "entei-ex-a4a",
+   "name": "Entei ex",
+   "icons": [
+    "entei"
+   ],
+   "count": 8,
+   "share": 0.15,
+   "wins": 31,
+   "losses": 20,
+   "ties": 0,
+   "n": 51,
+   "winrate": 60.8,
+   "wilsonLo": 47.1,
+   "tier": "D"
+  },
+  {
+   "id": "umbreon-ex-a4-greninja-a1",
+   "name": "Umbreon ex Greninja",
+   "icons": [
+    "umbreon",
+    "greninja"
+   ],
+   "count": 8,
+   "share": 0.15,
+   "wins": 10,
+   "losses": 23,
+   "ties": 0,
+   "n": 33,
+   "winrate": 30.3,
+   "wilsonLo": 17.4,
+   "tier": "D"
+  },
+  {
+   "id": "team-rockets-electrode-b4a-luxray-b4",
+   "name": "Team Rocket's Electrode Luxray",
+   "icons": [
+    "electrode",
+    "luxray"
+   ],
+   "count": 7,
+   "share": 0.13,
+   "wins": 10,
+   "losses": 21,
+   "ties": 1,
+   "n": 31,
+   "winrate": 32.3,
+   "wilsonLo": 18.6,
+   "tier": "D"
+  },
+  {
+   "id": "mega-diancie-ex-carbink-b3b",
+   "name": "Mega Diancie ex Carbink",
+   "icons": [
+    "diancie-mega",
+    "carbink"
+   ],
+   "count": 7,
+   "share": 0.13,
+   "wins": 18,
+   "losses": 24,
+   "ties": 0,
+   "n": 42,
+   "winrate": 42.9,
+   "wilsonLo": 29.1,
+   "tier": "D"
+  },
+  {
+   "id": "flareon-ex-a3b-flareon-b4",
+   "name": "Flareon ex Flareon",
+   "icons": [
+    "flareon",
+    "flareon"
+   ],
+   "count": 7,
+   "share": 0.13,
+   "wins": 25,
+   "losses": 18,
+   "ties": 3,
+   "n": 43,
+   "winrate": 58.1,
+   "wilsonLo": 43.3,
+   "tier": "D"
+  },
+  {
+   "id": "mega-sharpedo-ex-b4-team-rockets-articuno-ex-b4a",
+   "name": "Mega Sharpedo ex Team Rocket's Articuno ex",
+   "icons": [
+    "sharpedo-mega",
+    "articuno"
+   ],
+   "count": 7,
+   "share": 0.13,
+   "wins": 14,
+   "losses": 21,
+   "ties": 0,
+   "n": 35,
+   "winrate": 40,
+   "wilsonLo": 25.6,
+   "tier": "D"
+  },
+  {
+   "id": "mega-gardevoir-ex-gardevoir-b2",
+   "name": "Mega Gardevoir ex Gardevoir",
+   "icons": [
+    "gardevoir-mega",
+    "gardevoir"
+   ],
+   "count": 7,
+   "share": 0.13,
+   "wins": 20,
+   "losses": 21,
+   "ties": 1,
+   "n": 41,
+   "winrate": 48.8,
+   "wilsonLo": 34.3,
+   "tier": "D"
+  },
+  {
+   "id": "mega-gardevoir-ex-b2-mega-diancie-ex-b3b",
+   "name": "Mega Gardevoir ex Mega Diancie ex",
+   "icons": [
+    "gardevoir-mega",
+    "diancie-mega"
+   ],
+   "count": 7,
+   "share": 0.13,
+   "wins": 20,
+   "losses": 22,
+   "ties": 1,
+   "n": 42,
+   "winrate": 47.6,
+   "wilsonLo": 33.4,
+   "tier": "D"
+  },
+  {
+   "id": "mega-ampharos-ex-b1-team-rockets-electrode-b4a",
+   "name": "Mega Ampharos ex Team Rocket's Electrode",
+   "icons": [
+    "ampharos-mega",
+    "electrode"
+   ],
+   "count": 7,
+   "share": 0.13,
+   "wins": 16,
+   "losses": 21,
+   "ties": 1,
+   "n": 37,
+   "winrate": 43.2,
+   "wilsonLo": 28.7,
+   "tier": "D"
+  },
+  {
+   "id": "mega-lucario-ex-b3-team-rockets-raticate-ex-b4a",
+   "name": "Mega Lucario ex Team Rocket's Raticate ex",
+   "icons": [
+    "lucario-mega",
+    "raticate"
+   ],
+   "count": 7,
+   "share": 0.13,
+   "wins": 21,
+   "losses": 21,
+   "ties": 0,
+   "n": 42,
+   "winrate": 50,
+   "wilsonLo": 35.5,
+   "tier": "D"
+  },
+  {
+   "id": "mega-blaziken-ex-b1-skeledirge-b2a",
+   "name": "Mega Blaziken ex Skeledirge",
+   "icons": [
+    "blaziken-mega",
+    "skeledirge"
+   ],
+   "count": 7,
+   "share": 0.13,
+   "wins": 19,
+   "losses": 23,
+   "ties": 0,
+   "n": 42,
+   "winrate": 45.2,
+   "wilsonLo": 31.2,
+   "tier": "D"
+  },
+  {
+   "id": "zoroark-ex-b3-mega-sableye-ex-b3b",
+   "name": "Zoroark ex Mega Sableye ex",
+   "icons": [
+    "zoroark",
+    "sableye-mega"
+   ],
+   "count": 7,
+   "share": 0.13,
+   "wins": 15,
+   "losses": 21,
+   "ties": 1,
+   "n": 36,
+   "winrate": 41.7,
+   "wilsonLo": 27.1,
+   "tier": "D"
+  },
+  {
+   "id": "garchomp-ex-a2a-garchomp-b4a",
+   "name": "Garchomp ex Garchomp",
+   "icons": [
+    "garchomp",
+    "garchomp"
+   ],
+   "count": 6,
+   "share": 0.11,
+   "wins": 11,
+   "losses": 14,
+   "ties": 0,
+   "n": 25,
+   "winrate": 44,
+   "wilsonLo": 26.7,
+   "tier": "?"
+  },
+  {
+   "id": "mega-pidgeot-ex-p-b-pidgeot-a1",
+   "name": "Mega Pidgeot ex Pidgeot",
+   "icons": [
+    "pidgeot-mega",
+    "pidgeot"
+   ],
+   "count": 6,
+   "share": 0.11,
+   "wins": 15,
+   "losses": 15,
+   "ties": 2,
+   "n": 30,
+   "winrate": 50,
+   "wilsonLo": 33.2,
+   "tier": "D"
+  },
+  {
+   "id": "mega-sableye-ex-b3b-mega-absol-ex-b1",
+   "name": "Mega Sableye ex Mega Absol ex",
+   "icons": [
+    "sableye-mega",
+    "absol-mega"
+   ],
+   "count": 6,
+   "share": 0.11,
+   "wins": 19,
+   "losses": 19,
+   "ties": 0,
+   "n": 38,
+   "winrate": 50,
+   "wilsonLo": 34.8,
+   "tier": "D"
+  },
+  {
+   "id": "magcargo-a4",
+   "name": "Magcargo",
+   "icons": [
+    "magcargo"
+   ],
+   "count": 6,
+   "share": 0.11,
+   "wins": 16,
+   "losses": 19,
+   "ties": 0,
+   "n": 35,
+   "winrate": 45.7,
+   "wilsonLo": 30.5,
+   "tier": "D"
+  },
+  {
+   "id": "milotic-ex-b3b-igglybuff-a4a",
+   "name": "Milotic ex Igglybuff",
+   "icons": [
+    "milotic",
+    "igglybuff"
+   ],
+   "count": 6,
+   "share": 0.11,
+   "wins": 23,
+   "losses": 15,
+   "ties": 2,
+   "n": 38,
+   "winrate": 60.5,
+   "wilsonLo": 44.7,
+   "tier": "D"
+  },
+  {
+   "id": "team-rockets-electrode-team-rockets-zapdos-ex-b4a",
+   "name": "Team Rocket's Electrode Team Rocket's Zapdos ex",
+   "icons": [
+    "electrode",
+    "zapdos"
+   ],
+   "count": 6,
+   "share": 0.11,
+   "wins": 10,
+   "losses": 18,
+   "ties": 1,
+   "n": 28,
+   "winrate": 35.7,
+   "wilsonLo": 20.7,
+   "tier": "?"
+  },
+  {
+   "id": "vaporeon-ex-b3-greninja-ex-b1",
+   "name": "Vaporeon ex Greninja ex",
+   "icons": [
+    "vaporeon",
+    "greninja"
+   ],
+   "count": 6,
+   "share": 0.11,
+   "wins": 11,
+   "losses": 25,
+   "ties": 2,
+   "n": 36,
+   "winrate": 30.6,
+   "wilsonLo": 18,
+   "tier": "D"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-mega-kangaskhan-ex-b2",
+   "name": "Team Rocket's Raticate ex Mega Kangaskhan ex",
+   "icons": [
+    "raticate",
+    "kangaskhan-mega"
+   ],
+   "count": 6,
+   "share": 0.11,
+   "wins": 2,
+   "losses": 16,
+   "ties": 0,
+   "n": 18,
+   "winrate": 11.1,
+   "wilsonLo": 3.1,
+   "tier": "?"
+  },
+  {
+   "id": "rotom-ex-b4",
+   "name": "Rotom ex",
+   "icons": [
+    "rotom"
+   ],
+   "count": 6,
+   "share": 0.11,
+   "wins": 5,
+   "losses": 13,
+   "ties": 1,
+   "n": 18,
+   "winrate": 27.8,
+   "wilsonLo": 12.5,
+   "tier": "?"
+  },
+  {
+   "id": "magnezone-heliolisk-b1a",
+   "name": "Magnezone Heliolisk",
+   "icons": [
+    "magnezone",
+    "heliolisk"
+   ],
+   "count": 6,
+   "share": 0.11,
+   "wins": 15,
+   "losses": 15,
+   "ties": 1,
+   "n": 30,
+   "winrate": 50,
+   "wilsonLo": 33.2,
+   "tier": "D"
+  },
+  {
+   "id": "indeedee-ex-b1-stoutland-a3a",
+   "name": "Indeedee ex Stoutland",
+   "icons": [
+    "indeedee",
+    "stoutland"
+   ],
+   "count": 6,
+   "share": 0.11,
+   "wins": 17,
+   "losses": 17,
+   "ties": 0,
+   "n": 34,
+   "winrate": 50,
+   "wilsonLo": 34.1,
+   "tier": "D"
+  },
+  {
+   "id": "milotic-ex-b3b-chien-pao-ex-b2a",
+   "name": "Milotic ex Chien-Pao ex",
+   "icons": [
+    "milotic",
+    "chien-pao"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 13,
+   "losses": 12,
+   "ties": 1,
+   "n": 25,
+   "winrate": 52,
+   "wilsonLo": 33.5,
+   "tier": "?"
+  },
+  {
+   "id": "vespiquen-ex-b4-teal-mask-ogerpon-ex-b2",
+   "name": "Vespiquen ex Teal Mask Ogerpon ex",
+   "icons": [
+    "vespiquen",
+    "ogerpon"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 6,
+   "losses": 17,
+   "ties": 0,
+   "n": 23,
+   "winrate": 26.1,
+   "wilsonLo": 12.5,
+   "tier": "?"
+  },
+  {
+   "id": "giratina-ex-a2b-indeedee-ex-b1",
+   "name": "Giratina ex Indeedee ex",
+   "icons": [
+    "giratina",
+    "indeedee"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 20,
+   "losses": 12,
+   "ties": 1,
+   "n": 32,
+   "winrate": 62.5,
+   "wilsonLo": 45.3,
+   "tier": "D"
+  },
+  {
+   "id": "mega-steelix-ex-b1a-indeedee-ex-b1",
+   "name": "Mega Steelix ex Indeedee ex",
+   "icons": [
+    "steelix-mega",
+    "indeedee"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 7,
+   "losses": 15,
+   "ties": 0,
+   "n": 22,
+   "winrate": 31.8,
+   "wilsonLo": 16.4,
+   "tier": "?"
+  },
+  {
+   "id": "decidueye-ex-a3-team-rockets-electrode-b4a",
+   "name": "Decidueye ex Team Rocket's Electrode",
+   "icons": [
+    "decidueye",
+    "electrode"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 7,
+   "losses": 16,
+   "ties": 0,
+   "n": 23,
+   "winrate": 30.4,
+   "wilsonLo": 15.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gallade-ex-b4-gallade-b3",
+   "name": "Mega Gallade ex Gallade",
+   "icons": [
+    "gallade-mega",
+    "gallade"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 11,
+   "losses": 15,
+   "ties": 0,
+   "n": 26,
+   "winrate": 42.3,
+   "wilsonLo": 25.5,
+   "tier": "?"
+  },
+  {
+   "id": "haxorus-b2b-dragonair-b4",
+   "name": "Haxorus Dragonair",
+   "icons": [
+    "haxorus",
+    "dragonair"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 4,
+   "losses": 18,
+   "ties": 0,
+   "n": 22,
+   "winrate": 18.2,
+   "wilsonLo": 7.3,
+   "tier": "?"
+  },
+  {
+   "id": "rotom-ex-b4-oricorio-a3",
+   "name": "Rotom ex Oricorio",
+   "icons": [
+    "rotom",
+    "oricorio-pom-pom"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 10,
+   "losses": 20,
+   "ties": 0,
+   "n": 30,
+   "winrate": 33.3,
+   "wilsonLo": 19.2,
+   "tier": "D"
+  },
+  {
+   "id": "mega-lucario-ex-lucario-b3",
+   "name": "Mega Lucario ex Lucario",
+   "icons": [
+    "lucario-mega",
+    "lucario"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 12,
+   "losses": 12,
+   "ties": 0,
+   "n": 24,
+   "winrate": 50,
+   "wilsonLo": 31.4,
+   "tier": "?"
+  },
+  {
+   "id": "dragonair-b4-altaria-a4a",
+   "name": "Dragonair Altaria",
+   "icons": [
+    "dragonair",
+    "altaria"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 8,
+   "losses": 17,
+   "ties": 0,
+   "n": 25,
+   "winrate": 32,
+   "wilsonLo": 17.2,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-indeedee-ex-b1",
+   "name": "Team Rocket's Raticate ex Indeedee ex",
+   "icons": [
+    "raticate",
+    "indeedee"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 6,
+   "losses": 14,
+   "ties": 0,
+   "n": 20,
+   "winrate": 30,
+   "wilsonLo": 14.5,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sceptile-ex-b3-teal-mask-ogerpon-ex-b2",
+   "name": "Mega Sceptile ex Teal Mask Ogerpon ex",
+   "icons": [
+    "sceptile-mega",
+    "ogerpon"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 13,
+   "losses": 13,
+   "ties": 1,
+   "n": 26,
+   "winrate": 50,
+   "wilsonLo": 32.1,
+   "tier": "?"
+  },
+  {
+   "id": "flygon-ex-b3-sylveon-ex-a3b",
+   "name": "Flygon ex Sylveon ex",
+   "icons": [
+    "flygon",
+    "sylveon"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 9,
+   "losses": 17,
+   "ties": 0,
+   "n": 26,
+   "winrate": 34.6,
+   "wilsonLo": 19.4,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-a2-greninja-a1",
+   "name": "Garchomp Greninja",
+   "icons": [
+    "garchomp",
+    "greninja"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 8,
+   "losses": 13,
+   "ties": 0,
+   "n": 21,
+   "winrate": 38.1,
+   "wilsonLo": 20.8,
+   "tier": "?"
+  },
+  {
+   "id": "indeedee-ex-b1-oricorio-a3",
+   "name": "Indeedee ex Oricorio",
+   "icons": [
+    "indeedee",
+    "oricorio-pom-pom"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 11,
+   "losses": 14,
+   "ties": 1,
+   "n": 25,
+   "winrate": 44,
+   "wilsonLo": 26.7,
+   "tier": "?"
+  },
+  {
+   "id": "wailord-ex-b4-indeedee-ex-b1",
+   "name": "Wailord ex Indeedee ex",
+   "icons": [
+    "wailord",
+    "indeedee"
+   ],
+   "count": 5,
+   "share": 0.09,
+   "wins": 2,
+   "losses": 15,
+   "ties": 0,
+   "n": 17,
+   "winrate": 11.8,
+   "wilsonLo": 3.3,
+   "tier": "?"
+  },
+  {
+   "id": "porygon-z-a2-teal-mask-ogerpon-ex-b2",
+   "name": "Porygon-Z Teal Mask Ogerpon ex",
+   "icons": [
+    "porygon-z",
+    "ogerpon"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 5,
+   "losses": 11,
+   "ties": 0,
+   "n": 16,
+   "winrate": 31.3,
+   "wilsonLo": 14.2,
+   "tier": "?"
+  },
+  {
+   "id": "mega-ampharos-ex-b1-ampharos-a4",
+   "name": "Mega Ampharos ex Ampharos",
+   "icons": [
+    "ampharos-mega",
+    "ampharos"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 6,
+   "losses": 12,
+   "ties": 0,
+   "n": 18,
+   "winrate": 33.3,
+   "wilsonLo": 16.3,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-mega-altaria-ex-b1",
+   "name": "Team Rocket's Raticate ex Mega Altaria ex",
+   "icons": [
+    "raticate",
+    "altaria-mega"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 7,
+   "losses": 13,
+   "ties": 0,
+   "n": 20,
+   "winrate": 35,
+   "wilsonLo": 18.1,
+   "tier": "?"
+  },
+  {
+   "id": "mega-altaria-ex-indeedee-ex-b1",
+   "name": "Mega Altaria ex Indeedee ex",
+   "icons": [
+    "altaria-mega",
+    "indeedee"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 5,
+   "losses": 10,
+   "ties": 0,
+   "n": 15,
+   "winrate": 33.3,
+   "wilsonLo": 15.2,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-zapdos-ex-b4a-heliolisk-b4",
+   "name": "Team Rocket's Zapdos ex Heliolisk",
+   "icons": [
+    "zapdos",
+    "heliolisk"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 4,
+   "losses": 12,
+   "ties": 0,
+   "n": 16,
+   "winrate": 25,
+   "wilsonLo": 10.2,
+   "tier": "?"
+  },
+  {
+   "id": "beedrill-ex-a2b-team-rockets-raticate-ex-b4a",
+   "name": "Beedrill ex Team Rocket's Raticate ex",
+   "icons": [
+    "beedrill",
+    "raticate"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 7,
+   "losses": 13,
+   "ties": 0,
+   "n": 20,
+   "winrate": 35,
+   "wilsonLo": 18.1,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-tyrantrum-b2",
+   "name": "Team Rocket's Raticate ex Tyrantrum",
+   "icons": [
+    "raticate",
+    "tyrantrum"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 6,
+   "losses": 13,
+   "ties": 0,
+   "n": 19,
+   "winrate": 31.6,
+   "wilsonLo": 15.4,
+   "tier": "?"
+  },
+  {
+   "id": "growlithe-b3b-lillipup-b3",
+   "name": "Growlithe Lillipup",
+   "icons": [
+    "growlithe",
+    "lillipup"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 10,
+   "losses": 13,
+   "ties": 3,
+   "n": 23,
+   "winrate": 43.5,
+   "wilsonLo": 25.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-altaria-ex-b1-oricorio-b4",
+   "name": "Mega Altaria ex Oricorio",
+   "icons": [
+    "altaria-mega",
+    "oricorio"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 15,
+   "losses": 11,
+   "ties": 2,
+   "n": 26,
+   "winrate": 57.7,
+   "wilsonLo": 38.9,
+   "tier": "?"
+  },
+  {
+   "id": "magnezone-b1a-mega-lucario-ex-b3",
+   "name": "Magnezone Mega Lucario ex",
+   "icons": [
+    "magnezone",
+    "lucario-mega"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 10,
+   "losses": 9,
+   "ties": 1,
+   "n": 19,
+   "winrate": 52.6,
+   "wilsonLo": 31.7,
+   "tier": "?"
+  },
+  {
+   "id": "magnezone-b1a-team-rockets-electrode-b4a",
+   "name": "Magnezone Team Rocket's Electrode",
+   "icons": [
+    "magnezone",
+    "electrode"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 15,
+   "losses": 12,
+   "ties": 0,
+   "n": 27,
+   "winrate": 55.6,
+   "wilsonLo": 37.3,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-articuno-ex-gholdengo-b4a",
+   "name": "Team Rocket's Articuno ex Gholdengo",
+   "icons": [
+    "articuno",
+    "gholdengo"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 5,
+   "losses": 13,
+   "ties": 0,
+   "n": 18,
+   "winrate": 27.8,
+   "wilsonLo": 12.5,
+   "tier": "?"
+  },
+  {
+   "id": "luxray-b4-zeraora-a3a",
+   "name": "Luxray Zeraora",
+   "icons": [
+    "luxray",
+    "zeraora"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 3,
+   "losses": 19,
+   "ties": 0,
+   "n": 22,
+   "winrate": 13.6,
+   "wilsonLo": 4.7,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-moltres-ex-b4a-mega-houndoom-ex-p-b",
+   "name": "Team Rocket's Moltres ex Mega Houndoom ex",
+   "icons": [
+    "moltres",
+    "houndoom-mega"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 2,
+   "losses": 6,
+   "ties": 0,
+   "n": 8,
+   "winrate": 25,
+   "wilsonLo": 7.1,
+   "tier": "?"
+  },
+  {
+   "id": "dragonair-b4-haxorus-b2b",
+   "name": "Dragonair Haxorus",
+   "icons": [
+    "dragonair",
+    "haxorus"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 3,
+   "losses": 13,
+   "ties": 0,
+   "n": 16,
+   "winrate": 18.8,
+   "wilsonLo": 6.6,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-mega-sableye-ex-b3b",
+   "name": "Team Rocket's Weezing ex Mega Sableye ex",
+   "icons": [
+    "weezing",
+    "sableye-mega"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 5,
+   "losses": 11,
+   "ties": 0,
+   "n": 16,
+   "winrate": 31.3,
+   "wilsonLo": 14.2,
+   "tier": "?"
+  },
+  {
+   "id": "mega-charizard-y-ex-b1a-team-rockets-moltres-ex-b4a",
+   "name": "Mega Charizard Y ex Team Rocket's Moltres ex",
+   "icons": [
+    "charizard-mega-y",
+    "moltres"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 3,
+   "losses": 14,
+   "ties": 0,
+   "n": 17,
+   "winrate": 17.6,
+   "wilsonLo": 6.2,
+   "tier": "?"
+  },
+  {
+   "id": "blacephalon-ex-b2",
+   "name": "Blacephalon ex",
+   "icons": [
+    "blacephalon"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 7,
+   "losses": 11,
+   "ties": 0,
+   "n": 18,
+   "winrate": 38.9,
+   "wilsonLo": 20.3,
+   "tier": "?"
+  },
+  {
+   "id": "mega-kangaskhan-ex-b2",
+   "name": "Mega Kangaskhan ex",
+   "icons": [
+    "kangaskhan-mega"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 4,
+   "losses": 7,
+   "ties": 0,
+   "n": 11,
+   "winrate": 36.4,
+   "wilsonLo": 15.2,
+   "tier": "?"
+  },
+  {
+   "id": "mega-kangaskhan-ex-b2-zeraora-a3a",
+   "name": "Mega Kangaskhan ex Zeraora",
+   "icons": [
+    "kangaskhan-mega",
+    "zeraora"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 8,
+   "losses": 9,
+   "ties": 2,
+   "n": 17,
+   "winrate": 47.1,
+   "wilsonLo": 26.2,
+   "tier": "?"
+  },
+  {
+   "id": "mega-houndoom-ex-p-b-castform-sunny-form-b3",
+   "name": "Mega Houndoom ex Castform Sunny Form",
+   "icons": [
+    "houndoom-mega",
+    "castform-sunny"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 6,
+   "losses": 10,
+   "ties": 0,
+   "n": 16,
+   "winrate": 37.5,
+   "wilsonLo": 18.5,
+   "tier": "?"
+  },
+  {
+   "id": "magnezone-b1a-heliolisk-b4",
+   "name": "Magnezone Heliolisk",
+   "icons": [
+    "magnezone",
+    "heliolisk"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 8,
+   "losses": 12,
+   "ties": 0,
+   "n": 20,
+   "winrate": 40,
+   "wilsonLo": 21.9,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sceptile-ex-b3",
+   "name": "Mega Sceptile ex",
+   "icons": [
+    "sceptile-mega"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 6,
+   "losses": 12,
+   "ties": 1,
+   "n": 18,
+   "winrate": 33.3,
+   "wilsonLo": 16.3,
+   "tier": "?"
+  },
+  {
+   "id": "espeon-ex-a4-giratina-ex-a2b",
+   "name": "Espeon ex Giratina ex",
+   "icons": [
+    "espeon",
+    "giratina"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 19,
+   "losses": 11,
+   "ties": 1,
+   "n": 30,
+   "winrate": 63.3,
+   "wilsonLo": 45.5,
+   "tier": "D"
+  },
+  {
+   "id": "rotom-ex-b4-zeraora-a3a",
+   "name": "Rotom ex Zeraora",
+   "icons": [
+    "rotom",
+    "zeraora"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 9,
+   "losses": 9,
+   "ties": 1,
+   "n": 18,
+   "winrate": 50,
+   "wilsonLo": 29,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-hydreigon-b1",
+   "name": "Team Rocket's Weezing ex Hydreigon",
+   "icons": [
+    "weezing",
+    "hydreigon"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 11,
+   "losses": 13,
+   "ties": 0,
+   "n": 24,
+   "winrate": 45.8,
+   "wilsonLo": 27.9,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-crawdaunt-a4",
+   "name": "Team Rocket's Raticate ex Crawdaunt",
+   "icons": [
+    "raticate",
+    "crawdaunt"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 2,
+   "losses": 11,
+   "ties": 0,
+   "n": 13,
+   "winrate": 15.4,
+   "wilsonLo": 4.3,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-slowking-ex-b4a-indeedee-ex-b1",
+   "name": "Team Rocket's Slowking ex Indeedee ex",
+   "icons": [
+    "slowking",
+    "indeedee"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 11,
+   "losses": 13,
+   "ties": 1,
+   "n": 24,
+   "winrate": 45.8,
+   "wilsonLo": 27.9,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-a2",
+   "name": "Garchomp",
+   "icons": [
+    "garchomp"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 8,
+   "losses": 11,
+   "ties": 1,
+   "n": 19,
+   "winrate": 42.1,
+   "wilsonLo": 23.1,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-darkrai-ex-a2",
+   "name": "Team Rocket's Weezing ex Darkrai ex",
+   "icons": [
+    "weezing",
+    "darkrai"
+   ],
+   "count": 4,
+   "share": 0.07,
+   "wins": 5,
+   "losses": 8,
+   "ties": 0,
+   "n": 13,
+   "winrate": 38.5,
+   "wilsonLo": 17.7,
+   "tier": "?"
+  },
+  {
+   "id": "luxray-a2-sylveon-b3b",
+   "name": "Luxray Sylveon",
+   "icons": [
+    "luxray",
+    "sylveon"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 17,
+   "losses": 9,
+   "ties": 0,
+   "n": 26,
+   "winrate": 65.4,
+   "wilsonLo": 46.2,
+   "tier": "?"
+  },
+  {
+   "id": "glimmora-kingambit-b3a",
+   "name": "Glimmora Kingambit",
+   "icons": [
+    "glimmora",
+    "kingambit"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 12,
+   "losses": 6,
+   "ties": 4,
+   "n": 18,
+   "winrate": 66.7,
+   "wilsonLo": 43.7,
+   "tier": "?"
+  },
+  {
+   "id": "dragonite-ex-a3b",
+   "name": "Dragonite ex",
+   "icons": [
+    "dragonite"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 10,
+   "losses": 9,
+   "ties": 0,
+   "n": 19,
+   "winrate": 52.6,
+   "wilsonLo": 31.7,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-articuno-ex-b4a-articuno-ex-a1",
+   "name": "Team Rocket's Articuno ex Articuno ex",
+   "icons": [
+    "articuno",
+    "articuno"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 8,
+   "losses": 10,
+   "ties": 0,
+   "n": 18,
+   "winrate": 44.4,
+   "wilsonLo": 24.6,
+   "tier": "?"
+  },
+  {
+   "id": "hisuian-goodra-b3b",
+   "name": "Hisuian Goodra",
+   "icons": [
+    "goodra-hisui"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 5,
+   "losses": 8,
+   "ties": 2,
+   "n": 13,
+   "winrate": 38.5,
+   "wilsonLo": 17.7,
+   "tier": "?"
+  },
+  {
+   "id": "serperior-a1a-teal-mask-ogerpon-ex-b2",
+   "name": "Serperior Teal Mask Ogerpon ex",
+   "icons": [
+    "serperior",
+    "ogerpon"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 6,
+   "losses": 9,
+   "ties": 0,
+   "n": 15,
+   "winrate": 40,
+   "wilsonLo": 19.8,
+   "tier": "?"
+  },
+  {
+   "id": "luxray-b4-team-rockets-electrode-b4a",
+   "name": "Luxray Team Rocket's Electrode",
+   "icons": [
+    "luxray",
+    "electrode"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 3,
+   "losses": 9,
+   "ties": 0,
+   "n": 12,
+   "winrate": 25,
+   "wilsonLo": 8.9,
+   "tier": "?"
+  },
+  {
+   "id": "decidueye-ex-a3-pheromosa-a3a",
+   "name": "Decidueye ex Pheromosa",
+   "icons": [
+    "decidueye",
+    "pheromosa"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 1,
+   "losses": 8,
+   "ties": 0,
+   "n": 9,
+   "winrate": 11.1,
+   "wilsonLo": 2,
+   "tier": "?"
+  },
+  {
+   "id": "dragonite-ex-a3b-walking-wake-b3a",
+   "name": "Dragonite ex Walking Wake",
+   "icons": [
+    "dragonite",
+    "walking-wake"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 6,
+   "losses": 11,
+   "ties": 0,
+   "n": 17,
+   "winrate": 35.3,
+   "wilsonLo": 17.3,
+   "tier": "?"
+  },
+  {
+   "id": "dragonair-b4-garchomp-b4a",
+   "name": "Dragonair Garchomp",
+   "icons": [
+    "dragonair",
+    "garchomp"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 5,
+   "losses": 9,
+   "ties": 0,
+   "n": 14,
+   "winrate": 35.7,
+   "wilsonLo": 16.3,
+   "tier": "?"
+  },
+  {
+   "id": "greninja-a1-team-rockets-zapdos-ex-b4a",
+   "name": "Greninja Team Rocket's Zapdos ex",
+   "icons": [
+    "greninja",
+    "zapdos"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 5,
+   "losses": 9,
+   "ties": 0,
+   "n": 14,
+   "winrate": 35.7,
+   "wilsonLo": 16.3,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sceptile-ex-b3-shuckle-ex-a4",
+   "name": "Mega Sceptile ex Shuckle ex",
+   "icons": [
+    "sceptile-mega",
+    "shuckle"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 7,
+   "losses": 9,
+   "ties": 0,
+   "n": 16,
+   "winrate": 43.8,
+   "wilsonLo": 23.1,
+   "tier": "?"
+  },
+  {
+   "id": "sylveon-b3b-snorlax-ex-a3b",
+   "name": "Sylveon Snorlax ex",
+   "icons": [
+    "sylveon",
+    "snorlax"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 2,
+   "losses": 6,
+   "ties": 1,
+   "n": 8,
+   "winrate": 25,
+   "wilsonLo": 7.1,
+   "tier": "?"
+  },
+  {
+   "id": "bellibolt-ex-b2a-zeraora-a3a",
+   "name": "Bellibolt ex Zeraora",
+   "icons": [
+    "bellibolt",
+    "zeraora"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 4,
+   "losses": 8,
+   "ties": 0,
+   "n": 12,
+   "winrate": 33.3,
+   "wilsonLo": 13.8,
+   "tier": "?"
+  },
+  {
+   "id": "wishiwashi-ex-a3-indeedee-ex-b1",
+   "name": "Wishiwashi ex Indeedee ex",
+   "icons": [
+    "wishiwashi-school",
+    "indeedee"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 4,
+   "losses": 5,
+   "ties": 2,
+   "n": 9,
+   "winrate": 44.4,
+   "wilsonLo": 18.9,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lucario-ex-b3-teal-mask-ogerpon-ex-b2",
+   "name": "Mega Lucario ex Teal Mask Ogerpon ex",
+   "icons": [
+    "lucario-mega",
+    "ogerpon"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 8,
+   "losses": 9,
+   "ties": 0,
+   "n": 17,
+   "winrate": 47.1,
+   "wilsonLo": 26.2,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-porygon-z-a2",
+   "name": "Team Rocket's Raticate ex Porygon-Z",
+   "icons": [
+    "raticate",
+    "porygon-z"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 9,
+   "losses": 12,
+   "ties": 0,
+   "n": 21,
+   "winrate": 42.9,
+   "wilsonLo": 24.5,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lopunny-ex-b1a",
+   "name": "Mega Lopunny ex",
+   "icons": [
+    "lopunny-mega"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 10,
+   "losses": 7,
+   "ties": 0,
+   "n": 17,
+   "winrate": 58.8,
+   "wilsonLo": 36,
+   "tier": "?"
+  },
+  {
+   "id": "jolteon-ex-b1-mega-manectric-ex-b2b",
+   "name": "Jolteon ex Mega Manectric ex",
+   "icons": [
+    "jolteon",
+    "manectric-mega"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 7,
+   "losses": 7,
+   "ties": 1,
+   "n": 14,
+   "winrate": 50,
+   "wilsonLo": 26.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-altaria-ex-b1-team-rockets-hypno-b4a",
+   "name": "Mega Altaria ex Team Rocket's Hypno",
+   "icons": [
+    "altaria-mega",
+    "hypno"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 12,
+   "losses": 10,
+   "ties": 0,
+   "n": 22,
+   "winrate": 54.5,
+   "wilsonLo": 34.7,
+   "tier": "?"
+  },
+  {
+   "id": "mega-altaria-ex-b1-wynaut-b4",
+   "name": "Mega Altaria ex Wynaut",
+   "icons": [
+    "altaria-mega",
+    "wynaut"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 3,
+   "losses": 11,
+   "ties": 0,
+   "n": 14,
+   "winrate": 21.4,
+   "wilsonLo": 7.6,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-tinkaton-b4a-wynaut-b4",
+   "name": "Team Rocket's Tinkaton Wynaut",
+   "icons": [
+    "tinkaton",
+    "wynaut"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 8,
+   "losses": 5,
+   "ties": 2,
+   "n": 13,
+   "winrate": 61.5,
+   "wilsonLo": 35.5,
+   "tier": "?"
+  },
+  {
+   "id": "milotic-ex-b3b-vaporeon-ex-b3",
+   "name": "Milotic ex Vaporeon ex",
+   "icons": [
+    "milotic",
+    "vaporeon"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 7,
+   "losses": 8,
+   "ties": 0,
+   "n": 15,
+   "winrate": 46.7,
+   "wilsonLo": 24.8,
+   "tier": "?"
+  },
+  {
+   "id": "espeon-ex-a4-sylveon-ex-a3b",
+   "name": "Espeon ex Sylveon ex",
+   "icons": [
+    "espeon",
+    "sylveon"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 13,
+   "losses": 9,
+   "ties": 0,
+   "n": 22,
+   "winrate": 59.1,
+   "wilsonLo": 38.7,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-paldean-clodsire-ex-a2b",
+   "name": "Team Rocket's Weezing ex Paldean Clodsire ex",
+   "icons": [
+    "weezing",
+    "clodsire"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 6,
+   "losses": 7,
+   "ties": 0,
+   "n": 13,
+   "winrate": 46.2,
+   "wilsonLo": 23.2,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-guzzlord-ex-a3a",
+   "name": "Team Rocket's Raticate ex Guzzlord ex",
+   "icons": [
+    "raticate",
+    "guzzlord"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 7,
+   "losses": 12,
+   "ties": 0,
+   "n": 19,
+   "winrate": 36.8,
+   "wilsonLo": 19.1,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-b4a-chien-pao-ex-b2a",
+   "name": "Garchomp Chien-Pao ex",
+   "icons": [
+    "garchomp",
+    "chien-pao"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 3,
+   "losses": 11,
+   "ties": 0,
+   "n": 14,
+   "winrate": 21.4,
+   "wilsonLo": 7.6,
+   "tier": "?"
+  },
+  {
+   "id": "alolan-ninetales-ex-b2-wugtrio-ex-a2b",
+   "name": "Alolan Ninetales ex Wugtrio ex",
+   "icons": [
+    "ninetales-alola",
+    "wugtrio"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 1,
+   "losses": 18,
+   "ties": 0,
+   "n": 19,
+   "winrate": 5.3,
+   "wilsonLo": 0.9,
+   "tier": "?"
+  },
+  {
+   "id": "mega-scizor-ex-revavroom-b2b",
+   "name": "Mega Scizor ex Revavroom",
+   "icons": [
+    "scizor-mega",
+    "revavroom"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 9,
+   "losses": 8,
+   "ties": 1,
+   "n": 17,
+   "winrate": 52.9,
+   "wilsonLo": 31,
+   "tier": "?"
+  },
+  {
+   "id": "banette-a3-gholdengo-b4a",
+   "name": "Banette Gholdengo",
+   "icons": [
+    "banette",
+    "gholdengo"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 4,
+   "losses": 8,
+   "ties": 0,
+   "n": 12,
+   "winrate": 33.3,
+   "wilsonLo": 13.8,
+   "tier": "?"
+  },
+  {
+   "id": "greninja-a1-mega-kangaskhan-ex-b2",
+   "name": "Greninja Mega Kangaskhan ex",
+   "icons": [
+    "greninja",
+    "kangaskhan-mega"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 7,
+   "losses": 10,
+   "ties": 0,
+   "n": 17,
+   "winrate": 41.2,
+   "wilsonLo": 21.6,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-slowking-ex-b4a-giratina-ex-a2b",
+   "name": "Team Rocket's Slowking ex Giratina ex",
+   "icons": [
+    "slowking",
+    "giratina"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 6,
+   "losses": 7,
+   "ties": 0,
+   "n": 13,
+   "winrate": 46.2,
+   "wilsonLo": 23.2,
+   "tier": "?"
+  },
+  {
+   "id": "serperior-b4a-teal-mask-ogerpon-ex-b2",
+   "name": "Serperior Teal Mask Ogerpon ex",
+   "icons": [
+    "serperior",
+    "ogerpon"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 5,
+   "losses": 7,
+   "ties": 0,
+   "n": 12,
+   "winrate": 41.7,
+   "wilsonLo": 19.3,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-teal-mask-ogerpon-ex-b2",
+   "name": "Team Rocket's Weezing ex Teal Mask Ogerpon ex",
+   "icons": [
+    "weezing",
+    "ogerpon"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 4,
+   "losses": 8,
+   "ties": 1,
+   "n": 12,
+   "winrate": 33.3,
+   "wilsonLo": 13.8,
+   "tier": "?"
+  },
+  {
+   "id": "milotic-ex-b3b-mega-sharpedo-ex-b4",
+   "name": "Milotic ex Mega Sharpedo ex",
+   "icons": [
+    "milotic",
+    "sharpedo-mega"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 7,
+   "losses": 12,
+   "ties": 0,
+   "n": 19,
+   "winrate": 36.8,
+   "wilsonLo": 19.1,
+   "tier": "?"
+  },
+  {
+   "id": "decidueye-ex-a3-ariados-b1a",
+   "name": "Decidueye ex Ariados",
+   "icons": [
+    "decidueye",
+    "ariados"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 1,
+   "losses": 16,
+   "ties": 0,
+   "n": 17,
+   "winrate": 5.9,
+   "wilsonLo": 1,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-articuno-ex-b4a-froslass-b3b",
+   "name": "Team Rocket's Articuno ex Froslass",
+   "icons": [
+    "articuno",
+    "froslass"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 7,
+   "losses": 8,
+   "ties": 0,
+   "n": 15,
+   "winrate": 46.7,
+   "wilsonLo": 24.8,
+   "tier": "?"
+  },
+  {
+   "id": "leafeon-ex-a2a-serperior-b4a",
+   "name": "Leafeon ex Serperior",
+   "icons": [
+    "leafeon",
+    "serperior"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 4,
+   "losses": 7,
+   "ties": 0,
+   "n": 11,
+   "winrate": 36.4,
+   "wilsonLo": 15.2,
+   "tier": "?"
+  },
+  {
+   "id": "leafeon-ex-a2a-serperior-a1a",
+   "name": "Leafeon ex Serperior",
+   "icons": [
+    "leafeon",
+    "serperior"
+   ],
+   "count": 3,
+   "share": 0.06,
+   "wins": 1,
+   "losses": 6,
+   "ties": 0,
+   "n": 7,
+   "winrate": 14.3,
+   "wilsonLo": 2.6,
+   "tier": "?"
+  },
+  {
+   "id": "vaporeon-ex-b3-milotic-ex-b3b",
+   "name": "Vaporeon ex Milotic ex",
+   "icons": [
+    "vaporeon",
+    "milotic"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 6,
+   "ties": 0,
+   "n": 10,
+   "winrate": 40,
+   "wilsonLo": 16.8,
+   "tier": "?"
+  },
+  {
+   "id": "gholdengo-ex-b2a-dialga-ex-a2",
+   "name": "Gholdengo ex Dialga ex",
+   "icons": [
+    "gholdengo",
+    "dialga"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 5,
+   "losses": 8,
+   "ties": 0,
+   "n": 13,
+   "winrate": 38.5,
+   "wilsonLo": 17.7,
+   "tier": "?"
+  },
+  {
+   "id": "ho-oh-ex-lugia-ex-a4",
+   "name": "Ho-Oh ex Lugia ex",
+   "icons": [
+    "ho-oh",
+    "lugia"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "koraidon-ex-b3a-furfrou-b4a",
+   "name": "Koraidon ex Furfrou",
+   "icons": [
+    "koraidon",
+    "furfrou"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 7,
+   "losses": 5,
+   "ties": 0,
+   "n": 12,
+   "winrate": 58.3,
+   "wilsonLo": 32,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lopunny-ex-b1a-greninja-a1",
+   "name": "Mega Lopunny ex Greninja",
+   "icons": [
+    "lopunny-mega",
+    "greninja"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 10,
+   "ties": 0,
+   "n": 14,
+   "winrate": 28.6,
+   "wilsonLo": 11.7,
+   "tier": "?"
+  },
+  {
+   "id": "decidueye-ex-a3-decidueye-a3a",
+   "name": "Decidueye ex Decidueye",
+   "icons": [
+    "decidueye",
+    "decidueye"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 6,
+   "losses": 5,
+   "ties": 2,
+   "n": 11,
+   "winrate": 54.5,
+   "wilsonLo": 28,
+   "tier": "?"
+  },
+  {
+   "id": "mega-charizard-x-ex-b2b-entei-ex-a4a",
+   "name": "Mega Charizard X ex Entei ex",
+   "icons": [
+    "charizard-mega-x",
+    "entei"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 6,
+   "ties": 0,
+   "n": 10,
+   "winrate": 40,
+   "wilsonLo": 16.8,
+   "tier": "?"
+  },
+  {
+   "id": "dragonite-ex-a3b-dragonite-a1",
+   "name": "Dragonite ex Dragonite",
+   "icons": [
+    "dragonite",
+    "dragonite"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 7,
+   "ties": 0,
+   "n": 10,
+   "winrate": 30,
+   "wilsonLo": 10.8,
+   "tier": "?"
+  },
+  {
+   "id": "togekiss-a4-meowth-b2",
+   "name": "Togekiss Meowth",
+   "icons": [
+    "togekiss",
+    "meowth"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 6,
+   "losses": 5,
+   "ties": 0,
+   "n": 11,
+   "winrate": 54.5,
+   "wilsonLo": 28,
+   "tier": "?"
+  },
+  {
+   "id": "samurott-b4-greninja-a1",
+   "name": "Samurott Greninja",
+   "icons": [
+    "samurott",
+    "greninja"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 12,
+   "ties": 0,
+   "n": 13,
+   "winrate": 7.7,
+   "wilsonLo": 1.4,
+   "tier": "?"
+  },
+  {
+   "id": "magnezone-ex-b3-magnezone-a2",
+   "name": "Magnezone ex Magnezone",
+   "icons": [
+    "magnezone",
+    "magnezone"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 0,
+   "losses": 8,
+   "ties": 0,
+   "n": 8,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gardevoir-ex-b2-giratina-ex-a2b",
+   "name": "Mega Gardevoir ex Giratina ex",
+   "icons": [
+    "gardevoir-mega",
+    "giratina"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 5,
+   "ties": 0,
+   "n": 8,
+   "winrate": 37.5,
+   "wilsonLo": 13.7,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sharpedo-ex-b4-gyarados-ex-a1a",
+   "name": "Mega Sharpedo ex Gyarados ex",
+   "icons": [
+    "sharpedo-mega",
+    "gyarados"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 7,
+   "ties": 0,
+   "n": 8,
+   "winrate": 12.5,
+   "wilsonLo": 2.2,
+   "tier": "?"
+  },
+  {
+   "id": "greninja-a1-mega-sableye-ex-b3b",
+   "name": "Greninja Mega Sableye ex",
+   "icons": [
+    "greninja",
+    "sableye-mega"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 6,
+   "ties": 0,
+   "n": 10,
+   "winrate": 40,
+   "wilsonLo": 16.8,
+   "tier": "?"
+  },
+  {
+   "id": "arceus-ex-a2a-pichu-a4",
+   "name": "Arceus ex Pichu",
+   "icons": [
+    "arceus",
+    "pichu"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 0,
+   "losses": 4,
+   "ties": 0,
+   "n": 4,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "greninja-a1-decidueye-ex-a3",
+   "name": "Greninja Decidueye ex",
+   "icons": [
+    "greninja",
+    "decidueye"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 5,
+   "losses": 5,
+   "ties": 0,
+   "n": 10,
+   "winrate": 50,
+   "wilsonLo": 23.7,
+   "tier": "?"
+  },
+  {
+   "id": "arceus-ex-crobat-a2a",
+   "name": "Arceus ex Crobat",
+   "icons": [
+    "arceus",
+    "crobat"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 6,
+   "losses": 7,
+   "ties": 0,
+   "n": 13,
+   "winrate": 46.2,
+   "wilsonLo": 23.2,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-slowking-ex-b4a-unown-a4",
+   "name": "Team Rocket's Slowking ex Unown",
+   "icons": [
+    "slowking",
+    "unown"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 5,
+   "losses": 8,
+   "ties": 0,
+   "n": 13,
+   "winrate": 38.5,
+   "wilsonLo": 17.7,
+   "tier": "?"
+  },
+  {
+   "id": "flygon-ex-b3-dragonair-b4",
+   "name": "Flygon ex Dragonair",
+   "icons": [
+    "flygon",
+    "dragonair"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 6,
+   "ties": 0,
+   "n": 10,
+   "winrate": 40,
+   "wilsonLo": 16.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sharpedo-ex-b4-mega-gyarados-ex-b1",
+   "name": "Mega Sharpedo ex Mega Gyarados ex",
+   "icons": [
+    "sharpedo-mega",
+    "gyarados-mega"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 6,
+   "losses": 8,
+   "ties": 0,
+   "n": 14,
+   "winrate": 42.9,
+   "wilsonLo": 21.4,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-galarian-obstagoon-b2",
+   "name": "Team Rocket's Weezing ex Galarian Obstagoon",
+   "icons": [
+    "weezing",
+    "obstagoon"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 9,
+   "ties": 0,
+   "n": 12,
+   "winrate": 25,
+   "wilsonLo": 8.9,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-hoopa-ex-b4",
+   "name": "Team Rocket's Raticate ex Hoopa ex",
+   "icons": [
+    "raticate",
+    "hoopa-unbound"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 7,
+   "losses": 6,
+   "ties": 1,
+   "n": 13,
+   "winrate": 53.8,
+   "wilsonLo": 29.1,
+   "tier": "?"
+  },
+  {
+   "id": "indeedee-ex-b1-dedenne-ex-b3b",
+   "name": "Indeedee ex Dedenne ex",
+   "icons": [
+    "indeedee",
+    "dedenne"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 5,
+   "losses": 3,
+   "ties": 0,
+   "n": 8,
+   "winrate": 62.5,
+   "wilsonLo": 30.6,
+   "tier": "?"
+  },
+  {
+   "id": "snorlax-ex-a3b-sylveon-b3b",
+   "name": "Snorlax ex Sylveon",
+   "icons": [
+    "snorlax",
+    "sylveon"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 6,
+   "ties": 0,
+   "n": 10,
+   "winrate": 40,
+   "wilsonLo": 16.8,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-banette-a3",
+   "name": "Team Rocket's Raticate ex Banette",
+   "icons": [
+    "raticate",
+    "banette"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 7,
+   "ties": 0,
+   "n": 11,
+   "winrate": 36.4,
+   "wilsonLo": 15.2,
+   "tier": "?"
+  },
+  {
+   "id": "serperior-b4a-shaymin-a2",
+   "name": "Serperior Shaymin",
+   "icons": [
+    "serperior",
+    "shaymin"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 0,
+   "losses": 9,
+   "ties": 0,
+   "n": 9,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "porygon-z-rampardos-a2",
+   "name": "Porygon-Z Rampardos",
+   "icons": [
+    "porygon-z",
+    "rampardos"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 4,
+   "ties": 0,
+   "n": 8,
+   "winrate": 50,
+   "wilsonLo": 21.5,
+   "tier": "?"
+  },
+  {
+   "id": "mega-metagross-ex-b4",
+   "name": "Mega Metagross ex",
+   "icons": [
+    "metagross-mega"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "crobat-ex-a4-weezing-a1",
+   "name": "Crobat ex Weezing",
+   "icons": [
+    "crobat",
+    "weezing"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 7,
+   "ties": 0,
+   "n": 8,
+   "winrate": 12.5,
+   "wilsonLo": 2.2,
+   "tier": "?"
+  },
+  {
+   "id": "aerodactyl-ex-a1a-rampardos-a2",
+   "name": "Aerodactyl ex Rampardos",
+   "icons": [
+    "aerodactyl",
+    "rampardos"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-dustox-b4",
+   "name": "Team Rocket's Weezing ex Dustox",
+   "icons": [
+    "weezing",
+    "dustox"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 2,
+   "losses": 6,
+   "ties": 0,
+   "n": 8,
+   "winrate": 25,
+   "wilsonLo": 7.1,
+   "tier": "?"
+  },
+  {
+   "id": "toxtricity-ex-b2-heliolisk-b4",
+   "name": "Toxtricity ex Heliolisk",
+   "icons": [
+    "toxtricity",
+    "heliolisk"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 6,
+   "losses": 9,
+   "ties": 0,
+   "n": 15,
+   "winrate": 40,
+   "wilsonLo": 19.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-altaria-ex-b1-bonsly-b3",
+   "name": "Mega Altaria ex Bonsly",
+   "icons": [
+    "altaria-mega",
+    "bonsly"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 5,
+   "losses": 6,
+   "ties": 0,
+   "n": 11,
+   "winrate": 45.5,
+   "wilsonLo": 21.3,
+   "tier": "?"
+  },
+  {
+   "id": "meowscarada-ex-b2a-teal-mask-ogerpon-ex-b2",
+   "name": "Meowscarada ex Teal Mask Ogerpon ex",
+   "icons": [
+    "meowscarada",
+    "ogerpon"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 5,
+   "losses": 6,
+   "ties": 0,
+   "n": 11,
+   "winrate": 45.5,
+   "wilsonLo": 21.3,
+   "tier": "?"
+  },
+  {
+   "id": "milotic-ex-b3b-mega-gyarados-ex-b1",
+   "name": "Milotic ex Mega Gyarados ex",
+   "icons": [
+    "milotic",
+    "gyarados-mega"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 9,
+   "ties": 0,
+   "n": 12,
+   "winrate": 25,
+   "wilsonLo": 8.9,
+   "tier": "?"
+  },
+  {
+   "id": "milotic-ex-b3b-team-rockets-articuno-ex-b4a",
+   "name": "Milotic ex Team Rocket's Articuno ex",
+   "icons": [
+    "milotic",
+    "articuno"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 5,
+   "ties": 0,
+   "n": 6,
+   "winrate": 16.7,
+   "wilsonLo": 3,
+   "tier": "?"
+  },
+  {
+   "id": "mega-blaziken-ex-blaziken-b1",
+   "name": "Mega Blaziken ex Blaziken",
+   "icons": [
+    "blaziken-mega",
+    "blaziken"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 4,
+   "ties": 0,
+   "n": 5,
+   "winrate": 20,
+   "wilsonLo": 3.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lucario-ex-b3-palossand-b3b",
+   "name": "Mega Lucario ex Palossand",
+   "icons": [
+    "lucario-mega",
+    "palossand"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 5,
+   "ties": 0,
+   "n": 8,
+   "winrate": 37.5,
+   "wilsonLo": 13.7,
+   "tier": "?"
+  },
+  {
+   "id": "mega-houndoom-ex-p-b-turtonator-a3",
+   "name": "Mega Houndoom ex Turtonator",
+   "icons": [
+    "houndoom-mega",
+    "turtonator"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 10,
+   "ties": 0,
+   "n": 11,
+   "winrate": 9.1,
+   "wilsonLo": 1.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lucario-ex-b3-excadrill-b4",
+   "name": "Mega Lucario ex Excadrill",
+   "icons": [
+    "lucario-mega",
+    "excadrill"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 0,
+   "losses": 4,
+   "ties": 0,
+   "n": 4,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sharpedo-ex-b4-suicune-ex-a4a",
+   "name": "Mega Sharpedo ex Suicune ex",
+   "icons": [
+    "sharpedo-mega",
+    "suicune"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 7,
+   "ties": 0,
+   "n": 10,
+   "winrate": 30,
+   "wilsonLo": 10.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-rayquaza-ex-dragonair-b4",
+   "name": "Mega Rayquaza ex Dragonair",
+   "icons": [
+    "rayquaza-mega",
+    "dragonair"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 5,
+   "ties": 0,
+   "n": 8,
+   "winrate": 37.5,
+   "wilsonLo": 13.7,
+   "tier": "?"
+  },
+  {
+   "id": "flygon-ex-b3-teal-mask-ogerpon-ex-b2",
+   "name": "Flygon ex Teal Mask Ogerpon ex",
+   "icons": [
+    "flygon",
+    "ogerpon"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 6,
+   "losses": 5,
+   "ties": 1,
+   "n": 11,
+   "winrate": 54.5,
+   "wilsonLo": 28,
+   "tier": "?"
+  },
+  {
+   "id": "decidueye-ex-a3-spiritomb-a2",
+   "name": "Decidueye ex Spiritomb",
+   "icons": [
+    "decidueye",
+    "spiritomb"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 2,
+   "losses": 6,
+   "ties": 0,
+   "n": 8,
+   "winrate": 25,
+   "wilsonLo": 7.1,
+   "tier": "?"
+  },
+  {
+   "id": "milotic-ex-b3b-garchomp-a2",
+   "name": "Milotic ex Garchomp",
+   "icons": [
+    "milotic",
+    "garchomp"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 5,
+   "ties": 0,
+   "n": 9,
+   "winrate": 44.4,
+   "wilsonLo": 18.9,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sceptile-ex-b3-pheromosa-a3a",
+   "name": "Mega Sceptile ex Pheromosa",
+   "icons": [
+    "sceptile-mega",
+    "pheromosa"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 0,
+   "losses": 8,
+   "ties": 0,
+   "n": 8,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "entei-ex-a4a-delphox-b4a",
+   "name": "Entei ex Delphox",
+   "icons": [
+    "entei",
+    "delphox"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 5,
+   "ties": 0,
+   "n": 8,
+   "winrate": 37.5,
+   "wilsonLo": 13.7,
+   "tier": "?"
+  },
+  {
+   "id": "hoopa-ex-b4-galarian-obstagoon-b2",
+   "name": "Hoopa ex Galarian Obstagoon",
+   "icons": [
+    "hoopa-unbound",
+    "obstagoon"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 6,
+   "ties": 0,
+   "n": 7,
+   "winrate": 14.3,
+   "wilsonLo": 2.6,
+   "tier": "?"
+  },
+  {
+   "id": "milotic-ex-b3b-palkia-ex-a2",
+   "name": "Milotic ex Palkia ex",
+   "icons": [
+    "milotic",
+    "palkia"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 9,
+   "losses": 6,
+   "ties": 0,
+   "n": 15,
+   "winrate": 60,
+   "wilsonLo": 35.7,
+   "tier": "?"
+  },
+  {
+   "id": "magneton-a1-lugia-ex-a4",
+   "name": "Magneton Lugia ex",
+   "icons": [
+    "magneton",
+    "lugia"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 6,
+   "ties": 0,
+   "n": 7,
+   "winrate": 14.3,
+   "wilsonLo": 2.6,
+   "tier": "?"
+  },
+  {
+   "id": "jolteon-ex-b1-jolteon-a3b",
+   "name": "Jolteon ex Jolteon",
+   "icons": [
+    "jolteon",
+    "jolteon"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 5,
+   "ties": 0,
+   "n": 8,
+   "winrate": 37.5,
+   "wilsonLo": 13.7,
+   "tier": "?"
+  },
+  {
+   "id": "mega-medicham-ex-p-b",
+   "name": "Mega Medicham ex",
+   "icons": [
+    "medicham-mega"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 6,
+   "losses": 4,
+   "ties": 2,
+   "n": 10,
+   "winrate": 60,
+   "wilsonLo": 31.3,
+   "tier": "?"
+  },
+  {
+   "id": "luxray-a2-zeraora-a3a",
+   "name": "Luxray Zeraora",
+   "icons": [
+    "luxray",
+    "zeraora"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 5,
+   "ties": 0,
+   "n": 9,
+   "winrate": 44.4,
+   "wilsonLo": 18.9,
+   "tier": "?"
+  },
+  {
+   "id": "mega-blaziken-ex-b1-team-rockets-moltres-ex-b4a",
+   "name": "Mega Blaziken ex Team Rocket's Moltres ex",
+   "icons": [
+    "blaziken-mega",
+    "moltres"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 0,
+   "losses": 4,
+   "ties": 0,
+   "n": 4,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lopunny-ex-b1a-teal-mask-ogerpon-ex-b2",
+   "name": "Mega Lopunny ex Teal Mask Ogerpon ex",
+   "icons": [
+    "lopunny-mega",
+    "ogerpon"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 7,
+   "ties": 0,
+   "n": 11,
+   "winrate": 36.4,
+   "wilsonLo": 15.2,
+   "tier": "?"
+  },
+  {
+   "id": "serperior-b4a",
+   "name": "Serperior",
+   "icons": [
+    "serperior"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 3,
+   "ties": 1,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-b4a-snorlax-b3b",
+   "name": "Garchomp Snorlax",
+   "icons": [
+    "garchomp",
+    "snorlax"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "snorlax-ex-a3b-ho-oh-ex-a4",
+   "name": "Snorlax ex Ho-Oh ex",
+   "icons": [
+    "snorlax",
+    "ho-oh"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 2,
+   "losses": 7,
+   "ties": 0,
+   "n": 9,
+   "winrate": 22.2,
+   "wilsonLo": 6.3,
+   "tier": "?"
+  },
+  {
+   "id": "mega-manectric-ex-b2b-heliolisk-b1a",
+   "name": "Mega Manectric ex Heliolisk",
+   "icons": [
+    "manectric-mega",
+    "heliolisk"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 2,
+   "losses": 5,
+   "ties": 0,
+   "n": 7,
+   "winrate": 28.6,
+   "wilsonLo": 8.2,
+   "tier": "?"
+  },
+  {
+   "id": "mega-kangaskhan-ex-b2-tauros-ex-b1",
+   "name": "Mega Kangaskhan ex Tauros ex",
+   "icons": [
+    "kangaskhan-mega",
+    "tauros"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 8,
+   "losses": 6,
+   "ties": 1,
+   "n": 14,
+   "winrate": 57.1,
+   "wilsonLo": 32.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-audino-ex-b3-indeedee-ex-b1",
+   "name": "Mega Audino ex Indeedee ex",
+   "icons": [
+    "audino-mega",
+    "indeedee"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 10,
+   "ties": 0,
+   "n": 11,
+   "winrate": 9.1,
+   "wilsonLo": 1.6,
+   "tier": "?"
+  },
+  {
+   "id": "serperior-a1a-mega-heracross-ex-p-b",
+   "name": "Serperior Mega Heracross ex",
+   "icons": [
+    "serperior",
+    "heracross-mega"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 5,
+   "ties": 0,
+   "n": 8,
+   "winrate": 37.5,
+   "wilsonLo": 13.7,
+   "tier": "?"
+  },
+  {
+   "id": "mega-medicham-ex-p-b-spiritomb-a2",
+   "name": "Mega Medicham ex Spiritomb",
+   "icons": [
+    "medicham-mega",
+    "spiritomb"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 0,
+   "losses": 4,
+   "ties": 0,
+   "n": 4,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-charizard-y-ex-b1a-moltres-ex-a1",
+   "name": "Mega Charizard Y ex Moltres ex",
+   "icons": [
+    "charizard-mega-y",
+    "moltres"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 8,
+   "ties": 1,
+   "n": 11,
+   "winrate": 27.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "mega-blastoise-ex-b1a-zapdos-ex-a1",
+   "name": "Mega Blastoise ex Zapdos ex",
+   "icons": [
+    "blastoise-mega",
+    "zapdos"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 0,
+   "losses": 8,
+   "ties": 0,
+   "n": 8,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sceptile-ex-b3-butterfree-b3b",
+   "name": "Mega Sceptile ex Butterfree",
+   "icons": [
+    "sceptile-mega",
+    "butterfree"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "magnezone-ex-b3-miraidon-ex-b3a",
+   "name": "Magnezone ex Miraidon ex",
+   "icons": [
+    "magnezone",
+    "miraidon"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 6,
+   "ties": 0,
+   "n": 10,
+   "winrate": 40,
+   "wilsonLo": 16.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gyarados-ex-b1-articuno-ex-a1",
+   "name": "Mega Gyarados ex Articuno ex",
+   "icons": [
+    "gyarados-mega",
+    "articuno"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 7,
+   "ties": 0,
+   "n": 10,
+   "winrate": 30,
+   "wilsonLo": 10.8,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-suicune-ex-a4a",
+   "name": "Team Rocket's Raticate ex Suicune ex",
+   "icons": [
+    "raticate",
+    "suicune"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 6,
+   "ties": 0,
+   "n": 10,
+   "winrate": 40,
+   "wilsonLo": 16.8,
+   "tier": "?"
+  },
+  {
+   "id": "delphox-b4a-entei-ex-a4a",
+   "name": "Delphox Entei ex",
+   "icons": [
+    "delphox",
+    "entei"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 6,
+   "ties": 0,
+   "n": 9,
+   "winrate": 33.3,
+   "wilsonLo": 12.1,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gardevoir-ex-b2-gardevoir-a1",
+   "name": "Mega Gardevoir ex Gardevoir",
+   "icons": [
+    "gardevoir-mega",
+    "gardevoir"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 5,
+   "losses": 4,
+   "ties": 0,
+   "n": 9,
+   "winrate": 55.6,
+   "wilsonLo": 26.7,
+   "tier": "?"
+  },
+  {
+   "id": "crobat-ex-a4-darkrai-ex-a2",
+   "name": "Crobat ex Darkrai ex",
+   "icons": [
+    "crobat",
+    "darkrai"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 2,
+   "losses": 8,
+   "ties": 0,
+   "n": 10,
+   "winrate": 20,
+   "wilsonLo": 5.7,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-igglybuff-a4a",
+   "name": "Team Rocket's Weezing ex Igglybuff",
+   "icons": [
+    "weezing",
+    "igglybuff"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 4,
+   "ties": 0,
+   "n": 5,
+   "winrate": 20,
+   "wilsonLo": 3.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-blastoise-ex-b1a",
+   "name": "Mega Blastoise ex",
+   "icons": [
+    "blastoise-mega"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 8,
+   "ties": 0,
+   "n": 12,
+   "winrate": 33.3,
+   "wilsonLo": 13.8,
+   "tier": "?"
+  },
+  {
+   "id": "dustox-b4-team-rockets-magmar-b4a",
+   "name": "Dustox Team Rocket's Magmar",
+   "icons": [
+    "dustox",
+    "magmar"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "flygon-ex-b3-goomy-b1",
+   "name": "Flygon ex Goomy",
+   "icons": [
+    "flygon",
+    "goomy"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 5,
+   "ties": 1,
+   "n": 9,
+   "winrate": 44.4,
+   "wilsonLo": 18.9,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-b4a-hitmontop-a4",
+   "name": "Garchomp Hitmontop",
+   "icons": [
+    "garchomp",
+    "hitmontop"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 6,
+   "losses": 7,
+   "ties": 0,
+   "n": 13,
+   "winrate": 46.2,
+   "wilsonLo": 23.2,
+   "tier": "?"
+  },
+  {
+   "id": "typhlosion-ex-b4-typhlosion-a4",
+   "name": "Typhlosion ex Typhlosion",
+   "icons": [
+    "typhlosion",
+    "typhlosion"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 2,
+   "losses": 6,
+   "ties": 0,
+   "n": 8,
+   "winrate": 25,
+   "wilsonLo": 7.1,
+   "tier": "?"
+  },
+  {
+   "id": "chandelure-b2",
+   "name": "Chandelure",
+   "icons": [
+    "chandelure"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 8,
+   "ties": 0,
+   "n": 9,
+   "winrate": 11.1,
+   "wilsonLo": 2,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-team-rockets-moltres-ex-b4a",
+   "name": "Team Rocket's Raticate ex Team Rocket's Moltres ex",
+   "icons": [
+    "raticate",
+    "moltres"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 5,
+   "ties": 0,
+   "n": 6,
+   "winrate": 16.7,
+   "wilsonLo": 3,
+   "tier": "?"
+  },
+  {
+   "id": "mega-metagross-ex-b4-orthworm-b2a",
+   "name": "Mega Metagross ex Orthworm",
+   "icons": [
+    "metagross-mega",
+    "orthworm"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 6,
+   "ties": 0,
+   "n": 7,
+   "winrate": 14.3,
+   "wilsonLo": 2.6,
+   "tier": "?"
+  },
+  {
+   "id": "solgaleo-ex-a3-snorlax-b3b",
+   "name": "Solgaleo ex Snorlax",
+   "icons": [
+    "solgaleo",
+    "snorlax"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 2,
+   "losses": 5,
+   "ties": 0,
+   "n": 7,
+   "winrate": 28.6,
+   "wilsonLo": 8.2,
+   "tier": "?"
+  },
+  {
+   "id": "mega-altaria-ex-b1-teal-mask-ogerpon-ex-b2",
+   "name": "Mega Altaria ex Teal Mask Ogerpon ex",
+   "icons": [
+    "altaria-mega",
+    "ogerpon"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 2,
+   "ties": 0,
+   "n": 5,
+   "winrate": 60,
+   "wilsonLo": 23.1,
+   "tier": "?"
+  },
+  {
+   "id": "flutter-mane-ex-b3a-greninja-a1",
+   "name": "Flutter Mane ex Greninja",
+   "icons": [
+    "flutter-mane",
+    "greninja"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 10,
+   "losses": 6,
+   "ties": 0,
+   "n": 16,
+   "winrate": 62.5,
+   "wilsonLo": 38.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-mawile-ex-b2",
+   "name": "Mega Mawile ex",
+   "icons": [
+    "mawile-mega"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 7,
+   "ties": 0,
+   "n": 11,
+   "winrate": 36.4,
+   "wilsonLo": 15.2,
+   "tier": "?"
+  },
+  {
+   "id": "pawmot-a2b",
+   "name": "Pawmot",
+   "icons": [
+    "pawmot"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 4,
+   "ties": 0,
+   "n": 8,
+   "winrate": 50,
+   "wilsonLo": 21.5,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-a2-mantyke-a4a",
+   "name": "Garchomp Mantyke",
+   "icons": [
+    "garchomp",
+    "mantyke"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 2,
+   "losses": 8,
+   "ties": 0,
+   "n": 10,
+   "winrate": 20,
+   "wilsonLo": 5.7,
+   "tier": "?"
+  },
+  {
+   "id": "mega-swampert-ex-b2-greninja-a1",
+   "name": "Mega Swampert ex Greninja",
+   "icons": [
+    "swampert-mega",
+    "greninja"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 1,
+   "losses": 4,
+   "ties": 0,
+   "n": 5,
+   "winrate": 20,
+   "wilsonLo": 3.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-kangaskhan-ex-b2-pichu-a4",
+   "name": "Mega Kangaskhan ex Pichu",
+   "icons": [
+    "kangaskhan-mega",
+    "pichu"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 0,
+   "losses": 5,
+   "ties": 0,
+   "n": 5,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "incineroar-ex-a3-mega-charizard-y-ex-b1a",
+   "name": "Incineroar ex Mega Charizard Y ex",
+   "icons": [
+    "incineroar",
+    "charizard-mega-y"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 0,
+   "losses": 9,
+   "ties": 0,
+   "n": 9,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-nihilego-a3a",
+   "name": "Team Rocket's Weezing ex Nihilego",
+   "icons": [
+    "weezing",
+    "nihilego"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 4,
+   "losses": 7,
+   "ties": 0,
+   "n": 11,
+   "winrate": 36.4,
+   "wilsonLo": 15.2,
+   "tier": "?"
+  },
+  {
+   "id": "nidoking-a1-munchlax-b3b",
+   "name": "Nidoking Munchlax",
+   "icons": [
+    "nidoking",
+    "munchlax"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 3,
+   "losses": 8,
+   "ties": 0,
+   "n": 11,
+   "winrate": 27.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "charizard-ex-a1-mega-charizard-y-ex-b1a",
+   "name": "Charizard ex Mega Charizard Y ex",
+   "icons": [
+    "charizard",
+    "charizard-mega-y"
+   ],
+   "count": 2,
+   "share": 0.04,
+   "wins": 2,
+   "losses": 8,
+   "ties": 0,
+   "n": 10,
+   "winrate": 20,
+   "wilsonLo": 5.7,
+   "tier": "?"
+  },
+  {
+   "id": "dragonite-b4-greninja-a1",
+   "name": "Dragonite Greninja",
+   "icons": [
+    "dragonite",
+    "greninja"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gardevoir-ex-b2-mewtwo-ex-a1",
+   "name": "Mega Gardevoir ex Mewtwo ex",
+   "icons": [
+    "gardevoir-mega",
+    "mewtwo"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "lilligant-b1-teal-maskogerpon-b4",
+   "name": "Lilligant Teal MaskOgerpon",
+   "icons": [
+    "lilligant",
+    null
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "leafeon-ex-a2a-giratina-ex-a2b",
+   "name": "Leafeon ex Giratina ex",
+   "icons": [
+    "leafeon",
+    "giratina"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 6,
+   "losses": 1,
+   "ties": 2,
+   "n": 7,
+   "winrate": 85.7,
+   "wilsonLo": 48.7,
+   "tier": "?"
+  },
+  {
+   "id": "flutter-mane-ex-b3a-mega-altaria-ex-b1",
+   "name": "Flutter Mane ex Mega Altaria ex",
+   "icons": [
+    "flutter-mane",
+    "altaria-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 5,
+   "losses": 3,
+   "ties": 0,
+   "n": 8,
+   "winrate": 62.5,
+   "wilsonLo": 30.6,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-b4a-cleffa-a4",
+   "name": "Garchomp Cleffa",
+   "icons": [
+    "garchomp",
+    "cleffa"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 5,
+   "losses": 3,
+   "ties": 0,
+   "n": 8,
+   "winrate": 62.5,
+   "wilsonLo": 30.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lopunny-ex-b1a-lucario-a2",
+   "name": "Mega Lopunny ex Lucario",
+   "icons": [
+    "lopunny-mega",
+    "lucario"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "buzzwole-ex-celesteela-a3a",
+   "name": "Buzzwole ex Celesteela",
+   "icons": [
+    "buzzwole",
+    "celesteela"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-steelix-ex-b1a-galarian-perrserker-b2",
+   "name": "Mega Steelix ex Galarian Perrserker",
+   "icons": [
+    "steelix-mega",
+    "perrserker"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 7,
+   "ties": 0,
+   "n": 7,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "decidueye-ex-a3-heliolisk-b4",
+   "name": "Decidueye ex Heliolisk",
+   "icons": [
+    "decidueye",
+    "heliolisk"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "magnezone-b1a-oricorio-a3",
+   "name": "Magnezone Oricorio",
+   "icons": [
+    "magnezone",
+    "oricorio-pom-pom"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "glimmora-b3a-darkrai-ex-a2",
+   "name": "Glimmora Darkrai ex",
+   "icons": [
+    "glimmora",
+    "darkrai"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-oricorio-a3",
+   "name": "Team Rocket's Weezing ex Oricorio",
+   "icons": [
+    "weezing",
+    "oricorio-pom-pom"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "tsareena-a3b-teal-mask-ogerpon-ex-b2",
+   "name": "Tsareena Teal Mask Ogerpon ex",
+   "icons": [
+    "tsareena",
+    "ogerpon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "leafeon-ex-a2a-indeedee-ex-b1",
+   "name": "Leafeon ex Indeedee ex",
+   "icons": [
+    "leafeon",
+    "indeedee"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 2,
+   "ties": 0,
+   "n": 4,
+   "winrate": 50,
+   "wilsonLo": 15,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-electrode-b4a-pawmot-b3a",
+   "name": "Team Rocket's Electrode Pawmot",
+   "icons": [
+    "electrode",
+    "pawmot"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 5,
+   "ties": 0,
+   "n": 6,
+   "winrate": 16.7,
+   "wilsonLo": 3,
+   "tier": "?"
+  },
+  {
+   "id": "indeedee-ex-b1-team-rockets-tinkaton-b4a",
+   "name": "Indeedee ex Team Rocket's Tinkaton",
+   "icons": [
+    "indeedee",
+    "tinkaton"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-venusaur-ex-b1a-venusaur-a1",
+   "name": "Mega Venusaur ex Venusaur",
+   "icons": [
+    "venusaur-mega",
+    "venusaur"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "rampardos-a2",
+   "name": "Rampardos",
+   "icons": [
+    "rampardos"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 4,
+   "ties": 0,
+   "n": 5,
+   "winrate": 20,
+   "wilsonLo": 3.6,
+   "tier": "?"
+  },
+  {
+   "id": "mismagius-ex-a2-hatterene-b3",
+   "name": "Mismagius ex Hatterene",
+   "icons": [
+    "mismagius",
+    "hatterene"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "milotic-ex-b3b-silvally-b4",
+   "name": "Milotic ex Silvally",
+   "icons": [
+    "milotic",
+    "silvally"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "gholdengo-ex-b2a-gholdengo-b4a",
+   "name": "Gholdengo ex Gholdengo",
+   "icons": [
+    "gholdengo",
+    "gholdengo"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "haxorus-b2b-archaludon-b4a",
+   "name": "Haxorus Archaludon",
+   "icons": [
+    "haxorus",
+    "archaludon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "hydreigon-b1-zoroark-a4a",
+   "name": "Hydreigon Zoroark",
+   "icons": [
+    "hydreigon",
+    "zoroark"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-diancie-ex-b3b-mega-gardevoir-ex-b2",
+   "name": "Mega Diancie ex Mega Gardevoir ex",
+   "icons": [
+    "diancie-mega",
+    "gardevoir-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-houndoom-ex-p-b-houndoom-b4",
+   "name": "Mega Houndoom ex Houndoom",
+   "icons": [
+    "houndoom-mega",
+    "houndoom"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 6,
+   "ties": 0,
+   "n": 7,
+   "winrate": 14.3,
+   "wilsonLo": 2.6,
+   "tier": "?"
+  },
+  {
+   "id": "hoopa-ex-b4-decidueye-ex-a3",
+   "name": "Hoopa ex Decidueye ex",
+   "icons": [
+    "hoopa-unbound",
+    "decidueye"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 7,
+   "ties": 0,
+   "n": 7,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "gourgeist-b2-galarian-cursola-a4a",
+   "name": "Gourgeist Galarian Cursola",
+   "icons": [
+    "gourgeist",
+    "cursola"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "lanturn-ex-a4-raikou-ex-a4a",
+   "name": "Lanturn ex Raikou ex",
+   "icons": [
+    "lanturn",
+    "raikou"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "machamp-b2-zygarde-ex-p-b",
+   "name": "Machamp Zygarde ex",
+   "icons": [
+    "machamp",
+    "zygarde"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "indeedee-ex-delcatty-b1",
+   "name": "Indeedee ex Delcatty",
+   "icons": [
+    "indeedee",
+    "delcatty"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 2,
+   "ties": 0,
+   "n": 4,
+   "winrate": 50,
+   "wilsonLo": 15,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-electrode-b4a-pawmot-a2b",
+   "name": "Team Rocket's Electrode Pawmot",
+   "icons": [
+    "electrode",
+    "pawmot"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 6,
+   "losses": 3,
+   "ties": 1,
+   "n": 9,
+   "winrate": 66.7,
+   "wilsonLo": 35.4,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sharpedo-ex-b4-mamoswine-a2",
+   "name": "Mega Sharpedo ex Mamoswine",
+   "icons": [
+    "sharpedo-mega",
+    "mamoswine"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 4,
+   "losses": 4,
+   "ties": 0,
+   "n": 8,
+   "winrate": 50,
+   "wilsonLo": 21.5,
+   "tier": "?"
+  },
+  {
+   "id": "espeon-b3a-igglybuff-a4a",
+   "name": "Espeon Igglybuff",
+   "icons": [
+    "espeon",
+    "igglybuff"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 5,
+   "ties": 0,
+   "n": 8,
+   "winrate": 37.5,
+   "wilsonLo": 13.7,
+   "tier": "?"
+  },
+  {
+   "id": "jolteon-ex-b1-zeraora-a3a",
+   "name": "Jolteon ex Zeraora",
+   "icons": [
+    "jolteon",
+    "zeraora"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "greninja-ex-b1-vaporeon-ex-b3",
+   "name": "Greninja ex Vaporeon ex",
+   "icons": [
+    "greninja",
+    "vaporeon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "milotic-ex-b3b-dustox-b4",
+   "name": "Milotic ex Dustox",
+   "icons": [
+    "milotic",
+    "dustox"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "wailord-ex-b4-suicune-ex-a4a",
+   "name": "Wailord ex Suicune ex",
+   "icons": [
+    "wailord",
+    "suicune"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "armarouge-ex-b2a-sylveon-b3b",
+   "name": "Armarouge ex Sylveon",
+   "icons": [
+    "armarouge",
+    "sylveon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "crobat-ex-a4-mega-sableye-ex-b3b",
+   "name": "Crobat ex Mega Sableye ex",
+   "icons": [
+    "crobat",
+    "sableye-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "mega-altaria-ex-b1-magnezone-b1a",
+   "name": "Mega Altaria ex Magnezone",
+   "icons": [
+    "altaria-mega",
+    "magnezone"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 6,
+   "losses": 2,
+   "ties": 0,
+   "n": 8,
+   "winrate": 75,
+   "wilsonLo": 40.9,
+   "tier": "?"
+  },
+  {
+   "id": "milotic-ex-b3b-suicune-ex-a4a",
+   "name": "Milotic ex Suicune ex",
+   "icons": [
+    "milotic",
+    "suicune"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-kangaskhan-ex-b2-mantyke-a4a",
+   "name": "Mega Kangaskhan ex Mantyke",
+   "icons": [
+    "kangaskhan-mega",
+    "mantyke"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 5,
+   "ties": 0,
+   "n": 5,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "eevee-ex-a3b-vaporeon-ex-b3",
+   "name": "Eevee ex Vaporeon ex",
+   "icons": [
+    "eevee",
+    "vaporeon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "miltank-a4a",
+   "name": "Miltank",
+   "icons": [
+    "miltank"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 5,
+   "ties": 0,
+   "n": 7,
+   "winrate": 28.6,
+   "wilsonLo": 8.2,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lucario-ex-b3-snorlax-b3b",
+   "name": "Mega Lucario ex Snorlax",
+   "icons": [
+    "lucario-mega",
+    "snorlax"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 6,
+   "ties": 0,
+   "n": 7,
+   "winrate": 14.3,
+   "wilsonLo": 2.6,
+   "tier": "?"
+  },
+  {
+   "id": "indeedee-ex-b1-mega-diancie-ex-b3b",
+   "name": "Indeedee ex Mega Diancie ex",
+   "icons": [
+    "indeedee",
+    "diancie-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-ceruledge-ex-p-b",
+   "name": "Team Rocket's Raticate ex Ceruledge ex",
+   "icons": [
+    "raticate",
+    "ceruledge"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-altaria-ex-goomy-b1",
+   "name": "Mega Altaria ex Goomy",
+   "icons": [
+    "altaria-mega",
+    "goomy"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-ex-a2a-mega-lucario-ex-b3",
+   "name": "Garchomp ex Mega Lucario ex",
+   "icons": [
+    "garchomp",
+    "lucario-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "luxray-b4-oricorio-a3",
+   "name": "Luxray Oricorio",
+   "icons": [
+    "luxray",
+    "oricorio-pom-pom"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 5,
+   "losses": 3,
+   "ties": 1,
+   "n": 8,
+   "winrate": 62.5,
+   "wilsonLo": 30.6,
+   "tier": "?"
+  },
+  {
+   "id": "serperior-b4a-chingling-b1",
+   "name": "Serperior Chingling",
+   "icons": [
+    "serperior",
+    "chingling"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-venusaur-ex-b1a-exeggutor-a1",
+   "name": "Mega Venusaur ex Exeggutor",
+   "icons": [
+    "venusaur-mega",
+    "exeggutor"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 5,
+   "losses": 3,
+   "ties": 0,
+   "n": 8,
+   "winrate": 62.5,
+   "wilsonLo": 30.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-blastoise-ex-b1a-suicune-ex-a4a",
+   "name": "Mega Blastoise ex Suicune ex",
+   "icons": [
+    "blastoise-mega",
+    "suicune"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 4,
+   "losses": 3,
+   "ties": 0,
+   "n": 7,
+   "winrate": 57.1,
+   "wilsonLo": 25,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sharpedo-ex-b4-palkia-ex-a2",
+   "name": "Mega Sharpedo ex Palkia ex",
+   "icons": [
+    "sharpedo-mega",
+    "palkia"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 4,
+   "losses": 3,
+   "ties": 0,
+   "n": 7,
+   "winrate": 57.1,
+   "wilsonLo": 25,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sableye-ex-b3b-scrafty-b2",
+   "name": "Mega Sableye ex Scrafty",
+   "icons": [
+    "sableye-mega",
+    "scrafty"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "milotic-ex-b3b-mega-kangaskhan-ex-b2",
+   "name": "Milotic ex Mega Kangaskhan ex",
+   "icons": [
+    "milotic",
+    "kangaskhan-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-ho-oh-ex-a4",
+   "name": "Team Rocket's Raticate ex Ho-Oh ex",
+   "icons": [
+    "raticate",
+    "ho-oh"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-mega-scizor-ex-b2b",
+   "name": "Team Rocket's Raticate ex Mega Scizor ex",
+   "icons": [
+    "raticate",
+    "scizor-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "guzzlord-b2",
+   "name": "Guzzlord",
+   "icons": [
+    "guzzlord"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-electrode-b4a-luxray-a2",
+   "name": "Team Rocket's Electrode Luxray",
+   "icons": [
+    "electrode",
+    "luxray"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-houndoom-ex-p-b-houndoom-a2a",
+   "name": "Mega Houndoom ex Houndoom",
+   "icons": [
+    "houndoom-mega",
+    "houndoom"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lopunny-ex-b1a-primeape-a1",
+   "name": "Mega Lopunny ex Primeape",
+   "icons": [
+    "lopunny-mega",
+    "primeape"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 1,
+   "ties": 0,
+   "n": 2,
+   "winrate": 50,
+   "wilsonLo": 9.5,
+   "tier": "?"
+  },
+  {
+   "id": "mega-houndoom-ex-p-b-magby-a4",
+   "name": "Mega Houndoom ex Magby",
+   "icons": [
+    "houndoom-mega",
+    "magby"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "dragonite-ex-a3b-hisuian-goodra-b3b",
+   "name": "Dragonite ex Hisuian Goodra",
+   "icons": [
+    "dragonite",
+    "goodra-hisui"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "iron-bundle-ex-b3a-vaporeon-ex-b3",
+   "name": "Iron Bundle ex Vaporeon ex",
+   "icons": [
+    "iron-bundle",
+    "vaporeon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-zapdos-ex-b4a-indeedee-ex-b1",
+   "name": "Team Rocket's Zapdos ex Indeedee ex",
+   "icons": [
+    "zapdos",
+    "indeedee"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-ex-a2a-koraidon-ex-b3a",
+   "name": "Garchomp ex Koraidon ex",
+   "icons": [
+    "garchomp",
+    "koraidon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-metagross-ex-b4-teal-mask-ogerpon-ex-b2",
+   "name": "Mega Metagross ex Teal Mask Ogerpon ex",
+   "icons": [
+    "metagross-mega",
+    "ogerpon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "crobat-a2a-mega-absol-ex-b1",
+   "name": "Crobat Mega Absol ex",
+   "icons": [
+    "crobat",
+    "absol-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "jolteon-ex-b1-team-rockets-zapdos-ex-b4a",
+   "name": "Jolteon ex Team Rocket's Zapdos ex",
+   "icons": [
+    "jolteon",
+    "zapdos"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "suicune-ex-a4a-vaporeon-ex-b3",
+   "name": "Suicune ex Vaporeon ex",
+   "icons": [
+    "suicune",
+    "vaporeon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "serperior-b4a-mega-heracross-ex-p-b",
+   "name": "Serperior Mega Heracross ex",
+   "icons": [
+    "serperior",
+    "heracross-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "hitmonchan-ex-b1-mega-gallade-ex-b4",
+   "name": "Hitmonchan ex Mega Gallade ex",
+   "icons": [
+    "hitmonchan",
+    "gallade-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-team-rockets-tinkaton-b4a",
+   "name": "Team Rocket's Raticate ex Team Rocket's Tinkaton",
+   "icons": [
+    "raticate",
+    "tinkaton"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-articuno-ex-b4a-inteleon-b3",
+   "name": "Team Rocket's Articuno ex Inteleon",
+   "icons": [
+    "articuno",
+    "inteleon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-manectric-ex-b2b-pichu-a4",
+   "name": "Mega Manectric ex Pichu",
+   "icons": [
+    "manectric-mega",
+    "pichu"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "alolan-ninetales-ex-b2-crawdaunt-a4",
+   "name": "Alolan Ninetales ex Crawdaunt",
+   "icons": [
+    "ninetales-alola",
+    "crawdaunt"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "probopass-ex-a2a-magby-a4",
+   "name": "Probopass ex Magby",
+   "icons": [
+    "probopass",
+    "magby"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-altaria-ex-b1-iron-valiant-b3a",
+   "name": "Mega Altaria ex Iron Valiant",
+   "icons": [
+    "altaria-mega",
+    "iron-valiant"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "togekiss-a4-meloetta-b2",
+   "name": "Togekiss Meloetta",
+   "icons": [
+    "togekiss",
+    "meloetta"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 1,
+   "ties": 0,
+   "n": 3,
+   "winrate": 66.7,
+   "wilsonLo": 20.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-kangaskhan-ex-b2-darkrai-ex-a2",
+   "name": "Mega Kangaskhan ex Darkrai ex",
+   "icons": [
+    "kangaskhan-mega",
+    "darkrai"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 1,
+   "ties": 0,
+   "n": 2,
+   "winrate": 50,
+   "wilsonLo": 9.5,
+   "tier": "?"
+  },
+  {
+   "id": "mega-scizor-ex-b2b-scizor-a4",
+   "name": "Mega Scizor ex Scizor",
+   "icons": [
+    "scizor-mega",
+    "scizor"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "naganadel-guzzlord-ex-a3a",
+   "name": "Naganadel Guzzlord ex",
+   "icons": [
+    "naganadel",
+    "guzzlord"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gallade-ex-b4-koraidon-ex-b3a",
+   "name": "Mega Gallade ex Koraidon ex",
+   "icons": [
+    "gallade-mega",
+    "koraidon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "pidgeot-ex-a1a",
+   "name": "Pidgeot ex",
+   "icons": [
+    "pidgeot"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sharpedo-ex-walrein-b4",
+   "name": "Mega Sharpedo ex Walrein",
+   "icons": [
+    "sharpedo-mega",
+    "walrein"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-ex-a2a-garchomp-a2",
+   "name": "Garchomp ex Garchomp",
+   "icons": [
+    "garchomp",
+    "garchomp"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 2,
+   "ties": 0,
+   "n": 4,
+   "winrate": 50,
+   "wilsonLo": 15,
+   "tier": "?"
+  },
+  {
+   "id": "pachirisu-ex-a2-dedenne-ex-b3b",
+   "name": "Pachirisu ex Dedenne ex",
+   "icons": [
+    "pachirisu",
+    "dedenne"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gallade-ex-b4",
+   "name": "Mega Gallade ex",
+   "icons": [
+    "gallade-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-hypno-a1",
+   "name": "Team Rocket's Weezing ex Hypno",
+   "icons": [
+    "weezing",
+    "hypno"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 5,
+   "losses": 4,
+   "ties": 0,
+   "n": 9,
+   "winrate": 55.6,
+   "wilsonLo": 26.7,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gallade-ex-b4-hitmontop-a4",
+   "name": "Mega Gallade ex Hitmontop",
+   "icons": [
+    "gallade-mega",
+    "hitmontop"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 5,
+   "ties": 0,
+   "n": 8,
+   "winrate": 37.5,
+   "wilsonLo": 13.7,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-tinkaton-b4a-kartana-b2b",
+   "name": "Team Rocket's Tinkaton Kartana",
+   "icons": [
+    "tinkaton",
+    "kartana"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-entei-ex-a4a",
+   "name": "Team Rocket's Weezing ex Entei ex",
+   "icons": [
+    "weezing",
+    "entei"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-dragonite-a1",
+   "name": "Team Rocket's Raticate ex Dragonite",
+   "icons": [
+    "raticate",
+    "dragonite"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "greninja-ex-b1-suicune-ex-a4a",
+   "name": "Greninja ex Suicune ex",
+   "icons": [
+    "greninja",
+    "suicune"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "persian-a1-chandelure-b1",
+   "name": "Persian Chandelure",
+   "icons": [
+    "persian",
+    "chandelure"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "gholdengo-ex-b2a-charcadet-p-b",
+   "name": "Gholdengo ex Charcadet",
+   "icons": [
+    "gholdengo",
+    "charcadet"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "entei-ex-a4a-mega-blaziken-ex-b1",
+   "name": "Entei ex Mega Blaziken ex",
+   "icons": [
+    "entei",
+    "blaziken-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 2,
+   "ties": 0,
+   "n": 4,
+   "winrate": 50,
+   "wilsonLo": 15,
+   "tier": "?"
+  },
+  {
+   "id": "leafeon-ex-a2a-accelgor-b4",
+   "name": "Leafeon ex Accelgor",
+   "icons": [
+    "leafeon",
+    "accelgor"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-igglybuff-a4a",
+   "name": "Team Rocket's Raticate ex Igglybuff",
+   "icons": [
+    "raticate",
+    "igglybuff"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 4,
+   "losses": 3,
+   "ties": 0,
+   "n": 7,
+   "winrate": 57.1,
+   "wilsonLo": 25,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gardevoir-ex-b2-ceruledge-b2a",
+   "name": "Mega Gardevoir ex Ceruledge",
+   "icons": [
+    "gardevoir-mega",
+    "ceruledge"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "mega-kangaskhan-ex-b2-oricorio-a3",
+   "name": "Mega Kangaskhan ex Oricorio",
+   "icons": [
+    "kangaskhan-mega",
+    "oricorio-pom-pom"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-garchomp-b4a",
+   "name": "Team Rocket's Raticate ex Garchomp",
+   "icons": [
+    "raticate",
+    "garchomp"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "magnezone-a2-lugia-ex-a4",
+   "name": "Magnezone Lugia ex",
+   "icons": [
+    "magnezone",
+    "lugia"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-team-rockets-muk-b4a",
+   "name": "Team Rocket's Weezing ex Team Rocket's Muk",
+   "icons": [
+    "weezing",
+    "muk"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "milotic-ex-b3b-garchomp-b4a",
+   "name": "Milotic ex Garchomp",
+   "icons": [
+    "milotic",
+    "garchomp"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "meowscarada-a2b-decidueye-ex-a3",
+   "name": "Meowscarada Decidueye ex",
+   "icons": [
+    "meowscarada",
+    "decidueye"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-slowking-ex-b4a-mega-gardevoir-ex-b2",
+   "name": "Team Rocket's Slowking ex Mega Gardevoir ex",
+   "icons": [
+    "slowking",
+    "gardevoir-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-mega-manectric-ex-b2b",
+   "name": "Team Rocket's Raticate ex Mega Manectric ex",
+   "icons": [
+    "raticate",
+    "manectric-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 4,
+   "ties": 1,
+   "n": 5,
+   "winrate": 20,
+   "wilsonLo": 3.6,
+   "tier": "?"
+  },
+  {
+   "id": "ho-oh-ex-a4-mega-rayquaza-ex-b4",
+   "name": "Ho-Oh ex Mega Rayquaza ex",
+   "icons": [
+    "ho-oh",
+    "rayquaza-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-b4a-mime-jr-b4",
+   "name": "Garchomp Mime Jr.",
+   "icons": [
+    "garchomp",
+    "mime-jr"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-team-rockets-persian-b4a",
+   "name": "Team Rocket's Raticate ex Team Rocket's Persian",
+   "icons": [
+    "raticate",
+    "persian"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 5,
+   "ties": 0,
+   "n": 6,
+   "winrate": 16.7,
+   "wilsonLo": 3,
+   "tier": "?"
+  },
+  {
+   "id": "dragonite-ex-a3b-haxorus-b2b",
+   "name": "Dragonite ex Haxorus",
+   "icons": [
+    "dragonite",
+    "haxorus"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "magneton-a1-giratina-ex-a2b",
+   "name": "Magneton Giratina ex",
+   "icons": [
+    "magneton",
+    "giratina"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-flygon-ex-b3",
+   "name": "Team Rocket's Raticate ex Flygon ex",
+   "icons": [
+    "raticate",
+    "flygon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lopunny-ex-b1a-furfrou-b4",
+   "name": "Mega Lopunny ex Furfrou",
+   "icons": [
+    "lopunny-mega",
+    "furfrou"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 2,
+   "ties": 0,
+   "n": 4,
+   "winrate": 50,
+   "wilsonLo": 15,
+   "tier": "?"
+  },
+  {
+   "id": "guzzlord-ex-a3a-indeedee-ex-b1",
+   "name": "Guzzlord ex Indeedee ex",
+   "icons": [
+    "guzzlord",
+    "indeedee"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "bastiodon-a2",
+   "name": "Bastiodon",
+   "icons": [
+    "bastiodon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sharpedo-ex-b4-greninja-a1",
+   "name": "Mega Sharpedo ex Greninja",
+   "icons": [
+    "sharpedo-mega",
+    "greninja"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 4,
+   "ties": 0,
+   "n": 4,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "pikachu-ex-a1-pichu-a4",
+   "name": "Pikachu ex Pichu",
+   "icons": [
+    "pikachu",
+    "pichu"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gyarados-ex-b1-mantyke-a4a",
+   "name": "Mega Gyarados ex Mantyke",
+   "icons": [
+    "gyarados-mega",
+    "mantyke"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "alolan-ninetales-ex-b2-mega-sharpedo-ex-b4",
+   "name": "Alolan Ninetales ex Mega Sharpedo ex",
+   "icons": [
+    "ninetales-alola",
+    "sharpedo-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "mega-blaziken-ex-turtonator-b1",
+   "name": "Mega Blaziken ex Turtonator",
+   "icons": [
+    "blaziken-mega",
+    "turtonator"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 5,
+   "ties": 0,
+   "n": 6,
+   "winrate": 16.7,
+   "wilsonLo": 3,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-mega-houndoom-ex-p-b",
+   "name": "Team Rocket's Raticate ex Mega Houndoom ex",
+   "icons": [
+    "raticate",
+    "houndoom-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 1,
+   "ties": 0,
+   "n": 3,
+   "winrate": 66.7,
+   "wilsonLo": 20.8,
+   "tier": "?"
+  },
+  {
+   "id": "gholdengo-ex-orthworm-b2a",
+   "name": "Gholdengo ex Orthworm",
+   "icons": [
+    "gholdengo",
+    "orthworm"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "sylveon-ex-a3b-garchomp-b4a",
+   "name": "Sylveon ex Garchomp",
+   "icons": [
+    "sylveon",
+    "garchomp"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "rotom-ex-b4-smeargle-b2",
+   "name": "Rotom ex Smeargle",
+   "icons": [
+    "rotom",
+    "smeargle"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lucario-ex-b3-mega-lopunny-ex-b1a",
+   "name": "Mega Lucario ex Mega Lopunny ex",
+   "icons": [
+    "lucario-mega",
+    "lopunny-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 4,
+   "losses": 4,
+   "ties": 0,
+   "n": 8,
+   "winrate": 50,
+   "wilsonLo": 21.5,
+   "tier": "?"
+  },
+  {
+   "id": "palossand-b3b-koraidon-ex-b3a",
+   "name": "Palossand Koraidon ex",
+   "icons": [
+    "palossand",
+    "koraidon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-giratina-ex-a2b",
+   "name": "Team Rocket's Weezing ex Giratina ex",
+   "icons": [
+    "weezing",
+    "giratina"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-kangaskhan-ex-b2-porygon-z-a2",
+   "name": "Mega Kangaskhan ex Porygon-Z",
+   "icons": [
+    "kangaskhan-mega",
+    "porygon-z"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 4,
+   "ties": 0,
+   "n": 4,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-slowking-ex-b4a-magneton-b3",
+   "name": "Team Rocket's Slowking ex Magneton",
+   "icons": [
+    "slowking",
+    "magneton"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "greninja-a1-giratina-ex-a2b",
+   "name": "Greninja Giratina ex",
+   "icons": [
+    "greninja",
+    "giratina"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "charizard-ex-a2b",
+   "name": "Charizard ex",
+   "icons": [
+    "charizard"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "decidueye-ex-a3-miltank-b2b",
+   "name": "Decidueye ex Miltank",
+   "icons": [
+    "decidueye",
+    "miltank"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "dragonair-b4-archaludon-b4a",
+   "name": "Dragonair Archaludon",
+   "icons": [
+    "dragonair",
+    "archaludon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "alolan-ninetales-ex-b2-team-rockets-raticate-ex-b4a",
+   "name": "Alolan Ninetales ex Team Rocket's Raticate ex",
+   "icons": [
+    "ninetales-alola",
+    "raticate"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-altaria-ex-b1-team-rockets-raticate-ex-b4a",
+   "name": "Mega Altaria ex Team Rocket's Raticate ex",
+   "icons": [
+    "altaria-mega",
+    "raticate"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 4,
+   "losses": 3,
+   "ties": 1,
+   "n": 7,
+   "winrate": 57.1,
+   "wilsonLo": 25,
+   "tier": "?"
+  },
+  {
+   "id": "mega-blaziken-ex-heatmor-b1",
+   "name": "Mega Blaziken ex Heatmor",
+   "icons": [
+    "blaziken-mega",
+    "heatmor"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-ampharos-ex-b1-oricorio-a3",
+   "name": "Mega Ampharos ex Oricorio",
+   "icons": [
+    "ampharos-mega",
+    "oricorio-pom-pom"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "incineroar-ex-a3-team-rockets-moltres-ex-b4a",
+   "name": "Incineroar ex Team Rocket's Moltres ex",
+   "icons": [
+    "incineroar",
+    "moltres"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sharpedo-ex-b4-iron-bundle-ex-b3a",
+   "name": "Mega Sharpedo ex Iron Bundle ex",
+   "icons": [
+    "sharpedo-mega",
+    "iron-bundle"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "starmie-ex-articuno-ex-a1",
+   "name": "Starmie ex Articuno ex",
+   "icons": [
+    "starmie",
+    "articuno"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "hoopa-ex-b4-darkrai-ex-a2",
+   "name": "Hoopa ex Darkrai ex",
+   "icons": [
+    "hoopa-unbound",
+    "darkrai"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "terapagos-ex-b3a-team-rockets-raticate-ex-b4a",
+   "name": "Terapagos ex Team Rocket's Raticate ex",
+   "icons": [
+    "terapagos",
+    "raticate"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-stoutland-a3a",
+   "name": "Team Rocket's Raticate ex Stoutland",
+   "icons": [
+    "raticate",
+    "stoutland"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-slowking-ex-b4a-gourgeist-b2",
+   "name": "Team Rocket's Slowking ex Gourgeist",
+   "icons": [
+    "slowking",
+    "gourgeist"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-zapdos-ex-b4a-pichu-a4",
+   "name": "Team Rocket's Zapdos ex Pichu",
+   "icons": [
+    "zapdos",
+    "pichu"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "mega-kangaskhan-ex-b2-hoopa-ex-b4",
+   "name": "Mega Kangaskhan ex Hoopa ex",
+   "icons": [
+    "kangaskhan-mega",
+    "hoopa-unbound"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "jumpluff-ex-a4a-oricorio-a3",
+   "name": "Jumpluff ex Oricorio",
+   "icons": [
+    "jumpluff",
+    "oricorio-pom-pom"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lucario-ex-bonsly-b3",
+   "name": "Mega Lucario ex Bonsly",
+   "icons": [
+    "lucario-mega",
+    "bonsly"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 5,
+   "losses": 3,
+   "ties": 0,
+   "n": 8,
+   "winrate": 62.5,
+   "wilsonLo": 30.6,
+   "tier": "?"
+  },
+  {
+   "id": "hydreigon-b1-hoopa-ex-b4",
+   "name": "Hydreigon Hoopa ex",
+   "icons": [
+    "hydreigon",
+    "hoopa-unbound"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 1,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "greninja-a1-team-rockets-articuno-ex-b4a",
+   "name": "Greninja Team Rocket's Articuno ex",
+   "icons": [
+    "greninja",
+    "articuno"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "wailord-b1-gholdengo-b4a",
+   "name": "Wailord Gholdengo",
+   "icons": [
+    "wailord",
+    "gholdengo"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "magnezone-b1a-zapdos-ex-a1",
+   "name": "Magnezone Zapdos ex",
+   "icons": [
+    "magnezone",
+    "zapdos"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-articuno-ex-team-rockets-lapras-b4a",
+   "name": "Team Rocket's Articuno ex Team Rocket's Lapras",
+   "icons": [
+    "articuno",
+    "lapras"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-greninja-a1",
+   "name": "Team Rocket's Raticate ex Greninja",
+   "icons": [
+    "raticate",
+    "greninja"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 4,
+   "ties": 0,
+   "n": 5,
+   "winrate": 20,
+   "wilsonLo": 3.6,
+   "tier": "?"
+  },
+  {
+   "id": "wigglytuff-ex-a1-delcatty-b1",
+   "name": "Wigglytuff ex Delcatty",
+   "icons": [
+    "wigglytuff",
+    "delcatty"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "gardevoir-b2-mega-diancie-ex-b3b",
+   "name": "Gardevoir Mega Diancie ex",
+   "icons": [
+    "gardevoir",
+    "diancie-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "rotom-ex-mime-jr-b4",
+   "name": "Rotom ex Mime Jr.",
+   "icons": [
+    "rotom",
+    "mime-jr"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 6,
+   "losses": 2,
+   "ties": 0,
+   "n": 8,
+   "winrate": 75,
+   "wilsonLo": 40.9,
+   "tier": "?"
+  },
+  {
+   "id": "blacephalon-ex-b2-nihilego-a3a",
+   "name": "Blacephalon ex Nihilego",
+   "icons": [
+    "blacephalon",
+    "nihilego"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 2,
+   "ties": 0,
+   "n": 5,
+   "winrate": 60,
+   "wilsonLo": 23.1,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-a2-meowth-b2",
+   "name": "Garchomp Meowth",
+   "icons": [
+    "garchomp",
+    "meowth"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "koraidon-ex-b3a-furfrou-b4",
+   "name": "Koraidon ex Furfrou",
+   "icons": [
+    "koraidon",
+    "furfrou"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "aerodactyl-ex-a1a-lucario-a2",
+   "name": "Aerodactyl ex Lucario",
+   "icons": [
+    "aerodactyl",
+    "lucario"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "dragonite-a1",
+   "name": "Dragonite",
+   "icons": [
+    "dragonite"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-tinkaton-b4a",
+   "name": "Team Rocket's Tinkaton",
+   "icons": [
+    "tinkaton"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-blastoise-ex-b1a-snorlax-ex-a3b",
+   "name": "Mega Blastoise ex Snorlax ex",
+   "icons": [
+    "blastoise-mega",
+    "snorlax"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 4,
+   "losses": 3,
+   "ties": 0,
+   "n": 7,
+   "winrate": 57.1,
+   "wilsonLo": 25,
+   "tier": "?"
+  },
+  {
+   "id": "mega-charizard-y-ex-charizard-b1a",
+   "name": "Mega Charizard Y ex Charizard",
+   "icons": [
+    "charizard-mega-y",
+    "charizard"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 5,
+   "ties": 0,
+   "n": 7,
+   "winrate": 28.6,
+   "wilsonLo": 8.2,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-tinkaton-b4a-skarmory-a2",
+   "name": "Team Rocket's Tinkaton Skarmory",
+   "icons": [
+    "tinkaton",
+    "skarmory"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 5,
+   "ties": 0,
+   "n": 7,
+   "winrate": 28.6,
+   "wilsonLo": 8.2,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-hypno-b4a-giratina-ex-a2b",
+   "name": "Team Rocket's Hypno Giratina ex",
+   "icons": [
+    "hypno",
+    "giratina"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gyarados-ex-b1-manaphy-a2",
+   "name": "Mega Gyarados ex Manaphy",
+   "icons": [
+    "gyarados-mega",
+    "manaphy"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 2,
+   "ties": 0,
+   "n": 4,
+   "winrate": 50,
+   "wilsonLo": 15,
+   "tier": "?"
+  },
+  {
+   "id": "suicune-ex-a4a-greninja-a1",
+   "name": "Suicune ex Greninja",
+   "icons": [
+    "suicune",
+    "greninja"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 4,
+   "ties": 0,
+   "n": 4,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-slowking-ex-b4a-mimikyu-ex-b2",
+   "name": "Team Rocket's Slowking ex Mimikyu ex",
+   "icons": [
+    "slowking",
+    "mimikyu"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "indeedee-ex-b1-dragonite-a1",
+   "name": "Indeedee ex Dragonite",
+   "icons": [
+    "indeedee",
+    "dragonite"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 4,
+   "losses": 3,
+   "ties": 0,
+   "n": 7,
+   "winrate": 57.1,
+   "wilsonLo": 25,
+   "tier": "?"
+  },
+  {
+   "id": "indeedee-ex-b1-mismagius-a4a",
+   "name": "Indeedee ex Mismagius",
+   "icons": [
+    "indeedee",
+    "mismagius"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "arceus-ex-a2a-miraidon-ex-b3a",
+   "name": "Arceus ex Miraidon ex",
+   "icons": [
+    "arceus",
+    "miraidon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 4,
+   "losses": 3,
+   "ties": 0,
+   "n": 7,
+   "winrate": 57.1,
+   "wilsonLo": 25,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-mega-slowbro-ex-b2b",
+   "name": "Team Rocket's Raticate ex Mega Slowbro ex",
+   "icons": [
+    "raticate",
+    "slowbro-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 4,
+   "losses": 3,
+   "ties": 0,
+   "n": 7,
+   "winrate": 57.1,
+   "wilsonLo": 25,
+   "tier": "?"
+  },
+  {
+   "id": "mega-altaria-ex-b1-furfrou-b1a",
+   "name": "Mega Altaria ex Furfrou",
+   "icons": [
+    "altaria-mega",
+    "furfrou"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "rotom-ex-heliolisk-b4",
+   "name": "Rotom ex Heliolisk",
+   "icons": [
+    "rotom",
+    "heliolisk"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "jolteon-ex-b1-raichu-b4",
+   "name": "Jolteon ex Raichu",
+   "icons": [
+    "jolteon",
+    "raichu"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "snorlax-ex-a3b-tyrantrum-b2",
+   "name": "Snorlax ex Tyrantrum",
+   "icons": [
+    "snorlax",
+    "tyrantrum"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "iron-bundle-ex-iron-valiant-b3a",
+   "name": "Iron Bundle ex Iron Valiant",
+   "icons": [
+    "iron-bundle",
+    "iron-valiant"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-b4a-butterfree-b3b",
+   "name": "Team Rocket's Weezing ex Butterfree",
+   "icons": [
+    "weezing",
+    "butterfree"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-b4a-elekid-a4",
+   "name": "Garchomp Elekid",
+   "icons": [
+    "garchomp",
+    "elekid"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-weezing-ex-team-rockets-houndoom-b4a",
+   "name": "Team Rocket's Weezing ex Team Rocket's Houndoom",
+   "icons": [
+    "weezing",
+    "houndoom"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 4,
+   "ties": 0,
+   "n": 4,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "hisuian-zoroark-ex-butterfree-b3b",
+   "name": "Hisuian Zoroark ex Butterfree",
+   "icons": [
+    "zoroark-hisui",
+    "butterfree"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "suicune-ex-a4a-gholdengo-b4a",
+   "name": "Suicune ex Gholdengo",
+   "icons": [
+    "suicune",
+    "gholdengo"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 4,
+   "losses": 3,
+   "ties": 0,
+   "n": 7,
+   "winrate": 57.1,
+   "wilsonLo": 25,
+   "tier": "?"
+  },
+  {
+   "id": "luxray-a2-team-rockets-electrode-b4a",
+   "name": "Luxray Team Rocket's Electrode",
+   "icons": [
+    "luxray",
+    "electrode"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 1,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "flygon-ex-b3-indeedee-ex-b1",
+   "name": "Flygon ex Indeedee ex",
+   "icons": [
+    "flygon",
+    "indeedee"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "milotic-ex-b3b-oricorio-a3",
+   "name": "Milotic ex Oricorio",
+   "icons": [
+    "milotic",
+    "oricorio-pom-pom"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "teal-mask-ogerpon-ex-b2-rampardos-a2",
+   "name": "Teal Mask Ogerpon ex Rampardos",
+   "icons": [
+    "ogerpon",
+    "rampardos"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "magnezone-b1a-team-rockets-persian-b4a",
+   "name": "Magnezone Team Rocket's Persian",
+   "icons": [
+    "magnezone",
+    "persian"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 4,
+   "ties": 0,
+   "n": 7,
+   "winrate": 42.9,
+   "wilsonLo": 15.8,
+   "tier": "?"
+  },
+  {
+   "id": "darkrai-ex-a2-hoopa-ex-b4",
+   "name": "Darkrai ex Hoopa ex",
+   "icons": [
+    "darkrai",
+    "hoopa-unbound"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 1,
+   "ties": 2,
+   "n": 3,
+   "winrate": 66.7,
+   "wilsonLo": 20.8,
+   "tier": "?"
+  },
+  {
+   "id": "jumpluff-ex-a4a-teal-mask-ogerpon-ex-b2",
+   "name": "Jumpluff ex Teal Mask Ogerpon ex",
+   "icons": [
+    "jumpluff",
+    "ogerpon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 2,
+   "ties": 1,
+   "n": 4,
+   "winrate": 50,
+   "wilsonLo": 15,
+   "tier": "?"
+  },
+  {
+   "id": "iron-bundle-ex-b3a-iron-bundle-b3b",
+   "name": "Iron Bundle ex Iron Bundle",
+   "icons": [
+    "iron-bundle",
+    "iron-bundle"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "haxorus-b2b-igglybuff-a4a",
+   "name": "Haxorus Igglybuff",
+   "icons": [
+    "haxorus",
+    "igglybuff"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gengar-ex-b2b-galarian-cursola-a4a",
+   "name": "Mega Gengar ex Galarian Cursola",
+   "icons": [
+    "gengar-mega",
+    "cursola"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 5,
+   "ties": 0,
+   "n": 7,
+   "winrate": 28.6,
+   "wilsonLo": 8.2,
+   "tier": "?"
+  },
+  {
+   "id": "banette-a3-araquanid-b4",
+   "name": "Banette Araquanid",
+   "icons": [
+    "banette",
+    "araquanid"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-absol-ex-b1-team-rockets-magmar-b4a",
+   "name": "Mega Absol ex Team Rocket's Magmar",
+   "icons": [
+    "absol-mega",
+    "magmar"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 5,
+   "ties": 0,
+   "n": 7,
+   "winrate": 28.6,
+   "wilsonLo": 8.2,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lucario-ex-b3-team-rockets-weezing-ex-b4a",
+   "name": "Mega Lucario ex Team Rocket's Weezing ex",
+   "icons": [
+    "lucario-mega",
+    "weezing"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 5,
+   "ties": 0,
+   "n": 7,
+   "winrate": 28.6,
+   "wilsonLo": 8.2,
+   "tier": "?"
+  },
+  {
+   "id": "mega-gyarados-ex-b1-gholdengo-b4a",
+   "name": "Mega Gyarados ex Gholdengo",
+   "icons": [
+    "gyarados-mega",
+    "gholdengo"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-charizard-x-ex-b2b-charizard-b1a",
+   "name": "Mega Charizard X ex Charizard",
+   "icons": [
+    "charizard-mega-x",
+    "charizard"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "mega-altaria-ex-b1-altaria-a4a",
+   "name": "Mega Altaria ex Altaria",
+   "icons": [
+    "altaria-mega",
+    "altaria"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "magikarp-a1",
+   "name": "Magikarp",
+   "icons": [
+    "magikarp"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 5,
+   "ties": 0,
+   "n": 6,
+   "winrate": 16.7,
+   "wilsonLo": 3,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lucario-ex-b3-marowak-b4a",
+   "name": "Mega Lucario ex Marowak",
+   "icons": [
+    "lucario-mega",
+    "marowak"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 5,
+   "ties": 0,
+   "n": 6,
+   "winrate": 16.7,
+   "wilsonLo": 3,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-zapdos-ex-b4a-greninja-a1",
+   "name": "Team Rocket's Zapdos ex Greninja",
+   "icons": [
+    "zapdos",
+    "greninja"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 5,
+   "ties": 0,
+   "n": 6,
+   "winrate": 16.7,
+   "wilsonLo": 3,
+   "tier": "?"
+  },
+  {
+   "id": "hoopa-ex-b4-umbreon-ex-a4",
+   "name": "Hoopa ex Umbreon ex",
+   "icons": [
+    "hoopa-unbound",
+    "umbreon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "dedenne-ex-b3b-happiny-b4a",
+   "name": "Dedenne ex Happiny",
+   "icons": [
+    "dedenne",
+    "happiny"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-metagross-ex-b4-indeedee-ex-b1",
+   "name": "Mega Metagross ex Indeedee ex",
+   "icons": [
+    "metagross-mega",
+    "indeedee"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "dragonite-a1-goomy-b1",
+   "name": "Dragonite Goomy",
+   "icons": [
+    "dragonite",
+    "goomy"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "alolan-ninetales-ex-b2-gholdengo-b4a",
+   "name": "Alolan Ninetales ex Gholdengo",
+   "icons": [
+    "ninetales-alola",
+    "gholdengo"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sharpedo-ex-araquanid-b4",
+   "name": "Mega Sharpedo ex Araquanid",
+   "icons": [
+    "sharpedo-mega",
+    "araquanid"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "typhlosion-a4-team-rockets-magmar-b4a",
+   "name": "Typhlosion Team Rocket's Magmar",
+   "icons": [
+    "typhlosion",
+    "magmar"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 4,
+   "ties": 0,
+   "n": 4,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-slowking-ex-b4a-shiinotic-a3a",
+   "name": "Team Rocket's Slowking ex Shiinotic",
+   "icons": [
+    "slowking",
+    "shiinotic"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-seaking-b3b",
+   "name": "Team Rocket's Raticate ex Seaking",
+   "icons": [
+    "raticate",
+    "seaking"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 6,
+   "ties": 0,
+   "n": 6,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-houndoom-ex-p-b-iron-moth-b3a",
+   "name": "Mega Houndoom ex Iron Moth",
+   "icons": [
+    "houndoom-mega",
+    "iron-moth"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-manectric-ex-b2b-zeraora-a3a",
+   "name": "Mega Manectric ex Zeraora",
+   "icons": [
+    "manectric-mega",
+    "zeraora"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 2,
+   "ties": 1,
+   "n": 5,
+   "winrate": 60,
+   "wilsonLo": 23.1,
+   "tier": "?"
+  },
+  {
+   "id": "flygon-ex-b3-munchlax-b3b",
+   "name": "Flygon ex Munchlax",
+   "icons": [
+    "flygon",
+    "munchlax"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "delphox-b4a-castform-sunny-form-b3",
+   "name": "Delphox Castform Sunny Form",
+   "icons": [
+    "delphox",
+    "castform-sunny"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 2,
+   "ties": 0,
+   "n": 4,
+   "winrate": 50,
+   "wilsonLo": 15,
+   "tier": "?"
+  },
+  {
+   "id": "skarmory-a2-team-rockets-tinkaton-b4a",
+   "name": "Skarmory Team Rocket's Tinkaton",
+   "icons": [
+    "skarmory",
+    "tinkaton"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "dragonair-b4-miraidon-ex-b3a",
+   "name": "Dragonair Miraidon ex",
+   "icons": [
+    "dragonair",
+    "miraidon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 3,
+   "ties": 0,
+   "n": 3,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-zapdos-ex-team-rockets-electrode-b4a",
+   "name": "Team Rocket's Zapdos ex Team Rocket's Electrode",
+   "icons": [
+    "zapdos",
+    "electrode"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "tinkaton-ex-a2b-skarmory-b4",
+   "name": "Tinkaton ex Skarmory",
+   "icons": [
+    "tinkaton",
+    "skarmory"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 4,
+   "ties": 0,
+   "n": 5,
+   "winrate": 20,
+   "wilsonLo": 3.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-slowbro-ex-b2b-mantyke-a4a",
+   "name": "Mega Slowbro ex Mantyke",
+   "icons": [
+    "slowbro-mega",
+    "mantyke"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 4,
+   "ties": 0,
+   "n": 6,
+   "winrate": 33.3,
+   "wilsonLo": 9.7,
+   "tier": "?"
+  },
+  {
+   "id": "bellibolt-ex-b2a-team-rockets-electrode-b4a",
+   "name": "Bellibolt ex Team Rocket's Electrode",
+   "icons": [
+    "bellibolt",
+    "electrode"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "mewtwo-ex-gardevoir-a1",
+   "name": "Mewtwo ex Gardevoir",
+   "icons": [
+    "mewtwo",
+    "gardevoir"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 6,
+   "ties": 0,
+   "n": 7,
+   "winrate": 14.3,
+   "wilsonLo": 2.6,
+   "tier": "?"
+  },
+  {
+   "id": "heliolisk-b4-zapdos-ex-a1",
+   "name": "Heliolisk Zapdos ex",
+   "icons": [
+    "heliolisk",
+    "zapdos"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 0,
+   "ties": 0,
+   "n": 1,
+   "winrate": 100,
+   "wilsonLo": 20.7,
+   "tier": "?"
+  },
+  {
+   "id": "serperior-a1a-oricorio-a3",
+   "name": "Serperior Oricorio",
+   "icons": [
+    "serperior",
+    "oricorio-pom-pom"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "beedrill-ex-a2b-bonsly-b3",
+   "name": "Beedrill ex Bonsly",
+   "icons": [
+    "beedrill",
+    "bonsly"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 7,
+   "ties": 0,
+   "n": 7,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "guzzlord-ex-a3a-darkrai-ex-a2",
+   "name": "Guzzlord ex Darkrai ex",
+   "icons": [
+    "guzzlord",
+    "darkrai"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-moltres-ex-b4a-mega-blaziken-ex-b1",
+   "name": "Team Rocket's Moltres ex Mega Blaziken ex",
+   "icons": [
+    "moltres",
+    "blaziken-mega"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-furfrou-b4a",
+   "name": "Garchomp Furfrou",
+   "icons": [
+    "garchomp",
+    "furfrou"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "weavile-ex-darkrai-ex-a2",
+   "name": "Weavile ex Darkrai ex",
+   "icons": [
+    "weavile",
+    "darkrai"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-raticate-ex-b4a-alolan-raichu-ex-a3",
+   "name": "Team Rocket's Raticate ex Alolan Raichu ex",
+   "icons": [
+    "raticate",
+    "raichu-alola"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-a2-munchlax-b3b",
+   "name": "Garchomp Munchlax",
+   "icons": [
+    "garchomp",
+    "munchlax"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 1,
+   "ties": 0,
+   "n": 1,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-swampert-ex-b2-munchlax-b3b",
+   "name": "Mega Swampert ex Munchlax",
+   "icons": [
+    "swampert-mega",
+    "munchlax"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-houndoom-ex-p-b-team-rockets-moltres-ex-b4a",
+   "name": "Mega Houndoom ex Team Rocket's Moltres ex",
+   "icons": [
+    "houndoom-mega",
+    "moltres"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "guzzlord-ex-a3a-team-rockets-raticate-ex-b4a",
+   "name": "Guzzlord ex Team Rocket's Raticate ex",
+   "icons": [
+    "guzzlord",
+    "raticate"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 3,
+   "ties": 0,
+   "n": 4,
+   "winrate": 25,
+   "wilsonLo": 4.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-lopunny-ex-b1a-pidgeot-a1",
+   "name": "Mega Lopunny ex Pidgeot",
+   "icons": [
+    "lopunny-mega",
+    "pidgeot"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "rapidash-ex-b1-castform-sunny-form-b3",
+   "name": "Rapidash ex Castform Sunny Form",
+   "icons": [
+    "rapidash",
+    "castform-sunny"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 4,
+   "losses": 3,
+   "ties": 1,
+   "n": 7,
+   "winrate": 57.1,
+   "wilsonLo": 25,
+   "tier": "?"
+  },
+  {
+   "id": "delphox-b4a-pichu-a4",
+   "name": "Delphox Pichu",
+   "icons": [
+    "delphox",
+    "pichu"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 5,
+   "ties": 0,
+   "n": 8,
+   "winrate": 37.5,
+   "wilsonLo": 13.7,
+   "tier": "?"
+  },
+  {
+   "id": "vaporeon-ex-b3-indeedee-ex-b1",
+   "name": "Vaporeon ex Indeedee ex",
+   "icons": [
+    "vaporeon",
+    "indeedee"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 6,
+   "ties": 0,
+   "n": 8,
+   "winrate": 25,
+   "wilsonLo": 7.1,
+   "tier": "?"
+  },
+  {
+   "id": "indeedee-ex-b1-banette-a3",
+   "name": "Indeedee ex Banette",
+   "icons": [
+    "indeedee",
+    "banette"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 1,
+   "ties": 0,
+   "n": 2,
+   "winrate": 50,
+   "wilsonLo": 9.5,
+   "tier": "?"
+  },
+  {
+   "id": "mega-absol-ex-b1-darkrai-ex-a2",
+   "name": "Mega Absol ex Darkrai ex",
+   "icons": [
+    "absol-mega",
+    "darkrai"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "slurpuff-alcremie-a3b",
+   "name": "Slurpuff Alcremie",
+   "icons": [
+    "slurpuff",
+    "alcremie"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 2,
+   "ties": 0,
+   "n": 2,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "mega-swampert-ex-b2-archaludon-b4a",
+   "name": "Mega Swampert ex Archaludon",
+   "icons": [
+    "swampert-mega",
+    "archaludon"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "flygon-ex-b3-giratina-ex-a2b",
+   "name": "Flygon ex Giratina ex",
+   "icons": [
+    "flygon",
+    "giratina"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "team-rockets-electrode-b4a-greninja-a1",
+   "name": "Team Rocket's Electrode Greninja",
+   "icons": [
+    "electrode",
+    "greninja"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 3,
+   "losses": 3,
+   "ties": 0,
+   "n": 6,
+   "winrate": 50,
+   "wilsonLo": 18.8,
+   "tier": "?"
+  },
+  {
+   "id": "mega-venusaur-ex-b1a-igglybuff-a4a",
+   "name": "Mega Venusaur ex Igglybuff",
+   "icons": [
+    "venusaur-mega",
+    "igglybuff"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 0,
+   "losses": 6,
+   "ties": 0,
+   "n": 6,
+   "winrate": 0,
+   "wilsonLo": 0,
+   "tier": "?"
+  },
+  {
+   "id": "jolteon-ex-b1-team-rockets-electrode-b4a",
+   "name": "Jolteon ex Team Rocket's Electrode",
+   "icons": [
+    "jolteon",
+    "electrode"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 4,
+   "ties": 0,
+   "n": 5,
+   "winrate": 20,
+   "wilsonLo": 3.6,
+   "tier": "?"
+  },
+  {
+   "id": "mega-manectric-ex-b2b-igglybuff-a4a",
+   "name": "Mega Manectric ex Igglybuff",
+   "icons": [
+    "manectric-mega",
+    "igglybuff"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 5,
+   "losses": 3,
+   "ties": 0,
+   "n": 8,
+   "winrate": 62.5,
+   "wilsonLo": 30.6,
+   "tier": "?"
+  },
+  {
+   "id": "hydreigon-b1-darkrai-ex-a2",
+   "name": "Hydreigon Darkrai ex",
+   "icons": [
+    "hydreigon",
+    "darkrai"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "dedenne-ex-b3b-pichu-a4",
+   "name": "Dedenne ex Pichu",
+   "icons": [
+    "dedenne",
+    "pichu"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  },
+  {
+   "id": "mega-sharpedo-ex-b4-arboliva-b2a",
+   "name": "Mega Sharpedo ex Arboliva",
+   "icons": [
+    "sharpedo-mega",
+    "arboliva"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 5,
+   "ties": 0,
+   "n": 6,
+   "winrate": 16.7,
+   "wilsonLo": 3,
+   "tier": "?"
+  },
+  {
+   "id": "alolan-ninetales-ex-b2-alolan-ninetales-a3",
+   "name": "Alolan Ninetales ex Alolan Ninetales",
+   "icons": [
+    "ninetales-alola",
+    "ninetales-alola"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "leafeon-ex-a2a-eevee-ex-a3b",
+   "name": "Leafeon ex Eevee ex",
+   "icons": [
+    "leafeon",
+    "eevee"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 3,
+   "ties": 0,
+   "n": 5,
+   "winrate": 40,
+   "wilsonLo": 11.8,
+   "tier": "?"
+  },
+  {
+   "id": "snorlax-ex-a3b-indeedee-ex-b1",
+   "name": "Snorlax ex Indeedee ex",
+   "icons": [
+    "snorlax",
+    "indeedee"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 2,
+   "losses": 5,
+   "ties": 0,
+   "n": 7,
+   "winrate": 28.6,
+   "wilsonLo": 8.2,
+   "tier": "?"
+  },
+  {
+   "id": "garchomp-ex-a2a",
+   "name": "Garchomp ex",
+   "icons": [
+    "garchomp"
+   ],
+   "count": 1,
+   "share": 0.02,
+   "wins": 1,
+   "losses": 2,
+   "ties": 0,
+   "n": 3,
+   "winrate": 33.3,
+   "wilsonLo": 6.1,
+   "tier": "?"
+  }
+ ]
+}

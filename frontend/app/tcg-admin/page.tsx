@@ -32,7 +32,7 @@ const ROADMAP: { section: string; items: { t: string; status: "done" | "wip" | "
     { t: "sitemap.xml · robots.txt(호스트별)", status: "todo" },
   ] },
   { section: "깊이 백본 (원본 분석)", items: [
-    { t: "덱 티어표(대회 승률 기반)", status: "todo" },
+    { t: "덱 티어표(대회 승률 기반)", status: "done" },
     { t: "메타 환경 분석", status: "todo" },
     { t: "대표 덱 심층 공략 ×10", status: "todo" },
   ] },
@@ -43,8 +43,8 @@ const ROADMAP: { section: string; items: { t: string; status: "done" | "wip" | "
     { t: "초보/전략 가이드", status: "todo" },
   ] },
   { section: "데이터 파이프라인", items: [
+    { t: "Limitless 대회 통계 인제스트(티어·매치업)", status: "done" },
     { t: "카드 데이터셋 인제스트(9개국어)", status: "todo" },
-    { t: "정규화 스키마", status: "todo" },
     { t: "롱테일 카드 페이지(승인 후 공개·noindex)", status: "todo" },
   ] },
 ];
