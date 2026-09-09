@@ -27,7 +27,7 @@ const T: Record<Locale, {
   typeH: string; typeP: string;
   topH: string; overH: string; overP: string;
   readH: string; read: (top: string, top5: number, over?: string) => string;
-  tierLink: string; deckLink: string; energyNames: Record<string, string>;
+  tierLink: string; deckLink: string; src: string; energyNames: Record<string, string>;
 }> = {
   ko: {
     title: "포켓몬 카드 게임 Pocket 메타 환경 분석", desc: "포켓몬 카드 게임 Pocket 현재 메타 분석 — 에너지 타입 분포·상위 덱 집중도·오버퍼포머. 대회 데이터 기반.",
@@ -38,7 +38,7 @@ const T: Record<Locale, {
     topH: "🏆 상위 덱", overH: "📈 오버퍼포머", overP: "점유율 대비 승률이 높은 다크호스.",
     readH: "🔎 지금 메타 한줄 읽기",
     read: (top, t5, over) => `현재 메타는 '${top}'가 점유율 1위로 중심을 잡고 있으며, 상위 5덱이 ${t5}%를 차지합니다.${over ? ` 점유율은 낮지만 승률이 높은 '${over}'가 떠오르는 다크호스로, 메타가 대비하기 전 선점 가치가 있습니다.` : ""}`,
-    tierLink: "전체 덱 티어표 →", deckLink: "대표 덱 공략 →", energyNames: { Grass: "풀", Fire: "불꽃", Water: "물", Lightning: "번개", Psychic: "에스퍼", Fighting: "격투", Darkness: "악", Metal: "강철", Dragon: "드래곤", Colorless: "무색" },
+    tierLink: "전체 덱 티어표 →", deckLink: "대표 덱 공략 →", src: "출처: Limitless TCG (play.limitlesstcg.com) — 대회 순위·대진 자체 집계", energyNames: { Grass: "풀", Fire: "불꽃", Water: "물", Lightning: "번개", Psychic: "에스퍼", Fighting: "격투", Darkness: "악", Metal: "강철", Dragon: "드래곤", Colorless: "무색" },
   },
   en: {
     title: "Pokémon TCG Pocket Meta Analysis", desc: "Current Pokémon TCG Pocket meta analysis — energy-type distribution, top-deck concentration and overperformers. Tournament-data based.",
@@ -49,7 +49,7 @@ const T: Record<Locale, {
     topH: "🏆 Top decks", overH: "📈 Overperformers", overP: "Dark horses with high win rate relative to share.",
     readH: "🔎 The meta in one line",
     read: (top, t5, over) => `The current meta is anchored by '${top}' at #1 in share, with the top 5 decks making up ${t5}%.${over ? ` '${over}' is a rising dark horse — low share but high win rate, worth picking up before the meta adapts.` : ""}`,
-    tierLink: "Full tier list →", deckLink: "Deck guides →", energyNames: { Grass: "Grass", Fire: "Fire", Water: "Water", Lightning: "Lightning", Psychic: "Psychic", Fighting: "Fighting", Darkness: "Darkness", Metal: "Metal", Dragon: "Dragon", Colorless: "Colorless" },
+    tierLink: "Full tier list →", deckLink: "Deck guides →", src: "Source: Limitless TCG (play.limitlesstcg.com) — self-aggregated from tournament standings/pairings", energyNames: { Grass: "Grass", Fire: "Fire", Water: "Water", Lightning: "Lightning", Psychic: "Psychic", Fighting: "Fighting", Darkness: "Darkness", Metal: "Metal", Dragon: "Dragon", Colorless: "Colorless" },
   },
   ja: {
     title: "ポケポケ メタ環境分析", desc: "現在のポケモンカードゲーム Pocket 環境分析 — エネルギータイプ分布·上位デッキ集中度·オーバーパフォーマー。大会データ基準。",
@@ -60,7 +60,7 @@ const T: Record<Locale, {
     topH: "🏆 上位デッキ", overH: "📈 オーバーパフォーマー", overP: "使用率の割に勝率が高いダークホース。",
     readH: "🔎 今の環境を一言で",
     read: (top, t5, over) => `現環境は「${top}」が使用率1位で中心を担い、上位5デッキで${t5}%を占めます。${over ? ` 使用率は低いが勝率が高い「${over}」が台頭中のダークホースで、環境が対策する前に先取りする価値があります。` : ""}`,
-    tierLink: "デッキティア表 →", deckLink: "デッキ攻略 →", energyNames: { Grass: "草", Fire: "炎", Water: "水", Lightning: "雷", Psychic: "超", Fighting: "闘", Darkness: "悪", Metal: "鋼", Dragon: "竜", Colorless: "無" },
+    tierLink: "デッキティア表 →", deckLink: "デッキ攻略 →", src: "出典: Limitless TCG (play.limitlesstcg.com) — 大会順位·対戦を自前集計", energyNames: { Grass: "草", Fire: "炎", Water: "水", Lightning: "雷", Psychic: "超", Fighting: "闘", Darkness: "悪", Metal: "鋼", Dragon: "竜", Colorless: "無" },
   },
   "zh-TW": {
     title: "寶可夢卡牌 Pocket 環境分析", desc: "當前寶可夢集換式卡牌 Pocket 環境分析 — 能量屬性分布·上位牌組集中度·超常發揮。以賽事數據為基礎。",
@@ -71,7 +71,7 @@ const T: Record<Locale, {
     topH: "🏆 上位牌組", overH: "📈 超常發揮", overP: "相對使用率勝率偏高的黑馬。",
     readH: "🔎 一句話讀懂環境",
     read: (top, t5, over) => `當前環境由「${top}」以使用率第一坐鎮，前5牌組佔${t5}%。${over ? ` 使用率低但勝率高的「${over}」是崛起黑馬，值得在環境針對前搶先使用。` : ""}`,
-    tierLink: "完整強度表 →", deckLink: "牌組攻略 →", energyNames: { Grass: "草", Fire: "火", Water: "水", Lightning: "雷", Psychic: "超", Fighting: "鬥", Darkness: "惡", Metal: "鋼", Dragon: "龍", Colorless: "無" },
+    tierLink: "完整強度表 →", deckLink: "牌組攻略 →", src: "來源: Limitless TCG (play.limitlesstcg.com) — 自賽事排名·對戰自行彙整", energyNames: { Grass: "草", Fire: "火", Water: "水", Lightning: "雷", Psychic: "超", Fighting: "鬥", Darkness: "惡", Metal: "鋼", Dragon: "龍", Colorless: "無" },
   },
 };
 
@@ -169,7 +169,7 @@ export default function MetaPage({ params }: { params: { lang: string } }) {
         <Link href={L("/tcg/tier")} style={{ color: "#dc2626", textDecoration: "none", fontWeight: 700, marginRight: 14 }}>{t.tierLink}</Link>
         <Link href={L("/tcg/decks")} style={{ color: "#dc2626", textDecoration: "none", fontWeight: 700 }}>{t.deckLink}</Link>
       </p>
-      <p style={{ marginTop: 12, fontSize: "0.7rem", color: "#cbd5e1" }}>{META.source}</p>
+      <p style={{ marginTop: 12, fontSize: "0.7rem", color: "#cbd5e1" }}>{t.src}</p>
     </div>
   );
 }

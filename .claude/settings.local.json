@@ -351,7 +351,10 @@
       "Bash(curl -s -o /dev/null -w \"guides → %{http_code}\\\\n\" --max-time 15 https://tcgnote.net/tcg/guides)",
       "Bash(node -e \"const c=require\\('./app/[lang]/tcg/data/cards.json'\\); console.log\\('총',c.length,'장'\\); console.log\\('hp키 가진 카드 수:', c.filter\\(x=>'hp' in x\\).length\\); console.log\\('샘플:', JSON.stringify\\(c[0]\\)\\);\")",
       "Bash(curl -s --max-time 20 https://tcgnote.net/tcg/cards)",
-      "Bash(curl -s -H \"Host: tcgnote.net\" http://localhost:3000/tcg/guides/deck-builder-guide)"
+      "Bash(curl -s -H \"Host: tcgnote.net\" http://localhost:3000/tcg/guides/deck-builder-guide)",
+      "Bash(curl -s -H \"Host: tcgnote.net\" http://localhost:3000/ja/tcg)",
+      "Bash(grep -vE \"^\\\\s*$\")",
+      "Bash(curl -s -H \"Host: tcgnote.net\" http://localhost:3000/zh-TW/tcg)"
     ]
   }
 }
