@@ -28,13 +28,13 @@ const ROADMAP: { section: string; items: { t: string; status: "done" | "wip" | "
     { t: "랜딩(4개국어)", status: "done" },
     { t: "레이아웃·내비·i18n", status: "done" },
     { t: "미들웨어 도메인 라우팅", status: "done" },
-    { t: "정책 페이지(개인정보·약관·소개)", status: "todo" },
-    { t: "sitemap.xml · robots.txt(호스트별)", status: "todo" },
+    { t: "정책 페이지(개인정보·약관·소개)", status: "done" },
+    { t: "sitemap.xml · robots.txt(호스트별)", status: "done" },
   ] },
   { section: "깊이 백본 (원본 분석)", items: [
     { t: "덱 티어표(대회 승률 기반)", status: "done" },
     { t: "메타 환경 분석", status: "todo" },
-    { t: "대표 덱 심층 공략 ×10", status: "todo" },
+    { t: "대표 덱 심층 공략 ×10", status: "done" },
   ] },
   { section: "도구·가이드", items: [
     { t: "카드 검색 도구", status: "todo" },
