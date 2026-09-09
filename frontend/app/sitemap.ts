@@ -66,7 +66,7 @@ function tcgPaths(): [string, CF, number][] {
     ["/tcg/tier", "daily", 0.9],
     ["/tcg/decks", "weekly", 0.8],
     ...analyzedDeckIds().map((id) => [`/tcg/decks/${id}`, "weekly", 0.7] as [string, CF, number]),
-    ["/tcg/cards", "weekly", 0.6],
+    // /tcg/cards(카드 DB 유틸)는 린 런치 동안 noindex → 사이트맵 제외. 승인 후 추가 검토.
     ["/tcg/about", "monthly", 0.4],
     ["/tcg/privacy", "yearly", 0.3],
     ["/tcg/terms", "yearly", 0.3],

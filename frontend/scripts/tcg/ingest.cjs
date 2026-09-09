@@ -4,6 +4,7 @@
 // 산출: app/[lang]/tcg/data/meta.json, matchups.json  (언어 무관 공유 데이터)
 const fs = require("fs");
 const path = require("path");
+const { localize } = require("./localizeName.cjs"); // 덱리스트 카드명 현지화
 
 const API = "https://play.limitlesstcg.com/api";
 // API 매너 — 앱 식별. 공격적 캐시(이 스크립트를 크론으로 시간당 1회) + 폴라이트 딜레이.
@@ -134,10 +135,14 @@ async function main() {
     for (const b of topIds) if (a !== b && matchup[a]?.[b]) matchupsTop[a][b] = matchup[a][b];
   }
 
+  // 덱리스트 카드명 현지화(포켓몬만; 트레이너는 영어 유지) — 각 카드에 nm 추가.
+  const locList = (arr) => (arr || []).map((c) => { const nm = localize(c.name); return nm ? { ...c, nm } : c; });
+  const locDecklist = (dl) => (dl ? { pokemon: locList(dl.pokemon), trainer: locList(dl.trainer), energy: dl.energy || [] } : null);
+
   // 대표덱 상세 — 랭크덱별 대표 덱리스트 + 통계(대표덱 페이지 /tcg/decks/[id])
   const deckDetails = decks.filter((d) => RANKED.includes(d.tier)).map((d) => ({
     id: d.id, name: d.name, icons: d.icons, tier: d.tier, share: d.share, winrate: d.winrate, wilsonLo: d.wilsonLo, n: d.n,
-    decklist: bestList[d.id]?.decklist || null,
+    decklist: locDecklist(bestList[d.id]?.decklist),
     sampleFrom: bestList[d.id] ? { wins: bestList[d.id].wins, losses: bestList[d.id].losses } : null,
   }));
 

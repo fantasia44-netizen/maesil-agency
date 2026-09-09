@@ -17,7 +17,9 @@ const T: Record<Locale, { title: string; desc: string; h1: string; intro: string
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = T[lang];
-  return { title: `${t.title} | TCG Note`, description: t.desc, alternates: { canonical: localizePath(lang, PATH), languages: hreflangLanguages(PATH) } };
+  // 린 런치 — 카드 검색은 DB성 유틸이라 심사 기간 noindex(봇 동선을 에디토리얼로만).
+  // 유저에겐 그대로 제공, 색인만 제외. 승인 후 index 전환 검토.
+  return { title: `${t.title} | TCG Note`, description: t.desc, robots: { index: false, follow: true }, alternates: { canonical: localizePath(lang, PATH), languages: hreflangLanguages(PATH) } };
 }
 
 export default function CardsPage({ params }: { params: { lang: string } }) {

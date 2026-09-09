@@ -11,7 +11,7 @@ import { isLocale, defaultLocale, localizePath, hreflangLanguages, locales, type
 
 export const revalidate = 3600;
 
-type Card = { count: number; set: string; number: string; name: string };
+type Card = { count: number; set: string; number: string; name: string; nm?: Record<string, string> };
 type Deck = { id: string; name: string; icons: string[]; tier: string; share: number; winrate: number; wilsonLo: number; n: number; decklist: { pokemon: Card[]; trainer: Card[]; energy: string[] } | null; sampleFrom: { wins: number; losses: number } | null };
 const DECK_LIST = DECKS as Deck[];
 const NAME_BY_ID: Record<string, string> = Object.fromEntries((META.decks as { id: string; name: string }[]).map((d) => [d.id, d.name]));
@@ -69,6 +69,7 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = L10N[lang];
   const L = (p: string) => localizePath(lang, p);
+  const cn = (c: Card) => (c.nm && c.nm[lang]) || c.name; // 덱리스트 카드명 현지화(포켓몬)
   const deck = DECK_LIST.find((d) => d.id === params.id);
   const a = getDeckAnalysis(params.id, lang);
   if (!deck || !a) notFound();
@@ -150,13 +151,13 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
             <div style={{ background: "#fff", border: "1px solid #eadff2", borderRadius: 10, padding: "0.7rem 0.9rem" }}>
               <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#a01f7f", marginBottom: 4 }}>{t.pokemon}</div>
               {(deck.decklist.pokemon || []).map((c, i) => (
-                <div key={i} style={{ fontSize: "0.83rem", color: "#334155", padding: "2px 0" }}><b>{c.count}×</b> {c.name}</div>
+                <div key={i} style={{ fontSize: "0.83rem", color: "#334155", padding: "2px 0" }}><b>{c.count}×</b> {cn(c)}</div>
               ))}
             </div>
             <div style={{ background: "#fff", border: "1px solid #eadff2", borderRadius: 10, padding: "0.7rem 0.9rem" }}>
               <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#a01f7f", marginBottom: 4 }}>{t.trainer}</div>
               {(deck.decklist.trainer || []).map((c, i) => (
-                <div key={i} style={{ fontSize: "0.83rem", color: "#334155", padding: "2px 0" }}><b>{c.count}×</b> {c.name}</div>
+                <div key={i} style={{ fontSize: "0.83rem", color: "#334155", padding: "2px 0" }}><b>{c.count}×</b> {cn(c)}</div>
               ))}
               <div style={{ marginTop: 8, fontSize: "0.78rem", fontWeight: 800, color: "#a01f7f" }}>{t.energy}</div>
               <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 3 }}>
