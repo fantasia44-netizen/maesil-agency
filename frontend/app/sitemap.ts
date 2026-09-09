@@ -5,6 +5,7 @@ import RAIDS from "./[lang]/gbl/gbl_raids.json";
 import { GUIDES } from "./[lang]/gbl/guide/guides";
 import { IV_ANALYSIS } from "./[lang]/gbl/iv/analysis/registry";
 import { analyzedDeckIds } from "./[lang]/tcg/decks/analysis";
+import { GUIDES as TCG_GUIDES } from "./[lang]/tcg/guides/guides";
 import { locales, localeMeta, localizePath, defaultLocale } from "../lib/i18n";
 
 // 호스트별 사이트맵 — gblnote.com=/gbl 트리, tcgnote.net=/tcg 트리(같은 배포, 도메인 분리).
@@ -67,7 +68,10 @@ function tcgPaths(): [string, CF, number][] {
     ["/tcg/decks", "weekly", 0.8],
     ...analyzedDeckIds().map((id) => [`/tcg/decks/${id}`, "weekly", 0.7] as [string, CF, number]),
     ["/tcg/counters", "weekly", 0.8],
+    ["/tcg/deck-builder", "weekly", 0.7],
     ["/tcg/pack-sim", "weekly", 0.7],
+    ["/tcg/guides", "weekly", 0.7],
+    ...TCG_GUIDES.map((g) => [`/tcg/guides/${g.slug}`, "monthly", 0.6] as [string, CF, number]),
     // /tcg/cards(카드 DB 유틸)는 린 런치 동안 noindex → 사이트맵 제외. 승인 후 추가 검토.
     ["/tcg/about", "monthly", 0.4],
     ["/tcg/privacy", "yearly", 0.3],
