@@ -36,6 +36,11 @@ for (const [id, mv] of Object.entries(MOVES)) {
 const LEAGUE_KEY = "gbl_league";
 // 현재 시즌 — 공용 레지스트리(seasons.ts)에서 파생. 시즌 넘어가면 자동 롤오버(수동 갱신 불필요).
 const SEASON = currentSeason();
+// 시즌 경계 = KST 05:00(GBL 일일 리셋). 자정이 아니라 05:00 기준이어야 새벽(00~05시) 전적이
+// 이전 시즌으로 정확히 잡힘. 이 경계로 현재 시즌 필터를 통일(내 기록·전체 유저·통계 공통).
+const SEASON_START_MS = Date.parse(`${SEASON.start}T05:00:00+09:00`);
+const SEASON_END_MS = Date.parse(`${SEASON.end}T05:00:00+09:00`);
+const inSeason = (playedAtISO: string): boolean => { const t = Date.parse(playedAtISO); return t >= SEASON_START_MS && t < SEASON_END_MS; };
 // 프로필(전체전적) 시즌별 분리용 — 레지스트리 시즌은 정확 경계, 그 이전은 ≈99일 근사 역산.
 type Seas = { num: number; start: number; end: number };
 function buildSeasons(count = 16): Seas[] {
@@ -521,8 +526,8 @@ export default function GblPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const since = encodeURIComponent(`${SEASON.start}T00:00:00+09:00`);
-      const until = encodeURIComponent(`${SEASON.end}T23:59:59+09:00`);
+      const since = encodeURIComponent(`${SEASON.start}T05:00:00+09:00`);       // 시즌 경계 05:00 KST
+      const until = encodeURIComponent(`${SEASON.end}T04:59:59+09:00`);          // 다음 시즌 05:00 직전까지
       const data = await apiFetch<Match[]>(`/api/gbl/matches?since=${since}&until=${until}`, {}, 20000);
       setMatches(Array.isArray(data) ? data : []);
     } catch (e) {
@@ -608,7 +613,7 @@ export default function GblPage() {
   // 조회: 이름으로 그룹핑 (최근순 유지). scope=all이면 전체 유저 기록.
   const groups = useMemo(() => {
     // 조회(mine): 검색어 있으면 서버검색 결과(전 시즌), 없으면 현재 시즌 로드분. admin(all)은 기존 클라필터.
-    const src = scope === "all" ? allMatches : (query.trim() ? searchResults : matches);
+    const src = scope === "all" ? allMatches.filter((m) => inSeason(m.played_at)) : (query.trim() ? searchResults : matches);
     const q = query.trim().toLowerCase();
     const filtered = src.filter((m) =>
       (m.league || "master") === league &&
@@ -632,7 +637,7 @@ export default function GblPage() {
   }, [matches, allMatches, searchResults, scope, query, league, sort]);
 
   const leagueCount = useMemo(
-    () => (scope === "all" ? allMatches : matches).filter((m) => (m.league || "master") === league).length,
+    () => (scope === "all" ? allMatches.filter((m) => inSeason(m.played_at)) : matches).filter((m) => (m.league || "master") === league).length,
     [matches, allMatches, scope, league]);
 
   // 전적: 내 기록(선택 리그) 기준 승률 + 상대 덱별 전적
@@ -649,10 +654,8 @@ export default function GblPage() {
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}` === tk;
       });
     } else if (statsPeriod === "season") {
-      // KST(+09:00) 고정 — 타임존 누락 시 기기 로컬 타임존으로 파싱돼 시즌 경계가 하루 어긋남
-      const s = new Date(SEASON.start + "T00:00:00+09:00").getTime();
-      const e = new Date(SEASON.end + "T23:59:59+09:00").getTime();
-      src = src.filter((m) => { const t = new Date(m.played_at).getTime(); return t >= s && t <= e; });
+      // 시즌 경계 05:00 KST(GBL 리셋) — 새벽(00~05시) 전적은 이전 시즌으로.
+      src = src.filter((m) => inSeason(m.played_at));
     } else if (statsPeriod !== "all") {
       const since = Date.now() - Number(statsPeriod) * 86400000;
       src = src.filter((m) => new Date(m.played_at).getTime() >= since);
