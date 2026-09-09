@@ -9,7 +9,7 @@ export type PrivacyDict = {
   s4h: string; s4intro: string; s4providers: string;
   s4gaPre: string; s4gaLink: string; s4gaPost: string;
   s4adsPre: string; s4adsLink: string; s4adsPost: string;
-  s4coupang: string; s4cookie: string;
+  s4cookie: string;
   s5h: string; s5: string[];
   contactHead: string; contactSuffix: string;
   changeNote: string; termsLink: string;
@@ -41,7 +41,6 @@ const ko: PrivacyDict = {
   s4adsPre: "• Google AdSense(광고): 맞춤 광고를 위해 쿠키가 사용될 수 있습니다. 이용자는 ",
   s4adsLink: "Google 광고 설정",
   s4adsPost: "에서 관리·거부할 수 있습니다.",
-  s4coupang: "• 쿠팡 파트너스(제휴 광고): 서비스에는 쿠팡 파트너스 제휴 링크·배너가 포함될 수 있으며, 이를 통해 쿠팡의 쿠키가 설정될 수 있습니다. 이 배너 노출·클릭에 따라 서비스는 일정액의 수수료를 제공받습니다.",
   s4cookie: "이용자는 브라우저 설정에서 쿠키 저장을 거부할 수 있으나, 이 경우 로그인 유지 등 일부 기능이 제한될 수 있습니다.",
   s5h: "5. 이용자의 권리",
   s5: ["이용자는 언제든 본인의 개인정보 열람·수정·삭제 및 처리 정지를 요청할 수 있습니다. 계정·데이터 삭제를 원하시면 아래 연락처로 요청해 주세요."],
@@ -77,7 +76,6 @@ const en: PrivacyDict = {
   s4adsPre: "• Google AdSense (ads): cookies may be used for personalized ads. You can manage or opt out in ",
   s4adsLink: "Google Ads Settings",
   s4adsPost: ".",
-  s4coupang: "• Coupang Partners (affiliate ads): the Service may include Coupang Partners affiliate links/banners, through which Coupang cookies may be set. The Service earns a commission based on impressions/clicks of these banners.",
   s4cookie: "You may refuse cookie storage in your browser settings, but some features such as staying logged in may then be limited.",
   s5h: "5. Your Rights",
   s5: ["You may request access to, correction or deletion of, or suspension of processing of your personal data at any time. To delete your account or data, please contact us at the address below."],
@@ -113,7 +111,6 @@ const ja: PrivacyDict = {
   s4adsPre: "• Google AdSense(広告): パーソナライズ広告のためCookieが使用される場合があります。利用者は",
   s4adsLink: "Google広告設定",
   s4adsPost: "で管理・拒否できます。",
-  s4coupang: "• Coupangパートナー(アフィリエイト広告): 本サービスにはCoupangパートナーのアフィリエイトリンク・バナーが含まれる場合があり、これによりCoupangのCookieが設定されることがあります。このバナーの表示・クリックに応じて、本サービスは一定額の手数料を受け取ります。",
   s4cookie: "利用者はブラウザ設定でCookieの保存を拒否できますが、その場合ログイン維持など一部機能が制限されることがあります。",
   s5h: "5. 利用者の権利",
   s5: ["利用者はいつでも自身の個人情報の閲覧・訂正・削除および処理の停止を請求できます。アカウント・データの削除をご希望の場合は、下記の連絡先へご請求ください。"],
@@ -149,7 +146,6 @@ const zhTW: PrivacyDict = {
   s4adsPre: "• Google AdSense（廣告）：為提供個人化廣告可能使用 Cookie。使用者可於 ",
   s4adsLink: "Google 廣告設定",
   s4adsPost: " 管理·拒絕。",
-  s4coupang: "• Coupang Partners（聯盟廣告）：本服務可能包含 Coupang Partners 聯盟連結·橫幅，並可能藉此設定 Coupang 的 Cookie。依此橫幅的曝光·點擊，本服務會獲得一定金額的佣金。",
   s4cookie: "使用者可於瀏覽器設定拒絕儲存 Cookie，但此時維持登入等部分功能可能受限。",
   s5h: "5. 使用者的權利",
   s5: ["使用者可隨時要求查閱·修改·刪除本人個人資料及停止處理。若欲刪除帳號·資料，請以下方聯絡方式提出。"],

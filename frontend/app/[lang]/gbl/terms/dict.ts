@@ -29,7 +29,7 @@ const ko: TermsDict = {
       "위반 시 운영자는 사전 통지 없이 이용을 제한하거나 계정을 정지·삭제할 수 있습니다.",
     ] },
     { h: "제5조 (이용자 콘텐츠)", lines: ["이용자가 입력한 대전 기록의 권리는 이용자에게 있습니다. 다만 이용자는 서비스가 해당 데이터를 개인 식별정보를 제거한 익명 통계(실측 메타 등)로 가공·표시하는 것에 동의합니다. 개별 기록은 본인만 조회할 수 있습니다."] },
-    { h: "제6조 (광고)", lines: ["서비스는 운영을 위해 Google AdSense, 쿠팡 파트너스 등 광고·제휴 링크를 게재할 수 있습니다. 광고 및 제휴 상품의 내용·거래에 대한 책임은 해당 광고주·판매자에게 있습니다. 자세한 사항은 개인정보처리방침을 참고하세요."] },
+    { h: "제6조 (광고)", lines: ["서비스는 운영을 위해 Google AdSense 등 광고를 게재할 수 있습니다. 광고 상품의 내용·거래에 대한 책임은 해당 광고주에게 있습니다. 자세한 사항은 개인정보처리방침을 참고하세요."] },
     { h: "제7조 (서비스의 제공·변경·중단)", lines: ["서비스는 무료로 제공되며, 운영자는 필요에 따라 서비스 내용을 변경하거나 중단할 수 있습니다. 이용자는 본인의 데이터를 스스로 백업할 책임이 있으며, 서비스 중단·장애로 인한 데이터 손실에 대해 운영자는 고의·중과실이 없는 한 책임지지 않습니다."] },
     { h: "제8조 (면책)", lines: [
       "• 서비스가 제공하는 통계·티어·기술 정보 등은 참고용이며, 정확성·완전성을 보증하지 않습니다.",
@@ -64,7 +64,7 @@ const en: TermsDict = {
       "In case of violation, the operator may restrict use or suspend/delete the account without prior notice.",
     ] },
     { h: "5. User Content", lines: ["You retain the rights to the battle records you enter. However, you agree that the Service may process and display that data as anonymous statistics with personal identifiers removed (e.g., encounter meta). Individual records are visible only to you."] },
-    { h: "6. Advertising", lines: ["To fund operations, the Service may display advertising and affiliate links such as Google AdSense and Coupang Partners. Responsibility for the content and transactions of ads and affiliate products lies with the respective advertisers/sellers. See the Privacy Policy for details."] },
+    { h: "6. Advertising", lines: ["To fund operations, the Service may display advertising such as Google AdSense. Responsibility for the content and transactions of ads lies with the respective advertisers. See the Privacy Policy for details."] },
     { h: "7. Provision, Changes & Discontinuation", lines: ["The Service is provided free of charge, and the operator may change or discontinue it as needed. You are responsible for backing up your own data, and the operator is not liable for data loss due to Service discontinuation or failure, absent willful misconduct or gross negligence."] },
     { h: "8. Disclaimer", lines: [
       "• Statistics, tiers, and move information provided by the Service are for reference only, and their accuracy or completeness is not guaranteed.",
@@ -99,7 +99,7 @@ const ja: TermsDict = {
       "違反時、運営者は事前通知なく利用を制限し、またはアカウントを停止・削除することがあります。",
     ] },
     { h: "第5条 (利用者コンテンツ)", lines: ["利用者が入力した対戦記録の権利は利用者に帰属します。ただし利用者は、本サービスが当該データを個人を識別する情報を除いた匿名統計(実測メタ等)として加工・表示することに同意します。個別の記録は本人のみが閲覧できます。"] },
-    { h: "第6条 (広告)", lines: ["本サービスは運営のため、Google AdSense、楽天/Coupangパートナー等の広告・アフィリエイトリンクを掲載することがあります。広告およびアフィリエイト商品の内容・取引についての責任は各広告主・販売者にあります。詳細はプライバシーポリシーをご確認ください。"] },
+    { h: "第6条 (広告)", lines: ["本サービスは運営のため、Google AdSense等の広告を掲載することがあります。広告の内容・取引についての責任は各広告主にあります。詳細はプライバシーポリシーをご確認ください。"] },
     { h: "第7条 (サービスの提供・変更・中断)", lines: ["本サービスは無料で提供され、運営者は必要に応じて内容を変更・中断できます。利用者は自身のデータを自らバックアップする責任を負い、サービスの中断・障害によるデータ損失について、運営者は故意・重過失がない限り責任を負いません。"] },
     { h: "第8条 (免責)", lines: [
       "• 本サービスが提供する統計・ティア・技情報等は参考用であり、正確性・完全性を保証しません。",
@@ -134,7 +134,7 @@ const zhTW: TermsDict = {
       "違反時，營運者可不經事先通知限制使用或停權·刪除帳號。",
     ] },
     { h: "第5條（使用者內容）", lines: ["使用者輸入之對戰記錄的權利歸使用者所有。惟使用者同意本服務將該資料加工·顯示為去除個人識別資訊的匿名統計（實測環境等）。個別記錄僅本人可查詢。"] },
-    { h: "第6條（廣告）", lines: ["本服務為營運可刊登 Google AdSense、Coupang Partners 等廣告·聯盟連結。廣告及聯盟商品之內容·交易責任歸該廣告主·賣方。詳情請參考隱私權政策。"] },
+    { h: "第6條（廣告）", lines: ["本服務為營運可刊登 Google AdSense 等廣告。廣告之內容·交易責任歸該廣告主。詳情請參考隱私權政策。"] },
     { h: "第7條（服務的提供·變更·中止）", lines: ["本服務免費提供，營運者可視需要變更或中止服務內容。使用者有責任自行備份本人資料，因服務中止·故障造成的資料遺失，除營運者有故意·重大過失外概不負責。"] },
     { h: "第8條（免責）", lines: [
       "• 本服務提供的統計·強度·招式資訊等僅供參考，不保證正確性·完整性。",

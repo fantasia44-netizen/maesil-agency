@@ -66,7 +66,6 @@ export default function GblPrivacy({ params }: { params: { lang: string } }) {
         <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer" style={aStyle}>{t.s4adsLink}</a>
         {t.s4adsPost}
       </p>
-      <p style={li}>{t.s4coupang}</p>
       <p style={li}>{t.s4cookie}</p>
 
       <h2 style={h2}>{t.s5h}</h2>

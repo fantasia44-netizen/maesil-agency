@@ -6,7 +6,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MON, monName, spriteUrl } from "../monNames";
 import AdSlot from "../../AdSlot";
-import CoupangAd from "../../CoupangAd";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../../../lib/i18n";
 import { leagueName, leagueShort } from "../../contentI18n";
 import { getLeagueMeta } from "./dict";
@@ -189,7 +188,6 @@ export default async function LeagueMetaPage({ params }: { params: { lang: strin
               })}
             </div>
 
-            <CoupangAd />
           </>
         )}
 

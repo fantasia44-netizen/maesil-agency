@@ -4,7 +4,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import AdSlot from "../../AdSlot";
-import CoupangAd from "../../CoupangAd";
 import { localizePath, type Locale } from "../../../../../lib/i18n";
 import type { IvEntry, SimSpread, Coverage } from "../analysis/registry";
 import DEX_TYPE from "../../dex_type.json";
@@ -521,7 +520,6 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
           </div>
         ); })()}
 
-        <CoupangAd />
 
         <div style={{ textAlign: "center", marginTop: 22, fontSize: "0.72rem", color: "#94a3b8", display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <Link href={L(`/gbl/tier/master`)} style={{ color: "#64748b", textDecoration: "none" }}>{u.tier}</Link>

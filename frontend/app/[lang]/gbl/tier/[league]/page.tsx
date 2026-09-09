@@ -11,7 +11,6 @@ import MOVENAMES from "../../pvp_move_names.json";
 import AdSlot from "../../AdSlot";
 import ListShare from "../../ListShare";
 import { GUIDE_CHIP } from "../../guideLinks";
-import CoupangAd from "../../CoupangAd";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
 import { leagueName, localName } from "../../contentI18n";
 import { typeLabel } from "../../typeLabels";
@@ -357,7 +356,6 @@ export default async function TierPage({ params, searchParams }: { params: { lan
           </div>
         </div>
 
-        <CoupangAd />
 
         <div style={{ textAlign: "center", marginTop: 22, fontSize: "0.72rem", color: "#94a3b8" }}>
           <Link href={L("/gbl/privacy")} style={{ color: "#64748b", textDecoration: "none" }}>{getDict(lang).footer.privacy}</Link>

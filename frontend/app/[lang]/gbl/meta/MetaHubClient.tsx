@@ -6,7 +6,6 @@ import { useParams } from "next/navigation";
 import { apiFetch } from "../../../../lib/api";
 import { MON, monName, spriteUrl } from "./monNames";
 import AdSlot from "../AdSlot";
-import CoupangAd from "../CoupangAd";
 import { currentFormats, todayISO, type Format } from "../formats";
 import { SEASONS, SEASON_BY_SLUG, statusOf, seasonShort } from "../seasons";
 import { isLocale, defaultLocale, localizePath, type Locale } from "../../../../lib/i18n";
@@ -229,7 +228,7 @@ export default function MetaHubClient() {
           </>
         )}
 
-        {meta && meta.total > 0 && <><AdSlot /><CoupangAd /></>}
+        {meta && meta.total > 0 && <AdSlot />}
 
         {/* 크롤 가능한 리그별 상세 링크(서버렌더 SEO 페이지로 연결) */}
         <div style={{ marginTop: 26, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.9rem 1rem" }}>

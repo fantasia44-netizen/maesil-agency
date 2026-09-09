@@ -8,7 +8,6 @@ import RAIDS_MF from "../../gbl_raids_megafinale.json";
 import PKNAMES from "../../pokedex_names.json";
 import MOVENAMES from "../../pvp_move_names.json";
 import AdSlot from "../../AdSlot";
-import CoupangAd from "../../CoupangAd";
 import ListShare from "../../ListShare";
 import { GUIDE_CHIP } from "../../guideLinks";
 import { monSprite, formDex } from "../../sprite";
@@ -281,7 +280,6 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
           </div>
         </div>
 
-        <CoupangAd />
 
         <div style={{ textAlign: "center", marginTop: 22, fontSize: "0.72rem", color: "#94a3b8" }}>
           <Link href={L("/gbl/privacy")} style={{ color: "#64748b", textDecoration: "none" }}>{getDict(lang).footer.privacy}</Link>

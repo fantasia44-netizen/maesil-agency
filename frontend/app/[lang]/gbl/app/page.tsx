@@ -13,7 +13,6 @@ import CUR_MP_DATA from "../movepools_current.json";
 import MOVENAMES from "../pvp_move_names.json";
 import { monSlug as _slug } from "../monSlug";
 import AdSlot from "../AdSlot";
-import CoupangAd from "../CoupangAd";
 import ShareModal from "../ShareModal";
 import { track } from "../../../../lib/track";
 import { currentFormats, FORMAT_BY_KEY, ALL_FORMATS, todayISO, type Format } from "../formats";
@@ -1459,9 +1458,8 @@ export default function GblPage() {
         </div>
       )}
 
-      {/* 하단 광고 (AdSense·쿠팡 — env 설정 시에만 노출) */}
+      {/* 하단 광고 (AdSense — env 설정 시에만 노출) */}
       <AdSlot />
-      <CoupangAd />
       </div>
     </div>
   );

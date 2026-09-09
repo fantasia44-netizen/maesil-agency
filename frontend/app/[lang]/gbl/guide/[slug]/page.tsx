@@ -3,7 +3,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import AdSlot from "../../AdSlot";
-import CoupangAd from "../../CoupangAd";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, localeMeta, type Locale } from "../../../../../lib/i18n";
 import { GUIDES, guideContent, guideKeywords } from "../guides";
 import { TOOL_CHIP, GUIDE_RELATED_TOOLS } from "../../guideLinks";
@@ -111,7 +110,6 @@ export default function GuidePage({ params }: { params: { lang: string; slug: st
           {params.slug === "moveset" && <MovesetExamples lang={lang} />}
         </article>
 
-        <CoupangAd />
 
         <div style={{ marginTop: 24, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
           <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a", marginBottom: 8 }}>{t.othersH}</div>

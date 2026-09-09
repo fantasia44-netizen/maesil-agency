@@ -7,7 +7,6 @@ import { getUser, logout, apiFetch } from "../../../lib/api";
 import { localizePath, isLocale, defaultLocale, type Locale } from "../../../lib/i18n";
 import { getDict } from "./dictionaries";
 import DATA from "./gbl_data.json";
-import CoupangAd from "./CoupangAd";
 
 type Mon = { id: string; dex: number; ko: string; sprite?: string };
 const DS = DATA as unknown as { leagues: Record<string, { pokemon: Mon[] }> };
@@ -150,7 +149,6 @@ export default function GblLandingClient() {
           </div>
         )}
 
-        <CoupangAd />
 
         <p style={{ textAlign: "center", fontSize: "0.75rem", color: "#94a3b8", lineHeight: 2 }}>
           <Link href={L("/gbl/raid")} style={{ color: "#64748b" }}>{f.raidDealer}</Link> ·{" "}

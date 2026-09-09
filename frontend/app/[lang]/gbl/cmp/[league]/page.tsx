@@ -9,7 +9,6 @@ import DETAIL_S28 from "../../gbl_detail_s28.json";
 import PKNAMES from "../../pokedex_names.json";
 import MOVENAMES from "../../pvp_move_names.json";
 import AdSlot from "../../AdSlot";
-import CoupangAd from "../../CoupangAd";
 import CmpShareDense from "./CmpShareDense";
 import { formDexById } from "../../sprite";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
@@ -354,7 +353,6 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
           </p>
         </div>
 
-        <CoupangAd />
 
         <div style={{ textAlign: "center", marginTop: 22, fontSize: "0.72rem", color: "#94a3b8" }}>
           <Link href={L("/gbl/guide")} style={{ color: "#64748b", textDecoration: "none" }}>{t.guide}</Link> ·{" "}
