@@ -61,6 +61,7 @@ async function main() {
 
   const deckAgg = {}; // id -> {id,name,icons,count,wins,losses,ties}
   const matchup = {}; // aId -> bId -> {w,l}
+  const bestList = {}; // id -> {score,wins,losses,player,decklist} — 최고 성적 플레이어의 덱리스트(대표 리스트)
   let players = 0, matches = 0, usedTourneys = 0;
 
   for (const t of chosen) {
@@ -82,6 +83,12 @@ async function main() {
       a.losses += s.record?.losses || 0;
       a.ties += s.record?.ties || 0;
       players++;
+      // 대표 덱리스트 — 최고 성적(승 가중) 플레이어 것 보관
+      if (s.decklist) {
+        const score = (s.record?.wins || 0) * 3 - (s.record?.losses || 0);
+        const cur = bestList[d.id];
+        if (!cur || score > cur.score) bestList[d.id] = { score, wins: s.record?.wins || 0, losses: s.record?.losses || 0, player: s.player, decklist: s.decklist };
+      }
     }
     for (const p of pairings) {
       if (!p.player2 || p.winner === -1) continue; // 부전승/더블로스 제외
@@ -118,17 +125,26 @@ async function main() {
     decks,
   };
 
-  // 매치업은 상위 덱(티어 S~B) 사이만 저장(용량 절약) — 대표덱 페이지용
-  const topIds = new Set(decks.filter((d) => ["S", "A", "B"].includes(d.tier)).map((d) => d.id));
+  // 매치업 — 랭크덱(S~C) 사이만 저장(용량 절약) — 대표덱 페이지용
+  const RANKED = ["S", "A", "B", "C"];
+  const topIds = new Set(decks.filter((d) => RANKED.includes(d.tier)).map((d) => d.id));
   const matchupsTop = {};
   for (const a of topIds) {
     matchupsTop[a] = {};
     for (const b of topIds) if (a !== b && matchup[a]?.[b]) matchupsTop[a][b] = matchup[a][b];
   }
 
+  // 대표덱 상세 — 랭크덱별 대표 덱리스트 + 통계(대표덱 페이지 /tcg/decks/[id])
+  const deckDetails = decks.filter((d) => RANKED.includes(d.tier)).map((d) => ({
+    id: d.id, name: d.name, icons: d.icons, tier: d.tier, share: d.share, winrate: d.winrate, wilsonLo: d.wilsonLo, n: d.n,
+    decklist: bestList[d.id]?.decklist || null,
+    sampleFrom: bestList[d.id] ? { wins: bestList[d.id].wins, losses: bestList[d.id].losses } : null,
+  }));
+
   fs.mkdirSync(OUT_DIR, { recursive: true });
   fs.writeFileSync(path.join(OUT_DIR, "meta.json"), JSON.stringify(meta, null, 1));
   fs.writeFileSync(path.join(OUT_DIR, "matchups.json"), JSON.stringify(matchupsTop));
+  fs.writeFileSync(path.join(OUT_DIR, "decks.json"), JSON.stringify(deckDetails));
   console.log(`[tcg-ingest] done: ${decks.length} decks | ${usedTourneys} tourneys, ${players} players, ${matches} matches`);
   console.log(`[tcg-ingest] top: ` + decks.slice(0, 8).map((d) => `${d.name}(${d.tier} ${d.share}%/${d.winrate}%·N${d.n})`).join(", "));
 }
