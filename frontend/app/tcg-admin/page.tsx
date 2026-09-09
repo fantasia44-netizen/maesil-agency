@@ -33,18 +33,19 @@ const ROADMAP: { section: string; items: { t: string; status: "done" | "wip" | "
   ] },
   { section: "깊이 백본 (원본 분석)", items: [
     { t: "덱 티어표(대회 승률 기반)", status: "done" },
-    { t: "메타 환경 분석", status: "todo" },
+    { t: "메타 환경 분석", status: "done" },
     { t: "대표 덱 심층 공략 ×10", status: "done" },
   ] },
   { section: "도구·가이드", items: [
-    { t: "카드 검색 도구", status: "todo" },
+    { t: "카드 검색 도구", status: "done" },
     { t: "덱 빌더", status: "todo" },
-    { t: "팩 확률 분석", status: "todo" },
+    { t: "팩 확률 분석(pullRates)", status: "todo" },
     { t: "초보/전략 가이드", status: "todo" },
   ] },
   { section: "데이터 파이프라인", items: [
     { t: "Limitless 대회 통계 인제스트(티어·매치업)", status: "done" },
-    { t: "카드 데이터셋 인제스트(9개국어)", status: "todo" },
+    { t: "카드 데이터셋 인제스트(전 세트)", status: "done" },
+    { t: "카드명 현지화(영→ko/ja/zh)", status: "todo" },
     { t: "롱테일 카드 페이지(승인 후 공개·noindex)", status: "todo" },
   ] },
 ];

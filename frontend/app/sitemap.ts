@@ -62,9 +62,11 @@ function gblPaths(): [string, CF, number][] {
 function tcgPaths(): [string, CF, number][] {
   return [
     ["/tcg", "weekly", 1],
+    ["/tcg/meta", "daily", 0.9],
     ["/tcg/tier", "daily", 0.9],
     ["/tcg/decks", "weekly", 0.8],
     ...analyzedDeckIds().map((id) => [`/tcg/decks/${id}`, "weekly", 0.7] as [string, CF, number]),
+    ["/tcg/cards", "weekly", 0.6],
     ["/tcg/about", "monthly", 0.4],
     ["/tcg/privacy", "yearly", 0.3],
     ["/tcg/terms", "yearly", 0.3],
