@@ -35,6 +35,8 @@ export type ScheduleDict = {
   share: string; save: string; close: string;
   imgTitle: string; imgFooter: string; imgShareTitle: string; imgFile: string;
   cpModalSub: string; cpModalNoData: string;
+  // 서버렌더 SEO 아젠다(크롤러가 JS 없이 보스·날짜 텍스트를 읽도록) — 달력은 ssr:false라 SSR HTML이 얇음
+  seoAgendaH: string; seoAgendaLead: string;
   // 메타
   metaTitle: string; metaDesc: string; metaKeywords: string[]; ogTitle: string; ogDesc: string;
 };
@@ -83,8 +85,10 @@ const ko: ScheduleDict = {
   share: "📤 공유", save: "💾 저장", close: "닫기",
   imgTitle: "포켓몬고 {m}월 레이드", imgFooter: "포켓몬GO 레이드 일정", imgShareTitle: "포켓몬고 {m}월 레이드 일정", imgFile: "gbl-raid-{m}월.png",
   cpModalSub: "개체값별 포획 CP", cpModalNoData: "이 보스의 CP 데이터가 아직 준비되지 않았어요.",
-  metaTitle: "포켓몬고 레이드 스케줄 달력 · 5성·메가 로테이션 | GBL Note",
-  metaDesc: "포켓몬 GO 레이드 일정을 달력으로. 5성 전설·메가·섀도우 레이드 로테이션 기간과 레이드 아워·레이드 데이를 날짜별로 확인. 보스 100% CP·약점 딜러 연결. 자동 업데이트.",
+  seoAgendaH: "🔥 다가오는 레이드 로테이션",
+  seoAgendaLead: "지금부터 예정된 5성 전설·메가·섀도우 레이드 보스와 기간입니다. 보스를 누르면 100% CP·약점 딜러로 이동합니다.",
+  metaTitle: "포켓몬고 레이드 일정 · 이번주 5성·메가 보스 달력 | GBL Note",
+  metaDesc: "포켓몬 GO 레이드 일정을 한눈에. 이번 주 5성 전설·메가·섀도우 레이드 보스와 로테이션 기간, 레이드 아워·데이를 날짜별로. 보스 100% CP·약점 딜러 바로가기. 매일 자동 업데이트.",
   metaKeywords: ["포켓몬고 레이드 일정", "레이드 달력", "5성 레이드 로테이션", "메가 레이드 일정", "레이드 아워", "레이드 데이"],
   ogTitle: "포켓몬고 레이드 스케줄 달력", ogDesc: "5성·메가 로테이션 + 레이드 아워·데이",
 };
@@ -126,8 +130,10 @@ const en: ScheduleDict = {
   share: "📤 Share", save: "💾 Save", close: "Close",
   imgTitle: "Pokémon GO {month} Raids", imgFooter: "Pokémon GO raid schedule", imgShareTitle: "Pokémon GO {month} raid schedule", imgFile: "gbl-raid-{m}.png",
   cpModalSub: "Catch CP by IV", cpModalNoData: "CP data for this boss isn't ready yet.",
-  metaTitle: "Pokémon GO Raid Schedule · 5★ & Mega Rotation | GBL Note",
-  metaDesc: "Pokémon GO raid schedule as a calendar. See 5-star legendary, Mega and Shadow raid rotation periods plus Raid Hour and Raid Day by date.",
+  seoAgendaH: "🔥 Upcoming Raid Rotations",
+  seoAgendaLead: "5★ legendary, Mega and Shadow raid bosses scheduled from now, with dates. Tap a boss for its 100% CP and best counters.",
+  metaTitle: "Pokémon GO Raid Schedule · This Week's 5★ & Mega Bosses | GBL Note",
+  metaDesc: "Pokémon GO raid schedule at a glance. This week's 5-star legendary, Mega and Shadow raid bosses with rotation dates, plus Raid Hour and Raid Day. 100% CP and best counters, auto-updated daily.",
   metaKeywords: ["pokemon go raid schedule", "raid calendar", "5-star raid rotation", "mega raid schedule", "raid hour", "raid day"],
   ogTitle: "Pokémon GO Raid Schedule Calendar", ogDesc: "5★ & Mega rotation + Raid Hour & Day",
 };
@@ -176,8 +182,10 @@ const ja: ScheduleDict = {
   share: "📤 共有", save: "💾 保存", close: "閉じる",
   imgTitle: "ポケモンGO {m}月 レイド", imgFooter: "ポケモンGO レイド日程", imgShareTitle: "ポケモンGO {m}月 レイド日程", imgFile: "gbl-raid-{m}.png",
   cpModalSub: "個体値別 捕獲CP", cpModalNoData: "このボスのCPデータはまだ準備できていません。",
-  metaTitle: "ポケモンGO レイドスケジュール カレンダー · 5★・メガローテーション | GBL Note",
-  metaDesc: "ポケモンGOのレイド日程をカレンダーで。5★伝説・メガ・シャドウレイドのローテーション期間とレイドアワー・レイドデイを日付ごとに確認。ボスの100% CP・弱点アタッカーへ連携。自動更新。",
+  seoAgendaH: "🔥 今後のレイドローテーション",
+  seoAgendaLead: "今から予定されている5★伝説・メガ・シャドウレイドのボスと期間です。ボスをタップすると100% CP・弱点アタッカーへ移動します。",
+  metaTitle: "ポケモンGO レイド日程 · 今週の5★・メガボス カレンダー | GBL Note",
+  metaDesc: "ポケモンGOのレイド日程をひと目で。今週の5★伝説・メガ・シャドウレイドのボスとローテーション期間、レイドアワー・デイを日付ごとに。ボス100% CP・弱点アタッカーへ。毎日自動更新。",
   metaKeywords: ["ポケモンGO レイド日程", "レイドカレンダー", "5★レイド ローテーション", "メガレイド 日程", "レイドアワー", "レイドデイ"],
   ogTitle: "ポケモンGO レイドスケジュール カレンダー", ogDesc: "5★・メガローテーション + レイドアワー・デイ",
 };
@@ -219,8 +227,10 @@ const zhTW: ScheduleDict = {
   share: "📤 分享", save: "💾 儲存", close: "關閉",
   imgTitle: "寶可夢GO {m}月團體戰", imgFooter: "寶可夢GO 團體戰時程", imgShareTitle: "寶可夢GO {m}月團體戰時程", imgFile: "gbl-raid-{m}月.png",
   cpModalSub: "各個體值捕捉 CP", cpModalNoData: "此頭目的 CP 資料尚未準備。",
-  metaTitle: "寶可夢GO 團體戰時程行事曆 · 五星·超級輪替 | GBL Note",
-  metaDesc: "寶可夢 GO 團體戰時程行事曆。依日期確認五星傳說·超級·暗影團體戰輪替期間與團體戰時刻·團體戰日。連結頭目 100% CP·剋制攻擊手。自動更新。",
+  seoAgendaH: "🔥 即將到來的團體戰輪替",
+  seoAgendaLead: "從現在起排定的五星傳說·超級·暗影團體戰頭目與期間。點擊頭目可查看 100% CP·剋制攻擊手。",
+  metaTitle: "寶可夢GO 團體戰時程 · 本週五星·超級頭目 行事曆 | GBL Note",
+  metaDesc: "寶可夢GO團體戰時程一目了然。本週五星傳說·超級·暗影團體戰頭目與輪替期間，團體戰時刻·團體戰日。頭目100% CP·剋制攻擊手，每日自動更新。",
   metaKeywords: ["寶可夢GO 團體戰時程", "團體戰行事曆", "五星團體戰輪替", "超級團體戰時程", "團體戰時刻", "團體戰日"],
   ogTitle: "寶可夢GO 團體戰時程行事曆", ogDesc: "五星·超級輪替 + 團體戰時刻·日",
 };

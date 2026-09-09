@@ -204,6 +204,42 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
     .filter((e) => MAJOR_EMOJI[e.eventType])
     .map((e) => ({ eventType: e.eventType, emoji: MAJOR_EMOJI[e.eventType], name: localMajorName(lang, e.name, t), start: e.start, end: e.end }));
 
+  // ── 서버렌더 SEO 아젠다 + JSON-LD ──
+  // 달력(RaidCalendarClient)은 ssr:false라 SSR HTML에 보스명·날짜 텍스트가 없어 크롤러엔 얇은 페이지.
+  // 다가오는 로테이션을 서버에서 실제 텍스트로 렌더해 색인 대상 콘텐츠를 제공(모바일/데스크톱 공통 순위 신호).
+  const nowMs = Date.now();
+  const toISO = (s: string) => (/(?:Z|[+-]\d\d:?\d\d)$/.test(s) ? s : `${s}+09:00`);
+  const mdKST = (s: string) => { const dt = new Date(Date.parse(toISO(s)) + 9 * 3600 * 1000); return `${dt.getUTCMonth() + 1}/${dt.getUTCDate()}`; };
+  const rotLabel = (v?: "star" | "mega" | "shadow") => (v === "mega" ? t.rotMegaTitle : v === "shadow" ? t.rotShadowTitle : t.rotStarTitle);
+  const seenAgenda = new Set<string>();
+  const agenda = calEvents
+    .filter((e) => e.kind === "rotation" && e.bosses.length > 0 && Date.parse(toISO(e.end)) >= nowMs)
+    .sort((a, b) => Date.parse(toISO(a.start)) - Date.parse(toISO(b.start)))
+    .filter((e) => { const k = `${e.variant}|${e.start}|${e.bosses.map((b) => b.ko).join(",")}`; if (seenAgenda.has(k)) return false; seenAgenda.add(k); return true; })
+    .slice(0, 8)
+    .map((e) => ({ variant: e.variant, label: rotLabel(e.variant), bosses: e.bosses.map((b) => b.name).join(" · "), range: `${mdKST(e.start)}~${mdKST(e.end)}`, start: toISO(e.start), end: toISO(e.end) }));
+
+  const pageUrl = `https://gblnote.com${localizePath(lang, PATH)}`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "BreadcrumbList", itemListElement: [
+        { "@type": "ListItem", position: 1, name: "GBL Note", item: `https://gblnote.com${localizePath(lang, "/gbl")}` },
+        { "@type": "ListItem", position: 2, name: t.navBack.replace(/^[←\s]+/, ""), item: `https://gblnote.com${localizePath(lang, "/gbl/raid")}` },
+        { "@type": "ListItem", position: 3, name: t.h1, item: pageUrl },
+      ] },
+      ...agenda.map((a) => ({
+        "@type": "Event", name: `${a.label}: ${a.bosses}`,
+        startDate: a.start, endDate: a.end,
+        eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+        eventStatus: "https://schema.org/EventScheduled",
+        location: { "@type": "VirtualLocation", url: pageUrl },
+        image: [`https://gblnote.com${localizePath(lang, PATH + "/opengraph-image")}`],
+        organizer: { "@type": "Organization", name: "Niantic / Pokémon GO" },
+      })),
+    ],
+  };
+
   const wrap: React.CSSProperties = {
     minHeight: "100dvh",
     background: "radial-gradient(1000px 500px at 50% -10%, #ffe3d1 0%, transparent 60%), linear-gradient(180deg,#fdf8f4,#f4eef8)",
@@ -212,6 +248,7 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
 
   return (
     <div style={wrap}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
         <div style={{ marginBottom: 6, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <Link href={L("/gbl/raid")} style={{ fontSize: "0.82rem", color: "#ea580c", textDecoration: "none" }}>{t.navBack}</Link>
@@ -266,6 +303,23 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
               <RaidCalendarClient events={calEvents} majorEvents={majorEvents} today={today} t={t} lang={lang} />
             </div>
           </>
+        )}
+
+        {/* 서버렌더 SEO 아젠다 — 크롤러가 JS 없이 읽는 보스·날짜 텍스트(달력은 ssr:false) */}
+        {agenda.length > 0 && (
+          <section style={{ marginTop: 20, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: "14px 16px 16px" }}>
+            <h2 style={{ margin: "0 0 4px", fontSize: "1.05rem", fontWeight: 800, color: "#0f172a" }}>{t.seoAgendaH}</h2>
+            <p style={{ margin: "0 0 10px", fontSize: "0.82rem", color: "#64748b", lineHeight: 1.6 }}>{t.seoAgendaLead}</p>
+            <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
+              {agenda.map((a, i) => (
+                <li key={i} style={{ display: "flex", alignItems: "baseline", gap: 10, fontSize: "0.88rem", lineHeight: 1.5, borderTop: i ? `1px solid ${BORDER}` : "none", paddingTop: i ? 8 : 0 }}>
+                  <span style={{ flex: "0 0 auto", fontVariantNumeric: "tabular-nums", fontWeight: 700, color: "#ea580c", minWidth: 74 }}>{a.range}</span>
+                  <span style={{ flex: "0 0 auto", fontSize: "0.72rem", fontWeight: 700, color: a.variant === "mega" ? "#7c3aed" : a.variant === "shadow" ? "#475569" : "#c2410c", background: a.variant === "mega" ? "#f5f3ff" : a.variant === "shadow" ? "#f1f5f9" : "#fff7ed", borderRadius: 999, padding: "2px 9px" }}>{a.label}</span>
+                  <span style={{ color: "#334155", fontWeight: 600 }}>{a.bosses}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
 
         <div style={{ marginTop: 24, textAlign: "center", fontSize: "0.72rem", color: "#94a3b8" }}>
