@@ -331,7 +331,10 @@
       "Bash(timeout 25 curl -s \"https://gblnote.com/gbl?v=$\\(date +%s\\)\")",
       "Bash(timeout 25 curl -s -I \"https://gblnote.com/gbl\")",
       "Bash(grep -n \"const CARD = \\\\\"#fff\\\\\", BORDER\\\\|const lgC =\\\\|const top = rows.slice\\\\|<div style={{ fontSize: \\\\\"0.72rem\\\\\", color: \\\\\"#94a3b8\\\\\", margin: \\\\\"7px 2px 0\\\\\" }}>{t.topNote}\" \"app/[lang]/gbl/iv/IvChecker.tsx\")",
-      "Bash(curl -s \"http://localhost:3000/gbl/iv\" -o /dev/null -w \"IV HTTP %{http_code}\\\\n\")"
+      "Bash(curl -s \"http://localhost:3000/gbl/iv\" -o /dev/null -w \"IV HTTP %{http_code}\\\\n\")",
+      "Bash(curl -s -o /dev/null -w \"deck-builder: %{http_code}\\\\n\" http://localhost:3000/tcg/deck-builder)",
+      "Bash(curl -s -o /dev/null -w \"tcg home: %{http_code}\\\\n\" http://localhost:3000/tcg)",
+      "Read(//c/maesil-agency/frontend/**)"
     ]
   }
 }

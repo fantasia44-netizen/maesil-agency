@@ -1,0 +1,1 @@
+cs_patterns 조회 실패: {'code': 'PGRST205', 'details': None, 'hint': None, 'message': "Could not find the table 'agent_work.growth_analysis_results' in the schema cache"}

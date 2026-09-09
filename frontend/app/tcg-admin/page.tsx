@@ -41,7 +41,7 @@ const ROADMAP: { section: string; items: { t: string; status: "done" | "wip" | "
     { t: "카운터 검색(상대 덱→이기는 덱)", status: "done" },
     { t: "팩 오픈 시뮬레이터(pullRates)", status: "done" },
     { t: "덱 빌더(20장·2카피·메타덱 시작·공유)", status: "done" },
-    { t: "초보/전략 가이드", status: "todo" },
+    { t: "초보/전략 가이드(시작·덱선택·타입상성)", status: "done" },
   ] },
   { section: "데이터 파이프라인", items: [
     { t: "Limitless 대회 통계 인제스트(티어·매치업)", status: "done" },

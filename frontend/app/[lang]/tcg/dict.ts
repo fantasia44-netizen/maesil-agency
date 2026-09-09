@@ -31,6 +31,7 @@ const ko: TcgDict = {
     { key: "counters", path: "/tcg/counters", label: "카운터" },
     { key: "cards", path: "/tcg/cards", label: "카드" },
     { key: "packsim", path: "/tcg/pack-sim", label: "팩시뮬" },
+    { key: "guides", path: "/tcg/guides", label: "가이드" },
   ],
   hero: {
     h1: "TCG Note — 포켓몬 카드 게임 Pocket 메타·덱 분석",
@@ -69,6 +70,7 @@ const en: TcgDict = {
     { key: "counters", path: "/tcg/counters", label: "Counters" },
     { key: "cards", path: "/tcg/cards", label: "Cards" },
     { key: "packsim", path: "/tcg/pack-sim", label: "Pack Sim" },
+    { key: "guides", path: "/tcg/guides", label: "Guides" },
   ],
   hero: {
     h1: "TCG Note — Pokémon TCG Pocket Meta & Deck Analysis",
@@ -107,6 +109,7 @@ const ja: TcgDict = {
     { key: "counters", path: "/tcg/counters", label: "カウンター" },
     { key: "cards", path: "/tcg/cards", label: "カード" },
     { key: "packsim", path: "/tcg/pack-sim", label: "パック開封" },
+    { key: "guides", path: "/tcg/guides", label: "ガイド" },
   ],
   hero: {
     h1: "TCG Note — ポケポケ デッキ環境・ティア分析",
@@ -145,6 +148,7 @@ const zhTW: TcgDict = {
     { key: "counters", path: "/tcg/counters", label: "剋星" },
     { key: "cards", path: "/tcg/cards", label: "卡片" },
     { key: "packsim", path: "/tcg/pack-sim", label: "開包" },
+    { key: "guides", path: "/tcg/guides", label: "指南" },
   ],
   hero: {
     h1: "TCG Note — 寶可夢卡牌 Pocket 環境·牌組分析",
