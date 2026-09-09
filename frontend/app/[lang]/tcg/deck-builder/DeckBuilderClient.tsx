@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import CARDS from "../data/cards.json";
 import DECKS from "../data/decks.json";
 import { type Locale } from "../../../../lib/i18n";
+import { elementName, packName } from "../loc";
 
 type Card = { s: string; n: number; name: string; r?: string; packs?: string[]; nm?: Record<string, string>; e?: string; w?: string };
 type DeckEntry = { count: number; set: string; number: string | number; name: string; nm?: Record<string, string> };
@@ -29,21 +30,21 @@ for (const c of DATA) BY_KEY.set(keyOf(c.s, c.n), c);
 type DbT = {
   title: string; start: string; clear: string; share: string; copied: string; empty: string; full: string; copyMax: string;
   valid: string; invalidN: string; pool: string; search: string; allSets: string; allTypes: string; types: string; packs: string;
-  packNote: string; none: string; tierWin: string; note: string; weak: string; inDeck: string; removeAll: string;
+  packNote: string; none: string; tierWin: string; note: string; weak: string; inDeck: string; removeAll: string; showN: (shown: number, total: number) => string;
   elem: Record<string, string>;
 };
 const L: Record<Locale, DbT> = {
-  ko: { title: "내 덱", start: "메타 덱에서 시작…", clear: "비우기", share: "🔗 공유 링크", copied: "복사됨!", empty: "카드를 눌러 덱에 추가하세요 (20장)", full: "덱이 가득 찼습니다 (20장)", copyMax: "같은 이름 2장까지", valid: "✅ 완성된 덱 (20장)", invalidN: "장 더 필요", pool: "카드 풀", search: "카드 이름 검색…", allSets: "전체 세트", allTypes: "전체 타입", types: "타입 분포", packs: "필요한 팩", packNote: "이 카드들은 아래 팩에서 나옵니다", none: "-", tierWin: "티어·승률", note: "포켓포켓 규칙: 20장 / 같은 이름 2장. 에너지는 덱과 별도로 선택합니다.", weak: "약점", inDeck: "덱에", removeAll: "전체 삭제",
-    elem: { grass: "풀", fire: "불꽃", water: "물", lightning: "번개", psychic: "에스퍼", fighting: "격투", darkness: "악", metal: "강철", dragon: "드래곤", colorless: "무색" } },
-  en: { title: "Your Deck", start: "Start from a meta deck…", clear: "Clear", share: "🔗 Share link", copied: "Copied!", empty: "Tap a card to add it (20)", full: "Deck is full (20)", copyMax: "Max 2 of a name", valid: "✅ Complete deck (20)", invalidN: "more needed", pool: "Card pool", search: "Search card name…", allSets: "All sets", allTypes: "All types", types: "Type spread", packs: "Packs you need", packNote: "These cards come from the packs below", none: "-", tierWin: "Tier·WR", note: "Pocket rules: 20 cards / max 2 of a name. Energy is chosen separately.", weak: "Weak", inDeck: "in deck", removeAll: "Remove all",
+  ko: { title: "내 덱", start: "메타 덱에서 시작…", clear: "비우기", share: "🔗 공유 링크", copied: "복사됨!", empty: "카드를 눌러 덱에 추가하세요 (20장)", full: "덱이 가득 찼습니다 (20장)", copyMax: "같은 이름 2장까지", valid: "✅ 완성된 덱 (20장)", invalidN: "장 더 필요", pool: "카드 풀", search: "카드 이름 검색…", allSets: "전체 세트", allTypes: "전체 타입", types: "타입 분포", packs: "필요한 팩", packNote: "이 카드들은 아래 팩에서 나옵니다", none: "-", tierWin: "티어·승률", note: "포켓포켓 규칙: 20장 / 같은 이름 2장. 에너지는 덱과 별도로 선택합니다.", weak: "약점", inDeck: "덱에", removeAll: "전체 삭제", showN: (m,t)=>`총 ${t.toLocaleString()}장 중 상위 ${m}장 · 검색·필터로 좁히기`,
+    elem: { grass: "풀", fire: "불꽃", water: "물", lightning: "번개", psychic: "에스퍼", fighting: "격투", darkness: "악", metal: "강철", dragon: "드래곤", colorless: "노말" } },
+  en: { title: "Your Deck", start: "Start from a meta deck…", clear: "Clear", share: "🔗 Share link", copied: "Copied!", empty: "Tap a card to add it (20)", full: "Deck is full (20)", copyMax: "Max 2 of a name", valid: "✅ Complete deck (20)", invalidN: "more needed", pool: "Card pool", search: "Search card name…", allSets: "All sets", allTypes: "All types", types: "Type spread", packs: "Packs you need", packNote: "These cards come from the packs below", none: "-", tierWin: "Tier·WR", note: "Pocket rules: 20 cards / max 2 of a name. Energy is chosen separately.", weak: "Weak", inDeck: "in deck", removeAll: "Remove all", showN: (m,t)=>`Top ${m} of ${t.toLocaleString()} · search/filter to narrow`,
     elem: { grass: "Grass", fire: "Fire", water: "Water", lightning: "Lightning", psychic: "Psychic", fighting: "Fighting", darkness: "Darkness", metal: "Metal", dragon: "Dragon", colorless: "Colorless" } },
-  ja: { title: "マイデッキ", start: "メタデッキから開始…", clear: "クリア", share: "🔗 共有リンク", copied: "コピー!", empty: "カードを押して追加(20枚)", full: "デッキが満杯(20枚)", copyMax: "同名は2枚まで", valid: "✅ 完成(20枚)", invalidN: "枚不足", pool: "カードプール", search: "カード名を検索…", allSets: "全セット", allTypes: "全タイプ", types: "タイプ分布", packs: "必要なパック", packNote: "これらのカードは下記パックから出ます", none: "-", tierWin: "ティア·勝率", note: "ポケポケ: 20枚 / 同名2枚まで。エネルギーは別で選択。", weak: "弱点", inDeck: "採用", removeAll: "全削除",
+  ja: { title: "マイデッキ", start: "メタデッキから開始…", clear: "クリア", share: "🔗 共有リンク", copied: "コピー!", empty: "カードを押して追加(20枚)", full: "デッキが満杯(20枚)", copyMax: "同名は2枚まで", valid: "✅ 完成(20枚)", invalidN: "枚不足", pool: "カードプール", search: "カード名を検索…", allSets: "全セット", allTypes: "全タイプ", types: "タイプ分布", packs: "必要なパック", packNote: "これらのカードは下記パックから出ます", none: "-", tierWin: "ティア·勝率", note: "ポケポケ: 20枚 / 同名2枚まで。エネルギーは別で選択。", weak: "弱点", inDeck: "採用", removeAll: "全削除", showN: (m,t)=>`全${t.toLocaleString()}枚中 上位${m}枚 · 検索·フィルターで絞り込み`,
     elem: { grass: "草", fire: "炎", water: "水", lightning: "雷", psychic: "超", fighting: "闘", darkness: "悪", metal: "鋼", dragon: "竜", colorless: "無" } },
-  "zh-TW": { title: "我的牌組", start: "從主流牌組開始…", clear: "清空", share: "🔗 分享連結", copied: "已複製!", empty: "點卡片加入牌組(20張)", full: "牌組已滿(20張)", copyMax: "同名最多2張", valid: "✅ 完成(20張)", invalidN: "張不足", pool: "卡片池", search: "搜尋卡名…", allSets: "全部卡包", allTypes: "全部屬性", types: "屬性分布", packs: "需要的卡包", packNote: "這些卡片來自下列卡包", none: "-", tierWin: "強度·勝率", note: "Pocket規則：20張 / 同名最多2張。能量另外選擇。", weak: "弱點", inDeck: "採用", removeAll: "全部移除",
+  "zh-TW": { title: "我的牌組", start: "從主流牌組開始…", clear: "清空", share: "🔗 分享連結", copied: "已複製!", empty: "點卡片加入牌組(20張)", full: "牌組已滿(20張)", copyMax: "同名最多2張", valid: "✅ 完成(20張)", invalidN: "張不足", pool: "卡片池", search: "搜尋卡名…", allSets: "全部卡包", allTypes: "全部屬性", types: "屬性分布", packs: "需要的卡包", packNote: "這些卡片來自下列卡包", none: "-", tierWin: "強度·勝率", note: "Pocket規則：20張 / 同名最多2張。能量另外選擇。", weak: "弱點", inDeck: "採用", removeAll: "全部移除", showN: (m,t)=>`共${t.toLocaleString()}張中 前${m}張 · 用搜尋·篩選縮小`,
     elem: { grass: "草", fire: "火", water: "水", lightning: "雷", psychic: "超", fighting: "鬥", darkness: "惡", metal: "鋼", dragon: "龍", colorless: "無" } },
 };
 
-const POOL_LIMIT = 60;
+const POOL_LIMIT = 150;
 const inputStyle: React.CSSProperties = { fontSize: "0.85rem", padding: "7px 11px", borderRadius: 8, border: "1px solid #fbd8d8", background: "#fff", color: "#0f172a" };
 const STORE = "tcgDeck";
 
@@ -195,7 +196,7 @@ export default function DeckBuilderClient({ lang }: { lang: Locale }) {
                 <div>
                   <div style={{ fontWeight: 800, color: "#64748b", marginBottom: 4 }}>📦 {t.packs}</div>
                   <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-                    {packNeeds.map((p) => <span key={p} style={{ fontWeight: 800, color: "#b91c1c", background: "#fee6e6", border: "1px solid #fbd8d8", borderRadius: 999, padding: "2px 9px" }}>{p}</span>)}
+                    {packNeeds.map((p) => <span key={p} style={{ fontWeight: 800, color: "#b91c1c", background: "#fee6e6", border: "1px solid #fbd8d8", borderRadius: 999, padding: "2px 9px" }}>{packName(lang, p)}</span>)}
                   </div>
                 </div>
               )}
@@ -218,6 +219,7 @@ export default function DeckBuilderClient({ lang }: { lang: Locale }) {
         {ELEMENTS.map((el) => <button key={el} onClick={() => setElem(elem === el ? "" : el)} style={chip(elem === el, ELEMENT_COLOR[el])}>{t.elem[el]}</button>)}
       </div>
 
+      <div style={{ fontSize: "0.74rem", color: "#94a3b8", marginBottom: 8 }}>{t.showN(Math.min(filtered.length, POOL_LIMIT), filtered.length)}</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 7 }}>
         {filtered.slice(0, POOL_LIMIT).map((c) => {
           const inDeck = deck[keyOf(c.s, c.n)] || 0;
@@ -234,7 +236,7 @@ export default function DeckBuilderClient({ lang }: { lang: Locale }) {
               <div style={{ fontSize: "0.7rem", color: "#94a3b8", display: "flex", gap: 7, flexWrap: "wrap" }}>
                 <span>{c.s}·{c.n}</span>
                 {c.e && <span>{t.elem[c.e]}</span>}
-                {c.w && <span>{t.weak} {c.w}</span>}
+                {c.w && <span>{t.weak} {elementName(lang, c.w)}</span>}
               </div>
             </button>
           );

@@ -38,7 +38,7 @@ const T: Record<Locale, {
     topH: "🏆 상위 덱", overH: "📈 오버퍼포머", overP: "점유율 대비 승률이 높은 다크호스.",
     readH: "🔎 지금 메타 한줄 읽기",
     read: (top, t5, over) => `현재 메타는 '${top}'가 점유율 1위로 중심을 잡고 있으며, 상위 5덱이 ${t5}%를 차지합니다.${over ? ` 점유율은 낮지만 승률이 높은 '${over}'가 떠오르는 다크호스로, 메타가 대비하기 전 선점 가치가 있습니다.` : ""}`,
-    tierLink: "전체 덱 티어표 →", deckLink: "대표 덱 공략 →", src: "출처: Limitless TCG (play.limitlesstcg.com) — 대회 순위·대진 자체 집계", energyNames: { Grass: "풀", Fire: "불꽃", Water: "물", Lightning: "번개", Psychic: "에스퍼", Fighting: "격투", Darkness: "악", Metal: "강철", Dragon: "드래곤", Colorless: "무색" },
+    tierLink: "전체 덱 티어표 →", deckLink: "대표 덱 공략 →", src: "출처: Limitless TCG (play.limitlesstcg.com) — 대회 순위·대진 자체 집계", energyNames: { Grass: "풀", Fire: "불꽃", Water: "물", Lightning: "번개", Psychic: "에스퍼", Fighting: "격투", Darkness: "악", Metal: "강철", Dragon: "드래곤", Colorless: "노말" },
   },
   en: {
     title: "Pokémon TCG Pocket Meta Analysis", desc: "Current Pokémon TCG Pocket meta analysis — energy-type distribution, top-deck concentration and overperformers. Tournament-data based.",

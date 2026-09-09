@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import CARDS from "../data/cards.json";
 import { localizePath, type Locale } from "../../../../lib/i18n";
+import { elementName, packName } from "../loc";
 
 type Card = { s: string; n: number; name: string; r: string; packs: string[]; nm?: Record<string, string>; e?: string; w?: string };
 const DATA = CARDS as Card[];
@@ -22,7 +23,7 @@ const L: Record<Locale, {
   elem: Record<string, string>;
 }> = {
   ko: { search: "카드 이름 검색…", allSets: "전체 세트", allTypes: "전체 타입", showing: (n, t) => `${t.toLocaleString()}장 중 ${n}장`, hp: "HP", weak: "약점", pack: "팩", noResult: "결과 없음", note: "카드명 현지화(일부 트레이너는 영어) · 타입·약점 표시(보유분) · 데이터: 커뮤니티 공개 데이터셋",
-    elem: { grass: "풀", fire: "불꽃", water: "물", lightning: "번개", psychic: "에스퍼", fighting: "격투", darkness: "악", metal: "강철", dragon: "드래곤", colorless: "무색" } },
+    elem: { grass: "풀", fire: "불꽃", water: "물", lightning: "번개", psychic: "에스퍼", fighting: "격투", darkness: "악", metal: "강철", dragon: "드래곤", colorless: "노말" } },
   en: { search: "Search card name…", allSets: "All sets", allTypes: "All types", showing: (n, t) => `${n} of ${t.toLocaleString()}`, hp: "HP", weak: "Weak", pack: "Pack", noResult: "No results", note: "Card names localized (some trainers stay English) · type/weakness where available · data: community open dataset",
     elem: { grass: "Grass", fire: "Fire", water: "Water", lightning: "Lightning", psychic: "Psychic", fighting: "Fighting", darkness: "Darkness", metal: "Metal", dragon: "Dragon", colorless: "Colorless" } },
   ja: { search: "カード名を検索…", allSets: "全セット", allTypes: "全タイプ", showing: (n, t) => `${t.toLocaleString()}枚中 ${n}枚`, hp: "HP", weak: "弱点", pack: "パック", noResult: "結果なし", note: "カード名は現地化(一部トレーナーは英語) · タイプ·弱点を表示(保有分) · データ: コミュニティ公開データセット",
@@ -81,10 +82,10 @@ export default function CardsClient({ lang }: { lang: Locale }) {
               <div style={{ fontSize: "0.72rem", color: "#64748b", display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <span>{c.s}·{c.n}</span>
                 {c.e && <span>{t.elem[c.e]}</span>}
-                {c.w && <span>{t.weak} {c.w}</span>}
+                {c.w && <span>{t.weak} {elementName(lang, c.w)}</span>}
               </div>
               {c.packs.length > 0 && (
-                <div style={{ marginTop: 4, fontSize: "0.68rem", color: "#dc2626" }}>{t.pack}: {c.packs.join(", ")}</div>
+                <div style={{ marginTop: 4, fontSize: "0.68rem", color: "#dc2626" }}>{t.pack}: {c.packs.map((p) => packName(lang, p)).join(", ")}</div>
               )}
             </Link>
           ))}

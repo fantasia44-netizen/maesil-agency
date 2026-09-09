@@ -8,6 +8,7 @@ import DECKS from "../../data/decks.json";
 import MATCHUPS from "../../data/matchups.json";
 import { getDeckAnalysis, analyzedDeckIds } from "../analysis";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, locales, type Locale } from "../../../../../lib/i18n";
+import { elementName } from "../../loc";
 
 export const revalidate = 3600;
 
@@ -173,7 +174,7 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
               <div style={{ marginTop: 8, fontSize: "0.78rem", fontWeight: 800, color: "#b91c1c" }}>{t.energy}</div>
               <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 3 }}>
                 {(deck.decklist.energy || []).map((e, i) => (
-                  <span key={i} style={{ fontSize: "0.74rem", fontWeight: 700, color: "#fff", background: ENERGY_COLOR[e] || "#9fa19f", borderRadius: 999, padding: "2px 9px" }}>{e}</span>
+                  <span key={i} style={{ fontSize: "0.74rem", fontWeight: 700, color: "#fff", background: ENERGY_COLOR[e] || "#9fa19f", borderRadius: 999, padding: "2px 9px" }}>{elementName(lang, e)}</span>
                 ))}
               </div>
             </div>

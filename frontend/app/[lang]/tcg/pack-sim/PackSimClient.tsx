@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import CARDS from "../data/cards.json";
 import RATES from "../data/packrates.json";
 import { type Locale } from "../../../../lib/i18n";
+import { packName } from "../loc";
 
 type Card = { s: string; n: number; name: string; r: string; packs: string[]; nm?: Record<string, string>; e?: string };
 const DATA = CARDS as Card[];
@@ -101,7 +102,7 @@ export default function PackSimClient({ lang }: { lang: Locale }) {
         </select>
         <label style={{ fontSize: "0.78rem", color: "#64748b" }}>{t.packL}</label>
         <select value={curPack} onChange={(e) => { setPack(e.target.value); setOpened([]); setStats(null); }} style={sel}>
-          {packs.map((p) => <option key={p} value={p}>{p}</option>)}
+          {packs.map((p) => <option key={p} value={p}>{packName(lang, p)}</option>)}
         </select>
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>

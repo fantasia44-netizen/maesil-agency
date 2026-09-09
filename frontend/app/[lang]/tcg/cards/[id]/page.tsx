@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import CARDS from "../../data/cards.json";
 import DECKS from "../../data/decks.json";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../../../lib/i18n";
+import { elementName, packName } from "../../loc";
 
 export const revalidate = 86400;
 // 승인 전엔 noindex(카드 검색과 동일 정책). AdSense 승인 후 NEXT_PUBLIC_TCG_INDEX_CARDS=1 로 색인 개방.
@@ -30,7 +31,7 @@ const T: Record<Locale, {
   ko: { back: "← 카드 검색", set: "세트", num: "번호", rarity: "희귀도", type: "타입", weak: "약점", packs: "나오는 팩", packFrom: "이 카드는 다음 팩에서 나옵니다", packSim: "팩 시뮬레이터에서 확률 보기 →",
     usedIn: "이 카드를 쓰는 메타 덱", usedNone: "현재 대회 상위 메타 덱에는 채용되지 않았습니다.", related: "같은 팩의 다른 카드", note: "카드 데이터: 커뮤니티 공개 데이터셋 · 팬 제작 비공식 사이트",
     descA: "의 카드 정보", descB: "타입·약점·나오는 팩과 이 카드를 채용하는 대회 메타 덱을 확인하세요.", tier: "티어", wr: "승률",
-    elem: { grass: "풀", fire: "불꽃", water: "물", lightning: "번개", psychic: "에스퍼", fighting: "격투", darkness: "악", metal: "강철", dragon: "드래곤", colorless: "무색" } },
+    elem: { grass: "풀", fire: "불꽃", water: "물", lightning: "번개", psychic: "에스퍼", fighting: "격투", darkness: "악", metal: "강철", dragon: "드래곤", colorless: "노말" } },
   en: { back: "← Card search", set: "Set", num: "No.", rarity: "Rarity", type: "Type", weak: "Weak", packs: "From packs", packFrom: "This card comes from these packs", packSim: "See odds in the Pack Simulator →",
     usedIn: "Meta decks that use this card", usedNone: "Not currently played in top tournament meta decks.", related: "Other cards from the same pack", note: "Card data: community open dataset · unofficial fan-made site",
     descA: " card details", descB: "See its type, weakness, the packs it comes from, and the tournament meta decks that run it.", tier: "Tier", wr: "WR",
@@ -110,7 +111,7 @@ export default function CardPage({ params }: { params: { lang: string; id: strin
         <div style={box}><div style={label}>{t.set}</div><div style={val}>{c.s}</div></div>
         <div style={box}><div style={label}>{t.num}</div><div style={val}>{c.n}</div></div>
         {c.e && <div style={box}><div style={label}>{t.type}</div><div style={{ ...val, color }}>{t.elem[c.e]}</div></div>}
-        {c.w && <div style={box}><div style={label}>{t.weak}</div><div style={val}>{c.w}</div></div>}
+        {c.w && <div style={box}><div style={label}>{t.weak}</div><div style={val}>{elementName(lang, c.w)}</div></div>}
         {c.r && <div style={box}><div style={label}>{t.rarity}</div><div style={val}>{c.r}</div></div>}
       </div>
 
@@ -120,7 +121,7 @@ export default function CardPage({ params }: { params: { lang: string; id: strin
           <div style={{ fontSize: "0.9rem", fontWeight: 900, color: "#0f172a", marginBottom: 6 }}>📦 {t.packs}</div>
           <p style={{ margin: "0 0 8px", fontSize: "0.84rem", color: "#475569" }}>{t.packFrom}</p>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
-            {c.packs.map((p) => <span key={p} style={{ fontWeight: 800, color: "#b91c1c", background: "#fee6e6", border: "1px solid #fbd8d8", borderRadius: 999, padding: "3px 12px", fontSize: "0.8rem" }}>{p}</span>)}
+            {c.packs.map((p) => <span key={p} style={{ fontWeight: 800, color: "#b91c1c", background: "#fee6e6", border: "1px solid #fbd8d8", borderRadius: 999, padding: "3px 12px", fontSize: "0.8rem" }}>{packName(lang, p)}</span>)}
           </div>
           <Link href={localizePath(lang, "/tcg/pack-sim")} style={{ fontSize: "0.8rem", fontWeight: 700, color: "#dc2626", textDecoration: "none" }}>{t.packSim}</Link>
         </div>
