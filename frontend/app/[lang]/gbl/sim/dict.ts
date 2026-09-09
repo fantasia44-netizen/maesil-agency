@@ -76,7 +76,7 @@ const ja: SimDict = {
   intro: "2匹のポケモンを対戦。個体値(攻/防/HP)・技・レベル・シャドウ・シールドを指定して実際のバトル結果を計算します。",
   leagues: { great: "スーパーリーグ", ultra: "ハイパーリーグ", master: "マスターリーグ" },
   searchPh: "ポケモン検索", pickMon: "ポケモンを選択",
-  fast: "ノーマルアタック", charged: "スペシャルアタック", ivLabel: "個体値", atk: "攻撃", def: "防御", sta: "HP",
+  fast: "ノーマルアタック", charged: "ゲージ技", ivLabel: "個体値", atk: "攻撃", def: "防御", sta: "HP",
   level: "レベル", cp: "CP", hp: "HP", shadow: "シャドウ", bestBuddy: "バディ(+1)", shields: "シールド",
   vs: "VS", run: "バトル!",
   resultH: "バトル結果", winA: "左の勝ち", winB: "右の勝ち", tie: "引き分け", empty: "2匹選んでください。",

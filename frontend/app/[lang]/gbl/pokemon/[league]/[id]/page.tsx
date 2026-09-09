@@ -11,7 +11,6 @@ import PKNAMES from "../../../pokedex_names.json";
 import { formDexById } from "../../../sprite";
 import MOVENAMES from "../../../pvp_move_names.json";
 import AdSlot from "../../../AdSlot";
-import CoupangAd from "../../../CoupangAd";
 import PokemonShare from "./PokemonShare";
 import MovesetShare from "./MovesetShare";
 import { type FastOpt, type ChargedOpt } from "./MovesetPanel";
@@ -157,7 +156,7 @@ function dynMetaDesc(lang: Locale, d: Detail, name: string, lgName: string, pr?:
   const t = d.tier;
   const hasPick = typeof pr === "number" && pr > 0;
   if (lang === "en") return `${name} in ${lgName}: ${t}-tier. Best moveset ${moves}${topC ? `, top counter ${topC}` : ""}. Weaknesses, win/loss matchups & 0/1/2-shield sim${hasPick ? `, real pick rate ${pr}%` : ""}.`;
-  if (lang === "ja") return `${name} ${lgName} ${t}ティア。推奨技構成 ${moves}${topC ? `、主要カウンター ${topC}` : ""}。弱点・有利不利対面・0/1/2ゲージのシミュ結果${hasPick ? `・実測ピック率${pr}%` : ""}。`;
+  if (lang === "ja") return `${name} ${lgName} ${t}ティア。推奨技構成 ${moves}${topC ? `、主要対策 ${topC}` : ""}。弱点・有利不利対面・0/1/2ゲージのシミュ結果${hasPick ? `・実測ピック率${pr}%` : ""}。`;
   if (lang === "zh-TW") return `${name} ${lgName} ${t}級。推薦配招 ${moves}${topC ? `、主要剋星 ${topC}` : ""}。弱點·勝負對面·0/1/2護盾模擬結果${hasPick ? `·實測使用率${pr}%` : ""}。`;
   return `${name} ${lgName} ${t}티어. 추천 기술배치 ${moves}${topC ? `, 주요 카운터 ${topC}` : ""}. 약점·승패 매치업·0/1/2실드 시뮬 결과${hasPick ? `·실측 픽률 ${pr}%` : ""}까지.`;
 }
@@ -529,7 +528,6 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
           </p>
         </div>
 
-        <CoupangAd />
 
         <div style={{ textAlign: "center", marginTop: 22, fontSize: "0.72rem", color: "#94a3b8" }}>
           <Link href={L("/gbl/privacy")} style={{ color: "#64748b", textDecoration: "none" }}>{pk.privacy}</Link>
