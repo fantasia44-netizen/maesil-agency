@@ -104,16 +104,16 @@ export default function TierPage({ params }: { params: { lang: string } }) {
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "1.4rem 1rem 4rem" }}>
-      <div style={{ fontSize: "0.78rem", color: "#b4258f", marginBottom: 6 }}>
-        <Link href={L("/tcg")} style={{ color: "#b4258f", textDecoration: "none" }}>← TCG Note</Link>
+      <div style={{ fontSize: "0.78rem", color: "#dc2626", marginBottom: 6 }}>
+        <Link href={L("/tcg")} style={{ color: "#dc2626", textDecoration: "none" }}>← TCG Note</Link>
       </div>
       <h1 style={{ margin: "0 0 8px", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.25 }}>{t.h1}</h1>
       <p style={{ margin: "0 0 12px", fontSize: "0.9rem", color: "#475569", lineHeight: 1.7 }}>{t.intro}</p>
 
       {/* 방법론 — 투명성(독창 신호) */}
-      <details style={{ background: "#fbf5fa", border: "1px solid #eadff2", borderRadius: 10, padding: "0.7rem 0.9rem", marginBottom: 16 }}>
-        <summary style={{ fontSize: "0.86rem", fontWeight: 800, color: "#a01f7f", cursor: "pointer" }}>{t.method}</summary>
-        <p style={{ margin: "8px 0 0", fontSize: "0.8rem", color: "#5b4a58", lineHeight: 1.7 }}>{t.methodBody(META)}</p>
+      <details style={{ background: "#fef6f5", border: "1px solid #fbd8d8", borderRadius: 10, padding: "0.7rem 0.9rem", marginBottom: 16 }}>
+        <summary style={{ fontSize: "0.86rem", fontWeight: 800, color: "#b91c1c", cursor: "pointer" }}>{t.method}</summary>
+        <p style={{ margin: "8px 0 0", fontSize: "0.8rem", color: "#5b4a4a", lineHeight: 1.7 }}>{t.methodBody(META)}</p>
         <p style={{ margin: "6px 0 0", fontSize: "0.72rem", color: "#94a3b8" }}>
           {t.updated} {fmtDate} · {t.src}: Limitless TCG
         </p>
@@ -138,9 +138,9 @@ export default function TierPage({ params }: { params: { lang: string } }) {
               </thead>
               <tbody>
                 {byTier[tr].map((d) => (
-                  <tr key={d.id} style={{ borderTop: "1px solid #f0e6f0" }}>
+                  <tr key={d.id} style={{ borderTop: "1px solid #f6e0e0" }}>
                     <td style={{ padding: "7px 8px", fontWeight: 600, color: "#0f172a" }}>{d.name}</td>
-                    <td style={{ padding: "7px 8px", textAlign: "right", fontWeight: 700, color: "#b4258f", fontVariantNumeric: "tabular-nums" }}>{d.share}%</td>
+                    <td style={{ padding: "7px 8px", textAlign: "right", fontWeight: 700, color: "#dc2626", fontVariantNumeric: "tabular-nums" }}>{d.share}%</td>
                     <td style={{ padding: "7px 8px", textAlign: "right", fontVariantNumeric: "tabular-nums", color: d.winrate >= 50 ? "#16a34a" : "#dc2626", fontWeight: 700 }}>{d.winrate}%</td>
                     <td style={{ padding: "7px 8px", textAlign: "right", fontVariantNumeric: "tabular-nums", color: "#94a3b8" }}>{d.n.toLocaleString()}</td>
                   </tr>

@@ -83,7 +83,7 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
   return (
     <div style={{ maxWidth: 860, margin: "0 auto", padding: "1.4rem 1rem 4rem" }}>
       <div style={{ fontSize: "0.78rem", marginBottom: 8 }}>
-        <Link href={L("/tcg/tier")} style={{ color: "#b4258f", textDecoration: "none" }}>{t.back}</Link>
+        <Link href={L("/tcg/tier")} style={{ color: "#dc2626", textDecoration: "none" }}>{t.back}</Link>
       </div>
 
       {/* 헤더 + 통계 */}
@@ -92,20 +92,20 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
         <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.2 }}>{deck.name}</h1>
       </div>
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: "0.85rem", color: "#475569", marginBottom: 14 }}>
-        <span>{t.share} <b style={{ color: "#b4258f" }}>{deck.share}%</b></span>
+        <span>{t.share} <b style={{ color: "#dc2626" }}>{deck.share}%</b></span>
         <span>{t.win} <b style={{ color: deck.winrate >= 50 ? "#16a34a" : "#dc2626" }}>{deck.winrate}%</b></span>
         <span>{t.sample} <b>{deck.n.toLocaleString()}</b></span>
         <span style={{ color: "#94a3b8" }}>{t.updated} {new Date(META.generatedAt).toISOString().slice(0, 10)}</span>
       </div>
 
       {/* 원본 전략 */}
-      <section style={{ background: "#fbf5fa", border: "1px solid #eadff2", borderRadius: 12, padding: "1rem 1.1rem", marginBottom: 16 }}>
+      <section style={{ background: "#fef6f5", border: "1px solid #fbd8d8", borderRadius: 12, padding: "1rem 1.1rem", marginBottom: 16 }}>
         <p style={{ margin: "0 0 10px", fontSize: "0.92rem", color: "#0f172a", lineHeight: 1.75, fontWeight: 600 }}>{a.summary}</p>
-        <h2 style={{ margin: "0 0 4px", fontSize: "0.9rem", fontWeight: 800, color: "#a01f7f" }}>{t.planH}</h2>
+        <h2 style={{ margin: "0 0 4px", fontSize: "0.9rem", fontWeight: 800, color: "#b91c1c" }}>{t.planH}</h2>
         <p style={{ margin: "0 0 10px", fontSize: "0.86rem", color: "#475569", lineHeight: 1.75 }}>{a.gamePlan}</p>
         {a.keyCards.length > 0 && (
           <>
-            <h2 style={{ margin: "0 0 4px", fontSize: "0.9rem", fontWeight: 800, color: "#a01f7f" }}>{t.keyH}</h2>
+            <h2 style={{ margin: "0 0 4px", fontSize: "0.9rem", fontWeight: 800, color: "#b91c1c" }}>{t.keyH}</h2>
             <ul style={{ margin: 0, paddingLeft: 18, fontSize: "0.85rem", color: "#475569", lineHeight: 1.7 }}>
               {a.keyCards.map((k, i) => <li key={i}>{k}</li>)}
             </ul>
@@ -113,7 +113,7 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
         )}
         {a.techCards && a.techCards.length > 0 && (
           <>
-            <h2 style={{ margin: "10px 0 4px", fontSize: "0.9rem", fontWeight: 800, color: "#a01f7f" }}>{t.techH}</h2>
+            <h2 style={{ margin: "10px 0 4px", fontSize: "0.9rem", fontWeight: 800, color: "#b91c1c" }}>{t.techH}</h2>
             <ul style={{ margin: 0, paddingLeft: 18, fontSize: "0.85rem", color: "#475569", lineHeight: 1.7 }}>
               {a.techCards.map((k, i) => <li key={i}>{k}</li>)}
             </ul>
@@ -135,7 +135,7 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
               </tr></thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.oid} style={{ borderTop: "1px solid #f0e6f0" }}>
+                  <tr key={r.oid} style={{ borderTop: "1px solid #f6e0e0" }}>
                     <td style={{ padding: "7px 8px", fontWeight: 600, color: "#0f172a" }}>
                       {analyzedDeckIds().includes(r.oid) ? <Link href={L(`/tcg/decks/${r.oid}`)} style={{ color: "#0f172a", textDecoration: "none" }}>{r.name}</Link> : r.name}
                     </td>
@@ -157,18 +157,18 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
         <section style={{ marginBottom: 8 }}>
           <h2 style={{ margin: "0 0 8px", fontSize: "1rem", fontWeight: 800, color: "#0f172a" }}>{t.listH}</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
-            <div style={{ background: "#fff", border: "1px solid #eadff2", borderRadius: 10, padding: "0.7rem 0.9rem" }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#a01f7f", marginBottom: 4 }}>{t.pokemon}</div>
+            <div style={{ background: "#fff", border: "1px solid #fbd8d8", borderRadius: 10, padding: "0.7rem 0.9rem" }}>
+              <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#b91c1c", marginBottom: 4 }}>{t.pokemon}</div>
               {(deck.decklist.pokemon || []).map((c, i) => (
                 <div key={i} style={{ fontSize: "0.83rem", color: "#334155", padding: "2px 0" }}><b>{c.count}×</b> {cn(c)}</div>
               ))}
             </div>
-            <div style={{ background: "#fff", border: "1px solid #eadff2", borderRadius: 10, padding: "0.7rem 0.9rem" }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#a01f7f", marginBottom: 4 }}>{t.trainer}</div>
+            <div style={{ background: "#fff", border: "1px solid #fbd8d8", borderRadius: 10, padding: "0.7rem 0.9rem" }}>
+              <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#b91c1c", marginBottom: 4 }}>{t.trainer}</div>
               {(deck.decklist.trainer || []).map((c, i) => (
                 <div key={i} style={{ fontSize: "0.83rem", color: "#334155", padding: "2px 0" }}><b>{c.count}×</b> {cn(c)}</div>
               ))}
-              <div style={{ marginTop: 8, fontSize: "0.78rem", fontWeight: 800, color: "#a01f7f" }}>{t.energy}</div>
+              <div style={{ marginTop: 8, fontSize: "0.78rem", fontWeight: 800, color: "#b91c1c" }}>{t.energy}</div>
               <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 3 }}>
                 {(deck.decklist.energy || []).map((e, i) => (
                   <span key={i} style={{ fontSize: "0.74rem", fontWeight: 700, color: "#fff", background: ENERGY_COLOR[e] || "#9fa19f", borderRadius: 999, padding: "2px 9px" }}>{e}</span>

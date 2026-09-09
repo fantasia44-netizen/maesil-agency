@@ -9,12 +9,12 @@ const ADS = process.env.NEXT_PUBLIC_TCG_ADSENSE_CLIENT || "";
 const GA = process.env.NEXT_PUBLIC_TCG_GA_ID || "";
 const NAVER = process.env.NEXT_PUBLIC_TCG_NAVER_VERIFY || "";
 
-const CARD: React.CSSProperties = { background: "#fff", border: "1px solid #eadff2", borderRadius: 12, padding: "1rem 1.2rem" };
+const CARD: React.CSSProperties = { background: "#fff", border: "1px solid #fbd8d8", borderRadius: 12, padding: "1rem 1.2rem" };
 const H2: React.CSSProperties = { margin: "0 0 10px", fontSize: "1rem", fontWeight: 800, color: "#0f172a" };
 
 function StatusRow({ label, value, ok }: { label: string; value: string; ok: boolean }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", padding: "5px 0", borderTop: "1px solid #f4eef7" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", padding: "5px 0", borderTop: "1px solid #f9e8e8" }}>
       <span style={{ width: 10, height: 10, borderRadius: 999, background: ok ? "#16a34a" : "#cbd5e1", flexShrink: 0 }} />
       <span style={{ minWidth: 150, color: "#475569", fontWeight: 600 }}>{label}</span>
       <span style={{ color: ok ? "#0f172a" : "#94a3b8" }}>{value}</span>
@@ -72,7 +72,7 @@ export default function TcgAdminPage() {
   return (
     <div style={{ maxWidth: 960, margin: "0 auto", padding: "1.5rem 1rem 4rem", display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <h1 style={{ margin: "0 0 4px", fontSize: "1.4rem", fontWeight: 900, color: "#a01f7f" }}>🎴 TCG Note 관리</h1>
+        <h1 style={{ margin: "0 0 4px", fontSize: "1.4rem", fontWeight: 900, color: "#b91c1c" }}>🎴 TCG Note 관리</h1>
         <p style={{ margin: 0, fontSize: "0.85rem", color: "#64748b" }}>
           tcgnote.net · 포켓몬 카드 게임 Pocket · 진척 {done}/{total} 페이지
         </p>
@@ -91,7 +91,7 @@ export default function TcgAdminPage() {
       <section style={CARD}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
           <h2 style={{ ...H2, margin: 0 }}>🗺️ 콘텐츠 로드맵 (AdSense용 "작지만 완성된 20페이지")</h2>
-          <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "#b4258f" }}>{done}/{total}</span>
+          <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "#dc2626" }}>{done}/{total}</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {ROADMAP.map((s) => (
@@ -118,8 +118,8 @@ export default function TcgAdminPage() {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {LOCALE_LINKS.map((l) => (
             <Link key={l.href} href={l.href} target="_blank" style={{
-              fontSize: "0.82rem", fontWeight: 700, color: "#b4258f", textDecoration: "none",
-              background: "#fbeaf6", borderRadius: 8, padding: "6px 12px",
+              fontSize: "0.82rem", fontWeight: 700, color: "#dc2626", textDecoration: "none",
+              background: "#fee6e6", borderRadius: 8, padding: "6px 12px",
             }}>{l.label} ↗</Link>
           ))}
         </div>

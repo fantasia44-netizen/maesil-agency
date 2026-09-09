@@ -101,23 +101,23 @@ export default function MetaPage({ params }: { params: { lang: string } }) {
 
   return (
     <div style={{ maxWidth: 860, margin: "0 auto", padding: "1.4rem 1rem 4rem" }}>
-      <div style={{ fontSize: "0.78rem", marginBottom: 6 }}><Link href={L("/tcg")} style={{ color: "#b4258f", textDecoration: "none" }}>← TCG Note</Link></div>
+      <div style={{ fontSize: "0.78rem", marginBottom: 6 }}><Link href={L("/tcg")} style={{ color: "#dc2626", textDecoration: "none" }}>← TCG Note</Link></div>
       <h1 style={{ margin: "0 0 8px", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a" }}>{t.h1}</h1>
       <p style={{ margin: "0 0 14px", fontSize: "0.9rem", color: "#475569", lineHeight: 1.7 }}>{t.intro}</p>
 
       {/* 핵심 수치 */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 8, marginBottom: 16 }}>
         {[[t.statTourneys, META.sampleTournaments], [t.statPlayers, META.samplePlayers], [t.statMatches, META.sampleMatches], [t.statDecks, DECKS_STAT.length]].map(([label, val]) => (
-          <div key={label as string} style={{ background: "#fff", border: "1px solid #eadff2", borderRadius: 10, padding: "0.7rem 0.9rem", textAlign: "center" }}>
-            <div style={{ fontSize: "1.2rem", fontWeight: 900, color: "#b4258f" }}>{(val as number).toLocaleString()}</div>
+          <div key={label as string} style={{ background: "#fff", border: "1px solid #fbd8d8", borderRadius: 10, padding: "0.7rem 0.9rem", textAlign: "center" }}>
+            <div style={{ fontSize: "1.2rem", fontWeight: 900, color: "#dc2626" }}>{(val as number).toLocaleString()}</div>
             <div style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 600 }}>{label as string}</div>
           </div>
         ))}
       </div>
 
       {/* 한줄 읽기 */}
-      <section style={{ background: "#fbf5fa", border: "1px solid #eadff2", borderRadius: 12, padding: "0.9rem 1.1rem", marginBottom: 16 }}>
-        <h2 style={{ margin: "0 0 5px", fontSize: "0.92rem", fontWeight: 800, color: "#a01f7f" }}>{t.readH}</h2>
+      <section style={{ background: "#fef6f5", border: "1px solid #fbd8d8", borderRadius: 12, padding: "0.9rem 1.1rem", marginBottom: 16 }}>
+        <h2 style={{ margin: "0 0 5px", fontSize: "0.92rem", fontWeight: 800, color: "#b91c1c" }}>{t.readH}</h2>
         <p style={{ margin: 0, fontSize: "0.9rem", color: "#0f172a", lineHeight: 1.75 }}>{t.read(top[0]?.name, top5share, over?.name)}</p>
       </section>
 
@@ -125,8 +125,8 @@ export default function MetaPage({ params }: { params: { lang: string } }) {
       <section style={{ marginBottom: 16 }}>
         <h2 style={{ margin: "0 0 4px", fontSize: "1rem", fontWeight: 800, color: "#0f172a" }}>{t.concH}</h2>
         <p style={{ margin: "0 0 8px", fontSize: "0.84rem", color: "#475569", lineHeight: 1.6 }}>{t.concP(top5share)}</p>
-        <div style={{ height: 14, background: "#f0e6f0", borderRadius: 999, overflow: "hidden" }}>
-          <div style={{ width: `${Math.min(top5share, 100)}%`, height: "100%", background: "linear-gradient(90deg,#b4258f,#e879c9)" }} />
+        <div style={{ height: 14, background: "#f6e0e0", borderRadius: 999, overflow: "hidden" }}>
+          <div style={{ width: `${Math.min(top5share, 100)}%`, height: "100%", background: "linear-gradient(90deg,#dc2626,#f87171)" }} />
         </div>
       </section>
 
@@ -139,7 +139,7 @@ export default function MetaPage({ params }: { params: { lang: string } }) {
             {typeRows.map(([type, share]) => (
               <div key={type} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ minWidth: 52, fontSize: "0.8rem", fontWeight: 700, color: "#334155" }}>{t.energyNames[type] || type}</span>
-                <div style={{ flex: 1, height: 16, background: "#f4eef7", borderRadius: 6, overflow: "hidden" }}>
+                <div style={{ flex: 1, height: 16, background: "#f9e8e8", borderRadius: 6, overflow: "hidden" }}>
                   <div style={{ width: `${Math.round((share / typeMax) * 100)}%`, height: "100%", background: ENERGY_COLOR[type] || "#9fa19f" }} />
                 </div>
                 <span style={{ minWidth: 42, textAlign: "right", fontSize: "0.78rem", fontWeight: 700, color: "#64748b", fontVariantNumeric: "tabular-nums" }}>{share.toFixed(1)}%</span>
@@ -154,10 +154,10 @@ export default function MetaPage({ params }: { params: { lang: string } }) {
         <h2 style={{ margin: "0 0 8px", fontSize: "1rem", fontWeight: 800, color: "#0f172a" }}>{t.topH}</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
           {top.slice(0, 8).map((d, i) => (
-            <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.84rem", padding: "3px 0", borderTop: i ? "1px solid #f4eef7" : "none" }}>
+            <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.84rem", padding: "3px 0", borderTop: i ? "1px solid #f9e8e8" : "none" }}>
               <span style={{ minWidth: 20, color: "#cbd5e1", fontWeight: 800 }}>{i + 1}</span>
               <span style={{ flex: 1, fontWeight: 600, color: "#0f172a" }}>{d.name}</span>
-              <span style={{ color: "#b4258f", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{d.share}%</span>
+              <span style={{ color: "#dc2626", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{d.share}%</span>
               <span style={{ minWidth: 46, textAlign: "right", color: d.winrate >= 50 ? "#16a34a" : "#dc2626", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{d.winrate}%</span>
             </div>
           ))}
@@ -165,8 +165,8 @@ export default function MetaPage({ params }: { params: { lang: string } }) {
       </section>
 
       <p style={{ marginTop: 16, fontSize: "0.82rem" }}>
-        <Link href={L("/tcg/tier")} style={{ color: "#b4258f", textDecoration: "none", fontWeight: 700, marginRight: 14 }}>{t.tierLink}</Link>
-        <Link href={L("/tcg/decks")} style={{ color: "#b4258f", textDecoration: "none", fontWeight: 700 }}>{t.deckLink}</Link>
+        <Link href={L("/tcg/tier")} style={{ color: "#dc2626", textDecoration: "none", fontWeight: 700, marginRight: 14 }}>{t.tierLink}</Link>
+        <Link href={L("/tcg/decks")} style={{ color: "#dc2626", textDecoration: "none", fontWeight: 700 }}>{t.deckLink}</Link>
       </p>
       <p style={{ marginTop: 12, fontSize: "0.7rem", color: "#cbd5e1" }}>{META.source}</p>
     </div>

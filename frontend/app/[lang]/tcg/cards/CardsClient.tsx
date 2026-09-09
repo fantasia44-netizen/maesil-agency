@@ -31,7 +31,7 @@ const L: Record<Locale, {
 };
 
 const LIMIT = 80;
-const inputStyle: React.CSSProperties = { fontSize: "0.85rem", padding: "7px 11px", borderRadius: 8, border: "1px solid #eadff2", background: "#fff", color: "#0f172a" };
+const inputStyle: React.CSSProperties = { fontSize: "0.85rem", padding: "7px 11px", borderRadius: 8, border: "1px solid #fbd8d8", background: "#fff", color: "#0f172a" };
 
 export default function CardsClient({ lang }: { lang: Locale }) {
   const t = L[lang];
@@ -71,7 +71,7 @@ export default function CardsClient({ lang }: { lang: Locale }) {
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 8 }}>
           {filtered.slice(0, LIMIT).map((c) => (
-            <div key={`${c.s}-${c.n}`} style={{ background: "#fff", border: "1px solid #eadff2", borderRadius: 10, padding: "0.6rem 0.8rem" }}>
+            <div key={`${c.s}-${c.n}`} style={{ background: "#fff", border: "1px solid #fbd8d8", borderRadius: 10, padding: "0.6rem 0.8rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
                 {c.e && <span style={{ width: 9, height: 9, borderRadius: 999, background: ELEMENT_COLOR[c.e], flexShrink: 0 }} />}
                 <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameOf(c)}</span>
@@ -83,7 +83,7 @@ export default function CardsClient({ lang }: { lang: Locale }) {
                 {c.w && <span>{t.weak} {c.w}</span>}
               </div>
               {c.packs.length > 0 && (
-                <div style={{ marginTop: 4, fontSize: "0.68rem", color: "#b4258f" }}>{t.pack}: {c.packs.join(", ")}</div>
+                <div style={{ marginTop: 4, fontSize: "0.68rem", color: "#dc2626" }}>{t.pack}: {c.packs.join(", ")}</div>
               )}
             </div>
           ))}
@@ -97,7 +97,7 @@ export default function CardsClient({ lang }: { lang: Locale }) {
 function chip(active: boolean, color?: string): React.CSSProperties {
   return {
     fontSize: "0.76rem", fontWeight: 700, cursor: "pointer", borderRadius: 999, padding: "4px 11px",
-    border: `1px solid ${active ? (color || "#b4258f") : "#eadff2"}`,
-    background: active ? (color || "#b4258f") : "#fff", color: active ? "#fff" : "#64748b",
+    border: `1px solid ${active ? (color || "#dc2626") : "#fbd8d8"}`,
+    background: active ? (color || "#dc2626") : "#fff", color: active ? "#fff" : "#64748b",
   };
 }

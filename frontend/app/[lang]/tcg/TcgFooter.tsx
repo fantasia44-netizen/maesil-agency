@@ -13,9 +13,9 @@ export default function TcgFooter({ lang: raw }: { lang: string }) {
   const lang: Locale = isLocale(raw) ? raw : defaultLocale;
   const t = T[lang];
   const L = (p: string) => localizePath(lang, p);
-  const link = { fontSize: "0.8rem", color: "#b4258f", textDecoration: "none", fontWeight: 600 } as const;
+  const link = { fontSize: "0.8rem", color: "#dc2626", textDecoration: "none", fontWeight: 600 } as const;
   return (
-    <footer style={{ borderTop: "1px solid #eadff2", background: "#fdf7fb", marginTop: 24 }}>
+    <footer style={{ borderTop: "1px solid #fbd8d8", background: "#fef7f5", marginTop: 24 }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "1.3rem 1rem 1.6rem" }}>
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 8 }}>
           <Link href={L("/tcg/about")} style={link}>{t.about}</Link>

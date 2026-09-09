@@ -35,26 +35,26 @@ export default function DecksIndexPage({ params }: { params: { lang: string } })
 
   return (
     <div style={{ maxWidth: 860, margin: "0 auto", padding: "1.4rem 1rem 4rem" }}>
-      <div style={{ fontSize: "0.78rem", marginBottom: 6 }}><Link href={L("/tcg")} style={{ color: "#b4258f", textDecoration: "none" }}>← TCG Note</Link></div>
+      <div style={{ fontSize: "0.78rem", marginBottom: 6 }}><Link href={L("/tcg")} style={{ color: "#dc2626", textDecoration: "none" }}>← TCG Note</Link></div>
       <h1 style={{ margin: "0 0 8px", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a" }}>{t.h1}</h1>
       <p style={{ margin: "0 0 16px", fontSize: "0.9rem", color: "#475569", lineHeight: 1.7 }}>{t.intro}</p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 12 }}>
         {decks.map(({ id, m, a }) => (
-          <Link key={id} href={L(`/tcg/decks/${id}`)} style={{ display: "block", background: "#fff", border: "1px solid #eadff2", borderRadius: 12, padding: "0.85rem 1rem", textDecoration: "none" }}>
+          <Link key={id} href={L(`/tcg/decks/${id}`)} style={{ display: "block", background: "#fff", border: "1px solid #fbd8d8", borderRadius: 12, padding: "0.85rem 1rem", textDecoration: "none" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
               <span style={{ background: TIER_COLOR[m.tier] || "#64748b", color: "#fff", borderRadius: 6, padding: "1px 8px", fontSize: "0.78rem", fontWeight: 900 }}>{m.tier}</span>
-              <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#b4258f" }}>{a!.playstyle}</span>
+              <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#dc2626" }}>{a!.playstyle}</span>
             </div>
             <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a", marginBottom: 4 }}>{m.name}</div>
             <div style={{ fontSize: "0.78rem", color: "#64748b", lineHeight: 1.5, marginBottom: 6 }}>{a!.summary.length > 70 ? a!.summary.slice(0, 70) + "…" : a!.summary}</div>
             <div style={{ display: "flex", gap: 12, fontSize: "0.78rem", color: "#475569" }}>
-              <span>{t.share} <b style={{ color: "#b4258f" }}>{m.share}%</b></span>
+              <span>{t.share} <b style={{ color: "#dc2626" }}>{m.share}%</b></span>
               <span>{t.win} <b style={{ color: m.winrate >= 50 ? "#16a34a" : "#dc2626" }}>{m.winrate}%</b></span>
             </div>
           </Link>
         ))}
       </div>
-      <p style={{ margin: "16px 0 0", fontSize: "0.8rem", color: "#94a3b8" }}>{t.more} · <Link href={L("/tcg/tier")} style={{ color: "#b4258f", textDecoration: "none", fontWeight: 700 }}>{t.tierLink}</Link></p>
+      <p style={{ margin: "16px 0 0", fontSize: "0.8rem", color: "#94a3b8" }}>{t.more} · <Link href={L("/tcg/tier")} style={{ color: "#dc2626", textDecoration: "none", fontWeight: 700 }}>{t.tierLink}</Link></p>
     </div>
   );
 }

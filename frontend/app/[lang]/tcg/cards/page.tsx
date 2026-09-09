@@ -27,7 +27,7 @@ export default function CardsPage({ params }: { params: { lang: string } }) {
   const t = T[lang];
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "1.4rem 1rem 4rem" }}>
-      <div style={{ fontSize: "0.78rem", marginBottom: 6 }}><Link href={localizePath(lang, "/tcg")} style={{ color: "#b4258f", textDecoration: "none" }}>← TCG Note</Link></div>
+      <div style={{ fontSize: "0.78rem", marginBottom: 6 }}><Link href={localizePath(lang, "/tcg")} style={{ color: "#dc2626", textDecoration: "none" }}>← TCG Note</Link></div>
       <h1 style={{ margin: "0 0 8px", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a" }}>{t.h1}</h1>
       <p style={{ margin: "0 0 14px", fontSize: "0.9rem", color: "#475569", lineHeight: 1.7 }}>{t.intro}</p>
       <CardsClient lang={lang} />

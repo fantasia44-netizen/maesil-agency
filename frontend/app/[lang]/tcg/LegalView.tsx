@@ -10,7 +10,7 @@ export default function LegalView({ doc, lang }: { doc: LegalDoc; lang: Locale }
   return (
     <div style={{ maxWidth: 760, margin: "0 auto", padding: "1.4rem 1rem 4rem" }}>
       <div style={{ fontSize: "0.78rem", marginBottom: 6 }}>
-        <Link href={localizePath(lang, "/tcg")} style={{ color: "#b4258f", textDecoration: "none" }}>{BACK_LABEL[lang]}</Link>
+        <Link href={localizePath(lang, "/tcg")} style={{ color: "#dc2626", textDecoration: "none" }}>{BACK_LABEL[lang]}</Link>
       </div>
       <h1 style={{ margin: "0 0 4px", fontSize: "1.4rem", fontWeight: 900, color: "#0f172a" }}>{doc.title}</h1>
       <p style={{ margin: "0 0 18px", fontSize: "0.74rem", color: "#94a3b8" }}>{UPDATED_LABEL[lang]}: {doc.updated}</p>
