@@ -84,12 +84,15 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   // 현재 로케일 프리픽스(/en·/ja, ko는 "") — 리다이렉트 시 언어판 유지용
   const localePfx = (() => { const s = pathname.split("/")[1]; return isLocale(s) && s !== "ko" ? `/${s}` : ""; })();
   const isGblSection = corePath === "/gbl" || corePath.startsWith("/gbl/");
+  // TCG Note(tcgnote.net) 공개 섹션 — /tcg-admin은 하이픈이라 여기 안 걸리고 에이전시 관리자 게이트로 감.
+  const isTcgSection = corePath === "/tcg" || corePath.startsWith("/tcg/");
+  const isGameSection = isGblSection || isTcgSection;
   // GBL 회원전용(앱·갤러리·게시판)은 리다이렉트 대신 각 페이지가 자체 회원가입 게이트를 렌더 → 여기선 항상 공개 처리
   const gblNeedsAuth = false;
 
   useEffect(() => {
-    // 공개: 에이전시 공개경로 + GBL 섹션 중 로그인 불필요(랜딩·로그인·메타·개인정보)
-    const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p)) || (isGblSection && !gblNeedsAuth);
+    // 공개: 에이전시 공개경로 + 게임 섹션(GBL·TCG) 공개 페이지
+    const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p)) || (isGameSection && !gblNeedsAuth);
     const token = getToken();
 
     if (!token && !isPublic) {
@@ -98,7 +101,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }
     const u = getUser();
     // gbl 유저는 에이전시 화면(관리자 포함) 접근 차단 — 항상 GBL 앱으로(현재 언어판 유지)
-    if (token && u?.role === "gbl" && !isGblSection) {
+    if (token && u?.role === "gbl" && !isGameSection) {
       router.replace(`${localePfx}/gbl/app`);
       return;
     }
@@ -106,8 +109,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     setReady(true);
   }, [pathname]);
 
-  // 로그인/랜딩/메타/앱 — GBL 섹션은 에이전시 헤더 없이 자체 chrome로 렌더
-  if (PUBLIC_PATHS.some(p => pathname.startsWith(p)) || isGblSection) {
+  // 로그인/랜딩/메타/앱 — 게임 섹션(GBL·TCG)은 에이전시 헤더 없이 자체 chrome로 렌더
+  if (PUBLIC_PATHS.some(p => pathname.startsWith(p)) || isGameSection) {
     return <>{children}</>;
   }
 
@@ -145,6 +148,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           {admin && <Link href="/chat">대화</Link>}
           {admin && <Link href="/gbl">GBL</Link>}
           {admin && <Link href="/gbl-admin">GBL관리</Link>}
+          {admin && <Link href="/tcg">TCG</Link>}
+          {admin && <Link href="/tcg-admin">TCG관리</Link>}
           {admin && <Link href="/settings">설정</Link>}
 
           {/* 고객(customer) */}
