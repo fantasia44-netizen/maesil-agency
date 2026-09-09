@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import TcgNav from "./TcgNav";
+import TcgFooter from "./TcgFooter";
 import { locales, localeMeta, isLocale, defaultLocale } from "../../../lib/i18n";
 import { getTcg } from "./dict";
 
@@ -81,6 +82,7 @@ export default function TcgLayout({ children, params }: { children: React.ReactN
         </>
       )}
       {children}
+      <TcgFooter lang={params.lang} />
     </>
   );
 }

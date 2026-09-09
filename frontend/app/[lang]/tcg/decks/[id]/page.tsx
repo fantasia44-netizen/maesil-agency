@@ -149,18 +149,18 @@ export default function DeckDetailPage({ params }: { params: { lang: string; id:
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
             <div style={{ background: "#fff", border: "1px solid #eadff2", borderRadius: 10, padding: "0.7rem 0.9rem" }}>
               <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#a01f7f", marginBottom: 4 }}>{t.pokemon}</div>
-              {deck.decklist.pokemon.map((c, i) => (
+              {(deck.decklist.pokemon || []).map((c, i) => (
                 <div key={i} style={{ fontSize: "0.83rem", color: "#334155", padding: "2px 0" }}><b>{c.count}×</b> {c.name}</div>
               ))}
             </div>
             <div style={{ background: "#fff", border: "1px solid #eadff2", borderRadius: 10, padding: "0.7rem 0.9rem" }}>
               <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#a01f7f", marginBottom: 4 }}>{t.trainer}</div>
-              {deck.decklist.trainer.map((c, i) => (
+              {(deck.decklist.trainer || []).map((c, i) => (
                 <div key={i} style={{ fontSize: "0.83rem", color: "#334155", padding: "2px 0" }}><b>{c.count}×</b> {c.name}</div>
               ))}
               <div style={{ marginTop: 8, fontSize: "0.78rem", fontWeight: 800, color: "#a01f7f" }}>{t.energy}</div>
               <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 3 }}>
-                {deck.decklist.energy.map((e, i) => (
+                {(deck.decklist.energy || []).map((e, i) => (
                   <span key={i} style={{ fontSize: "0.74rem", fontWeight: 700, color: "#fff", background: ENERGY_COLOR[e] || "#9fa19f", borderRadius: 999, padding: "2px 9px" }}>{e}</span>
                 ))}
               </div>

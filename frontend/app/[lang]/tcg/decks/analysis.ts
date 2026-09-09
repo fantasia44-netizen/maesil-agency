@@ -114,6 +114,87 @@ const A: Record<string, Partial<Record<Locale, DeckAnalysis>>> = {
       keyCards: ["超級蜥蜴王ex — 收尾", "巴大蝶(綠毛蟲系) — 治療·支援", "葉子斗篷·芬芳森林 — 續航"],
     },
   },
+  // ── Vespiquen ex / Shuckle ex — 벌레 스웜·템포 (A) ──
+  "vespiquen-ex-b4-shuckle-ex-a4": {
+    ko: {
+      playstyle: "벌레 스웜·템포",
+      summary: "비퀸 ex가 벤치 전개에 비례해 화력을 내는 벌레 덱. A티어 중에서도 승률이 높은 템포형입니다.",
+      gamePlan: "벤치를 빠르게 채워 비퀸 ex의 타점을 끌어올리고, 단단지로 보조하며 상대가 자리를 잡기 전에 템포로 몰아칩니다. 전개가 곧 화력이므로 드로우로 벤치를 안정적으로 채우는 것이 핵심입니다.",
+      keyCards: ["비퀸 ex — 벤치 비례 타점", "단단지 — 서포트·유지", "박사의 연구 — 전개 드로우"],
+    },
+    en: {
+      playstyle: "Bug Swarm / Tempo",
+      summary: "A Bug deck where Vespiquen ex scales damage with your bench. A high-win-rate tempo build within A-tier.",
+      gamePlan: "Fill your bench quickly to raise Vespiquen ex's damage, support with Shuckle, and press tempo before the opponent sets up. Board development is your damage — draw consistently to keep the bench full.",
+      keyCards: ["Vespiquen ex — bench-scaling damage", "Shuckle — support / longevity", "Professor's Research — development draw"],
+    },
+    ja: {
+      playstyle: "虫 スウォーム・テンポ",
+      summary: "ビークインexがベンチ展開に比例して火力を出す虫デッキ。Aティアの中でも勝率が高いテンポ型です。",
+      gamePlan: "ベンチを素早く埋めてビークインexの打点を上げ、ツボツボで支えつつ相手が構える前にテンポで攻めます。展開がそのまま火力なので、ドローでベンチを安定して埋めるのが鍵です。",
+      keyCards: ["ビークインex — ベンチ比例打点", "ツボツボ — 支援・継戦", "博士の研究 — 展開ドロー"],
+    },
+    "zh-TW": {
+      playstyle: "蟲群·節奏",
+      summary: "蜂女王ex依隨備位展開提升火力的蟲系牌組。是A級中勝率偏高的節奏型。",
+      gamePlan: "快速填滿備位以拉高蜂女王ex的打點，用壺壺輔助，在對手站穩前以節奏施壓。展開即火力，靠抽牌穩定補滿備位是關鍵。",
+      keyCards: ["蜂女王ex — 依備位提升打點", "壺壺 — 輔助·續航", "博士的研究 — 展開抽牌"],
+    },
+  },
+  // ── Team Rocket's Weezing ex / Hoopa ex — 독·방해 (A) ──
+  "team-rockets-weezing-ex-b4a-hoopa-ex-b4": {
+    ko: {
+      playstyle: "독·방해 (로켓단)",
+      summary: "로켓단의 또도가스 ex의 독과 후파 ex를 축으로 상대를 방해하며 그라인드하는 로켓단 덱입니다.",
+      gamePlan: "독으로 지속 데미지를 누적시키고, 방해 카드로 상대 전개를 늦추며 장기전으로 끌고 갑니다. 즉발 화력보다 시간이 지날수록 유리해지는 덱이므로, 초반 속공 덱을 어떻게 버티느냐가 승부처입니다.",
+      keyCards: ["로켓단의 또도가스 ex — 독 축", "후파 ex — 핵심 어태커", "방해·독 트레이너 — 자원 압박"],
+    },
+    en: {
+      playstyle: "Poison / Disruption (Team Rocket)",
+      summary: "A Team Rocket deck that grinds the opponent down with Team Rocket's Weezing ex poison and Hoopa ex.",
+      gamePlan: "Stack poison for recurring damage and slow the opponent's setup with disruption to drag the game long. It gets better over time rather than bursting — surviving early aggro is the crux.",
+      keyCards: ["TR's Weezing ex — poison core", "Hoopa ex — key attacker", "Disruption / poison trainers — resource pressure"],
+    },
+    ja: {
+      playstyle: "毒・妨害(ロケット団)",
+      summary: "ロケット団のマタドガスexの毒とフーパexを軸に、相手を妨害しながらグラインドするロケット団デッキです。",
+      gamePlan: "毒で継続ダメージを蓄積し、妨害で相手の展開を遅らせて長期戦に持ち込みます。瞬発火力より時間経過で有利になるデッキなので、序盤の速攻をどう凌ぐかが勝負所です。",
+      keyCards: ["ロケット団のマタドガスex — 毒の軸", "フーパex — 主軸アタッカー", "妨害・毒トレーナー — 資源圧迫"],
+    },
+    "zh-TW": {
+      playstyle: "毒·干擾(火箭隊)",
+      summary: "以火箭隊的雙彈瓦斯ex的毒與胡帕ex為軸、邊干擾邊消耗對手的火箭隊牌組。",
+      gamePlan: "以毒累積持續傷害，用干擾拖慢對手展開、把比賽帶入長局。屬於愈打愈有利而非爆發型，因此能否撐過前期快攻是勝負關鍵。",
+      keyCards: ["火箭隊的雙彈瓦斯ex — 毒的核心", "胡帕ex — 主力攻擊手", "干擾·毒訓練家 — 資源壓迫"],
+    },
+  },
+  // ── Mega Blaziken ex — 불꽃 어그로 (A) ──
+  "mega-blaziken-ex-b1": {
+    ko: {
+      playstyle: "불꽃 어그로",
+      summary: "메가 번치코 ex의 화력으로 빠르게 압박하는 불꽃 속공 덱. A티어 중 승률이 높은 편입니다.",
+      gamePlan: "아차모–영치코 라인을 세워 메가 번치코 ex를 조기에 가동하고, 강한 화력으로 상대를 앞서 나갑니다. 세팅이 완성되면 압도적이므로, 에너지 가속과 드로우로 가동 속도를 최대한 앞당기는 것이 중요합니다.",
+      keyCards: ["메가 번치코 ex — 주력 어태커", "아차모/영치코 — 진화 라인", "불꽃 에너지 · 가속 트레이너"],
+    },
+    en: {
+      playstyle: "Fire Aggro",
+      summary: "A fast Fire deck that pressures with Mega Blaziken ex's damage. Among the higher win rates in A-tier.",
+      gamePlan: "Set up the Torchic–Combusken line to bring Mega Blaziken ex online early and race ahead on damage. Overwhelming once assembled — speed up your setup with energy acceleration and draw.",
+      keyCards: ["Mega Blaziken ex — main attacker", "Torchic/Combusken — evolution line", "Fire Energy · acceleration trainers"],
+    },
+    ja: {
+      playstyle: "炎 アグロ",
+      summary: "メガバシャーモexの火力で素早く圧をかける炎の速攻デッキ。Aティアの中では勝率が高めです。",
+      gamePlan: "アチャモ–ワカシャモのラインを立ててメガバシャーモexを早期起動し、高い火力で先行します。組み上がれば圧倒的なので、エネ加速とドローで起動を早めるのが重要です。",
+      keyCards: ["メガバシャーモex — 主力アタッカー", "アチャモ/ワカシャモ — 進化ライン", "炎エネルギー・加速トレーナー"],
+    },
+    "zh-TW": {
+      playstyle: "火焰快攻",
+      summary: "以超級火焰雞ex火力快速施壓的火系快攻牌組。在A級中勝率偏高。",
+      gamePlan: "鋪好火稚雞–力壯雞進化線，早期啟動超級火焰雞ex，以高火力搶先。組合完成後極為強勢，因此用能量加速與抽牌盡量提早啟動很重要。",
+      keyCards: ["超級火焰雞ex — 主力攻擊手", "火稚雞/力壯雞 — 進化線", "火能量·加速訓練家"],
+    },
+  },
 };
 
 export function getDeckAnalysis(id: string, lang: Locale): DeckAnalysis | null {
