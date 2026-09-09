@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import CARDS from "../data/cards.json";
 import { type Locale } from "../../../../lib/i18n";
 
-type Card = { s: string; n: number; name: string; r: string; packs: string[]; e?: string; hp?: number; w?: string; st?: string };
+type Card = { s: string; n: number; name: string; r: string; packs: string[]; nm?: Record<string, string>; e?: string; hp?: number; w?: string; st?: string };
 const DATA = CARDS as Card[];
 const SETS = [...new Set(DATA.map((c) => c.s))];
 const ELEMENTS = ["grass", "fire", "water", "lightning", "psychic", "fighting", "darkness", "metal", "dragon", "colorless"];
@@ -39,14 +39,15 @@ export default function CardsClient({ lang }: { lang: Locale }) {
   const [set, setSet] = useState("");
   const [elem, setElem] = useState("");
 
+  const nameOf = (c: Card) => (c.nm && c.nm[lang]) || c.name;
   const filtered = useMemo(() => {
     const ql = q.trim().toLowerCase();
     return DATA.filter((c) =>
-      (!ql || c.name.toLowerCase().includes(ql)) &&
+      (!ql || c.name.toLowerCase().includes(ql) || nameOf(c).toLowerCase().includes(ql)) &&
       (!set || c.s === set) &&
       (!elem || c.e === elem)
     );
-  }, [q, set, elem]);
+  }, [q, set, elem]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div>
@@ -73,7 +74,7 @@ export default function CardsClient({ lang }: { lang: Locale }) {
             <div key={`${c.s}-${c.n}`} style={{ background: "#fff", border: "1px solid #eadff2", borderRadius: 10, padding: "0.6rem 0.8rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
                 {c.e && <span style={{ width: 9, height: 9, borderRadius: 999, background: ELEMENT_COLOR[c.e], flexShrink: 0 }} />}
-                <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</span>
+                <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameOf(c)}</span>
                 <span style={{ fontSize: "0.68rem", fontWeight: 800, color: "#94a3b8" }}>{c.r}</span>
               </div>
               <div style={{ fontSize: "0.72rem", color: "#64748b", display: "flex", gap: 8, flexWrap: "wrap" }}>
