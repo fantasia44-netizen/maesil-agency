@@ -59,6 +59,9 @@ const TRAINER = {
   "Team Rocket's Boss":         { ko: "로켓단의 보스", ja: "ロケット団のボス" },
   "Kid's Room":                 { ko: "아이 방", ja: "こども部屋" },
   "May":                        { ko: "봄이", ja: "ハルカ" },
+  // 폼 포켓몬(종족명 파서 미지원) — RaenonX명에 가독성 공백 추가.
+  "Teal Mask Ogerpon ex":       { ko: "오거폰 벽록의 가면 ex", ja: "オーガポン みどりのめん ex" },
+  "Castform Sunny Form":        { ko: "캐스퐁 태양의 모습", ja: "ポワルン たいようのすがた" },
 };
 const TRAINER_NORM = {}; // norm+lower → {ko,ja,"zh-TW"}
 for (const [en, loc] of Object.entries(TRAINER)) TRAINER_NORM[norm(en).toLowerCase()] = loc;
