@@ -6,6 +6,7 @@ import Link from "next/link";
 import META from "../data/meta.json";
 import MATCHUPS from "../data/matchups.json";
 import { localizePath, type Locale } from "../../../../lib/i18n";
+import { track } from "../../../../lib/track";
 
 type MDeck = { id: string; name: string; nm?: Record<string, string>; tier: string; share: number };
 const DECKS = META.decks as MDeck[];
@@ -70,7 +71,7 @@ export default function CountersClient({ lang }: { lang: Locale }) {
     <div>
       <div style={{ marginBottom: 16 }}>
         <label style={{ display: "block", fontSize: "0.78rem", color: "#64748b", marginBottom: 4 }}>{t.pickL}</label>
-        <select value={sel} onChange={(e) => setSel(e.target.value)} style={sel2}>
+        <select value={sel} onChange={(e) => { setSel(e.target.value); track("counter_search", undefined, e.target.value, "tcg"); }} style={sel2}>
           {PICKABLE.map((d) => <option key={d.id} value={d.id}>{dn(d.id)} ({d.tier})</option>)}
         </select>
       </div>

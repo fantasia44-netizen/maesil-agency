@@ -6,6 +6,7 @@ import CARDS from "../data/cards.json";
 import RATES from "../data/packrates.json";
 import { type Locale } from "../../../../lib/i18n";
 import { packName } from "../loc";
+import { track } from "../../../../lib/track";
 
 type Card = { s: string; n: number; name: string; r: string; packs: string[]; nm?: Record<string, string>; e?: string };
 const DATA = CARDS as Card[];
@@ -73,6 +74,7 @@ export default function PackSimClient({ lang }: { lang: Locale }) {
     return { cards: slots.map((s) => draw(rollRarity(s))).filter((c): c is Card => !!c), rare: isRare };
   }
   function open(n: number) {
+    track("pack_open", undefined, String(n), "tcg");
     if (n === 1) { setOpened(openOne().cards); setStats(null); return; }
     const agg: Record<string, number> = {}; let god = 0; const notable: Card[] = [];
     for (let i = 0; i < n; i++) { const o = openOne(); if (o.rare) god++; for (const c of o.cards) { agg[c.r] = (agg[c.r] || 0) + 1; if (rank(c.r) >= 4) notable.push(c); } }

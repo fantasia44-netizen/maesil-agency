@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import TcgNav from "./TcgNav";
 import TcgFooter from "./TcgFooter";
+import TcgTracker from "./TcgTracker";
 import { locales, localeMeta, isLocale, defaultLocale } from "../../../lib/i18n";
 import { getTcg } from "./dict";
 
@@ -67,6 +68,7 @@ export default function TcgLayout({ children, params }: { children: React.ReactN
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }} />
       {/* htmlLang 조기 주입 — 루트 layout의 <html lang>이 [lang]을 못 받아 "ko" 고정이라 로케일별 교정 */}
       <script dangerouslySetInnerHTML={{ __html: `document.documentElement.lang=${JSON.stringify(htmlLang)}` }} />
+      <TcgTracker />
       <TcgNav />
       {ADS_CLIENT && (
         <Script id="adsbygoogle-loader" async strategy="afterInteractive"

@@ -10,8 +10,13 @@ function tok(key: string, store: Storage): string {
   } catch { return "anon"; }
 }
 
-// label: share/download 카드 유형(예: "cp-table", "raid-dealer", "calendar", "stats-card") — 바이럴 주도 콘텐츠 측정용
-export function track(event: "pageview" | "share" | "download" | "install" | "installable", path?: string, label?: string) {
+export type TrackEvent =
+  | "pageview" | "share" | "download" | "install" | "installable"
+  | "sim_run" | "pack_open" | "deck_build" | "counter_search"; // tcg 도구사용 이벤트
+
+// label: share/download·도구 상세(예: "cp-table", "hand-sim", 팩 오픈 수, 덱 id) — 바이럴/사용 측정용
+// site: "gbl"(기본, 하위호환) | "tcg" — 사이트별 비콘 엔드포인트·익명 토큰 분리
+export function track(event: TrackEvent, path?: string, label?: string, site: "gbl" | "tcg" = "gbl") {
   if (typeof window === "undefined") return;
   if (getUser()?.role === "super_admin") return; // 관리자(오너) 본인 방문은 통계 제외
   let ref = "";
@@ -29,14 +34,14 @@ export function track(event: "pageview" | "share" | "download" | "install" | "in
   }
   const body = JSON.stringify({
     event,
-    visitor: tok("gblv", localStorage),
-    session: tok("gbls", sessionStorage),
+    visitor: tok(site === "tcg" ? "tcgv" : "gblv", localStorage),
+    session: tok(site === "tcg" ? "tcgs" : "gbls", sessionStorage),
     path: (path || location.pathname).slice(0, 200),
     ref,
     label: label ? label.slice(0, 60) : undefined,
   });
   try {
-    const url = `${BASE}/api/gbl/track`;
+    const url = `${BASE}/api/${site}/track`;
     if (navigator.sendBeacon) navigator.sendBeacon(url, new Blob([body], { type: "application/json" }));
     else fetch(url, { method: "POST", body, headers: { "Content-Type": "application/json" }, keepalive: true }).catch(() => {});
   } catch { /* noop */ }

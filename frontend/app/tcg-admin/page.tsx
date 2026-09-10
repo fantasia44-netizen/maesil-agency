@@ -3,7 +3,7 @@
 // 환경설정 상태 + 콘텐츠 구축 로드맵 + 라이브 사이트 바로가기. (트래픽 대시보드는 GA 연동 후 확장)
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { isSuperAdmin } from "../../lib/api";
+import { isSuperAdmin, apiFetch, apiDownload } from "../../lib/api";
 
 const ADS = process.env.NEXT_PUBLIC_TCG_ADSENSE_CLIENT || "";
 const GA = process.env.NEXT_PUBLIC_TCG_GA_ID || "";
@@ -60,6 +60,159 @@ const LOCALE_LINKS = [
   { label: "繁體中文", href: "/zh-TW/tcg" },
 ];
 
+// ── 라이브 트래픽·도구사용 대시보드 (1st-party 자체 계측) ──────────────────
+type Traffic = {
+  days: number;
+  summary: { pageviews: number; uniques: number; sessions: number; shares: number; downloads: number; tool_events: number };
+  active: { active_30m: number };
+  daily: { day: string; pageviews: number; uniques: number; sessions: number }[];
+  langs: { lang: string; pageviews: number; uniques: number; sessions: number }[];
+  pages: { type: string; pageviews: number; uniques: number }[];
+  tools: { event: string; count: number }[];
+  paths: { path: string; views: number }[];
+  refs: { ref: string; views: number }[];
+  shares: { label: string; shares: number; downloads: number; total: number }[];
+};
+
+const TOOL_LABEL: Record<string, string> = {
+  sim_run: "🎲 핸드심 실행", pack_open: "🎰 팩 오픈", deck_build: "🧱 덱 빌드·공유", counter_search: "🛡️ 카운터 검색",
+};
+const PAGE_LABEL: Record<string, string> = {
+  home: "홈", tier: "티어표", meta: "메타 분석", decks: "덱 목록", "deck-detail": "덱 상세",
+  "hand-sim": "핸드심", "pack-sim": "팩심", "deck-builder": "덱 빌더", counters: "카운터",
+  guides: "가이드 목록", guide: "가이드", cards: "카드", other: "기타",
+};
+const LANG_LABEL: Record<string, string> = { ko: "🇰🇷 한국어", en: "🇬🇧 English", ja: "🇯🇵 日本語", "zh-TW": "🇹🇼 繁體" };
+
+function Tile({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <div style={{ flex: "1 1 90px", background: "#fff", border: "1px solid #f1d5d5", borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
+      <div style={{ fontSize: "1.3rem", fontWeight: 900, color }}>{value.toLocaleString()}</div>
+      <div style={{ fontSize: "0.72rem", color: "#64748b", marginTop: 2 }}>{label}</div>
+    </div>
+  );
+}
+
+function TrafficSection() {
+  const [t, setT] = useState<Traffic | null>(null);
+  const [days, setDays] = useState(30);
+  const [err, setErr] = useState("");
+  const [dlErr, setDlErr] = useState("");
+
+  useEffect(() => {
+    setErr("");
+    apiFetch<Traffic>(`/api/tcg/admin/traffic?days=${days}`, {}, 25000)
+      .then(setT)
+      .catch((e) => setErr(String((e as Error)?.message || e)));
+  }, [days]);
+
+  const maxDaily = Math.max(1, ...(t?.daily || []).map((d) => d.pageviews));
+
+  return (
+    <section style={CARD}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, flexWrap: "wrap" }}>
+        <h2 style={{ ...H2, margin: 0 }}>📊 실시간 트래픽 · 도구사용 (자체 계측)</h2>
+        {t && (
+          <span style={{ fontSize: "0.76rem", fontWeight: 800, color: "#16a34a", background: "#dcfce7", borderRadius: 12, padding: "3px 12px" }}>
+            🟢 실시간 활성 {t.active?.active_30m ?? 0}명 <span style={{ fontWeight: 500, color: "#4d7c53" }}>(30분)</span>
+          </span>
+        )}
+        <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
+          {[7, 30, 90].map((d) => (
+            <button key={d} onClick={() => setDays(d)} style={{
+              fontSize: "0.74rem", fontWeight: 700, padding: "4px 10px", borderRadius: 8, cursor: "pointer",
+              border: "1px solid #fbd8d8", background: days === d ? "#dc2626" : "#fff", color: days === d ? "#fff" : "#b91c1c",
+            }}>{d}일</button>
+          ))}
+        </div>
+      </div>
+
+      {err && (
+        <div style={{ fontSize: "0.78rem", color: "#b45309", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, padding: "8px 10px" }}>
+          트래픽 조회 실패: {err}<br />
+          <span style={{ color: "#92400e" }}>→ Supabase에서 <code>backend/sql/077_tcg_visits.sql</code>를 실행했는지 확인하세요. 백엔드 배포 후 방문이 쌓이면 데이터가 나타납니다.</span>
+        </div>
+      )}
+
+      {t && !err && (
+        <>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+            <Tile label="페이지뷰" value={t.summary.pageviews} color="#dc2626" />
+            <Tile label="순방문자" value={t.summary.uniques} color="#0f172a" />
+            <Tile label="세션" value={t.summary.sessions} color="#0f172a" />
+            <Tile label="도구 사용" value={t.summary.tool_events} color="#7c3aed" />
+            <Tile label="공유" value={t.summary.shares} color="#0891b2" />
+          </div>
+
+          {/* 도구 사용 — tcg 특화 지표 */}
+          <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#334155", margin: "6px 0 6px" }}>🧰 도구 사용 (계산기 참여도)</div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+            {t.tools.map((x) => (
+              <div key={x.event} style={{ flex: "1 1 120px", background: "#faf5ff", border: "1px solid #e9d5ff", borderRadius: 10, padding: "8px 10px" }}>
+                <div style={{ fontSize: "1.1rem", fontWeight: 900, color: "#7c3aed" }}>{x.count.toLocaleString()}</div>
+                <div style={{ fontSize: "0.72rem", color: "#6b21a8" }}>{TOOL_LABEL[x.event] || x.event}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* 일별 추이(막대) */}
+          <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#334155", margin: "6px 0 6px" }}>📅 일별 페이지뷰</div>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 90, marginBottom: 14, overflowX: "auto" }}>
+            {(t.daily || []).map((d) => (
+              <div key={d.day} title={`${d.day} · ${d.pageviews}pv · ${d.uniques}명`} style={{ flex: "1 0 8px", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center" }}>
+                <div style={{ width: "100%", maxWidth: 18, height: `${Math.round((d.pageviews / maxDaily) * 76)}px`, minHeight: d.pageviews ? 2 : 0, background: "#dc2626", borderRadius: "3px 3px 0 0" }} />
+              </div>
+            ))}
+            {(!t.daily || t.daily.length === 0) && <span style={{ fontSize: "0.78rem", color: "#94a3b8" }}>아직 방문 데이터가 없습니다.</span>}
+          </div>
+
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+            {/* 페이지 유형별 */}
+            <div style={{ flex: "1 1 240px" }}>
+              <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#334155", marginBottom: 6 }}>📄 페이지 유형별</div>
+              {t.pages.slice(0, 10).map((p) => (
+                <div key={p.type} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem", padding: "3px 0", borderTop: "1px solid #f9e8e8" }}>
+                  <span style={{ color: "#475569" }}>{PAGE_LABEL[p.type] || p.type}</span>
+                  <span style={{ fontWeight: 700, color: "#0f172a" }}>{p.pageviews.toLocaleString()} <span style={{ fontWeight: 400, color: "#94a3b8" }}>({p.uniques})</span></span>
+                </div>
+              ))}
+            </div>
+            {/* 언어별 */}
+            <div style={{ flex: "1 1 240px" }}>
+              <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#334155", marginBottom: 6 }}>🌐 언어별</div>
+              {t.langs.map((l) => (
+                <div key={l.lang} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem", padding: "3px 0", borderTop: "1px solid #f9e8e8" }}>
+                  <span style={{ color: "#475569" }}>{LANG_LABEL[l.lang] || l.lang}</span>
+                  <span style={{ fontWeight: 700, color: "#0f172a" }}>{l.pageviews.toLocaleString()} <span style={{ fontWeight: 400, color: "#94a3b8" }}>({l.uniques})</span></span>
+                </div>
+              ))}
+            </div>
+            {/* 유입경로 */}
+            <div style={{ flex: "1 1 240px" }}>
+              <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#334155", marginBottom: 6 }}>🔗 유입 경로 (referrer)</div>
+              {t.refs.slice(0, 8).map((r) => (
+                <div key={r.ref} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem", padding: "3px 0", borderTop: "1px solid #f9e8e8" }}>
+                  <span style={{ color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 170 }}>{r.ref}</span>
+                  <span style={{ fontWeight: 700, color: "#0f172a" }}>{r.views.toLocaleString()}</span>
+                </div>
+              ))}
+              {t.refs.length === 0 && <div style={{ fontSize: "0.76rem", color: "#94a3b8", padding: "3px 0" }}>직접 유입뿐</div>}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14 }}>
+            <button onClick={() => { setDlErr(""); apiDownload(`/api/tcg/admin/traffic/export?days=${days}`, `tcg-traffic-${days}d.xlsx`).catch((e) => setDlErr(String((e as Error)?.message || e))); }}
+              style={{ fontSize: "0.78rem", fontWeight: 700, color: "#dc2626", background: "#fee6e6", border: "1px solid #fbd8d8", borderRadius: 8, padding: "6px 12px", cursor: "pointer" }}>
+              ⬇️ XLSX 내보내기 ({days}일)
+            </button>
+            {dlErr && <span style={{ fontSize: "0.74rem", color: "#dc2626" }}>{dlErr}</span>}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
 export default function TcgAdminPage() {
   const [allowed, setAllowed] = useState<boolean | null>(null);
   useEffect(() => { setAllowed(isSuperAdmin()); }, []);
@@ -78,6 +231,8 @@ export default function TcgAdminPage() {
           tcgnote.net · 포켓몬 카드 게임 Pocket · 진척 {done}/{total} 페이지
         </p>
       </div>
+
+      <TrafficSection />
 
       <section style={CARD}>
         <h2 style={H2}>⚙️ 환경설정 (도메인 배포 시 Render env 설정)</h2>

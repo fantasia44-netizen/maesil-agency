@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import CARDS from "../data/cards.json";
 import DECKS from "../data/decks.json";
 import { type Locale } from "../../../../lib/i18n";
+import { track } from "../../../../lib/track";
 
 type Card = { s: string; n: number; name: string; nm?: Record<string, string>; e?: string; st?: string };
 type DeckEntry = { count: number; set: string; number: string | number; name: string; nm?: Record<string, string> };
@@ -190,7 +191,7 @@ export default function HandSimClient({ lang }: { lang: Locale }) {
     <div>
       {/* 덱 선택 */}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
-        <select value={sel} onChange={(e) => setSel(e.target.value)} style={{ ...sel2, flex: "1 1 240px" }}>
+        <select value={sel} onChange={(e) => { setSel(e.target.value); track("sim_run", undefined, e.target.value, "tcg"); }} style={{ ...sel2, flex: "1 1 240px" }}>
           {myDeck && <option value="__mine">⭐ {t.myDeck}</option>}
           {META.map((d) => <option key={d.id} value={d.id}>{d.tier ? `[${d.tier}] ` : ""}{nameOf(d)}</option>)}
         </select>

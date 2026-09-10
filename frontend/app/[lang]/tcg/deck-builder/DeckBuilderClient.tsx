@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import CARDS from "../data/cards.json";
 import DECKS from "../data/decks.json";
 import { type Locale } from "../../../../lib/i18n";
+import { track } from "../../../../lib/track";
 import { elementName, packName } from "../loc";
 
 type Card = { s: string; n: number; name: string; r?: string; packs?: string[]; nm?: Record<string, string>; e?: string; w?: string };
@@ -118,6 +119,7 @@ export default function DeckBuilderClient({ lang }: { lang: Locale }) {
     setDeck(nd); setElem(""); setQ("");
   };
   const share = async () => {
+    track("deck_build", undefined, String(total), "tcg");
     const url = `${window.location.origin}${window.location.pathname}?d=${encodeDeck(deck)}`;
     try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1500); }
     catch { window.prompt("URL", url); }
