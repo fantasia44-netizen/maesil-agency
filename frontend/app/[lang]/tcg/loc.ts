@@ -45,6 +45,21 @@ const PACK: Record<string, Record<Locale, string>> = {
   "Ho-Oh": { ko: "칠색조", en: "Ho-Oh", ja: "ホウオウ", "zh-TW": "鳳王" },
   Lugia: { ko: "루기아", en: "Lugia", ja: "ルギア", "zh-TW": "洛奇亞" },
   Gardevoir: { ko: "가디안", en: "Gardevoir", ja: "サーナイト", "zh-TW": "沙奈朵" },
+  // 메가 마스코트 팩(B1) — 포켓몬명 현지화(zh-TW 포함).
+  "Mega Blaziken": { ko: "메가 번치코", en: "Mega Blaziken", ja: "メガバシャーモ", "zh-TW": "超級火焰雞" },
+  "Mega Altaria": { ko: "메가 파비코리", en: "Mega Altaria", ja: "メガチルタリス", "zh-TW": "超級七夕青鳥" },
+  "Mega Gyarados": { ko: "메가 갸라도스", en: "Mega Gyarados", ja: "メガギャラドス", "zh-TW": "超級暴鯉龍" },
+  // 테마 확장 팩 — RaenonX 공식 ko·ja(인덱스 정렬). zh-TW는 RaenonX 미보유 → 영어 전체명 폴백.
+  "Secluded": { ko: "미지의 수역", en: "Secluded Springs", ja: "未知なる水域", "zh-TW": "Secluded Springs" },
+  "Shining": { ko: "샤이닝 하이", en: "Shining Revelry", ja: "シャイニングハイ", "zh-TW": "Shining Revelry" },
+  "Extradimensional": { ko: "이차원 크라이시스", en: "Extradimensional Crisis", ja: "異次元クライシス", "zh-TW": "Extradimensional Crisis" },
+  "Deluxe": { ko: "하이클래스팩 ex", en: "Deluxe Pack: ex", ja: "ハイクラスパック ex", "zh-TW": "Deluxe Pack: ex" },
+  "Crimson Blaze": { ko: "홍련 블레이즈", en: "Crimson Blaze", ja: "紅蓮ブレイズ", "zh-TW": "Crimson Blaze" },
+  "Everyday Wonders": { ko: "미라클 데이즈", en: "Everyday Wonders", ja: "ミラクルデイズ", "zh-TW": "Everyday Wonders" },
+  "Paldean": { ko: "팔데아 원더", en: "Paldean Wonders", ja: "パルデアワンダー", "zh-TW": "Paldean Wonders" },
+  "Paradox Drive": { ko: "진격 패러독스", en: "Paradox Drive", ja: "進撃パラドックス", "zh-TW": "Paradox Drive" },
+  "Pulsing Aura": { ko: "파동 비트", en: "Pulsing Aura", ja: "波動ビート", "zh-TW": "Pulsing Aura" },
+  "Mega Shine": { ko: "샤이닝 메가", en: "Mega Shine", ja: "シャイニングメガ", "zh-TW": "Mega Shine" },
 };
 
 export function packName(lang: Locale, raw: string): string {
