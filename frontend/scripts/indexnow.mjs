@@ -1,9 +1,19 @@
-// IndexNow 제출 스크립트 — gblnote.com 사이트맵의 전 URL을 Bing·Naver 등에 즉시 색인 요청.
-// 새 페이지 추가/대량 변경 후 실행:  node scripts/indexnow.mjs
-// (일부 URL만 제출하려면 인자로 전달:  node scripts/indexnow.mjs https://gblnote.com/gbl/iv ...)
+// IndexNow 제출 스크립트 — 사이트맵의 전 URL을 Bing·Naver 등에 즉시 색인 요청.
+// 새 페이지 추가/대량 변경 후 실행:
+//   node scripts/indexnow.mjs                 → gblnote.com(기본)
+//   node scripts/indexnow.mjs tcgnote.net     → tcgnote.net
+//   node scripts/indexnow.mjs tcgnote.net https://tcgnote.net/tcg ...  → 특정 URL만
 // IndexNow는 Bing/Yandex/Naver/Seznam가 공유하는 프로토콜 — 한 번 제출로 모두에 전달됨(구글은 미지원).
-const HOST = "gblnote.com";
-const KEY = "8c5c82349e896a340f9b20597e2c6472";
+
+// host별 IndexNow 키(키파일은 public/<key>.txt, 두 도메인 공유 서빙).
+const KEYS = {
+  "gblnote.com": "8c5c82349e896a340f9b20597e2c6472",
+  "tcgnote.net": "6bcae8955974b0a4c2c29d0ca5036e90",
+};
+const args0 = process.argv.slice(2);
+const HOST = (args0.find((a) => !a.startsWith("http")) || "gblnote.com").replace(/^https?:\/\//, "");
+const KEY = KEYS[HOST];
+if (!KEY) { console.error(`알 수 없는 host: ${HOST} (등록된 host: ${Object.keys(KEYS).join(", ")})`); process.exit(1); }
 const KEY_LOCATION = `https://${HOST}/${KEY}.txt`;
 const ENDPOINT = "https://api.indexnow.org/indexnow";
 

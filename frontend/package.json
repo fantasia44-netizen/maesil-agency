@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "indexnow": "node scripts/indexnow.mjs"
+    "indexnow": "node scripts/indexnow.mjs",
+    "indexnow:tcg": "node scripts/indexnow.mjs tcgnote.net"
   },
   "dependencies": {
     "html-to-image": "^1.11.13",
