@@ -1,7 +1,9 @@
 -- TCG Note(tcgnote.net) 자체 트래픽·도구사용 계측 테이블.
 -- gbl_visits와 동일 구조(사이트 분리) — gbl 광고/통계가 tcg로 안 섞이게 별도 테이블.
 -- 집계는 백엔드(app/routers/tcg.py)에서 Python으로 수행 → RPC 함수 불필요(테이블 하나만).
--- Supabase SQL Editor에서 1회 실행. (gbl_visits와 같은 public 스키마 = maesil-hub)
+-- ⚠️ 반드시 maesil-HUB 프로젝트에서 실행(gbl_visits가 있는 그 프로젝트).
+--    백엔드 _db()가 hub_configured면 maesil-hub(public)를 봄 — maesil-total에 만들면 백엔드가 못 찾아 insert가 조용히 실패함.
+--    헷갈리면: `SELECT count(*) FROM public.gbl_visits;`가 에러 없이 도는 프로젝트 = maesil-hub.
 CREATE TABLE IF NOT EXISTS public.tcg_visits (
     id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     day        date NOT NULL DEFAULT (now() AT TIME ZONE 'utc')::date,

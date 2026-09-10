@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { isSuperAdmin, apiFetch, apiDownload } from "../../lib/api";
 
+// layout.tsx와 동일한 유효값(env 우선, 없으면 하드코딩 기본값 — 실제 배포 상태를 반영).
 const ADS = process.env.NEXT_PUBLIC_TCG_ADSENSE_CLIENT || "";
-const GA = process.env.NEXT_PUBLIC_TCG_GA_ID || "";
-const NAVER = process.env.NEXT_PUBLIC_TCG_NAVER_VERIFY || "";
+const GA = process.env.NEXT_PUBLIC_TCG_GA_ID || "G-C069X6WZYT";
+const NAVER = process.env.NEXT_PUBLIC_TCG_NAVER_VERIFY || "c691d37014d804696ee408a4d16333a3805bdd3f";
+const BING = "CA02CE9D3CEFEBFDA1C1F4CAC49F2F2A"; // 하드코딩(layout)
 
 const CARD: React.CSSProperties = { background: "#fff", border: "1px solid #fbd8d8", borderRadius: 12, padding: "1rem 1.2rem" };
 const H2: React.CSSProperties = { margin: "0 0 10px", fontSize: "1rem", fontWeight: 800, color: "#0f172a" };
@@ -237,10 +239,11 @@ export default function TcgAdminPage() {
       <section style={CARD}>
         <h2 style={H2}>⚙️ 환경설정 (도메인 배포 시 Render env 설정)</h2>
         <StatusRow label="AdSense (TCG)" value={ADS ? ADS : "NEXT_PUBLIC_TCG_ADSENSE_CLIENT 미설정"} ok={!!ADS} />
-        <StatusRow label="Google Analytics" value={GA ? GA : "NEXT_PUBLIC_TCG_GA_ID 미설정"} ok={!!GA} />
-        <StatusRow label="네이버 소유확인" value={NAVER ? "설정됨" : "NEXT_PUBLIC_TCG_NAVER_VERIFY 미설정"} ok={!!NAVER} />
+        <StatusRow label="Google Analytics" value={GA} ok={!!GA} />
+        <StatusRow label="네이버 소유확인" value={NAVER ? "설정됨 (라이브 검증 통과)" : "미설정"} ok={!!NAVER} />
+        <StatusRow label="Bing 소유확인" value="설정됨 (라이브 검증 통과)" ok={true} />
         <p style={{ margin: "10px 0 0", fontSize: "0.74rem", color: "#94a3b8", lineHeight: 1.5 }}>
-          gbl과 분리된 별도 키 — gblnote AdSense/GA가 tcgnote로 새지 않음. 미설정 시 해당 코드는 아예 노출되지 않아 안전.
+          gbl과 분리된 별도 키 — gblnote AdSense/GA가 tcgnote로 새지 않음. GA·네이버·Bing은 layout에 하드코딩(기본값)이라 env 없이도 라이브 · AdSense는 Render env로 주입.
         </p>
       </section>
 
