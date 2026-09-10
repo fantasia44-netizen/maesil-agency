@@ -141,6 +141,204 @@ export const GUIDES: Guide[] = [
     },
   },
   {
+    slug: "odds-vs-winrate",
+    icon: "⚖️",
+    i18n: {
+      ko: {
+        title: "확률과 승률은 다르다 — 계산(첫패)과 실측(대회)을 함께 읽기",
+        summary: "TCG Note는 '계산한 확률'과 '실제 대회 승률'을 둘 다 제공합니다. 이 둘은 다른 것을 측정합니다. 어떻게 다르고, 함께 보면 무엇을 알 수 있는지 실제 데이터로 설명합니다.",
+        sections: [
+          { h: "두 숫자는 다른 질문에 답한다", p: "확률 계산기의 '첫 손 세팅 확률'은 과정을 봅니다 — 이 덱이 얼마나 안정적으로 굴러가는가. 대회 승률은 결과를 봅니다 — 실제로 이겼는가. 안정적으로 세팅되는 덱이 반드시 많이 이기는 건 아니고(세팅은 되는데 상성에서 지거나), 세팅이 덜 안정적이어도 터지면 강한 덱도 있습니다. 그래서 하나만 보면 반쪽입니다." },
+          { h: "실제 데이터로 본 관계", p: "우리 대표 덱들을 보면, 첫 손 기본 포켓몬 기대 매수(안정성 지표)와 관측 승률 사이에 단순한 비례 관계가 없습니다. 예를 들어 안정성이 높은 덱(기대 1.9매)과 낮은 덱(1.25매)의 승률이 비슷하게 52%대이기도 합니다. 즉 안정성은 이기기 위한 필요조건이지 충분조건이 아닙니다 — 세팅이 잘 돼도 매치업과 플레이가 승패를 가릅니다." },
+          { h: "그럼 계산기는 왜 쓰나", p: "승률이 결과라면, 계산 확률은 그 결과를 만들기 전에 내가 통제할 수 있는 부분입니다. 대회 승률은 '이 덱이 강한가'를 알려주지만, 내가 덱을 짜거나 카드를 바꿀 때 '이 변경이 안정성에 어떤 영향을 주는가'는 계산기만 답합니다. 두 도구의 역할 분담: 티어·승률로 강한 덱을 고르고 → 계산기로 그 덱을 안정적으로 굴러가게 다듬는다." },
+          { h: "정직한 구분 — 실측 vs 시뮬", p: "가장 중요한 원칙: 이 둘을 절대 섞지 않습니다. 대회 승률은 '실측(관측)', 계산기 확률은 '시뮬(계산)'로 항상 라벨을 나눠 표기합니다. '이 덱 승률 58%'(실측)와 '핵심 카드 첫 손 62%'(계산)는 다른 숫자이고, 섞어서 '이 덱은 62% 이긴다'처럼 말하면 신뢰가 깨집니다. 재료(공개 데이터)와 계산(우리 산출)을 정직하게 구분하는 것 — 그게 도구의 신뢰입니다." },
+        ],
+        cta: [
+          { label: "🏆 덱 티어표(실측 승률)", href: "/tcg/tier" },
+          { label: "📊 확률 계산기(계산)", href: "/tcg/hand-sim" },
+          { label: "🎯 대표 덱 공략(둘 다)", href: "/tcg/decks" },
+        ],
+      },
+      en: {
+        title: "Probability vs Win Rate — Reading Computed Odds and Observed Results Together",
+        summary: "TCG Note gives you both a computed probability and a real tournament win rate. They measure different things. Here's how they differ, and what reading them together reveals — with real data.",
+        sections: [
+          { h: "The two numbers answer different questions", p: "The calculator's opening-hand setup odds measure the process — how reliably a deck runs. The tournament win rate measures the result — whether it actually wins. A deck that sets up reliably doesn't necessarily win the most (it sets up but loses the matchup), and a less-consistent deck can be strong when it pops off. Look at only one and you see half the picture." },
+          { h: "The relationship, in real data", p: "Across our featured decks, there's no simple proportional link between expected opening Basics (a consistency proxy) and observed win rate. A highly consistent deck (expected 1.9 Basics) and a less consistent one (1.25) can both sit around a 52% win rate. In short, consistency is necessary but not sufficient to win — setup helps, but matchups and play decide games." },
+          { h: "So why use the calculator", p: "If win rate is the result, computed odds are the part you control before that result. A win rate tells you 'is this deck strong,' but only the calculator answers 'how does this change affect consistency' when you build a deck or swap a card. The division of labor: pick a strong deck by tier/win rate → tune it to run consistently with the calculator." },
+          { h: "An honest split — observed vs simulated", p: "The key principle: we never mix them. Tournament win rate is labeled 'observed,' the calculator's odds 'simulation (computed)' — always separated. 'This deck wins 58%' (observed) and 'the key card is in the opening 62%' (computed) are different numbers; blending them into 'this deck wins 62%' would break trust. Honestly separating the raw material (public data) from our computation is what makes a tool trustworthy." },
+        ],
+        cta: [
+          { label: "🏆 Deck tier list (observed)", href: "/tcg/tier" },
+          { label: "📊 Odds calculator (computed)", href: "/tcg/hand-sim" },
+          { label: "🎯 Deck guides (both)", href: "/tcg/decks" },
+        ],
+      },
+      ja: {
+        title: "確率と勝率は違う — 計算(初手)と実測(大会)を一緒に読む",
+        summary: "TCG Note は「計算した確率」と「実際の大会勝率」の両方を提供します。この2つは別のものを測ります。どう違い、一緒に見ると何が分かるかを実データで説明します。",
+        sections: [
+          { h: "2つの数字は別の問いに答える", p: "確率計算機の「初手セットアップ確率」は過程を見ます — このデッキがどれだけ安定して回るか。大会勝率は結果を見ます — 実際に勝ったか。安定して立ち上がるデッキが必ず多く勝つわけではなく(立つが相性で負ける)、安定性が低くても決まれば強いデッキもあります。片方だけでは半分です。" },
+          { h: "実データで見る関係", p: "主要デッキを見ると、初手たね期待枚数(安定性の指標)と観測勝率の間に単純な比例関係はありません。安定性が高いデッキ(期待1.9枚)も低いデッキ(1.25枚)も勝率が同じ52%台のことがあります。つまり安定性は勝つための必要条件で、十分条件ではない — セットアップは助けますが、相性・立ち回りが勝敗を分けます。" },
+          { h: "ではなぜ計算機を使う", p: "勝率が結果なら、計算確率はその結果を作る前に自分が制御できる部分です。勝率は「このデッキは強いか」を教えますが、デッキを組む・カードを入れ替えるときに「この変更が安定性にどう影響するか」は計算機だけが答えます。役割分担: ティア・勝率で強いデッキを選び → 計算機で安定して回るよう調整。" },
+          { h: "正直な区別 — 実測 vs シミュ", p: "最重要原則: 決して混ぜません。大会勝率は「実測」、計算機の確率は「シミュ(計算)」と常にラベルを分けます。「このデッキ勝率58%」(実測)と「キーカード初手62%」(計算)は別の数字で、混ぜて「このデッキは62%勝つ」と言えば信頼が崩れます。材料(公開データ)と計算(自前算出)を正直に分けること — それが道具の信頼です。" },
+        ],
+        cta: [
+          { label: "🏆 デッキティア表(実測)", href: "/tcg/tier" },
+          { label: "📊 確率計算機(計算)", href: "/tcg/hand-sim" },
+          { label: "🎯 デッキ攻略(両方)", href: "/tcg/decks" },
+        ],
+      },
+      "zh-TW": {
+        title: "機率與勝率不同 — 一起讀計算(起手)與實測(賽事)",
+        summary: "TCG Note 同時提供「計算的機率」與「實際賽事勝率」。這兩者測量不同的東西。這裡用實際數據說明它們如何不同，以及一起看能發現什麼。",
+        sections: [
+          { h: "兩個數字回答不同問題", p: "計算機的「起手展開機率」看的是過程 — 這副牌組運轉得多穩定。賽事勝率看的是結果 — 是否真的贏。穩定展開的牌組不一定贏最多(展開了但相剋輸掉)，穩定度低但爆發時很強的牌組也有。只看一個只見一半。" },
+          { h: "用實際數據看關係", p: "看我們的代表牌組，起手基礎寶可夢期望張數(穩定度指標)與觀測勝率之間沒有單純的正比。穩定度高的牌組(期望1.9張)與低的(1.25張)可能勝率都在52%上下。也就是說穩定度是贏的必要條件，非充分條件 — 展開有幫助，但相剋與操作決定勝負。" },
+          { h: "那為何用計算機", p: "若勝率是結果，計算機率就是在那結果之前你能控制的部分。勝率告訴你「這副牌強不強」，但組牌或換卡時「這個更動如何影響穩定度」只有計算機能回答。分工: 用強度·勝率選強牌組 → 用計算機調到穩定運轉。" },
+          { h: "誠實的區分 — 實測 vs 模擬", p: "最重要原則: 絕不混用。賽事勝率標為「實測」，計算機機率標為「模擬(計算)」，始終分開。「這副牌勝率58%」(實測)與「關鍵卡起手62%」(計算)是不同數字；混成「這副牌贏62%」會破壞信任。誠實地把材料(公開數據)與計算(自行產出)分開 — 這就是工具的可信度。" },
+        ],
+        cta: [
+          { label: "🏆 牌組強度表(實測)", href: "/tcg/tier" },
+          { label: "📊 機率計算機(計算)", href: "/tcg/hand-sim" },
+          { label: "🎯 牌組攻略(兩者)", href: "/tcg/decks" },
+        ],
+      },
+    },
+  },
+  {
+    slug: "pack-sim-guide",
+    icon: "🎰",
+    i18n: {
+      ko: {
+        title: "팩 오픈 시뮬레이터 활용법 — 젬 쓰기 전에 확률로 계획하기",
+        summary: "실제 공개 확률(pull rate)로 팩을 열어보는 시뮬레이터입니다. 어떤 원리로 돌아가는지, 그리고 목표 카드를 위해 젬을 어디에 쓸지 계획하는 데 어떻게 쓰는지 정리했습니다.",
+        sections: [
+          { h: "이 도구가 하는 일", p: "포켓포켓 팩을 실제 공개 확률로 열어보는 도구입니다. 1팩·10팩·100팩을 열어 커먼(◇)부터 ex(◇◇◇◇)·아트(☆)·크라운(👑)까지 어떤 레어도가 얼마나 나오는지 눈으로 확인합니다. 젬(재화)을 쓰기 전에 '100팩 까면 대충 이 정도 나오는구나'를 미리 감 잡는 용도입니다." },
+          { h: "어떻게 계산하나 — 실제 슬롯 확률", p: "팩은 카드 5장이고, 슬롯마다 등장하는 레어도 확률이 정해져 있습니다(앞쪽 슬롯일수록 커먼, 뒤쪽 슬롯에서 희귀 카드). 이 도구는 각 슬롯을 실제 공개 확률로 굴린 뒤, 그 레어도에 해당하는 카드 중 하나를 무작위로 뽑습니다. 아주 낮은 확률(≈0.05%)로 전부 희귀한 '레어팩(갓팩)'도 반영합니다. 확률 데이터는 커뮤니티가 문서화한 인게임 공개 오퍼링 레이트 기준입니다." },
+          { h: "실전 활용법", p: "① 목표 카드 계획 — 갖고 싶은 카드가 어느 팩·어느 레어도인지 확인하고, 100팩 시뮬로 그 레어도가 몇 장 나오는지 감을 잡아 젬을 어디에 쓸지 정합니다. ② 기대치 조정 — '☆ 아트를 노린다면 몇 팩이 현실적인가'를 미리 체험해 무리한 목표를 거릅니다. ③ 덱 완성 비용 — 덱 빌더의 '필요한 팩'과 이어서, 목표 덱을 완성하려면 어느 팩을 얼마나 까야 하는지 계획합니다." },
+          { h: "독창성과 정직", p: "카드 나열은 어느 사이트나 같지만, '실제 확률로 팩을 굴려보는' 계산은 흔치 않습니다. 단, 이 결과는 슬롯별 레어도 분포를 반영한 독립 시뮬레이션이며 실제 인게임 개봉을 보장하지 않습니다 — 재미·계획용임을 항상 명시합니다. 확률의 출처(커뮤니티 문서화 오퍼링 레이트)와 확인일도 함께 표기합니다." },
+        ],
+        cta: [
+          { label: "🎰 팩 시뮬레이터 열기", href: "/tcg/pack-sim" },
+          { label: "🃏 덱 빌더(필요한 팩)", href: "/tcg/deck-builder" },
+          { label: "🔍 카드 검색", href: "/tcg/cards" },
+        ],
+      },
+      en: {
+        title: "How to Use the Pack Opening Simulator — Plan Before You Spend Gems",
+        summary: "Open packs at real pull rates. Here's how it works, and how to use it to plan where to spend gems for the cards you want.",
+        sections: [
+          { h: "What this tool does", p: "Open Pocket packs at their real pull rates. Rip 1 / 10 / 100 packs and see how often each rarity appears — from commons (◇) up to ex (◇◇◇◇), art (☆) and crown (👑). It's for getting a feel — 'about this much comes out of 100 packs' — before you spend gems." },
+          { h: "How it calculates — real slot odds", p: "A pack has 5 cards, and each slot has its own rarity distribution (earlier slots skew common; the back slots roll the rare cards). The tool rolls each slot at its real rate, then draws a random card of that rarity. A very rare (~0.05%) all-rare 'god pack' is modeled too. The odds are based on the in-game offering rates as documented by the community." },
+          { h: "Practical uses", p: "① Target planning — check which pack and rarity your wanted card is, then use the 100-pack sim to gauge how many of that rarity appear, and decide where to spend gems. ② Expectation setting — experience 'how many packs is realistic for a ☆ art' before chasing an unrealistic goal. ③ Deck completion cost — pair with the Deck Builder's 'packs you need' to plan how many of which pack to open to finish a target deck." },
+          { h: "Originality and honesty", p: "Listing cards is the same everywhere, but simulating packs at real odds is uncommon. Note this is an independent simulation reflecting per-slot rarity distributions and doesn't guarantee actual in-game pulls — we always mark it as for-fun/planning. We also cite the odds source (community-documented offering rates) and verification date." },
+        ],
+        cta: [
+          { label: "🎰 Open the simulator", href: "/tcg/pack-sim" },
+          { label: "🃏 Deck Builder (packs you need)", href: "/tcg/deck-builder" },
+          { label: "🔍 Card search", href: "/tcg/cards" },
+        ],
+      },
+      ja: {
+        title: "パック開封シミュレーターの使い方 — 石を使う前に確率で計画",
+        summary: "実際の排出確率でパックを開くツール。仕組みと、狙いのカードに石をどこで使うか計画する使い方をまとめました。",
+        sections: [
+          { h: "このツールの機能", p: "ポケポケのパックを実際の排出確率で開けます。1/10/100パックを開き、コモン(◇)からex(◇◇◇◇)・アート(☆)・クラウン(👑)まで各レアリティがどれだけ出るか確認。石を使う前に「100パックで大体これくらい」を掴む用途です。" },
+          { h: "計算方法 — 実際のスロット確率", p: "パックは5枚、スロットごとにレアリティ確率が決まっています(前は基本コモン、後ろのスロットで希少カード)。各スロットを実際の確率で回し、そのレアリティのカードを1枚ランダムに引きます。ごく低確率(≈0.05%)の全希少『レアパック(神パック)』も反映。確率はコミュニティが文書化したゲーム内排出レート基準です。" },
+          { h: "実戦での使い方", p: "①狙い計画 — 欲しいカードがどのパック・レアリティか確認し、100パックシミュでそのレアリティが何枚出るか掴んで石の使い所を決める。②期待値調整 — 「☆アートを狙うなら何パック現実的か」を先に体験して無理な目標を避ける。③デッキ完成コスト — デッキビルダーの『必要なパック』と連携し、目標デッキを完成させるにはどのパックを何個開けるか計画。" },
+          { h: "独創性と正直さ", p: "カードの羅列はどこも同じですが、実際の確率でパックを回す計算は稀です。ただしこれはスロット別レアリティ分布を反映した独立シミュで、実際の開封を保証しません — 常に娯楽・計画用と明記。確率の出典(コミュニティ文書化の排出レート)と確認日も併記します。" },
+        ],
+        cta: [
+          { label: "🎰 シミュレーターを開く", href: "/tcg/pack-sim" },
+          { label: "🃏 デッキビルダー(必要なパック)", href: "/tcg/deck-builder" },
+          { label: "🔍 カード検索", href: "/tcg/cards" },
+        ],
+      },
+      "zh-TW": {
+        title: "開包模擬器使用方法 — 花寶石前用機率規劃",
+        summary: "以實際開包機率開包的工具。這裡整理原理，以及如何用它規劃為想要的卡片在哪裡花寶石。",
+        sections: [
+          { h: "這個工具的功能", p: "以實際開包機率開 Pocket 卡包。開1/10/100包，看各稀有度出多少 — 從普通(◇)到ex(◇◇◇◇)、美術(☆)、皇冠(👑)。用於在花寶石前掌握「100包大概出這麼多」。" },
+          { h: "如何計算 — 實際槽位機率", p: "一包5張，每個槽位有各自的稀有度分布(前面偏普通，後面槽位出稀有卡)。工具以實際機率轉每個槽位，再從該稀有度隨機抽1張。也反映極低機率(≈0.05%)的全稀有「稀有包(神包)」。機率以社群記錄的遊戲內開包率為準。" },
+          { h: "實戰用法", p: "①目標規劃 — 確認想要的卡在哪個卡包·稀有度，用100包模擬掌握該稀有度出幾張，決定寶石花在哪。②期望調整 — 先體驗「想要☆美術要開幾包才現實」，避免不切實際的目標。③牌組完成成本 — 與牌組製作的『需要的卡包』連動，規劃要開哪些卡包幾個才能完成目標牌組。" },
+          { h: "獨創性與誠實", p: "列卡片每個網站都一樣，但以實際機率轉包的計算少見。惟這是反映各槽位稀有度分布的獨立模擬，不保證實際開包 — 始終標示為娛樂·規劃用。也標明機率來源(社群記錄的開包率)與確認日。" },
+        ],
+        cta: [
+          { label: "🎰 開啟模擬器", href: "/tcg/pack-sim" },
+          { label: "🃏 牌組製作(需要的卡包)", href: "/tcg/deck-builder" },
+          { label: "🔍 卡片查詢", href: "/tcg/cards" },
+        ],
+      },
+    },
+  },
+  {
+    slug: "meta-guide",
+    icon: "📈",
+    i18n: {
+      ko: {
+        title: "메타 환경 분석 읽는 법 — 지금 뭐가 강하고 뭘 대비할까",
+        summary: "타입 분포·상위 집중도·오버퍼포머까지, 대회 데이터로 현재 메타를 읽는 법을 정리했습니다. 덱을 고르기 전에 '지금 뭐가 많은가'를 파악하는 도구입니다.",
+        sections: [
+          { h: "메타 분석이 답하는 것", p: "'지금 이 게임에서 뭐가 많이 쓰이고, 뭐가 잘 이기나?' — 메타 환경 분석은 대회 데이터로 이걸 보여줍니다. 어떤 타입·덱이 점유율이 높은지, 상위 몇 덱이 환경을 얼마나 장악했는지(집중도), 점유율 대비 승률이 높은 '숨은 강덱'(오버퍼포머)은 무엇인지를 데이터로 읽습니다." },
+          { h: "핵심 지표 3가지", p: "① 점유율(사용률) — 대회에서 얼마나 많이 쓰이는가. 높을수록 '자주 만나는 상대'입니다. ② 상위 집중도 — 상위 5덱이 환경의 몇 %를 차지하나. 높으면 '소수 덱이 지배하는 좁은 메타', 낮으면 '다양한 덱이 공존하는 넓은 메타'입니다. ③ 오버퍼포머 — 점유율은 낮은데 승률이 높은 덱. 아직 덜 알려진 다크호스로, 메타가 대비하기 전에 선점할 가치가 있습니다." },
+          { h: "실전 활용법", p: "① 상대 예측 — 점유율 상위 덱을 알면 '무엇을 자주 만날지' 알고, 카운터 검색으로 미리 대비할 수 있습니다. ② 선점 기회 — 오버퍼포머를 먼저 잡으면 메타가 적응하기 전에 유리한 위치를 선점합니다. ③ 덱 선택 방향 — 집중도가 높은(좁은) 메타면 상위 덱 저격이 통하고, 넓은 메타면 여러 상대에 두루 통하는 범용 덱이 안전합니다." },
+          { h: "데이터 출처와 독창성", p: "메타 분석은 감이나 인기 투표가 아니라 실제 대회 결과(Limitless TCG)를 우리가 직접 집계한 것입니다. 점유율·승률·집중도·오버퍼포머 판정은 전부 공개 대회 데이터를 재료로 TCG Note가 계산한 값이며, 출처와 갱신일을 함께 표기합니다." },
+        ],
+        cta: [
+          { label: "📊 메타 환경 분석", href: "/tcg/meta" },
+          { label: "🏆 덱 티어표", href: "/tcg/tier" },
+          { label: "🎯 카운터 검색", href: "/tcg/counters" },
+        ],
+      },
+      en: {
+        title: "How to Read the Meta Analysis — What's Strong Now and What to Prepare For",
+        summary: "Read the current meta from tournament data — type distribution, top-deck concentration, and overperformers. A tool for grasping 'what's common now' before you pick a deck.",
+        sections: [
+          { h: "What the meta analysis answers", p: "'What's played a lot and what wins right now?' — the meta analysis shows this from tournament data. Which types and decks have high share, how much the top few decks dominate (concentration), and which 'hidden strong' decks (overperformers) win more than their share would suggest — all read from data." },
+          { h: "Three key metrics", p: "① Share (usage) — how much a deck is played in tournaments. Higher means an opponent you face often. ② Top concentration — what % of the field the top 5 decks make up. High = a narrow meta dominated by a few decks; low = a wide meta where many decks coexist. ③ Overperformers — low share but high win rate. Under-the-radar dark horses worth picking up before the meta adapts." },
+          { h: "Practical uses", p: "① Predict opponents — knowing the top-share decks tells you what you'll face, so you can prepare with Counter Search. ② Seize opportunity — pick up an overperformer before the meta adapts for a favorable early position. ③ Deck-choice direction — in a high-concentration (narrow) meta, targeting the top decks works; in a wide meta, a versatile deck that performs into many opponents is safer." },
+          { h: "Data source and originality", p: "The meta analysis isn't gut feeling or a popularity vote — it's real tournament results (Limitless TCG) aggregated by us. Share, win rate, concentration and overperformer calls are all values TCG Note computes from public tournament data, shown with the source and update date." },
+        ],
+        cta: [
+          { label: "📊 Meta analysis", href: "/tcg/meta" },
+          { label: "🏆 Deck tier list", href: "/tcg/tier" },
+          { label: "🎯 Counter search", href: "/tcg/counters" },
+        ],
+      },
+      ja: {
+        title: "メタ環境分析の読み方 — 今何が強く、何に備えるか",
+        summary: "タイプ分布・上位集中度・オーバーパフォーマーまで、大会データで現環境を読む方法。デッキを選ぶ前に「今何が多いか」を掴むツールです。",
+        sections: [
+          { h: "メタ分析が答えること", p: "「今このゲームで何が多く使われ、何が勝つか?」— メタ環境分析は大会データでこれを示します。どのタイプ・デッキの使用率が高いか、上位数デッキが環境をどれだけ支配するか(集中度)、使用率の割に勝率が高い『隠れ強デッキ』(オーバーパフォーマー)は何かをデータで読みます。" },
+          { h: "3つの主要指標", p: "①使用率 — 大会でどれだけ使われるか。高いほど「よく当たる相手」。②上位集中度 — 上位5デッキが環境の何%を占めるか。高いと少数デッキ支配の狭い環境、低いと多様なデッキ共存の広い環境。③オーバーパフォーマー — 使用率は低いが勝率が高いデッキ。まだ知られていないダークホースで、環境が対策する前に先取りする価値。" },
+          { h: "実戦での使い方", p: "①相手予測 — 使用率上位デッキを知れば何に当たるか分かり、カウンター検索で先に備えられる。②先取り — オーバーパフォーマーを先に押さえ、環境が適応する前に有利な位置を取る。③デッキ選びの方向 — 集中度が高い(狭い)環境なら上位デッキ狙い撃ちが通り、広い環境なら多くの相手に通用する汎用デッキが安全。" },
+          { h: "データ出典と独創性", p: "メタ分析は感覚や人気投票ではなく、実際の大会結果(Limitless TCG)を自前で集計したもの。使用率・勝率・集中度・オーバーパフォーマー判定はすべて公開大会データを材料にTCG Noteが計算した値で、出典と更新日を併記します。" },
+        ],
+        cta: [
+          { label: "📊 メタ環境分析", href: "/tcg/meta" },
+          { label: "🏆 デッキティア表", href: "/tcg/tier" },
+          { label: "🎯 カウンター検索", href: "/tcg/counters" },
+        ],
+      },
+      "zh-TW": {
+        title: "環境分析的看法 — 現在什麼強、要防什麼",
+        summary: "從屬性分布、上位集中度到超常發揮，用賽事數據讀懂當前環境。選牌組前掌握「現在什麼多」的工具。",
+        sections: [
+          { h: "環境分析回答什麼", p: "「現在這遊戲什麼多用、什麼會贏?」— 環境分析用賽事數據呈現。哪些屬性·牌組使用率高、上位幾副牌組多大程度主宰環境(集中度)、相對使用率勝率偏高的『隱藏強牌』(超常發揮)是什麼，全以數據解讀。" },
+          { h: "三大指標", p: "①使用率 — 賽事中用得多不多。越高代表「常遇到的對手」。②上位集中度 — 前5牌組佔環境幾%。高=少數牌組主宰的窄環境；低=多樣牌組共存的廣環境。③超常發揮 — 使用率低但勝率高的牌組。尚未廣為人知的黑馬，值得在環境針對前搶先。" },
+          { h: "實戰用法", p: "①預測對手 — 知道使用率上位牌組就知道會遇到什麼，用剋星搜尋先準備。②搶先 — 先押超常發揮牌組，在環境適應前取得有利位置。③選牌方向 — 集中度高(窄)環境可狙擊上位牌組；廣環境用對多數對手都有效的泛用牌組較穩。" },
+          { h: "數據來源與獨創", p: "環境分析並非憑感覺或人氣投票，而是自行彙整實際賽事結果(Limitless TCG)。使用率·勝率·集中度·超常發揮判定全是以公開賽事數據為材料由 TCG Note 計算的值，並標示來源與更新日。" },
+        ],
+        cta: [
+          { label: "📊 環境分析", href: "/tcg/meta" },
+          { label: "🏆 牌組強度表", href: "/tcg/tier" },
+          { label: "🎯 剋星搜尋", href: "/tcg/counters" },
+        ],
+      },
+    },
+  },
+  {
     slug: "getting-started",
     icon: "🃏",
     i18n: {
