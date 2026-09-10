@@ -9,6 +9,72 @@ export type Guide = { slug: string; icon: string; i18n: Record<Locale, GuideBody
 
 export const GUIDES: Guide[] = [
   {
+    slug: "why-tcg-note",
+    icon: "💡",
+    i18n: {
+      ko: {
+        title: "TCG Note는 무엇이 다른가 — 계산으로 답하는 포켓포켓 도구",
+        summary: "카드를 나열하는 사이트는 많습니다. TCG Note는 공개 데이터를 재료로 '계산된 답'을 만듭니다. 무엇이 다른지, 그리고 200% 활용하는 법을 정리했습니다.",
+        sections: [
+          { h: "DB를 보여주는 게 아니라, 계산해서 답합니다", p: "카드 정보·대회 결과 같은 '공개 데이터'는 어느 사이트나 같습니다. TCG Note의 가치는 그 데이터를 재료로 직접 계산한 결과에 있습니다 — 대회 승률로 산출한 덱 티어, 실제 대전 기록으로 만든 매치업·카운터, 덱 구성으로 확률을 돌리는 첫패·콤보 계산기. 즉 '무슨 카드가 있나'가 아니라 '무엇을 왜 쓰고, 얼마나 통하나'에 답합니다." },
+          { h: "세 겹의 가치 — 사실 · 분석 · 계산", p: "① 공개 사실(카드·덱리스트·대회 결과)은 출처(Limitless 등)를 명시해 그대로 제공합니다. ② 그 위에 TCG Note의 자체 분석을 얹습니다 — Wilson 보정 티어, 점유율과 기간별 승률(3·7·30일)·추세, 상성 카운터. ③ 마지막으로 자체 계산/시뮬을 제공합니다 — 첫 손에 핵심 카드가 잡힐 확률, 콤보가 갖춰질 확률, 팩 오픈 확률. 사실은 재료일 뿐, 우리가 만드는 건 '계산된 답'입니다." },
+          { h: "이렇게 쓰면 200% — 덱 고르기부터 뽑기 계획까지", p: "① 덱 티어표에서 '표본도 충분하고 승률도 높은' 덱을 고릅니다(반짝 승률은 Wilson 하한이 걸러줍니다). ② 카운터 검색으로 요즘 많이 보이는 상대 덱의 카운터를 미리 준비합니다. ③ 첫패·콤보 계산기로 고른 덱의 일관성을 점검합니다(핵심 카드 첫 손 확률, 콤보 확보 확률). ④ 팩 시뮬레이터로 목표 카드가 어느 팩에서 얼마나 나오는지 확인해 젬 쓸 곳을 정합니다. ⑤ 기간별 승률·추세로 메타 흐름을 추적합니다 — 어제 강했던 덱이 오늘 꺾였는지 한눈에 봅니다." },
+          { h: "우리가 지키는 원칙 — 정직한 숫자", p: "숫자를 믿을 수 있어야 도구가 됩니다. 그래서 TCG Note는 ① '실제 관측 승률'과 '계산한 예상 확률(시뮬)'을 반드시 구분해 표기하고, ② 모든 지표에 표본 수를 함께 보여줍니다(10경기 70%와 1,000경기 56%는 다릅니다 — Wilson 보정으로 소표본 과대평가를 막습니다), ③ 공개 데이터의 출처를 명시합니다. 예뻐 보이는 숫자보다 믿을 수 있는 숫자를 택합니다." },
+        ],
+        cta: [
+          { label: "🏆 덱 티어표", href: "/tcg/tier" },
+          { label: "📊 첫패·콤보 계산기", href: "/tcg/hand-sim" },
+          { label: "⚔️ 카운터 검색", href: "/tcg/counters" },
+        ],
+      },
+      en: {
+        title: "What makes TCG Note different — a Pokémon TCG Pocket toolkit that computes answers",
+        summary: "Plenty of sites list cards. TCG Note turns public data into computed answers. Here's what's different, and how to get the most out of it.",
+        sections: [
+          { h: "It doesn't just show a database — it computes answers", p: "Public data like card info and tournament results is the same everywhere. TCG Note's value is in what it computes from that data — deck tiers from tournament win rates, matchups and counters from real game records, and an opening-hand/combo calculator that runs the odds on your deck's composition. It answers not 'what cards exist' but 'what to play, why, and how well it works.'" },
+          { h: "Three layers of value — facts · analysis · computation", p: "① Public facts (cards, decklists, tournament results) are shown as-is with their source (Limitless, etc.) credited. ② On top we add TCG Note's own analysis — Wilson-adjusted tiers, share and period win rates (3/7/30 days) with trend, and matchup counters. ③ Finally, our own computation/simulation — the probability a key card is in your opening hand, that a combo comes together, or what a pack opens. The facts are raw material; what we build is the computed answer." },
+          { h: "How to get 200% out of it — from picking a deck to planning your pulls", p: "① In the tier list, pick a deck with both a solid sample and a high win rate (the Wilson lower bound filters out lucky streaks). ② Use Counter Search to prepare in advance against the decks you're facing a lot. ③ Check your chosen deck's consistency with the Opening Hand & Combo Calculator (opening-hand odds for key cards, combo odds). ④ Use the Pack Simulator to see how often target cards appear in each pack and decide where to spend gems. ⑤ Track the meta with period win rates and trends — see at a glance whether a deck that was strong yesterday has cooled off today." },
+          { h: "The principles we keep — honest numbers", p: "A tool is only useful if you can trust its numbers. So TCG Note ① always labels 'observed win rate' separately from 'computed probability (simulation),' ② shows the sample size alongside every figure (70% over 10 games and 56% over 1,000 are different — the Wilson adjustment prevents small-sample overrating), and ③ credits the source of public data. We choose trustworthy numbers over pretty ones." },
+        ],
+        cta: [
+          { label: "🏆 Deck tier list", href: "/tcg/tier" },
+          { label: "📊 Opening Hand Calculator", href: "/tcg/hand-sim" },
+          { label: "⚔️ Counter Search", href: "/tcg/counters" },
+        ],
+      },
+      ja: {
+        title: "TCG Note はどこが違うか — 計算で答えるポケポケツール",
+        summary: "カードを並べるサイトは多い。TCG Note は公開データを材料に『計算された答え』を作ります。何が違うのか、そして200%活用する方法をまとめました。",
+        sections: [
+          { h: "DBを見せるのではなく、計算して答えます", p: "カード情報や大会結果といった『公開データ』はどのサイトも同じです。TCG Note の価値は、それを材料に自分で計算した結果にあります — 大会勝率で算出したデッキティア、実際の対戦記録で作った相性・カウンター、デッキ構成で確率を回す初手・コンボ計算機。『どんなカードがあるか』ではなく『何をなぜ使い、どれだけ通用するか』に答えます。" },
+          { h: "三層の価値 — 事実 · 分析 · 計算", p: "①公開事実(カード・デッキリスト・大会結果)は出典(Limitless等)を明記してそのまま提供。②その上に TCG Note 独自の分析を重ねます — ウィルソン補正ティア、使用率・期間別勝率(3・7・30日)と推移、相性カウンター。③最後に独自の計算/シミュ — 初手にキーカードが来る確率、コンボが揃う確率、パック開封の確率。事実は材料にすぎず、作るのは『計算された答え』です。" },
+          { h: "こう使えば200% — デッキ選びから引きの計画まで", p: "①ティア表で『標本も十分で勝率も高い』デッキを選ぶ(まぐれ勝率はウィルソン下限が弾きます)。②カウンター検索で、よく当たる相手デッキの対策を先に用意。③初手・コンボ計算機で選んだデッキの安定性を点検(キーカードの初手率、コンボ確保率)。④パックシミュで目標カードがどのパックでどれだけ出るか確認し、石の使い所を決める。⑤期間別勝率・推移で環境の流れを追う — 昨日強かったデッキが今日落ちたか一目で。" },
+          { h: "私たちが守る原則 — 正直な数字", p: "数字が信頼できて初めて道具になります。だから TCG Note は①『実際の観測勝率』と『計算した予想確率(シミュ)』を必ず区別して表記し、②すべての指標に標本数を併記し(10試合70%と1,000試合56%は違います — ウィルソン補正で小標本の過大評価を防ぎます)、③公開データの出典を明記します。きれいな数字より信頼できる数字を選びます。" },
+        ],
+        cta: [
+          { label: "🏆 デッキティア表", href: "/tcg/tier" },
+          { label: "📊 初手・コンボ計算機", href: "/tcg/hand-sim" },
+          { label: "⚔️ カウンター検索", href: "/tcg/counters" },
+        ],
+      },
+      "zh-TW": {
+        title: "TCG Note 有何不同 — 以計算回答的 Pocket 工具",
+        summary: "列卡片的網站很多。TCG Note 以公開數據為材料，做出『計算後的答案』。這裡整理有何不同，以及如何200%活用。",
+        sections: [
+          { h: "不是展示資料庫，而是計算後回答", p: "卡片資訊、賽事結果這類『公開數據』每個網站都一樣。TCG Note 的價值在於用它計算出的結果 — 以賽事勝率算出的牌組強度、以實際對戰記錄做的對戰·剋星、以牌組構成跑機率的起手·連段計算機。回答的不是『有哪些卡』，而是『該用什麼、為什麼、有多有效』。" },
+          { h: "三層價值 — 事實 · 分析 · 計算", p: "①公開事實(卡片·牌表·賽事結果)標明來源(Limitless等)原樣提供。②在其上疊加 TCG Note 自有分析 — Wilson 修正強度、使用率·期間別勝率(3·7·30日)與趨勢、對戰剋星。③最後是自有計算/模擬 — 起手抽到關鍵卡的機率、連段湊齊的機率、開包機率。事實只是材料，我們提供的是計算後的答案。" },
+          { h: "這樣用能200% — 從選牌組到規劃抽卡", p: "①在強度表選『樣本充足且勝率高』的牌組(僥倖勝率會被 Wilson 下限濾掉)。②用剋星搜尋，先準備常遇到的對手牌組的剋制。③用起手·連段計算機檢查所選牌組的穩定度(關鍵卡起手率、連段確保率)。④用開包模擬器看目標卡在哪個卡包出多少，決定寶石花在哪。⑤用期間別勝率·趨勢追蹤環境 — 昨天強的牌組今天是否降溫，一目了然。" },
+          { h: "我們堅守的原則 — 誠實的數字", p: "數字可信才成為工具。所以 TCG Note ①必定區分標示『實際觀測勝率』與『計算的預估機率(模擬)』，②每項指標都併示樣本數(10場70%與1,000場56%不同 — Wilson 修正防止小樣本高估)，③標明公開數據來源。我們選擇可信的數字，而非好看的數字。" },
+        ],
+        cta: [
+          { label: "🏆 牌組強度表", href: "/tcg/tier" },
+          { label: "📊 起手·連段計算機", href: "/tcg/hand-sim" },
+          { label: "⚔️ 剋星搜尋", href: "/tcg/counters" },
+        ],
+      },
+    },
+  },
+  {
     slug: "getting-started",
     icon: "🃏",
     i18n: {
