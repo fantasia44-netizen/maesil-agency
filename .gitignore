@@ -35,3 +35,7 @@ Thumbs.db
 # TypeScript incremental build info
 *.tsbuildinfo
 .claude/worktrees/
+
+# GBL IV precompute 생성 산출물(빌드 아티팩트, 앱 미참조)
+frontend/scripts/gbl/out_*.json
+frontend/scripts/gbl/build_iv.cjs
