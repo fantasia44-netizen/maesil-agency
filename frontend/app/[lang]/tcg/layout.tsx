@@ -20,7 +20,9 @@ export const dynamic = "force-dynamic";
 // 미설정 시 아무 코드도 노출 안 함(도메인 준비 전 안전).
 const ADS_CLIENT = process.env.NEXT_PUBLIC_TCG_ADSENSE_CLIENT || "";
 const GA_ID = process.env.NEXT_PUBLIC_TCG_GA_ID || "";
-const NAVER_VERIFY = process.env.NEXT_PUBLIC_TCG_NAVER_VERIFY || "";
+const NAVER_VERIFY = process.env.NEXT_PUBLIC_TCG_NAVER_VERIFY || "c691d37014d804696ee408a4d16333a3805bdd3f";
+// Bing Webmaster 소유확인(공개·고정 토큰) — env로 덮어쓸 수 있게 기본값 하드코딩.
+const BING_VERIFY = process.env.NEXT_PUBLIC_TCG_BING_VERIFY || "CA02CE9D3CEFEBFDA1C1F4CAC49F2F2A";
 
 export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
   const lang = isLocale(params.lang) ? params.lang : defaultLocale;
@@ -43,6 +45,7 @@ export async function generateMetadata({ params }: { params: { lang: string } })
     other: {
       ...(ADS_CLIENT ? { "google-adsense-account": ADS_CLIENT } : {}),
       ...(NAVER_VERIFY ? { "naver-site-verification": NAVER_VERIFY } : {}),
+      ...(BING_VERIFY ? { "msvalidate.01": BING_VERIFY } : {}),
     },
   };
 }
