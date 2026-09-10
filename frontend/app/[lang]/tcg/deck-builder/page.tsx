@@ -10,7 +10,7 @@ const PATH = "/tcg/deck-builder";
 const T: Record<Locale, { title: string; desc: string; h1: string; intro: string; how: string; howBody: string }> = {
   ko: {
     title: "포켓몬 카드 게임 Pocket 덱 빌더 — 20장 덱 만들고 공유",
-    desc: "포켓몬 카드 게임 Pocket(포켓포켓) 덱을 직접 만드는 빌더. 대회 메타 덱에서 시작하거나 카드를 골라 20장 덱을 짜고, 필요한 팩·속성 분포를 확인해 링크로 공유하세요.",
+    desc: "포켓포켓 덱을 직접 만드는 빌더. 메타 덱에서 시작하거나 카드를 골라 20장 덱을 짜고, 필요한 팩·속성 분포를 확인해 링크로 공유.",
     h1: "덱 빌더",
     intro: "카드를 골라 나만의 20장 덱을 만들어보세요. 대회 상위 메타 덱에서 시작해 손보거나, 처음부터 짜도 됩니다. 이 덱을 완성하려면 어떤 팩을 까야 하는지까지 알려주고, 링크로 바로 공유됩니다.",
     how: "📐 규칙 · 이 도구가 하는 일",

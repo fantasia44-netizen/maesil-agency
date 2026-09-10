@@ -10,7 +10,7 @@ const PATH = "/tcg/pack-sim";
 const T: Record<Locale, { title: string; desc: string; h1: string; intro: string; how: string; howBody: string; source: string }> = {
   ko: {
     title: "포켓몬 카드 게임 Pocket 팩 오픈 시뮬레이터 — 실제 확률로",
-    desc: "포켓몬 카드 게임 Pocket(포켓포켓) 팩을 실제 공개 확률로 열어보는 시뮬레이터. 1팩/10팩/100팩 열고 레어·이머시브·크라운이 얼마나 나오는지 확인하세요.",
+    desc: "포켓포켓 팩을 실제 공개 확률로 열어보는 시뮬레이터. 1·10·100팩 열고 레어·이머시브·크라운이 얼마나 나오는지 확인.",
     h1: "팩 오픈 시뮬레이터",
     intro: "실제 공개 확률(pull rate)로 팩을 열어보세요. 100팩 까면 ◇◇◇◇(ex)·☆(아트)·👑(크라운)이 얼마나 나오는지 감이 옵니다 — 젬 쓰기 전에 미리.",
     how: "📐 확률은 어떻게 계산하나",

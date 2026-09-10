@@ -21,7 +21,7 @@ const ko: TcgDict = {
   brand: "TCG Note",
   meta: {
     title: "TCG Note — 포켓몬 카드 게임 Pocket 메타·덱·티어 분석",
-    description: "포켓몬 카드 게임 Pocket(포켓포켓)의 덱 티어·메타 분석·대표 덱 공략·카드 검색을 한 곳에서. 대회 승률 데이터 기반 티어와 원본 덱 전략.",
+    description: "대회 승률로 계산한 포켓포켓 덱 티어·메타. 티어표·덱 빌더·확률 계산기까지, 데이터로 답하는 덱 분석 도구.",
     ogTitle: "TCG Note — 포켓몬 카드 게임 Pocket 메타·덱 분석",
     ogDescription: "대회 승률 기반 덱 티어 + 대표 덱 공략 + 카드 도구",
   },

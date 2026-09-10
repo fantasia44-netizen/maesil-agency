@@ -11,7 +11,7 @@ const PATH = "/tcg/hand-sim";
 const T: Record<Locale, { title: string; desc: string; h1: string; intro: string; how: string; howBody: string }> = {
   ko: {
     title: "포켓몬 카드 게임 Pocket 첫패·콤보 확률 계산기",
-    desc: "포켓몬 카드 게임 Pocket(포켓포켓) 덱의 첫 손 기본 포켓몬·핵심 카드 확보·콤보 확률을 몬테카를로로 계산. 대회 메타 덱 또는 내 덱으로 일관성을 확인하세요.",
+    desc: "포켓포켓 덱의 첫 손 기본 포켓몬·핵심 카드·콤보 확률을 몬테카를로로 계산. 메타 덱이나 내 덱의 일관성을 숫자로 확인.",
     h1: "첫패·콤보 확률 계산기",
     intro: "이 덱의 첫 손에 핵심 카드가 잡힐 확률은? 콤보 두 장이 함께 갖춰질 확률은? 공개 대회 덱리스트(또는 내 덱)를 재료로 TCG Note가 직접 확률을 계산합니다.",
     how: "📐 어떻게 계산하나 (방법론)",
