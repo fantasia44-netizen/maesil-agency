@@ -75,6 +75,72 @@ export const GUIDES: Guide[] = [
     },
   },
   {
+    slug: "hand-sim-guide",
+    icon: "📊",
+    i18n: {
+      ko: {
+        title: "첫패·콤보 확률 계산기 활용법 — 덱 일관성을 숫자로",
+        summary: "핵심 카드가 첫 손에 잡힐 확률, 콤보가 갖춰질 확률을 몬테카를로로 계산합니다. 이 도구가 어떻게 계산하는지, 그리고 덱을 짜고 고를 때 어떻게 쓰는지 정리했습니다.",
+        sections: [
+          { h: "이 도구가 답하는 질문", p: "'이 덱, 첫 턴에 세팅이 될까?' — 감이 아니라 확률로 답합니다. 덱을 고르면 핵심 카드가 첫 손(5장)에 잡힐 확률, 두 카드가 함께 갖춰질 콤보 확률, 첫 손에 기본 포켓몬이 몇 장 나올지를 계산해 보여줍니다. '강한 덱'과 '안정적으로 돌아가는 덱'은 다릅니다 — 이 도구는 그 '일관성'을 숫자로 만듭니다." },
+          { h: "어떻게 계산하나 — 몬테카를로 엔진", p: "포켓포켓 규칙 그대로 시뮬레이션합니다. 덱 20장을 섞어 첫 손 5장을 뽑되, 규칙대로 기본 포켓몬이 1장 이상 나오도록 자동 재드로우(몰리건)하고, 이후 매 턴 1장씩 드로우합니다. 이 과정을 2만 번 반복해 각 카드가 첫 손·누적 7장·9장 시점에 손에 있던 비율을 집계합니다. 이론 공식(초기하분포)만으로는 몰리건 조건을 정확히 반영하기 어려워, 실제 규칙을 그대로 돌리는 몬테카를로를 씁니다. 시드를 고정해 같은 덱은 항상 같은 결과가 나오도록 했습니다(재현성)." },
+          { h: "실전 활용 5가지", p: "① 덱 안정성 점검 — 주력 어태커의 기본 포켓몬이 첫 손에 올 확률이 낮으면 그 라인을 늘리세요. ② 콤보 성공률 — 'A를 세우고 B로 마무리' 같은 2카드 콤보가 몇 턴에 갖춰지는지 확인해 무리한 콤보인지 판단합니다. ③ 몰리건 리스크 — 첫 손 기본 포켓몬 기대 매수가 1.3~1.5 이상이면 안정적, 1 근처면 사고가 잦습니다(기본 포켓몬 8~12장 권장). ④ 내 덱 vs 메타 덱 — 내가 짠 덱과 대회 상위 덱의 확률을 비교해 일관성 격차를 봅니다. ⑤ 덱 빌더 연계 — 덱 빌더에서 만든 덱이 자동으로 넘어와, 카드를 바꿔가며 확률 변화를 즉시 확인할 수 있습니다." },
+          { h: "왜 여기서만 보나 — 계산이 만드는 가치", p: "카드 데이터·덱리스트는 어느 사이트나 같은 공개 자료입니다. TCG Note는 그 자료를 '재료'로 쓸 뿐, 파는 것은 계산된 답입니다. 이 확률 계산기가 대표적입니다 — 다른 사이트들은 카드를 나열하지만, '이 덱이 얼마나 안정적으로 돌아가는가'를 확률로 계산해주는 곳은 드뭅니다. 단, 이 수치는 덱 구성으로 계산한 확률(시뮬레이션)이며 실제 대회 관측 승률과는 구분됩니다 — 우리는 이 둘을 항상 라벨로 나눠 표기합니다." },
+        ],
+        cta: [
+          { label: "📊 확률 계산기 열기", href: "/tcg/hand-sim" },
+          { label: "🃏 덱 빌더", href: "/tcg/deck-builder" },
+          { label: "🏆 덱 티어표", href: "/tcg/tier" },
+        ],
+      },
+      en: {
+        title: "How to Use the Opening Hand & Combo Calculator — Deck Consistency in Numbers",
+        summary: "Compute the odds your key card is in the opening hand, or that a combo comes together, via Monte Carlo. Here's how it calculates, and how to use it when building and choosing decks.",
+        sections: [
+          { h: "The question this tool answers", p: "'Will this deck set up on turn one?' — answered with probability, not gut feeling. Pick a deck and it computes the odds your key card is in the opening 5, the odds two cards come together (a combo), and how many Basic Pokémon your opening hand holds. A strong deck and a consistent deck aren't the same thing — this tool turns 'consistency' into a number." },
+          { h: "How it calculates — the Monte Carlo engine", p: "It simulates Pocket's exact rules. It shuffles the 20-card deck and draws a 5-card opening hand, auto-redrawing until it contains at least one Basic Pokémon (the mulligan), then draws 1 per turn. It repeats this 20,000 times and tallies how often each card was in hand at the opening / by 9 cards. A closed-form formula (hypergeometric) can't cleanly capture the mulligan condition, so we run the actual rules via Monte Carlo. The seed is fixed, so the same deck always gives the same result (reproducible)." },
+          { h: "Five practical uses", p: "① Consistency check — if your main attacker's Basic has a low opening-hand rate, run more of that line. ② Combo success — see by which turn a two-card 'set up A, finish with B' combo assembles, to judge if it's too greedy. ③ Mulligan risk — an expected 1.3–1.5+ Basics in the opening is stable; near 1 means frequent stumbles (run 8–12 Basics). ④ Your deck vs meta decks — compare your build's odds against top tournament decks to see the consistency gap. ⑤ Deck Builder link — a deck you built there carries over automatically, so you can swap cards and watch the odds shift instantly." },
+          { h: "Why you'll only find this here — value from computation", p: "Card data and decklists are the same public material everywhere. TCG Note uses that only as raw material; what it offers is the computed answer. This calculator is the prime example — other sites list cards, but few compute 'how consistently this deck actually runs.' Note that these figures are a computed probability (simulation) from the deck's composition, distinct from observed tournament win rates — we always label the two separately." },
+        ],
+        cta: [
+          { label: "📊 Open the calculator", href: "/tcg/hand-sim" },
+          { label: "🃏 Deck Builder", href: "/tcg/deck-builder" },
+          { label: "🏆 Deck tier list", href: "/tcg/tier" },
+        ],
+      },
+      ja: {
+        title: "初手・コンボ確率計算機の使い方 — デッキの安定性を数字で",
+        summary: "キーカードが初手に来る確率、コンボが揃う確率をモンテカルロで計算。どう計算しているか、そしてデッキを組む・選ぶときの使い方をまとめました。",
+        sections: [
+          { h: "このツールが答える問い", p: "「このデッキ、初手で立ち上がる?」を感覚ではなく確率で答えます。デッキを選ぶと、キーカードが初手5枚に来る確率、2枚が揃うコンボ確率、初手のたねポケモン枚数を計算します。強いデッキと安定して回るデッキは別物 — このツールはその「安定性」を数字にします。" },
+          { h: "計算方法 — モンテカルロエンジン", p: "ポケポケのルール通りにシミュレーションします。20枚を混ぜて初手5枚を引き、ルール通りたねポケモンが1枚以上出るまで自動リドロー(マリガン)、以降毎ターン1枚ドロー。これを2万回繰り返し、各カードが初手・累計9枚時点で手札にあった割合を集計します。理論式(超幾何分布)ではマリガン条件を正確に反映しにくいため、実際のルールをそのまま回すモンテカルロを採用。シードを固定し、同じデッキは常に同じ結果(再現性)。" },
+          { h: "実戦での5つの使い方", p: "①安定性チェック — 主軸のたねポケモンの初手率が低ければそのラインを増やす。②コンボ成功率 — 「Aを立ててBで決める」2枚コンボが何ターンで揃うか確認し、無理なコンボか判断。③マリガンリスク — 初手たね期待枚数が1.3〜1.5以上なら安定、1付近だと事故が多い(たね8〜12枚推奨)。④マイデッキ vs メタデッキ — 自作デッキと大会上位デッキの確率を比較し安定性の差を見る。⑤デッキビルダー連携 — ビルダーで作ったデッキが自動で引き継がれ、カードを入れ替えながら確率変化を即確認。" },
+          { h: "ここでしか見られない理由 — 計算が生む価値", p: "カードデータ・デッキリストはどのサイトも同じ公開資料です。TCG Note はそれを「材料」として使うだけで、売るのは計算された答え。この確率計算機が代表例 — 他サイトはカードを羅列しますが、「このデッキがどれだけ安定して回るか」を確率で計算する所は稀です。ただしこの数値はデッキ構成から計算した確率(シミュ)で、実際の大会勝率とは区別します — 両者は常にラベルで分けて表記します。" },
+        ],
+        cta: [
+          { label: "📊 計算機を開く", href: "/tcg/hand-sim" },
+          { label: "🃏 デッキビルダー", href: "/tcg/deck-builder" },
+          { label: "🏆 デッキティア表", href: "/tcg/tier" },
+        ],
+      },
+      "zh-TW": {
+        title: "起手·連段機率計算機使用方法 — 用數字看牌組穩定度",
+        summary: "以蒙地卡羅計算關鍵卡起手到手、連段湊齊的機率。這裡整理它如何計算，以及組牌·選牌時怎麼用。",
+        sections: [
+          { h: "這個工具回答的問題", p: "「這副牌組第一回合能不能展開?」用機率回答，而非憑感覺。選一副牌組，它會計算關鍵卡在起手5張的機率、兩張湊齊的連段機率、起手有幾張基礎寶可夢。強牌組和穩定運轉的牌組不同 — 這個工具把「穩定度」化為數字。" },
+          { h: "如何計算 — 蒙地卡羅引擎", p: "依 Pocket 規則模擬。洗好20張抽起手5張，依規則自動重抽直到含至少1張基礎寶可夢(調度)，之後每回合抽1張。重複2萬次，統計各卡在起手／至9張時在手的比率。理論公式(超幾何分布)難以精確反映調度條件，故直接跑實際規則的蒙地卡羅。固定亂數種子，同一副牌組永遠得到相同結果(可重現)。" },
+          { h: "實戰5種用法", p: "①穩定度檢查 — 主攻手的基礎寶可夢起手率低，就增加該系列。②連段成功率 — 看「立起A、用B收尾」的兩張連段幾回合湊齊，判斷是否太貪。③調度風險 — 起手基礎寶可夢期望張數1.3〜1.5以上較穩，接近1易事故(建議基礎8〜12張)。④我的牌組 vs 主流牌組 — 比較自組牌組與賽事上位牌組的機率，看穩定度差距。⑤與牌組製作連動 — 在製作工具組的牌組會自動帶入，換卡即時看機率變化。" },
+          { h: "為何只有這裡看得到 — 計算創造的價值", p: "卡片數據·牌表每個網站都是相同公開資料。TCG Note 只把它當「材料」，提供的是計算後的答案。這個機率計算機就是代表 — 其他網站列卡片，但少有把「這副牌組運轉得多穩定」用機率算出來的。惟這些數值是依牌組構成計算的機率(模擬)，與實際賽事勝率有別 — 我們始終以標籤分開標示。" },
+        ],
+        cta: [
+          { label: "📊 開啟計算機", href: "/tcg/hand-sim" },
+          { label: "🃏 牌組製作", href: "/tcg/deck-builder" },
+          { label: "🏆 牌組強度表", href: "/tcg/tier" },
+        ],
+      },
+    },
+  },
+  {
     slug: "getting-started",
     icon: "🃏",
     i18n: {
