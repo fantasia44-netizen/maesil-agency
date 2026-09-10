@@ -70,6 +70,7 @@ function tcgPaths(): [string, CF, number][] {
     ["/tcg/counters", "weekly", 0.8],
     ["/tcg/deck-builder", "weekly", 0.7],
     ["/tcg/pack-sim", "weekly", 0.7],
+    ["/tcg/hand-sim", "weekly", 0.8],
     ["/tcg/guides", "weekly", 0.7],
     ...TCG_GUIDES.map((g) => [`/tcg/guides/${g.slug}`, "monthly", 0.6] as [string, CF, number]),
     // /tcg/cards(카드 DB 유틸)는 린 런치 동안 noindex → 사이트맵 제외. 승인 후 추가 검토.

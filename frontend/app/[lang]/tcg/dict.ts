@@ -56,6 +56,7 @@ const ko: TcgDict = {
   tools: {
     h: "직접 써보는 도구",
     items: [
+      { icon: "📊", t: "첫패·콤보 확률 계산기", d: "덱의 핵심 카드·콤보가 손에 잡힐 확률을 직접 계산", href: "/tcg/hand-sim" },
       { icon: "🃏", t: "덱 빌더", d: "20장 덱을 만들고 필요한 팩까지 확인·공유", href: "/tcg/deck-builder" },
       { icon: "⚔️", t: "카운터 검색", d: "실제 대회 매치업으로 상대 덱 카운터 찾기", href: "/tcg/counters" },
       { icon: "🎰", t: "팩 시뮬레이터", d: "공개 확률로 1/10/100팩 오픈 테스트", href: "/tcg/pack-sim" },
@@ -104,6 +105,7 @@ const en: TcgDict = {
   tools: {
     h: "Tools you can try",
     items: [
+      { icon: "📊", t: "Opening Hand & Combo Calculator", d: "Compute the odds of drawing a deck's key cards and combos", href: "/tcg/hand-sim" },
       { icon: "🃏", t: "Deck Builder", d: "Build a 20-card deck, see the packs you need, and share it", href: "/tcg/deck-builder" },
       { icon: "⚔️", t: "Counter Search", d: "Find counters to a deck from real tournament matchups", href: "/tcg/counters" },
       { icon: "🎰", t: "Pack Simulator", d: "Open 1 / 10 / 100 packs at the real pull rates", href: "/tcg/pack-sim" },
@@ -152,6 +154,7 @@ const ja: TcgDict = {
   tools: {
     h: "自分で試せるツール",
     items: [
+      { icon: "📊", t: "初手·コンボ確率計算機", d: "デッキのキーカード·コンボが揃う確率を計算", href: "/tcg/hand-sim" },
       { icon: "🃏", t: "デッキビルダー", d: "20枚デッキを作り、必要なパックまで確認·共有", href: "/tcg/deck-builder" },
       { icon: "⚔️", t: "カウンター検索", d: "実際の大会マッチアップで相手デッキの対策を探す", href: "/tcg/counters" },
       { icon: "🎰", t: "パック開封シミュ", d: "公開確率で1/10/100パックを開封テスト", href: "/tcg/pack-sim" },
@@ -200,6 +203,7 @@ const zhTW: TcgDict = {
   tools: {
     h: "可親自試用的工具",
     items: [
+      { icon: "📊", t: "起手·連段機率計算機", d: "計算牌組關鍵卡·連段到手的機率", href: "/tcg/hand-sim" },
       { icon: "🃏", t: "牌組製作", d: "組20張牌組，查看需要的卡包並分享", href: "/tcg/deck-builder" },
       { icon: "⚔️", t: "剋星搜尋", d: "以實際賽事對戰找出剋制對手牌組的牌組", href: "/tcg/counters" },
       { icon: "🎰", t: "開包模擬器", d: "以公開機率開1/10/100包測試", href: "/tcg/pack-sim" },
