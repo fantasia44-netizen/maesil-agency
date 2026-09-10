@@ -26,11 +26,11 @@ const RARITY: Record<string, { rank: number; color: string; label: string }> = {
 const rank = (c: string) => RARITY[c]?.rank || 0;
 const RANK_ORDER = Object.keys(RARITY).sort((a, b) => rank(b) - rank(a));
 
-const L: Record<Locale, { title: string; setL: string; packL: string; open1: string; open10: string; open100: string; god: string; hits: string; none: string; total: string; note: string; nonewSets: string }> = {
-  ko: { title: "🎴 팩 오픈 시뮬레이터", setL: "세트", packL: "팩", open1: "1팩 열기", open10: "10팩", open100: "100팩", god: "레어팩(갓팩)", hits: "주요 카드 (◇◇◇◇ 이상)", none: "이번엔 대박 없음 😅", total: "레어도별 합계", note: "실제 공개 확률(pullRates) 기반 시뮬레이션 · 재미용 · 실제 결과와 다를 수 있음 · 최신 세트(B4~)는 확률 데이터 대기 중", nonewSets: "" },
-  en: { title: "🎴 Pack Opening Simulator", setL: "Set", packL: "Pack", open1: "Open 1", open10: "×10", open100: "×100", god: "Rare Packs (god packs)", hits: "Notable pulls (◇◇◇◇+)", none: "No big hits this time 😅", total: "By rarity", note: "Simulated on real pull rates · for fun · may differ from actual · newest sets (B4+) pending rate data", nonewSets: "" },
-  ja: { title: "🎴 パック開封シミュレーター", setL: "セット", packL: "パック", open1: "1パック", open10: "×10", open100: "×100", god: "レアパック(神パック)", hits: "注目カード(◇◇◇◇以上)", none: "今回は大当たりなし 😅", total: "レアリティ別合計", note: "実際の排出確率(pullRates)基準のシミュ · 娯楽用 · 実際と異なる場合あり · 最新セット(B4~)は確率データ待ち", nonewSets: "" },
-  "zh-TW": { title: "🎴 開包模擬器", setL: "系列", packL: "卡包", open1: "開1包", open10: "×10", open100: "×100", god: "稀有包(神包)", hits: "亮眼卡(◇◇◇◇以上)", none: "這次沒中大獎 😅", total: "各稀有度合計", note: "以實際開包機率(pullRates)模擬 · 娛樂用 · 可能與實際不同 · 最新系列(B4~)機率資料待補", nonewSets: "" },
+const L: Record<Locale, { title: string; setL: string; packL: string; open1: string; open10: string; open100: string; god: string; hits: string; none: string; total: string; note: string; nonewSets: string; legend: string }> = {
+  ko: { title: "🎴 팩 오픈 시뮬레이터", setL: "세트", packL: "팩", open1: "1팩 열기", open10: "10팩", open100: "100팩", god: "레어팩(갓팩)", hits: "주요 카드 (◇◇◇◇ 이상)", none: "이번엔 대박 없음 😅", total: "레어도별 합계", note: "실제 공개 확률(pullRates) 기반 시뮬레이션 · 재미용 · 실제 결과와 다를 수 있음 · 최신 세트(B4~)는 확률 데이터 대기 중", nonewSets: "", legend: "레어도: ◇ 마름모 = 기본(◇ 커먼 → ◇◇ → ◇◇◇ → ◇◇◇◇ ex) · ☆ 별 = 특수 일러스트(☆ 아트 → ☆☆ 슈퍼 → ☆☆☆ 이머시브) · ✸ 샤이니 · 👑 크라운(최고). 오른쪽일수록 희귀합니다." },
+  en: { title: "🎴 Pack Opening Simulator", setL: "Set", packL: "Pack", open1: "Open 1", open10: "×10", open100: "×100", god: "Rare Packs (god packs)", hits: "Notable pulls (◇◇◇◇+)", none: "No big hits this time 😅", total: "By rarity", note: "Simulated on real pull rates · for fun · may differ from actual · newest sets (B4+) pending rate data", nonewSets: "", legend: "Rarity: ◇ diamond = base (◇ common → ◇◇ → ◇◇◇ → ◇◇◇◇ ex) · ☆ star = special art (☆ art → ☆☆ super → ☆☆☆ immersive) · ✸ shiny · 👑 crown (top). Rarer toward the right." },
+  ja: { title: "🎴 パック開封シミュレーター", setL: "セット", packL: "パック", open1: "1パック", open10: "×10", open100: "×100", god: "レアパック(神パック)", hits: "注目カード(◇◇◇◇以上)", none: "今回は大当たりなし 😅", total: "レアリティ別合計", note: "実際の排出確率(pullRates)基準のシミュ · 娯楽用 · 実際と異なる場合あり · 最新セット(B4~)は確率データ待ち", nonewSets: "", legend: "レアリティ: ◇ ダイヤ = 基本(◇ コモン → ◇◇ → ◇◇◇ → ◇◇◇◇ ex) · ☆ スター = 特別アート(☆ アート → ☆☆ スーパー → ☆☆☆ イマーシブ) · ✸ シャイニー · 👑 クラウン(最高)。右ほど希少。" },
+  "zh-TW": { title: "🎴 開包模擬器", setL: "系列", packL: "卡包", open1: "開1包", open10: "×10", open100: "×100", god: "稀有包(神包)", hits: "亮眼卡(◇◇◇◇以上)", none: "這次沒中大獎 😅", total: "各稀有度合計", note: "以實際開包機率(pullRates)模擬 · 娛樂用 · 可能與實際不同 · 最新系列(B4~)機率資料待補", nonewSets: "", legend: "稀有度: ◇ 菱形 = 基本(◇ 普通 → ◇◇ → ◇◇◇ → ◇◇◇◇ ex) · ☆ 星 = 特殊美術(☆ 美術 → ☆☆ 超級 → ☆☆☆ 沉浸) · ✸ 閃亮 · 👑 皇冠(最高)。越右越稀有。" },
 };
 
 function rollRarity(dist: SlotDist): string {
@@ -110,6 +110,9 @@ export default function PackSimClient({ lang }: { lang: Locale }) {
         <button onClick={() => open(10)} style={btn()}>{t.open10}</button>
         <button onClick={() => open(100)} style={btn()}>{t.open100}</button>
       </div>
+
+      {/* 레어도 범례 — 심볼(◇/☆/✸/👑) 설명(유저 혼동 방지) */}
+      <div style={{ fontSize: "0.72rem", color: "#64748b", lineHeight: 1.6, background: "#fef6f5", border: "1px solid #fbd8d8", borderRadius: 8, padding: "7px 11px", marginBottom: 14 }}>{t.legend}</div>
 
       {opened.length > 0 && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 8, marginBottom: 8 }}>
