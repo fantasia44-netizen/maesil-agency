@@ -9,7 +9,7 @@ import { leagueName } from "../contentI18n";
 import { loadLogo, loadSprites, drawBrandFooter, saveDataUrl, shareDataUrl } from "../raid/raidShareUtil";
 import { track } from "../../../../lib/track";
 import ShareModal from "../ShareModal";
-import { rankIVs, LEAGUE_CAP, type Base, type IVRow } from "./ivRank";
+import { rankIVs, LEAGUE_CAP, cpOf, CPM, type Base, type IVRow } from "./ivRank";
 import type { IvDict } from "./dict";
 import type { Locale } from "../../../../lib/i18n";
 
@@ -69,6 +69,15 @@ export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
   const CARD = "#fff", BORDER = "#e3e8f2";
   const lgC = LEAGUES.find((l) => l.key === league)!.c;
   const top = rows.slice(0, 100);
+  // 메가/원시 선택 시: 같은 레벨의 "메진 전"(비메가) CP — 메가는 진화 후 레벨업 불가라, 이 CP까지 키운 뒤 메가진화.
+  const megaBase = picked && picked.mega && STATS[picked.dex] ? STATS[picked.dex] : null;
+  const preCp = (r: IVRow) => (megaBase ? cpOf(megaBase.a + r.ia, megaBase.d + r.id, megaBase.s + r.is, CPM[Math.round((r.level - 1) * 2)]) : null);
+  const MEGA_L = ({
+    ko: { pre: "메진 전", note: "⚠️ 메가는 진화 후 파워업 불가 — 일반몬을 '메진 전 CP'까지 키운 뒤 메가진화하면 위 CP가 됩니다." },
+    en: { pre: "pre-Mega", note: "⚠️ Can't power up while Mega — raise the base form to the 'pre-Mega' CP, then Mega-evolve to reach the CP shown." },
+    ja: { pre: "メガ前", note: "⚠️ メガ中はパワーアップ不可 — 通常個体を「メガ前CP」まで上げてからメガ進化すると上のCPになります。" },
+    "zh-TW": { pre: "超進化前", note: "⚠️ 超進化後無法強化 — 將一般個體練到「超進化前CP」再超進化，即為上方CP。" },
+  } as Record<string, { pre: string; note: string }>)[lang] || { pre: "pre-Mega", note: "" };
   const tpl = (s: string, n: number) => s.replace("{n}", String(n));
 
   // IV 순위표 상위 N개를 이미지로(공유·저장). 출처 gblnote.com.
@@ -194,10 +203,14 @@ export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
               <div style={{ marginTop: 9, display: "flex", alignItems: "center", gap: 10, background: `${lgC}14`, border: `1px solid ${lgC}44`, borderRadius: 10, padding: "8px 12px", flexWrap: "wrap" }}>
                 <span style={{ fontSize: "0.78rem", color: "#475569" }}>{t.yourRank}</span>
                 <span style={{ fontSize: "1.15rem", fontWeight: 900, color: lgC }}>#{myRow.rank}{t.rankUnit}</span>
-                <span style={{ fontSize: "0.78rem", color: "#64748b" }}>· {myRow.pct.toFixed(2)}% · CP {myRow.cp} · L{myRow.level}</span>
+                <span style={{ fontSize: "0.78rem", color: "#64748b" }}>· {myRow.pct.toFixed(2)}% · CP {myRow.cp}{megaBase && <span style={{ color: "#d97706", fontWeight: 700 }}> ({MEGA_L.pre} {preCp(myRow)})</span>} · L{myRow.level}</span>
               </div>
             )}
           </div>
+
+          {megaBase && (
+            <div style={{ marginTop: 10, fontSize: "0.76rem", color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 10, padding: "8px 12px", lineHeight: 1.5 }}>{MEGA_L.note}</div>
+          )}
 
           {/* 순위표 */}
           <div style={{ marginTop: 12, overflowX: "auto", border: `1px solid ${BORDER}`, borderRadius: 12 }}>
@@ -216,7 +229,7 @@ export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
                     <tr key={r.rank} style={{ background: mine ? `${lgC}18` : r.rank % 2 === 0 ? "#fbfcfe" : "#fff" }}>
                       <td style={{ textAlign: "center", padding: "6px 9px", fontWeight: 900, color: r.rank <= 3 ? lgC : "#94a3b8" }}>{r.rank}</td>
                       <td style={{ padding: "6px 9px", fontWeight: 700, color: "#0f172a", whiteSpace: "nowrap" }}>{r.ia}/{r.id}/{r.is}</td>
-                      <td style={{ textAlign: "right", padding: "6px 9px", color: "#334155" }}>{r.cp}</td>
+                      <td style={{ textAlign: "right", padding: "6px 9px", color: "#334155" }}>{r.cp}{megaBase && <span style={{ display: "block", fontSize: "0.68rem", color: "#d97706", fontWeight: 700, whiteSpace: "nowrap" }}>{MEGA_L.pre} {preCp(r)}</span>}</td>
                       <td style={{ textAlign: "right", padding: "6px 9px", color: "#64748b" }}>{r.level}</td>
                       <td style={{ textAlign: "right", padding: "6px 9px", color: "#475569" }}>{r.att.toFixed(1)}</td>
                       <td style={{ textAlign: "right", padding: "6px 9px", color: "#475569" }}>{r.def.toFixed(1)}</td>
