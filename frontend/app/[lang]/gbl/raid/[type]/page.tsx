@@ -40,18 +40,19 @@ type RaidData = {
 const RD = RAIDS as unknown as RaidData;
 const TYPES = Object.keys(RD.types);
 
-// 레이드 딜러 버전(메타). 기본=현재, 메가 피날레(슈퍼메가 버프)=신규(내일부터). 새 버전은 여기 추가.
+// 레이드 딜러 버전(메타). 이벤트 시작으로 기본=메가 피날레(현재 진행중). 이벤트 종료 시 DEFAULT_VER를 "current"로 되돌리면 됨.
 const RAID_BY_VER: Record<string, RaidData> = { current: RAIDS as unknown as RaidData, megafinale: RAIDS_MF as unknown as RaidData };
+const DEFAULT_VER = "megafinale"; // 현재 진행중인 메타(이벤트 종료 시 "current"로)
 const RAID_VERSIONS: { slug: string; isNew?: boolean; label: Record<string, string> }[] = [
-  { slug: "megafinale", isNew: true, label: { ko: "메가 피날레", en: "Mega Finale", ja: "メガフィナーレ", "zh-TW": "超級大結局" } },
-  { slug: "current", label: { ko: "현재", en: "Current", ja: "現在", "zh-TW": "目前" } },
+  { slug: "megafinale", label: { ko: "메가 피날레", en: "Mega Finale", ja: "メガフィナーレ", "zh-TW": "超級大結局" } },
+  { slug: "current", label: { ko: "이전(일반)", en: "Previous", ja: "以前(通常)", "zh-TW": "先前(一般)" } },
 ];
 const RAID_VER_NOTE: Record<string, Record<string, string>> = {
   megafinale: {
-    ko: "🌙 슈퍼메가 버프·스페셜 어택 미리보기 — 공식 반영 전 예상치라 수치·기술이 추후 변경될 수 있습니다.",
-    en: "🌙 Super Mega buff & special-attack preview — provisional estimates; values/moves may change on official release.",
-    ja: "🌙 スーパーメガ強化・専用技プレビュー — 公式反映前の予測値のため数値・技は変更される場合があります。",
-    "zh-TW": "🌙 超級Mega強化·專用技預覽 — 官方實裝前為預估值，數值·招式可能變動。",
+    ko: "🌙 메가 피날레 이벤트 슈퍼메가 버프·스페셜 어택 반영 — 수치·기술은 갱신될 수 있습니다.",
+    en: "🌙 Reflects Mega Finale super-mega buffs & special attacks — values/moves may be updated.",
+    ja: "🌙 メガフィナーレのスーパーメガ強化・専用技を反映 — 数値・技は更新される場合があります。",
+    "zh-TW": "🌙 反映超級大結局的超級Mega強化·專用技 — 數值·招式可能更新。",
   },
 };
 
@@ -119,8 +120,8 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
   const d = getRaidType(lang);
   const tName = typeLabel(lang, type);
   const L = (p: string) => localizePath(lang, p);
-  // 버전 해석 — searchParams.v(유효 버전만), 기본=현재
-  const ver = searchParams?.v && RAID_BY_VER[searchParams.v] ? searchParams.v : "current";
+  // 버전 해석 — searchParams.v(유효 버전만), 기본=현재 진행중(DEFAULT_VER)
+  const ver = searchParams?.v && RAID_BY_VER[searchParams.v] ? searchParams.v : DEFAULT_VER;
   const RDV = RAID_BY_VER[ver];
   const verInfo = RAID_VERSIONS.find((v) => v.slug === ver) || RAID_VERSIONS[RAID_VERSIONS.length - 1];
   const verLabel = `${verInfo.isNew ? "🌙 " : ""}${verInfo.label[lang] || verInfo.label.ko}`;
@@ -145,7 +146,7 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
         <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
           {RAID_VERSIONS.map((v) => {
             const on = v.slug === ver;
-            const href = v.slug === "current" ? L(`/gbl/raid/${type}`) : `${L(`/gbl/raid/${type}`)}?v=${v.slug}`;
+            const href = v.slug === DEFAULT_VER ? L(`/gbl/raid/${type}`) : `${L(`/gbl/raid/${type}`)}?v=${v.slug}`;
             return (
               <Link key={v.slug} href={href} scroll={false}
                 style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 14px", borderRadius: 16, fontSize: "0.82rem", fontWeight: 800, textDecoration: "none",
