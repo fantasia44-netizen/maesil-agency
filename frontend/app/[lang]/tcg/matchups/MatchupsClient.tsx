@@ -88,7 +88,7 @@ export default function MatchupsClient({ lang }: { lang: Locale }) {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                   {selDeck && <span style={{ background: "#dc2626", color: "#fff", borderRadius: 6, padding: "1px 9px", fontSize: 13, fontWeight: 900 }}>{selDeck.tier}</span>}
-                  <span style={{ fontSize: 16, fontWeight: 900, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{dn(sel)}</span>
+                  <span style={{ fontSize: 16, fontWeight: 900, color: "#0f172a", flex: 1, minWidth: 0, lineHeight: 1.2, wordBreak: "keep-all" }}>{dn(sel)}</span>
                 </div>
                 <div style={{ background: "#fff", borderRadius: 12, padding: "12px", textAlign: "center", marginBottom: 10 }}>
                   <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 2 }}>{t.expWR} · {t.vsField}</div>
@@ -98,12 +98,12 @@ export default function MatchupsClient({ lang }: { lang: Locale }) {
                 <div style={{ display: "flex", gap: 8 }}>
                   <div style={{ flex: 1, background: "#fff", borderRadius: 10, padding: "8px 10px", borderLeft: "3px solid #16a34a" }}>
                     <div style={{ fontSize: 11, fontWeight: 800, color: "#16a34a", marginBottom: 3 }}>{t.strongH}</div>
-                    {strong.slice(0, 3).map((r) => <div key={r.id} style={{ fontSize: 11.5, display: "flex", justifyContent: "space-between", gap: 6 }}><span style={{ color: "#334155", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{dn(r.id)}</span><b style={{ color: "#16a34a" }}>{r.wr}%</b></div>)}
+                    {strong.slice(0, 3).map((r) => <div key={r.id} style={{ fontSize: 11.5, display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 6, padding: "1px 0" }}><span style={{ color: "#334155", flex: 1, minWidth: 0, lineHeight: 1.25, wordBreak: "keep-all" }}>{dn(r.id)}</span><b style={{ color: "#16a34a", flexShrink: 0 }}>{r.wr}%</b></div>)}
                     {strong.length === 0 && <div style={{ fontSize: 11, color: "#cbd5e1" }}>-</div>}
                   </div>
                   <div style={{ flex: 1, background: "#fff", borderRadius: 10, padding: "8px 10px", borderLeft: "3px solid #dc2626" }}>
                     <div style={{ fontSize: 11, fontWeight: 800, color: "#dc2626", marginBottom: 3 }}>{t.weakH}</div>
-                    {weak.slice(0, 3).map((r) => <div key={r.id} style={{ fontSize: 11.5, display: "flex", justifyContent: "space-between", gap: 6 }}><span style={{ color: "#334155", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{dn(r.id)}</span><b style={{ color: "#dc2626" }}>{r.wr}%</b></div>)}
+                    {weak.slice(0, 3).map((r) => <div key={r.id} style={{ fontSize: 11.5, display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 6, padding: "1px 0" }}><span style={{ color: "#334155", flex: 1, minWidth: 0, lineHeight: 1.25, wordBreak: "keep-all" }}>{dn(r.id)}</span><b style={{ color: "#dc2626", flexShrink: 0 }}>{r.wr}%</b></div>)}
                     {weak.length === 0 && <div style={{ fontSize: 11, color: "#cbd5e1" }}>-</div>}
                   </div>
                 </div>

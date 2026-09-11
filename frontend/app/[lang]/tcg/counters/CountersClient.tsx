@@ -105,7 +105,7 @@ export default function CountersClient({ lang }: { lang: Locale }) {
                 {counters.slice(0, 3).map((c, i) => (
                   <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, background: "#fff", borderRadius: 10, padding: "10px 13px" }}>
                     <span style={{ fontSize: 16, fontWeight: 900, color: "#dc2626", width: 20 }}>{i + 1}</span>
-                    <span style={{ flex: 1, fontSize: 14, fontWeight: 800, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{dn(c.id)}</span>
+                    <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 800, color: "#0f172a", lineHeight: 1.25, wordBreak: "keep-all", paddingRight: 4 }}>{dn(c.id)}</span>
                     <span style={{ fontSize: 15, fontWeight: 900, color: "#16a34a", fontVariantNumeric: "tabular-nums" }}>{c.wr}%</span>
                     <span style={{ fontSize: 11, color: "#94a3b8", minWidth: 40, textAlign: "right" }}>{c.w}–{c.l}</span>
                   </div>

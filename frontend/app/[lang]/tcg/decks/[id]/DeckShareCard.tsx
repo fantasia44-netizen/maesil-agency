@@ -22,7 +22,7 @@ export default function DeckShareCard({ id, name, tier, share, recentWr, trendD,
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
           <span style={{ background: "#dc2626", color: "#fff", borderRadius: 6, padding: "1px 9px", fontSize: 14, fontWeight: 900 }}>{tier}</span>
-          <span style={{ fontSize: 17, fontWeight: 900, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</span>
+          <span style={{ fontSize: 17, fontWeight: 900, color: "#0f172a", flex: 1, minWidth: 0, lineHeight: 1.2, wordBreak: "keep-all" }}>{name}</span>
         </div>
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 13, color: "#475569", marginBottom: 12, background: "#fff", borderRadius: 10, padding: "9px 12px" }}>
           <span>{ui.share} <b style={{ color: "#dc2626" }}>{share}%</b></span>
@@ -34,7 +34,7 @@ export default function DeckShareCard({ id, name, tier, share, recentWr, trendD,
             <div style={{ fontSize: 12, fontWeight: 800, color: "#16a34a", marginBottom: 4 }}>⚔️ {ui.best}</div>
             {fav.slice(0, 2).map((m) => (
               <div key={m.name} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "1px 0" }}>
-                <span style={{ color: "#0f172a", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.name}</span>
+                <span style={{ color: "#0f172a", fontWeight: 600, flex: 1, minWidth: 0, lineHeight: 1.25, wordBreak: "keep-all", paddingRight: 4 }}>{m.name}</span>
                 <span style={{ fontWeight: 900, color: "#16a34a" }}>{m.wr}%</span>
               </div>
             ))}
@@ -44,7 +44,7 @@ export default function DeckShareCard({ id, name, tier, share, recentWr, trendD,
           <div style={{ background: "#fff", borderRadius: 10, padding: "9px 12px", marginBottom: 8, borderLeft: "4px solid #dc2626" }}>
             <div style={{ fontSize: 12, fontWeight: 800, color: "#dc2626", marginBottom: 4 }}>🛡️ {ui.worst}</div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-              <span style={{ color: "#0f172a", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{threat.name}</span>
+              <span style={{ color: "#0f172a", fontWeight: 600, flex: 1, minWidth: 0, lineHeight: 1.25, wordBreak: "keep-all", paddingRight: 4 }}>{threat.name}</span>
               <span style={{ fontWeight: 900, color: "#dc2626" }}>{threat.wr}%</span>
             </div>
           </div>

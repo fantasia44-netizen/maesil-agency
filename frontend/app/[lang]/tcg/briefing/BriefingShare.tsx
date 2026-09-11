@@ -20,7 +20,7 @@ export default function BriefingShare({ highlights, ui, dateLabel }: { highlight
             <div key={h.label} style={{ background: "#fff", borderRadius: 12, padding: "11px 13px", borderLeft: `4px solid ${h.color}` }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: h.color, marginBottom: 3 }}>{h.emoji} {h.label}</div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
-                <span style={{ fontSize: 14, fontWeight: 800, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.deck}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "#0f172a", flex: 1, minWidth: 0, lineHeight: 1.25, wordBreak: "keep-all", paddingRight: 6 }}>{h.deck}</span>
                 <span style={{ fontSize: 13, fontWeight: 900, color: h.color, flexShrink: 0, fontVariantNumeric: "tabular-nums" }}>{h.metric}</span>
               </div>
               {h.sub && <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>{h.sub}</div>}
