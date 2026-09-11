@@ -3,7 +3,8 @@ import { useMemo, useState } from "react";
 import STATSJSON from "../pokedex_stats.json";
 import NAMESJSON from "../pokedex_names.json";
 import FORMSJSON from "../gbl_form_stats.json";
-import { pokeSprite, monSprite, formDex } from "../sprite";
+import MEGASJSON from "../gbl_mega_stats.json";
+import { pokeSprite, monSprite, formDex, formDexById } from "../sprite";
 import { leagueName } from "../contentI18n";
 import { loadLogo, loadSprites, drawBrandFooter, saveDataUrl, shareDataUrl } from "../raid/raidShareUtil";
 import { track } from "../../../../lib/track";
@@ -16,8 +17,9 @@ const STATS = STATSJSON as unknown as Record<string, Base>;
 const NAMES = NAMESJSON as unknown as Record<string, { ko: string; en: string; ja: string }>;
 type FormEntry = { id: string; ko: string; en: string; ja: string; dex: number; a: number; d: number; s: number };
 const FORMS = FORMSJSON as unknown as FormEntry[];
-// 검색 대상: 전 도감(base) + 폼체인지/합체(검왕·큐레무·네크로즈마·지가르데 등, GM 폼 종족값)
-type Poke = { key: string; ko: string; en: string; ja: string; dex: string; a: number; d: number; s: number; form: boolean };
+const MEGAS = MEGASJSON as unknown as FormEntry[]; // 메가/원시(gamemaster 종족값) — 전 리그 CP캡은 rankIVs가 자동 적용
+// 검색 대상: 전 도감(base) + 폼체인지/합체 + 메가/원시. 메가 시 각 리그(1500/2500/무제한) 최적 IV·CP.
+type Poke = { key: string; ko: string; en: string; ja: string; dex: string; a: number; d: number; s: number; form: boolean; mega?: boolean; sid?: string };
 // base 도감 이름 오버라이드(폼 구분 필요한 종만) — 예: 지가르데 base=50% 폼
 const BASE_NAME_OVERRIDE: Record<string, { ko: string; en: string; ja: string }> = {
   "718": { ko: "지가르데 (50% 폼)", en: "Zygarde (50%)", ja: "ジガルデ (50%)" },
@@ -25,8 +27,9 @@ const BASE_NAME_OVERRIDE: Record<string, { ko: string; en: string; ja: string }>
 const POKELIST: Poke[] = [
   ...Object.keys(STATS).filter((dx) => NAMES[dx]).map((dx) => ({ key: dx, ...(BASE_NAME_OVERRIDE[dx] || NAMES[dx]), dex: dx, a: STATS[dx].a, d: STATS[dx].d, s: STATS[dx].s, form: false })),
   ...FORMS.map((f) => ({ key: "f:" + f.id, ko: f.ko, en: f.en, ja: f.ja, dex: String(f.dex), a: f.a, d: f.d, s: f.s, form: true })),
+  ...MEGAS.map((m) => ({ key: "m:" + m.id, ko: m.ko, en: m.en, ja: m.ja, dex: String(m.dex), a: m.a, d: m.d, s: m.s, form: true, mega: true, sid: m.id })),
 ].sort((a, b) => Number(a.dex) - Number(b.dex) || (a.form ? 1 : 0) - (b.form ? 1 : 0));
-const spriteOf = (p: Poke) => (p.form ? monSprite(p.ko, p.dex) : pokeSprite(p.dex));
+const spriteOf = (p: Poke) => (p.mega && p.sid ? pokeSprite(formDexById(p.sid, p.dex)) : p.form ? monSprite(p.ko, p.dex) : pokeSprite(p.dex));
 
 const LEAGUES: { key: string; c: string }[] = [
   { key: "great", c: "#2563eb" }, { key: "ultra", c: "#d97706" }, { key: "master", c: "#7c3aed" },
