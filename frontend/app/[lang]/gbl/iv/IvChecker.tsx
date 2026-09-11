@@ -288,7 +288,7 @@ export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
                     <tr key={r.rank} style={{ background: mine ? `${lgC}18` : r.rank % 2 === 0 ? "#fbfcfe" : "#fff" }}>
                       <td style={{ textAlign: "center", padding: "6px 9px", fontWeight: 900, color: r.rank <= 3 ? lgC : "#94a3b8" }}>{r.rank}</td>
                       <td style={{ padding: "6px 9px", fontWeight: 700, color: "#0f172a", whiteSpace: "nowrap" }}>{r.ia}/{r.id}/{r.is}</td>
-                      <td style={{ textAlign: "right", padding: "6px 9px", color: "#334155" }}>{r.cp}{megaBase && <span style={{ display: "block", fontSize: "0.68rem", color: "#d97706", fontWeight: 700, whiteSpace: "nowrap" }}>{MEGA_L.pre} {preCp(r)}</span>}{megaForms.length > 0 && <span style={{ display: "block", fontSize: "0.68rem", color: "#d97706", fontWeight: 700, whiteSpace: "nowrap" }}>{MEGA_L.post} {megaCpStr(r)}</span>}</td>
+                      <td style={{ textAlign: "right", padding: "6px 9px", color: "#334155" }}>{r.cp}{megaBase && <span style={{ display: "block", fontSize: "0.68rem", color: "#d97706", fontWeight: 700, whiteSpace: "nowrap" }}>{MEGA_L.pre} {preCp(r)}</span>}</td>
                       <td style={{ textAlign: "right", padding: "6px 9px", color: "#64748b" }}>{r.level}</td>
                       <td style={{ textAlign: "right", padding: "6px 9px", color: "#475569" }}>{r.att.toFixed(1)}</td>
                       <td style={{ textAlign: "right", padding: "6px 9px", color: "#475569" }}>{r.def.toFixed(1)}</td>
