@@ -16,7 +16,7 @@ type L10 = {
   risingS: string; fallingS: string; popularS: string; topwrS: string; underratedS: string; overratedS: string;
   share: string; wr: string; games: string; useRank: string; wrRank: string; recent: string; view: string;
   method: string; empty: string;
-  shareUi: string; saveUi: string; cardTitle: string; cardFooter: string; dateLabel: (d: string) => string;
+  shareUi: string; saveUi: string; copyUi: string; copiedUi: string; closeUi: string; cardTitle: string; cardFooter: string; dateLabel: (d: string) => string;
 };
 
 const T: Record<Locale, L10> = {
@@ -33,7 +33,7 @@ const T: Record<Locale, L10> = {
     share: "사용률", wr: "승률", games: "경기", useRank: "사용", wrRank: "승률", recent: "최근7일", view: "덱 보기 →",
     method: "표본이 충분한 덱만 노출하고, 승률은 표본 크기를 보정한 Wilson 95% 하한으로 계산합니다. 저평가·거품은 절대 승률이 아니라 '사용률 순위 vs 승률 순위'의 격차로 판정 — 표본 없는 덱은 제외됩니다.",
     empty: "이번 집계에는 조건을 만족하는 덱이 없습니다.",
-    shareUi: "공유", saveUi: "저장", cardTitle: "이번 주 덱 브리핑",
+    shareUi: "공유", saveUi: "이미지 저장", copyUi: "링크 복사", copiedUi: "복사됨", closeUi: "닫기", cardTitle: "이번 주 덱 브리핑",
     cardFooter: `최근 ${BRIEF_META.windowDays}일 · ${BRIEF_META.tournaments}개 대회 · ${BRIEF_META.matches.toLocaleString()}경기 실제 승률 계산`,
     dateLabel: (d) => `${d} 기준 · Tournament Meta`,
   },
@@ -50,7 +50,7 @@ const T: Record<Locale, L10> = {
     share: "Usage", wr: "WR", games: "games", useRank: "Use", wrRank: "WR", recent: "7-day", view: "View deck →",
     method: "Only well-sampled decks are shown, and win rate uses the sample-corrected Wilson 95% lower bound. Underrated/overrated is judged by the gap between usage rank and win-rate rank — not absolute win rate — so low-sample decks are excluded.",
     empty: "No decks met the criteria in this aggregation.",
-    shareUi: "Share", saveUi: "Save", cardTitle: "Weekly Deck Briefing",
+    shareUi: "Share", saveUi: "Save image", copyUi: "Copy link", copiedUi: "Copied", closeUi: "Close", cardTitle: "Weekly Deck Briefing",
     cardFooter: `Last ${BRIEF_META.windowDays}d · ${BRIEF_META.tournaments} tournaments · ${BRIEF_META.matches.toLocaleString()} games`,
     dateLabel: (d) => `As of ${d} · Tournament Meta`,
   },
@@ -67,7 +67,7 @@ const T: Record<Locale, L10> = {
     share: "使用率", wr: "勝率", games: "戦", useRank: "使用", wrRank: "勝率", recent: "直近7日", view: "デッキを見る →",
     method: "十分なサンプルのデッキのみ表示し、勝率はサンプル補正したWilson95%下限で計算。過小/過大評価は絶対勝率ではなく『使用率順位と勝率順位の差』で判定 — 低サンプルは除外。",
     empty: "今回の集計では条件を満たすデッキがありません。",
-    shareUi: "共有", saveUi: "保存", cardTitle: "今週のデッキブリーフィング",
+    shareUi: "共有", saveUi: "画像を保存", copyUi: "リンクをコピー", copiedUi: "コピー完了", closeUi: "閉じる", cardTitle: "今週のデッキブリーフィング",
     cardFooter: `直近${BRIEF_META.windowDays}日 · ${BRIEF_META.tournaments}大会 · ${BRIEF_META.matches.toLocaleString()}戦`,
     dateLabel: (d) => `${d}時点 · Tournament Meta`,
   },
@@ -84,7 +84,7 @@ const T: Record<Locale, L10> = {
     share: "使用率", wr: "勝率", games: "場", useRank: "使用", wrRank: "勝率", recent: "近7日", view: "查看牌組 →",
     method: "僅顯示樣本足夠的牌組，勝率以樣本校正的 Wilson 95% 下限計算。被低估/高估以『使用率排名與勝率排名的差距』判定，而非絕對勝率 — 低樣本牌組排除。",
     empty: "本次彙整沒有符合條件的牌組。",
-    shareUi: "分享", saveUi: "儲存", cardTitle: "本週牌組簡報",
+    shareUi: "分享", saveUi: "儲存圖片", copyUi: "複製連結", copiedUi: "已複製", closeUi: "關閉", cardTitle: "本週牌組簡報",
     cardFooter: `近${BRIEF_META.windowDays}日 · ${BRIEF_META.tournaments}場賽事 · ${BRIEF_META.matches.toLocaleString()}場對戰`,
     dateLabel: (d) => `${d} · Tournament Meta`,
   },
@@ -149,7 +149,7 @@ export default function BriefingPage({ params }: { params: { lang: string } }) {
       {highlights.length > 0 && (
         <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 14, padding: "1rem", marginBottom: 20 }}>
           <BriefingShare highlights={highlights} dateLabel={t.dateLabel(dateOnly)}
-            ui={{ share: t.shareUi, save: t.saveUi, title: t.cardTitle, footer: t.cardFooter }} />
+            ui={{ share: t.shareUi, save: t.saveUi, copy: t.copyUi, copied: t.copiedUi, close: t.closeUi, title: t.cardTitle, footer: t.cardFooter }} />
         </div>
       )}
 
