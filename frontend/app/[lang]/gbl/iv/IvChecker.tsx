@@ -18,6 +18,12 @@ const NAMES = NAMESJSON as unknown as Record<string, { ko: string; en: string; j
 type FormEntry = { id: string; ko: string; en: string; ja: string; dex: number; a: number; d: number; s: number };
 const FORMS = FORMSJSON as unknown as FormEntry[];
 const MEGAS = MEGASJSON as unknown as FormEntry[]; // 메가/원시(gamemaster 종족값) — 전 리그 CP캡은 rankIVs가 자동 적용
+// dex → 그 종의 메가 종족값(X/Y·원시 포함). 일반몬 화면에서 "메가진화 시 CP" 계산용.
+const MEGA_BY_DEX: Record<string, { variant: string; a: number; d: number; s: number }[]> = {};
+for (const m of MEGAS) {
+  const v = m.id.endsWith("_mega_x") ? "X" : m.id.endsWith("_mega_y") ? "Y" : "";
+  (MEGA_BY_DEX[String(m.dex)] = MEGA_BY_DEX[String(m.dex)] || []).push({ variant: v, a: m.a, d: m.d, s: m.s });
+}
 // 검색 대상: 전 도감(base) + 폼체인지/합체 + 메가/원시. 메가 시 각 리그(1500/2500/무제한) 최적 IV·CP.
 type Poke = { key: string; ko: string; en: string; ja: string; dex: string; a: number; d: number; s: number; form: boolean; mega?: boolean; sid?: string };
 // base 도감 이름 오버라이드(폼 구분 필요한 종만) — 예: 지가르데 base=50% 폼
@@ -72,12 +78,15 @@ export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
   // 메가/원시 선택 시: 같은 레벨의 "메진 전"(비메가) CP — 메가는 진화 후 레벨업 불가라, 이 CP까지 키운 뒤 메가진화.
   const megaBase = picked && picked.mega && STATS[picked.dex] ? STATS[picked.dex] : null;
   const preCp = (r: IVRow) => (megaBase ? cpOf(megaBase.a + r.ia, megaBase.d + r.id, megaBase.s + r.is, CPM[Math.round((r.level - 1) * 2)]) : null);
+  // 일반몬 선택 시: 그 종에 메가가 있으면 "메가진화 시 CP"(같은 레벨) — 내 개체를 메진하면 얼마가 되나.
+  const megaForms = picked && !picked.mega ? (MEGA_BY_DEX[picked.dex] || []) : [];
+  const megaCpStr = (r: IVRow) => megaForms.map((m) => (m.variant ? m.variant + " " : "") + cpOf(m.a + r.ia, m.d + r.id, m.s + r.is, CPM[Math.round((r.level - 1) * 2)])).join(" / ");
   const MEGA_L = ({
-    ko: { pre: "메진 전", note: "⚠️ 메가는 진화 후 파워업 불가 — 일반몬을 '메진 전 CP'까지 키운 뒤 메가진화하면 위 CP가 됩니다." },
-    en: { pre: "pre-Mega", note: "⚠️ Can't power up while Mega — raise the base form to the 'pre-Mega' CP, then Mega-evolve to reach the CP shown." },
-    ja: { pre: "メガ前", note: "⚠️ メガ中はパワーアップ不可 — 通常個体を「メガ前CP」まで上げてからメガ進化すると上のCPになります。" },
-    "zh-TW": { pre: "超進化前", note: "⚠️ 超進化後無法強化 — 將一般個體練到「超進化前CP」再超進化，即為上方CP。" },
-  } as Record<string, { pre: string; note: string }>)[lang] || { pre: "pre-Mega", note: "" };
+    ko: { pre: "메진 전", note: "⚠️ 메가는 진화 후 파워업 불가 — 일반몬을 '메진 전 CP'까지 키운 뒤 메가진화하면 위 CP가 됩니다.", post: "메가진화 시", postNote: "💡 '메가진화 시' = 이 레벨에서 메가진화하면 되는 CP(같은 개체·레벨). 메가는 진화 후 파워업 불가." },
+    en: { pre: "pre-Mega", note: "⚠️ Can't power up while Mega — raise the base form to the 'pre-Mega' CP, then Mega-evolve to reach the CP shown.", post: "as Mega", postNote: "💡 'as Mega' = CP if you Mega-evolve at this level (same IVs/level). Can't power up while Mega." },
+    ja: { pre: "メガ前", note: "⚠️ メガ中はパワーアップ不可 — 通常個体を「メガ前CP」まで上げてからメガ進化すると上のCPになります。", post: "メガ時", postNote: "💡 「メガ時」= このレベルでメガ進化した時のCP(同個体・同レベル)。メガ中はパワーアップ不可。" },
+    "zh-TW": { pre: "超進化前", note: "⚠️ 超進化後無法強化 — 將一般個體練到「超進化前CP」再超進化，即為上方CP。", post: "超進化時", postNote: "💡 「超進化時」= 在此等級超進化後的CP（同個體·同等級）。超進化後無法強化。" },
+  } as Record<string, { pre: string; note: string; post: string; postNote: string }>)[lang] || { pre: "pre-Mega", note: "", post: "as Mega", postNote: "" };
   const tpl = (s: string, n: number) => s.replace("{n}", String(n));
 
   // IV 순위표 상위 N개를 이미지로(공유·저장). 출처 gblnote.com.
@@ -203,13 +212,16 @@ export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
               <div style={{ marginTop: 9, display: "flex", alignItems: "center", gap: 10, background: `${lgC}14`, border: `1px solid ${lgC}44`, borderRadius: 10, padding: "8px 12px", flexWrap: "wrap" }}>
                 <span style={{ fontSize: "0.78rem", color: "#475569" }}>{t.yourRank}</span>
                 <span style={{ fontSize: "1.15rem", fontWeight: 900, color: lgC }}>#{myRow.rank}{t.rankUnit}</span>
-                <span style={{ fontSize: "0.78rem", color: "#64748b" }}>· {myRow.pct.toFixed(2)}% · CP {myRow.cp}{megaBase && <span style={{ color: "#d97706", fontWeight: 700 }}> ({MEGA_L.pre} {preCp(myRow)})</span>} · L{myRow.level}</span>
+                <span style={{ fontSize: "0.78rem", color: "#64748b" }}>· {myRow.pct.toFixed(2)}% · CP {myRow.cp}{megaBase && <span style={{ color: "#d97706", fontWeight: 700 }}> ({MEGA_L.pre} {preCp(myRow)})</span>}{megaForms.length > 0 && <span style={{ color: "#d97706", fontWeight: 700 }}> · {MEGA_L.post} {megaCpStr(myRow)}</span>} · L{myRow.level}</span>
               </div>
             )}
           </div>
 
           {megaBase && (
             <div style={{ marginTop: 10, fontSize: "0.76rem", color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 10, padding: "8px 12px", lineHeight: 1.5 }}>{MEGA_L.note}</div>
+          )}
+          {megaForms.length > 0 && (
+            <div style={{ marginTop: 10, fontSize: "0.76rem", color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 10, padding: "8px 12px", lineHeight: 1.5 }}>{MEGA_L.postNote}</div>
           )}
 
           {/* 순위표 */}
@@ -229,7 +241,7 @@ export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
                     <tr key={r.rank} style={{ background: mine ? `${lgC}18` : r.rank % 2 === 0 ? "#fbfcfe" : "#fff" }}>
                       <td style={{ textAlign: "center", padding: "6px 9px", fontWeight: 900, color: r.rank <= 3 ? lgC : "#94a3b8" }}>{r.rank}</td>
                       <td style={{ padding: "6px 9px", fontWeight: 700, color: "#0f172a", whiteSpace: "nowrap" }}>{r.ia}/{r.id}/{r.is}</td>
-                      <td style={{ textAlign: "right", padding: "6px 9px", color: "#334155" }}>{r.cp}{megaBase && <span style={{ display: "block", fontSize: "0.68rem", color: "#d97706", fontWeight: 700, whiteSpace: "nowrap" }}>{MEGA_L.pre} {preCp(r)}</span>}</td>
+                      <td style={{ textAlign: "right", padding: "6px 9px", color: "#334155" }}>{r.cp}{megaBase && <span style={{ display: "block", fontSize: "0.68rem", color: "#d97706", fontWeight: 700, whiteSpace: "nowrap" }}>{MEGA_L.pre} {preCp(r)}</span>}{megaForms.length > 0 && <span style={{ display: "block", fontSize: "0.68rem", color: "#d97706", fontWeight: 700, whiteSpace: "nowrap" }}>{MEGA_L.post} {megaCpStr(r)}</span>}</td>
                       <td style={{ textAlign: "right", padding: "6px 9px", color: "#64748b" }}>{r.level}</td>
                       <td style={{ textAlign: "right", padding: "6px 9px", color: "#475569" }}>{r.att.toFixed(1)}</td>
                       <td style={{ textAlign: "right", padding: "6px 9px", color: "#475569" }}>{r.def.toFixed(1)}</td>
