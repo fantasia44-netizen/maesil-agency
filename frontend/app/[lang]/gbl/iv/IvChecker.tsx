@@ -82,22 +82,35 @@ export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
   // 일반몬 선택 시: 그 종에 메가가 있으면 "메가진화 시 CP"(같은 레벨) — 내 개체를 메진하면 얼마가 되나.
   const megaForms = picked && !picked.mega ? (MEGA_BY_DEX[picked.dex] || []) : [];
   const megaCpStr = (r: IVRow) => megaForms.map((m) => (m.variant ? m.variant + " " : "") + cpOf(m.a + r.ia, m.d + r.id, m.s + r.is, CPM[Math.round((r.level - 1) * 2)])).join(" / ");
+  // 메가 폼별 IV 랭킹(현재 리그) — 내 IV가 '메가로선' 몇 등/몇 %인지 산출용.
+  const megaRanks = useMemo(() => megaForms.map((m) => rankIVs({ a: m.a, d: m.d, s: m.s }, LEAGUE_CAP[league], bb ? 51 : 50)), [selKey, league, bb]); // eslint-disable-line react-hooks/exhaustive-deps
   // 내 유닛: IV + 현재 CP → 실제 레벨 추정 → 그 레벨에서 메가진화 시 CP(X/Y 각각).
   const myUnitMega = (() => {
     if (!megaForms.length || !picked || !STATS[picked.dex]) return null;
     const a = Number(iv.a), d = Number(iv.d), s = Number(iv.s), c = Number(curCp);
     if (![a, d, s].every((n) => Number.isInteger(n) && n >= 0 && n <= 15) || !(c >= 10)) return null;
-    const b = STATS[picked.dex]; const maxIdx = bb ? 100 : 98;
+    const b = STATS[picked.dex]; const maxIdx = 100; // 레벨1~51 전부 탐색(내 유닛이 베프/고레벨일 수 있음)
     let bi = 0, bd = Infinity;
     for (let i = 0; i <= maxIdx; i++) { const cc = cpOf(b.a + a, b.d + d, b.s + s, CPM[i]); const df = Math.abs(cc - c); if (df < bd) { bd = df; bi = i; } }
-    return { level: 1 + bi * 0.5, baseCp: cpOf(b.a + a, b.d + d, b.s + s, CPM[bi]), megaCps: megaForms.map((m) => ({ variant: m.variant, cp: cpOf(m.a + a, m.d + d, m.s + s, CPM[bi]) })) };
+    const baseCp = cpOf(b.a + a, b.d + d, b.s + s, CPM[bi]);
+    // 근사치 스냅은 허용(반레벨 이산이라 ±약간). 다만 그 IV로 도달 불가능한 범위 밖(자릿수 오타 등)이면 경고.
+    if (Math.abs(baseCp - c) > 80) return { invalid: true as const };
+    const cap = LEAGUE_CAP[league];
+    return {
+      level: 1 + bi * 0.5, baseCp,
+      megaCps: megaForms.map((m, i) => {
+        const mc = cpOf(m.a + a, m.d + d, m.s + s, CPM[bi]);
+        const rr = megaRanks[i]?.find((r) => r.ia === a && r.id === d && r.is === s);
+        return { variant: m.variant, cp: mc, rank: rr?.rank ?? null, pct: rr?.pct ?? null, over: cap != null && mc > cap };
+      }),
+    };
   })();
   const MEGA_L = ({
-    ko: { pre: "메진 전", note: "⚠️ 메가는 진화 후 파워업 불가 — 일반몬을 '메진 전 CP'까지 키운 뒤 메가진화하면 위 CP가 됩니다.", post: "메가진화 시", postNote: "💡 '메가진화 시' = 이 레벨에서 메가진화하면 되는 CP(같은 개체·레벨). 메가는 진화 후 파워업 불가.", curCpL: "현재 CP", unit: "내 유닛" },
-    en: { pre: "pre-Mega", note: "⚠️ Can't power up while Mega — raise the base form to the 'pre-Mega' CP, then Mega-evolve to reach the CP shown.", post: "as Mega", postNote: "💡 'as Mega' = CP if you Mega-evolve at this level (same IVs/level). Can't power up while Mega.", curCpL: "Current CP", unit: "Your unit" },
-    ja: { pre: "メガ前", note: "⚠️ メガ中はパワーアップ不可 — 通常個体を「メガ前CP」まで上げてからメガ進化すると上のCPになります。", post: "メガ時", postNote: "💡 「メガ時」= このレベルでメガ進化した時のCP(同個体・同レベル)。メガ中はパワーアップ不可。", curCpL: "現在CP", unit: "マイ個体" },
-    "zh-TW": { pre: "超進化前", note: "⚠️ 超進化後無法強化 — 將一般個體練到「超進化前CP」再超進化，即為上方CP。", post: "超進化時", postNote: "💡 「超進化時」= 在此等級超進化後的CP（同個體·同等級）。超進化後無法強化。", curCpL: "目前CP", unit: "我的個體" },
-  } as Record<string, { pre: string; note: string; post: string; postNote: string; curCpL: string; unit: string }>)[lang] || { pre: "pre-Mega", note: "", post: "as Mega", postNote: "", curCpL: "Current CP", unit: "Your unit" };
+    ko: { pre: "메진 전", note: "⚠️ 메가는 진화 후 파워업 불가 — 일반몬을 '메진 전 CP'까지 키운 뒤 메가진화하면 위 CP가 됩니다.", post: "메가진화 시", postNote: "💡 '메가진화 시' = 이 레벨에서 메가진화하면 되는 CP(같은 개체·레벨). 메가는 진화 후 파워업 불가.", curCpL: "현재 CP", unit: "내 유닛", mismatch: "⚠️ 입력한 공/방/체로는 그 CP가 나오지 않습니다 — 개체값과 현재 CP를 다시 확인하세요.", over: "리그 초과·탈락", ok: "리그 OK", rankU: "위" },
+    en: { pre: "pre-Mega", note: "⚠️ Can't power up while Mega — raise the base form to the 'pre-Mega' CP, then Mega-evolve to reach the CP shown.", post: "as Mega", postNote: "💡 'as Mega' = CP if you Mega-evolve at this level (same IVs/level). Can't power up while Mega.", curCpL: "Current CP", unit: "Your unit", mismatch: "⚠️ That CP isn't possible with those IVs — double-check the IVs and current CP.", over: "over cap · out", ok: "eligible", rankU: "" },
+    ja: { pre: "メガ前", note: "⚠️ メガ中はパワーアップ不可 — 通常個体を「メガ前CP」まで上げてからメガ進化すると上のCPになります。", post: "メガ時", postNote: "💡 「メガ時」= このレベルでメガ進化した時のCP(同個体・同レベル)。メガ中はパワーアップ不可。", curCpL: "現在CP", unit: "マイ個体", mismatch: "⚠️ その個体値ではそのCPになりません — 個体値と現在CPを再確認してください。", over: "上限超過·不可", ok: "使用可", rankU: "位" },
+    "zh-TW": { pre: "超進化前", note: "⚠️ 超進化後無法強化 — 將一般個體練到「超進化前CP」再超進化，即為上方CP。", post: "超進化時", postNote: "💡 「超進化時」= 在此等級超進化後的CP（同個體·同等級）。超進化後無法強化。", curCpL: "目前CP", unit: "我的個體", mismatch: "⚠️ 該個體值無法達到此CP — 請重新確認個體值與目前CP。", over: "超過上限·不可", ok: "可用", rankU: "名" },
+  } as Record<string, { pre: string; note: string; post: string; postNote: string; curCpL: string; unit: string; mismatch: string; over: string; ok: string; rankU: string }>)[lang] || { pre: "pre-Mega", note: "", post: "as Mega", postNote: "", curCpL: "Current CP", unit: "Your unit", mismatch: "", over: "over", ok: "ok", rankU: "" };
   const tpl = (s: string, n: number) => s.replace("{n}", String(n));
 
   // IV 순위표 상위 N개를 이미지로(공유·저장). 출처 gblnote.com.
@@ -226,16 +239,22 @@ export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
               <button onClick={findMyIv} style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: lgC, color: "#fff", fontWeight: 800, fontSize: "0.82rem", cursor: "pointer" }}>{t.findBtn}</button>
               {ivErr && <span style={{ fontSize: "0.74rem", color: "#dc2626" }}>{ivErr}</span>}
             </div>
-            {myUnitMega && (
+            {myUnitMega && ("invalid" in myUnitMega ? (
+              <div style={{ marginTop: 9, fontSize: "0.8rem", fontWeight: 700, color: "#b91c1c", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 10, padding: "8px 12px" }}>{MEGA_L.mismatch}</div>
+            ) : (
               <div style={{ marginTop: 9, display: "flex", alignItems: "center", gap: 8, background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 10, padding: "8px 12px", flexWrap: "wrap" }}>
                 <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "#92400e" }}>🔮 {MEGA_L.unit}</span>
                 <span style={{ fontSize: "0.78rem", color: "#64748b" }}>CP {myUnitMega.baseCp} · L{myUnitMega.level}</span>
                 <span style={{ fontSize: "0.78rem", color: "#92400e" }}>→ {MEGA_L.post}</span>
                 {myUnitMega.megaCps.map((m, i) => (
-                  <span key={i} style={{ fontSize: "1.05rem", fontWeight: 900, color: "#d97706" }}>{m.variant ? m.variant + " " : ""}{m.cp}</span>
+                  <span key={i} style={{ display: "inline-flex", alignItems: "baseline", gap: 5 }}>
+                    <span style={{ fontSize: "1.05rem", fontWeight: 900, color: m.over ? "#dc2626" : "#16a34a" }}>{m.variant ? m.variant + " " : ""}{m.cp}</span>
+                    <span style={{ fontSize: "0.68rem", fontWeight: 800, color: "#fff", background: m.over ? "#dc2626" : "#16a34a", borderRadius: 5, padding: "1px 6px" }}>{m.over ? MEGA_L.over : MEGA_L.ok}</span>
+                    {m.rank != null && <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>#{m.rank}{MEGA_L.rankU} · {m.pct!.toFixed(1)}%</span>}
+                  </span>
                 ))}
               </div>
-            )}
+            ))}
             {myRow && (
               <div style={{ marginTop: 9, display: "flex", alignItems: "center", gap: 10, background: `${lgC}14`, border: `1px solid ${lgC}44`, borderRadius: 10, padding: "8px 12px", flexWrap: "wrap" }}>
                 <span style={{ fontSize: "0.78rem", color: "#475569" }}>{t.yourRank}</span>
