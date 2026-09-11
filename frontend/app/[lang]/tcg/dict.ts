@@ -26,6 +26,7 @@ const ko: TcgDict = {
     ogDescription: "대회 승률 기반 덱 티어 + 대표 덱 공략 + 카드 도구",
   },
   nav: [
+    { key: "briefing", path: "/tcg/briefing", label: "이번 주 브리핑" },
     { key: "meta", path: "/tcg/meta", label: "메타" },
     { key: "tier", path: "/tcg/tier", label: "덱 티어" },
     { key: "decks", path: "/tcg/decks", label: "대표 덱" },
@@ -76,6 +77,7 @@ const en: TcgDict = {
     ogDescription: "Win-rate-based deck tiers + top deck guides + card tools",
   },
   nav: [
+    { key: "briefing", path: "/tcg/briefing", label: "Weekly Briefing" },
     { key: "meta", path: "/tcg/meta", label: "Meta" },
     { key: "tier", path: "/tcg/tier", label: "Deck Tiers" },
     { key: "decks", path: "/tcg/decks", label: "Top Decks" },
@@ -126,6 +128,7 @@ const ja: TcgDict = {
     ogDescription: "勝率ベースのデッキティア + 主要デッキ攻略 + カードツール",
   },
   nav: [
+    { key: "briefing", path: "/tcg/briefing", label: "今週の要点" },
     { key: "meta", path: "/tcg/meta", label: "メタ" },
     { key: "tier", path: "/tcg/tier", label: "デッキティア" },
     { key: "decks", path: "/tcg/decks", label: "主要デッキ" },
@@ -176,6 +179,7 @@ const zhTW: TcgDict = {
     ogDescription: "勝率為基礎的牌組強度 + 代表牌組攻略 + 卡片工具",
   },
   nav: [
+    { key: "briefing", path: "/tcg/briefing", label: "本週簡報" },
     { key: "meta", path: "/tcg/meta", label: "環境" },
     { key: "tier", path: "/tcg/tier", label: "牌組強度" },
     { key: "decks", path: "/tcg/decks", label: "代表牌組" },

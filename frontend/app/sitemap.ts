@@ -63,6 +63,7 @@ function gblPaths(): [string, CF, number][] {
 function tcgPaths(): [string, CF, number][] {
   return [
     ["/tcg", "weekly", 1],
+    ["/tcg/briefing", "daily", 0.9],
     ["/tcg/meta", "daily", 0.9],
     ["/tcg/tier", "daily", 0.9],
     ["/tcg/decks", "weekly", 0.8],

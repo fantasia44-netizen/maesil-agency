@@ -2,24 +2,19 @@
 // 백엔드 의존 없음(정적 SSR). 하위 콘텐츠 페이지(티어·덱·카드·가이드)는 데이터 파이프라인과 함께 구축.
 import Link from "next/link";
 import type { Metadata } from "next";
-import META from "./data/meta.json";
+import { RISING, POPULAR, UNDERRATED, OVERRATED, type BDeck } from "./briefing/compute";
 import { analyzedDeckIds } from "./decks/analysis";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../lib/i18n";
 import { getTcg } from "./dict";
 
 export const revalidate = 3600;
 
-// 급상승/급락 — 2층 자체분석. trend(최근 7/3일 vs 30일 %p, 표본 게이팅 내장)로 산출.
-type DeckMeta = { id: string; name: string; nm?: Record<string, string>; winrate: number; n: number; wr3?: number | null; wr7?: number | null; n7?: number; trend?: { d: number; w: number } | null };
-const MOVERS = (META.decks as DeckMeta[]).filter((d) => d.trend && (d.n7 ?? 0) >= 40); // 홈 헤드라인은 신뢰 표본만(개별 덱 페이지는 표본 표시하며 더 낮은 것도 노출)
-const RISING = MOVERS.filter((d) => (d.trend as { d: number }).d >= 3).sort((a, b) => (b.trend as { d: number }).d - (a.trend as { d: number }).d).slice(0, 4);
-const FALLING = MOVERS.filter((d) => (d.trend as { d: number }).d <= -3).sort((a, b) => (a.trend as { d: number }).d - (b.trend as { d: number }).d).slice(0, 4);
-
-const MOVE_L: Record<Locale, { h: string; sub: string; rising: string; falling: string }> = {
-  ko: { h: "📊 최근 급상승·급락 덱", sub: "실제 대회 데이터로 계산한 최근 7일 승률의 30일 평균 대비 변화입니다.", rising: "급상승", falling: "급락" },
-  en: { h: "📊 Rising & falling decks", sub: "Change in the last 7-day win rate vs the 30-day average, computed from real tournament data.", rising: "Rising", falling: "Falling" },
-  ja: { h: "📊 最近の急上昇・急落デッキ", sub: "実際の大会データで計算した直近7日勝率の30日平均比の変化です。", rising: "急上昇", falling: "急落" },
-  "zh-TW": { h: "📊 近期急升·急跌牌組", sub: "以實際賽事數據計算的近7日勝率相對30日均值的變化。", rising: "急升", falling: "急跌" },
+// 홈 "지금 뭘 써야 하나" 4칸 — 이번 주 덱 브리핑에서 각 섹션 상위. 클릭 시 브리핑 전체로.
+const BRIEF_L: Record<Locale, { h: string; sub: string; all: string; rising: string; popular: string; under: string; over: string; use: string; wr: string }> = {
+  ko: { h: "🎯 지금 뭘 써야 하나 — 이번 주 브리핑", sub: "실제 대회 데이터로 자동 계산. 카드를 눌러 근거를 보세요.", all: "브리핑 전체 보기 →", rising: "🔥 지금 뜨는", popular: "👑 많이 쓰는", under: "💎 숨은 꿀덱", over: "☠️ 과대평가", use: "사용", wr: "승률" },
+  en: { h: "🎯 What to play now — this week's briefing", sub: "Auto-computed from real tournament data. Tap a deck for the evidence.", all: "See full briefing →", rising: "🔥 Rising", popular: "👑 Most-played", under: "💎 Hidden gems", over: "☠️ Overrated", use: "Use", wr: "WR" },
+  ja: { h: "🎯 今何を使うべきか — 今週のブリーフィング", sub: "実際の大会データで自動計算。デッキを押すと根拠へ。", all: "ブリーフィング全体 →", rising: "🔥 急上昇", popular: "👑 人気", under: "💎 隠れ強デッキ", over: "☠️ 過大評価", use: "使用", wr: "勝率" },
+  "zh-TW": { h: "🎯 現在該用什麼 — 本週簡報", sub: "以實際賽事數據自動計算。點牌組看依據。", all: "查看完整簡報 →", rising: "🔥 急升", popular: "👑 熱門", under: "💎 隱藏強牌", over: "☠️ 被高估", use: "使用", wr: "勝率" },
 };
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
@@ -33,8 +28,14 @@ export default function TcgLandingPage({ params }: { params: { lang: string } })
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const L = (p: string) => localizePath(lang, p);
   const t = getTcg(lang);
-  const m = MOVE_L[lang];
+  const m = BRIEF_L[lang];
   const analyzed = analyzedDeckIds();
+  const cols = [
+    { title: m.rising, color: "#16a34a", list: RISING, metric: (d: BDeck) => `${d.wr7 ?? d.winrate}% ${d.trend && d.trend.d > 0 ? "+" : ""}${d.trend ? d.trend.d : 0}%p` },
+    { title: m.popular, color: "#d97706", list: POPULAR, metric: (d: BDeck) => `${m.use} ${d.share}%` },
+    { title: m.under, color: "#7c3aed", list: UNDERRATED, metric: (d: BDeck) => `${d.winrate}%` },
+    { title: m.over, color: "#dc2626", list: OVERRATED, metric: (d: BDeck) => `${d.winrate}%` },
+  ].filter((c) => c.list.length > 0);
 
   return (
     <>
@@ -84,31 +85,30 @@ export default function TcgLandingPage({ params }: { params: { lang: string } })
         </div>
       </div>
 
-      {/* ── 최근 급상승·급락 덱(2층 자체분석 — '매일 바뀌는 계산 결과' = 재방문) ── */}
-      {(RISING.length > 0 || FALLING.length > 0) && (
+      {/* ── 지금 뭘 써야 하나 4칸(이번 주 브리핑 — 바이럴 엔진·재방문 훅) ── */}
+      {cols.length > 0 && (
         <div style={{ background: "#fff", padding: "0.4rem 1rem 0.6rem" }}>
           <div style={{ maxWidth: 1040, margin: "0 auto" }}>
-            <h2 style={{ margin: "0.4rem 0 4px", fontSize: "1rem", fontWeight: 800, color: "#0f172a" }}>{m.h}</h2>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+              <h2 style={{ margin: "0.4rem 0 4px", fontSize: "1rem", fontWeight: 800, color: "#0f172a" }}>{m.h}</h2>
+              <Link href={L("/tcg/briefing")} style={{ fontSize: "0.78rem", fontWeight: 700, color: "#dc2626", textDecoration: "none" }}>{m.all}</Link>
+            </div>
             <p style={{ margin: "0 0 10px", fontSize: "0.76rem", color: "#94a3b8" }}>{m.sub}</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 12 }}>
-              {[{ title: `🔥 ${m.rising}`, list: RISING, c: "#16a34a" }, { title: `📉 ${m.falling}`, list: FALLING, c: "#dc2626" }].filter((col) => col.list.length > 0).map((col) => (
-                <div key={col.title} style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.6rem 0.9rem" }}>
-                  <div style={{ fontSize: "0.85rem", fontWeight: 800, color: "#0f172a", marginBottom: 4 }}>{col.title}</div>
-                  {col.list.map((d) => {
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 12 }}>
+              {cols.map((col) => (
+                <div key={col.title} style={{ background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.6rem 0.9rem", borderTop: `3px solid ${col.color}` }}>
+                  <div style={{ fontSize: "0.84rem", fontWeight: 800, color: "#0f172a", marginBottom: 4 }}>{col.title}</div>
+                  {col.list.slice(0, 3).map((d) => {
                     const nm = (d.nm && d.nm[lang]) || d.name;
-                    const recent = d.wr7 ?? d.wr3;
-                    const dd = (d.trend as { d: number }).d;
                     const inner = (
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, padding: "4px 0", fontSize: "0.83rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8, padding: "4px 0", fontSize: "0.82rem", borderTop: "1px solid #f6e0e0" }}>
                         <span style={{ fontWeight: 700, color: "#334155", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nm}</span>
-                        <span style={{ flexShrink: 0, fontVariantNumeric: "tabular-nums" }}>
-                          <b style={{ color: col.c }}>{recent}%</b> <span style={{ fontSize: "0.76rem", fontWeight: 800, color: col.c }}>{dd > 0 ? "+" : ""}{dd}%p</span>
-                        </span>
+                        <span style={{ flexShrink: 0, fontWeight: 800, color: col.color, fontVariantNumeric: "tabular-nums" }}>{col.metric(d)}</span>
                       </div>
                     );
                     return analyzed.includes(d.id)
-                      ? <Link key={d.id} href={L(`/tcg/decks/${d.id}`)} style={{ textDecoration: "none", display: "block", borderTop: "1px solid #f6e0e0" }}>{inner}</Link>
-                      : <div key={d.id} style={{ borderTop: "1px solid #f6e0e0" }}>{inner}</div>;
+                      ? <Link key={d.id} href={L(`/tcg/decks/${d.id}`)} style={{ textDecoration: "none", display: "block" }}>{inner}</Link>
+                      : <div key={d.id}>{inner}</div>;
                   })}
                 </div>
               ))}
