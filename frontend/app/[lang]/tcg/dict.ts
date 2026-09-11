@@ -35,6 +35,7 @@ const ko: TcgDict = {
     { key: "cards", path: "/tcg/cards", label: "카드" },
     { key: "handsim", path: "/tcg/hand-sim", label: "확률 계산기" },
     { key: "packsim", path: "/tcg/pack-sim", label: "팩시뮬" },
+    { key: "packplanner", path: "/tcg/pack-planner", label: "팩 추천" },
     { key: "guides", path: "/tcg/guides", label: "가이드" },
   ],
   hero: {
@@ -62,6 +63,7 @@ const ko: TcgDict = {
       { icon: "🃏", t: "덱 빌더", d: "20장 덱을 만들고 필요한 팩까지 확인·공유", href: "/tcg/deck-builder" },
       { icon: "⚔️", t: "카운터 검색", d: "실제 대회 매치업으로 상대 덱 카운터 찾기", href: "/tcg/counters" },
       { icon: "🎰", t: "팩 시뮬레이터", d: "공개 확률로 1/10/100팩 오픈 테스트", href: "/tcg/pack-sim" },
+      { icon: "📦", t: "팩 추천 계산기", d: "목표 덱 → 지금 까야 할 팩 순위·적중률", href: "/tcg/pack-planner" },
       { icon: "📘", t: "초보·전략 가이드", d: "시작 규칙·덱 고르는 법·타입 상성 정리", href: "/tcg/guides" },
     ],
   },
@@ -86,6 +88,7 @@ const en: TcgDict = {
     { key: "cards", path: "/tcg/cards", label: "Cards" },
     { key: "handsim", path: "/tcg/hand-sim", label: "Odds Calc" },
     { key: "packsim", path: "/tcg/pack-sim", label: "Pack Sim" },
+    { key: "packplanner", path: "/tcg/pack-planner", label: "Pack Advisor" },
     { key: "guides", path: "/tcg/guides", label: "Guides" },
   ],
   hero: {
@@ -113,6 +116,7 @@ const en: TcgDict = {
       { icon: "🃏", t: "Deck Builder", d: "Build a 20-card deck, see the packs you need, and share it", href: "/tcg/deck-builder" },
       { icon: "⚔️", t: "Counter Search", d: "Find counters to a deck from real tournament matchups", href: "/tcg/counters" },
       { icon: "🎰", t: "Pack Simulator", d: "Open 1 / 10 / 100 packs at the real pull rates", href: "/tcg/pack-sim" },
+      { icon: "📦", t: "Pack Advisor", d: "Target decks → which packs to open now, ranked", href: "/tcg/pack-planner" },
       { icon: "📘", t: "Beginner & Strategy Guides", d: "Rules, how to pick a deck, and type matchups", href: "/tcg/guides" },
     ],
   },
@@ -137,6 +141,7 @@ const ja: TcgDict = {
     { key: "cards", path: "/tcg/cards", label: "カード" },
     { key: "handsim", path: "/tcg/hand-sim", label: "確率計算" },
     { key: "packsim", path: "/tcg/pack-sim", label: "パック開封" },
+    { key: "packplanner", path: "/tcg/pack-planner", label: "パック推奨" },
     { key: "guides", path: "/tcg/guides", label: "ガイド" },
   ],
   hero: {
@@ -164,6 +169,7 @@ const ja: TcgDict = {
       { icon: "🃏", t: "デッキビルダー", d: "20枚デッキを作り、必要なパックまで確認·共有", href: "/tcg/deck-builder" },
       { icon: "⚔️", t: "カウンター検索", d: "実際の大会マッチアップで相手デッキの対策を探す", href: "/tcg/counters" },
       { icon: "🎰", t: "パック開封シミュ", d: "公開確率で1/10/100パックを開封テスト", href: "/tcg/pack-sim" },
+      { icon: "📦", t: "パック推奨計算機", d: "目標デッキ → 今開くべきパックを順位で", href: "/tcg/pack-planner" },
       { icon: "📘", t: "初心者·戦略ガイド", d: "開始ルール·デッキ選び·タイプ相性を整理", href: "/tcg/guides" },
     ],
   },
@@ -188,6 +194,7 @@ const zhTW: TcgDict = {
     { key: "cards", path: "/tcg/cards", label: "卡片" },
     { key: "handsim", path: "/tcg/hand-sim", label: "機率計算" },
     { key: "packsim", path: "/tcg/pack-sim", label: "開包" },
+    { key: "packplanner", path: "/tcg/pack-planner", label: "推薦卡包" },
     { key: "guides", path: "/tcg/guides", label: "指南" },
   ],
   hero: {
@@ -215,6 +222,7 @@ const zhTW: TcgDict = {
       { icon: "🃏", t: "牌組製作", d: "組20張牌組，查看需要的卡包並分享", href: "/tcg/deck-builder" },
       { icon: "⚔️", t: "剋星搜尋", d: "以實際賽事對戰找出剋制對手牌組的牌組", href: "/tcg/counters" },
       { icon: "🎰", t: "開包模擬器", d: "以公開機率開1/10/100包測試", href: "/tcg/pack-sim" },
+      { icon: "📦", t: "卡包推薦計算機", d: "目標牌組 → 現在該開的卡包排名", href: "/tcg/pack-planner" },
       { icon: "📘", t: "新手·策略指南", d: "起步規則·選牌組·屬性相剋整理", href: "/tcg/guides" },
     ],
   },

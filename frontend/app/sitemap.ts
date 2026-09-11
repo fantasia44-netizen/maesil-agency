@@ -71,6 +71,7 @@ function tcgPaths(): [string, CF, number][] {
     ["/tcg/counters", "weekly", 0.8],
     ["/tcg/deck-builder", "weekly", 0.7],
     ["/tcg/pack-sim", "weekly", 0.7],
+    ["/tcg/pack-planner", "weekly", 0.8],
     ["/tcg/hand-sim", "weekly", 0.8],
     ["/tcg/guides", "weekly", 0.7],
     ...TCG_GUIDES.map((g) => [`/tcg/guides/${g.slug}`, "monthly", 0.6] as [string, CF, number]),
