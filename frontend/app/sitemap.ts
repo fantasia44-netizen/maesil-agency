@@ -69,6 +69,7 @@ function tcgPaths(): [string, CF, number][] {
     ["/tcg/decks", "weekly", 0.8],
     ...analyzedDeckIds().map((id) => [`/tcg/decks/${id}`, "weekly", 0.7] as [string, CF, number]),
     ["/tcg/counters", "weekly", 0.8],
+    ["/tcg/matchups", "weekly", 0.8],
     ["/tcg/deck-builder", "weekly", 0.7],
     ["/tcg/pack-sim", "weekly", 0.7],
     ["/tcg/pack-planner", "weekly", 0.8],
