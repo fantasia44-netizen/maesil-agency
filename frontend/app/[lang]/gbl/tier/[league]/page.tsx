@@ -82,7 +82,9 @@ const moveLabel = (lang: Locale, id: string) => {
   return id;
 };
 
-type Detail = { id: string; score: number; tier: string; moveset: string[]; counters: string[]; wins: string[]; stats: Record<string, number>; ko?: string; dex?: number; types?: string[] };
+type ChargedMv = { id: string; energy: number; counts: number[] };
+type Detail = { id: string; score: number; tier: string; moveset: string[]; counters: string[]; wins: string[]; stats: Record<string, number>; ko?: string; dex?: number; types?: string[];
+  mv?: { fast: { id: string; gain: number; turns: number }; charged: ChargedMv[]; fasts?: { id: string; gain: number; turns: number }[] } };
 
 const TYPE_COLOR: Record<string, string> = {
   normal: "#9fa19f", fire: "#e62829", water: "#2980ef", electric: "#d9a900", grass: "#3fa129",
@@ -162,6 +164,35 @@ function MoveChip({ id, lang }: { id: string; lang: Locale }) {
       {moveLabel(lang, id)}
     </span>
   );
+}
+
+// 스킬/타수 — CMP(/gbl/cmp)와 동일 규칙. 타수 = 차지기술 발동까지 빠른기술 횟수(에너지 이월).
+const moveColor = (id: string) => TYPE_COLOR[MOVES[baseMoveId(id)]?.type] || "#94a3b8";
+const tausSeq = (cost: number, gain: number, n = 5): number[] => {
+  if (!gain) return Array(n).fill(0); let energy = 0; const seq: number[] = [];
+  for (let i = 0; i < n; i++) { const need = cost - energy; const t = need > 0 ? Math.ceil(need / gain) : 0; energy += t * gain - cost; seq.push(t); }
+  return seq;
+};
+// 함께 보여줄 추가 빠른기술 변형(CMP와 동일)
+const FAST_EXTRA: Record<string, string[]> = {
+  mewtwo_mega_x: ["COUNTER"], groudon_primal: ["MUD_SHOT"], garchomp_mega: ["MUD_SHOT"],
+  kyurem_black: ["SHADOW_CLAW"], metagross_mega: ["FURY_CUTTER"],
+};
+const HITS_UNIT: Record<string, string> = { ko: "타", en: "", ja: "回", "zh-TW": "次" };
+const TURN_UNIT: Record<string, string> = { ko: "턴", en: "T", ja: "T", "zh-TW": "回" };
+function buildMoves(d: Detail, lang: Locale) {
+  if (!d.mv) return null;
+  const mv = d.mv;
+  const fastById = new Map((mv.fasts && mv.fasts.length ? mv.fasts : [mv.fast]).map((f) => [f.id, f]));
+  const ids = [mv.fast.id, ...(FAST_EXTRA[d.id] || [])];
+  return ids.map((fid) => {
+    const f = fastById.get(fid);
+    const isDef = fid === mv.fast.id;
+    return {
+      fast: { label: moveLabel(lang, fid), color: moveColor(fid), turns: f?.turns ?? mv.fast.turns },
+      charged: mv.charged.map((c) => ({ label: moveLabel(lang, c.id), color: moveColor(c.id), counts: isDef ? c.counts : tausSeq(c.energy, f?.gain ?? mv.fast.gain) })),
+    };
+  });
 }
 
 export default async function TierPage({ params, searchParams }: { params: { lang: string; league: string }; searchParams?: { s?: string } }) {
@@ -302,6 +333,7 @@ export default async function TierPage({ params, searchParams }: { params: { lan
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {byTier[tr].map((d) => {
                   const pr = pick[d.id];
+                  const mvRows = buildMoves(d, lang);
                   const types = (d.types && d.types.length) ? d.types : (MON[d.id]?.types || []);
                   const dex = d.dex || MON[d.id]?.dex;
                   const dispName = dispNameOf(lang, d);
@@ -329,9 +361,27 @@ export default async function TierPage({ params, searchParams }: { params: { lan
                           <span style={{ fontSize: "0.74rem", color: "#94a3b8" }}>{t.scoreLabel} {d.score}</span>
                         </span>
                       </div>
-                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6, paddingLeft: 44 }}>
-                        {d.moveset.map((mid) => <MoveChip key={mid} id={mid} lang={lang} />)}
-                      </div>
+                      {/* 추천 기술 + 타수(CMP 방식) — 데이터 없으면 기존 기술칩 폴백 */}
+                      {mvRows ? (
+                        <div style={{ marginTop: 6, paddingLeft: 44, display: "flex", flexDirection: "column", gap: 3 }}>
+                          {mvRows.map((v, vi) => (
+                            <div key={vi} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 6, ...(vi > 0 ? { paddingTop: 3, borderTop: "1px dashed #e3e8f2" } : {}) }}>
+                              <span style={{ fontSize: "0.66rem", fontWeight: 700, color: "#fff", background: v.fast.color, padding: "1px 7px", borderRadius: 6, whiteSpace: "nowrap" }}>{v.fast.label} <span style={{ opacity: 0.9, fontWeight: 800 }}>{v.fast.turns}{TURN_UNIT[lang] ?? "턴"}</span></span>
+                              {v.charged.map((c, ci) => (
+                                <span key={ci} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "0.68rem" }}>
+                                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
+                                  <span style={{ color: "#334155", fontWeight: 600, whiteSpace: "nowrap" }}>{c.label}</span>
+                                  <span style={{ fontFamily: "ui-monospace, monospace", color: "#94a3b8", fontWeight: 700, letterSpacing: "-0.3px" }}>{c.counts.join("·")}<span style={{ fontSize: "0.6rem" }}>{HITS_UNIT[lang] ?? "타"}</span></span>
+                                </span>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6, paddingLeft: 44 }}>
+                          {d.moveset.map((mid) => <MoveChip key={mid} id={mid} lang={lang} />)}
+                        </div>
+                      )}
                     </Link>
                   );
                 })}
