@@ -1,168 +1,168 @@
-ï»¿league,id,name_ko,tier,score,note_ko
-great,tinkaton,"ë‘ë“œë¦¬ì§±",S,93,""
-great,altaria,"íŒŒë¹„ì½”ë¦¬",S,92,""
-great,empoleon,"ì— í˜ë¥´íŠ¸",S,92,""
-great,mimikyu,"ë”°ë¼í",S,92,""
-great,altaria_shadow,"ê·¸ë¦¼ì íŒŒë¹„ì½”ë¦¬",S,92,""
-great,empoleon_shadow,"ê·¸ë¦¼ì ì— í˜ë¥´íŠ¸",S,92,""
-great,quagsire_shadow,"ê·¸ë¦¼ì ëˆ„ì˜¤",S,92,""
-great,quagsire,"ëˆ„ì˜¤",S,92,""
-great,jellicent,"íƒ±íƒ±ê²”",S,92,""
-great,forretress,"ì˜ì½˜",S,92,""
-great,ninetales,"ë‚˜ì¸í…Œì¼",S,92,""
-great,ninetales_shadow,"ê·¸ë¦¼ì ë‚˜ì¸í…Œì¼",A,91,""
-great,feraligatr,"ì¥í¬ë¡œë‹¤ì¼",A,91,""
-great,forretress_shadow,"ê·¸ë¦¼ì ì˜ì½˜",A,91,""
-great,corsola_galarian,"ê°€ë¼ë¥´ ì½”ì‚°í˜¸",A,91,""
-great,jumpluff,"ì†œì†œì½”",A,91,""
-great,clodsire,"í† ì˜¤",A,91,""
-great,corviknight,"ì•„ë¨¸ê¹Œì˜¤",A,91,""
-great,fearow,"ê¹¨ë¹„ë“œë¦´ì¡°",A,91,""
-great,azumarill,"ë§ˆë¦´ë¦¬",A,91,""
-great,feraligatr_shadow,"ê·¸ë¦¼ì ì¥í¬ë¡œë‹¤ì¼",A,91,""
-great,kingdra,"í‚¹ë“œë¼",A,91,""
-great,guzzlord,"ì•…ì‹í‚¹",A,90,""
-great,lapras,"ë¼í”„ë¼ìŠ¤",A,90,""
-great,corviknight_shadow,"ê·¸ë¦¼ì ì•„ë¨¸ê¹Œì˜¤",A,90,""
-great,furret,"ë‹¤ê¼¬ë¦¬",A,90,""
-great,kingdra_shadow,"ê·¸ë¦¼ì í‚¹ë“œë¼",A,90,""
-great,dragonair_shadow,"ê·¸ë¦¼ì ì‹ ë‡½",A,90,""
-great,medicham,"ìš”ê°€ë¨",A,90,""
-great,sableye_shadow,"ê·¸ë¦¼ì ê¹œê¹Œë¯¸",A,90,""
-great,seismitoad,"ë‘ë¹…êµ´",A,90,""
-great,umbreon,"ë¸”ë˜í‚¤",A,90,""
-great,talonflame,"íŒŒì´ì–´ë¡œ",A,90,""
-great,dragonair,"ì‹ ë‡½",A,90,""
-great,thievul,"í­ìŠ¬ë¼ì´",A,90,""
-great,diggersby,"íŒŒë¥´í† ",A,90,""
-great,dusclops,"ë¯¸ë¼ëª½",A,90,""
-great,grumpig,"í”¼ê·¸í‚¹",A,90,""
-great,florges,"í”Œë¼ì œìŠ¤",A,90,""
-great,lapras_shadow,"ê·¸ë¦¼ì ë¼í”„ë¼ìŠ¤",A,90,""
-great,sableye,"ê¹œê¹Œë¯¸",A,90,""
-great,wigglytuff,"í‘¸í¬ë¦°",A,90,""
-great,cradily,"ë¦´ë¦¬ìš”",A,89,""
-great,dusclops_shadow,"ê·¸ë¦¼ì ë¯¸ë¼ëª½",A,89,""
-great,mantine,"ë§Œíƒ€ì¸",A,89,""
-great,moltres_galarian,"ê°€ë¼ë¥´ íŒŒì´ì–´",A,89,""
-great,blastoise,"ê±°ë¶ì™•",A,89,""
-great,clefable,"í”½ì‹œ",A,89,""
-great,talonflame_shadow,"ê·¸ë¦¼ì íŒŒì´ì–´ë¡œ",A,89,""
-great,mandibuzz,"ë²„ëœì§€ë‚˜",A,89,""
-great,dewgong,"ì¥¬ë ˆê³¤",A,89,""
-great,malamar,"ì¹¼ë¼ë§ˆë„¤ë¡œ",A,89,""
-great,steelix_shadow,"ê·¸ë¦¼ì ê°•ì² í†¤",A,89,""
-great,charjabug,"ì „ì§€ì¶©ì´",A,89,""
-great,drapion_shadow,"ê·¸ë¦¼ì ë“œë˜í”¼ì˜¨",A,89,""
-great,ninetales_alolan,"ì•Œë¡œë¼ ë‚˜ì¸í…Œì¼",A,89,""
-great,ninetales_alolan_shadow,"ê·¸ë¦¼ì ì•Œë¡œë¼ ë‚˜ì¸í…Œì¼",A,89,""
-great,swampert,"ëŒ€ì§±ì´",A,89,""
-great,aegislash_shield,"í‚¬ê°€ë¥´ë„",A,89,""
-great,bastiodon,"ë°”ë¦¬í†±ìŠ¤",A,89,""
-great,marowak_shadow,"ê·¸ë¦¼ì í……êµ¬ë¦¬",A,89,""
-great,swampert_shadow,"ê·¸ë¦¼ì ëŒ€ì§±ì´",A,89,""
-great,registeel,"ë ˆì§€ìŠ¤í‹¸",A,88,""
-great,hydreigon_shadow,"ê·¸ë¦¼ì ì‚¼ì‚¼ë“œë˜",A,88,""
-great,malamar_shadow,"ê·¸ë¦¼ì ì¹¼ë¼ë§ˆë„¤ë¡œ",A,88,""
-great,melmetal,"ë©œë©”íƒˆ",A,88,""
-great,turtonator,"í­ê±°ë¶ìŠ¤",A,88,""
-great,dondozo,"ì–´ì¨ëŸ¬ì…”",A,88,""
-great,oranguru,"í•˜ë‘ìš°íƒ„",A,88,""
-great,gourgeist_large,"íŒí‚¨ì¸",A,88,""
-great,gourgeist_super,"íŒí‚¨ì¸",A,88,""
-great,hydreigon,"ì‚¼ì‚¼ë“œë˜",A,88,""
-great,gourgeist_average,"íŒí‚¨ì¸",A,88,""
-great,samurott,"ëŒ€ê²€ê·€",B,88,""
-great,doublade,"ìŒê²€í‚¬",B,88,""
-great,gourgeist_small,"íŒí‚¨ì¸",B,87,""
-great,carbink,"ë©œë¦¬ì‹œ",B,87,""
-great,walrein,"ì”¨ì¹´ì´ì €",B,86,""
-great,hippowdon,"í•˜ë§ˆëˆ",B,86,""
-great,araquanid,"ê¹¨ë¹„ë¬¼ê±°ë¯¸",B,86,""
-great,steelix,"ê°•ì² í†¤",B,86,""
-great,zweilous,"ë””í—¤ë“œ",B,86,""
-great,spiritomb,"í™”ê°•ëŒ",B,86,""
-great,araquanid_shadow,"ê·¸ë¦¼ì ê¹¨ë¹„ë¬¼ê±°ë¯¸",B,86,""
-great,annihilape,"ì €ìŠ¹ê°“ìˆ­",B,86,""
-great,marowak,"í……êµ¬ë¦¬",B,86,""
-great,walrein_shadow,"ê·¸ë¦¼ì ì”¨ì¹´ì´ì €",B,86,""
-great,zweilous_shadow,"ê·¸ë¦¼ì ë””í—¤ë“œ",B,86,""
-great,metang_shadow,"ê·¸ë¦¼ì ë©”íƒ•êµ¬",B,85,""
-great,annihilape_shadow,"ê·¸ë¦¼ì ì €ìŠ¹ê°“ìˆ­",B,85,""
-great,hippowdon_shadow,"ê·¸ë¦¼ì í•˜ë§ˆëˆ",B,85,""
-great,metang,"ë©”íƒ•êµ¬",B,85,""
-great,electrode_hisuian,"íˆìŠ¤ì´ ë¶ë³¼",B,84,""
-ultra,mimikyu,"ë”°ë¼í",S,96,""
-ultra,corviknight,"ì•„ë¨¸ê¹Œì˜¤",S,93,""
-ultra,corviknight_shadow,"ê·¸ë¦¼ì ì•„ë¨¸ê¹Œì˜¤",A,93,""
-ultra,florges,"í”Œë¼ì œìŠ¤",A,93,""
-ultra,empoleon_shadow,"ê·¸ë¦¼ì ì— í˜ë¥´íŠ¸",A,93,""
-ultra,virizion,"ë¹„ë¦¬ë””ì˜¨",A,93,""
-ultra,empoleon,"ì— í˜ë¥´íŠ¸",A,92,""
-ultra,moltres_galarian,"ê°€ë¼ë¥´ íŒŒì´ì–´",A,92,""
-ultra,jellicent,"íƒ±íƒ±ê²”",A,92,""
-ultra,forretress,"ì˜ì½˜",A,92,""
-ultra,feraligatr_shadow,"ê·¸ë¦¼ì ì¥í¬ë¡œë‹¤ì¼",A,91,""
-ultra,forretress_shadow,"ê·¸ë¦¼ì ì˜ì½˜",A,91,""
-ultra,ninetales_alolan,"ì•Œë¡œë¼ ë‚˜ì¸í…Œì¼",A,91,""
-ultra,registeel,"ë ˆì§€ìŠ¤í‹¸",A,91,""
-ultra,dusknoir,"ì•¼ëŠì™€ë¥´ëª½",A,91,""
-ultra,lapras,"ë¼í”„ë¼ìŠ¤",A,91,""
-ultra,ninetales_alolan_shadow,"ê·¸ë¦¼ì ì•Œë¡œë¼ ë‚˜ì¸í…Œì¼",A,91,""
-ultra,dusknoir_shadow,"ê·¸ë¦¼ì ì•¼ëŠì™€ë¥´ëª½",A,91,""
-ultra,lapras_shadow,"ê·¸ë¦¼ì ë¼í”„ë¼ìŠ¤",A,90,""
-ultra,talonflame,"íŒŒì´ì–´ë¡œ",A,90,""
-ultra,walrein_shadow,"ê·¸ë¦¼ì ì”¨ì¹´ì´ì €",A,90,""
-ultra,dondozo,"ì–´ì¨ëŸ¬ì…”",A,90,""
-ultra,regidrago,"ë ˆì§€ë“œë˜ê³ ",A,90,""
-ultra,walrein,"ì”¨ì¹´ì´ì €",A,90,""
-ultra,giratina_altered,"ê¸°ë¼í‹°ë‚˜",A,90,""
-ultra,bellibolt,"ì°Œë¦¬ë°°ë¦¬",A,90,""
-ultra,talonflame_shadow,"ê·¸ë¦¼ì íŒŒì´ì–´ë¡œ",A,90,""
-ultra,cresselia,"í¬ë ˆì„¸ë¦¬ì•„",B,90,""
-ultra,giratina_altered_shadow,"ê·¸ë¦¼ì ê¸°ë¼í‹°ë‚˜",B,90,""
-ultra,steelix,"ê°•ì² í†¤",B,90,""
-ultra,feraligatr,"ì¥í¬ë¡œë‹¤ì¼",B,90,""
-ultra,runerigus,"ë°ìŠ¤íŒ",B,90,""
-ultra,steelix_shadow,"ê·¸ë¦¼ì ê°•ì² í†¤",B,89,""
-ultra,cradily_shadow,"ê·¸ë¦¼ì ë¦´ë¦¬ìš”",B,89,""
-ultra,cresselia_shadow,"ê·¸ë¦¼ì í¬ë ˆì„¸ë¦¬ì•„",B,89,""
-ultra,ampharos_shadow,"ê·¸ë¦¼ì ì „ë£¡",B,89,""
-ultra,ampharos,"ì „ë£¡",B,89,""
-ultra,guzzlord,"ì•…ì‹í‚¹",B,88,""
-ultra,skeledirge,"ë¼ìš°ë“œë³¸",B,88,""
-ultra,grumpig,"í”¼ê·¸í‚¹",B,87,""
-ultra,grumpig_shadow,"ê·¸ë¦¼ì í”¼ê·¸í‚¹",B,86,""
-ultra,doublade,"ìŒê²€í‚¬",B,86,""
-master,zacian_crowned_sword,"ìì‹œì•ˆ (ê²€ì™•)",S,99,""
-master,palkia_origin,"í„ê¸°ì•„ (ì˜¤ë¦¬ì§„)",S,99,""
-master,metagross,"ë©”íƒ€ê·¸ë¡œìŠ¤",S,98,""
-master,kyurem_white,"í™”ì´íŠ¸ íë ˆë¬´",A,95,""
-master,lunala,"ë£¨ë‚˜ì•„ë¼",A,95,""
-master,xerneas,"ì œë¥´ë„¤ì•„ìŠ¤",A,95,""
-master,dialga_origin,"ë””ì•„ë£¨ê°€ (ì˜¤ë¦¬ì§„)",A,94,""
-master,reshiram,"ë ˆì‹œë¼ë¬´",A,94,""
-master,zamazenta_crowned_shield,"ìë§ˆì  íƒ€ (ë°©íŒ¨ì™•)",A,94,""
-master,kyurem_black,"ë¸”ë™ íë ˆë¬´",A,93,""
-master,kyogre,"ê°€ì´ì˜¤ê°€",A,93,""
-master,zekrom,"ì œí¬ë¡œë¬´",B,93,""
-master,marshadow,"ë§ˆìƒ¤ë„",B,93,""
-master,reshiram_shadow,"ê·¸ë¦¼ì ë ˆì‹œë¼ë¬´",B,92,""
-master,eternatus,"ë¬´í•œë‹¤ì´ë…¸",B,91,""
-master,palkia_shadow,"ê·¸ë¦¼ì í„ê¸°ì•„",B,91,""
-master,lugia,"ë£¨ê¸°ì•„",B,91,""
-master,metagross_shadow,"ê·¸ë¦¼ì ë©”íƒ€ê·¸ë¡œìŠ¤",B,90,""
-master,lugia_shadow,"ê·¸ë¦¼ì ë£¨ê¸°ì•„",B,90,""
-master,garchomp_shadow,"ê·¸ë¦¼ì í•œì¹´ë¦¬ì•„ìŠ¤",B,90,""
-master,necrozma_dawn_wings,"ë„¤í¬ë¡œì¦ˆë§ˆ (ìƒˆë²½ì˜ ë‚ ê°œ)",B,90,""
-master,garchomp,"í•œì¹´ë¦¬ì•„ìŠ¤",C,89,""
-master,ho_oh,"ì¹ ìƒ‰ì¡°",C,89,""
-master,zygarde_complete,"ì§€ê°€ë¥´ë°",C,89,""
-master,necrozma_dusk_mane,"ë„¤í¬ë¡œì¦ˆë§ˆ (í™©í˜¼ì˜ ê°ˆê¸°)",C,88,""
-master,groudon,"ê·¸ë€ëˆ",C,87,""
-master,solgaleo,"ì†”ê°€ë ˆì˜¤",C,87,""
-master,melmetal,"ë©œë©”íƒˆ",C,87,""
-master,keldeo_resolute,"ì¼€ë¥´ë””ì˜¤",C,86,""
-master,primarina,"ëˆ„ë¦¬ë ˆëŠ",C,85,""
-master,ursaluna_shadow,"ê·¸ë¦¼ì ë‹¤íˆ¬ê³°",D,73,""
-master,ursaluna,"ë‹¤íˆ¬ê³°",D,73,""
+league,id,name_ko,tier,score,note_ko
+great,tinkaton,µÎµå¸®Â¯,S,93,
+great,altaria,ÆÄºñÄÚ¸®,S,92,
+great,empoleon,¿¥Æä¸£Æ®,S,92,
+great,mimikyu,µû¶óÅ¥,S,92,
+great,altaria_shadow,±×¸²ÀÚ ÆÄºñÄÚ¸®,S,92,
+great,empoleon_shadow,±×¸²ÀÚ ¿¥Æä¸£Æ®,S,92,
+great,quagsire_shadow,±×¸²ÀÚ ´©¿À,S,92,
+great,quagsire,´©¿À,S,92,
+great,jellicent,ÅÊÅÊ°Ö,S,92,
+great,forretress,½îÄÜ,S,92,
+great,ninetales,³ªÀÎÅ×ÀÏ,S,92,
+great,ninetales_shadow,±×¸²ÀÚ ³ªÀÎÅ×ÀÏ,A,91,
+great,feraligatr,ÀåÅ©·Î´ÙÀÏ,A,91,
+great,forretress_shadow,±×¸²ÀÚ ½îÄÜ,A,91,
+great,corsola_galarian,°¡¶ó¸£ ÄÚ»êÈ£,A,91,
+great,jumpluff,¼Ø¼ØÄÚ,A,91,
+great,clodsire,Åä¿À,A,91,
+great,corviknight,¾Æ¸Ó±î¿À,A,91,
+great,fearow,±úºñµå¸±Á¶,A,91,
+great,azumarill,¸¶¸±¸®,A,91,
+great,feraligatr_shadow,±×¸²ÀÚ ÀåÅ©·Î´ÙÀÏ,A,91,
+great,kingdra,Å·µå¶ó,A,91,
+great,guzzlord,¾Ç½ÄÅ·,A,90,
+great,lapras,¶óÇÁ¶ó½º,A,90,
+great,corviknight_shadow,±×¸²ÀÚ ¾Æ¸Ó±î¿À,A,90,
+great,furret,´Ù²¿¸®,A,90,
+great,kingdra_shadow,±×¸²ÀÚ Å·µå¶ó,A,90,
+great,dragonair_shadow,±×¸²ÀÚ ½Å´¨,A,90,
+great,medicham,¿ä°¡·¥,A,90,
+great,sableye_shadow,±×¸²ÀÚ ±ô±î¹Ì,A,90,
+great,seismitoad,µÎºò±¼,A,90,
+great,umbreon,ºí·¡Å°,A,90,
+great,talonflame,ÆÄÀÌ¾î·Î,A,90,
+great,dragonair,½Å´¨,A,90,
+great,thievul,Æø½½¶óÀÌ,A,90,
+great,diggersby,ÆÄ¸£Åä,A,90,
+great,dusclops,¹Ì¶ó¸ù,A,90,
+great,grumpig,ÇÇ±×Å·,A,90,
+great,florges,ÇÃ¶óÁ¦½º,A,90,
+great,lapras_shadow,±×¸²ÀÚ ¶óÇÁ¶ó½º,A,90,
+great,sableye,±ô±î¹Ì,A,90,
+great,wigglytuff,ÇªÅ©¸°,A,90,
+great,cradily,¸±¸®¿ä,A,89,
+great,dusclops_shadow,±×¸²ÀÚ ¹Ì¶ó¸ù,A,89,
+great,mantine,¸¸Å¸ÀÎ,A,89,
+great,moltres_galarian,°¡¶ó¸£ ÆÄÀÌ¾î,A,89,
+great,blastoise,°ÅºÏ¿Õ,A,89,
+great,clefable,ÇÈ½Ã,A,89,
+great,talonflame_shadow,±×¸²ÀÚ ÆÄÀÌ¾î·Î,A,89,
+great,mandibuzz,¹ö·£Áö³ª,A,89,
+great,dewgong,Áê·¹°ï,A,89,
+great,malamar,Ä®¶ó¸¶³×·Î,A,89,
+great,steelix_shadow,±×¸²ÀÚ °­Ã¶Åæ,A,89,
+great,charjabug,ÀüÁöÃæÀÌ,A,89,
+great,drapion_shadow,±×¸²ÀÚ µå·¡ÇÇ¿Â,A,89,
+great,ninetales_alolan,¾Ë·Î¶ó ³ªÀÎÅ×ÀÏ,A,89,
+great,ninetales_alolan_shadow,±×¸²ÀÚ ¾Ë·Î¶ó ³ªÀÎÅ×ÀÏ,A,89,
+great,swampert,´ëÂ¯ÀÌ,A,89,
+great,aegislash_shield,Å³°¡¸£µµ,A,89,
+great,bastiodon,¹Ù¸®Åé½º,A,89,
+great,marowak_shadow,±×¸²ÀÚ ÅÖ±¸¸®,A,89,
+great,swampert_shadow,±×¸²ÀÚ ´ëÂ¯ÀÌ,A,89,
+great,registeel,·¹Áö½ºÆ¿,A,88,
+great,hydreigon_shadow,±×¸²ÀÚ »ï»ïµå·¡,A,88,
+great,malamar_shadow,±×¸²ÀÚ Ä®¶ó¸¶³×·Î,A,88,
+great,melmetal,¸á¸ŞÅ»,A,88,
+great,turtonator,Æø°ÅºÏ½º,A,88,
+great,dondozo,¾î½á·¯¼Å,A,88,
+great,oranguru,ÇÏ¶û¿ìÅº,A,88,
+great,gourgeist_large,ÆßÅ²ÀÎ,A,88,
+great,gourgeist_super,ÆßÅ²ÀÎ,A,88,
+great,hydreigon,»ï»ïµå·¡,A,88,
+great,gourgeist_average,ÆßÅ²ÀÎ,A,88,
+great,samurott,´ë°Ë±Í,B,88,
+great,doublade,½Ö°ËÅ³,B,88,
+great,gourgeist_small,ÆßÅ²ÀÎ,B,87,
+great,carbink,¸á¸®½Ã,B,87,
+great,walrein,¾¾Ä«ÀÌÀú,B,86,
+great,hippowdon,ÇÏ¸¶µ·,B,86,
+great,araquanid,±úºñ¹°°Å¹Ì,B,86,
+great,steelix,°­Ã¶Åæ,B,86,
+great,zweilous,µğÇìµå,B,86,
+great,spiritomb,È­°­µ¹,B,86,
+great,araquanid_shadow,±×¸²ÀÚ ±úºñ¹°°Å¹Ì,B,86,
+great,annihilape,Àú½Â°«¼ş,B,86,
+great,marowak,ÅÖ±¸¸®,B,86,
+great,walrein_shadow,±×¸²ÀÚ ¾¾Ä«ÀÌÀú,B,86,
+great,zweilous_shadow,±×¸²ÀÚ µğÇìµå,B,86,
+great,metang_shadow,±×¸²ÀÚ ¸ŞÅÁ±¸,B,85,
+great,annihilape_shadow,±×¸²ÀÚ Àú½Â°«¼ş,B,85,
+great,hippowdon_shadow,±×¸²ÀÚ ÇÏ¸¶µ·,B,85,
+great,metang,¸ŞÅÁ±¸,B,85,
+great,electrode_hisuian,È÷½ºÀÌ ºÕº¼,B,84,
+ultra,mimikyu,µû¶óÅ¥,S,96,
+ultra,corviknight,¾Æ¸Ó±î¿À,S,93,
+ultra,corviknight_shadow,±×¸²ÀÚ ¾Æ¸Ó±î¿À,A,93,
+ultra,florges,ÇÃ¶óÁ¦½º,A,93,
+ultra,empoleon_shadow,±×¸²ÀÚ ¿¥Æä¸£Æ®,A,93,
+ultra,virizion,ºñ¸®µğ¿Â,A,93,
+ultra,empoleon,¿¥Æä¸£Æ®,A,92,
+ultra,moltres_galarian,°¡¶ó¸£ ÆÄÀÌ¾î,A,92,
+ultra,jellicent,ÅÊÅÊ°Ö,A,92,
+ultra,forretress,½îÄÜ,A,92,
+ultra,feraligatr_shadow,±×¸²ÀÚ ÀåÅ©·Î´ÙÀÏ,A,91,
+ultra,forretress_shadow,±×¸²ÀÚ ½îÄÜ,A,91,
+ultra,ninetales_alolan,¾Ë·Î¶ó ³ªÀÎÅ×ÀÏ,A,91,
+ultra,registeel,·¹Áö½ºÆ¿,A,91,
+ultra,dusknoir,¾ß´À¿Í¸£¸ù,A,91,
+ultra,lapras,¶óÇÁ¶ó½º,A,91,
+ultra,ninetales_alolan_shadow,±×¸²ÀÚ ¾Ë·Î¶ó ³ªÀÎÅ×ÀÏ,A,91,
+ultra,dusknoir_shadow,±×¸²ÀÚ ¾ß´À¿Í¸£¸ù,A,91,
+ultra,lapras_shadow,±×¸²ÀÚ ¶óÇÁ¶ó½º,A,90,
+ultra,talonflame,ÆÄÀÌ¾î·Î,A,90,
+ultra,walrein_shadow,±×¸²ÀÚ ¾¾Ä«ÀÌÀú,A,90,
+ultra,dondozo,¾î½á·¯¼Å,A,90,
+ultra,regidrago,·¹Áöµå·¡°í,A,90,
+ultra,walrein,¾¾Ä«ÀÌÀú,A,90,
+ultra,giratina_altered,±â¶óÆ¼³ª,A,90,
+ultra,bellibolt,Âî¸®¹è¸®,A,90,
+ultra,talonflame_shadow,±×¸²ÀÚ ÆÄÀÌ¾î·Î,A,90,
+ultra,cresselia,Å©·¹¼¼¸®¾Æ,B,90,
+ultra,giratina_altered_shadow,±×¸²ÀÚ ±â¶óÆ¼³ª,B,90,
+ultra,steelix,°­Ã¶Åæ,B,90,
+ultra,feraligatr,ÀåÅ©·Î´ÙÀÏ,B,90,
+ultra,runerigus,µ¥½ºÆÇ,B,90,
+ultra,steelix_shadow,±×¸²ÀÚ °­Ã¶Åæ,B,89,
+ultra,cradily_shadow,±×¸²ÀÚ ¸±¸®¿ä,B,89,
+ultra,cresselia_shadow,±×¸²ÀÚ Å©·¹¼¼¸®¾Æ,B,89,
+ultra,ampharos_shadow,±×¸²ÀÚ Àü·æ,B,89,
+ultra,ampharos,Àü·æ,B,89,
+ultra,guzzlord,¾Ç½ÄÅ·,B,88,
+ultra,skeledirge,¶ó¿ìµåº»,B,88,
+ultra,grumpig,ÇÇ±×Å·,B,87,
+ultra,grumpig_shadow,±×¸²ÀÚ ÇÇ±×Å·,B,86,
+ultra,doublade,½Ö°ËÅ³,B,86,
+master,zacian_crowned_sword,ÀÚ½Ã¾È (°Ë¿Õ),S,99,
+master,palkia_origin,ÆŞ±â¾Æ (¿À¸®Áø),S,99,
+master,metagross,¸ŞÅ¸±×·Î½º,S,98,
+master,kyurem_white,È­ÀÌÆ® Å¥·¹¹«,A,95,
+master,lunala,·ç³ª¾Æ¶ó,A,95,
+master,xerneas,Á¦¸£³×¾Æ½º,A,95,
+master,dialga_origin,µğ¾Æ·ç°¡ (¿À¸®Áø),A,94,
+master,reshiram,·¹½Ã¶ó¹«,A,94,
+master,zamazenta_crowned_shield,ÀÚ¸¶Á¨Å¸ (¹æÆĞ¿Õ),A,94,
+master,kyurem_black,ºí·¢ Å¥·¹¹«,A,93,
+master,kyogre,°¡ÀÌ¿À°¡,A,93,
+master,zekrom,Á¦Å©·Î¹«,B,93,
+master,marshadow,¸¶»şµµ,B,93,
+master,reshiram_shadow,±×¸²ÀÚ ·¹½Ã¶ó¹«,B,92,
+master,eternatus,¹«ÇÑ´ÙÀÌ³ë,B,91,
+master,palkia_shadow,±×¸²ÀÚ ÆŞ±â¾Æ,B,91,
+master,lugia,·ç±â¾Æ,B,91,
+master,metagross_shadow,±×¸²ÀÚ ¸ŞÅ¸±×·Î½º,B,90,
+master,lugia_shadow,±×¸²ÀÚ ·ç±â¾Æ,B,90,
+master,garchomp_shadow,±×¸²ÀÚ ÇÑÄ«¸®¾Æ½º,B,90,
+master,necrozma_dawn_wings,³×Å©·ÎÁî¸¶ (»õº®ÀÇ ³¯°³),B,90,
+master,garchomp,ÇÑÄ«¸®¾Æ½º,C,89,
+master,ho_oh,Ä¥»öÁ¶,C,89,
+master,zygarde_complete,Áö°¡¸£µ¥,C,89,
+master,necrozma_dusk_mane,³×Å©·ÎÁî¸¶ (È²È¥ÀÇ °¥±â),C,88,
+master,groudon,±×¶õµ·,C,87,
+master,solgaleo,¼Ö°¡·¹¿À,C,87,
+master,melmetal,¸á¸ŞÅ»,C,87,
+master,keldeo_resolute,ÄÉ¸£µğ¿À,C,86,
+master,primarina,´©¸®·¹´À,C,85,
+master,ursaluna_shadow,±×¸²ÀÚ ´ÙÅõ°õ,D,73,
+master,ursaluna,´ÙÅõ°õ,D,73,
