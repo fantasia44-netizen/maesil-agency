@@ -43,7 +43,11 @@ export function middleware(req: NextRequest) {
   if (NON_DEFAULT_LOCALES.includes(seg1 as (typeof NON_DEFAULT_LOCALES)[number])) {
     const rest = pathname.slice(seg1.length + 1);
     const restSeg = rest.split("/")[1] || "";
-    if (isSectionSeg(restSeg)) return NextResponse.next();
+    if (isSectionSeg(restSeg)) {
+      // gblnote 호스트로 들어온 /<lang>/tcg/* → tcgnote.net 301 (크로스호스트 중복 색인 방지)
+      if (hostSection === "gbl" && restSeg === "tcg") return NextResponse.redirect(new URL(pathname + req.nextUrl.search, "https://tcgnote.net"), 301);
+      return NextResponse.next();
+    }
     const url = req.nextUrl.clone();
     url.pathname = `/${seg1}/${hostSection || "gbl"}`;
     return NextResponse.redirect(url, 301);
@@ -51,6 +55,8 @@ export function middleware(req: NextRequest) {
 
   // /<section>/* (ko 기본, 프리픽스 없음) → 내부 rewrite /ko/<section>/* (URL 유지)
   if (isSectionSeg(seg1)) {
+    // gblnote 호스트로 들어온 /tcg/* → tcgnote.net 301 (TCG는 tcgnote 도메인에서만 서빙·색인)
+    if (hostSection === "gbl" && seg1 === "tcg") return NextResponse.redirect(new URL(pathname + req.nextUrl.search, "https://tcgnote.net"), 301);
     const url = req.nextUrl.clone();
     url.pathname = `/ko${pathname}`;
     return NextResponse.rewrite(url);

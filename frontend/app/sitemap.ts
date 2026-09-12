@@ -4,6 +4,7 @@ import DETAIL from "./[lang]/gbl/gbl_detail.json";
 import RAIDS from "./[lang]/gbl/gbl_raids.json";
 import { GUIDES } from "./[lang]/gbl/guide/guides";
 import { IV_ANALYSIS } from "./[lang]/gbl/iv/analysis/registry";
+import { isMetaMon } from "./[lang]/gbl/indexGate";
 import { analyzedDeckIds } from "./[lang]/tcg/decks/analysis";
 import { GUIDES as TCG_GUIDES } from "./[lang]/tcg/guides/guides";
 import { locales, localeMeta, localizePath, defaultLocale } from "../lib/i18n";
@@ -12,7 +13,6 @@ import { locales, localeMeta, localizePath, defaultLocale } from "../lib/i18n";
 // 각 경로를 4개 로케일 URL로 발행 + hreflang 상호연결. headers()로 요청 호스트에 따라 분기(동적).
 const LEAGUES = ["master", "great", "ultra"];
 const RAID_TYPES = Object.keys((RAIDS as unknown as { types: Record<string, unknown> }).types);
-const POKE_TOP = 200;
 const DET = DETAIL as unknown as Record<string, { id: string }[]>;
 
 type CF = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
@@ -34,7 +34,7 @@ function build(base: string, paths: [string, CF, number][]): MetadataRoute.Sitem
 function gblPaths(): [string, CF, number][] {
   return [
     ["/gbl", "weekly", 1],
-    ["/gbl/meta", "daily", 0.9],
+    // /gbl/meta 허브는 noindex(리그 페이지로 유도) → 사이트맵 제외(noindex+사이트맵 동시는 GSC 경고)
     ...LEAGUES.map((l) => [`/gbl/meta/${l}`, "daily", 0.9] as [string, CF, number]),
     ...LEAGUES.map((l) => [`/gbl/tier/${l}`, "weekly", 0.8] as [string, CF, number]),
     ...LEAGUES.map((l) => [`/gbl/cmp/${l}`, "weekly", 0.7] as [string, CF, number]),
@@ -43,7 +43,8 @@ function gblPaths(): [string, CF, number][] {
     ["/gbl/sim", "weekly", 0.8],
     ["/gbl/trade", "weekly", 0.7],
     ["/gbl/events", "daily", 0.8],
-    ...LEAGUES.flatMap((l) => (DET[l] || []).slice(0, POKE_TOP).map((d) => [`/gbl/pokemon/${l}/${d.id}`, "weekly", 0.6] as [string, CF, number])),
+    // 포켓몬 개별 — 색인 게이트(PvPoke 편집 메타) 통과분만. 나머지는 페이지 유지·noindex(indexGate.ts).
+    ...LEAGUES.flatMap((l) => (DET[l] || []).filter((d) => isMetaMon(l, d.id)).map((d) => [`/gbl/pokemon/${l}/${d.id}`, "weekly", 0.6] as [string, CF, number])),
     ["/gbl/raid", "weekly", 0.9],
     ["/gbl/raid/bosses", "daily", 0.8],
     ["/gbl/raid/schedule", "daily", 0.8],
@@ -51,7 +52,7 @@ function gblPaths(): [string, CF, number][] {
     ["/gbl/schedule", "weekly", 0.7],
     ["/gbl/guide", "weekly", 0.7],
     ...Object.keys(GUIDES).map((slug) => [`/gbl/guide/${slug}`, "monthly", 0.6] as [string, CF, number]),
-    ["/gbl/board", "daily", 0.7],
+    // /gbl/board 는 noindex(로그인 게이트·UGC) → 사이트맵 제외
     ["/gbl/about", "monthly", 0.4],
     ["/gbl/contact", "yearly", 0.3],
     ["/gbl/privacy", "yearly", 0.3],

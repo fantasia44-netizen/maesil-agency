@@ -22,6 +22,8 @@ import { typeLabel } from "../../../typeLabels";
 import { getPoke } from "./dict";
 import { buildAnalysis, HEADINGS } from "./analysis";
 import { currentSeason, seasonBySlug } from "../../../seasons";
+import { isMetaMon } from "../../../indexGate";
+import MON_NOTES from "../../../gbl_mon_notes.json";
 
 export const revalidate = 600;
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
@@ -174,6 +176,8 @@ export async function generateMetadata({ params, searchParams }: { params: { lan
   try { pr = (await getMetaInfo(params.league)).rate[d.id]; } catch { /* 폴백 */ }
   const desc = dynMetaDesc(lang, d, name, lgName, pr) || `${name} · ${lgName} — ${pk.metaDesc}`;
   return {
+    // 색인 게이트 — PvPoke 편집 메타 밖 몬은 noindex,follow (페이지·데이터·IV찾기 유지, 구글 노출만 제외)
+    ...(isMetaMon(params.league, d.id) ? {} : { robots: { index: false, follow: true } }),
     title: `${name} ${lgName} ${pk.metaTitle.replace(" | GBL Note", "")} | GBL Note`,
     description: desc,
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
@@ -259,6 +263,12 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
   const name = dispName(lang, d, isShadow ? (lang === "zh-TW" ? "暗影 " : "그림자 ") : "");
   const info = await getMetaInfo(params.league);
   const pr = info.rate[d.id];
+  // 색인 게이트 — 메타 밖 몬은 시뮬 표·카운터·기술배치는 그대로 두되, 데이터 파생 분석문(강점/약점/평가)은
+  // 렌더하지 않음(600페이지 동일 골격 문장 = 구글 '대량 생성' 판정의 실체). 표본 부족 안내는 유지.
+  const isMeta = isMetaMon(params.league, d.id);
+  // 운영자 실전 평가 — 사람이 쓴 판단. gbl_mon_notes.json {league:{id:{ko,en,ja,"zh-TW"}}}, 로케일 없으면 ko 폴백.
+  const note = (MON_NOTES as Record<string, Record<string, Record<string, string>>>)[params.league]?.[d.id];
+  const noteText = note ? (note[lang] || note.ko) : undefined;
 
   // ── 데이터 파생 분석문(포켓몬별 분기) ──
   const rankTag = (r: number) => lang === "en" ? `#${r}` : lang === "ja" ? `${r}位` : lang === "zh-TW" ? `第${r}名` : `${r}위`;
@@ -389,7 +399,7 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
         )}
 
         {/* 데이터 파생 분석 — 강점/약점/평가 3구조(크롤러가 분석 문서로 인식) */}
-        {hasAnalysis && (
+        {(isMeta ? hasAnalysis : !!analysis.thinNote) && (
           <div style={{ marginTop: 14, background: `linear-gradient(180deg, ${c1}0d, #ffffff 60%)`, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.9rem 1.05rem" }}>
             <h2 style={{ margin: "0 0 2px", fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>{aTitle}</h2>
             {/* 분석 기준 명시(#4) — "긁은 DB"가 아니라 두 데이터 소스 조합·해석임을 첫 화면에서 노출 */}
@@ -400,7 +410,7 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
                 {analysis.thinNote}
               </p>
             )}
-            {analysis.strengths.length > 0 && (
+            {isMeta && analysis.strengths.length > 0 && (
               <>
                 <h3 style={{ margin: "10px 0 4px", fontSize: "0.86rem", fontWeight: 800, color: "#15803d" }}>✔ {aH.strengths}</h3>
                 <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.84rem", color: "#334155", lineHeight: 1.75 }}>
@@ -408,7 +418,7 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
                 </ul>
               </>
             )}
-            {analysis.weaknesses.length > 0 && (
+            {isMeta && analysis.weaknesses.length > 0 && (
               <>
                 <h3 style={{ margin: "12px 0 4px", fontSize: "0.86rem", fontWeight: 800, color: "#b45309" }}>⚠ {aH.weaknesses}</h3>
                 <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.84rem", color: "#334155", lineHeight: 1.75 }}>
@@ -416,7 +426,7 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
                 </ul>
               </>
             )}
-            {analysis.verdict && (
+            {isMeta && analysis.verdict && (
               <>
                 <h3 style={{ margin: "12px 0 4px", fontSize: "0.86rem", fontWeight: 800, color: "#3b5bdb" }}>{aH.verdict}</h3>
                 <p style={{ margin: 0, fontSize: "0.84rem", color: "#334155", lineHeight: 1.8 }}>{analysis.verdict}</p>
@@ -425,6 +435,16 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
             <Link href={L("/gbl/guide/pogo-pvp-calc")} style={{ display: "inline-block", marginTop: 10, fontSize: "0.76rem", color: "#3b5bdb", fontWeight: 700, textDecoration: "none" }}>
               {lang === "en" ? "How GO calculates type & damage →" : lang === "ja" ? "GOのタイプ・ダメージ計算 →" : lang === "zh-TW" ? "GO的屬性·傷害計算 →" : "GO 타입 배율·데미지 계산법 →"}
             </Link>
+          </div>
+        )}
+
+        {/* 운영자 실전 평가 — 사람이 쓴 판단(시뮬이 못 하는 말). gbl_mon_notes.json에 노트 있는 메타몬만 노출. */}
+        {isMeta && noteText && (
+          <div style={{ marginTop: 12, background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 12, padding: "0.85rem 1.05rem" }}>
+            <h2 style={{ margin: "0 0 6px", fontSize: "0.92rem", fontWeight: 800, color: "#92400e" }}>
+              {lang === "en" ? "🎯 Operator's field verdict" : lang === "ja" ? "🎯 運営者の実戦評価" : lang === "zh-TW" ? "🎯 站長實戰評價" : "🎯 운영자 실전 평가"}
+            </h2>
+            <p style={{ margin: 0, fontSize: "0.86rem", color: "#334155", lineHeight: 1.8, whiteSpace: "pre-line" }}>{noteText}</p>
           </div>
         )}
 

@@ -31,6 +31,8 @@ export function generateMetadata({ params }: { params: { lang: string } }): Meta
   return {
     title: c.title,
     description: c.desc,
+    // 게시판은 색인 불필요(로그인 게이트·유저 생성 콘텐츠) — 검색 콘텐츠로 밀 이유 없음
+    robots: { index: false, follow: true },
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
     openGraph: { title: c.title, description: c.desc, url: localizePath(lang, path), images: ["/gbl-og.png"], type: "website" },
   };
