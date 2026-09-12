@@ -6,6 +6,8 @@ import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale }
 import { getIv } from "./dict";
 import { IV_ANALYSIS } from "./analysis/registry";
 import { formDexById } from "../sprite";
+import ToolExplainer from "../ToolExplainer";
+import { getIvContent } from "../toolContent";
 
 const PUBLISHED_IV = Object.values(IV_ANALYSIS).filter((e) => e.published);
 const ivSprite = (dex: number) => `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png`;
@@ -81,6 +83,9 @@ export default function IvPage({ params }: { params: { lang: string } }) {
           <h2 style={{ fontSize: "0.95rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>{t.explainerH}</h2>
           <p style={{ margin: 0, fontSize: "0.82rem", color: "#475569", lineHeight: 1.75 }}>{t.explainerBody}</p>
         </div>
+
+        {/* 서버렌더 설명 본문 — IV·CP 원리, 순위 의미, XL·베스트버디, 개체 구하는 법, FAQ */}
+        <ToolExplainer c={getIvContent(lang)} L={L} />
 
         <div style={{ textAlign: "center", marginTop: 22, fontSize: "0.72rem", color: "#94a3b8" }}>
           <Link href={L("/gbl/guide")} style={{ color: "#64748b", textDecoration: "none" }}>{t.footerGuide}</Link> ·{" "}

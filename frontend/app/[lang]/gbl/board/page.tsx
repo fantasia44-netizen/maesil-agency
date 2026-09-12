@@ -24,13 +24,18 @@ const META: Record<Locale, { title: string; desc: string }> = {
   "zh-TW": { title: "GBL Note 討論板 — 寶可夢GO對戰聯盟閒聊·問答", desc: "寶可夢GO GBL訓練家的閒聊·問答·攻略分享討論板。人人可讀，登入即可發文。" },
 };
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+// 공개 글이 이만큼 안 되면 noindex — "아직 글이 없습니다"만 있는 빈 게시판이 색인·심사에 잡히지 않게.
+const MIN_POSTS_TO_INDEX = 5;
+
+export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const c = META[lang];
   const path = "/gbl/board";
+  const posts = await getPublicPosts(lang);
   return {
     title: c.title,
     description: c.desc,
+    ...(posts.length >= MIN_POSTS_TO_INDEX ? {} : { robots: { index: false, follow: true } }),
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
     openGraph: { title: c.title, description: c.desc, url: localizePath(lang, path), images: ["/gbl-og.png"], type: "website" },
   };

@@ -29,4 +29,10 @@ export const GUIDE_RELATED_TOOLS: Record<string, { path: string; key: ToolKey }[
   "league-cp": [{ path: "/gbl/tier/master", key: "tierList" }, { path: "/gbl/cmp/master", key: "cmp" }],
   "gbl-basics": [{ path: "/gbl/tier/master", key: "tierList" }, { path: "/gbl/raid", key: "raidTier" }],
   "party-building": [{ path: "/gbl/tier/master", key: "tierList" }, { path: "/gbl/meta/master", key: "meta" }],
+  "shields-baiting": [{ path: "/gbl/sim", key: "sim" }, { path: "/gbl/tier/great", key: "tierList" }, { path: "/gbl/meta", key: "meta" }],
+  "switching-and-alignment": [{ path: "/gbl/sim", key: "sim" }, { path: "/gbl/tier/great", key: "tierList" }, { path: "/gbl/meta", key: "meta" }],
+  "buffs-debuffs": [{ path: "/gbl/sim", key: "sim" }, { path: "/gbl/cmp/master", key: "cmp" }, { path: "/gbl/tier/master", key: "tierList" }],
+  "rank-and-rating": [{ path: "/gbl/meta", key: "meta" }, { path: "/gbl/tier/great", key: "tierList" }],
+  "shadow-xl-investment": [{ path: "/gbl/iv", key: "ivChecker" }, { path: "/gbl/tier/great", key: "tierList" }, { path: "/gbl/cmp/master", key: "cmp" }],
+  "raid-basics": [{ path: "/gbl/raid", key: "raidTier" }, { path: "/gbl/meta", key: "meta" }],
 };

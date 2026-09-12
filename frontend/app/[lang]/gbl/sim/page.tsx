@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import SimView from "./SimView";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
 import { getSim } from "./dict";
+import ToolExplainer from "../ToolExplainer";
+import { getSimContent } from "../toolContent";
 
 const PATH = "/gbl/sim";
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
@@ -35,6 +37,10 @@ export default function SimPage({ params }: { params: { lang: string } }) {
         <p style={{ margin: "0.3rem 0 0.4rem", fontSize: "0.9rem", color: "#475569", lineHeight: 1.6 }}>{t.intro}</p>
       </div>
       <SimView lang={lang} t={t} />
+      {/* 서버렌더 설명 본문 — 원리·수치·FAQ(크롤러·심사자용 실질 콘텐츠) */}
+      <div style={{ maxWidth: 760, margin: "0 auto" }}>
+        <ToolExplainer c={getSimContent(lang)} L={L} />
+      </div>
     </div>
   );
 }

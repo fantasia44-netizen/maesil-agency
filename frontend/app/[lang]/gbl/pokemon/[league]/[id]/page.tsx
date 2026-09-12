@@ -22,6 +22,7 @@ import { typeLabel } from "../../../typeLabels";
 import { getPoke } from "./dict";
 import { buildAnalysis, HEADINGS } from "./analysis";
 import { currentSeason, seasonBySlug } from "../../../seasons";
+import { isIndexablePokemon } from "../../indexable";
 
 export const revalidate = 600;
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
@@ -173,9 +174,13 @@ export async function generateMetadata({ params, searchParams }: { params: { lan
   let pr: number | undefined;
   try { pr = (await getMetaInfo(params.league)).rate[d.id]; } catch { /* 폴백 */ }
   const desc = dynMetaDesc(lang, d, name, lgName, pr) || `${name} · ${lgName} — ${pk.metaDesc}`;
+  // 색인 정책(pokemon/indexable.ts): 리그별 상위·심층분석 보유종만 index. 그 외(하위 티어·메가 리그·시즌 쿼리)는
+  // noindex,follow — 페이지는 유지하되 검색/심사 노출은 막아 "자동 생성 대량 페이지" 신호를 제거.
+  const indexable = isIndexablePokemon(params.league, params.id) && !searchParams?.s;
   return {
     title: `${name} ${lgName} ${pk.metaTitle.replace(" | GBL Note", "")} | GBL Note`,
     description: desc,
+    ...(indexable ? {} : { robots: { index: false, follow: true } }),
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
     openGraph: {
       title: `${name} ${lgName} ${pk.ogTitleSuffix}`,

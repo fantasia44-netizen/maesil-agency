@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
 import { getTrade } from "./dict";
 import TradeMaker from "./TradeMaker";
+import ToolExplainer from "../ToolExplainer";
+import { getTradeContent } from "../toolContent";
 
 export const revalidate = 86400;
 
@@ -34,6 +36,10 @@ export default function TradePage({ params }: { params: { lang: string } }) {
         <p style={{ margin: "0.4rem 0 1.2rem", fontSize: "0.9rem", color: "#475569", lineHeight: 1.7 }}>{t.intro}</p>
 
         <TradeMaker lang={lang} t={t} />
+        {/* 서버렌더 설명 본문 — 교환 규칙·모래 비용·IV 재추첨·사용법·FAQ */}
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          <ToolExplainer c={getTradeContent(lang)} L={L} />
+        </div>
 
         <div style={{ textAlign: "center", marginTop: 26, fontSize: "0.72rem", color: "#94a3b8" }}>
           <Link href={L("/gbl/guide")} style={{ color: "#64748b", textDecoration: "none" }}>{t.footerGuide}</Link> ·{" "}

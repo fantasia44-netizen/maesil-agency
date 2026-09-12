@@ -1,8 +1,10 @@
+import { GUIDES_EXTRA } from "./guides2";
+
 // GBL 가이드 데이터(3개국어) — 페이지 export 규칙 회피 위해 분리(sitemap도 여기서 import).
 // slug/updated는 공유, 사람이 읽는 필드(title/desc/sections)와 keywords는 로케일별 제공.
 type Section = { h?: string; p: string };
 export type GuideContent = { title: string; desc: string; sections: Section[] };
-type Guide = {
+export type Guide = {
   updated: string;
   keywords: { ko: string[]; en: string[]; ja: string[]; "zh-TW": string[] };
   ko: GuideContent;
@@ -20,7 +22,7 @@ export function guideKeywords(lang: string, g: Guide): string[] {
   return (g.keywords as Record<string, string[]>)[lang] || g.keywords.ko;
 }
 
-export const GUIDES: Record<string, Guide> = {
+const GUIDES_CORE: Record<string, Guide> = {
   "type-chart": {
     updated: "2026-09-03",
     keywords: {
@@ -462,3 +464,6 @@ export const GUIDES: Record<string, Guide> = {
     },
   },
 };
+
+// 1차(기본기·계산) + 2차(실전 운영·시스템·육성·레이드, guides2.ts) 병합 — 목록·상세·사이트맵 공용.
+export const GUIDES: Record<string, Guide> = { ...GUIDES_CORE, ...GUIDES_EXTRA };

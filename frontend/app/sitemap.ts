@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 import { headers } from "next/headers";
-import DETAIL from "./[lang]/gbl/gbl_detail.json";
 import RAIDS from "./[lang]/gbl/gbl_raids.json";
 import { GUIDES } from "./[lang]/gbl/guide/guides";
 import { IV_ANALYSIS } from "./[lang]/gbl/iv/analysis/registry";
+import { INDEXABLE_POKEMON } from "./[lang]/gbl/pokemon/indexable";
 import { analyzedDeckIds } from "./[lang]/tcg/decks/analysis";
 import { GUIDES as TCG_GUIDES } from "./[lang]/tcg/guides/guides";
 import { locales, localeMeta, localizePath, defaultLocale } from "../lib/i18n";
@@ -12,8 +12,6 @@ import { locales, localeMeta, localizePath, defaultLocale } from "../lib/i18n";
 // 각 경로를 4개 로케일 URL로 발행 + hreflang 상호연결. headers()로 요청 호스트에 따라 분기(동적).
 const LEAGUES = ["master", "great", "ultra"];
 const RAID_TYPES = Object.keys((RAIDS as unknown as { types: Record<string, unknown> }).types);
-const POKE_TOP = 200;
-const DET = DETAIL as unknown as Record<string, { id: string }[]>;
 
 type CF = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
@@ -43,7 +41,8 @@ function gblPaths(): [string, CF, number][] {
     ["/gbl/sim", "weekly", 0.8],
     ["/gbl/trade", "weekly", 0.7],
     ["/gbl/events", "daily", 0.8],
-    ...LEAGUES.flatMap((l) => (DET[l] || []).slice(0, POKE_TOP).map((d) => [`/gbl/pokemon/${l}/${d.id}`, "weekly", 0.6] as [string, CF, number])),
+    // 포켓몬 상세 — 색인 허용 목록만(리그별 S/A 상위 + 심층분석 보유종). 나머지 상세는 noindex(pokemon/indexable.ts).
+    ...LEAGUES.flatMap((l) => (INDEXABLE_POKEMON[l] || []).map((id) => [`/gbl/pokemon/${l}/${id}`, "weekly", 0.6] as [string, CF, number])),
     ["/gbl/raid", "weekly", 0.9],
     ["/gbl/raid/bosses", "daily", 0.8],
     ["/gbl/raid/schedule", "daily", 0.8],
