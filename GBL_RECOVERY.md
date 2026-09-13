@@ -41,5 +41,6 @@
 
 ## 되돌리기 / 조정
 - 게이트 완화: `build_meta_mons.mjs`의 `MASTER_SCORE_TOP` 조정 또는 슈퍼/하이퍼에도 점수 top-N 보강 추가 → 재실행 → 커밋.
+- **특정 몬 수동 유지/추가**: `build_meta_mons.mjs`의 `EXTRA_INDEX = { great: ["lickilicky"] }`에 리그별 id 추가 → `node scripts/gbl/build_meta_mons.mjs` → 커밋. (사이트맵·robots 자동 반영. 노트 쓰려면 `GBL_MON_NOTES.csv`에 행도 추가)
 - 전면 롤백: `indexGate.ts`의 `isMetaMon`이 `true` 반환하게 바꾸면 이전 상태(전부 색인). 데이터·페이지는 손댄 게 없어 즉시 복구.
 - 우리 실측(유저 기록)이 쌓이면 게이트를 PvPoke 편집픽 + 실측 등장≥N 으로 확장 가능(`/api/gbl/meta` 활용).
