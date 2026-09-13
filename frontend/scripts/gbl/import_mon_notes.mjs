@@ -46,14 +46,25 @@ if (iL < 0 || iI < 0 || iN < 0) throw new Error(`헤더에 league/id/note_ko 필
 
 const prev = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : {};
 const notes = { great: {}, ultra: {}, master: {} };
-let filled = 0, skipped = 0; const bad = [];
+const MIN_LEN = 15; // 이보다 짧으면 쓰다 만 것으로 보고 제외(미완성 노트가 배포되는 사고 방지)
+let filled = 0, skipped = 0; const bad = [], partial = [];
 for (const r of rows.slice(1)) {
   const league = (r[iL] || "").trim(), id = (r[iI] || "").trim(), ko = (r[iN] || "").trim().replace(/\r/g, "");
   if (!league || !id) continue;
   if (!notes[league]) { bad.push(`${league}/${id}`); continue; }
   if (!ko) { skipped++; continue; }
+  if (ko.length < MIN_LEN) { partial.push(`${league}/${id}(${ko.length}자)`); skipped++; continue; }
   notes[league][id] = { ...(prev[league]?.[id] || {}), ko };
   filled++;
 }
+// 그림자(_shadow) 폼: 별도 노트가 비어 있으면 같은 리그의 기본 폼 노트를 그대로 상속 (2중 작성 불필요).
+// 그림자 칸에 직접 쓰면 그게 우선(상속 안 함).
+let inherited = 0;
+for (const r of rows.slice(1)) {
+  const league = (r[iL] || "").trim(), id = (r[iI] || "").trim();
+  if (!notes[league] || !id.endsWith("_shadow") || notes[league][id]) continue;
+  const base = notes[league][id.replace(/_shadow$/, "")];
+  if (base) { notes[league][id] = { ...base }; inherited++; skipped--; }
+}
 writeFileSync(OUT, JSON.stringify(notes, null, 1));
-console.log(`[${SRC.split(/[\\/]/).pop()} · ${delim === "\t" ? "탭" : "쉼표"}] 노트 반영 ${filled}마리 (미작성 ${skipped}${bad.length ? `, 리그 인식 실패 ${bad.length}: ${bad.slice(0, 3).join(", ")}` : ""}) → gbl_mon_notes.json`);
+console.log(`[${SRC.split(/[\\/]/).pop()} · ${delim === "\t" ? "탭" : "쉼표"}] 노트 반영 ${filled}마리 + 그림자 상속 ${inherited} (미작성 ${skipped}${partial.length ? ` · 미완성 제외 ${partial.length}: ${partial.join(", ")}` : ""}${bad.length ? `, 리그 인식 실패 ${bad.length}: ${bad.slice(0, 3).join(", ")}` : ""}) → gbl_mon_notes.json`);
