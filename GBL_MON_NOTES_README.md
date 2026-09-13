@@ -44,6 +44,12 @@ cd .. && git add GBL_MON_NOTES.csv "frontend/app/[lang]/gbl/gbl_mon_notes.json" 
 ```
 → Render 자동 배포(수 분). 번역(en/ja/zh)은 나중에 Claude에게 요청.
 
+## 4-1. 파티 포인트 노트 (선택) — `GBL_PARTY_NOTES.csv`
+- 각 메타몬의 "GBL Note 추천 파트너" 3마리는 **자동 산출**(PvPoke 매치업: 이 몬의 카운터를 이기는 메타몬 상위 3, `scripts/gbl/build_partners.mjs`). 사람이 고를 필요 없음.
+- 레포 루트 `GBL_PARTY_NOTES.csv`에 168행이 파트너 3마리·잡아주는 상대와 함께 채워져 있음 → 마지막 열 **`party_note`에 "이 파티의 포인트" 한 줄**만 적으면 페이지 파트너 블록 아래 💬로 뜸(비우면 안 뜸). 그림자 폼은 기본 폼 노트 상속.
+- 반영: `cd frontend && node scripts/gbl/import_party_notes.mjs` → 커밋·푸시 (또는 Claude에게 "파티 노트 반영해줘").
+- 시즌 바뀌어 재산출할 때: `node scripts/gbl/build_partners.mjs && py scripts/gbl/write_party_csv.py` — 기존 party_note는 보존됨.
+
 ## 5. 확인
 배포 후 `https://gblnote.com/gbl/pokemon/{league}/{id}` (예: `/gbl/pokemon/great/tinkaton`) — "GBL Note 분석" 박스 아래 노란 **"🎯 운영자 실전 평가"** 박스. **메타몬 167마리만** 해당(비메타몬은 노트 써도 안 뜸 — 그 몬은 색인 제외 대상).
 

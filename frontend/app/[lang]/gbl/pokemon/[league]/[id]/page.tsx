@@ -24,6 +24,7 @@ import { buildAnalysis, HEADINGS } from "./analysis";
 import { currentSeason, seasonBySlug } from "../../../seasons";
 import { isMetaMon } from "../../../indexGate";
 import MON_NOTES from "../../../gbl_mon_notes.json";
+import PARTNERS from "../../../gbl_partners.json";
 
 export const revalidate = 600;
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
@@ -116,6 +117,16 @@ const TYPE_COLOR: Record<string, string> = {
   dark: "#4b4243", steel: "#5a8a9c", fairy: "#d76ad7",
 };
 const TIER_COLOR: Record<string, string> = { S: "#dc2626", A: "#ea580c", B: "#ca8a04", C: "#16a34a", D: "#64748b" };
+
+// GBL Note 추천 파트너 — 데이터 산출(이 몬의 주요 카운터를 이기는 메타몬 상위 3, scripts/gbl/build_partners.mjs) + 사장님 파티 포인트(있을 때).
+type PartnerEntry = { p: { id: string; covers: string[] }[]; note?: Record<string, string> };
+const PARTNER_DATA = PARTNERS as Record<string, Record<string, PartnerEntry>>;
+const PT: Record<Locale, { h: string; basis: string; covers: string }> = {
+  ko: { h: "🤝 GBL Note 추천 파트너", basis: "산출 기준: 이 포켓몬의 주요 카운터를 시뮬 매치업에서 이기는 현재 시즌 메타몬 상위 3 (PvPoke 매치업)", covers: "잡아주는 상대" },
+  en: { h: "🤝 GBL Note Partner Picks", basis: "How it's computed: top 3 current-season meta Pokémon that beat this Pokémon's main counters in sim matchups (PvPoke)", covers: "Covers" },
+  ja: { h: "🤝 GBL Note おすすめパートナー", basis: "算出基準: このポケモンの主な対策をシミュ対面で倒せる現シーズンのメタポケモン上位3(PvPoke対面)", covers: "対策できる相手" },
+  "zh-TW": { h: "🤝 GBL Note 推薦搭檔", basis: "計算依據：在模擬對戰中能打贏此寶可夢主要剋星的本賽季 Meta 寶可夢前3（PvPoke 對戰）", covers: "可應對" },
+};
 
 type Meta = { total: number; top_mons: { speciesId: string; count: number }[] };
 type MetaInfo = { rate: Record<string, number>; rank: Record<string, number> };
@@ -269,6 +280,8 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
   // 운영자 실전 평가 — 사람이 쓴 판단. gbl_mon_notes.json {league:{id:{ko,en,ja,"zh-TW"}}}, 로케일 없으면 ko 폴백.
   const note = (MON_NOTES as Record<string, Record<string, Record<string, string>>>)[params.league]?.[d.id];
   const noteText = note ? (note[lang] || note.ko) : undefined;
+  const partners = isMeta ? PARTNER_DATA[params.league]?.[d.id] : undefined;
+  const partyNote = partners?.note ? (partners.note[lang] || partners.note.ko) : undefined;
 
   // ── 데이터 파생 분석문(포켓몬별 분기) ──
   const rankTag = (r: number) => lang === "en" ? `#${r}` : lang === "ja" ? `${r}位` : lang === "zh-TW" ? `第${r}名` : `${r}위`;
@@ -445,6 +458,24 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
               {lang === "en" ? "🎯 Operator's field verdict" : lang === "ja" ? "🎯 運営者の実戦評価" : lang === "zh-TW" ? "🎯 站長實戰評價" : "🎯 운영자 실전 평가"}
             </h2>
             <p style={{ margin: 0, fontSize: "0.86rem", color: "#334155", lineHeight: 1.8, whiteSpace: "pre-line" }}>{noteText}</p>
+          </div>
+        )}
+
+        {/* GBL Note 추천 파트너 — 데이터 산출 상위 3(칩·링크) + 사장님 파티 포인트(GBL_PARTY_NOTES.csv, 있을 때) */}
+        {partners && partners.p.length > 0 && (
+          <div style={{ marginTop: 12, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.85rem 1.05rem" }}>
+            <h2 style={{ margin: "0 0 2px", fontSize: "0.92rem", fontWeight: 800, color: "#0f172a" }}>{PT[lang].h}</h2>
+            <p style={{ margin: "0 0 8px", fontSize: "0.72rem", color: "#94a3b8", lineHeight: 1.5 }}>{PT[lang].basis}</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {partners.p.map((x) => (
+                <Link key={x.id} href={L(`/gbl/pokemon/${params.league}/${x.id}`) + seasonQ} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", background: "#f7f9fd", border: `1px solid ${BORDER}`, borderRadius: 10, padding: "6px 10px", flexWrap: "wrap" }}>
+                  <Sprite id={x.id} size={32} />
+                  <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "#0f172a" }}>{locName(lang, x.id)}</span>
+                  {x.covers.length > 0 && <span style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#64748b" }}>{PT[lang].covers}: {x.covers.map((c) => locName(lang, c)).join(" · ")}</span>}
+                </Link>
+              ))}
+            </div>
+            {partyNote && <p style={{ margin: "10px 0 0", fontSize: "0.84rem", color: "#334155", lineHeight: 1.75, whiteSpace: "pre-line" }}>💬 {partyNote}</p>}
           </div>
         )}
 

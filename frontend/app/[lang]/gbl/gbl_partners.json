@@ -1,0 +1,4652 @@
+{
+ "great": {
+  "tinkaton": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "stunfisk",
+      "quagsire",
+      "empoleon",
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "stunfisk",
+      "quagsire",
+      "empoleon",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "empoleon",
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "ninetales_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "altaria",
+      "sableye_shadow",
+      "empoleon",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "altaria",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "mimikyu",
+      "altaria",
+      "sableye_shadow"
+     ]
+    }
+   ]
+  },
+  "corsola_galarian": {
+   "p": [
+    {
+     "id": "tinkaton",
+     "covers": [
+      "sableye_shadow",
+      "guzzlord",
+      "lickilicky",
+      "mimikyu"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "sableye_shadow",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "sableye_shadow",
+      "lickilicky",
+      "tinkaton"
+     ]
+    }
+   ]
+  },
+  "corviknight": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "stunfisk",
+      "forretress_shadow",
+      "altaria",
+      "ninetales_shadow",
+      "azumarill"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "forretress_shadow",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "ninetales_shadow",
+     "covers": [
+      "stunfisk",
+      "forretress_shadow",
+      "azumarill"
+     ]
+    }
+   ]
+  },
+  "quagsire_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "altaria",
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "altaria",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "mimikyu",
+      "altaria",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "quagsire": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "guzzlord",
+      "altaria",
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "guzzlord",
+      "altaria",
+      "mimikyu"
+     ]
+    },
+    {
+     "id": "jumpluff",
+     "covers": [
+      "guzzlord",
+      "mimikyu"
+     ]
+    }
+   ]
+  },
+  "altaria": {
+   "p": [
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "lickilicky",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "lickilicky",
+      "jellicent",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "melmetal": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "quagsire",
+      "jellicent",
+      "altaria"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "empoleon": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "quagsire",
+      "guzzlord",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "quagsire",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "mantine": {
+   "p": [
+    {
+     "id": "quagsire",
+     "covers": [
+      "stunfisk",
+      "lickilicky",
+      "tinkaton"
+     ]
+    },
+    {
+     "id": "jumpluff",
+     "covers": [
+      "stunfisk",
+      "mimikyu"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "ninetales": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "guzzlord",
+      "empoleon",
+      "altaria"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "guzzlord",
+      "altaria",
+      "lickilicky",
+      "mimikyu"
+     ]
+    },
+    {
+     "id": "jumpluff",
+     "covers": [
+      "guzzlord",
+      "mimikyu"
+     ]
+    }
+   ]
+  },
+  "empoleon_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "quagsire",
+      "jellicent",
+      "altaria",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "quagsire",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "quagsire"
+     ]
+    }
+   ]
+  },
+  "florges": {
+   "p": [
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "empoleon",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "empoleon",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "empoleon",
+      "jellicent",
+      "ninetales_shadow"
+     ]
+    }
+   ]
+  },
+  "thievul": {
+   "p": [
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "azumarill",
+      "quagsire",
+      "medicham"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "azumarill",
+      "quagsire",
+      "medicham"
+     ]
+    },
+    {
+     "id": "ninetales_shadow",
+     "covers": [
+      "tinkaton",
+      "azumarill",
+      "quagsire",
+      "medicham"
+     ]
+    }
+   ]
+  },
+  "corviknight_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "altaria",
+      "sableye_shadow",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow",
+      "sableye_shadow",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "mimikyu": {
+   "p": [
+    {
+     "id": "ninetales_shadow",
+     "covers": [
+      "lickilicky",
+      "jumpluff",
+      "furret",
+      "corviknight",
+      "tinkaton"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "lickilicky",
+      "jumpluff",
+      "tinkaton"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "lickilicky",
+      "tinkaton"
+     ]
+    }
+   ]
+  },
+  "feraligatr": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "quagsire",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "ninetales_shadow",
+      "empoleon",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "jellicent": {
+   "p": [
+    {
+     "id": "tinkaton",
+     "covers": [
+      "sableye_shadow",
+      "guzzlord",
+      "mimikyu",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "sableye_shadow",
+      "guzzlord",
+      "stunfisk"
+     ]
+    },
+    {
+     "id": "jumpluff",
+     "covers": [
+      "guzzlord",
+      "mimikyu",
+      "stunfisk"
+     ]
+    }
+   ]
+  },
+  "altaria_shadow": {
+   "p": [
+    {
+     "id": "ninetales_shadow",
+     "covers": [
+      "tinkaton",
+      "azumarill",
+      "feraligatr",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "azumarill",
+      "feraligatr",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "azumarill"
+     ]
+    }
+   ]
+  },
+  "araquanid": {
+   "p": [
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent",
+      "altaria"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "altaria"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "furret": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "guzzlord",
+      "stunfisk",
+      "ninetales_shadow",
+      "altaria"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "guzzlord",
+      "altaria"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "ninetales_shadow",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "azumarill": {
+   "p": [
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "empoleon",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "empoleon",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "clodsire": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "quagsire",
+      "altaria",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "quagsire",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "fearow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "altaria",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "altaria"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "mimikyu",
+      "altaria",
+      "lickilicky",
+      "guzzlord"
+     ]
+    }
+   ]
+  },
+  "marowak": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "altaria",
+      "quagsire",
+      "empoleon",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "altaria",
+      "quagsire",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "quagsire",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "annihilape": {
+   "p": [
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent",
+      "altaria"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "altaria",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "ninetales_shadow"
+     ]
+    }
+   ]
+  },
+  "annihilape_shadow": {
+   "p": [
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent",
+      "altaria"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "altaria",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "feraligatr_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "ninetales_shadow",
+      "lickilicky",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "ninetales_shadow",
+      "lickilicky",
+      "tinkaton"
+     ]
+    }
+   ]
+  },
+  "malamar": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "guzzlord",
+      "altaria",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "guzzlord",
+      "mimikyu",
+      "altaria",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "jumpluff",
+     "covers": [
+      "guzzlord",
+      "mimikyu"
+     ]
+    }
+   ]
+  },
+  "sableye_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "guzzlord",
+      "altaria",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "guzzlord",
+      "altaria",
+      "mimikyu"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "altaria",
+      "quagsire"
+     ]
+    }
+   ]
+  },
+  "electrode_hisuian": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "sableye_shadow",
+      "guzzlord",
+      "altaria"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "sableye_shadow",
+      "mimikyu",
+      "guzzlord",
+      "altaria"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow",
+      "sableye_shadow"
+     ]
+    }
+   ]
+  },
+  "malamar_shadow": {
+   "p": [
+    {
+     "id": "jellicent",
+     "covers": [
+      "empoleon",
+      "tinkaton",
+      "quagsire",
+      "altaria"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "empoleon",
+      "tinkaton"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "empoleon",
+      "quagsire",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "lapras": {
+   "p": [
+    {
+     "id": "guzzlord",
+     "covers": [
+      "sableye_shadow",
+      "jellicent",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "lickilicky",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "sableye_shadow",
+      "lickilicky",
+      "empoleon",
+      "tinkaton"
+     ]
+    }
+   ]
+  },
+  "umbreon": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "altaria",
+      "guzzlord",
+      "stunfisk"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "ninetales_shadow",
+      "altaria"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "ninetales_shadow",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "dondozo": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "altaria"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "jellicent",
+      "mimikyu",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "guzzlord": {
+   "p": [
+    {
+     "id": "ninetales_shadow",
+     "covers": [
+      "tinkaton",
+      "azumarill",
+      "jumpluff",
+      "corviknight"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "azumarill",
+      "jumpluff"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "azumarill"
+     ]
+    }
+   ]
+  },
+  "mandibuzz": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "stunfisk",
+      "guzzlord",
+      "clodsire"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "stunfisk",
+      "tinkaton",
+      "clodsire",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "guzzlord",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "araquanid_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "altaria",
+      "empoleon",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "altaria",
+      "jellicent",
+      "mimikyu"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "altaria",
+      "empoleon",
+      "tinkaton"
+     ]
+    }
+   ]
+  },
+  "kingdra": {
+   "p": [
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent",
+      "altaria"
+     ]
+    },
+    {
+     "id": "jumpluff",
+     "covers": [
+      "mimikyu"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "sableye_shadow"
+     ]
+    }
+   ]
+  },
+  "hippowdon": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "empoleon",
+      "quagsire",
+      "guzzlord",
+      "altaria"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "mimikyu",
+      "guzzlord",
+      "altaria"
+     ]
+    },
+    {
+     "id": "jumpluff",
+     "covers": [
+      "mimikyu",
+      "guzzlord"
+     ]
+    }
+   ]
+  },
+  "kingdra_shadow": {
+   "p": [
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent",
+      "altaria"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "guzzlord",
+      "altaria"
+     ]
+    },
+    {
+     "id": "jumpluff",
+     "covers": [
+      "mimikyu",
+      "guzzlord"
+     ]
+    }
+   ]
+  },
+  "sableye": {
+   "p": [
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "lickilicky",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "ninetales_shadow",
+     "covers": [
+      "tinkaton",
+      "quagsire",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "jumpluff": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "empoleon",
+      "altaria"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow",
+      "corviknight"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "ninetales_shadow",
+      "empoleon",
+      "tinkaton",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "blastoise": {
+   "p": [
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "jumpluff",
+     "covers": [
+      "mimikyu",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "mimikyu",
+      "guzzlord",
+      "sableye_shadow"
+     ]
+    }
+   ]
+  },
+  "hydreigon_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "guzzlord",
+      "clodsire",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "clodsire",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "clodsire",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "carbink": {
+   "p": [
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "empoleon",
+      "stunfisk"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "quagsire",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "quagsire",
+      "empoleon",
+      "stunfisk"
+     ]
+    }
+   ]
+  },
+  "hippowdon_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "altaria",
+      "empoleon",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "empoleon",
+      "quagsire"
+     ]
+    }
+   ]
+  },
+  "medicham": {
+   "p": [
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "sableye_shadow",
+      "ninetales_shadow"
+     ]
+    }
+   ]
+  },
+  "forretress": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "altaria",
+      "quagsire",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "altaria",
+      "guzzlord",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "moltres_galarian": {
+   "p": [
+    {
+     "id": "ninetales_shadow",
+     "covers": [
+      "tinkaton",
+      "feraligatr",
+      "stunfisk",
+      "corviknight"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "feraligatr",
+      "stunfisk"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "feraligatr"
+     ]
+    }
+   ]
+  },
+  "dragonair_shadow": {
+   "p": [
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "empoleon",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "empoleon",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "turtonator": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "quagsire",
+      "altaria",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "altaria"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "mimikyu",
+      "lickilicky",
+      "altaria",
+      "guzzlord"
+     ]
+    }
+   ]
+  },
+  "charjabug": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "altaria",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "mimikyu",
+      "altaria",
+      "lickilicky",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "cradily": {
+   "p": [
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "sableye_shadow",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton"
+     ]
+    }
+   ]
+  },
+  "diggersby": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "altaria",
+      "quagsire",
+      "jellicent",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "altaria",
+      "lickilicky",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "quagsire",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "ninetales_alolan": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "ninetales_shadow",
+      "tinkaton",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "lapras_shadow": {
+   "p": [
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "lickilicky",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "lickilicky",
+      "empoleon",
+      "tinkaton"
+     ]
+    }
+   ]
+  },
+  "swampert": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "sableye_shadow",
+      "altaria",
+      "quagsire",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "sableye_shadow",
+      "altaria",
+      "mimikyu"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "altaria",
+      "mimikyu",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "swampert_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "sableye_shadow",
+      "altaria",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "sableye_shadow",
+      "altaria",
+      "mimikyu",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "altaria",
+      "mimikyu",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "dewgong": {
+   "p": [
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "ninetales_shadow",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "ninetales_shadow",
+      "empoleon",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "empoleon",
+      "sableye_shadow"
+     ]
+    }
+   ]
+  },
+  "dusclops_shadow": {
+   "p": [
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "lickilicky",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "lickilicky",
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "ninetales_alolan_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "ninetales_shadow",
+      "tinkaton",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "doublade": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent",
+      "altaria"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "ninetales_shadow",
+      "lickilicky",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "ninetales_shadow",
+      "lickilicky",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "aegislash_shield": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "altaria",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "dusclops": {
+   "p": [
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "lickilicky",
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "marowak_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "altaria",
+      "ninetales_shadow",
+      "jellicent",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "altaria",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "dragonair": {
+   "p": [
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "empoleon",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "forretress_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "altaria",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "altaria",
+      "mimikyu"
+     ]
+    }
+   ]
+  },
+  "seismitoad": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "ninetales_shadow",
+      "lickilicky",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow",
+      "corviknight"
+     ]
+    }
+   ]
+  },
+  "gourgeist_large": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "sableye_shadow",
+      "altaria"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "sableye_shadow",
+      "mimikyu",
+      "altaria",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "gourgeist_super": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "altaria",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "ninetales_shadow",
+      "lickilicky",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "gourgeist_average": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "sableye_shadow",
+      "altaria"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "sableye_shadow",
+      "mimikyu",
+      "altaria",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "grumpig": {
+   "p": [
+    {
+     "id": "tinkaton",
+     "covers": [
+      "sableye_shadow",
+      "mimikyu",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "sableye_shadow",
+      "stunfisk"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "sableye_shadow",
+      "guzzlord",
+      "stunfisk"
+     ]
+    }
+   ]
+  },
+  "talonflame": {
+   "p": [
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "lickilicky",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "empoleon",
+      "altaria"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "registeel": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "quagsire",
+      "jellicent",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "ninetales_shadow",
+      "quagsire",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "quagsire",
+      "jellicent",
+      "sableye_shadow"
+     ]
+    }
+   ]
+  },
+  "gourgeist_small": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "altaria"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "ninetales_shadow",
+      "lickilicky",
+      "tinkaton",
+      "altaria"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "ninetales_shadow",
+      "tinkaton",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "clefable": {
+   "p": [
+    {
+     "id": "jellicent",
+     "covers": [
+      "empoleon",
+      "tinkaton",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "empoleon",
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "empoleon",
+      "tinkaton"
+     ]
+    }
+   ]
+  },
+  "drapion_shadow": {
+   "p": [
+    {
+     "id": "jellicent",
+     "covers": [
+      "empoleon",
+      "tinkaton",
+      "altaria"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "empoleon",
+      "tinkaton",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "empoleon",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "hydreigon": {
+   "p": [
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "empoleon",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "ninetales_shadow",
+     "covers": [
+      "tinkaton",
+      "quagsire",
+      "corviknight"
+     ]
+    }
+   ]
+  },
+  "oranguru": {
+   "p": [
+    {
+     "id": "quagsire",
+     "covers": [
+      "sableye_shadow",
+      "tinkaton",
+      "lickilicky",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "sableye_shadow",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "sableye_shadow",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "samurott": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent",
+      "altaria"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "steelix_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "quagsire",
+      "stunfisk",
+      "guzzlord",
+      "clodsire",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "quagsire",
+      "clodsire",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "guzzlord"
+     ]
+    }
+   ]
+  },
+  "talonflame_shadow": {
+   "p": [
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "lickilicky",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "jellicent",
+      "empoleon",
+      "altaria"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "wigglytuff": {
+   "p": [
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "empoleon",
+      "ninetales_shadow",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "empoleon",
+      "ninetales_shadow",
+      "quagsire"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "empoleon",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "walrein": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "forretress_shadow",
+      "ninetales_shadow",
+      "corsola_galarian",
+      "jellicent",
+      "feraligatr"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "forretress_shadow",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "ninetales_shadow",
+      "corsola_galarian",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "spiritomb": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "guzzlord",
+      "ninetales_shadow",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "guzzlord",
+      "mimikyu",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "jumpluff",
+     "covers": [
+      "guzzlord",
+      "mimikyu"
+     ]
+    }
+   ]
+  },
+  "steelix": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "quagsire",
+      "guzzlord",
+      "ninetales_shadow",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "tinkaton",
+     "covers": [
+      "guzzlord",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "quagsire",
+      "ninetales_shadow",
+      "sableye_shadow"
+     ]
+    }
+   ]
+  },
+  "zweilous": {
+   "p": [
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "altaria"
+     ]
+    },
+    {
+     "id": "ninetales_shadow",
+     "covers": [
+      "tinkaton",
+      "corviknight"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "altaria"
+     ]
+    }
+   ]
+  },
+  "metang": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "altaria",
+      "jellicent",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "altaria",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "jellicent",
+      "ninetales_shadow"
+     ]
+    }
+   ]
+  },
+  "metang_shadow": {
+   "p": [
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent",
+      "altaria"
+     ]
+    },
+    {
+     "id": "lickilicky",
+     "covers": [
+      "mimikyu",
+      "jellicent",
+      "altaria"
+     ]
+    },
+    {
+     "id": "sableye_shadow",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "walrein_shadow": {
+   "p": [
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "ninetales_shadow",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "ninetales_shadow",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "ninetales_shadow"
+     ]
+    }
+   ]
+  },
+  "zweilous_shadow": {
+   "p": [
+    {
+     "id": "ninetales_shadow",
+     "covers": [
+      "tinkaton",
+      "jumpluff",
+      "corviknight"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "jumpluff"
+     ]
+    },
+    {
+     "id": "quagsire",
+     "covers": [
+      "tinkaton",
+      "clodsire"
+     ]
+    }
+   ]
+  },
+  "bastiodon": {
+   "p": [
+    {
+     "id": "guzzlord",
+     "covers": [
+      "quagsire",
+      "empoleon",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "quagsire",
+      "empoleon",
+      "tinkaton"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "quagsire",
+      "empoleon",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "lickilicky": {
+   "p": [
+    {
+     "id": "guzzlord",
+     "covers": [
+      "quagsire",
+      "empoleon",
+      "sableye_shadow"
+     ]
+    },
+    {
+     "id": "mimikyu",
+     "covers": [
+      "quagsire",
+      "empoleon",
+      "sableye_shadow",
+      "ninetales_shadow"
+     ]
+    },
+    {
+     "id": "altaria",
+     "covers": [
+      "quagsire",
+      "sableye_shadow",
+      "ninetales_shadow"
+     ]
+    }
+   ]
+  }
+ },
+ "ultra": {
+  "corviknight": {
+   "p": [
+    {
+     "id": "virizion",
+     "covers": [
+      "forretress",
+      "jellicent",
+      "ampharos"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "forretress",
+      "jellicent",
+      "ampharos"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "forretress",
+      "florges",
+      "togekiss"
+     ]
+    }
+   ]
+  },
+  "corviknight_shadow": {
+   "p": [
+    {
+     "id": "florges",
+     "covers": [
+      "togekiss",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "guzzlord",
+      "feraligatr",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "togekiss",
+      "florges"
+     ]
+    }
+   ]
+  },
+  "virizion": {
+   "p": [
+    {
+     "id": "feraligatr",
+     "covers": [
+      "togekiss",
+      "skeledirge",
+      "florges",
+      "zygarde_complete"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "skeledirge",
+      "zygarde_complete"
+     ]
+    },
+    {
+     "id": "florges",
+     "covers": [
+      "togekiss",
+      "skeledirge",
+      "corviknight",
+      "zygarde_complete"
+     ]
+    }
+   ]
+  },
+  "empoleon": {
+   "p": [
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "feraligatr"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "jellicent",
+      "feraligatr",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    }
+   ]
+  },
+  "empoleon_shadow": {
+   "p": [
+    {
+     "id": "florges",
+     "covers": [
+      "virizion",
+      "corviknight",
+      "zygarde_complete",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "mimikyu": {
+   "p": [
+    {
+     "id": "virizion",
+     "covers": [
+      "lickilicky",
+      "forretress",
+      "tinkaton",
+      "empoleon",
+      "feraligatr"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "forretress",
+      "tinkaton",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "lickilicky",
+      "tinkaton",
+      "empoleon",
+      "feraligatr"
+     ]
+    }
+   ]
+  },
+  "florges": {
+   "p": [
+    {
+     "id": "jellicent",
+     "covers": [
+      "empoleon",
+      "tinkaton"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "empoleon",
+      "tinkaton",
+      "feraligatr",
+      "lickilicky",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "feraligatr",
+     "covers": [
+      "empoleon",
+      "tinkaton",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "moltres_galarian": {
+   "p": [
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "florges"
+     ]
+    },
+    {
+     "id": "florges",
+     "covers": [
+      "guzzlord",
+      "kingdra"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "tinkaton",
+      "guzzlord",
+      "lickilicky",
+      "kingdra"
+     ]
+    }
+   ]
+  },
+  "feraligatr_shadow": {
+   "p": [
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "virizion",
+      "empoleon",
+      "guzzlord",
+      "lickilicky",
+      "kingdra"
+     ]
+    },
+    {
+     "id": "florges",
+     "covers": [
+      "virizion",
+      "guzzlord",
+      "kingdra"
+     ]
+    }
+   ]
+  },
+  "feraligatr": {
+   "p": [
+    {
+     "id": "florges",
+     "covers": [
+      "guzzlord",
+      "kingdra",
+      "virizion",
+      "corviknight"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "guzzlord",
+      "kingdra",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "guzzlord",
+      "kingdra",
+      "lickilicky",
+      "virizion"
+     ]
+    }
+   ]
+  },
+  "jellicent": {
+   "p": [
+    {
+     "id": "florges",
+     "covers": [
+      "guzzlord",
+      "virizion",
+      "zygarde_complete"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "guzzlord",
+      "lickilicky",
+      "feraligatr"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "guzzlord",
+      "lickilicky",
+      "virizion",
+      "feraligatr",
+      "zygarde_complete"
+     ]
+    }
+   ]
+  },
+  "giratina_altered": {
+   "p": [
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "florges"
+     ]
+    },
+    {
+     "id": "feraligatr",
+     "covers": [
+      "tinkaton",
+      "florges",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "florges",
+      "corviknight"
+     ]
+    }
+   ]
+  },
+  "guzzlord": {
+   "p": [
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "florges",
+      "togekiss"
+     ]
+    },
+    {
+     "id": "feraligatr",
+     "covers": [
+      "tinkaton",
+      "florges",
+      "togekiss"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "florges",
+      "togekiss",
+      "corviknight"
+     ]
+    }
+   ]
+  },
+  "skeledirge": {
+   "p": [
+    {
+     "id": "guzzlord",
+     "covers": [
+      "feraligatr",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "feraligatr",
+      "lickilicky",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "forretress",
+     "covers": [
+      "corviknight"
+     ]
+    }
+   ]
+  },
+  "lapras": {
+   "p": [
+    {
+     "id": "virizion",
+     "covers": [
+      "tinkaton",
+      "jellicent",
+      "lickilicky",
+      "guzzlord",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent"
+     ]
+    },
+    {
+     "id": "feraligatr",
+     "covers": [
+      "tinkaton",
+      "jellicent",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "lapras_shadow": {
+   "p": [
+    {
+     "id": "virizion",
+     "covers": [
+      "lickilicky",
+      "jellicent",
+      "forretress",
+      "guzzlord",
+      "kingdra"
+     ]
+    },
+    {
+     "id": "florges",
+     "covers": [
+      "guzzlord",
+      "kingdra"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "forretress"
+     ]
+    }
+   ]
+  },
+  "dusknoir": {
+   "p": [
+    {
+     "id": "virizion",
+     "covers": [
+      "lickilicky",
+      "guzzlord",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "florges",
+     "covers": [
+      "guzzlord",
+      "togekiss"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "togekiss",
+      "florges"
+     ]
+    }
+   ]
+  },
+  "ninetales_alolan": {
+   "p": [
+    {
+     "id": "jellicent",
+     "covers": [
+      "empoleon",
+      "tinkaton",
+      "corviknight"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "feraligatr",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "feraligatr",
+     "covers": [
+      "empoleon",
+      "tinkaton",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "dondozo": {
+   "p": [
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "virizion",
+      "feraligatr",
+      "kingdra"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "feraligatr"
+     ]
+    }
+   ]
+  },
+  "dusknoir_shadow": {
+   "p": [
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "florges"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "tinkaton",
+      "lickilicky",
+      "feraligatr"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "corviknight",
+      "florges"
+     ]
+    }
+   ]
+  },
+  "registeel": {
+   "p": [
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "feraligatr"
+     ]
+    },
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    },
+    {
+     "id": "florges",
+     "covers": [
+      "virizion",
+      "zygarde_complete",
+      "corviknight"
+     ]
+    }
+   ]
+  },
+  "ninetales_alolan_shadow": {
+   "p": [
+    {
+     "id": "jellicent",
+     "covers": [
+      "empoleon",
+      "tinkaton",
+      "florges"
+     ]
+    },
+    {
+     "id": "feraligatr",
+     "covers": [
+      "empoleon",
+      "tinkaton",
+      "jellicent",
+      "florges"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "feraligatr"
+     ]
+    }
+   ]
+  },
+  "forretress": {
+   "p": [
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    },
+    {
+     "id": "florges",
+     "covers": [
+      "virizion",
+      "kingdra",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "virizion",
+      "kingdra",
+      "lickilicky",
+      "guzzlord"
+     ]
+    }
+   ]
+  },
+  "giratina_altered_shadow": {
+   "p": [
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "feraligatr"
+     ]
+    },
+    {
+     "id": "feraligatr",
+     "covers": [
+      "jellicent",
+      "tinkaton",
+      "florges",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "florges"
+     ]
+    }
+   ]
+  },
+  "regidrago": {
+   "p": [
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "florges",
+      "togekiss"
+     ]
+    },
+    {
+     "id": "feraligatr",
+     "covers": [
+      "tinkaton",
+      "florges",
+      "togekiss"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "florges",
+      "togekiss",
+      "corviknight",
+      "forretress"
+     ]
+    }
+   ]
+  },
+  "cresselia": {
+   "p": [
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "corviknight",
+      "empoleon",
+      "florges"
+     ]
+    },
+    {
+     "id": "forretress",
+     "covers": [
+      "corviknight"
+     ]
+    },
+    {
+     "id": "feraligatr",
+     "covers": [
+      "tinkaton",
+      "empoleon",
+      "florges",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "talonflame": {
+   "p": [
+    {
+     "id": "guzzlord",
+     "covers": [
+      "feraligatr",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "kingdra",
+      "feraligatr",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "kingdra",
+      "feraligatr",
+      "jellicent",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "forretress_shadow": {
+   "p": [
+    {
+     "id": "feraligatr",
+     "covers": [
+      "skeledirge",
+      "zygarde_complete"
+     ]
+    },
+    {
+     "id": "florges",
+     "covers": [
+      "skeledirge",
+      "virizion",
+      "zygarde_complete",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "skeledirge",
+      "virizion",
+      "zygarde_complete",
+      "guzzlord",
+      "lickilicky"
+     ]
+    }
+   ]
+  },
+  "walrein": {
+   "p": [
+    {
+     "id": "virizion",
+     "covers": [
+      "forretress",
+      "jellicent",
+      "lickilicky",
+      "tinkaton"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "forretress",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "forretress",
+      "tinkaton",
+      "corviknight"
+     ]
+    }
+   ]
+  },
+  "walrein_shadow": {
+   "p": [
+    {
+     "id": "virizion",
+     "covers": [
+      "ampharos",
+      "forretress",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "feraligatr",
+     "covers": [
+      "skeledirge",
+      "annihilape",
+      "jellicent"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "ampharos",
+      "forretress",
+      "jellicent"
+     ]
+    }
+   ]
+  },
+  "runerigus": {
+   "p": [
+    {
+     "id": "empoleon",
+     "covers": [
+      "florges"
+     ]
+    },
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "lickilicky",
+      "virizion",
+      "feraligatr",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "steelix": {
+   "p": [
+    {
+     "id": "empoleon",
+     "covers": [
+      "florges"
+     ]
+    },
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    },
+    {
+     "id": "florges",
+     "covers": [
+      "virizion",
+      "guzzlord"
+     ]
+    }
+   ]
+  },
+  "cresselia_shadow": {
+   "p": [
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "corviknight",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "forretress",
+     "covers": [
+      "corviknight"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "tinkaton",
+      "lickilicky",
+      "feraligatr",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "steelix_shadow": {
+   "p": [
+    {
+     "id": "florges",
+     "covers": [
+      "guzzlord",
+      "virizion",
+      "kingdra"
+     ]
+    },
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "guzzlord",
+      "virizion",
+      "kingdra",
+      "tinkaton"
+     ]
+    }
+   ]
+  },
+  "ampharos": {
+   "p": [
+    {
+     "id": "florges",
+     "covers": [
+      "virizion",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "guzzlord",
+      "lickilicky",
+      "tinkaton"
+     ]
+    }
+   ]
+  },
+  "cradily_shadow": {
+   "p": [
+    {
+     "id": "jellicent",
+     "covers": [
+      "tinkaton",
+      "empoleon",
+      "kingdra"
+     ]
+    },
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "tinkaton",
+      "empoleon",
+      "virizion",
+      "kingdra"
+     ]
+    }
+   ]
+  },
+  "ampharos_shadow": {
+   "p": [
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "virizion",
+      "lickilicky",
+      "tinkaton"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "florges"
+     ]
+    }
+   ]
+  },
+  "talonflame_shadow": {
+   "p": [
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "feraligatr"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "kingdra",
+      "jellicent",
+      "feraligatr",
+      "lickilicky",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "kingdra",
+      "feraligatr",
+      "lickilicky",
+      "empoleon"
+     ]
+    }
+   ]
+  },
+  "bellibolt": {
+   "p": [
+    {
+     "id": "florges",
+     "covers": [
+      "zygarde_complete",
+      "virizion",
+      "guzzlord",
+      "kingdra"
+     ]
+    },
+    {
+     "id": "skeledirge",
+     "covers": [
+      "virizion"
+     ]
+    },
+    {
+     "id": "corviknight",
+     "covers": [
+      "zygarde_complete",
+      "virizion",
+      "guzzlord",
+      "tinkaton",
+      "kingdra"
+     ]
+    }
+   ]
+  },
+  "doublade": {
+   "p": [
+    {
+     "id": "florges",
+     "covers": [
+      "corviknight",
+      "guzzlord"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "jellicent",
+      "guzzlord",
+      "feraligatr",
+      "lickilicky"
+     ]
+    },
+    {
+     "id": "guzzlord",
+     "covers": [
+      "jellicent",
+      "feraligatr"
+     ]
+    }
+   ]
+  },
+  "grumpig": {
+   "p": [
+    {
+     "id": "florges",
+     "covers": [
+      "guzzlord",
+      "corviknight"
+     ]
+    },
+    {
+     "id": "virizion",
+     "covers": [
+      "guzzlord",
+      "jellicent",
+      "feraligatr",
+      "empoleon"
+     ]
+    },
+    {
+     "id": "forretress",
+     "covers": [
+      "corviknight"
+     ]
+    }
+   ]
+  },
+  "grumpig_shadow": {
+   "p": [
+    {
+     "id": "forretress",
+     "covers": [
+      "corviknight"
+     ]
+    },
+    {
+     "id": "jellicent",
+     "covers": [
+      "corviknight",
+      "tinkaton",
+      "florges"
+     ]
+    },
+    {
+     "id": "empoleon",
+     "covers": [
+      "tinkaton",
+      "florges"
+     ]
+    }
+   ]
+  }
+ },
+ "master": {
+  "palkia_origin": {
+   "p": [
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "dialga_origin",
+      "xerneas",
+      "lugia",
+      "kyurem_white",
+      "zamazenta_crowned_shield"
+     ]
+    },
+    {
+     "id": "xerneas",
+     "covers": [
+      "dialga_origin",
+      "lugia",
+      "kyurem_white"
+     ]
+    },
+    {
+     "id": "ho_oh",
+     "covers": [
+      "xerneas",
+      "zamazenta_crowned_shield"
+     ]
+    }
+   ]
+  },
+  "zacian_crowned_sword": {
+   "p": [
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "groudon",
+      "necrozma_dawn_wings",
+      "ho_oh",
+      "kyogre",
+      "palkia_origin"
+     ]
+    },
+    {
+     "id": "kyurem_black",
+     "covers": [
+      "groudon",
+      "necrozma_dawn_wings",
+      "ho_oh",
+      "kyogre"
+     ]
+    },
+    {
+     "id": "kyogre",
+     "covers": [
+      "groudon",
+      "necrozma_dawn_wings",
+      "ho_oh"
+     ]
+    }
+   ]
+  },
+  "kyurem_white": {
+   "p": [
+    {
+     "id": "ho_oh",
+     "covers": [
+      "xerneas",
+      "dragonite",
+      "zacian_crowned_sword",
+      "zamazenta_crowned_shield"
+     ]
+    },
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "xerneas",
+      "dragonite",
+      "zamazenta_crowned_shield",
+      "dialga_origin"
+     ]
+    },
+    {
+     "id": "kyogre",
+     "covers": [
+      "xerneas",
+      "dragonite",
+      "zacian_crowned_sword",
+      "zamazenta_crowned_shield"
+     ]
+    }
+   ]
+  },
+  "kyogre": {
+   "p": [
+    {
+     "id": "xerneas",
+     "covers": [
+      "kyurem_white",
+      "palkia_origin",
+      "dialga_origin",
+      "lugia"
+     ]
+    },
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "kyurem_black",
+      "kyurem_white",
+      "dialga_origin",
+      "lugia"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "kyurem_black",
+      "kyurem_white",
+      "palkia_origin",
+      "lugia"
+     ]
+    }
+   ]
+  },
+  "dialga_origin": {
+   "p": [
+    {
+     "id": "kyogre",
+     "covers": [
+      "rhyperior",
+      "zacian_crowned_sword",
+      "zamazenta_crowned_shield",
+      "groudon",
+      "xerneas"
+     ]
+    },
+    {
+     "id": "necrozma_dawn_wings",
+     "covers": [
+      "zacian_crowned_sword",
+      "zamazenta_crowned_shield"
+     ]
+    },
+    {
+     "id": "ho_oh",
+     "covers": [
+      "zacian_crowned_sword",
+      "zamazenta_crowned_shield",
+      "groudon",
+      "xerneas"
+     ]
+    }
+   ]
+  },
+  "kyurem_black": {
+   "p": [
+    {
+     "id": "xerneas",
+     "covers": [
+      "kyurem_white",
+      "dialga_origin",
+      "palkia_origin"
+     ]
+    },
+    {
+     "id": "necrozma_dawn_wings",
+     "covers": [
+      "zacian_crowned_sword",
+      "zamazenta_crowned_shield"
+     ]
+    },
+    {
+     "id": "groudon",
+     "covers": [
+      "zacian_crowned_sword",
+      "dialga_origin"
+     ]
+    }
+   ]
+  },
+  "lugia": {
+   "p": [
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "kyurem_black",
+      "kyurem_white",
+      "dialga_origin",
+      "xerneas"
+     ]
+    },
+    {
+     "id": "xerneas",
+     "covers": [
+      "kyurem_white",
+      "dialga_origin"
+     ]
+    },
+    {
+     "id": "zamazenta_crowned_shield",
+     "covers": [
+      "kyurem_black",
+      "kyurem_white",
+      "dialga_origin",
+      "xerneas"
+     ]
+    }
+   ]
+  },
+  "lunala": {
+   "p": [
+    {
+     "id": "palkia_origin",
+     "covers": [
+      "ho_oh",
+      "kyurem_black",
+      "zacian_crowned_sword"
+     ]
+    },
+    {
+     "id": "kyogre",
+     "covers": [
+      "ho_oh",
+      "zacian_crowned_sword"
+     ]
+    },
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "ho_oh",
+      "kyurem_black"
+     ]
+    }
+   ]
+  },
+  "lugia_shadow": {
+   "p": [
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "dialga_origin",
+      "kyurem_black",
+      "zamazenta_crowned_shield",
+      "kyurem_white"
+     ]
+    },
+    {
+     "id": "zamazenta_crowned_shield",
+     "covers": [
+      "dialga_origin",
+      "kyurem_black",
+      "kyurem_white"
+     ]
+    },
+    {
+     "id": "xerneas",
+     "covers": [
+      "dialga_origin",
+      "kyurem_white"
+     ]
+    }
+   ]
+  },
+  "ho_oh": {
+   "p": [
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "palkia_origin",
+      "kyogre",
+      "kyurem_black",
+      "kyurem_white"
+     ]
+    },
+    {
+     "id": "xerneas",
+     "covers": [
+      "palkia_origin",
+      "kyurem_white",
+      "dialga_origin"
+     ]
+    },
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "palkia_origin",
+      "kyogre",
+      "kyurem_black"
+     ]
+    }
+   ]
+  },
+  "solgaleo": {
+   "p": [
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "ho_oh",
+      "palkia_origin",
+      "kyogre",
+      "lugia"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "ho_oh",
+      "landorus_therian",
+      "palkia_origin",
+      "kyogre",
+      "lugia"
+     ]
+    },
+    {
+     "id": "kyurem_black",
+     "covers": [
+      "ho_oh",
+      "landorus_therian",
+      "kyogre",
+      "lugia"
+     ]
+    }
+   ]
+  },
+  "primarina": {
+   "p": [
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "kyurem_black",
+      "kyogre",
+      "palkia_origin"
+     ]
+    },
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "kyurem_black",
+      "dialga_origin"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "kyurem_black",
+      "kyogre",
+      "palkia_origin"
+     ]
+    }
+   ]
+  },
+  "zygarde_complete": {
+   "p": [
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "dialga_origin",
+      "kyurem_black"
+     ]
+    },
+    {
+     "id": "zamazenta_crowned_shield",
+     "covers": [
+      "dialga_origin",
+      "kyurem_black",
+      "palkia_origin"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "kyurem_black",
+      "palkia_origin",
+      "kyogre"
+     ]
+    }
+   ]
+  },
+  "metagross": {
+   "p": [
+    {
+     "id": "xerneas",
+     "covers": [
+      "kyurem_white"
+     ]
+    },
+    {
+     "id": "kyurem_black",
+     "covers": [
+      "ho_oh",
+      "kyogre",
+      "landorus_therian",
+      "groudon"
+     ]
+    },
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "ho_oh",
+      "kyogre",
+      "groudon"
+     ]
+    }
+   ]
+  },
+  "xerneas": {
+   "p": [
+    {
+     "id": "palkia_origin",
+     "covers": [
+      "ho_oh",
+      "zacian_crowned_sword",
+      "kyogre",
+      "landorus_therian"
+     ]
+    },
+    {
+     "id": "kyogre",
+     "covers": [
+      "ho_oh",
+      "zacian_crowned_sword",
+      "zamazenta_crowned_shield",
+      "landorus_therian"
+     ]
+    },
+    {
+     "id": "kyurem_black",
+     "covers": [
+      "ho_oh",
+      "kyogre",
+      "landorus_therian"
+     ]
+    }
+   ]
+  },
+  "reshiram": {
+   "p": [
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "dialga_origin",
+      "lugia",
+      "landorus_therian",
+      "zamazenta_crowned_shield"
+     ]
+    },
+    {
+     "id": "xerneas",
+     "covers": [
+      "dialga_origin",
+      "palkia_origin",
+      "lugia"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "palkia_origin",
+      "lugia",
+      "landorus_therian"
+     ]
+    }
+   ]
+  },
+  "ursaluna": {
+   "p": [
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "dialga_origin",
+      "kyurem_black"
+     ]
+    },
+    {
+     "id": "groudon",
+     "covers": [
+      "dialga_origin",
+      "zacian_crowned_sword"
+     ]
+    },
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "kyogre",
+      "kyurem_black",
+      "palkia_origin"
+     ]
+    }
+   ]
+  },
+  "eternatus": {
+   "p": [
+    {
+     "id": "necrozma_dawn_wings",
+     "covers": [
+      "zacian_crowned_sword",
+      "zamazenta_crowned_shield"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "palkia_origin",
+      "landorus_therian"
+     ]
+    },
+    {
+     "id": "xerneas",
+     "covers": [
+      "palkia_origin",
+      "dialga_origin"
+     ]
+    }
+   ]
+  },
+  "reshiram_shadow": {
+   "p": [
+    {
+     "id": "xerneas",
+     "covers": [
+      "palkia_origin",
+      "kyurem_white"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "landorus_therian",
+      "kyogre",
+      "palkia_origin",
+      "kyurem_white"
+     ]
+    },
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "kyogre",
+      "palkia_origin"
+     ]
+    }
+   ]
+  },
+  "zamazenta_crowned_shield": {
+   "p": [
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "necrozma_dawn_wings",
+      "kyogre",
+      "ho_oh",
+      "lugia"
+     ]
+    },
+    {
+     "id": "kyurem_black",
+     "covers": [
+      "necrozma_dawn_wings",
+      "kyogre",
+      "ho_oh",
+      "lugia"
+     ]
+    },
+    {
+     "id": "palkia_origin",
+     "covers": [
+      "necrozma_dawn_wings",
+      "kyogre",
+      "ho_oh",
+      "zacian_crowned_sword"
+     ]
+    }
+   ]
+  },
+  "ursaluna_shadow": {
+   "p": [
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "palkia_origin",
+      "kyogre",
+      "kyurem_black"
+     ]
+    },
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "dialga_origin",
+      "kyurem_black"
+     ]
+    },
+    {
+     "id": "groudon",
+     "covers": [
+      "dialga_origin",
+      "zacian_crowned_sword"
+     ]
+    }
+   ]
+  },
+  "necrozma_dawn_wings": {
+   "p": [
+    {
+     "id": "xerneas",
+     "covers": [
+      "kyurem_white",
+      "dialga_origin",
+      "palkia_origin"
+     ]
+    },
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "kyurem_white",
+      "kyurem_black",
+      "dialga_origin"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "kyurem_white",
+      "kyurem_black",
+      "kyogre",
+      "palkia_origin"
+     ]
+    }
+   ]
+  },
+  "marshadow": {
+   "p": [
+    {
+     "id": "kyogre",
+     "covers": [
+      "ho_oh",
+      "xerneas",
+      "groudon"
+     ]
+    },
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "ho_oh",
+      "groudon",
+      "kyogre",
+      "palkia_origin"
+     ]
+    },
+    {
+     "id": "palkia_origin",
+     "covers": [
+      "ho_oh",
+      "kyogre"
+     ]
+    }
+   ]
+  },
+  "zekrom": {
+   "p": [
+    {
+     "id": "xerneas",
+     "covers": [
+      "kyurem_white",
+      "palkia_origin"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "kyurem_white",
+      "palkia_origin",
+      "landorus_therian"
+     ]
+    },
+    {
+     "id": "kyogre",
+     "covers": [
+      "xerneas",
+      "zamazenta_crowned_shield",
+      "landorus_therian"
+     ]
+    }
+   ]
+  },
+  "necrozma_dusk_mane": {
+   "p": [
+    {
+     "id": "xerneas",
+     "covers": [
+      "kyurem_white",
+      "palkia_origin"
+     ]
+    },
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "ho_oh",
+      "kyogre",
+      "palkia_origin"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "kyurem_white",
+      "ho_oh",
+      "kyogre",
+      "palkia_origin"
+     ]
+    }
+   ]
+  },
+  "palkia_shadow": {
+   "p": [
+    {
+     "id": "xerneas",
+     "covers": [
+      "palkia_origin",
+      "kyurem_white"
+     ]
+    },
+    {
+     "id": "necrozma_dawn_wings",
+     "covers": [
+      "zacian_crowned_sword",
+      "zamazenta_crowned_shield"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "palkia_origin",
+      "kyurem_white",
+      "kyurem_black"
+     ]
+    }
+   ]
+  },
+  "garchomp_shadow": {
+   "p": [
+    {
+     "id": "kyogre",
+     "covers": [
+      "zamazenta_crowned_shield",
+      "ho_oh",
+      "landorus_therian"
+     ]
+    },
+    {
+     "id": "necrozma_dawn_wings",
+     "covers": [
+      "zamazenta_crowned_shield"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "palkia_origin",
+      "ho_oh",
+      "landorus_therian",
+      "kyogre"
+     ]
+    }
+   ]
+  },
+  "groudon": {
+   "p": [
+    {
+     "id": "palkia_origin",
+     "covers": [
+      "ho_oh",
+      "kyurem_black",
+      "landorus_therian",
+      "kyogre"
+     ]
+    },
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "ho_oh",
+      "kyurem_black",
+      "kyogre"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "ho_oh",
+      "kyurem_black",
+      "kyurem_white",
+      "landorus_therian",
+      "kyogre"
+     ]
+    }
+   ]
+  },
+  "metagross_shadow": {
+   "p": [
+    {
+     "id": "xerneas",
+     "covers": [
+      "kyurem_white",
+      "palkia_origin"
+     ]
+    },
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "landorus_therian",
+      "kyurem_white",
+      "zygarde_complete",
+      "ho_oh",
+      "palkia_origin"
+     ]
+    },
+    {
+     "id": "kyogre",
+     "covers": [
+      "landorus_therian",
+      "zygarde_complete",
+      "ho_oh"
+     ]
+    }
+   ]
+  },
+  "melmetal": {
+   "p": [
+    {
+     "id": "kyogre",
+     "covers": [
+      "groudon",
+      "landorus_therian",
+      "ho_oh",
+      "zacian_crowned_sword",
+      "zamazenta_crowned_shield"
+     ]
+    },
+    {
+     "id": "palkia_origin",
+     "covers": [
+      "landorus_therian",
+      "ho_oh",
+      "zacian_crowned_sword"
+     ]
+    },
+    {
+     "id": "kyurem_black",
+     "covers": [
+      "groudon",
+      "landorus_therian",
+      "ho_oh"
+     ]
+    }
+   ]
+  },
+  "keldeo_resolute": {
+   "p": [
+    {
+     "id": "dialga_origin",
+     "covers": [
+      "lugia",
+      "palkia_origin",
+      "landorus_therian",
+      "ho_oh"
+     ]
+    },
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "xerneas",
+      "lugia",
+      "landorus_therian"
+     ]
+    },
+    {
+     "id": "kyogre",
+     "covers": [
+      "xerneas",
+      "landorus_therian",
+      "ho_oh"
+     ]
+    }
+   ]
+  },
+  "garchomp": {
+   "p": [
+    {
+     "id": "kyurem_black",
+     "covers": [
+      "lugia",
+      "kyogre"
+     ]
+    },
+    {
+     "id": "kyurem_white",
+     "covers": [
+      "lugia",
+      "kyogre"
+     ]
+    },
+    {
+     "id": "zacian_crowned_sword",
+     "covers": [
+      "lugia",
+      "xerneas",
+      "zamazenta_crowned_shield"
+     ]
+    }
+   ]
+  }
+ }
+}
