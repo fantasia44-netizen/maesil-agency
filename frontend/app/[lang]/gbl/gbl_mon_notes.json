@@ -1,76 +1,148 @@
 {
  "great": {
   "tinkaton": {
-   "ko": "강철/페어리 로 같은 강철도 쉽게이기고, 드래곤도 잡으며 레거시기술 거대해머의 사기적인 데미지로 반감있는 녀석조차 실드 쓰지않으면 매우 아프게 때릴수있어서, 선봉에 주로사용되고 후봉에도 가끔등장하며 땅,불 약점만 잘피하면 아주좋은포켓몬"
+   "ko": "강철/페어리 로 같은 강철도 쉽게이기고, 드래곤도 잡으며 레거시기술 거대해머의 사기적인 데미지로 반감있는 녀석조차 실드 쓰지않으면 매우 아프게 때릴수있어서, 선봉에 주로사용되고 후봉에도 가끔등장하며 땅,불 약점만 잘피하면 아주좋은포켓몬",
+   "en": "Steel/Fairy typing lets it beat other Steel types with ease and handle Dragons too. Its legacy move Gigaton Hammer hits absurdly hard — even Pokémon that resist it take heavy damage without a shield. Mostly run in the lead, occasionally in the back. Dodge its Ground and Fire weaknesses and it's an excellent pick.",
+   "ja": "はがね/フェアリー複合で同じはがねにも楽に勝て、ドラゴンも処理できる。レガシー技デカハンマーの火力が理不尽で、半減の相手でもシールドなしなら大きく削られる。主に先発、たまに後衛でも登場。じめん・ほのおの弱点さえ避ければ非常に優秀。",
+   "zh-TW": "鋼/妖精屬性讓牠輕鬆打贏其他鋼系，也能處理龍系。傳承招式巨力錘傷害離譜，連減半的對手不開護盾也會被打掉大量血量。主要當先鋒，偶爾也放後排。只要避開地面·火的弱點就非常好用。"
   },
   "altaria": {
-   "ko": "드래곤/비행 타입으로 튼튼한체력 빠른공격, 얼음 2중약점이지만 슈퍼리그엔 얼음이별로없고 전기에도 중립이라 선봉으로 페어리만 피하면 대부분 상대가 가능한 포켓몬"
+   "ko": "드래곤/비행 타입으로 튼튼한체력 빠른공격, 얼음 2중약점이지만 슈퍼리그엔 얼음이별로없고 전기에도 중립이라 선봉으로 페어리만 피하면 대부분 상대가 가능한 포켓몬",
+   "en": "Dragon/Flying with solid bulk and fast pressure. Double-weak to Ice, but Ice is rare in Great League and it's neutral to Electric, so as a lead it handles most matchups as long as you avoid Fairy.",
+   "ja": "ドラゴン/ひこうで耐久が高く攻撃も速い。こおり4倍弱点だがスーパーリーグにこおりは少なく、でんきにも等倍なので、先発でフェアリーさえ避ければほとんどの相手に対応できる。",
+   "zh-TW": "龍/飛行，耐久紮實、出招快。雖然冰系四倍弱點，但超級聯盟冰系很少，對電系也是一般傷害，先鋒只要避開妖精，大多數對手都能應付。"
   },
   "empoleon": {
-   "ko": "물/강철 타입으로 격투,땅,전기에 약점이나 빠른 특수기 하이드로캐논과, 비행공격으로 풀/격투도 견재 가능해서 선두로 많이쓰이는 포켓몬"
+   "ko": "물/강철 타입으로 격투,땅,전기에 약점이나 빠른 특수기 하이드로캐논과, 비행공격으로 풀/격투도 견재 가능해서 선두로 많이쓰이는 포켓몬",
+   "en": "Water/Steel, weak to Fighting, Ground and Electric, but fast-charging Hydro Cannon plus a Flying move lets it check Grass and Fighting too — a very common lead.",
+   "ja": "みず/はがねでかくとう・じめん・でんきが弱点だが、溜まりの速いハイドロカノンとひこう技でくさ/かくとうも牽制できるため、先発でよく使われる。",
+   "zh-TW": "水/鋼，弱點是格鬥·地面·電，但集能快的加農水炮加上飛行招式也能牽制草/格鬥，是很常見的先鋒。"
   },
   "mimikyu": {
-   "ko": "고스트/페어리 타입 이라 약점인 고스트와,강철이지만 따라큐탈이라는 셀프1실드가 있어서, 특수기 방어도 버틸수있고, 노멀타입빼고 대부분 상대가 가능하며 드래곤 악에게 쉽게 이길수있는 포켓몬"
+   "ko": "고스트/페어리 타입 이라 약점인 고스트와,강철이지만 따라큐탈이라는 셀프1실드가 있어서, 특수기 방어도 버틸수있고, 노멀타입빼고 대부분 상대가 가능하며 드래곤 악에게 쉽게 이길수있는 포켓몬",
+   "en": "Ghost/Fairy, weak to Ghost and Steel, but Disguise acts as a free extra shield, so it can even eat a charged move. Handles almost everything except Normal types and beats Dragon and Dark with ease.",
+   "ja": "ゴースト/フェアリーでゴースト・はがねが弱点だが、ばけのかわが実質1枚の無料シールドになり、ゲージ技も耐えられる。ノーマル以外ほぼ対応でき、ドラゴン・あくには楽に勝てる。",
+   "zh-TW": "幽靈/妖精，弱點是幽靈和鋼，但畫皮等於多一面免費護盾，連特殊招式都能扛。除了一般系幾乎都能應付，對龍和惡系輕鬆取勝。"
   },
   "quagsire": {
-   "ko": "풀 이중약점을 제외하곤 약점이 없고, 차징이 빨리차는 머드샷을 장착해서, 아쿠아테일, 스톤엣지, 어느기술을 쓸지 잘모르기 때문에 상대하는 측에서 아주 까다로운 포켓몬"
+   "ko": "풀 이중약점을 제외하곤 약점이 없고, 차징이 빨리차는 머드샷을 장착해서, 아쿠아테일, 스톤엣지, 어느기술을 쓸지 잘모르기 때문에 상대하는 측에서 아주 까다로운 포켓몬",
+   "en": "No weaknesses apart from a double weakness to Grass. Runs fast-charging Mud Shot, and because the opponent can't tell whether Aqua Tail or Stone Edge is coming, it's a very awkward Pokémon to face.",
+   "ja": "くさ4倍以外に弱点がなく、溜まりの速いマッドショットを持つ。アクアテールとストーンエッジのどちらが来るか相手には読めないため、対面すると非常に厄介。",
+   "zh-TW": "除了草系四倍弱點之外沒有弱點，配上集能快的泥巴射擊，對手猜不到會出水流尾還是尖石攻擊，是非常難纏的寶可夢。"
   },
   "jellicent": {
-   "ko": "고스트/물 타입으로 튼튼한 체력으로 고스트 약점이면서도 고스트스킬 맞아도 버틸수있고, 불과 격투타입에 아주 강한 포켓몬"
+   "ko": "고스트/물 타입으로 튼튼한 체력으로 고스트 약점이면서도 고스트스킬 맞아도 버틸수있고, 불과 격투타입에 아주 강한 포켓몬",
+   "en": "Ghost/Water with great bulk — weak to Ghost yet sturdy enough to survive Ghost attacks, and very strong against Fire and Fighting types.",
+   "ja": "ゴースト/みずで耐久が高い。ゴースト弱点だがゴースト技を受けても耐えられ、ほのお・かくとうにはとても強い。",
+   "zh-TW": "幽靈/水，耐久出色。雖然弱幽靈，但挨幽靈招式也撐得住，對火系和格鬥系非常強。"
   },
   "forretress": {
-   "ko": "불꽃 이중약점만 안만나게되면 어떤타입과도 잘싸우고, 암석봉인으로 상대 공격력약화, 모래 뿌리기로 상대방어감소까지 할수있어 체력도 튼튼하며 선봉으로 아주 좋은포켓몬"
+   "ko": "불꽃 이중약점만 안만나게되면 어떤타입과도 잘싸우고, 암석봉인으로 상대 공격력약화, 모래지옥으로 상대방어감소까지 할수있어 체력도 튼튼하며 선봉으로 아주 좋은포켓몬",
+   "en": "As long as it avoids its double Fire weakness it fights well against any type. Rock Tomb lowers the opponent's Attack and Sand Tomb lowers their Defense, and with its solid bulk it's an excellent lead.",
+   "ja": "ほのお4倍弱点さえ踏まなければどのタイプとも渡り合える。がんせきふうじで相手の攻撃を、すなじごくで防御を下げられ、耐久も高いので先発として非常に優秀。",
+   "zh-TW": "只要不碰上火系四倍弱點，對任何屬性都打得不錯。岩石封鎖降低對手攻擊、流沙深淵降低防禦，耐久也紮實，是很棒的先鋒。"
   },
   "ninetales": {
-   "ko": "불꽃타입 나인테일은 불꽃세례를 받으면서 아주 빠른 차징기를 익혀지고  웨더볼, 에너지볼을 사용하면서 빠른불꽃기술과 풀타입기술까지 사용하면서 빠르고 강한공격이 장점인 포켓몬"
+   "ko": "불꽃타입 나인테일은 불꽃세례를 받으면서 아주 빠른 차징기를 익혀지고  웨더볼, 에너지볼을 사용하면서 빠른불꽃기술과 풀타입기술까지 사용하면서 빠르고 강한공격이 장점인 포켓몬",
+   "en": "Fire-type Ninetales builds energy very fast with Ember, and with Weather Ball and Energy Ball it throws out quick Fire and Grass attacks — fast, hard-hitting offense is its strength.",
+   "ja": "ほのおタイプのキュウコンはひのこでゲージが非常に速く溜まり、ウェザーボール・エナジーボールでほのお技とくさ技を素早く撃てる。速くて強い攻撃が持ち味。",
+   "zh-TW": "火系九尾用火花集能極快，搭配氣象球和能量球能快速打出火系和草系攻擊，快而強的進攻是牠的長處。"
   },
   "feraligatr": {
-   "ko": "물타입으로 풀과 전기에 약점이지만, 빠른 차징인 새도클로를 익혀서, 빠르고 강한 하이드로캐논을 주로사용하며 비행과/드래곤을 상대하기위해 냉동빔을 쓸수도있고, 고스트를 잡기위해 깨물어부수기도 익힐수있으며, 공격방어 둘다 훌륭하다."
+   "ko": "물타입으로 풀과 전기에 약점이지만, 빠른 차징인 섀도클로를 익혀서, 빠르고 강한 하이드로캐논을 주로사용하며 비행과/드래곤을 상대하기위해 냉동빔을 쓸수도있고, 고스트를 잡기위해 깨물어부수기도 익힐수있으며, 공격방어 둘다 훌륭하다.",
+   "en": "Water-type, weak to Grass and Electric, but with fast-charging Shadow Claw it fires off strong Hydro Cannons, can run Ice Beam for Flying and Dragon, and Crunch for Ghosts. Excellent on both offense and defense.",
+   "ja": "みずタイプでくさ・でんきが弱点だが、溜まりの速いシャドークローから強力なハイドロカノンを連発できる。ひこう・ドラゴン対策にれいとうビーム、ゴースト対策にかみくだくも選べ、攻守ともに優秀。",
+   "zh-TW": "水系，弱草和電，但靠集能快的暗影爪能連發強力加農水炮，可帶冰凍光束對付飛行/龍，也能學咬碎打幽靈，攻守都很優秀。"
   },
   "corsola_galarian": {
-   "ko": "고스트타입으로 악/고스트 약점이지만 강한평타기술 놀래키기로 같은고스트에게 아주 강하며, 파워젬으로 공중몬도 이길수가있다, 노멀타입에겐 불리한 포켓몬"
+   "ko": "고스트타입으로 악/고스트 약점이지만 강한평타기술 놀래키기로 같은고스트에게 아주 강하며, 파워젬으로 공중몬도 이길수가있다, 노멀타입에겐 불리한 포켓몬",
+   "en": "A Ghost type weak to Dark and Ghost, but its powerful fast move Astonish makes it very strong against other Ghosts, and Power Gem lets it beat Flying types too. Struggles against Normal types.",
+   "ja": "ゴーストタイプであく・ゴーストが弱点だが、強力な通常技おどろかすで同じゴーストにとても強く、パワージェムでひこうにも勝てる。ノーマルには不利。",
+   "zh-TW": "幽靈系，弱惡和幽靈，但強力的小招驚嚇讓牠對同為幽靈的對手非常強，力量寶石也能打贏飛行系。對一般系不利。"
   },
   "jumpluff": {
-   "ko": "풀/비행 타입이면서 기본기는 요정의바람을 사용해서 격투/악/드래곤에게 잘 싸우며, 아주 강한 비행기술 애크러뱃을 익힐수있어서, 아주 강한 공격을 할수있다. 얼음에 2중약점이라 얼음타입은 피해야한다"
+   "ko": "풀/비행 타입이면서 기본기는 요정의바람을 사용해서 격투/악/드래곤에게 잘 싸우며, 아주 강한 비행기술 애크러뱃을 익힐수있어서, 아주 강한 공격을 할수있다. 얼음에 2중약점이라 얼음타입은 피해야한다",
+   "en": "Grass/Flying that runs Fairy Wind as its fast move, so it does well against Fighting, Dark and Dragon, and it can learn the very powerful Flying move Acrobatics for huge damage. Double-weak to Ice, so avoid Ice types.",
+   "ja": "くさ/ひこうで通常技はようせいのかぜを使い、かくとう/あく/ドラゴンに強い。強力なひこう技アクロバットも覚え、高い攻撃力を出せる。こおり4倍弱点なのでこおりタイプは避けること。",
+   "zh-TW": "草/飛行，小招用妖精之風，對格鬥/惡/龍都打得不錯，還能學超強的飛行招式雜技打出高傷害。冰系四倍弱點，要避開冰系。"
   },
   "clodsire": {
-   "ko": "독/땅 타입으로 땅,물,얼음,에스퍼에 약점이지반 튼튼한 체력을 바탕으로 싸우며, 빠르게 차징에너지를채워주는 독침으로, 지진을 주로 사용하고, 스톤에지나 오물폭탄중 유저들의 취향에따라 사용된다."
+   "ko": "독/땅 타입으로 땅,물,얼음,에스퍼에 약점이지반 튼튼한 체력을 바탕으로 싸우며, 빠르게 차징에너지를채워주는 독침으로, 지진을 주로 사용하고, 스톤에지나 오물폭탄중 유저들의 취향에따라 사용된다.",
+   "en": "Poison/Ground, weak to Ground, Water, Ice and Psychic, but it fights on its sturdy bulk. Poison Sting charges energy quickly into Earthquake as the main move, with Stone Edge or Sludge Bomb chosen by player preference.",
+   "ja": "どく/じめんでじめん・みず・こおり・エスパーが弱点だが、高い耐久で戦う。どくばりで素早くゲージを溜め、じしんを主軸に、ストーンエッジかヘドロばくだんは好みで選ばれる。",
+   "zh-TW": "毒/地面，弱地面·水·冰·超能力，但靠紮實的耐久作戰。毒針集能快，主要打地震，尖石攻擊或污泥炸彈則看玩家喜好。"
   },
   "corviknight": {
-   "ko": "강철/비행의 아머까오는 튼튼한 체력을 바탕으로 모래뿌리기 땅공격을 기본으로 하며, 악타입 보복과, 공격을 올려주는 에어커터를 주로 사용한다, 페어리를 잡기위해 아이언헤드를 사용하기도한다"
+   "ko": "강철/비행의 아머까오는 튼튼한 체력을 바탕으로 모래뿌리기 땅공격을 기본으로 하며, 악타입 보복과, 공격을 올려주는 에어커터를 주로 사용한다, 페어리를 잡기위해 아이언헤드를 사용하기도한다",
+   "en": "Steel/Flying Corviknight leans on its bulk, using the Ground fast move Sand Attack, the Dark move Payback and Attack-boosting Air Cutter as its core, with Iron Head sometimes added to handle Fairies.",
+   "ja": "はがね/ひこうのアーマーガアは高い耐久を軸に、じめん技すなかけを通常技に、あく技しっぺがえしと攻撃を上げるエアカッターを主に使う。フェアリー対策にアイアンヘッドを採用することも。",
+   "zh-TW": "鋼/飛行的鋼鎧鴉以紮實耐久為本，小招用地面招潑沙，主要使用惡系以牙還牙和能提升攻擊的空氣利刃，有時也帶鐵頭對付妖精。"
   },
   "fearow": {
-   "ko": "노멀/비행으로 고스트와 땅타입에 강하며, 차징이 빠르면서 데미지도좋은 쪼기를 기본기로 사용하며, 드릴라이너,회전부리를 주로 사용한다. 체력은 약하지만 공격력이 좋아, 공격적인 스타일에 많이사용된다."
+   "ko": "노멀/비행으로 고스트와 땅타입에 강하며, 차징이 빠르면서 데미지도좋은 쪼기를 기본기로 사용하며, 드릴라이너,회전부리를 주로 사용한다. 체력은 약하지만 공격력이 좋아, 공격적인 스타일에 많이사용된다.",
+   "en": "Normal/Flying, strong against Ghost and Ground. Peck charges fast while hitting hard, and it mainly runs Drill Run and Drill Peck. Low bulk but high attack — favored in aggressive playstyles.",
+   "ja": "ノーマル/ひこうでゴースト・じめんに強い。溜まりが速く威力も高いつつくを通常技に、ドリルライナーとドリルくちばしを主に使う。耐久は低いが攻撃力が高く、攻撃的なスタイルでよく使われる。",
+   "zh-TW": "一般/飛行，對幽靈和地面系強。小招啄集能快又有傷害，主要用直衝鑽和啄鑽。耐久偏低但攻擊力好，常見於進攻型打法。"
   },
   "azumarill": {
-   "ko": "튼튼한 체력을 바탕으로 아주 오랫동안 인기를 받는 페어리/물타입의 마릴리, 물공격 거품을 기본기로하며, 냉동빔과 치근거리기를 주로사용하나, 하이드로펌프를 익혀서 쓰는 유저도 있다."
+   "ko": "튼튼한 체력을 바탕으로 아주 오랫동안 인기를 받는 페어리/물타입의 마릴리, 물공격 거품을 기본기로하며, 냉동빔과 치근거리기를 주로사용하나, 하이드로펌프를 익혀서 쓰는 유저도 있다.",
+   "en": "A Fairy/Water Pokémon that's stayed popular for a long time thanks to its bulk. Runs the Water fast move Bubble, mainly with Ice Beam and Play Rough, though some players learn Hydro Pump instead.",
+   "ja": "高い耐久で長く人気を保つフェアリー/みずのマリルリ。みず技あわを通常技に、れいとうビームとじゃれつくを主に使うが、ハイドロポンプを覚えさせて使う人もいる。",
+   "zh-TW": "靠紮實耐久長期受歡迎的妖精/水系瑪力露麗。小招用水系泡沫，主要用冰凍光束和嬉鬧，也有玩家改學水炮。"
   },
   "kingdra": {
-   "ko": "물/드래곤타입으로 용의숨결을 사용하며, 스피드스타와 파도타기를 주로 사용한다. 빠른 물공격과 노멀공격으로 인기있는 포켓몬"
+   "ko": "물/드래곤타입으로 용의숨결을 사용하며, 스피드스타와 파도타기를 주로 사용한다. 빠른 물공격과 노멀공격으로 인기있는 포켓몬",
+   "en": "Water/Dragon that uses Dragon Breath, with Swift and Surf as its main charged moves. Popular for its quick Water and Normal attacks.",
+   "ja": "みず/ドラゴンでりゅうのいぶきを使い、スピードスターとなみのりを主に使う。速いみず技とノーマル技で人気のポケモン。",
+   "zh-TW": "水/龍，使用龍息，主要打高速星星和衝浪。靠快速的水系和一般系攻擊而受歡迎的寶可夢。"
   },
   "altaria_shadow": {
-   "ko": "드래곤/비행 타입으로 튼튼한체력 빠른공격, 얼음 2중약점이지만 슈퍼리그엔 얼음이별로없고 전기에도 중립이라 선봉으로 페어리만 피하면 대부분 상대가 가능한 포켓몬"
+   "ko": "드래곤/비행 타입으로 튼튼한체력 빠른공격, 얼음 2중약점이지만 슈퍼리그엔 얼음이별로없고 전기에도 중립이라 선봉으로 페어리만 피하면 대부분 상대가 가능한 포켓몬",
+   "en": "Dragon/Flying with solid bulk and fast pressure. Double-weak to Ice, but Ice is rare in Great League and it's neutral to Electric, so as a lead it handles most matchups as long as you avoid Fairy.",
+   "ja": "ドラゴン/ひこうで耐久が高く攻撃も速い。こおり4倍弱点だがスーパーリーグにこおりは少なく、でんきにも等倍なので、先発でフェアリーさえ避ければほとんどの相手に対応できる。",
+   "zh-TW": "龍/飛行，耐久紮實、出招快。雖然冰系四倍弱點，但超級聯盟冰系很少，對電系也是一般傷害，先鋒只要避開妖精，大多數對手都能應付。"
   },
   "empoleon_shadow": {
-   "ko": "물/강철 타입으로 격투,땅,전기에 약점이나 빠른 특수기 하이드로캐논과, 비행공격으로 풀/격투도 견재 가능해서 선두로 많이쓰이는 포켓몬"
+   "ko": "물/강철 타입으로 격투,땅,전기에 약점이나 빠른 특수기 하이드로캐논과, 비행공격으로 풀/격투도 견재 가능해서 선두로 많이쓰이는 포켓몬",
+   "en": "Water/Steel, weak to Fighting, Ground and Electric, but fast-charging Hydro Cannon plus a Flying move lets it check Grass and Fighting too — a very common lead.",
+   "ja": "みず/はがねでかくとう・じめん・でんきが弱点だが、溜まりの速いハイドロカノンとひこう技でくさ/かくとうも牽制できるため、先発でよく使われる。",
+   "zh-TW": "水/鋼，弱點是格鬥·地面·電，但集能快的加農水炮加上飛行招式也能牽制草/格鬥，是很常見的先鋒。"
   },
   "quagsire_shadow": {
-   "ko": "풀 이중약점을 제외하곤 약점이 없고, 차징이 빨리차는 머드샷을 장착해서, 아쿠아테일, 스톤엣지, 어느기술을 쓸지 잘모르기 때문에 상대하는 측에서 아주 까다로운 포켓몬"
+   "ko": "풀 이중약점을 제외하곤 약점이 없고, 차징이 빨리차는 머드샷을 장착해서, 아쿠아테일, 스톤엣지, 어느기술을 쓸지 잘모르기 때문에 상대하는 측에서 아주 까다로운 포켓몬",
+   "en": "No weaknesses apart from a double weakness to Grass. Runs fast-charging Mud Shot, and because the opponent can't tell whether Aqua Tail or Stone Edge is coming, it's a very awkward Pokémon to face.",
+   "ja": "くさ4倍以外に弱点がなく、溜まりの速いマッドショットを持つ。アクアテールとストーンエッジのどちらが来るか相手には読めないため、対面すると非常に厄介。",
+   "zh-TW": "除了草系四倍弱點之外沒有弱點，配上集能快的泥巴射擊，對手猜不到會出水流尾還是尖石攻擊，是非常難纏的寶可夢。"
   },
   "ninetales_shadow": {
-   "ko": "불꽃타입 나인테일은 불꽃세례를 받으면서 아주 빠른 차징기를 익혀지고  웨더볼, 에너지볼을 사용하면서 빠른불꽃기술과 풀타입기술까지 사용하면서 빠르고 강한공격이 장점인 포켓몬"
+   "ko": "불꽃타입 나인테일은 불꽃세례를 받으면서 아주 빠른 차징기를 익혀지고  웨더볼, 에너지볼을 사용하면서 빠른불꽃기술과 풀타입기술까지 사용하면서 빠르고 강한공격이 장점인 포켓몬",
+   "en": "Fire-type Ninetales builds energy very fast with Ember, and with Weather Ball and Energy Ball it throws out quick Fire and Grass attacks — fast, hard-hitting offense is its strength.",
+   "ja": "ほのおタイプのキュウコンはひのこでゲージが非常に速く溜まり、ウェザーボール・エナジーボールでほのお技とくさ技を素早く撃てる。速くて強い攻撃が持ち味。",
+   "zh-TW": "火系九尾用火花集能極快，搭配氣象球和能量球能快速打出火系和草系攻擊，快而強的進攻是牠的長處。"
   },
   "forretress_shadow": {
-   "ko": "불꽃 이중약점만 안만나게되면 어떤타입과도 잘싸우고, 암석봉인으로 상대 공격력약화, 모래 뿌리기로 상대방어감소까지 할수있어 체력도 튼튼하며 선봉으로 아주 좋은포켓몬"
+   "ko": "불꽃 이중약점만 안만나게되면 어떤타입과도 잘싸우고, 암석봉인으로 상대 공격력약화, 모래지옥으로 상대방어감소까지 할수있어 체력도 튼튼하며 선봉으로 아주 좋은포켓몬",
+   "en": "As long as it avoids its double Fire weakness it fights well against any type. Rock Tomb lowers the opponent's Attack and Sand Tomb lowers their Defense, and with its solid bulk it's an excellent lead.",
+   "ja": "ほのお4倍弱点さえ踏まなければどのタイプとも渡り合える。がんせきふうじで相手の攻撃を、すなじごくで防御を下げられ、耐久も高いので先発として非常に優秀。",
+   "zh-TW": "只要不碰上火系四倍弱點，對任何屬性都打得不錯。岩石封鎖降低對手攻擊、流沙深淵降低防禦，耐久也紮實，是很棒的先鋒。"
   },
   "feraligatr_shadow": {
-   "ko": "물타입으로 풀과 전기에 약점이지만, 빠른 차징인 새도클로를 익혀서, 빠르고 강한 하이드로캐논을 주로사용하며 비행과/드래곤을 상대하기위해 냉동빔을 쓸수도있고, 고스트를 잡기위해 깨물어부수기도 익힐수있으며, 공격방어 둘다 훌륭하다."
+   "ko": "물타입으로 풀과 전기에 약점이지만, 빠른 차징인 섀도클로를 익혀서, 빠르고 강한 하이드로캐논을 주로사용하며 비행과/드래곤을 상대하기위해 냉동빔을 쓸수도있고, 고스트를 잡기위해 깨물어부수기도 익힐수있으며, 공격방어 둘다 훌륭하다.",
+   "en": "Water-type, weak to Grass and Electric, but with fast-charging Shadow Claw it fires off strong Hydro Cannons, can run Ice Beam for Flying and Dragon, and Crunch for Ghosts. Excellent on both offense and defense.",
+   "ja": "みずタイプでくさ・でんきが弱点だが、溜まりの速いシャドークローから強力なハイドロカノンを連発できる。ひこう・ドラゴン対策にれいとうビーム、ゴースト対策にかみくだくも選べ、攻守ともに優秀。",
+   "zh-TW": "水系，弱草和電，但靠集能快的暗影爪能連發強力加農水炮，可帶冰凍光束對付飛行/龍，也能學咬碎打幽靈，攻守都很優秀。"
   },
   "corviknight_shadow": {
-   "ko": "강철/비행의 아머까오는 튼튼한 체력을 바탕으로 모래뿌리기 땅공격을 기본으로 하며, 악타입 보복과, 공격을 올려주는 에어커터를 주로 사용한다, 페어리를 잡기위해 아이언헤드를 사용하기도한다"
+   "ko": "강철/비행의 아머까오는 튼튼한 체력을 바탕으로 모래뿌리기 땅공격을 기본으로 하며, 악타입 보복과, 공격을 올려주는 에어커터를 주로 사용한다, 페어리를 잡기위해 아이언헤드를 사용하기도한다",
+   "en": "Steel/Flying Corviknight leans on its bulk, using the Ground fast move Sand Attack, the Dark move Payback and Attack-boosting Air Cutter as its core, with Iron Head sometimes added to handle Fairies.",
+   "ja": "はがね/ひこうのアーマーガアは高い耐久を軸に、じめん技すなかけを通常技に、あく技しっぺがえしと攻撃を上げるエアカッターを主に使う。フェアリー対策にアイアンヘッドを採用することも。",
+   "zh-TW": "鋼/飛行的鋼鎧鴉以紮實耐久為本，小招用地面招潑沙，主要使用惡系以牙還牙和能提升攻擊的空氣利刃，有時也帶鐵頭對付妖精。"
   },
   "kingdra_shadow": {
-   "ko": "물/드래곤타입으로 용의숨결을 사용하며, 스피드스타와 파도타기를 주로 사용한다. 빠른 물공격과 노멀공격으로 인기있는 포켓몬"
+   "ko": "물/드래곤타입으로 용의숨결을 사용하며, 스피드스타와 파도타기를 주로 사용한다. 빠른 물공격과 노멀공격으로 인기있는 포켓몬",
+   "en": "Water/Dragon that uses Dragon Breath, with Swift and Surf as its main charged moves. Popular for its quick Water and Normal attacks.",
+   "ja": "みず/ドラゴンでりゅうのいぶきを使い、スピードスターとなみのりを主に使う。速いみず技とノーマル技で人気のポケモン。",
+   "zh-TW": "水/龍，使用龍息，主要打高速星星和衝浪。靠快速的水系和一般系攻擊而受歡迎的寶可夢。"
   }
  },
  "ultra": {},

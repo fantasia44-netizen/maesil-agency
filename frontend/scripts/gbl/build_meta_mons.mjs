@@ -11,6 +11,8 @@ const OUT = join(__dir, "../../app/[lang]/gbl/gbl_meta_mons.json");
 const RAW = (p) => `https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/${p}`;
 const RANK = { great: "rankings-1500", ultra: "rankings-2500", master: "rankings-10000" };
 const MASTER_SCORE_TOP = 30;
+// 수동 유지 목록 — PvPoke 편집픽 밖이지만 사이트 데이터상 상위 티어·조회 상위인 몬(사장님 판단으로 추가/삭제).
+const EXTRA_INDEX = { great: ["lickilicky"] }; // 내룸벨트: 슈퍼 S티어(94), 비메타 중 30일 조회 1위
 
 async function getJson(url) { const r = await fetch(url); if (!r.ok) throw new Error(`${r.status} ${url}`); return r.json(); }
 
@@ -20,7 +22,7 @@ async function getJson(url) { const r = await fetch(url); if (!r.ok) throw new E
     const rk = await getJson(RAW(`rankings/all/overall/${file}.json`));
     const editor = rk.filter((e) => e.editorScore > 0).map((e) => e.speciesId);
     const supp = league === "master" ? [...rk].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).slice(0, MASTER_SCORE_TOP).map((e) => e.speciesId) : [];
-    leagues[league] = [...new Set([...editor, ...supp])];
+    leagues[league] = [...new Set([...editor, ...supp, ...(EXTRA_INDEX[league] || [])])];
     console.log(`${league}: 편집픽 ${editor.length}${supp.length ? ` + 점수top${MASTER_SCORE_TOP} → ` : " → "}${leagues[league].length}`);
   }
   writeFileSync(OUT, JSON.stringify({ generatedAt: new Date().toISOString().slice(0, 10), source: "PvPoke rankings (master) editorScore>0 + master score top30", leagues }, null, 0));
