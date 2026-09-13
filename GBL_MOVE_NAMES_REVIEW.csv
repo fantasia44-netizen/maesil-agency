@@ -1,0 +1,235 @@
+move_id,en,ko_site,ko_correct,used_by_count,example_mons
+EARTHQUAKE,Earthquake,지진,,23,그림자 누오/누오/쏘콘
+DRAGON_BREATH,Dragon Breath,용의숨결,,20,파비코리/그림자 파비코리/킹드라
+HYDRO_PUMP,Hydro Pump,하이드로펌프,,19,엠페르트/그림자 엠페르트/장크로다일
+DRAGON_PULSE,Dragon Pulse,용의파동,,16,파비코리/그림자 파비코리/라프라스
+SHADOW_CLAW,Shadow Claw,섀도클로,,16,따라큐/장크로다일/그림자 장크로다일
+BLIZZARD,Blizzard,눈보라,,15,엠페르트/그림자 엠페르트/킹드라
+PSYCHIC,Psychic,사이코키네시스,,15,요가램/블래키/피그킹
+FLASH_CANNON,Flash Cannon,러스터캐논,,14,두드리짱/엠페르트/그림자 엠페르트
+SHADOW_BALL,Shadow Ball,섀도볼,,14,탱탱겔/피그킹/버랜지나
+WATER_GUN,Water Gun,물대포,,13,그림자 누오/누오/장크로다일
+BITE,Bite,물기,,13,장크로다일/그림자 장크로다일/거북왕
+DRAGON_TAIL,Dragon Tail,드래곤테일,,13,악식킹/그림자 강철톤/강철톤
+WATERFALL,Waterfall,폭포오르기,,12,엠페르트/그림자 엠페르트/장크로다일
+STONE_EDGE,Stone Edge,스톤에지,,12,그림자 누오/누오/토오
+CRUNCH,Crunch,깨물어부수기,,12,장크로다일/그림자 장크로다일/악식킹
+MOONBLAST,Moonblast,문포스,,11,파비코리/그림자 파비코리/플라제스
+ICE_BEAM,Ice Beam,냉동빔,,11,탱탱겔/장크로다일/마릴리
+FEINT_ATTACK,Feint Attack,속여때리기,,11,나인테일/그림자 나인테일/그림자 깜까미
+FIRE_BLAST,Fire Blast,불대문자,,11,나인테일/그림자 나인테일/파이어로
+OUTRAGE,Outrage,역린,,11,킹드라/그림자 킹드라/어써러셔
+METAL_CLAW,Metal Claw,메탈클로,,10,엠페르트/그림자 엠페르트/레지스틸
+MUD_SHOT,Mud Shot,머드샷,,10,그림자 누오/누오/토오
+DARK_PULSE,Dark Pulse,악의파동,,10,블래키/버랜지나/그림자 삼삼드래
+ZEN_HEADBUTT,Zen Headbutt,사념의박치기,,10,픽시/하랑우탄/그림자 메탕구
+FLAMETHROWER,Flamethrower,화염방사,,9,파비코리/그림자 파비코리/나인테일
+DAZZLING_GLEAM,Dazzling Gleam,매지컬샤인,,9,파비코리/그림자 파비코리/솜솜코
+STEEL_WING,Steel Wing,강철날개,,9,엠페르트/그림자 엠페르트/아머까오
+HYDRO_CANNON,Hydro Cannon,하이드로캐논,,9,엠페르트/그림자 엠페르트/장크로다일
+SURF,Surf,파도타기,,9,탱탱겔/킹드라/라프라스
+HYPER_BEAM,Hyper Beam,파괴광선,,9,다꼬리/파르토/푸크린
+PLAY_ROUGH,Play Rough,치근거리기,,8,두드리짱/따라큐/마릴리
+HEX,Hex,병상첨병,,8,따라큐/탱탱겔/미라몽
+TACKLE,Tackle,몸통박치기,,8,가라르 코산호/플라제스/쌍검킬
+IRON_HEAD,Iron Head,아이언헤드,,8,아머까오/그림자 아머까오/쌍검킬
+FLY,Fly,공중날기,,8,깨비드릴조/파이어로/가라르 파이어
+SWIFT,Swift,스피드스타,,8,킹드라/다꼬리/그림자 킹드라
+BRUTAL_SWING,Brutal Swing,세차게휘두르기,,8,악식킹/그림자 삼삼드래/폭거북스
+PSYCHO_CUT,Psycho Cut,사이코커터,,8,요가램/칼라마네로/그림자 칼라마네로
+ICE_PUNCH,Ice Punch,냉동펀치,,8,요가램/미라몽/그림자 미라몽
+FOUL_PLAY,Foul Play,속임수,,8,그림자 깜까미/블래키/깜까미
+FUTURE_SIGHT,Future Sight,미래예지,,8,하랑우탄/크레세리아/그림자 크레세리아
+CLOSE_COMBAT,Close Combat,인파이트,,8,저승갓숭/그림자 저승갓숭/비리디온
+ROCK_SMASH,Rock Smash,바위깨기,,7,두드리짱/마릴리/그림자 텅구리
+PECK,Peck,쪼기,,7,파비코리/그림자 파비코리/깨비드릴조
+SKY_ATTACK,Sky Attack,불새,,7,파비코리/그림자 파비코리/아머까오
+AQUA_TAIL,Aqua Tail,아쿠아테일,,7,그림자 누오/누오/그림자 신뇽
+SLUDGE_BOMB,Sludge Bomb,오물폭탄,,7,그림자 누오/누오/토오
+ICE_FANG,Ice Fang,얼음엄니,,7,장크로다일/그림자 장크로다일/그림자 드래피온
+WATER_PULSE,Water Pulse,물의파동,,7,토오/만타인/쥬레곤
+TRAILBLAZE,Trailblaze,개척하기,,7,다꼬리/플라제스/하랑우탄
+FIRE_PUNCH,Fire Punch,불꽃펀치,,7,파르토/미라몽/그림자 미라몽
+ROCK_SLIDE,Rock Slide,스톤샤워,,7,릴리요/그림자 텅구리/멜메탈
+SHADOW_SNEAK,Shadow Sneak,야습,,6,따라큐/그림자 깜까미/깜까미
+THUNDER,Thunder,번개,,6,따라큐/그림자 전룡/전룡
+ROCK_TOMB,Rock Tomb,암석봉인,,6,쏘콘/그림자 쏘콘/릴리요
+FIRE_SPIN,Fire Spin,회오리불꽃,,6,나인테일/그림자 나인테일/파이어로
+PSYSHOCK,Psyshock,사이코쇼크,,6,나인테일/그림자 나인테일/알로라 나인테일
+SOLAR_BEAM,Solar Beam,솔라빔,,6,나인테일/그림자 나인테일/솜솜코
+POWER_GEM,Power Gem,파워젬,,6,가라르 코산호/그림자 깜까미/깜까미
+INFESTATION,Infestation,엉겨붙기,,6,솜솜코/릴리요/그림자 드래피온
+AERIAL_ACE,Aerial Ace,제비반환,,6,솜솜코/깨비드릴조/만타인
+PSYWAVE,Psywave,사이코웨이브,,6,라프라스/피그킹/그림자 라프라스
+SUCKER_PUNCH,Sucker Punch,기습,,6,다꼬리/폭슬라이/가라르 파이어
+IRON_TAIL,Iron Tail,아이언테일,,6,그림자 신뇽/신뇽/쥬레곤
+BODY_SLAM,Body Slam,누르기,,6,그림자 신뇽/신뇽/하마돈
+DYNAMIC_PUNCH,Dynamic Punch,폭발펀치,,6,요가램/피그킹/멜메탈
+INCINERATE,Incinerate,불태우기,,6,파이어로/그림자 파이어로/폭거북스
+CHARGE_BEAM,Charge Beam,차지빔,,6,피그킹/픽시/그림자 전룡
+HEAVY_SLAM,Heavy Slam,헤비봄버,,5,두드리짱/쏘콘/그림자 쏘콘
+VOLT_SWITCH,Volt Switch,볼트체인지,,5,쏘콘/그림자 쏘콘/전지충이
+BUG_BITE,Bug Bite,벌레먹기,,5,쏘콘/그림자 쏘콘/전지충이
+SAND_TOMB,Sand Tomb,모래지옥,,5,쏘콘/그림자 쏘콘/데스판
+OVERHEAT,Overheat,오버히트,,5,나인테일/그림자 나인테일/폭거북스
+SCORCHING_SANDS,Scorching Sands,열사의대지,,5,나인테일/그림자 나인테일/파르토
+AIR_SLASH,Air Slash,에어슬래시,,5,아머까오/그림자 아머까오/버랜지나
+FROST_BREATH,Frost Breath,얼음숨결,,5,라프라스/그림자 라프라스/쥬레곤
+EARTH_POWER,Earth Power,대지의힘,,5,두빅굴/하마돈/그림자 하마돈
+POLTERGEIST,Poltergeist,폴터가이스트,,5,미라몽/그림자 미라몽/펌킨인
+EXTRASENSORY,Extrasensory,신통력,,5,피그킹/그림자 피그킹/루기아
+CHARM,Charm,애교부리기,,5,푸크린/픽시/알로라 나인테일
+BREAKING_SWIPE,Breaking Swipe,와이드브레이커,,5,그림자 강철톤/강철톤/레지드래고
+FURY_CUTTER,Fury Cutter,연속자르기,,5,대검귀/그림자 메탕구/메탕구
+THUNDER_PUNCH,Thunder Punch,번개펀치,,5,그림자 전룡/전룡/마샤도
+DRACO_METEOR,Draco Meteor,용성군,,5,펄기아 (오리진)/디아루가 (오리진)/레시라무
+FAIRY_WIND,Fairy Wind,요정의바람,,4,두드리짱/솜솜코/플라제스
+BULLDOZE,Bulldoze,땅고르기,,4,두드리짱/릴리요/그림자 릴리요
+DRAIN_PUNCH,Drain Punch,드레인펀치,,4,그림자 누오/누오/그림자 깜까미
+BUBBLE,Bubble,거품,,4,탱탱겔/마릴리/두빅굴
+BUBBLE_BEAM,Bubble Beam,거품광선,,4,탱탱겔/만타인/깨비물거미
+ENERGY_BALL,Energy Ball,에너지볼,,4,나인테일/그림자 나인테일/솜솜코
+ASTONISH,Astonish,놀래키기,,4,가라르 코산호/야느와르몽/그림자 야느와르몽
+BULLET_SEED,Bullet Seed,씨기관총,,4,솜솜코/릴리요/만타인
+SAND_ATTACK,Sand Attack,모래뿌리기,,4,아머까오/그림자 아머까오/하마돈
+TWISTER,Twister,회오리,,4,깨비드릴조/만타인/그림자 한카리아스
+SNARL,Snarl,바크아웃,,4,악식킹/블래키/폭슬라이
+DRAGON_CLAW,Dragon Claw,드래곤클로,,4,악식킹/폭거북스/기라티나
+QUICK_ATTACK,Quick Attack,전광석화,,4,다꼬리/폭슬라이/파르토
+DIG,Dig,구멍파기,,4,다꼬리/파르토/그림자 텅구리
+COUNTER,Counter,카운터,,4,요가램/저승갓숭/그림자 저승갓숭
+ICY_WIND,Icy Wind,얼어붙은바람,,4,두빅굴/폭슬라이/푸크린
+BRAVE_BIRD,Brave Bird,브레이브버드,,4,파이어로/가라르 파이어/그림자 파이어로
+SHADOW_PUNCH,Shadow Punch,섀도펀치,,4,미라몽/그림자 미라몽/야느와르몽
+MIRROR_COAT,Mirror Coat,미러코트,,4,피그킹/깨비물거미/그림자 깨비물거미
+DISARMING_VOICE,Disarming Voice,차밍보이스,,4,플라제스/푸크린/라우드본
+GRASS_KNOT,Grass Knot,풀묶기,,4,릴리요/크레세리아/그림자 릴리요
+ANCIENT_POWER,Ancient Power,원시의힘,,4,가라르 파이어/기라티나/그림자 기라티나
+THUNDER_FANG,Thunder Fang,번개엄니,,4,그림자 강철톤/하마돈/강철톤
+POWDER_SNOW,Powder Snow,눈싸라기,,4,알로라 나인테일/그림자 알로라 나인테일/씨카이저
+GYRO_BALL,Gyro Ball,자이로볼,,4,킬가르도/쌍검킬/그림자 메탕구
+FOCUS_BLAST,Focus Blast,기합구슬,,4,레지스틸/그림자 전룡/전룡
+ZAP_CANNON,Zap Cannon,전자포,,4,레지스틸/찌리배리/그림자 전룡
+CONFUSION,Confusion,염동력,,4,하랑우탄/크레세리아/그림자 크레세리아
+FIRE_FANG,Fire Fang,불꽃엄니,,4,하마돈/그림자 하마돈/레시라무
+DRILL_PECK,Drill Peck,회전부리,,3,엠페르트/그림자 엠페르트/깨비드릴조
+ACID_SPRAY,Acid Spray,애시드봄,,3,그림자 누오/누오/토오
+EMBER,Ember,불꽃세례,,3,나인테일/그림자 나인테일/폭거북스
+MEGAHORN,Megahorn,메가혼,,3,토오/대검귀/제르네아스
+PAYBACK,Payback,보복,,3,아머까오/그림자 아머까오/가라르 파이어
+ICE_SHARD,Ice Shard,얼음뭉치,,3,라프라스/그림자 라프라스/쥬레곤
+SPARKLING_ARIA,Sparkling Aria,물거품아리아,,3,라프라스/그림자 라프라스/누리레느
+SKULL_BASH,Skull Bash,로켓박치기,,3,라프라스/그림자 라프라스/거북왕
+MUDDY_WATER,Muddy Water,탁류,,3,두빅굴/대짱이/그림자 대짱이
+NIGHT_SLASH,Night Slash,깜짝베기,,3,폭슬라이/저승갓숭/그림자 저승갓숭
+CHILLING_WATER,Chilling Water,차가운물,,3,플라제스/알로라 나인테일/그림자 알로라 나인테일
+METEOR_MASH,Meteor Mash,코멧펀치,,3,픽시/메타그로스/그림자 메타그로스
+AURORA_BEAM,Aurora Beam,오로라빔,,3,쥬레곤/크레세리아/그림자 크레세리아
+LIQUIDATION,Liquidation,아쿠아브레이크,,3,쥬레곤/어써러셔/대검귀
+SUPER_POWER,Superpower,엄청난힘,,3,칼라마네로/그림자 칼라마네로/멜메탈
+PSYCHIC_FANGS,Psychic Fangs,사이코팽,,3,그림자 강철톤/강철톤/솔가레오
+SMACK_DOWN,Smack Down,떨어뜨리기,,3,바리톱스/그림자 다투곰/다투곰
+THUNDER_SHOCK,Thunder Shock,전기쇼크,,3,멜메탈/히스이 붐볼/찌리배리
+OMINOUS_WIND,Ominous Wind,괴상한바람,,3,화강돌/야느와르몽/그림자 야느와르몽
+LOW_KICK,Low Kick,안다리걸기,,3,저승갓숭/그림자 저승갓숭/케르디오
+GIGA_IMPACT,Giga Impact,기가임팩트,,3,자시안 (검왕)/제르네아스/자마젠타 (방패왕)
+FUSION_FLARE,Fusion Flare,크로스플레임,,3,화이트 큐레무/레시라무/그림자 레시라무
+POISON_JAB,Poison Jab,독찌르기,,3,마샤도/무한다이노/케르디오
+METAL_SOUND,Metal Sound,금속음,,2,엠페르트/그림자 엠페르트
+MUD_BOMB,Mud Bomb,진흙폭탄,,2,그림자 누오/누오
+STRUGGLE_BUG,Struggle Bug,벌레의저항,,2,쏘콘/그림자 쏘콘
+MIRROR_SHOT,Mirror Shot,미러샷,,2,쏘콘/그림자 쏘콘
+WEATHER_BALL_FIRE,Weather Ball (Fire),웨더볼,,2,나인테일/그림자 나인테일
+HEAT_WAVE,Heat Wave,열풍,,2,나인테일/그림자 나인테일
+POISON_STING,Poison Sting,독침,,2,토오/그림자 드래피온
+AIR_CUTTER,Air Cutter,에어커터,,2,아머까오/그림자 아머까오
+DRILL_RUN,Drill Run,드릴라이너,,2,깨비드릴조/쥬레곤
+OCTAZOOKA,Octazooka,대포무노포,,2,킹드라/그림자 킹드라
+WRAP,Wrap,김밥말이,,2,그림자 신뇽/신뇽
+FLAME_CHARGE,Flame Charge,니트로차지,,2,파이어로/그림자 파이어로
+HURRICANE,Hurricane,폭풍,,2,파이어로/그림자 파이어로
+RAZOR_LEAF,Razor Leaf,잎날가르기,,2,플라제스/펌킨인
+POUND,Pound,막치기,,2,푸크린/픽시
+ACID,Acid,용해액,,2,릴리요/그림자 릴리요
+WING_ATTACK,Wing Attack,날개치기,,2,만타인/가라르 파이어
+AQUA_JET,Aqua Jet,아쿠아제트,,2,쥬레곤/케르디오
+PSYBEAM,Psybeam,환상빔,,2,칼라마네로/그림자 칼라마네로
+X_SCISSOR,X-Scissor,시저크로스,,2,전지충이/케르디오
+DISCHARGE,Discharge,방전,,2,전지충이/찌리배리
+WEATHER_BALL_ICE,Weather Ball (Ice),웨더볼,,2,알로라 나인테일/그림자 알로라 나인테일
+SLUDGE_WAVE,Sludge Wave,오물웨이브,,2,대짱이/그림자 대짱이
+SLUDGE,Sludge,오물공격,,2,대짱이/그림자 대짱이
+MUD_SLAP,Mud Slap,진흙뿌리기,,2,그림자 텅구리/텅구리
+BONE_CLUB,Bone Club,뼈다귀치기,,2,그림자 텅구리/텅구리
+SACRED_SWORD,Sacred Sword,성스러운칼,,2,쌍검킬/비리디온
+ICICLE_SPEAR,Icicle Spear,고드름침,,2,씨카이저/그림자 씨카이저
+WEATHER_BALL_ROCK,Weather Ball (Rock),웨더볼,,2,하마돈/그림자 하마돈
+BUG_BUZZ,Bug Buzz,벌레의야단법석,,2,깨비물거미/그림자 깨비물거미
+RAGE_FIST,Rage Fist,분노의주먹,,2,저승갓숭/그림자 저승갓숭
+LOW_SWEEP,Low Sweep,로킥,,2,저승갓숭/그림자 저승갓숭
+WILD_CHARGE,Wild Charge,와일드볼트,,2,히스이 붐볼/제크로무
+SHADOW_FORCE,Shadow Force,섀도다이브,,2,기라티나/그림자 기라티나
+BULLET_PUNCH,Bullet Punch,불릿펀치,,2,메타그로스/그림자 메타그로스
+FUSION_BOLT,Fusion Bolt,크로스썬더,,2,블랙 큐레무/제크로무
+AEROBLAST,Aeroblast,에어로블라스트,,2,루기아/그림자 루기아
+HIGH_HORSEPOWER,High Horsepower,10만마력,,2,그림자 다투곰/다투곰
+GIGATON_HAMMER,Gigaton Hammer,거대해머,,1,두드리짱
+NIGHT_SHADE,Night Shade,나이트헤드,,1,가라르 코산호
+ROCK_BLAST,Rock Blast,록블라스트,,1,가라르 코산호
+ACROBATICS,Acrobatics,애크러뱃,,1,솜솜코
+BRICK_BREAK,Brick Break,깨트리기,,1,다꼬리
+POWER_UP_PUNCH,Power-Up Punch,그로우펀치,,1,요가램
+LAST_RESORT,Last Resort,비장의무기,,1,블래키
+VINE_WHIP,Vine Whip,덩굴채찍,,1,플라제스
+PETAL_BLIZZARD,Petal Blizzard,꽃보라,,1,플라제스
+ROLLOUT,Rollout,구르기,,1,거북왕
+DRAINING_KISS,Draining Kiss,드레인키스,,1,픽시
+SPARK,Spark,스파크,,1,전지충이
+FELL_STINGER,Fell Stinger,마지막일침,,1,그림자 드래피온
+AEGISLASH_CHARGE_PSYCHO_CUT,Psycho Cut,사이코커터,,1,킬가르도
+AEGISLASH_CHARGE_AIR_SLASH,Air Slash,에어슬래시,,1,킬가르도
+LOCK_ON,Lock On,록온,,1,레지스틸
+DOUBLE_IRON_BASH,Double Iron Bash,더블펀처,,1,멜메탈
+THUNDERBOLT,Thunderbolt,10만볼트,,1,멜메탈
+YAWN,Yawn,하품,,1,하랑우탄
+SEED_BOMB,Seed Bomb,씨폭탄,,1,펌킨인
+RAZOR_SHELL,Razor Shell,셸블레이드,,1,대검귀
+ROCK_THROW,Rock Throw,돌떨구기,,1,멜리시
+DOUBLE_KICK,Double Kick,두번차기,,1,비리디온
+LEAF_BLADE,Leaf Blade,리프블레이드,,1,비리디온
+DRAGON_ENERGY,Dragon Energy,드래곤에너지,,1,레지드래고
+VICE_GRIP,Vise Grip,찝기,,1,레지드래고
+PARABOLIC_CHARGE,Parabolic Charge,파라볼라차지,,1,찌리배리
+TORCH_SONG,Torch Song,플레어송,,1,라우드본
+BLAST_BURN,Blast Burn,블라스트번,,1,라우드본
+BEHEMOTH_BLADE,Behemoth Blade,거수참,,1,자시안 (검왕)
+SPACIAL_REND,Spacial Rend,공간절단,,1,펄기아 (오리진)
+ICE_BURN,Ice Burn,콜드플레어,,1,화이트 큐레무
+GEOMANCY,Geomancy,지오컨트롤,,1,제르네아스
+ROAR_OF_TIME,Roar of Time,시간의포효,,1,디아루가 (오리진)
+BEHEMOTH_BASH,Behemoth Bash,거수탄,,1,자마젠타 (방패왕)
+FREEZE_SHOCK,Freeze Shock,프리즈볼트,,1,블랙 큐레무
+AVALANCHE,Avalanche,눈사태,,1,가이오가
+ORIGIN_PULSE,Origin Pulse,근원의파동,,1,가이오가
+DYNAMAX_CANNON,Dynamax Cannon,다이맥스포,,1,무한다이노
+MOONGEIST_BEAM,Moongeist Beam,섀도레이,,1,네크로즈마 (새벽의 날개)
+HIDDEN_POWER_BUG,Hidden Power (Bug),잠재파워(벌레),,1,칠색조
+HIDDEN_POWER_DARK,Hidden Power (Dark),잠재파워(악),,1,칠색조
+HIDDEN_POWER_DRAGON,Hidden Power (Dragon),잠재파워(드래곤),,1,칠색조
+HIDDEN_POWER_ELECTRIC,Hidden Power (Electric),잠재파워(전기),,1,칠색조
+HIDDEN_POWER_FIGHTING,Hidden Power (Fighting),잠재파워(격투),,1,칠색조
+HIDDEN_POWER_FIRE,Hidden Power (Fire),잠재파워(불꽃),,1,칠색조
+HIDDEN_POWER_FLYING,Hidden Power (Flying),잠재파워(비행),,1,칠색조
+HIDDEN_POWER_GHOST,Hidden Power (Ghost),잠재파워(고스트),,1,칠색조
+HIDDEN_POWER_GRASS,Hidden Power (Grass),잠재파워(풀),,1,칠색조
+HIDDEN_POWER_GROUND,Hidden Power (Ground),잠재파워(땅),,1,칠색조
+HIDDEN_POWER_ICE,Hidden Power (Ice),잠재파워(얼음),,1,칠색조
+HIDDEN_POWER_POISON,Hidden Power (Poison),잠재파워(독),,1,칠색조
+HIDDEN_POWER_PSYCHIC,Hidden Power (Psychic),잠재파워(에스퍼),,1,칠색조
+HIDDEN_POWER_ROCK,Hidden Power (Rock),잠재파워(바위),,1,칠색조
+HIDDEN_POWER_STEEL,Hidden Power (Steel),잠재파워(강철),,1,칠색조
+HIDDEN_POWER_WATER,Hidden Power (Water),잠재파워(물),,1,칠색조
+SACRED_FIRE,Sacred Fire,성스러운불꽃,,1,칠색조
+SUNSTEEL_STRIKE,Sunsteel Strike,메테오드라이브,,1,네크로즈마 (황혼의 갈기)
+PRECIPICE_BLADES,Precipice Blades,단애의칼,,1,그란돈
+SECRET_SWORD,Secret Sword,신비의칼,,1,케르디오
