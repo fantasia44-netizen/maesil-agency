@@ -23,6 +23,7 @@ import { getPoke } from "./dict";
 import { buildAnalysis, HEADINGS } from "./analysis";
 import { currentSeason, seasonBySlug } from "../../../seasons";
 import { isMetaMon, mergedShadowBase, mergedVariantsOf, linkMonId } from "../../../indexGate";
+import MonLink from "../../../MonLink";
 import MON_NOTES from "../../../gbl_mon_notes.json";
 import PARTNERS from "../../../gbl_partners.json";
 
@@ -260,7 +261,7 @@ function OppRow({ lang, league, id, rating, ratingTitle, seasonQ = "" }: { lang:
   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
   const rc = rating >= 500 ? "#16a34a" : "#dc2626";
   return (
-    <Link href={localizePath(lang, `/gbl/pokemon/${league}/${linkMonId(league, id)}`) + seasonQ} style={{ textDecoration: "none",
+    <MonLink league={league} id={id} href={localizePath(lang, `/gbl/pokemon/${league}/${linkMonId(league, id)}`) + seasonQ} style={{ textDecoration: "none",
       display: "flex", alignItems: "center", gap: 8, background: `linear-gradient(100deg, ${c1}20, #ffffff 80%)`,
       border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "6px 10px" }}>
       <Sprite id={id} size={32} />
@@ -269,7 +270,7 @@ function OppRow({ lang, league, id, rating, ratingTitle, seasonQ = "" }: { lang:
         <span style={{ fontSize: "0.72rem", fontWeight: 800, color: rc, background: rc + "1a", padding: "1px 7px", borderRadius: 8 }} title={ratingTitle}>{rating}</span>
         <TypeBadges lang={lang} types={types} />
       </span>
-    </Link>
+    </MonLink>
   );
 }
 
@@ -495,11 +496,11 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
             <p style={{ margin: "0 0 8px", fontSize: "0.72rem", color: "#94a3b8", lineHeight: 1.5 }}>{PT[lang].basis}</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {partners.p.map((x) => (
-                <Link key={x.id} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, x.id)}`) + seasonQ} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", background: "#f7f9fd", border: `1px solid ${BORDER}`, borderRadius: 10, padding: "6px 10px", flexWrap: "wrap" }}>
+                <MonLink key={x.id} league={params.league} id={x.id} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, x.id)}`) + seasonQ} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", background: "#f7f9fd", border: `1px solid ${BORDER}`, borderRadius: 10, padding: "6px 10px", flexWrap: "wrap" }}>
                   <Sprite id={x.id} size={32} />
                   <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "#0f172a" }}>{locName(lang, x.id)}</span>
                   {x.covers.length > 0 && <span style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#64748b" }}>{PT[lang].covers}: {x.covers.map((c) => locName(lang, c)).join(" · ")}</span>}
-                </Link>
+                </MonLink>
               ))}
             </div>
             {partyNote && <p style={{ margin: "10px 0 0", fontSize: "0.84rem", color: "#334155", lineHeight: 1.75, whiteSpace: "pre-line" }}>💬 {partyNote}</p>}

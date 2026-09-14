@@ -5,7 +5,8 @@ import DETAIL_S28 from "../../gbl_detail_s28.json";
 import MOVENAMES from "../../pvp_move_names.json";
 import { MON, spriteUrl, monName } from "../../meta/monNames";
 import { localizePath, type Locale } from "../../../../../lib/i18n";
-import { linkMonId } from "../../indexGate";
+import { linkMonId, hasDetailLink } from "../../indexGate";
+import MonLink from "../../MonLink";
 
 type DItem = { id: string; tier: string; moveset: string[]; dex?: number };
 const DET = DETAIL_S28 as unknown as Record<string, DItem[]>;
@@ -55,7 +56,7 @@ export default function MovesetExamples({ lang }: { lang: Locale }) {
 
       {/* 대표몬 자시안 예시 카드 */}
       {feat && (
-        <Link href={localizePath(lang, `/gbl/pokemon/${FEATURED.league}/${FEATURED.id}`)} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
+        <MonLink league={FEATURED.league} id={FEATURED.id} href={localizePath(lang, `/gbl/pokemon/${FEATURED.league}/${FEATURED.id}`)} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
           <div style={{ background: "linear-gradient(100deg,#eef2ff 0%,#faf5ff 60%,#ffffff 100%)", border: "1px solid #dbe2ee", borderRadius: 14, padding: "14px 16px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -78,14 +79,15 @@ export default function MovesetExamples({ lang }: { lang: Locale }) {
               <span style={{ color: "#3b5bdb", fontWeight: 700 }}> {t.cta}</span>
             </p>
           </div>
-        </Link>
+        </MonLink>
       )}
 
       {/* 리그별 대표 포켓몬 그리드 → 상세 링크 */}
       <div style={{ marginTop: 16 }}>
         <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a", marginBottom: 8 }}>{t.gridH}</div>
         {LEAGUES.map((lg) => {
-          const list = (DET[lg.key] || []).filter((d) => d.id !== FEATURED.id).slice(0, 4);
+          // 상세 링크가 있는(메타) 몬만 그리드에 — 링크 없는 칩은 이 섹션("눌러서 확인")에 의미가 없음
+          const list = (DET[lg.key] || []).filter((d) => d.id !== FEATURED.id && hasDetailLink(lg.key, d.id)).slice(0, 4);
           if (!list.length) return null;
           return (
             <div key={lg.key} style={{ marginBottom: 10 }}>

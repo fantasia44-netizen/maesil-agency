@@ -47,6 +47,9 @@ export function isMetaMon(league: string, id: string): boolean {
   // (노트를 쓰면 자동으로 색인 복귀: gbl_mon_notes.json 기준)
   return hasNote(league, id) || ["S", "A"].includes(tierOf(league, id));
 }
+// 내부 링크 게이트 — 링크 목적지(통합 그림자→기본 폼)가 색인 대상일 때만 상세 링크를 건다(MonLink.tsx).
+// 티어표·CMP·카운터·파트너·가이드 그리드 전부 이 판정 하나를 씀 → 사이트맵·noindex·내부 링크가 같은 URL 집합을 가리킴.
+export const hasDetailLink = (league: string, id: string): boolean => isMetaMon(league, linkMonId(league, id));
 // 사이트맵용 — 현재 시즌 스냅샷 기준 색인 대상 id 목록(페이지의 robots 판정과 같은 소스·같은 시즌).
 export const indexableMonIds = (league: string): string[] => (CUR[league] || []).map((e) => e.id).filter((id) => isMetaMon(league, id));
 const NOTES = MON_NOTES as Record<string, Record<string, unknown>>;

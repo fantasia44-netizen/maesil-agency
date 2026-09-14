@@ -6,6 +6,7 @@ import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale }
 import { ivEntry, IV_ANALYSIS } from "../analysis/registry";
 import IvAnalysisView from "./IvAnalysisView";
 import JsonLd from "../../JsonLd";
+import { hasDetailLink } from "../../indexGate";
 
 export const revalidate = 86400;
 
@@ -54,7 +55,7 @@ export default function IvAnalysisPage({ params }: { params: { lang: string; id:
   return (
     <>
       {faqLd && <JsonLd data={faqLd} />}
-      <IvAnalysisView lang={lang} id={params.id} e={e} />
+      <IvAnalysisView lang={lang} id={params.id} e={e} detailLink={hasDetailLink("master", params.id)} />
     </>
   );
 }

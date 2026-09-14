@@ -20,6 +20,7 @@ import { tierAnalysis } from "../../leagueAnalysis";
 import { currentSeason, seasonBySlug, selectableSeasons, seasonShort, statusOf } from "../../seasons";
 import { formDexById } from "../../sprite";
 import { linkMonId } from "../../indexGate";
+import MonLink from "../../MonLink";
 
 export const revalidate = 600;
 
@@ -342,7 +343,7 @@ export default async function TierPage({ params, searchParams }: { params: { lan
                   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
                   const c2 = TYPE_COLOR[types[1]] || c1;
                   return (
-                    <Link key={d.id} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, d.id)}`) + detQ} style={{ textDecoration: "none", color: "inherit", display: "block", background: `linear-gradient(100deg, ${c1}26 0%, ${c2}18 42%, #ffffff 88%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
+                    <MonLink key={d.id} league={params.league} id={d.id} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, d.id)}`) + detQ} style={{ textDecoration: "none", color: "inherit", display: "block", background: `linear-gradient(100deg, ${c1}26 0%, ${c2}18 42%, #ffffff 88%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <span style={{ width: 36, height: 36, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
                           ...(isShadow ? { background: "radial-gradient(circle, #a855f7ee 0%, #7c3aed99 42%, transparent 72%)", borderRadius: "50%" } : {}) }}>
@@ -383,7 +384,7 @@ export default async function TierPage({ params, searchParams }: { params: { lan
                           {d.moveset.map((mid) => <MoveChip key={mid} id={mid} lang={lang} />)}
                         </div>
                       )}
-                    </Link>
+                    </MonLink>
                   );
                 })}
               </div>

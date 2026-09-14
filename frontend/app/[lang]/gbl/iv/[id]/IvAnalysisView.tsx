@@ -242,7 +242,8 @@ function weakChips(spread: SimSpread, shieldWord: string) {
   return Object.values(byOpp);
 }
 
-export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: string; e: IvEntry }) {
+// detailLink: 서버(page.tsx)에서 hasDetailLink("master", id) 판정을 넘김 — 클라이언트 번들에 indexGate(상세 스냅샷 JSON)를 싣지 않기 위함.
+export default function IvAnalysisView({ lang, id, e, detailLink = true }: { lang: Locale; id: string; e: IvEntry; detailLink?: boolean }) {
   // 공개 — 서버렌더(초기 HTML에 콘텐츠 실림, 크롤 가능). 발행 여부는 page.tsx가 색인/JSON-LD로 제어.
   // 데이터(e)는 서버(page.tsx)에서 해당 몬만 prop으로 전달 — registry를 클라에서 import하면
   // 20종 6.3MB가 통째로 번들돼 로드가 5초 걸리던 문제를 막음(이 파일은 registry를 타입만 참조).
@@ -271,7 +272,7 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
         <div style={{ marginBottom: 10, display: "flex", gap: 12, flexWrap: "wrap" }}>
           <Link href={L("/gbl")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>{u.back}</Link>
           <Link href={L("/gbl/iv")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>{u.ivTool}</Link>
-          <Link href={L(`/gbl/pokemon/master/${id}`)} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>{name}</Link>
+          {detailLink && <Link href={L(`/gbl/pokemon/master/${id}`)} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>{name}</Link>}
         </div>
 
         {/* 히어로 배너 — 타입 테마 그라디언트 + 큰 스프라이트(썸네일/og 재사용 가능) */}
