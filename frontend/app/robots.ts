@@ -16,7 +16,7 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "Yeti", allow: "/" }, // 네이버 검색로봇 명시 허용
       ...(isTcg && !cardsOpen ? [{ userAgent: "Mediapartners-Google", disallow: ["/tcg/cards/", "/en/tcg/cards/", "/ja/tcg/cards/", "/zh-TW/tcg/cards/"] }] : []),
     ],
+    // Host: 지시어는 얀덱스 전용 — GSC robots 보고서에 "Googlebot에서 무시되는 규칙" 경고만 띄우므로 제거.
     sitemap: `${site}/sitemap.xml`,
-    host: site,
   };
 }
