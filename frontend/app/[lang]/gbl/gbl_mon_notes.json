@@ -425,8 +425,472 @@
    "en": "Same Ice/Water typing as Dewgong, but where Dewgong is defensive, Walrein specializes in offense. Runs Powder Snow, Icicle Spear and Earthquake — a strong offensive Pokémon.",
    "ja": "こおり/みずでジュゴンと同じタイプだが、ジュゴンが防御型ならトドゼルガは攻撃特化。こなゆき・つららばり・じしんを使う強い攻撃型ポケモン。",
    "zh-TW": "冰/水，和白海獅同屬性，但白海獅是防禦型，帝牙海獅則是攻擊特化。用細雪、冰柱、地震，是很強的攻擊型寶可夢。"
+  },
+  "marowak": {
+   "ko": "단일 땅타입으로 진흙뿌리기가 너프당하면서 사용빈도가 줄었지만 그래도 땅타입으로 지진, 스톤샤워를 사용을하기 때문에 아직까지 땅타입 포켓몬으로 사용이 되는 포켓몬",
+   "en": "Pure Ground type. Usage dropped after the Mud-Slap nerf, but as a Ground type with Earthquake and Rock Slide it's still used as a Ground Pokémon.",
+   "ja": "じめん単タイプで、どろかけがナーフされて使用頻度は減ったが、それでもじめんタイプとしてじしん・いわなだれを使うため、今でもじめんポケモンとして使われている。",
+   "zh-TW": "純地面系，擲泥被削弱後使用率下降，但作為地面系能用地震、岩崩，至今仍被當地面系寶可夢使用。"
+  },
+  "sableye": {
+   "ko": "속임수,매지컬샤인을 주로쓰지만 드레인펀치를 사용해서 방어를 올려서 장기전도 가능하고, 사용에따라 장지건용, 드래곤/악을 이길수있는 매지컬샤인익히는형 여러가지 형태로 운영이 가능한 재능이 다양한 포켓몬",
+   "en": "Mainly runs Feint Attack and Dazzling Gleam, but it can also use Drain Punch to boost defense and go long. Depending on the build — a long-fight set, or a Dazzling Gleam set to beat Dragon/Dark — it can be run in many ways, a very versatile Pokémon.",
+   "ja": "だましうち・マジカルシャインを主に使うが、ドレインパンチで防御を上げて長期戦にも持ち込める。長期戦型や、ドラゴン/あくに勝てるマジカルシャイン型など、使い方次第でいろいろな形で運用できる多才なポケモン。",
+   "zh-TW": "主要用偷襲·魔法閃耀，但也能用吸取拳升防打持久戰。看用法可以走持久戰型，或帶魔法閃耀打贏龍/惡的型，多種運用方式的多才寶可夢。"
+  },
+  "dragonair": {
+   "ko": "차징이빠른 용숨을 이용하며, 아쿠아테일을 주로사용하지만, 확정 방떨시키는 김밥말이도 많이 사용하고 방어보다 공격적인 포켓몬",
+   "en": "Uses the fast-charging Dragon Breath and mainly Aqua Tail, but also runs Wrap a lot for its guaranteed defense drop. An offensive Pokémon rather than a defensive one.",
+   "ja": "回転の速いりゅうのいぶきを使い、アクアテールを主に使うが、確定で防御を下げるまきつくもよく使う。防御より攻撃寄りのポケモン。",
+   "zh-TW": "用集氣快的龍息，主要放水流尾，但確定降防的緊束也很常用。偏攻擊而非防禦的寶可夢。"
+  },
+  "hydreigon": {
+   "ko": "악/드래곤으로 강한공격을 위주로 사용하며, 세차게휘두르기로 용의숨결+세차게휘두르기+공중날기, 빠르고 강하며 아주 공격적인 포켓몬, 격투몬조차 빠르게 날아오는 공중날기에는 실드를 올리면서 상대해야 할정도인 포켓몬",
+   "en": "Dark/Dragon built around strong offense: Dragon Breath + Brutal Swing + Fly. Fast, hard-hitting and very aggressive — even Fighting types have to put up shields against its quick Fly.",
+   "ja": "あく/ドラゴンで強い攻撃を主体に使い、りゅうのいぶき＋ぶんまわす＋そらをとぶ。速くて強く非常に攻撃的で、かくとうでさえ素早く飛んでくるそらをとぶにはシールドを張って対処しなければならないほどのポケモン。",
+   "zh-TW": "惡/龍，以強攻擊為主：龍息＋狂舞揮打＋飛翔。又快又強非常具攻擊性，連格鬥系遇到快速飛來的飛翔也得開盾應對。"
+  },
+  "steelix": {
+   "ko": "강철/땅이면서 번개엄니를 주로 사용하면서 비행,물타입에 아프게 때리고, 방어하락 사이코팽, 강한땅공격 지진을 주로사용하지만, 고스트를잡기위한 깨물어부수기나, 드래곤을 상대하기위해 와이드브레이커 익힌 유저도있으니 실제 사용법이 매우 다양해서 까다로운 포켓몬",
+   "en": "Steel/Ground that mainly runs Thunder Fang to hurt Flying and Water types, with the defense-dropping Psychic Fangs and the strong Ground move Earthquake. Some players learn Crunch for Ghosts or Breaking Swipe for Dragons, so the actual sets vary a lot — a tricky Pokémon.",
+   "ja": "はがね/じめんでかみなりのキバを主に使い、ひこう・みずを痛く殴る。防御ダウンのサイコファング、強力なじめん技じしんを主に使うが、ゴースト対策にかみくだく、ドラゴン対策にワイドブレイカーを覚えさせる人もおり、実際の使い方が非常に多様で厄介なポケモン。",
+   "zh-TW": "鋼/地面，主要用雷電牙痛打飛行·水系，配降防的精神之牙和強力地面招地震。也有玩家為了打幽靈學咬碎、為了對付龍系學廣域破壞，實際配招非常多樣，很難纏的寶可夢。"
   }
  },
- "ultra": {},
- "master": {}
+ "ultra": {
+  "mimikyu": {
+   "ko": "고스트/페어리 타입 이라 약점인 고스트와,강철이지만 따라큐탈이라는 셀프1실드가 있어서, 특수기 방어도 버틸수있고, 노멀타입빼고 대부분 상대가 가능하며 드래곤 악에게 쉽게 이길수있는 포켓몬",
+   "en": "Ghost/Fairy, weak to Ghost and Steel, but Disguise acts as a free extra shield, so it can even eat a charged move. Handles almost everything except Normal types and beats Dragon and Dark with ease.",
+   "ja": "ゴースト/フェアリーでゴースト・はがねが弱点だが、ばけのかわが実質1枚の無料シールドになり、ゲージ技も耐えられる。ノーマル以外ほぼ対応でき、ドラゴン・あくには楽に勝てる。",
+   "zh-TW": "幽靈/妖精，弱點是幽靈和鋼，但畫皮等於多一面免費護盾，連特殊招式都能扛。除了一般系幾乎都能應付，對龍和惡系輕鬆取勝。"
+  },
+  "corviknight": {
+   "ko": "강철/비행의 아머까오는 튼튼한 체력을 바탕으로 모래뿌리기 땅공격을 기본으로 하며, 악타입 보복과, 공격을 올려주는 에어커터를 주로 사용한다, 페어리를 잡기위해 아이언헤드를 사용하기도한다, 아이언헤드없을경우 플라제스에게 지기도한다",
+   "en": "Steel/Flying Corviknight leans on its bulk, runs Sand Attack for Ground damage as its fast move, and mainly uses the Dark move Payback plus Air Cutter for attack buffs. Some also carry Iron Head to handle Fairies — without Iron Head it can lose to Florges.",
+   "ja": "はがね/ひこうのアーマーガアは高い耐久を土台に、通常技すなかけでじめん攻撃をし、あく技しっぺがえしと攻撃を上げるエアカッターを主に使う。フェアリー対策にアイアンヘッドを採用することもあり、アイアンヘッドがないとフラージェスに負けることもある。",
+   "zh-TW": "鋼/飛行的鋼鎧鴉靠厚實耐久，小招用潑沙打地面攻擊，主要用惡系以牙還牙和能提升攻擊的空氣利刃。也有人為了打妖精帶鐵頭，沒鐵頭的話會輸給花潔夫人。"
+  },
+  "florges": {
+   "ko": "개척하기,문포스,차밍보이스,찬물끼얹기까지 다양한 기술을 익힐수있으며, 두드리짱을제외하고 찬물만으로 다른 약점인 강철몬에게도 이기기도하는 강력한 포켓몬, 강철타입이 강철스킬을 안들고있는 경우가많아서 드래곤도이기고, 공격하락시키기때문에 쓰임세가 다양한포켓몬",
+   "en": "Learns a wide range of moves — Trailblaze, Moonblast, Disarming Voice and Chilling Water. With Chilling Water alone it can even beat Steel types (its weakness) other than Tinkaton. Since Steel types often don't carry Steel moves, it beats Dragons too, and the attack drop makes it useful in many roles.",
+   "ja": "くさわけ・ムーンフォース・チャームボイス・ひやみずと多彩な技を覚え、デカヌチャン以外なら弱点のはがねにもひやみずだけで勝ててしまう強力なポケモン。はがねがはがね技を持っていないことが多いためドラゴンにも勝て、攻撃ダウンも入るので用途が広い。",
+   "zh-TW": "能學開路、月亮之力、魅惑之聲、潑冷水等多種招式，除了巨鍛匠以外，光靠潑冷水就能贏過弱點的鋼系。鋼系常常不帶鋼招，所以龍系也打得贏，又能降攻擊，用途很廣的強力寶可夢。"
+  },
+  "empoleon_shadow": {
+   "ko": "물/강철 타입으로 격투,땅,전기에 약점이나 빠른 특수기 하이퍼캐논과, 비행공격으로 풀/격투도 견재 가능해서 선두로 많이쓰이는 포켓몬",
+   "en": "Water/Steel, weak to Fighting, Ground and Electric, but fast-charging Hydro Cannon plus a Flying move lets it check Grass and Fighting too — a very common lead.",
+   "ja": "みず/はがねでかくとう・じめん・でんきが弱点だが、溜まりの速いハイドロカノンとひこう技でくさ/かくとうも牽制できるため、先発でよく使われる。",
+   "zh-TW": "水/鋼，弱點是格鬥·地面·電，但集能快的加農水炮加上飛行招式也能牽制草/格鬥，是很常見的先鋒。"
+  },
+  "virizion": {
+   "ko": "하이퍼리그 격투몬중 제일 많이 만날수있고, 리프블레이드 풀공격과, 성스러운칼 로 격투기술을 주로 사용하나, 가끔 스톤에지 써서 비행몬 공격을 사용하는 유저도 있으며, 두번차기라는 매우 빠른 차징특수기를 가지고있음",
+   "en": "The Fighting type you'll meet most in the Ultra League. Mainly runs Leaf Blade for Grass damage and Sacred Sword for Fighting, though some players use Stone Edge to hit Flying types. It also has Double Kick, a very fast-charging move.",
+   "ja": "ハイパーリーグのかくとうの中で最もよく出会う。リーフブレードのくさ攻撃とせいなるつるぎのかくとう技を主に使うが、たまにストーンエッジでひこう対策をする人もいる。にどげりという非常に回転の速いゲージ技も持つ。",
+   "zh-TW": "超級聯盟(2500)最常遇到的格鬥系。主要用葉刃打草攻擊、聖劍打格鬥，偶爾也有玩家用尖石攻擊打飛行系。還有二連踢這個集氣極快的大招。"
+  },
+  "moltres_galarian": {
+   "ko": "강한 기본기 기습으로 고스트에 아주 강하지만, 비행몬으로 얼음,전기에 약한면이 있고, 악은 격투에 약점이지만 비행를 가지고있어 중립으로 격투몬에게 잘버티며 공중날기, 브레이브버드도 익힐수있어 격투몬과 잘싸우고, 페어리,전기,얼음은 피해야함",
+   "en": "Its strong fast move Sucker Punch makes it very strong against Ghosts. As a Flying type it's weak to Ice and Electric. Dark is weak to Fighting, but the Flying typing makes it neutral, so it holds up well against Fighting types, and with Fly and Brave Bird it fights them well. Avoid Fairy, Electric and Ice.",
+   "ja": "強力な通常技ふいうちでゴーストに非常に強いが、ひこうなのでこおり・でんきに弱い面がある。あくはかくとうが弱点だが、ひこうを持つため等倍になりかくとうによく耐え、そらをとぶ・ブレイブバードも覚えるのでかくとうとよく戦える。フェアリー・でんき・こおりは避けること。",
+   "zh-TW": "強力小招突襲對幽靈非常強，但身為飛行系怕冰·電。惡系本來怕格鬥，但有飛行屬性變成一般傷害，對格鬥系撐得住，又能學飛翔、勇鳥猛攻，跟格鬥系打得不錯。要避開妖精·電·冰。"
+  },
+  "jellicent": {
+   "ko": "고스트/물 타입으로 튼튼한 체력으로 고스트 약점이면서도 고스트스킬 맞아도 버틸수있고, 불과 격투타입에 아주 강한 포켓몬, 물타입과 만나는 경우가 많다.",
+   "en": "Ghost/Water with big bulk — weak to Ghost, but it can still tank Ghost moves. Very strong against Fire and Fighting. Often runs into Water types.",
+   "ja": "ゴースト/みずで高い耐久を持ち、ゴーストが弱点ながらゴースト技を受けても耐えられる。ほのお・かくとうに非常に強く、みずタイプと当たることが多い。",
+   "zh-TW": "幽靈/水，耐久厚實，雖然怕幽靈但吃了幽靈招也撐得住。對火·格鬥非常強，常會遇到水系。"
+  },
+  "forretress": {
+   "ko": "하이퍼리그 선봉에서 많이 사용되며, 불꽃에 이중약점이지만, 암성봉인으로 상대 공격력약화, 모래 뿌리기로 상대방어감소까지 할수있어 체력도 튼튼하며 선봉으로 아주 좋은포켓몬",
+   "en": "Widely used in the Ultra League lead. Double-weak to Fire, but Rock Tomb drops the opponent's attack and Sand Attack drops their defense too. Bulky as well — an excellent lead.",
+   "ja": "ハイパーリーグの先発でよく使われる。ほのおが二重弱点だが、がんせきふうじで相手の攻撃を下げ、すなかけで防御まで下げられる。耐久も高く、先発として非常に優秀。",
+   "zh-TW": "超級聯盟(2500)先鋒常客。火系雙重弱點，但岩石封鎖能降對手攻擊，潑沙還能降對手防禦。耐久也厚，是很好的先鋒。"
+  },
+  "feraligatr_shadow": {
+   "ko": "물타입으로 풀과 전기에 약점이지만, 빠른 차징인 새도클로를 익혀서, 빠르고 강한 하이드로캐논을 주로사용하며 비행과/드래곤을 상대하기위해 냉동빔을 쓸수도있고, 고스트를 잡기위해 깨물어부수기도 익힐수있으며, 공격방어 둘다 훌륭하다.",
+   "en": "Water-type, weak to Grass and Electric, but with fast-charging Shadow Claw it fires off strong Hydro Cannons, can run Ice Beam for Flying and Dragon, and Crunch for Ghosts. Excellent on both offense and defense.",
+   "ja": "みずタイプでくさ・でんきが弱点だが、溜まりの速いシャドークローから強力なハイドロカノンを連発できる。ひこう・ドラゴン対策にれいとうビーム、ゴースト対策にかみくだくも選べ、攻守ともに優秀。",
+   "zh-TW": "水系，弱草和電，但靠集能快的暗影爪能連發強力加農水炮，可帶冰凍光束對付飛行/龍，也能學咬碎打幽靈，攻守都很優秀。"
+  },
+  "ninetales_alolan": {
+   "ko": "얼음공격 눈싸라기를 주로사용하며, 빠르게 쓸수있는 웨더볼얼음으로 비행,풀에게 매우 강하며, 페어리타입도 가지고있어서 격투에도 밀리지않으나, 강철 이중약점이라 강철을 피해야하고 두드리짱을보면 도망가야함",
+   "en": "Mainly runs the Ice fast move Powder Snow, and the fast-charging Ice Weather Ball makes it very strong against Flying and Grass. Fairy typing means it doesn't lose to Fighting either, but it's double-weak to Steel, so avoid Steel types — and run if you see Tinkaton.",
+   "ja": "こおりの通常技こなゆきを主に使い、素早く撃てるウェザーボール(こおり)でひこう・くさに非常に強い。フェアリーも持つのでかくとうにも押されないが、はがねが二重弱点なのではがねは避け、デカヌチャンを見たら逃げるべき。",
+   "zh-TW": "主要用冰系小招細雪，能快速施放的冰系氣象球對飛行·草非常強。有妖精屬性所以對格鬥也不會輸，但鋼系雙重弱點，要避開鋼系，看到巨鍛匠就該跑。"
+  },
+  "registeel": {
+   "ko": "단일 강철스타일로, 록온으로 기본타는 매우약하지만 차징이 아주빠르며, 튼튼한 체력으로 강한기술을 모아서 사용함, 기합구술, 러스트캐논,전자포를 사용하는데. 유저에마다 다른걸 사용함",
+   "en": "Pure Steel. Lock-On has very weak fast-move damage but charges extremely fast, and its big bulk lets it build up and fire strong moves. Runs Focus Blast, Flash Cannon and Zap Cannon — which ones varies by player.",
+   "ja": "はがね単タイプで、ロックオンの通常技は非常に弱いがゲージ回転が非常に速く、高い耐久で強い技を貯めて撃つ。きあいだま・ラスターカノン・でんじほうを使うが、どれを採用するかは人によって異なる。",
+   "zh-TW": "純鋼系，鎖定小招傷害很低但集氣極快，靠厚實耐久把強招蓄滿再放。會用真氣彈、加農光炮、電磁炮，帶哪個因人而異。"
+  },
+  "dusknoir": {
+   "ko": "놀래키기,병상첨병 둘다 익힐수있으며 강한 평타를 위해서는 놀래키기, 빠른차징을하기위해서 병상첨병을 익힐수 있으며, 평타, 기술 모두 준수하며, 섀도볼, 폭발펀치를 주로 사용하며 약점인 악타입에게도 폭발펀치로 견재를 할수 있는 포켓몬",
+   "en": "Learns both Astonish and Poltergeist — Astonish for strong fast-move damage, Poltergeist for fast charging. Solid fast and charged moves. Mainly runs Shadow Ball and Dynamic Punch, so it can even check Dark types, its weakness, with Dynamic Punch.",
+   "ja": "おどろかすとポルターガイストの両方を覚え、強い通常技ならおどろかす、回転を速めたいならポルターガイスト。通常技・ゲージ技ともに優秀。シャドーボールとばくれつパンチを主に使い、弱点のあく相手にもばくれつパンチで牽制できる。",
+   "zh-TW": "驚嚇和靈騷都能學，想要強小招就用驚嚇，想集氣快就用靈騷，小招大招都不錯。主要用暗影球和爆裂拳，連弱點的惡系也能用爆裂拳牽制。"
+  },
+  "lapras": {
+   "ko": "격투 전기가 약점이지만, 사이코웨이브 기본기로 격투에게도 카운터 평타를 날릴수있으며 튼튼한 체력을 바탕으로 안정적으로 플레이를할수가있는 장점이이 있는 포켓몬",
+   "en": "Weak to Fighting and Electric, but with Psywave as its fast move it can counter-hit Fighting types too, and its big bulk lets it play very steadily.",
+   "ja": "かくとう・でんきが弱点だが、通常技サイコウェーブでかくとうにも反撃でき、高い耐久を活かして安定して立ち回れるのが強み。",
+   "zh-TW": "弱點是格鬥·電，但小招精神波可以反打格鬥系，加上厚實的耐久，能打得很穩定。"
+  },
+  "ninetales_alolan_shadow": {
+   "ko": "얼음공격 눈싸라기를 주로사용하며, 빠르게 쓸수있는 웨더볼얼음으로 비행,풀에게 매우 강하며, 페어리타입도 가지고있어서 격투에도 밀리지않으나, 강철 이중약점이라 강철을 피해야하고 두드리짱, 레지스틸, 아머까오를 피해야하는 포켓몬",
+   "en": "Mainly runs the Ice fast move Powder Snow, and the fast-charging Ice Weather Ball makes it very strong against Flying and Grass. Fairy typing means it doesn't lose to Fighting either, but it's double-weak to Steel — avoid Steel types, especially Tinkaton, Registeel and Corviknight.",
+   "ja": "こおりの通常技こなゆきを主に使い、素早く撃てるウェザーボール(こおり)でひこう・くさに非常に強い。フェアリーも持つのでかくとうにも押されないが、はがねが二重弱点なのではがねは避け、特にデカヌチャン・レジスチル・アーマーガアは避けるべき。",
+   "zh-TW": "主要用冰系小招細雪，能快速施放的冰系氣象球對飛行·草非常強。有妖精屬性所以對格鬥也不會輸，但鋼系雙重弱點，要避開鋼系，尤其是巨鍛匠、雷吉斯奇魯、鋼鎧鴉。"
+  },
+  "talonflame": {
+   "ko": "바위에 약하지만, 강한 기본기 불태우기로 강한평타와, 공업해주는 니트로차지를 주로 쓰지만, 공중날기, 브레이브버드 2비행공격을 쓰는 유저도 있어서 잘쓰는 유저만나면 매우 까다로우며, 15/15/15 50랩이 최강이지만 베스트파트너 15/12/15포켓몬이 51랩최고 포켓몬으로 사용됨",
+   "en": "Weak to Rock, but its strong fast move Incinerate hits hard, and it mostly runs Flame Charge for attack buffs. Some players run the two Flying moves Fly + Brave Bird, and a skilled user of that set is very tricky. A 15/15/15 at level 50 is the strongest, but a 15/12/15 Best Buddy at level 51 is used as the top spec.",
+   "ja": "いわが弱点だが、強力な通常技やきつくすで火力があり、攻撃を上げるニトロチャージを主に使う。そらをとぶ＋ブレイブバードのひこう技2枚構成を使う人もおり、上手い人に当たると非常に厄介。15/15/15のLv50が最強だが、相棒ブーストの15/12/15 Lv51が最高個体として使われる。",
+   "zh-TW": "弱岩石，但強力小招燒盡打得很痛，主要用能提升攻擊的蓄能焰襲。也有玩家帶飛翔＋勇鳥猛攻兩個飛行招，遇到熟手非常難纏。15/15/15的50級最強，但最佳夥伴的15/12/15在51級是最頂的個體。"
+  },
+  "walrein_shadow": {
+   "ko": "얼음/물타입 씨카이저는 공격에 특화되어있으며, 눈싸라기, 고드름침,지진을 사용하면서 비행,풀,땅 타입에 강한 포켓몬",
+   "en": "Ice/Water Walrein specializes in offense, running Powder Snow, Icicle Spear and Earthquake — strong against Flying, Grass and Ground types.",
+   "ja": "こおり/みずのトドゼルガは攻撃特化で、こなゆき・つららばり・じしんを使い、ひこう・くさ・じめんに強い。",
+   "zh-TW": "冰/水的帝牙海獅是攻擊特化，用細雪、冰柱、地震，對飛行·草·地面很強。"
+  },
+  "dondozo": {
+   "ko": "튼튼한 체력으로 하이퍼리그의 가이오가로 비견되며, 폭포오르기, 파도타기를 주로 사용하며, 역린을 배움으로 드래곤에게 일격을 가할수있는 포켓몬",
+   "en": "Its huge bulk earns it comparisons to Kyogre of the Ultra League. Mainly runs Waterfall and Surf, and having learned Outrage it can land a big hit on Dragons.",
+   "ja": "高い耐久からハイパーリーグのカイオーガと比較される。たきのぼり・なみのりを主に使い、げきりんを覚えたことでドラゴンに一撃を入れられる。",
+   "zh-TW": "耐久厚實到被稱為超級聯盟(2500)的蓋歐卡。主要用攀瀑、衝浪，學會逆鱗後也能給龍系致命一擊。"
+  },
+  "regidrago": {
+   "ko": "하이퍼리그 드래곤 최강자이며, 빵빵한 체력과, 드래곤에너지 레거시 스킬로인해 같은 드래곤뿐아니라 페어리,강철몬을 제외하곤 대부분 이길수있는 포켓몬.",
+   "en": "The strongest Dragon in the Ultra League. With massive HP and the legacy move Dragon Energy, it beats not just other Dragons but almost everything except Fairy and Steel.",
+   "ja": "ハイパーリーグのドラゴン最強格。豊富なHPとレガシー技ドラゴンエナジーにより、同じドラゴンだけでなくフェアリー・はがね以外のほとんどに勝てる。",
+   "zh-TW": "超級聯盟(2500)最強的龍系。血量超厚，加上傳承招式巨龍威能，不只同為龍系，除了妖精·鋼以外幾乎都打得贏。"
+  },
+  "giratina_altered": {
+   "ko": "하이퍼리그에서 기라티나는 섀도클로, 용의숨결 어느 기본기를 익히느냐에따라 사용법이 달라지며, 용의숨결을 익히면 페어리에게 약하지만 같은 드래곤이나 일반포켓몬에 강하고, 섀도클로를 익히면 페어리와도 싸울수있지만 악,드래곤에게 약한점을 보이는 포켓몬",
+   "en": "In the Ultra League, Giratina plays differently depending on whether it runs Shadow Claw or Dragon Breath. With Dragon Breath it's weak to Fairy but strong against other Dragons and regular Pokémon; with Shadow Claw it can fight Fairies too, but shows weakness to Dark and Dragon.",
+   "ja": "ハイパーリーグのギラティナはシャドークローとりゅうのいぶきのどちらの通常技を覚えるかで使い方が変わる。りゅうのいぶきだとフェアリーに弱いが同じドラゴンや一般的なポケモンに強く、シャドークローだとフェアリーとも戦えるがあく・ドラゴンに弱さを見せる。",
+   "zh-TW": "超級聯盟(2500)的騎拉帝納依小招帶暗影爪還是龍息，用法完全不同。帶龍息怕妖精，但對同為龍系和一般寶可夢很強；帶暗影爪能跟妖精打，但對惡·龍就顯得弱。"
+  },
+  "bellibolt": {
+   "ko": "단일 전기타입으로 땅에 약점이지만 튼튼한 방어체력을 가지고있는데 파라볼라차지로 방어업을 하게되면, 타임아웃을 발생시킬정도로 튼튼해지는 포켓몬, 기본기 기습과 전기쇼크를 익힐수있는데 스타일에따라 전기쇼크익히는유저도 있지만, 기습을 익히는 유저도 있음",
+   "en": "Pure Electric, weak to Ground, but with sturdy defense and HP. Once it boosts defense with Parabolic Charge it gets bulky enough to force timeouts. It can learn Sucker Punch or Thunder Shock as its fast move — some players use Thunder Shock, others Sucker Punch, depending on style.",
+   "ja": "でんき単タイプでじめんが弱点だが、防御・HPがしっかりしている。パラボラチャージで防御を上げるとタイムアウトを起こすほど硬くなる。通常技はふいうちとでんきショックを覚えられ、スタイルによりでんきショックを採用する人もふいうちを採用する人もいる。",
+   "zh-TW": "純電系，怕地面，但防禦和血量紮實。用拋物面充電升防後硬到會打出時間到。小招可學突襲或電擊，看風格有人帶電擊，也有人帶突襲。"
+  },
+  "cresselia": {
+   "ko": "튼튼하 체력과 방어로 하이퍼리그 타이아웃을 자주 나오게하는 포켓몬중 하나이며, 문포스를 익혀 드래곤을 이길수도있고, 풀묶기로 물타입도 상대가능하며, 미래예지를 익혀서 격투,독을 상대하기도 한다.",
+   "en": "One of the Pokémon that most often forces timeouts in the Ultra League thanks to its bulk and defense. With Moonblast it can beat Dragons, Grass Knot lets it handle Water types, and some learn Future Sight to deal with Fighting and Poison.",
+   "ja": "高い耐久と防御でハイパーリーグのタイムアウトを頻発させるポケモンの一つ。ムーンフォースを覚えればドラゴンにも勝て、くさむすびでみずも相手でき、みらいよちを覚えてかくとう・どくを相手にすることもある。",
+   "zh-TW": "靠厚實耐久和防禦，是超級聯盟(2500)最常打出時間到的寶可夢之一。學月亮之力能贏龍系，打草結能對付水系，也有人學預知未來對付格鬥·毒。"
+  },
+  "steelix": {
+   "ko": "강철/땅이면서 번개엄니를 주로 사용하면서 비행,물타입에 아프게 때리고, 방어하락 사이코팽, 강한땅공격 지진을 주로사용하지만, 고스트를잡기위한 깨물어부수기나, 드래곤을 상대하기위해 와이드브레이커 익힌 유저도있으니 실제 사용법이 매우 다양해서 까다로운 포켓몬. 하이퍼리그에 타임아웃을 만드는 포켓몬중하나",
+   "en": "Steel/Ground that mainly runs Thunder Fang to hurt Flying and Water types, with the defense-dropping Psychic Fangs and the strong Ground move Earthquake. Some players learn Crunch for Ghosts or Breaking Swipe for Dragons, so the actual sets vary a lot — a tricky Pokémon, and one of the timeout-makers of the Ultra League.",
+   "ja": "はがね/じめんでかみなりのキバを主に使い、ひこう・みずを痛く殴る。防御ダウンのサイコファング、強力なじめん技じしんを主に使うが、ゴースト対策にかみくだく、ドラゴン対策にワイドブレイカーを覚えさせる人もおり、実際の使い方が非常に多様で厄介。ハイパーリーグでタイムアウトを作るポケモンの一つ。",
+   "zh-TW": "鋼/地面，主要用雷電牙痛打飛行·水系，配降防的精神之牙和強力地面招地震。也有玩家為了打幽靈學咬碎、為了對付龍系學廣域破壞，實際配招非常多樣，很難纏。也是超級聯盟(2500)會打出時間到的寶可夢之一。"
+  },
+  "runerigus": {
+   "ko": "땅,고스트타입으로 약점은 많지만 새도클로로 빠른차징과, 섀도볼, 암성봉인을 주로 사용해서 공경력도 좋고, 상대 포켓몬의 공격을 하락시키고, 비행몬 견재도 가능한 포켓몬",
+   "en": "Ground/Ghost with many weaknesses, but Shadow Claw charges fast, and with Shadow Ball and Rock Tomb it has good offense, drops the opponent's attack, and can check Flying types too.",
+   "ja": "じめん/ゴーストで弱点は多いが、シャドークローで回転が速く、シャドーボール・がんせきふうじを主に使うため攻撃力も良く、相手の攻撃を下げ、ひこうの牽制もできる。",
+   "zh-TW": "地面/幽靈，弱點雖多，但暗影爪集氣快，主要用暗影球、岩石封鎖，攻擊力不錯，能降對手攻擊，也能牽制飛行系。"
+  },
+  "cradily_shadow": {
+   "ko": "바위/풀 이중상성으로 비행에도 약하지않고 불꽃에도 약하지않은 상성이지만 하이퍼리그에 많이등장하는 강철에 약한점은 있으나, 공격하락시키는 암성봉인과 풀묶기로 비행,땅,물에게 강한 포켓몬",
+   "en": "Rock/Grass typing means it isn't weak to Flying or Fire, though it is weak to Steel, which is common in the Ultra League. Rock Tomb drops the opponent's attack, and with Grass Knot it's strong against Flying, Ground and Water.",
+   "ja": "いわ/くさの複合でひこうにもほのおにも弱くない相性だが、ハイパーリーグに多いはがねに弱い面はある。攻撃ダウンのがんせきふうじとくさむすびで、ひこう・じめん・みずに強い。",
+   "zh-TW": "岩石/草的組合不怕飛行也不怕火，缺點是怕超級聯盟(2500)常見的鋼系。用能降攻擊的岩石封鎖和打草結，對飛行·地面·水很強。"
+  },
+  "ampharos": {
+   "ko": "볼트체인지 기본기를 쓰며, 개척하기 세차게 휘두르기나, 개척하기 번개펀치를 주로 사용하고, 고스트를 상대하기위한 세차게 휘두르는 전룡, 비행몬을 타겟으로하는 번개펀치, 두개의 스타일로 사용된다.",
+   "en": "Runs Volt Switch as its fast move, mainly with Trailblaze + Brutal Swing or Trailblaze + Thunder Punch. Two styles: Brutal Swing Ampharos for handling Ghosts, or Thunder Punch aimed at Flying types.",
+   "ja": "通常技ボルトチェンジで、くさわけ＋ぶんまわす、またはくさわけ＋かみなりパンチを主に使う。ゴースト対策のぶんまわす型と、ひこうを狙うかみなりパンチ型の2スタイルで使われる。",
+   "zh-TW": "小招用伏特替換，主要配開路＋狂舞揮打或開路＋雷電拳。分兩種型：對付幽靈的狂舞揮打電龍，和瞄準飛行系的雷電拳型。"
+  },
+  "guzzlord": {
+   "ko": "악/드래곤타입으로 오물폭탄을 사용할수있어서 페어리에게 카운터 공격도 가능하며, 튼튼한 체력을 바탕으로 장기전을 갈수있는 포켓몬으로 격투.페어리 잘피한다면 아주 좋은포켓몬",
+   "en": "Dark/Dragon typing with access to Sludge Bomb, so it can even counter-hit Fairies. Its huge bulk lets it go the distance in long fights. Avoid Fighting and Fairy and it's a very strong Pokémon.",
+   "ja": "あく/ドラゴンでヘドロばくだんを使えるため、フェアリーにも反撃できる。高い耐久を活かして長期戦に持ち込める。かくとう・フェアリーをうまく避ければ非常に優秀。",
+   "zh-TW": "惡/龍屬性又能用污泥炸彈，連妖精系也能反打。靠紮實的耐久可以打持久戰。只要避開格鬥·妖精就是非常好用的寶可夢。"
+  },
+  "skeledirge": {
+   "ko": "불태우기를 기본기로 사용하며, 섀도우볼,차밍보이스, 플레어송, 블라스트번 4개 스킬중2개를 많이 사용하며, 페어리나 드래곤을 상대하기위한 차밍보이스나, 강한 데미지를주기위한 블라스트번을 익힌유저도있고, 덱조합을 잘짜면 아주 강력한 포켓몬",
+   "en": "Runs Incinerate as its fast move and picks two of four charged moves — Shadow Ball, Disarming Voice, Torch Song, Blast Burn. Some take Disarming Voice for Fairies and Dragons, others Blast Burn for raw damage. Built into the right team it's a very powerful Pokémon.",
+   "ja": "通常技やきつくすで、シャドーボール・チャームボイス・フレアソング・ブラストバーンの4つから2つを選んで使う。フェアリーやドラゴン対策にチャームボイス、大ダメージを狙ってブラストバーンを覚えさせる人もいる。パーティをうまく組めば非常に強力。",
+   "zh-TW": "小招用燒盡，大招從暗影球、魅惑之聲、火炬之歌、爆炸烈焰四個裡挑兩個。有人為了打妖精·龍帶魅惑之聲，也有人為了高傷害帶爆炸烈焰。隊伍組得好就非常強力。"
+  },
+  "grumpig": {
+   "ko": "사이코웨이브로 격투,독타입에 강하지만 악/고스트에게 약한단점이 있으나, 악타입에겐 폭발펀치로 카운터도 날리기도하며, 섀도볼이라는 강력한 고스트공격을 날림",
+   "en": "Psywave makes it strong against Fighting and Poison, though it's weak to Dark and Ghost. It can counter Dark types with Dynamic Punch and also fires off the powerful Ghost move Shadow Ball.",
+   "ja": "サイコウェーブでかくとう・どくに強いが、あく・ゴーストには弱い。ただしあく相手にはばくれつパンチで反撃でき、強力なゴースト技シャドーボールも撃てる。",
+   "zh-TW": "靠精神波對格鬥·毒很強，缺點是怕惡·幽靈，不過對惡系可以用爆裂拳反打，還能丟出強力的幽靈招暗影球。"
+  },
+  "corviknight_shadow": {
+   "ko": "강철/비행의 아머까오는 튼튼한 체력을 바탕으로 모래뿌리기 땅공격을 기본으로 하며, 악타입 보복과, 공격을 올려주는 에어커터를 주로 사용한다, 페어리를 잡기위해 아이언헤드를 사용하기도한다, 아이언헤드없을경우 플라제스에게 지기도한다",
+   "en": "Steel/Flying Corviknight leans on its bulk, runs Sand Attack for Ground damage as its fast move, and mainly uses the Dark move Payback plus Air Cutter for attack buffs. Some also carry Iron Head to handle Fairies — without Iron Head it can lose to Florges.",
+   "ja": "はがね/ひこうのアーマーガアは高い耐久を土台に、通常技すなかけでじめん攻撃をし、あく技しっぺがえしと攻撃を上げるエアカッターを主に使う。フェアリー対策にアイアンヘッドを採用することもあり、アイアンヘッドがないとフラージェスに負けることもある。",
+   "zh-TW": "鋼/飛行的鋼鎧鴉靠厚實耐久，小招用潑沙打地面攻擊，主要用惡系以牙還牙和能提升攻擊的空氣利刃。也有人為了打妖精帶鐵頭，沒鐵頭的話會輸給花潔夫人。"
+  },
+  "lapras_shadow": {
+   "ko": "격투 전기가 약점이지만, 사이코웨이브 기본기로 격투에게도 카운터 평타를 날릴수있으며 튼튼한 체력을 바탕으로 안정적으로 플레이를할수가있는 장점이이 있는 포켓몬",
+   "en": "Weak to Fighting and Electric, but with Psywave as its fast move it can counter-hit Fighting types too, and its big bulk lets it play very steadily.",
+   "ja": "かくとう・でんきが弱点だが、通常技サイコウェーブでかくとうにも反撃でき、高い耐久を活かして安定して立ち回れるのが強み。",
+   "zh-TW": "弱點是格鬥·電，但小招精神波可以反打格鬥系，加上厚實的耐久，能打得很穩定。"
+  },
+  "dusknoir_shadow": {
+   "ko": "놀래키기,병상첨병 둘다 익힐수있으며 강한 평타를 위해서는 놀래키기, 빠른차징을하기위해서 병상첨병을 익힐수 있으며, 평타, 기술 모두 준수하며, 섀도볼, 폭발펀치를 주로 사용하며 약점인 악타입에게도 폭발펀치로 견재를 할수 있는 포켓몬",
+   "en": "Learns both Astonish and Poltergeist — Astonish for strong fast-move damage, Poltergeist for fast charging. Solid fast and charged moves. Mainly runs Shadow Ball and Dynamic Punch, so it can even check Dark types, its weakness, with Dynamic Punch.",
+   "ja": "おどろかすとポルターガイストの両方を覚え、強い通常技ならおどろかす、回転を速めたいならポルターガイスト。通常技・ゲージ技ともに優秀。シャドーボールとばくれつパンチを主に使い、弱点のあく相手にもばくれつパンチで牽制できる。",
+   "zh-TW": "驚嚇和靈騷都能學，想要強小招就用驚嚇，想集氣快就用靈騷，小招大招都不錯。主要用暗影球和爆裂拳，連弱點的惡系也能用爆裂拳牽制。"
+  },
+  "giratina_altered_shadow": {
+   "ko": "하이퍼리그에서 기라티나는 섀도클로, 용의숨결 어느 기본기를 익히느냐에따라 사용법이 달라지며, 용의숨결을 익히면 페어리에게 약하지만 같은 드래곤이나 일반포켓몬에 강하고, 섀도클로를 익히면 페어리와도 싸울수있지만 악,드래곤에게 약한점을 보이는 포켓몬",
+   "en": "In the Ultra League, Giratina plays differently depending on whether it runs Shadow Claw or Dragon Breath. With Dragon Breath it's weak to Fairy but strong against other Dragons and regular Pokémon; with Shadow Claw it can fight Fairies too, but shows weakness to Dark and Dragon.",
+   "ja": "ハイパーリーグのギラティナはシャドークローとりゅうのいぶきのどちらの通常技を覚えるかで使い方が変わる。りゅうのいぶきだとフェアリーに弱いが同じドラゴンや一般的なポケモンに強く、シャドークローだとフェアリーとも戦えるがあく・ドラゴンに弱さを見せる。",
+   "zh-TW": "超級聯盟(2500)的騎拉帝納依小招帶暗影爪還是龍息，用法完全不同。帶龍息怕妖精，但對同為龍系和一般寶可夢很強；帶暗影爪能跟妖精打，但對惡·龍就顯得弱。"
+  },
+  "forretress_shadow": {
+   "ko": "하이퍼리그 선봉에서 많이 사용되며, 불꽃에 이중약점이지만, 암성봉인으로 상대 공격력약화, 모래 뿌리기로 상대방어감소까지 할수있어 체력도 튼튼하며 선봉으로 아주 좋은포켓몬",
+   "en": "Widely used in the Ultra League lead. Double-weak to Fire, but Rock Tomb drops the opponent's attack and Sand Attack drops their defense too. Bulky as well — an excellent lead.",
+   "ja": "ハイパーリーグの先発でよく使われる。ほのおが二重弱点だが、がんせきふうじで相手の攻撃を下げ、すなかけで防御まで下げられる。耐久も高く、先発として非常に優秀。",
+   "zh-TW": "超級聯盟(2500)先鋒常客。火系雙重弱點，但岩石封鎖能降對手攻擊，潑沙還能降對手防禦。耐久也厚，是很好的先鋒。"
+  },
+  "cresselia_shadow": {
+   "ko": "튼튼하 체력과 방어로 하이퍼리그 타이아웃을 자주 나오게하는 포켓몬중 하나이며, 문포스를 익혀 드래곤을 이길수도있고, 풀묶기로 물타입도 상대가능하며, 미래예지를 익혀서 격투,독을 상대하기도 한다.",
+   "en": "One of the Pokémon that most often forces timeouts in the Ultra League thanks to its bulk and defense. With Moonblast it can beat Dragons, Grass Knot lets it handle Water types, and some learn Future Sight to deal with Fighting and Poison.",
+   "ja": "高い耐久と防御でハイパーリーグのタイムアウトを頻発させるポケモンの一つ。ムーンフォースを覚えればドラゴンにも勝て、くさむすびでみずも相手でき、みらいよちを覚えてかくとう・どくを相手にすることもある。",
+   "zh-TW": "靠厚實耐久和防禦，是超級聯盟(2500)最常打出時間到的寶可夢之一。學月亮之力能贏龍系，打草結能對付水系，也有人學預知未來對付格鬥·毒。"
+  },
+  "steelix_shadow": {
+   "ko": "강철/땅이면서 번개엄니를 주로 사용하면서 비행,물타입에 아프게 때리고, 방어하락 사이코팽, 강한땅공격 지진을 주로사용하지만, 고스트를잡기위한 깨물어부수기나, 드래곤을 상대하기위해 와이드브레이커 익힌 유저도있으니 실제 사용법이 매우 다양해서 까다로운 포켓몬. 하이퍼리그에 타임아웃을 만드는 포켓몬중하나",
+   "en": "Steel/Ground that mainly runs Thunder Fang to hurt Flying and Water types, with the defense-dropping Psychic Fangs and the strong Ground move Earthquake. Some players learn Crunch for Ghosts or Breaking Swipe for Dragons, so the actual sets vary a lot — a tricky Pokémon, and one of the timeout-makers of the Ultra League.",
+   "ja": "はがね/じめんでかみなりのキバを主に使い、ひこう・みずを痛く殴る。防御ダウンのサイコファング、強力なじめん技じしんを主に使うが、ゴースト対策にかみくだく、ドラゴン対策にワイドブレイカーを覚えさせる人もおり、実際の使い方が非常に多様で厄介。ハイパーリーグでタイムアウトを作るポケモンの一つ。",
+   "zh-TW": "鋼/地面，主要用雷電牙痛打飛行·水系，配降防的精神之牙和強力地面招地震。也有玩家為了打幽靈學咬碎、為了對付龍系學廣域破壞，實際配招非常多樣，很難纏。也是超級聯盟(2500)會打出時間到的寶可夢之一。"
+  },
+  "ampharos_shadow": {
+   "ko": "볼트체인지 기본기를 쓰며, 개척하기 세차게 휘두르기나, 개척하기 번개펀치를 주로 사용하고, 고스트를 상대하기위한 세차게 휘두르는 전룡, 비행몬을 타겟으로하는 번개펀치, 두개의 스타일로 사용된다.",
+   "en": "Runs Volt Switch as its fast move, mainly with Trailblaze + Brutal Swing or Trailblaze + Thunder Punch. Two styles: Brutal Swing Ampharos for handling Ghosts, or Thunder Punch aimed at Flying types.",
+   "ja": "通常技ボルトチェンジで、くさわけ＋ぶんまわす、またはくさわけ＋かみなりパンチを主に使う。ゴースト対策のぶんまわす型と、ひこうを狙うかみなりパンチ型の2スタイルで使われる。",
+   "zh-TW": "小招用伏特替換，主要配開路＋狂舞揮打或開路＋雷電拳。分兩種型：對付幽靈的狂舞揮打電龍，和瞄準飛行系的雷電拳型。"
+  },
+  "talonflame_shadow": {
+   "ko": "바위에 약하지만, 강한 기본기 불태우기로 강한평타와, 공업해주는 니트로차지를 주로 쓰지만, 공중날기, 브레이브버드 2비행공격을 쓰는 유저도 있어서 잘쓰는 유저만나면 매우 까다로우며, 15/15/15 50랩이 최강이지만 베스트파트너 15/12/15포켓몬이 51랩최고 포켓몬으로 사용됨",
+   "en": "Weak to Rock, but its strong fast move Incinerate hits hard, and it mostly runs Flame Charge for attack buffs. Some players run the two Flying moves Fly + Brave Bird, and a skilled user of that set is very tricky. A 15/15/15 at level 50 is the strongest, but a 15/12/15 Best Buddy at level 51 is used as the top spec.",
+   "ja": "いわが弱点だが、強力な通常技やきつくすで火力があり、攻撃を上げるニトロチャージを主に使う。そらをとぶ＋ブレイブバードのひこう技2枚構成を使う人もおり、上手い人に当たると非常に厄介。15/15/15のLv50が最強だが、相棒ブーストの15/12/15 Lv51が最高個体として使われる。",
+   "zh-TW": "弱岩石，但強力小招燒盡打得很痛，主要用能提升攻擊的蓄能焰襲。也有玩家帶飛翔＋勇鳥猛攻兩個飛行招，遇到熟手非常難纏。15/15/15的50級最強，但最佳夥伴的15/12/15在51級是最頂的個體。"
+  },
+  "grumpig_shadow": {
+   "ko": "사이코웨이브로 격투,독타입에 강하지만 악/고스트에게 약한단점이 있으나, 악타입에겐 폭발펀치로 카운터도 날리기도하며, 섀도볼이라는 강력한 고스트공격을 날림",
+   "en": "Psywave makes it strong against Fighting and Poison, though it's weak to Dark and Ghost. It can counter Dark types with Dynamic Punch and also fires off the powerful Ghost move Shadow Ball.",
+   "ja": "サイコウェーブでかくとう・どくに強いが、あく・ゴーストには弱い。ただしあく相手にはばくれつパンチで反撃でき、強力なゴースト技シャドーボールも撃てる。",
+   "zh-TW": "靠精神波對格鬥·毒很強，缺點是怕惡·幽靈，不過對惡系可以用爆裂拳反打，還能丟出強力的幽靈招暗影球。"
+  },
+  "empoleon": {
+   "ko": "물/강철 타입으로 격투,땅,전기에 약점이나 빠른 특수기 하이퍼캐논과, 비행공격으로 풀/격투도 견재 가능해서 선두로 많이쓰이는 포켓몬",
+   "en": "Water/Steel, weak to Fighting, Ground and Electric, but fast-charging Hydro Cannon plus a Flying move lets it check Grass and Fighting too — a very common lead.",
+   "ja": "みず/はがねでかくとう・じめん・でんきが弱点だが、溜まりの速いハイドロカノンとひこう技でくさ/かくとうも牽制できるため、先発でよく使われる。",
+   "zh-TW": "水/鋼，弱點是格鬥·地面·電，但集能快的加農水炮加上飛行招式也能牽制草/格鬥，是很常見的先鋒。"
+  },
+  "feraligatr": {
+   "ko": "물타입으로 풀과 전기에 약점이지만, 빠른 차징인 새도클로를 익혀서, 빠르고 강한 하이드로캐논을 주로사용하며 비행과/드래곤을 상대하기위해 냉동빔을 쓸수도있고, 고스트를 잡기위해 깨물어부수기도 익힐수있으며, 공격방어 둘다 훌륭하다.",
+   "en": "Water-type, weak to Grass and Electric, but with fast-charging Shadow Claw it fires off strong Hydro Cannons, can run Ice Beam for Flying and Dragon, and Crunch for Ghosts. Excellent on both offense and defense.",
+   "ja": "みずタイプでくさ・でんきが弱点だが、溜まりの速いシャドークローから強力なハイドロカノンを連発できる。ひこう・ドラゴン対策にれいとうビーム、ゴースト対策にかみくだくも選べ、攻守ともに優秀。",
+   "zh-TW": "水系，弱草和電，但靠集能快的暗影爪能連發強力加農水炮，可帶冰凍光束對付飛行/龍，也能學咬碎打幽靈，攻守都很優秀。"
+  },
+  "walrein": {
+   "ko": "얼음/물타입 씨카이저는 공격에 특화되어있으며, 눈싸라기, 고드름침,지진을 사용하면서 비행,풀,땅 타입에 강한 포켓몬",
+   "en": "Ice/Water Walrein specializes in offense, running Powder Snow, Icicle Spear and Earthquake — strong against Flying, Grass and Ground types.",
+   "ja": "こおり/みずのトドゼルガは攻撃特化で、こなゆき・つららばり・じしんを使い、ひこう・くさ・じめんに強い。",
+   "zh-TW": "冰/水的帝牙海獅是攻擊特化，用細雪、冰柱、地震，對飛行·草·地面很強。"
+  }
+ },
+ "master": {
+  "zacian_crowned_sword": {
+   "ko": "최강의 강철포켓몬 cmp순위1이며 거수참+인파이트를 주로 사용하나, 인파이트로 드래곤에게 지는경우가 있어 치근거리기들고있는 검왕도 종종 만날수있으며, 땅,불꽃에 약점이라, 레시라무, 화이트큐레무, 거대코부리 랑 붙으면 이긴다고 장담하기 어려움",
+   "en": "The strongest Steel Pokémon and #1 in CMP. Mainly runs Behemoth Blade + Close Combat, but since Close Combat can lose to Dragons, you'll often meet Crowned Sword Zacian with Play Rough. Weak to Ground and Fire, so against Reshiram, White Kyurem or Rhyperior a win is far from guaranteed.",
+   "ja": "最強のはがねポケモンでCMP順位1位。きょじゅうざん＋インファイトを主に使うが、インファイトではドラゴンに負けることがあるためじゃれつくを持った剣の王にもよく出会う。じめん・ほのおが弱点で、レシラム・ホワイトキュレム・ドサイドンと当たると勝てるとは言い切れない。",
+   "zh-TW": "最強的鋼系寶可夢，CMP排名第1。主要用巨獸斬＋近身戰，但近身戰有時會輸給龍系，所以也常遇到帶嬉鬧的劍之王。弱點是地面·火，碰到萊希拉姆、白酋雷姆、超甲狂犀很難保證贏。"
+  },
+  "palkia_origin": {
+   "ko": "드래곤전 디아루가를 제외하고 대부분 이기지만, 공간절단이 너프되면서 차징속도가 느려졌지만, 그래도 드래곤전에 매우 강하며 강철에 반감이라 검왕과도 잘 싸우는 포켓몬",
+   "en": "Beats almost every Dragon except Dialga. The Spacial Rend nerf slowed its charging, but it's still very strong in Dragon matchups, and resisting Steel lets it fight Crowned Sword Zacian well too.",
+   "ja": "ドラゴン戦ではディアルガを除いてほとんどに勝てる。あくうせつだんのナーフでゲージ回転は遅くなったが、それでもドラゴン戦に非常に強く、はがねを半減するため剣の王ともよく戦える。",
+   "zh-TW": "龍系對戰除了帝牙盧卡以外幾乎都贏。亞空裂斬被削弱後集氣變慢，但對龍依然非常強，又減半鋼系，所以跟劍之王也打得不錯。"
+  },
+  "metagross": {
+   "ko": "강철/에스퍼 타입으로 고스트,땅,불꽃,악 약점이지만, 강한 강철레거시 기술 코멧펀치와, 지진으로 드래곤견제도 잘하며 강철, 고스트에게도 이기는 포켓몬",
+   "en": "Steel/Psychic, weak to Ghost, Ground, Fire and Dark, but its strong legacy Steel move Meteor Mash plus Earthquake let it check Dragons well and beat Steel and Ghost types too.",
+   "ja": "はがね/エスパーでゴースト・じめん・ほのお・あくが弱点だが、強力なはがねのレガシー技コメットパンチとじしんでドラゴンの牽制も上手く、はがね・ゴーストにも勝てる。",
+   "zh-TW": "鋼/超能力，怕幽靈·地面·火·惡，但強力的鋼系傳承招式彗星拳加上地震，牽制龍系很在行，對鋼·幽靈也贏得了。"
+  },
+  "kyurem_white": {
+   "ko": "강한 불꽃기술 크로스플레임을 사용하나, 같은 크로스플레임을 사용하는 레시라무에게 밀리기도 하였지만, 원시의힘, 용의파동을 익혀서 같은 드래곤을 이기는 스타일도 많이 사용이 되며, 강한 얼음레거시 콜드플레어를 쓰는유저도있고, 상대하면 제일 까다로운 포켓몬중하나",
+   "en": "Runs the strong Fire move Fusion Flare, and while it has lost to Reshiram running the same Fusion Flare, the Ancient Power + Dragon Pulse style for beating other Dragons is also common. Some use the strong legacy Ice move Ice Burn. One of the trickiest Pokémon to face.",
+   "ja": "強力なほのお技クロスフレイムを使うが、同じクロスフレイムを使うレシラムに押されることもあった。げんしのちから・りゅうのはどうを覚えて同じドラゴンに勝つスタイルもよく使われ、強力なこおりのレガシー技コールドフレアを使う人もいる。相手にすると最も厄介なポケモンの一つ。",
+   "zh-TW": "用強力火招交錯火焰，雖然曾輸給同樣帶交錯火焰的萊希拉姆，但學原始之力、龍之波動打贏同為龍系的型也很常見，也有人用強力的冰系傳承招式極寒冷焰。是對上最難纏的寶可夢之一。"
+  },
+  "lunala": {
+   "ko": "27시즌 픽업율1위 루나아라, 28시즌되면서 너프가 많이되어서 픽업율이 많이줄게되었지만 튼튼한 체력을 바탕으로 깨물어부수기 제크로무/레시라무에게 약했지만 그외에 포켓몬 대부분을 상대할수있어서 매우 많이사용된 포켓몬",
+   "en": "The #1 pick of Season 27. It was nerfed heavily in Season 28 and its usage dropped a lot, but with its bulk it could handle almost everything except Crunch Zekrom/Reshiram, which made it extremely widely used.",
+   "ja": "シーズン27のピック率1位ルナアーラ。シーズン28で大きくナーフされピック率は大きく下がったが、高い耐久を土台に、かみくだくを持つゼクロム/レシラム以外のほとんどのポケモンを相手にできたため非常に多く使われた。",
+   "zh-TW": "第27季使用率第1的露奈雅拉。第28季被大幅削弱後使用率下降不少，但靠厚實耐久，除了帶咬碎的捷克羅姆/萊希拉姆以外幾乎都能對付，所以曾被大量使用。"
+  },
+  "xerneas": {
+   "ko": "지오컨트롤 상향을받아, 사용율이 많이올라온 페어리포켓몬, 인파이트, 문포스를 주로 사용하며, 28시즌에 문포스 스킬데미지는 줄엇으나 차징속도가 빨라져 기대되는 포켓몬",
+   "en": "A Fairy whose usage rose a lot after the Geomancy buff. Mainly runs Close Combat and Moonblast. Moonblast's damage was reduced in Season 28, but it charges faster now, so there's a lot to look forward to.",
+   "ja": "ジオコントロールの上方修正で使用率が大きく上がったフェアリー。インファイト・ムーンフォースを主に使う。シーズン28でムーンフォースの威力は下がったがゲージ回転が速くなり、期待できるポケモン。",
+   "zh-TW": "大地掌控被加強後使用率大幅上升的妖精系。主要用近身戰、月亮之力。第28季月亮之力傷害降低，但集氣變快，值得期待。"
+  },
+  "dialga_origin": {
+   "ko": "드래곤이 많은 마스터리그에 드래곤최강자인 강철드래곤 디아루가, 인파이트를 가지고있는 마스터리그 페어리들에게 약한면이 있었지만 아이언헤드가 상향버프를 받으면서 28시즌 기대되는 포켓몬",
+   "en": "Steel/Dragon Dialga, the top Dragon in a Dragon-heavy Master League. It used to struggle against Master League Fairies carrying Close Combat, but with the Iron Head buff it's one to watch in Season 28.",
+   "ja": "ドラゴンの多いマスターリーグでドラゴン最強格のはがね/ドラゴン、ディアルガ。インファイトを持つマスターリーグのフェアリーに弱い面があったが、アイアンヘッドが上方修正されシーズン28で期待されるポケモン。",
+   "zh-TW": "龍系眾多的大師聯盟裡最強的龍——鋼/龍的帝牙盧卡。以前對帶近身戰的大師聯盟妖精有點吃力，但鐵頭被加強後，是第28季值得期待的寶可夢。"
+  },
+  "reshiram": {
+   "ko": "27시즌 픽업율2위의 레시라무, 페어리에게도 밀리지않고 드래곤과도 잘싸우고, 루나아라조차 이겨버린 27시즌의 최강포켓몬이였고, 28시즌에도 너프된게 없기때문에 많은 사랑을 받을거로 기대되는 포켓몬",
+   "en": "The #2 pick of Season 27. It doesn't lose to Fairies, fights Dragons well, and even beat Lunala — the strongest Pokémon of Season 27. Nothing was nerfed for Season 28, so expect it to stay very popular.",
+   "ja": "シーズン27ピック率2位のレシラム。フェアリーにも押されず、ドラゴンともよく戦い、ルナアーラすら倒したシーズン27最強のポケモン。シーズン28でもナーフされていないため、引き続き多くの支持を集めそう。",
+   "zh-TW": "第27季使用率第2的萊希拉姆。不輸妖精、跟龍系也打得好，連露奈雅拉都能贏，是第27季最強的寶可夢。第28季也沒被削弱，預計會繼續受到喜愛。"
+  },
+  "zamazenta_crowned_shield": {
+   "ko": "자시안에 비해 사용빈도가 많이 낮지만 얼음엄니라는 얼음기술로 랜드로스 거대코뿌리와도 싸우고, 강철타입이라 드래곤과도 잘싸우나, 불꽃,땅 약점이라서 서로 약점대결이 많아 사용이 쉽지않은 포켓몬",
+   "en": "Used far less than Zacian, but with the Ice move Ice Fang it can fight Landorus and Rhyperior, and as a Steel type it fights Dragons well. Weak to Fire and Ground, so it ends up in a lot of weakness-vs-weakness trades — not an easy Pokémon to use.",
+   "ja": "ザシアンに比べ使用頻度はかなり低いが、こおり技こおりのキバでランドロス・ドサイドンとも戦え、はがねタイプなのでドラゴンともよく戦える。ただしほのお・じめんが弱点で、互いに弱点を突き合う対面が多く、使いこなすのは簡単ではない。",
+   "zh-TW": "使用率比蒼響低很多，但靠冰系招冰凍牙能跟土地雲、超甲狂犀打，鋼系身分對龍也打得好。不過弱火·地面，常常變成互打弱點，不好用。"
+  },
+  "kyurem_black": {
+   "ko": "화이트큐레무에 비해 사용빈도는 낮은 블랙큐레무, 불꽃기술이 아닌 번개기술을 사용하기 때문에 강철타입에 불리하지만, 비행타입에 강한 드래곤 포켓몬",
+   "en": "Used less than White Kyurem. Since it runs Electric moves instead of Fire, it's at a disadvantage against Steel types, but it's a Dragon that's strong against Flying types.",
+   "ja": "ホワイトキュレムに比べ使用頻度は低いブラックキュレム。ほのお技ではなくでんき技を使うためはがねには不利だが、ひこうに強いドラゴンポケモン。",
+   "zh-TW": "使用率比白酋雷姆低的黑酋雷姆。用的是電系而非火系招式，所以對鋼系不利，但是對飛行系很強的龍系寶可夢。"
+  },
+  "kyogre": {
+   "ko": "눈사태를 받으면서 드래곤과도 싸울수있게된 가이오가, 땅빠위 거대코뿔이나, 땅 그란돈, 랜드로스도 견제가 되며, 강철타입 검왕,방패왕,메타그로스에게도 강해서 잘사용하면 아주 좋은 포켓몬.",
+   "en": "Since getting Avalanche, Kyogre can fight Dragons too. It checks Ground/Rock Rhyperior, Ground Groudon and Landorus, and it's strong against the Steel types Zacian, Zamazenta and Metagross — an excellent Pokémon in the right hands.",
+   "ja": "ゆきなだれを得たことでドラゴンとも戦えるようになったカイオーガ。じめん/いわのドサイドン、じめんのグラードン、ランドロスも牽制でき、はがねの剣の王・盾の王・メタグロスにも強く、うまく使えば非常に優秀。",
+   "zh-TW": "拿到雪崩後也能跟龍系打的蓋歐卡。能牽制地面/岩石的超甲狂犀、地面的固拉多和土地雲，對鋼系的劍之王、盾之王、巨金怪也強，用得好就非常好用。"
+  },
+  "zekrom": {
+   "ko": "27시즌 초반에 레시라무와 비슷하게 많이사용되었지만 시즌 지나감으로 레시라무보다 사용빈도가 많이 떨어졌지만, 크로스썬더, 깨물어부수기, 역린을 익힐수있어, 루나아라와 같은 드래곤끼리 전투도 가능한 포켓몬",
+   "en": "Early in Season 27 it was used about as much as Reshiram, but as the season went on its usage fell well behind Reshiram's. It can learn Fusion Bolt, Crunch and Outrage, so it can also take Dragon-vs-Dragon fights like the one against Lunala.",
+   "ja": "シーズン27序盤はレシラムと同じくらい使われたが、シーズンが進むにつれレシラムより使用頻度が大きく落ちた。クロスサンダー・かみくだく・げきりんを覚えられ、ルナアーラのようなドラゴン同士の戦いも可能。",
+   "zh-TW": "第27季初和萊希拉姆一樣常被使用，但隨季節推進使用率遠低於萊希拉姆。能學交錯閃電、咬碎、逆鱗，也能打像露奈雅拉這種龍系對龍系的戰鬥。"
+  },
+  "marshadow": {
+   "ko": "섀도클로를 많이사용하는데 인파이트, 번개펀치, 냉동펀치,스톤샤워 다양한 기술을 익힐수있고, 빠른차징을 채워 인파이트2번모아서쏘기도하고, 베이팅도 할수있고, 잘쓰는 유저에게 매우 강한 포켓몬",
+   "en": "Mostly runs Shadow Claw and can learn a wide range of moves — Close Combat, Thunder Punch, Ice Punch, Rock Slide. It charges fast enough to bank two Close Combats, can bait too, and is very strong in skilled hands.",
+   "ja": "シャドークローを多く使い、インファイト・かみなりパンチ・れいとうパンチ・いわなだれと多彩な技を覚えられる。速いゲージ回転でインファイトを2発分貯めて撃つこともでき、ベイトもでき、上手い人が使うと非常に強い。",
+   "zh-TW": "多用暗影爪，能學近身戰、雷電拳、冰凍拳、岩崩等多種招式。集氣快到可以蓄兩發近身戰再放，也能騙盾，熟手用起來非常強。"
+  },
+  "eternatus": {
+   "ko": "디아루가를 제외하고 드래곤전 2위인 무한다이노. 빠른우선권, 차징이 빠른 레거시기술 다이맥스포를 사용하면서 대 드래곤전, 루나아라,가이오가 까지 모두 이길수있지만, 땅에 약점이라 거대코뿔이 만나게되면 교체하는게 좋음",
+   "en": "#2 in Dragon matchups after Dialga. With high CMP priority and the fast-charging legacy move Dynamax Cannon, it beats Dragons, Lunala and even Kyogre. Weak to Ground, though, so it's best to switch out when Rhyperior shows up.",
+   "ja": "ディアルガを除けばドラゴン戦2位のムゲンダイナ。速いCMP優先権と回転の速いレガシー技ダイマックスほうで、対ドラゴン戦、ルナアーラ、カイオーガまで全部勝てるが、じめんが弱点なのでドサイドンに当たったら交代するのが良い。",
+   "zh-TW": "除了帝牙盧卡以外龍系對戰第2的無極汰那。CMP優先權高，加上集氣快的傳承招式極巨炮，對龍、露奈雅拉、蓋歐卡全都能贏，但弱地面，遇到超甲狂犀最好換人。"
+  },
+  "lugia": {
+   "ko": "이전에는 별로 사용되지않앗지만 28시즌 대지의힘을 익힘으로, 레시라무,제크로무,검왕등 강철,불꽃,전기타입들에게 강한 공격을할수있는 땅공격을 받음으로 28시즌 사용율이 많이 늘게될거같은 포켓몬",
+   "en": "Rarely used before, but in Season 28 it learned Earth Power, giving it strong Ground damage against Steel, Fire and Electric types like Reshiram, Zekrom and Zacian — expect its usage to climb a lot in Season 28.",
+   "ja": "以前はあまり使われなかったが、シーズン28でだいちのちからを習得し、レシラム・ゼクロム・剣の王などはがね・ほのお・でんきに強い攻撃ができるじめん技を得たことで、シーズン28で使用率が大きく伸びそうなポケモン。",
+   "zh-TW": "以前不太被使用，但第28季學會大地之力，拿到能痛打萊希拉姆、捷克羅姆、劍之王等鋼·火·電系的地面招，第28季使用率應該會大幅上升。"
+  },
+  "garchomp_shadow": {
+   "ko": "빠른차징기 머드샷을 사용할수있으며, 회오리, 대지의힘을 주로 사용하는데, 같은 드래곤에게 강한공격을할수도있고, 땅공격도 매우 강하기때문에 체력방어는 약하지만 공격이 매우 좋은 포켓몬",
+   "en": "Can run the fast-charging Mud Shot, mainly with Twister and Earth Power. It hits other Dragons hard and its Ground damage is also very strong — low bulk, but excellent offense.",
+   "ja": "回転の速いマッドショットを使え、たつまき・だいちのちからを主に使う。同じドラゴンに強い攻撃ができ、じめん攻撃も非常に強いため、耐久は低いが攻撃が非常に優秀。",
+   "zh-TW": "能用集氣快的泥巴射擊，主要配龍捲風、大地之力。對同為龍系能打出強攻擊，地面攻擊也非常強，耐久雖弱但攻擊非常好。"
+  },
+  "necrozma_dawn_wings": {
+   "ko": "체력이 약하지만, 섀도레이라는 아주 강한 레거시 기술을 가지고있고, 같이사용을 많이하는 아이언헤드/악의파동 둘다 28시즌 상향되어, 기대가되는 포켓몬",
+   "en": "Low bulk, but it has the extremely strong legacy move Moongeist Beam, and both of its usual partners Iron Head and Dark Pulse were buffed in Season 28 — a promising Pokémon.",
+   "ja": "耐久は低いが、シャドーレイという非常に強力なレガシー技を持ち、一緒によく使われるアイアンヘッド/あくのはどうの両方がシーズン28で上方修正され、期待されるポケモン。",
+   "zh-TW": "耐久低，但擁有暗影之光這個超強的傳承招式，常搭配的鐵頭/惡之波動兩個都在第28季被加強，值得期待。"
+  },
+  "ho_oh": {
+   "ko": "드래곤이 강화되는 시점에서 사용이 줄거라고 생각했지만, 후봉에서 27시즌에도 게속 사용이 많이된 포켓몬, 이전에는 선봉으로 사용되었지만 지금 후봉 조커로 사용되며, 불태우기, 성스러운불꽃,브레이브버드로 체력도 튼튼하며 공격도 강한 포켓몬",
+   "en": "I expected its usage to fall as Dragons got stronger, but it stayed heavily used in the back through Season 27. It used to be a lead, now it's a back-line joker. Incinerate, Sacred Fire and Brave Bird, with big bulk and strong offense.",
+   "ja": "ドラゴンが強化される時期で使用が減ると思われたが、シーズン27でも後衛で使われ続けた。以前は先発だったが今は後衛のジョーカーとして使われ、やきつくす・せいなるほのお・ブレイブバードで耐久も高く攻撃も強い。",
+   "zh-TW": "本以為龍系加強後會變少用，但第27季在後排依然大量使用。以前當先鋒，現在是後排的鬼牌，用燒盡、神聖之火、勇鳥猛攻，耐久厚攻擊也強。"
+  },
+  "zygarde_complete": {
+   "ko": "튼튼한 체력으로 드래곤전에도 강했지만 땅고르기가 상향받으면서 강철과의 대전, 레시라무 제크로무와도 잘싸우게 되어, 28시즌 기대되는 포켓몬중 하나",
+   "en": "Its big bulk already made it strong in Dragon matchups, and with the Bulldoze buff it now fights Steel types and Reshiram/Zekrom well too — one to watch in Season 28.",
+   "ja": "高い耐久でドラゴン戦にも強かったが、じならしが上方修正されはがねとの対戦、レシラム・ゼクロムともよく戦えるようになり、シーズン28で期待されるポケモンの一つ。",
+   "zh-TW": "靠厚實耐久對龍本來就強，重踏被加強後跟鋼系、萊希拉姆·捷克羅姆也打得好，是第28季值得期待的寶可夢之一。"
+  },
+  "necrozma_dusk_mane": {
+   "ko": "아이언헤드, 악의파동 두개를 주로 사용하였는데 두기술 모두 상향을 받게되어, 28시즌에 많이 사용될거같은 포켓몬, 메테오드라이브보다 아이언헤드를 더 많이 사용될거 같음",
+   "en": "Mainly ran Iron Head and Dark Pulse, and both got buffed, so expect heavy use in Season 28. Iron Head will likely see more use than Sunsteel Strike.",
+   "ja": "アイアンヘッド・あくのはどうの2つを主に使っていたが、両方が上方修正されたためシーズン28でよく使われそう。メテオドライブよりアイアンヘッドの方が多く使われそう。",
+   "zh-TW": "主要用鐵頭、惡之波動兩招，兩招都被加強，第28季應該會很常見。鐵頭大概會比流星閃衝更常用。"
+  },
+  "groudon": {
+   "ko": "실제 많이 사용되진 않지만 머드샷 빠른차징기와, 단애의칼이라는 최강땅 레거시공격기를 가지고있어서, 잘쓰는 사람은 매우 잘쓰는 포켓몬.",
+   "en": "Not actually used much, but with the fast-charging Mud Shot and the legacy move Precipice Blades — the strongest Ground attack — skilled players get a lot out of it.",
+   "ja": "実際にはあまり使われないが、回転の速いマッドショットと、だんがいのつるぎという最強のじめんレガシー技を持つため、上手い人は非常に上手く使う。",
+   "zh-TW": "實際使用不多，但有集氣快的泥巴射擊，和斷崖之劍這個最強的地面傳承招，熟手用起來非常厲害。"
+  },
+  "solgaleo": {
+   "ko": "회오리불꽃으로 적당히 빠른차징속도와 강한평타기술을 가지고있으며, 사이코팽으로 방어를 하락시키면서 강철을 녹여가는 포켓몬이지만 드래곤을 견제하기 어려워 사용은 많지않을거로 예상됨",
+   "en": "Fire Spin gives it decent charge speed and strong fast-move damage, and Psychic Fangs drops defense while it melts Steel types. But it struggles to check Dragons, so I don't expect much usage.",
+   "ja": "ほのおのうずでそこそこ速いゲージ回転と強い通常技を持ち、サイコファングで防御を下げながらはがねを溶かしていくポケモンだが、ドラゴンの牽制が難しく使用は多くならない見込み。",
+   "zh-TW": "火焰旋渦集氣速度尚可、小招也強，用精神之牙降防一邊融掉鋼系，但很難牽制龍系，預計不會太常用。"
+  },
+  "melmetal": {
+   "ko": "강철이지만 전기쇼크 단일기본기를 쓰며, 무려 7개의 특수기가 있어서, 어떤기술을 가지고있느냐에따라 전혀 다른 포켓몬이됨, 더블펀처,폭발펀치 쓰기도하며, 10만볼트,폭발펀치 쓸수도있고 스킬과 스타일에 따라 완전 다른포켓몬이됨",
+   "en": "A Steel type, but its only fast move is Thunder Shock, and with as many as seven charged moves it becomes a completely different Pokémon depending on what it carries. Some run Double Iron Bash + Dynamic Punch, others Thunderbolt + Dynamic Punch — the moveset and style change it entirely.",
+   "ja": "はがねだが通常技はでんきショックのみで、ゲージ技が7つもあるため、どの技を持っているかでまったく別のポケモンになる。ダブルパンツァー＋ばくれつパンチも、10まんボルト＋ばくれつパンチもあり、技とスタイル次第で完全に別物。",
+   "zh-TW": "鋼系但小招只有電擊，大招多達7個，帶什麼招式就變成完全不同的寶可夢。有人用二連重拳＋爆裂拳，也有人用十萬伏特＋爆裂拳，招式和風格一變就是另一隻。"
+  },
+  "keldeo_resolute": {
+   "ko": "안다리걸기로 빠르면서 강한 기본기와, 매우 빠르게 때릴수있는 신비의칼, 아쿠아제트로, 드래곤과도 잘싸우고, 약점이였던 루나아라 너프되고, 제르네아스 문포스도 스킬이 변동되어, 28시즌에 사용율이 많아질거로 보여지는 포켓몬",
+   "en": "Low Kick is a fast, strong fast move, and Secret Sword and Aqua Jet fire off very quickly, so it fights Dragons well too. With Lunala (its bad matchup) nerfed and Xerneas's Moonblast changed, its usage looks set to rise in Season 28.",
+   "ja": "けたぐりで速くて強い通常技を持ち、非常に速く撃てるしんぴのつるぎ・アクアジェットでドラゴンともよく戦える。弱点だったルナアーラがナーフされ、ゼルネアスのムーンフォースも技が変更されたため、シーズン28で使用率が増えそう。",
+   "zh-TW": "踢倒是又快又強的小招，神秘之劍、水流噴射放得很快，跟龍系也打得好。原本的剋星露奈雅拉被削弱、哲爾尼亞斯的月亮之力也被改動，第28季使用率看來會上升。"
+  },
+  "primarina": {
+   "ko": "애교부리기 너프로 인해 사용빈도 많이 줄어들은 포켓몬, 제르네아스에 비해 좋은점이 많이 낮아졌고, 마스터리그에 사용하기엔 cp가 낮아서 비춘포켓몬",
+   "en": "Usage dropped a lot after the Charm nerf. Its advantages over Xerneas shrank considerably, and its CP is too low for the Master League — not recommended.",
+   "ja": "あまえるのナーフで使用頻度が大きく減ったポケモン。ゼルネアスに比べた長所がかなり小さくなり、マスターリーグで使うにはCPが低いためおすすめしない。",
+   "zh-TW": "撒嬌被削弱後使用率大減。相對哲爾尼亞斯的優點少了很多，CP也太低不適合大師聯盟，不推薦。"
+  },
+  "ursaluna_shadow": {
+   "ko": "28시즌 할퀴기를 받아 빠르고 강한 차징기를 얻었으며, 특수기술 8개를 익힐수있어 매우 다양하게 사용이 가능해진 포켓몬, 개척하기, 냉동펀치라면 드래곤도 견제가 가능하며 10만마력을 사용한다면 강한 땅공격으로 레시라무 제크로무에게도 한방 먹일수가 있는 포켓몬",
+   "en": "Got Scratch in Season 28, giving it a fast, strong charging fast move, and with eight charged moves to learn it's become very versatile. With Trailblaze or Ice Punch it can even check Dragons, and with High Horsepower its strong Ground damage can land a big hit on Reshiram and Zekrom.",
+   "ja": "シーズン28でひっかくを得て速くて強いゲージ回転の通常技を手に入れ、ゲージ技を8つ覚えられるため非常に多様に使えるようになった。くさわけ・れいとうパンチならドラゴンも牽制でき、10まんばりきを使えば強いじめん攻撃でレシラム・ゼクロムにも一発入れられる。",
+   "zh-TW": "第28季拿到抓，獲得又快又強的集氣小招，大招能學8個，變得非常多變。帶開路、冰凍拳能牽制龍系，用十萬馬力則能靠強力地面攻擊給萊希拉姆、捷克羅姆一記重擊。"
+  },
+  "lugia_shadow": {
+   "ko": "이전에는 별로 사용되지않앗지만 28시즌 대지의힘을 익힘으로, 레시라무,제크로무,검왕등 강철,불꽃,전기타입들에게 강한 공격을할수있는 땅공격을 받음으로 28시즌 사용율이 많이 늘게될거같은 포켓몬",
+   "en": "Rarely used before, but in Season 28 it learned Earth Power, giving it strong Ground damage against Steel, Fire and Electric types like Reshiram, Zekrom and Zacian — expect its usage to climb a lot in Season 28.",
+   "ja": "以前はあまり使われなかったが、シーズン28でだいちのちからを習得し、レシラム・ゼクロム・剣の王などはがね・ほのお・でんきに強い攻撃ができるじめん技を得たことで、シーズン28で使用率が大きく伸びそうなポケモン。",
+   "zh-TW": "以前不太被使用，但第28季學會大地之力，拿到能痛打萊希拉姆、捷克羅姆、劍之王等鋼·火·電系的地面招，第28季使用率應該會大幅上升。"
+  },
+  "reshiram_shadow": {
+   "ko": "27시즌 픽업율2위의 레시라무, 페어리에게도 밀리지않고 드래곤과도 잘싸우고, 루나아라조차 이겨버린 27시즌의 최강포켓몬이였고, 28시즌에도 너프된게 없기때문에 많은 사랑을 받을거로 기대되는 포켓몬",
+   "en": "The #2 pick of Season 27. It doesn't lose to Fairies, fights Dragons well, and even beat Lunala — the strongest Pokémon of Season 27. Nothing was nerfed for Season 28, so expect it to stay very popular.",
+   "ja": "シーズン27ピック率2位のレシラム。フェアリーにも押されず、ドラゴンともよく戦い、ルナアーラすら倒したシーズン27最強のポケモン。シーズン28でもナーフされていないため、引き続き多くの支持を集めそう。",
+   "zh-TW": "第27季使用率第2的萊希拉姆。不輸妖精、跟龍系也打得好，連露奈雅拉都能贏，是第27季最強的寶可夢。第28季也沒被削弱，預計會繼續受到喜愛。"
+  },
+  "metagross_shadow": {
+   "ko": "강철/에스퍼 타입으로 고스트,땅,불꽃,악 약점이지만, 강한 강철레거시 기술 코멧펀치와, 지진으로 드래곤견제도 잘하며 강철, 고스트에게도 이기는 포켓몬",
+   "en": "Steel/Psychic, weak to Ghost, Ground, Fire and Dark, but its strong legacy Steel move Meteor Mash plus Earthquake let it check Dragons well and beat Steel and Ghost types too.",
+   "ja": "はがね/エスパーでゴースト・じめん・ほのお・あくが弱点だが、強力なはがねのレガシー技コメットパンチとじしんでドラゴンの牽制も上手く、はがね・ゴーストにも勝てる。",
+   "zh-TW": "鋼/超能力，怕幽靈·地面·火·惡，但強力的鋼系傳承招式彗星拳加上地震，牽制龍系很在行，對鋼·幽靈也贏得了。"
+  },
+  "ursaluna": {
+   "ko": "28시즌 할퀴기를 받아 빠르고 강한 차징기를 얻었으며, 특수기술 8개를 익힐수있어 매우 다양하게 사용이 가능해진 포켓몬, 개척하기, 냉동펀치라면 드래곤도 견제가 가능하며 10만마력을 사용한다면 강한 땅공격으로 레시라무 제크로무에게도 한방 먹일수가 있는 포켓몬",
+   "en": "Got Scratch in Season 28, giving it a fast, strong charging fast move, and with eight charged moves to learn it's become very versatile. With Trailblaze or Ice Punch it can even check Dragons, and with High Horsepower its strong Ground damage can land a big hit on Reshiram and Zekrom.",
+   "ja": "シーズン28でひっかくを得て速くて強いゲージ回転の通常技を手に入れ、ゲージ技を8つ覚えられるため非常に多様に使えるようになった。くさわけ・れいとうパンチならドラゴンも牽制でき、10まんばりきを使えば強いじめん攻撃でレシラム・ゼクロムにも一発入れられる。",
+   "zh-TW": "第28季拿到抓，獲得又快又強的集氣小招，大招能學8個，變得非常多變。帶開路、冰凍拳能牽制龍系，用十萬馬力則能靠強力地面攻擊給萊希拉姆、捷克羅姆一記重擊。"
+  },
+  "garchomp": {
+   "ko": "빠른차징기 머드샷을 사용할수있으며, 회오리, 대지의힘을 주로 사용하는데, 같은 드래곤에게 강한공격을할수도있고, 땅공격도 매우 강하기때문에 체력방어는 약하지만 공격이 매우 좋은 포켓몬",
+   "en": "Can run the fast-charging Mud Shot, mainly with Twister and Earth Power. It hits other Dragons hard and its Ground damage is also very strong — low bulk, but excellent offense.",
+   "ja": "回転の速いマッドショットを使え、たつまき・だいちのちからを主に使う。同じドラゴンに強い攻撃ができ、じめん攻撃も非常に強いため、耐久は低いが攻撃が非常に優秀。",
+   "zh-TW": "能用集氣快的泥巴射擊，主要配龍捲風、大地之力。對同為龍系能打出強攻擊，地面攻擊也非常強，耐久雖弱但攻擊非常好。"
+  }
+ }
 }

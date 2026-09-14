@@ -69,6 +69,12 @@ for (const [league, ids] of Object.entries(META.leagues || {})) {
     const base = notes[league][id.replace(/_shadow$/, "")];
     if (base) { notes[league][id] = { ...base }; inherited++; }
   }
+  // 역방향: 기본 폼이 비어 있고 그림자 폼에만 써 있으면 기본 폼이 그림자 노트를 상속 (같은 종이므로)
+  for (const id of ids) {
+    if (id.endsWith("_shadow") || notes[league][id]) continue;
+    const sh = notes[league][`${id}_shadow`];
+    if (sh) { notes[league][id] = { ...sh }; inherited++; }
+  }
 }
 writeFileSync(OUT, JSON.stringify(notes, null, 1));
 console.log(`[${SRC.split(/[\\/]/).pop()} · ${delim === "\t" ? "탭" : "쉼표"}] 노트 반영 ${filled}마리 + 그림자 상속 ${inherited} (미작성 ${skipped}${partial.length ? ` · 미완성 제외 ${partial.length}: ${partial.join(", ")}` : ""}${bad.length ? `, 리그 인식 실패 ${bad.length}: ${bad.slice(0, 3).join(", ")}` : ""}) → gbl_mon_notes.json`);
