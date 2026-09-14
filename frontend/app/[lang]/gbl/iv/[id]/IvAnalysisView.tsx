@@ -32,6 +32,7 @@ const VERDICT: Record<string, { color: string; bg: string; label: Record<Locale,
   "CMP탈락": { color: "#dc2626", bg: "#fee2e2", label: { ko: "CMP 탈락", en: "CMP loss", ja: "CMP負け", "zh-TW": "CMP落敗" } },
 };
 
+const DRAW_L: Record<Locale, string> = { ko: "무", en: "Tie", ja: "引分", "zh-TW": "平手" };
 const UI: Record<Locale, Record<string, string>> = {
   ko: { back: "← GBL Note", ivTool: "개체값 순위 체커", tier: "티어표", compromiseLabel: "타협 개체값", verdictH: "개체값별 판정 (마스터리그 실측 시뮬)",
         thIv: "개체값(공/방/체)", thCp: "CP", thHp: "HP", thVerdict: "판정", thWeak: "불리해지는 상대", none: "없음", shieldTag: "실드",
@@ -359,12 +360,14 @@ export default function IvAnalysisView({ lang, id, e }: { lang: Locale; id: stri
                 <div style={{ fontSize: "0.72rem", color: "#94a3b8", marginBottom: 6 }}>{u.cmpMine} vs {u.cmpOpp}</div>
                 <div style={{ display: "flex", gap: 6 }}>
                   {duel.map((d) => {
-                    const lose = d.result === "패", tie = d.result === "무";
+                    const lose = d.result === "패" || d.result === "負", tie = d.result === "무" || d.result === "引分";
                     const c = lose ? "#dc2626" : tie ? "#64748b" : "#16a34a";
+                    // 시뮬 데이터의 결과 문자열은 ko 고정 → 로케일 라벨로 표시(en/ja/zh-TW 페이지에 '승/패/무' 누출 방지)
+                    const resLabel = lose ? u.loss : tie ? DRAW_L[lang] : u.win;
                     return (
                       <div key={d.shields} style={{ flex: 1, textAlign: "center", background: c + "12", border: `1px solid ${c}44`, borderRadius: 8, padding: "5px 4px" }}>
                         <div style={{ fontSize: "0.64rem", color: "#94a3b8" }}>{u.shieldTag}{d.shields}</div>
-                        <div style={{ fontSize: "0.9rem", fontWeight: 900, color: c }}>{d.result}</div>
+                        <div style={{ fontSize: "0.9rem", fontWeight: 900, color: c }}>{resLabel}</div>
                         <div style={{ fontSize: "0.62rem", color: "#94a3b8" }}>{d.mine}</div>
                       </div>
                     );

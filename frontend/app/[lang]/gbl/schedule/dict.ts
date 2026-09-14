@@ -76,6 +76,14 @@ const en: ScheduleDict = {
   nextSeasonChangesLabel: "What's coming", nextSeasonChanges: "Move rebalance · several new moves (Raichu Volt Tackle, etc.)",
   cupLabels: {
     "스크롤컵 (슈퍼리그)": "Scroll Cup (Great League)",
+    "컴페티티브컵 (슈퍼리그)": "Competitive Cup (Great League)",
+    "레트로컵 (슈퍼리그)": "Retro Cup (Great League)",
+    "메가 4색컵 (슈퍼리그)": "Mega Four-Color Cup (Great League)",
+    "리틀컵": "Little Cup",
+    "판타지컵 (슈퍼리그)": "Fantasy Cup (Great League)",
+    "메가 할로윈컵 (슈퍼리그)": "Mega Halloween Cup (Great League)",
+    "메가 캐치컵 (슈퍼리그)": "Mega Catch Cup (Great League)",
+    "GO 챔피언십 LA컵": "GO Championship LA Cup",
   },
   notes: {
     "배틀 승리 시 별의모래 4배 (세트 종료 리워드 제외)": "4× Stardust on battle wins (excludes set completion rewards)",
@@ -111,6 +119,14 @@ const ja: ScheduleDict = {
   nextSeasonChangesLabel: "次シーズン予告", nextSeasonChanges: "技のリバランス · 新規技追加 (ライチュウ ボルテッカー等)",
   cupLabels: {
     "스크롤컵 (슈퍼리그)": "スクロールカップ（スーパーリーグ）",
+    "컴페티티브컵 (슈퍼리그)": "コンペティティブカップ（スーパーリーグ）",
+    "레트로컵 (슈퍼리그)": "レトロカップ（スーパーリーグ）",
+    "메가 4색컵 (슈퍼리그)": "メガ4色カップ（スーパーリーグ）",
+    "리틀컵": "リトルカップ",
+    "판타지컵 (슈퍼리그)": "ファンタジーカップ（スーパーリーグ）",
+    "메가 할로윈컵 (슈퍼리그)": "メガハロウィンカップ（スーパーリーグ）",
+    "메가 캐치컵 (슈퍼리그)": "メガキャッチカップ（スーパーリーグ）",
+    "GO 챔피언십 LA컵": "GOチャンピオンシップ LAカップ",
   },
   notes: {
     "배틀 승리 시 별의모래 4배 (세트 종료 리워드 제외)": "対戦勝利でほしのすな4倍（セット終了報酬は除く）",
@@ -146,6 +162,14 @@ const zhTW: ScheduleDict = {
   nextSeasonChangesLabel: "下賽季預告", nextSeasonChanges: "招式重新平衡 · 新增多個招式（雷丘 伏特攻擊等）",
   cupLabels: {
     "스크롤컵 (슈퍼리그)": "捲軸盃（超級聯盟）",
+    "컴페티티브컵 (슈퍼리그)": "競技盃（超級聯盟）",
+    "레트로컵 (슈퍼리그)": "復古盃（超級聯盟）",
+    "메가 4색컵 (슈퍼리그)": "超級進化四色盃（超級聯盟）",
+    "리틀컵": "小小盃",
+    "판타지컵 (슈퍼리그)": "幻想盃（超級聯盟）",
+    "메가 할로윈컵 (슈퍼리그)": "超級進化萬聖節盃（超級聯盟）",
+    "메가 캐치컵 (슈퍼리그)": "超級進化捕捉盃（超級聯盟）",
+    "GO 챔피언십 LA컵": "GO 錦標賽 LA 盃",
   },
   notes: {
     "배틀 승리 시 별의모래 4배 (세트 종료 리워드 제외)": "對戰勝利時星星沙子4倍（不含賽組結束獎勵）",
