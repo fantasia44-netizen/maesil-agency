@@ -8,6 +8,10 @@ const LEAGUES = (META as { leagues: Record<string, string[]> }).leagues;
 const SETS: Record<string, Set<string>> = Object.fromEntries(Object.entries(LEAGUES).map(([l, ids]) => [l, new Set(ids)]));
 
 // 메가 리그(*_mega) 등 리스트에 없는 리그는 false → noindex(사이트맵에도 원래 없음).
+// 그림자(_shadow)는 기본 폼과 노트·해설이 같아 중복 페이지로 읽히므로, 기본 폼이 같은 리그 메타에 있으면 그림자는 noindex.
+// (기본 폼이 메타에 없는 그림자 단독 메타 — 그림자 깜까미·강철톤 등 — 는 중복이 없으니 그대로 색인)
 export function isMetaMon(league: string, id: string): boolean {
-  return SETS[league]?.has(id) ?? false;
+  const set = SETS[league];
+  if (!set?.has(id)) return false;
+  return !(id.endsWith("_shadow") && set.has(id.replace(/_shadow$/, "")));
 }
