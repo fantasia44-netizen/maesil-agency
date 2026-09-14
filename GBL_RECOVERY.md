@@ -71,10 +71,9 @@
 - **그림자 페이지 통합(삭제)** — 사장님 "중복인 애들은 삭제해서 페이지 줄이자": noindex에서 한 발 더 나가 **페이지 자체를 없앰**. `indexGate.ts` `mergedShadowBase(league,id)` = 현재 시즌 스냅샷에 기본 폼이 있으면 기본 폼 id. 상세 페이지: 그림자 URL → 기본 폼으로 **308 영구 리다이렉트**(`permanentRedirect`, ?s= 유지), 기본 폼 페이지에 **🌑 그림자 폼 요약 블록**(티어·점수·종족값, 4개국어). 티어표·CMP·가이드 예시·카운터·파트너 링크 전부 `linkMonId()`로 기본 폼을 가리킴(내부 301 없음). 기본 폼이 없는 그림자(니로우·기라티나 그림자 등 38)는 자기 페이지 유지(noindex). 그림자 단독 메타(드래피온·릴리요)는 기본 폼이 색인+노트+파트너(폴백) 승계. `import_mon_notes.mjs` 역상속을 메타 목록 무관 전 노트로 확대. 결과: 상세 페이지 s28 1,200 → **910**(그림자 290 통합 ×4로케일 = URL 1,160 감소), 사이트맵 772 그대로(포켓몬 496·그림자 0). 로컬 검증: lapras_shadow→308 lapras, drapion→index+노트+그림자블록, murkrow_shadow→200 noindex, 티어표 링크 그림자 0.
 - 이제 미노트(색인 대상 기준)는 **일반 폼 21마리**: great 18(cramorant·snorlax·araquanid·vigoroth·deoxys_defense·annihilape·dondozo·turtonator·doublade·gourgeist_super/average/small·oranguru·samurott·spiritomb·zweilous·metang·lickilicky) · ultra 3(cramorant·deoxys_defense·doublade). 이 21장만 자동 분석문이 남음.
 
-- **가이드 "레전드 한마디 — GBL Note의 이견"**(레버 ③ 비-포켓몬 편집 콘텐츠): 가이드 8개 중 6개(cct·moveset·gbl-basics·league-cp·iv-optimization·party-building)에 사장님 원문 Q&A 블록(주황 카드, "정답 아닐 수 있음" 명시), 4개국어. 데이터는 `guide/voices.ts`(`GUIDE_VOICE[slug][lang] = [{q,a}]`) — 한마디 추가는 여기에만. `league-cp` 제목 "리그별 CP 제한"→**"리그 안내 — …(CP 제한과 특징)"** 4개국어. type-chart·pogo-pvp-calc는 아직 없음(사장님이 한마디 주시면 추가).
+- **가이드 "레전드 한마디 — GBL Note의 이견"**(레버 ③ 비-포켓몬 편집 콘텐츠): 가이드 8개 중 6개(cct·moveset·gbl-basics·league-cp·iv-optimization·party-building)에 사장님 원문 Q&A 블록(주황 카드, "정답 아닐 수 있음" 명시), 4개국어. 데이터는 `guide/voices.ts`(`GUIDE_VOICE[slug][lang] = [{q,a}]`) — 한마디 추가는 여기에만. `league-cp` 제목 "리그별 CP 제한"→**"리그 안내 — …(CP 제한과 특징)"** 4개국어. type-chart·pogo-pvp-calc는 **의도적으로 없음**(사장님: "둘 다 그냥 데이터 계산식이라 적을 게 없어") — 억지로 얹지 말 것.
 
 ### 사장님이 이어서 할 것 (순서 무관, 급하지 않음)
-0. (선택) 타입 상성표·PvP 계산법 가이드에도 "레전드 한마디" 한 줄씩 → `voices.ts`에 추가.
 1. `GBL_MON_NOTES.csv`에 위 미노트 21마리(일반 폼) 행 추가 후 작성(148/176, 색인 기준 109/130). 규칙·예시: `GBL_MON_NOTES_README.md`. **"표에 없는 말 하나"** 필수(회피 상대 / 팀 역할 / 요즘 메타 평가). 후반 노트가 "타입→약점→기술" 나열로 굳어지는 경향 있었음 — 킹드라·나인테일·마릴리·깨비드릴조는 한 문장씩 보강 권장. 작성 후 `node scripts/gbl/import_mon_notes.mjs` → Claude에게 "ko 노트 번역 채워줘".
 2. (선택) `GBL_PARTY_NOTES.csv` 파티 포인트 한 줄.
 3. (선택) 포켓지니로 기술명 4개(섀도클로·머드샷·에어커터·거대해머) 인게임 스팟체크.
