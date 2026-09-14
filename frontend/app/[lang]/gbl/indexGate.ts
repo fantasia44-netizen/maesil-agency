@@ -5,6 +5,7 @@
 import META from "./gbl_meta_mons.json";
 import DETAIL from "./gbl_detail.json";
 import DETAIL_S28 from "./gbl_detail_s28.json";
+import MON_NOTES from "./gbl_mon_notes.json";
 import { currentSeason } from "./seasons";
 
 const LEAGUES = (META as { leagues: Record<string, string[]> }).leagues;
@@ -12,7 +13,7 @@ const SETS: Record<string, Set<string>> = Object.fromEntries(Object.entries(LEAG
 
 // 현재 시즌 상세 스냅샷의 리그→id 집합 (그림자 통합 판정 기준). 시즌 스냅샷을 추가하면 여기도 등록.
 const SNAP_BY_SLUG: Record<string, unknown> = { s27: DETAIL, s28: DETAIL_S28 };
-const CUR = (SNAP_BY_SLUG[currentSeason().slug] || DETAIL_S28) as Record<string, { id: string }[]>;
+const CUR = (SNAP_BY_SLUG[currentSeason().slug] || DETAIL_S28) as Record<string, { id: string; tier?: string }[]>;
 const CUR_IDS: Record<string, Set<string>> = Object.fromEntries(Object.entries(CUR).map(([l, arr]) => [l, new Set(arr.map((e) => e.id))]));
 
 // 그림자(_shadow) 페이지 통합 — 그림자는 기본 폼과 노트·해설이 같아 "중복 페이지"로 읽히므로 페이지 자체를 없앰.
@@ -39,7 +40,15 @@ export function isMetaMon(league: string, id: string): boolean {
   const set = SETS[league];
   if (!set) return false;
   if (mergedShadowBase(league, id)) return false; // 통합된 그림자·사이즈 폼은 301이므로 색인 대상 아님
-  if (id.endsWith("_shadow")) return set.has(id);
   const sh = `${id}_shadow`;
-  return set.has(id) || (set.has(sh) && mergedShadowBase(league, sh) === id);
+  const inMeta = id.endsWith("_shadow") ? set.has(id) : set.has(id) || (set.has(sh) && mergedShadowBase(league, sh) === id);
+  if (!inMeta) return false;
+  // 마지막 필터 — "실측 표본 부족 + 운영자 노트 없음 + 메타 비중 낮음(B 이하)"이 겹치는 몬은 노트가 채워질 때까지 noindex.
+  // (노트를 쓰면 자동으로 색인 복귀: gbl_mon_notes.json 기준)
+  return hasNote(league, id) || ["S", "A"].includes(tierOf(league, id));
 }
+// 사이트맵용 — 현재 시즌 스냅샷 기준 색인 대상 id 목록(페이지의 robots 판정과 같은 소스·같은 시즌).
+export const indexableMonIds = (league: string): string[] => (CUR[league] || []).map((e) => e.id).filter((id) => isMetaMon(league, id));
+const NOTES = MON_NOTES as Record<string, Record<string, unknown>>;
+const hasNote = (league: string, id: string) => !!NOTES[league]?.[id] || !!NOTES[league]?.[`${id}_shadow`];
+const tierOf = (league: string, id: string) => (CUR[league] || []).find((e) => e.id === id)?.tier || "";
