@@ -59,12 +59,16 @@ for (const r of rows.slice(1)) {
 }
 // 그림자(_shadow) 폼: 별도 노트가 비어 있으면 같은 리그의 기본 폼 노트를 그대로 상속 (2중 작성 불필요).
 // 그림자 칸에 직접 쓰면 그게 우선(상속 안 함).
+// ⚠️ CSV 행이 아니라 메타몬 목록(gbl_meta_mons.json) 기준으로 순회 — CSV에 그림자 행이 없어도 base 노트가 상속되도록.
+const META = JSON.parse(readFileSync(join(__dir, "../../app/[lang]/gbl/gbl_meta_mons.json"), "utf8"));
 let inherited = 0;
-for (const r of rows.slice(1)) {
-  const league = (r[iL] || "").trim(), id = (r[iI] || "").trim();
-  if (!notes[league] || !id.endsWith("_shadow") || notes[league][id]) continue;
-  const base = notes[league][id.replace(/_shadow$/, "")];
-  if (base) { notes[league][id] = { ...base }; inherited++; skipped--; }
+for (const [league, ids] of Object.entries(META.leagues || {})) {
+  if (!notes[league]) continue;
+  for (const id of ids) {
+    if (!id.endsWith("_shadow") || notes[league][id]) continue;
+    const base = notes[league][id.replace(/_shadow$/, "")];
+    if (base) { notes[league][id] = { ...base }; inherited++; }
+  }
 }
 writeFileSync(OUT, JSON.stringify(notes, null, 1));
 console.log(`[${SRC.split(/[\\/]/).pop()} · ${delim === "\t" ? "탭" : "쉼표"}] 노트 반영 ${filled}마리 + 그림자 상속 ${inherited} (미작성 ${skipped}${partial.length ? ` · 미완성 제외 ${partial.length}: ${partial.join(", ")}` : ""}${bad.length ? `, 리그 인식 실패 ${bad.length}: ${bad.slice(0, 3).join(", ")}` : ""}) → gbl_mon_notes.json`);
