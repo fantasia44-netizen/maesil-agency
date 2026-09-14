@@ -10,6 +10,12 @@ import { elementName, packName } from "../loc";
 type Card = { s: string; n: number; name: string; r: string; packs: string[]; nm?: Record<string, string>; e?: string; w?: string };
 const DATA = CARDS as Card[];
 const SETS = [...new Set(DATA.map((c) => c.s))];
+// AdSense 승인 전엔 카드 상세(3,879장)로 가는 내부 링크를 끊음 — noindex는 검색봇용이라 심사 크롤러(Mediapartners)는 링크를 타고 대량 DB 페이지를 볼 수 있음.
+// 승인 후 NEXT_PUBLIC_TCG_INDEX_CARDS=1 이면 링크·색인·robots 전부 자동 복구(cards/[id]/page.tsx·robots.ts와 같은 스위치).
+const CARDS_OPEN = process.env.NEXT_PUBLIC_TCG_INDEX_CARDS === "1";
+function CardBox({ href, style, children }: { href: string; style: React.CSSProperties; children: React.ReactNode }) {
+  return CARDS_OPEN ? <Link href={href} style={style}>{children}</Link> : <div style={style}>{children}</div>;
+}
 const ELEMENTS = ["grass", "fire", "water", "lightning", "psychic", "fighting", "darkness", "metal", "dragon", "colorless"];
 
 const ELEMENT_COLOR: Record<string, string> = {
@@ -73,7 +79,7 @@ export default function CardsClient({ lang }: { lang: Locale }) {
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 8 }}>
           {filtered.slice(0, LIMIT).map((c) => (
-            <Link key={`${c.s}-${c.n}`} href={localizePath(lang, `/tcg/cards/${c.s.toLowerCase()}-${c.n}`)} style={{ display: "block", textDecoration: "none", background: "#fff", border: "1px solid #fbd8d8", borderRadius: 10, padding: "0.6rem 0.8rem" }}>
+            <CardBox key={`${c.s}-${c.n}`} href={localizePath(lang, `/tcg/cards/${c.s.toLowerCase()}-${c.n}`)} style={{ display: "block", textDecoration: "none", background: "#fff", border: "1px solid #fbd8d8", borderRadius: 10, padding: "0.6rem 0.8rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
                 {c.e && <span style={{ width: 9, height: 9, borderRadius: 999, background: ELEMENT_COLOR[c.e], flexShrink: 0 }} />}
                 <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nameOf(c)}</span>
@@ -87,7 +93,7 @@ export default function CardsClient({ lang }: { lang: Locale }) {
               {c.packs.length > 0 && (
                 <div style={{ marginTop: 4, fontSize: "0.68rem", color: "#dc2626" }}>{t.pack}: {c.packs.map((p) => packName(lang, p)).join(", ")}</div>
               )}
-            </Link>
+            </CardBox>
           ))}
         </div>
       )}
