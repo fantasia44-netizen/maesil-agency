@@ -60,8 +60,15 @@
 - **GBL Note 추천 파트너**(8b1aba8): `build_partners.mjs` — 메타몬마다 "주요 카운터를 이기는 메타몬" 상위 3(PvPoke 매치업, 카운터의 카운터 가중합) → 상세 페이지 블록(4개국어, 산출 기준 명시, 링크 칩). `GBL_PARTY_NOTES.csv`의 `party_note`에 한 줄 적으면 💬로 붙음 → `import_party_notes.mjs`.
 - **데이터 관측**: 구글 크롤 예산 축소 확인(발견됐지만 크롤 안 함 1,074) · Coverage 보고서 9/4에서 멈춤(GSC 자체 지연) · 일 노출 아직 ~10 · 네이버 97페이지 색인으로 일 2,351노출 · 빙 9/8 이후 3배 · GA4 채널 = 직접 55 / 네이버 31 / 구글 7 / **AI(ChatGPT 등) 2.5** / 빙 1 — ChatGPT 검색은 빙 색인을 쓰므로 IndexNow 가치 큼 · 해외 사용자 12% · GA4 "영어 943"은 폰 언어 영어인 한국 유저(수요 아님) · 9db 파티 통계는 시즌 5일째라 표본 30~40개(무의미).
 
+### 2026-09-14 (저녁) — 노트 3·4차: 전 리그 작성 완료, 자동 분석문 대체
+- **노트 3차**(3168aca): 슈퍼 55마리 + 그림자 16 상속 = 71. `page.tsx` 조건 `isMeta ? (hasAnalysis && !noteText) : …` → **노트 있는 페이지는 자동 분석문 미렌더**(레버 ② 적용). 그림자 상속을 CSV 행이 아니라 `gbl_meta_mons.json` 기준으로 순회하도록 수정(CSV에 그림자 행 없어도 상속).
+- **번역**(80bdf49): 슈퍼 39건 번역 + 그림자 8 상속 → great 71 전부 4개국어.
+- **노트 4차**(b4e8aa5): 사장님 하이퍼 38·마스터 29 작성분 반영 + 43건 번역 + 동일 본문 재사용 29. `import_mon_notes.mjs`에 **역방향 상속**(기본 폼 비고 그림자만 있으면 기본 폼이 상속) 추가. CSV 깨진 바이트 2곳 교정(포레토스 `불꽃에`, 칠색조 `생각했지만`).
+- **현황: 메타 176 중 노트 148**(great 76/100 · ultra 41/44 · master 31/32), **전부 en/ja/zh-TW**. 미노트 28 = CSV에 행이 없는 몬: great 24(cramorant·snorlax(+shadow)·araquanid(+shadow)·vigoroth(+shadow)·deoxys_defense·annihilape(+shadow)·dondozo·turtonator·doublade·gourgeist_super/average/small·oranguru·samurott·spiritomb·zweilous(+shadow)·metang(+shadow)·lickilicky) · ultra 3(cramorant·deoxys_defense·doublade) · master 1(palkia_shadow).
+- **구글봇 관점 측정**(로컬, Googlebot UA): 노트 55개 상호 3-gram Jaccard 평균 0.024·최대 0.136(템플릿이면 0.3~0.5) → 사람 작성 분포. 노트 페이지는 자동문 0, 공통 텍스트는 네비·표 라벨뿐. **미노트 페이지는 여전히 슬롯 채움 문장("선봉·마무리 등 여러 역할 점수가 고르게 높아…")** → 남은 28장에도 자동 분석문을 끌지(= `false`로 전면 미렌더, 데이터 표+파트너만) 사장님 결정 대기.
+
 ### 사장님이 이어서 할 것 (순서 무관, 급하지 않음)
-1. `GBL_MON_NOTES.csv` 나머지 노트(16/168 완료, 악식킹 이어쓰기). 규칙·예시: `GBL_MON_NOTES_README.md`. **"표에 없는 말 하나"** 필수(회피 상대 / 팀 역할 / 요즘 메타 평가). 후반 노트가 "타입→약점→기술" 나열로 굳어지는 경향 있었음 — 킹드라·나인테일·마릴리·깨비드릴조는 한 문장씩 보강 권장.
+1. `GBL_MON_NOTES.csv`에 위 미노트 28마리 행 추가 후 작성(148/176 완료). 규칙·예시: `GBL_MON_NOTES_README.md`. **"표에 없는 말 하나"** 필수(회피 상대 / 팀 역할 / 요즘 메타 평가). 후반 노트가 "타입→약점→기술" 나열로 굳어지는 경향 있었음 — 킹드라·나인테일·마릴리·깨비드릴조는 한 문장씩 보강 권장. 작성 후 `node scripts/gbl/import_mon_notes.mjs` → Claude에게 "ko 노트 번역 채워줘".
 2. (선택) `GBL_PARTY_NOTES.csv` 파티 포인트 한 줄.
 3. (선택) 포켓지니로 기술명 4개(섀도클로·머드샷·에어커터·거대해머) 인게임 스팟체크.
 4. GSC **주 단위** 관찰 — 아래 지표.
