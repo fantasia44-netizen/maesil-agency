@@ -73,6 +73,11 @@
 
 - **가이드 "레전드 한마디 — GBL Note의 이견"**(레버 ③ 비-포켓몬 편집 콘텐츠): 가이드 8개 중 6개(cct·moveset·gbl-basics·league-cp·iv-optimization·party-building)에 사장님 원문 Q&A 블록(주황 카드, "정답 아닐 수 있음" 명시), 4개국어. 데이터는 `guide/voices.ts`(`GUIDE_VOICE[slug][lang] = [{q,a}]`) — 한마디 추가는 여기에만. `league-cp` 제목 "리그별 CP 제한"→**"리그 안내 — …(CP 제한과 특징)"** 4개국어. type-chart·pogo-pvp-calc는 **의도적으로 없음**(사장님: "둘 다 그냥 데이터 계산식이라 적을 게 없어") — 억지로 얹지 말 것.
 
+### 2026-09-14 (밤) — AdSense "가치 낮은 콘텐츠" 관점 전 사이트 점검(라이브·Googlebot UA, ko 193 URL 전수)
+- **결과 요약**: 사이트맵 772 전부 200·noindex 0·h1 1개·hreflang 정상·title/desc 중복은 펌킨인 4폼뿐. 섹션별 본문(네비 제외) 중앙값: 포켓몬 1,285자(124장, 노트 108·자동문 16), IV 4,913, 티어 7,086, CMP 5,671, 레이드 2,602, 가이드 1,875. 노트 페이지끼리 고유텍스트 Jaccard 0.48 vs 미노트 0.63(템플릿 페이지가 더 닮음 — 예상대로). 광고 `<ins>` 0(미승인 상태라 광고 없음 → "콘텐츠 없는 화면에 광고" 리스크 현재 없음). 필수 페이지(about/privacy/terms/contact) 존재. 사이트맵 밖 board·meta_mega·고아 그림자·login 전부 noindex, 존재하지 않는 몬 404.
+- **발견·수정**: ① **`<html lang="ko"` 전 로케일 고정**(SSR 기준 en/ja/zh-TW 페이지도 ko, 클라에서만 교정) → middleware가 `x-locale` 헤더 주입, 루트 `app/layout.tsx`가 `headers()`로 lang 결정. 검증: /en→en, /ja→ja, /zh-TW→zh-TW. ② **펌킨인 4사이즈 폼 = 같은 티어·점수·기술·제목·설명** → `FORM_MERGE`로 super/average/small → large 308 통합(그림자 통합과 동일 기제, `mergedVariantsOf`로 대표 페이지에 🎃 사이즈 요약 블록), 사이트맵 772→**760**. `isMetaMon`은 통합 대상이면 무조건 false.
+- **남은 약점(수정 안 함, 판단 근거)**: /gbl/sim 474자·/gbl/trade 549자 = 클라이언트 앱이라 SSR 텍스트 얇음 — 심사관은 브라우저로 보므로 앱 UI가 보이고, 도구 페이지에 설명문을 억지로 넣으면 템플릿 냄새. 필요하면 각 도구 상단 2~3문장 "무엇을·어떻게·데이터 출처"만. 포켓몬 미노트 16장은 사장님 노트로 해결.
+
 ### 사장님이 이어서 할 것 (순서 무관, 급하지 않음)
 1. `GBL_MON_NOTES.csv`에 위 미노트 21마리(일반 폼) 행 추가 후 작성(148/176, 색인 기준 109/130). 규칙·예시: `GBL_MON_NOTES_README.md`. **"표에 없는 말 하나"** 필수(회피 상대 / 팀 역할 / 요즘 메타 평가). 후반 노트가 "타입→약점→기술" 나열로 굳어지는 경향 있었음 — 킹드라·나인테일·마릴리·깨비드릴조는 한 문장씩 보강 권장. 작성 후 `node scripts/gbl/import_mon_notes.mjs` → Claude에게 "ko 노트 번역 채워줘".
 2. (선택) `GBL_PARTY_NOTES.csv` 파티 포인트 한 줄.

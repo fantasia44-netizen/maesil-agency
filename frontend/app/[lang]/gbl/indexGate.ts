@@ -18,10 +18,17 @@ const CUR_IDS: Record<string, Set<string>> = Object.fromEntries(Object.entries(C
 // 그림자(_shadow) 페이지 통합 — 그림자는 기본 폼과 노트·해설이 같아 "중복 페이지"로 읽히므로 페이지 자체를 없앰.
 // 현재 시즌에 기본 폼이 있으면 → 그림자 URL은 기본 폼으로 301, 내부 링크도 기본 폼으로(과거 시즌 ?s= 은 상세 페이지가 폴백 처리).
 // 기본 폼 페이지가 없는 그림자(니로우 그림자 등)는 통합 대상 아님(자기 페이지 유지). 반환: 기본 폼 id 또는 null.
+// 사이즈 폼 등 티어·점수·기술이 사실상 같은 폼도 대표 폼으로 통합(제목·설명까지 동일한 중복 페이지 방지). 대표 폼 = 노트가 있는 폼.
+const FORM_MERGE: Record<string, string> = { gourgeist_super: "gourgeist_large", gourgeist_average: "gourgeist_large", gourgeist_small: "gourgeist_large" };
 export function mergedShadowBase(league: string, id: string): string | null {
-  if (!id.endsWith("_shadow")) return null;
-  const base = id.replace(/_shadow$/, "");
+  const base = id.endsWith("_shadow") ? id.replace(/_shadow$/, "") : FORM_MERGE[id];
+  if (!base) return null;
   return CUR_IDS[league]?.has(base) ? base : null;
+}
+// 대표 폼 페이지에 요약으로 얹을 통합 변형 id 목록(그림자 + 사이즈 폼), 현재 시즌에 있는 것만.
+export function mergedVariantsOf(league: string, id: string): string[] {
+  const out = [`${id}_shadow`, ...Object.entries(FORM_MERGE).filter(([, b]) => b === id).map(([v]) => v)];
+  return out.filter((v) => CUR_IDS[league]?.has(v));
 }
 // 링크용 id — 통합된 그림자는 기본 폼으로(내부 301 방지).
 export const linkMonId = (league: string, id: string): string => mergedShadowBase(league, id) ?? id;
@@ -31,7 +38,8 @@ export const linkMonId = (league: string, id: string): string => mergedShadowBas
 export function isMetaMon(league: string, id: string): boolean {
   const set = SETS[league];
   if (!set) return false;
-  if (id.endsWith("_shadow")) return set.has(id) && !mergedShadowBase(league, id);
+  if (mergedShadowBase(league, id)) return false; // 통합된 그림자·사이즈 폼은 301이므로 색인 대상 아님
+  if (id.endsWith("_shadow")) return set.has(id);
   const sh = `${id}_shadow`;
   return set.has(id) || (set.has(sh) && mergedShadowBase(league, sh) === id);
 }

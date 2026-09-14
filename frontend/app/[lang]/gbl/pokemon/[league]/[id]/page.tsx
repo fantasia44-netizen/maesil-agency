@@ -22,7 +22,7 @@ import { typeLabel } from "../../../typeLabels";
 import { getPoke } from "./dict";
 import { buildAnalysis, HEADINGS } from "./analysis";
 import { currentSeason, seasonBySlug } from "../../../seasons";
-import { isMetaMon, mergedShadowBase, linkMonId } from "../../../indexGate";
+import { isMetaMon, mergedShadowBase, mergedVariantsOf, linkMonId } from "../../../indexGate";
 import MON_NOTES from "../../../gbl_mon_notes.json";
 import PARTNERS from "../../../gbl_partners.json";
 
@@ -211,6 +211,18 @@ const SHADOW_L: Record<Locale, { title: string; note: string }> = {
   ja: { title: "🌑 シャドウ", note: "シャドウのページはここに統合。攻撃×1.2・防御×0.83、技構成・対策・運営者評価は通常フォルムと同じ基準で。" },
   "zh-TW": { title: "🌑 暗影形態", note: "暗影形態頁面已併入此頁。攻擊×1.2·防禦×0.83，配招、剋星、站長評價與一般形態相同。" },
 };
+// 사이즈 폼(펌킨인 등) 통합 라벨
+const FORM_L: Record<string, Record<Locale, string>> = {
+  super: { ko: "슈퍼 사이즈", en: "Super Size", ja: "特大サイズ", "zh-TW": "特大尺寸" },
+  average: { ko: "보통 사이즈", en: "Average Size", ja: "普通サイズ", "zh-TW": "普通尺寸" },
+  small: { ko: "작은 사이즈", en: "Small Size", ja: "小さいサイズ", "zh-TW": "小尺寸" },
+};
+const FORM_NOTE: Record<Locale, string> = {
+  ko: "이 사이즈 폼 페이지는 여기로 통합됐습니다. 티어·기술배치·카운터는 같고 종족값만 조금 다릅니다.",
+  en: "This size form's page is merged here. Same tier, moveset and counters — only the base stats differ slightly.",
+  ja: "このサイズのページはここに統合。ティア・技構成・対策は同じで、種族値だけ少し異なります。",
+  "zh-TW": "此尺寸形態頁面已併入此頁。分級、配招、剋星相同，只有種族值略有不同。",
+};
 
 function Sprite({ id, size = 40 }: { id: string; size?: number }) {
   const m = MON[id];
@@ -271,8 +283,8 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
   // 기본 폼 URL인데 그 시즌 스냅샷에 그림자만 있으면(통합 링크 + 과거 시즌) 그림자 데이터로 렌더.
   const d = findDetail(params.league, params.id, seasonSlug) || (params.id.endsWith("_shadow") ? undefined : findDetail(params.league, `${params.id}_shadow`, seasonSlug));
   if (!LEAGUE_KEYS.includes(params.league) || !d) notFound();
-  // 통합된 그림자 폼의 요약(티어·점수·종족값) — 기본 폼 페이지 안에서 한 블록으로 보여줌.
-  const shadowD = d.id.endsWith("_shadow") ? undefined : findDetail(params.league, `${d.id}_shadow`, seasonSlug);
+  // 통합된 변형(그림자·사이즈 폼)의 요약(티어·점수·종족값) — 대표 폼 페이지 안에서 한 블록씩 보여줌.
+  const variants = d.id.endsWith("_shadow") ? [] : mergedVariantsOf(params.league, d.id).map((vid) => ({ vid, vd: findDetail(params.league, vid, seasonSlug) })).filter((x) => x.vd) as { vid: string; vd: Detail }[];
 
   const pk = getPoke(lang);
   const L = (p: string) => localizePath(lang, p);
@@ -555,20 +567,25 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
           </>
         )}
 
-        {/* 그림자 폼 요약 — 그림자 페이지는 이 페이지로 통합(301). 기술배치·카운터·노트는 기본 폼과 같은 기준으로 봄 */}
-        {shadowD && (
-          <div style={{ marginTop: 10, background: "linear-gradient(120deg,#f5f3ff,#ffffff 70%)", border: "1px solid #ddd6fe", borderRadius: 10, padding: "10px 12px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-            <span style={{ fontWeight: 800, fontSize: "0.86rem", color: "#5b21b6" }}>{SHADOW_L[lang].title}</span>
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 7, background: TIER_COLOR[shadowD.tier], color: "#fff", fontWeight: 900, fontSize: "0.88rem" }}>{shadowD.tier}</span>
-            <span style={{ fontSize: "0.78rem", color: "#334155" }}>{pk.tierScore} <b>{shadowD.score}</b></span>
-            {shadowD.stats && (
-              <span style={{ fontSize: "0.76rem", color: "#475569" }}>
-                {pk.atk} {shadowD.stats.atk} · {pk.def} {shadowD.stats.def} · {pk.hp} {shadowD.stats.hp}
-              </span>
-            )}
-            <span style={{ fontSize: "0.72rem", color: "#7c3aed", flexBasis: "100%" }}>{SHADOW_L[lang].note}</span>
-          </div>
-        )}
+        {/* 통합 변형 요약 — 그림자·사이즈 폼 페이지는 이 페이지로 통합(301). 기술배치·카운터·노트는 대표 폼과 같은 기준으로 봄 */}
+        {variants.map(({ vid, vd }) => {
+          const isSh = vid.endsWith("_shadow");
+          const size = vid.split("_").pop() || "";
+          const title = isSh ? SHADOW_L[lang].title : `🎃 ${FORM_L[size]?.[lang] || size}`;
+          return (
+            <div key={vid} style={{ marginTop: 10, background: "linear-gradient(120deg,#f5f3ff,#ffffff 70%)", border: "1px solid #ddd6fe", borderRadius: 10, padding: "10px 12px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+              <span style={{ fontWeight: 800, fontSize: "0.86rem", color: "#5b21b6" }}>{title}</span>
+              <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 7, background: TIER_COLOR[vd.tier], color: "#fff", fontWeight: 900, fontSize: "0.88rem" }}>{vd.tier}</span>
+              <span style={{ fontSize: "0.78rem", color: "#334155" }}>{pk.tierScore} <b>{vd.score}</b></span>
+              {vd.stats && (
+                <span style={{ fontSize: "0.76rem", color: "#475569" }}>
+                  {pk.atk} {vd.stats.atk} · {pk.def} {vd.stats.def} · {pk.hp} {vd.stats.hp}
+                </span>
+              )}
+              <span style={{ fontSize: "0.72rem", color: "#7c3aed", flexBasis: "100%" }}>{isSh ? SHADOW_L[lang].note : FORM_NOTE[lang]}</span>
+            </div>
+          );
+        })}
 
         {/* 역할 점수 */}
         {d.scores && d.scores.length === 6 && (

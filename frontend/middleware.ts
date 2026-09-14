@@ -22,6 +22,13 @@ function sectionForHost(host: string): Section | null {
 // - 기본 로케일 ko는 프리픽스 없이 /<section>/* 로 노출 → 내부 /ko/<section>/* 로 rewrite(URL 유지).
 // - 그 외 로케일은 /<lang>/<section>/* 로 그대로 노출.
 // - 섹션 경로 처리는 호스트 무관(로컬 dev 포함). 루트→섹션 랜딩 리다이렉트만 해당 도메인 한정.
+// 루트 app/layout.tsx가 <html lang>을 로케일별로 찍도록 요청 헤더로 로케일 전달(App Router 루트 레이아웃은 [lang] params를 못 받음).
+function withLocale(req: NextRequest, lang: string) {
+  const h = new Headers(req.headers);
+  h.set("x-locale", lang);
+  return { request: { headers: h } };
+}
+
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
@@ -46,7 +53,7 @@ export function middleware(req: NextRequest) {
     if (isSectionSeg(restSeg)) {
       // gblnote 호스트로 들어온 /<lang>/tcg/* → tcgnote.net 301 (크로스호스트 중복 색인 방지)
       if (hostSection === "gbl" && restSeg === "tcg") return NextResponse.redirect(new URL(pathname + req.nextUrl.search, "https://tcgnote.net"), 301);
-      return NextResponse.next();
+      return NextResponse.next(withLocale(req, seg1));
     }
     const url = req.nextUrl.clone();
     url.pathname = `/${seg1}/${hostSection || "gbl"}`;
@@ -59,7 +66,7 @@ export function middleware(req: NextRequest) {
     if (hostSection === "gbl" && seg1 === "tcg") return NextResponse.redirect(new URL(pathname + req.nextUrl.search, "https://tcgnote.net"), 301);
     const url = req.nextUrl.clone();
     url.pathname = `/ko${pathname}`;
-    return NextResponse.rewrite(url);
+    return NextResponse.rewrite(url, withLocale(req, "ko"));
   }
 
   // 그 외 — 섹션 전용 호스트: 루트(/) 및 구 루트 URL을 해당 섹션 하위로 301(SEO 보존).
