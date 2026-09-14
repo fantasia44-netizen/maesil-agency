@@ -426,11 +426,11 @@
    "ja": "こおり/みずでジュゴンと同じタイプだが、ジュゴンが防御型ならトドゼルガは攻撃特化。こなゆき・つららばり・じしんを使う強い攻撃型ポケモン。",
    "zh-TW": "冰/水，和白海獅同屬性，但白海獅是防禦型，帝牙海獅則是攻擊特化。用細雪、冰柱、地震，是很強的攻擊型寶可夢。"
   },
-  "marowak": {
-   "ko": "단일 땅타입으로 진흙뿌리기가 너프당하면서 사용빈도가 줄었지만 그래도 땅타입으로 지진, 스톤샤워를 사용을하기 때문에 아직까지 땅타입 포켓몬으로 사용이 되는 포켓몬",
-   "en": "Pure Ground type. Usage dropped after the Mud-Slap nerf, but as a Ground type with Earthquake and Rock Slide it's still used as a Ground Pokémon.",
-   "ja": "じめん単タイプで、どろかけがナーフされて使用頻度は減ったが、それでもじめんタイプとしてじしん・いわなだれを使うため、今でもじめんポケモンとして使われている。",
-   "zh-TW": "純地面系，擲泥被削弱後使用率下降，但作為地面系能用地震、岩崩，至今仍被當地面系寶可夢使用。"
+  "dragonair": {
+   "ko": "차징이빠른 용숨을 이용하며, 아쿠아테일을 주로사용하지만, 확정 방떨시키는 김밥말이도 많이 사용하고 방어보다 공격적인 포켓몬",
+   "en": "Uses the fast-charging Dragon Breath and mainly Aqua Tail, but also runs Wrap a lot for its guaranteed defense drop. An offensive Pokémon rather than a defensive one.",
+   "ja": "回転の速いりゅうのいぶきを使い、アクアテールを主に使うが、確定で防御を下げるまきつくもよく使う。防御より攻撃寄りのポケモン。",
+   "zh-TW": "用集氣快的龍息，主要放水流尾，但確定降防的緊束也很常用。偏攻擊而非防禦的寶可夢。"
   },
   "sableye": {
    "ko": "속임수,매지컬샤인을 주로쓰지만 드레인펀치를 사용해서 방어를 올려서 장기전도 가능하고, 사용에따라 장지건용, 드래곤/악을 이길수있는 매지컬샤인익히는형 여러가지 형태로 운영이 가능한 재능이 다양한 포켓몬",
@@ -438,23 +438,29 @@
    "ja": "だましうち・マジカルシャインを主に使うが、ドレインパンチで防御を上げて長期戦にも持ち込める。長期戦型や、ドラゴン/あくに勝てるマジカルシャイン型など、使い方次第でいろいろな形で運用できる多才なポケモン。",
    "zh-TW": "主要用偷襲·魔法閃耀，但也能用吸取拳升防打持久戰。看用法可以走持久戰型，或帶魔法閃耀打贏龍/惡的型，多種運用方式的多才寶可夢。"
   },
-  "dragonair": {
-   "ko": "차징이빠른 용숨을 이용하며, 아쿠아테일을 주로사용하지만, 확정 방떨시키는 김밥말이도 많이 사용하고 방어보다 공격적인 포켓몬",
-   "en": "Uses the fast-charging Dragon Breath and mainly Aqua Tail, but also runs Wrap a lot for its guaranteed defense drop. An offensive Pokémon rather than a defensive one.",
-   "ja": "回転の速いりゅうのいぶきを使い、アクアテールを主に使うが、確定で防御を下げるまきつくもよく使う。防御より攻撃寄りのポケモン。",
-   "zh-TW": "用集氣快的龍息，主要放水流尾，但確定降防的緊束也很常用。偏攻擊而非防禦的寶可夢。"
+  "steelix": {
+   "ko": "강철/땅이면서 번개엄니를 주로 사용하면서 비행,물타입에 아프게 때리고, 방어하락 사이코팽, 강한땅공격 지진을 주로사용하지만, 고스트를잡기위한 깨물어부수기나, 드래곤을 상대하기위해 와이드브레이커 익힌 유저도있으니 실제 사용법이 매우 다양해서 까다로운 포켓몬",
+   "en": "Steel/Ground that mainly runs Thunder Fang to hurt Flying and Water types, with the defense-dropping Psychic Fangs and the strong Ground move Earthquake. Some players learn Crunch for Ghosts or Breaking Swipe for Dragons, so the actual sets vary a lot — a tricky Pokémon.",
+   "ja": "はがね/じめんでかみなりのキバを主に使い、ひこう・みずを痛く殴る。防御ダウンのサイコファング、強力なじめん技じしんを主に使うが、ゴースト対策にかみくだく、ドラゴン対策にワイドブレイカーを覚えさせる人もおり、実際の使い方が非常に多様で厄介なポケモン。",
+   "zh-TW": "鋼/地面，主要用雷電牙痛打飛行·水系，配降防的精神之牙和強力地面招地震。也有玩家為了打幽靈學咬碎、為了對付龍系學廣域破壞，實際配招非常多樣，很難纏的寶可夢。"
+  },
+  "drapion": {
+   "ko": "강한 스킬인 깨물어부수기를 주로사용하며 빠른차징 아쿠아테일로 베이팅도 주로 하는데, 약점도 땅밖에 없지만 체력이 강하지않아 강한 공격을 선호하는 유저들이 많이 사용함",
+   "en": "Mainly runs the strong move Crunch and often baits with the fast-charging Aqua Tail. Its only weakness is Ground, but it isn't very bulky, so it's popular with players who prefer heavy offense.",
+   "ja": "強力なかみくだくを主に使い、回転の速いアクアテールでベイトもよく行う。弱点はじめんだけだが耐久が高くないため、強い攻撃を好む人によく使われる。",
+   "zh-TW": "主要用強力的咬碎，也常用集氣快的水流尾騙盾。弱點只有地面，但耐久不高，偏好強攻的玩家很常用。"
+  },
+  "marowak": {
+   "ko": "단일 땅타입으로 진흙뿌리기가 너프당하면서 사용빈도가 줄었지만 그래도 땅타입으로 지진, 스톤샤워를 사용을하기 때문에 아직까지 땅타입 포켓몬으로 사용이 되는 포켓몬",
+   "en": "Pure Ground type. Usage dropped after the Mud-Slap nerf, but as a Ground type with Earthquake and Rock Slide it's still used as a Ground Pokémon.",
+   "ja": "じめん単タイプで、どろかけがナーフされて使用頻度は減ったが、それでもじめんタイプとしてじしん・いわなだれを使うため、今でもじめんポケモンとして使われている。",
+   "zh-TW": "純地面系，擲泥被削弱後使用率下降，但作為地面系能用地震、岩崩，至今仍被當地面系寶可夢使用。"
   },
   "hydreigon": {
    "ko": "악/드래곤으로 강한공격을 위주로 사용하며, 세차게휘두르기로 용의숨결+세차게휘두르기+공중날기, 빠르고 강하며 아주 공격적인 포켓몬, 격투몬조차 빠르게 날아오는 공중날기에는 실드를 올리면서 상대해야 할정도인 포켓몬",
    "en": "Dark/Dragon built around strong offense: Dragon Breath + Brutal Swing + Fly. Fast, hard-hitting and very aggressive — even Fighting types have to put up shields against its quick Fly.",
    "ja": "あく/ドラゴンで強い攻撃を主体に使い、りゅうのいぶき＋ぶんまわす＋そらをとぶ。速くて強く非常に攻撃的で、かくとうでさえ素早く飛んでくるそらをとぶにはシールドを張って対処しなければならないほどのポケモン。",
    "zh-TW": "惡/龍，以強攻擊為主：龍息＋狂舞揮打＋飛翔。又快又強非常具攻擊性，連格鬥系遇到快速飛來的飛翔也得開盾應對。"
-  },
-  "steelix": {
-   "ko": "강철/땅이면서 번개엄니를 주로 사용하면서 비행,물타입에 아프게 때리고, 방어하락 사이코팽, 강한땅공격 지진을 주로사용하지만, 고스트를잡기위한 깨물어부수기나, 드래곤을 상대하기위해 와이드브레이커 익힌 유저도있으니 실제 사용법이 매우 다양해서 까다로운 포켓몬",
-   "en": "Steel/Ground that mainly runs Thunder Fang to hurt Flying and Water types, with the defense-dropping Psychic Fangs and the strong Ground move Earthquake. Some players learn Crunch for Ghosts or Breaking Swipe for Dragons, so the actual sets vary a lot — a tricky Pokémon.",
-   "ja": "はがね/じめんでかみなりのキバを主に使い、ひこう・みずを痛く殴る。防御ダウンのサイコファング、強力なじめん技じしんを主に使うが、ゴースト対策にかみくだく、ドラゴン対策にワイドブレイカーを覚えさせる人もおり、実際の使い方が非常に多様で厄介なポケモン。",
-   "zh-TW": "鋼/地面，主要用雷電牙痛打飛行·水系，配降防的精神之牙和強力地面招地震。也有玩家為了打幽靈學咬碎、為了對付龍系學廣域破壞，實際配招非常多樣，很難纏的寶可夢。"
   }
  },
  "ultra": {
@@ -703,6 +709,12 @@
    "en": "Ice/Water Walrein specializes in offense, running Powder Snow, Icicle Spear and Earthquake — strong against Flying, Grass and Ground types.",
    "ja": "こおり/みずのトドゼルガは攻撃特化で、こなゆき・つららばり・じしんを使い、ひこう・くさ・じめんに強い。",
    "zh-TW": "冰/水的帝牙海獅是攻擊特化，用細雪、冰柱、地震，對飛行·草·地面很強。"
+  },
+  "cradily": {
+   "ko": "바위/풀 이중상성으로 비행에도 약하지않고 불꽃에도 약하지않은 상성이지만 하이퍼리그에 많이등장하는 강철에 약한점은 있으나, 공격하락시키는 암성봉인과 풀묶기로 비행,땅,물에게 강한 포켓몬",
+   "en": "Rock/Grass typing means it isn't weak to Flying or Fire, though it is weak to Steel, which is common in the Ultra League. Rock Tomb drops the opponent's attack, and with Grass Knot it's strong against Flying, Ground and Water.",
+   "ja": "いわ/くさの複合でひこうにもほのおにも弱くない相性だが、ハイパーリーグに多いはがねに弱い面はある。攻撃ダウンのがんせきふうじとくさむすびで、ひこう・じめん・みずに強い。",
+   "zh-TW": "岩石/草的組合不怕飛行也不怕火，缺點是怕超級聯盟(2500)常見的鋼系。用能降攻擊的岩石封鎖和打草結，對飛行·地面·水很強。"
   }
  },
  "master": {
@@ -880,17 +892,17 @@
    "ja": "はがね/エスパーでゴースト・じめん・ほのお・あくが弱点だが、強力なはがねのレガシー技コメットパンチとじしんでドラゴンの牽制も上手く、はがね・ゴーストにも勝てる。",
    "zh-TW": "鋼/超能力，怕幽靈·地面·火·惡，但強力的鋼系傳承招式彗星拳加上地震，牽制龍系很在行，對鋼·幽靈也贏得了。"
   },
-  "ursaluna": {
-   "ko": "28시즌 할퀴기를 받아 빠르고 강한 차징기를 얻었으며, 특수기술 8개를 익힐수있어 매우 다양하게 사용이 가능해진 포켓몬, 개척하기, 냉동펀치라면 드래곤도 견제가 가능하며 10만마력을 사용한다면 강한 땅공격으로 레시라무 제크로무에게도 한방 먹일수가 있는 포켓몬",
-   "en": "Got Scratch in Season 28, giving it a fast, strong charging fast move, and with eight charged moves to learn it's become very versatile. With Trailblaze or Ice Punch it can even check Dragons, and with High Horsepower its strong Ground damage can land a big hit on Reshiram and Zekrom.",
-   "ja": "シーズン28でひっかくを得て速くて強いゲージ回転の通常技を手に入れ、ゲージ技を8つ覚えられるため非常に多様に使えるようになった。くさわけ・れいとうパンチならドラゴンも牽制でき、10まんばりきを使えば強いじめん攻撃でレシラム・ゼクロムにも一発入れられる。",
-   "zh-TW": "第28季拿到抓，獲得又快又強的集氣小招，大招能學8個，變得非常多變。帶開路、冰凍拳能牽制龍系，用十萬馬力則能靠強力地面攻擊給萊希拉姆、捷克羅姆一記重擊。"
-  },
   "garchomp": {
    "ko": "빠른차징기 머드샷을 사용할수있으며, 회오리, 대지의힘을 주로 사용하는데, 같은 드래곤에게 강한공격을할수도있고, 땅공격도 매우 강하기때문에 체력방어는 약하지만 공격이 매우 좋은 포켓몬",
    "en": "Can run the fast-charging Mud Shot, mainly with Twister and Earth Power. It hits other Dragons hard and its Ground damage is also very strong — low bulk, but excellent offense.",
    "ja": "回転の速いマッドショットを使え、たつまき・だいちのちからを主に使う。同じドラゴンに強い攻撃ができ、じめん攻撃も非常に強いため、耐久は低いが攻撃が非常に優秀。",
    "zh-TW": "能用集氣快的泥巴射擊，主要配龍捲風、大地之力。對同為龍系能打出強攻擊，地面攻擊也非常強，耐久雖弱但攻擊非常好。"
+  },
+  "ursaluna": {
+   "ko": "28시즌 할퀴기를 받아 빠르고 강한 차징기를 얻었으며, 특수기술 8개를 익힐수있어 매우 다양하게 사용이 가능해진 포켓몬, 개척하기, 냉동펀치라면 드래곤도 견제가 가능하며 10만마력을 사용한다면 강한 땅공격으로 레시라무 제크로무에게도 한방 먹일수가 있는 포켓몬",
+   "en": "Got Scratch in Season 28, giving it a fast, strong charging fast move, and with eight charged moves to learn it's become very versatile. With Trailblaze or Ice Punch it can even check Dragons, and with High Horsepower its strong Ground damage can land a big hit on Reshiram and Zekrom.",
+   "ja": "シーズン28でひっかくを得て速くて強いゲージ回転の通常技を手に入れ、ゲージ技を8つ覚えられるため非常に多様に使えるようになった。くさわけ・れいとうパンチならドラゴンも牽制でき、10まんばりきを使えば強いじめん攻撃でレシラム・ゼクロムにも一発入れられる。",
+   "zh-TW": "第28季拿到抓，獲得又快又強的集氣小招，大招能學8個，變得非常多變。帶開路、冰凍拳能牽制龍系，用十萬馬力則能靠強力地面攻擊給萊希拉姆、捷克羅姆一記重擊。"
   }
  }
 }

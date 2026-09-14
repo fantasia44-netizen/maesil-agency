@@ -69,11 +69,14 @@ for (const [league, ids] of Object.entries(META.leagues || {})) {
     const base = notes[league][id.replace(/_shadow$/, "")];
     if (base) { notes[league][id] = { ...base }; inherited++; }
   }
-  // 역방향: 기본 폼이 비어 있고 그림자 폼에만 써 있으면 기본 폼이 그림자 노트를 상속 (같은 종이므로)
-  for (const id of ids) {
-    if (id.endsWith("_shadow") || notes[league][id]) continue;
-    const sh = notes[league][`${id}_shadow`];
-    if (sh) { notes[league][id] = { ...sh }; inherited++; }
+}
+// 역방향: 기본 폼이 비어 있고 그림자 폼에만 써 있으면 기본 폼이 그림자 노트를 상속 (같은 종이므로).
+// 메타 목록과 무관하게 전 노트 대상 — 그림자 페이지는 기본 폼으로 통합(301)되므로 노트가 기본 폼 페이지에 붙어야 함.
+for (const league of Object.keys(notes)) {
+  for (const id of Object.keys(notes[league])) {
+    if (!id.endsWith("_shadow")) continue;
+    const base = id.replace(/_shadow$/, "");
+    if (!notes[league][base]) { notes[league][base] = { ...notes[league][id] }; inherited++; }
   }
 }
 writeFileSync(OUT, JSON.stringify(notes, null, 1));

@@ -3,15 +3,35 @@
 // robots noindex,follow + 사이트맵 제외만 적용(사용자 영향 없음, 구글 검색 노출만 압축).
 // 리스트 갱신: node scripts/gbl/build_meta_mons.mjs
 import META from "./gbl_meta_mons.json";
+import DETAIL from "./gbl_detail.json";
+import DETAIL_S28 from "./gbl_detail_s28.json";
+import { currentSeason } from "./seasons";
 
 const LEAGUES = (META as { leagues: Record<string, string[]> }).leagues;
 const SETS: Record<string, Set<string>> = Object.fromEntries(Object.entries(LEAGUES).map(([l, ids]) => [l, new Set(ids)]));
 
+// 현재 시즌 상세 스냅샷의 리그→id 집합 (그림자 통합 판정 기준). 시즌 스냅샷을 추가하면 여기도 등록.
+const SNAP_BY_SLUG: Record<string, unknown> = { s27: DETAIL, s28: DETAIL_S28 };
+const CUR = (SNAP_BY_SLUG[currentSeason().slug] || DETAIL_S28) as Record<string, { id: string }[]>;
+const CUR_IDS: Record<string, Set<string>> = Object.fromEntries(Object.entries(CUR).map(([l, arr]) => [l, new Set(arr.map((e) => e.id))]));
+
+// 그림자(_shadow) 페이지 통합 — 그림자는 기본 폼과 노트·해설이 같아 "중복 페이지"로 읽히므로 페이지 자체를 없앰.
+// 현재 시즌에 기본 폼이 있으면 → 그림자 URL은 기본 폼으로 301, 내부 링크도 기본 폼으로(과거 시즌 ?s= 은 상세 페이지가 폴백 처리).
+// 기본 폼 페이지가 없는 그림자(니로우 그림자 등)는 통합 대상 아님(자기 페이지 유지). 반환: 기본 폼 id 또는 null.
+export function mergedShadowBase(league: string, id: string): string | null {
+  if (!id.endsWith("_shadow")) return null;
+  const base = id.replace(/_shadow$/, "");
+  return CUR_IDS[league]?.has(base) ? base : null;
+}
+// 링크용 id — 통합된 그림자는 기본 폼으로(내부 301 방지).
+export const linkMonId = (league: string, id: string): string => mergedShadowBase(league, id) ?? id;
+
 // 메가 리그(*_mega) 등 리스트에 없는 리그는 false → noindex(사이트맵에도 원래 없음).
-// 그림자(_shadow)는 기본 폼과 노트·해설이 같아 중복 페이지로 읽히므로, 기본 폼이 같은 리그 메타에 있으면 그림자는 noindex.
-// (기본 폼이 메타에 없는 그림자 단독 메타 — 그림자 깜까미·강철톤 등 — 는 중복이 없으니 그대로 색인)
+// 통합된 그림자는 false(어차피 301). 기본 폼은 자신 또는 (통합된) 그림자가 메타면 true — 그림자 단독 메타(드래피온 등)의 노트가 기본 폼 페이지에서 색인되도록.
 export function isMetaMon(league: string, id: string): boolean {
   const set = SETS[league];
-  if (!set?.has(id)) return false;
-  return !(id.endsWith("_shadow") && set.has(id.replace(/_shadow$/, "")));
+  if (!set) return false;
+  if (id.endsWith("_shadow")) return set.has(id) && !mergedShadowBase(league, id);
+  const sh = `${id}_shadow`;
+  return set.has(id) || (set.has(sh) && mergedShadowBase(league, sh) === id);
 }

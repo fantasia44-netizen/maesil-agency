@@ -5,6 +5,7 @@ import DETAIL_S28 from "../../gbl_detail_s28.json";
 import MOVENAMES from "../../pvp_move_names.json";
 import { MON, spriteUrl, monName } from "../../meta/monNames";
 import { localizePath, type Locale } from "../../../../../lib/i18n";
+import { linkMonId } from "../../indexGate";
 
 type DItem = { id: string; tier: string; moveset: string[]; dex?: number };
 const DET = DETAIL_S28 as unknown as Record<string, DItem[]>;
@@ -91,7 +92,7 @@ export default function MovesetExamples({ lang }: { lang: Locale }) {
               <div style={{ fontSize: "0.74rem", fontWeight: 800, color: "#6366f1", marginBottom: 5 }}>{lg[lang]}</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {list.map((d) => (
-                  <Link key={d.id} href={localizePath(lang, `/gbl/pokemon/${lg.key}/${d.id}`)}
+                  <Link key={d.id} href={localizePath(lang, `/gbl/pokemon/${lg.key}/${linkMonId(lg.key, d.id)}`)}
                     style={{ display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none", background: "#fff", border: "1px solid #dbe2ee", borderRadius: 999, padding: "4px 12px 4px 6px" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={spriteOf(d.id, d.dex)} alt="" width={26} height={26} style={{ imageRendering: "pixelated" }} />

@@ -3,7 +3,7 @@
 // "[포켓몬] 마스터리그 카운터/기술배치" 검색 타겟 + 시뮬레이터 대체(카운터 조회).
 import Link from "next/link";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import DATA from "../../../gbl_data.json";
 import DETAIL from "../../../gbl_detail.json";
 import DETAIL_S28 from "../../../gbl_detail_s28.json";
@@ -22,7 +22,7 @@ import { typeLabel } from "../../../typeLabels";
 import { getPoke } from "./dict";
 import { buildAnalysis, HEADINGS } from "./analysis";
 import { currentSeason, seasonBySlug } from "../../../seasons";
-import { isMetaMon } from "../../../indexGate";
+import { isMetaMon, mergedShadowBase, linkMonId } from "../../../indexGate";
 import MON_NOTES from "../../../gbl_mon_notes.json";
 import PARTNERS from "../../../gbl_partners.json";
 
@@ -204,6 +204,13 @@ export async function generateMetadata({ params, searchParams }: { params: { lan
 
 const CARD = "#ffffff";
 const BORDER = "#e3e8f2";
+// 그림자 폼 요약 블록 라벨
+const SHADOW_L: Record<Locale, { title: string; note: string }> = {
+  ko: { title: "🌑 그림자 폼", note: "그림자 폼 페이지는 여기로 통합됐습니다. 공격 ×1.2 · 방어 ×0.83, 기술배치·카운터·운영자 평가는 기본 폼과 같은 기준으로 보세요." },
+  en: { title: "🌑 Shadow form", note: "The Shadow form page is merged here. Attack ×1.2 · Defense ×0.83; moveset, counters and the operator's verdict apply the same as the base form." },
+  ja: { title: "🌑 シャドウ", note: "シャドウのページはここに統合。攻撃×1.2・防御×0.83、技構成・対策・運営者評価は通常フォルムと同じ基準で。" },
+  "zh-TW": { title: "🌑 暗影形態", note: "暗影形態頁面已併入此頁。攻擊×1.2·防禦×0.83，配招、剋星、站長評價與一般形態相同。" },
+};
 
 function Sprite({ id, size = 40 }: { id: string; size?: number }) {
   const m = MON[id];
@@ -241,7 +248,7 @@ function OppRow({ lang, league, id, rating, ratingTitle, seasonQ = "" }: { lang:
   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
   const rc = rating >= 500 ? "#16a34a" : "#dc2626";
   return (
-    <Link href={localizePath(lang, `/gbl/pokemon/${league}/${id}`) + seasonQ} style={{ textDecoration: "none",
+    <Link href={localizePath(lang, `/gbl/pokemon/${league}/${linkMonId(league, id)}`) + seasonQ} style={{ textDecoration: "none",
       display: "flex", alignItems: "center", gap: 8, background: `linear-gradient(100deg, ${c1}20, #ffffff 80%)`,
       border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "6px 10px" }}>
       <Sprite id={id} size={32} />
@@ -257,8 +264,15 @@ function OppRow({ lang, league, id, rating, ratingTitle, seasonQ = "" }: { lang:
 export default async function PokemonDetail({ params, searchParams }: { params: { lang: string; league: string; id: string }; searchParams?: { s?: string } }) {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const seasonSlug = resolveSeasonSlug(searchParams?.s);
-  const d = findDetail(params.league, params.id, seasonSlug);
+  // 그림자 폼 페이지 통합 — 기본 폼 페이지가 있으면 그림자 URL은 기본 폼으로 301(중복 페이지 제거, indexGate.ts).
+  // 과거 시즌(?s=)에 기본 폼이 없으면 그림자 페이지를 그대로 렌더(404 방지).
+  const mergedBase = mergedShadowBase(params.league, params.id);
+  if (mergedBase && findDetail(params.league, mergedBase, seasonSlug)) permanentRedirect(localizePath(lang, `/gbl/pokemon/${params.league}/${mergedBase}`) + (searchParams?.s ? `?s=${encodeURIComponent(searchParams.s)}` : ""));
+  // 기본 폼 URL인데 그 시즌 스냅샷에 그림자만 있으면(통합 링크 + 과거 시즌) 그림자 데이터로 렌더.
+  const d = findDetail(params.league, params.id, seasonSlug) || (params.id.endsWith("_shadow") ? undefined : findDetail(params.league, `${params.id}_shadow`, seasonSlug));
   if (!LEAGUE_KEYS.includes(params.league) || !d) notFound();
+  // 통합된 그림자 폼의 요약(티어·점수·종족값) — 기본 폼 페이지 안에서 한 블록으로 보여줌.
+  const shadowD = d.id.endsWith("_shadow") ? undefined : findDetail(params.league, `${d.id}_shadow`, seasonSlug);
 
   const pk = getPoke(lang);
   const L = (p: string) => localizePath(lang, p);
@@ -280,7 +294,8 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
   // 운영자 실전 평가 — 사람이 쓴 판단. gbl_mon_notes.json {league:{id:{ko,en,ja,"zh-TW"}}}, 로케일 없으면 ko 폴백.
   const note = (MON_NOTES as Record<string, Record<string, Record<string, string>>>)[params.league]?.[d.id];
   const noteText = note ? (note[lang] || note.ko) : undefined;
-  const partners = isMeta ? PARTNER_DATA[params.league]?.[d.id] : undefined;
+  // 그림자 단독 메타(드래피온 등)는 파트너 데이터가 그림자 id로 산출돼 있으므로 기본 폼 페이지에서 폴백
+  const partners = isMeta ? (PARTNER_DATA[params.league]?.[d.id] ?? PARTNER_DATA[params.league]?.[`${d.id}_shadow`]) : undefined;
   const partyNote = partners?.note ? (partners.note[lang] || partners.note.ko) : undefined;
 
   // ── 데이터 파생 분석문(포켓몬별 분기) ──
@@ -468,7 +483,7 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
             <p style={{ margin: "0 0 8px", fontSize: "0.72rem", color: "#94a3b8", lineHeight: 1.5 }}>{PT[lang].basis}</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {partners.p.map((x) => (
-                <Link key={x.id} href={L(`/gbl/pokemon/${params.league}/${x.id}`) + seasonQ} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", background: "#f7f9fd", border: `1px solid ${BORDER}`, borderRadius: 10, padding: "6px 10px", flexWrap: "wrap" }}>
+                <Link key={x.id} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, x.id)}`) + seasonQ} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", background: "#f7f9fd", border: `1px solid ${BORDER}`, borderRadius: 10, padding: "6px 10px", flexWrap: "wrap" }}>
                   <Sprite id={x.id} size={32} />
                   <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "#0f172a" }}>{locName(lang, x.id)}</span>
                   {x.covers.length > 0 && <span style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#64748b" }}>{PT[lang].covers}: {x.covers.map((c) => locName(lang, c)).join(" · ")}</span>}
@@ -538,6 +553,21 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
               {stat(pk.hp, d.stats.hp || 0, 250, "#22c55e")}
             </div>
           </>
+        )}
+
+        {/* 그림자 폼 요약 — 그림자 페이지는 이 페이지로 통합(301). 기술배치·카운터·노트는 기본 폼과 같은 기준으로 봄 */}
+        {shadowD && (
+          <div style={{ marginTop: 10, background: "linear-gradient(120deg,#f5f3ff,#ffffff 70%)", border: "1px solid #ddd6fe", borderRadius: 10, padding: "10px 12px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <span style={{ fontWeight: 800, fontSize: "0.86rem", color: "#5b21b6" }}>{SHADOW_L[lang].title}</span>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 7, background: TIER_COLOR[shadowD.tier], color: "#fff", fontWeight: 900, fontSize: "0.88rem" }}>{shadowD.tier}</span>
+            <span style={{ fontSize: "0.78rem", color: "#334155" }}>{pk.tierScore} <b>{shadowD.score}</b></span>
+            {shadowD.stats && (
+              <span style={{ fontSize: "0.76rem", color: "#475569" }}>
+                {pk.atk} {shadowD.stats.atk} · {pk.def} {shadowD.stats.def} · {pk.hp} {shadowD.stats.hp}
+              </span>
+            )}
+            <span style={{ fontSize: "0.72rem", color: "#7c3aed", flexBasis: "100%" }}>{SHADOW_L[lang].note}</span>
+          </div>
         )}
 
         {/* 역할 점수 */}

@@ -17,6 +17,7 @@ import { typeLabel } from "../../typeLabels";
 import { getDict } from "../../dictionaries";
 import { getCmp } from "./dict";
 import { cmpAnalysis } from "../../leagueAnalysis";
+import { linkMonId } from "../../indexGate";
 import { currentSeason, seasonBySlug, selectableSeasons, seasonShort, statusOf } from "../../seasons";
 
 export const revalidate = 600;
@@ -303,7 +304,7 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
               const atk = d.stats.atk || 0;
               const mv = buildMoves(d);
               return (
-                <Link key={d.id} href={L(`/gbl/pokemon/${params.league}/${d.id}`) + detQ}
+                <Link key={d.id} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, d.id)}`) + detQ}
                   style={{ textDecoration: "none", color: "inherit", display: "flex", flexDirection: "column", gap: 5,
                     background: `linear-gradient(160deg, ${c1}14, #ffffff 62%)`, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
                   {/* 순위·스프라이트·이름·티어·공격력 */}
