@@ -12,6 +12,11 @@ import { isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
 import type { ScheduleDict } from "./dict";
 
 const STATS = STATSJSON as Record<string, { a: number; d: number; s: number }>;
+// 이벤트 브로슈어가 있는 보스의 배지·화살표 라벨(로케일별)
+const EVENT_L: Record<Locale, { badge: string; arrow: string }> = {
+  ko: { badge: "이벤트", arrow: "이벤트 정보 →" }, en: { badge: "Event", arrow: "Event info →" },
+  ja: { badge: "イベント", arrow: "イベント情報 →" }, "zh-TW": { badge: "活動", arrow: "活動資訊 →" },
+};
 const CPM_L20 = 0.5974, CPM_L25 = 0.667934;
 function cpAt(st: { a: number; d: number; s: number }, iv: number[], cpm: number): number {
   return Math.max(10, Math.floor((st.a + iv[0]) * Math.sqrt(st.d + iv[1]) * Math.sqrt(st.s + iv[2]) * cpm * cpm / 10));
@@ -518,9 +523,9 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
                   <img src={spr} alt={m.b.name} width={34} height={34} style={{ imageRendering: m.brochure?.hero.img ? "auto" : "pixelated", objectFit: "contain" }}
                     onError={(e) => { const f = monSprite(m.b.ko, m.b.dex); if (e.currentTarget.src !== f) { e.currentTarget.src = f; e.currentTarget.style.imageRendering = "pixelated"; } }} />
                   <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a" }}>{m.b.name}{m.b.shiny ? " ✨" : ""}</span>
-                  {isBro ? <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#a21caf", background: "#fae8ff", border: "1px solid #f0abfc", borderRadius: 6, padding: "1px 7px" }}>🎉 이벤트</span>
+                  {isBro ? <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#a21caf", background: "#fae8ff", border: "1px solid #f0abfc", borderRadius: 6, padding: "1px 7px" }}>🎉 {EVENT_L[lang].badge}</span>
                     : rs && <span style={{ fontSize: "0.6rem", fontWeight: 800, color: rs.c, background: rs.bg, border: `1px solid ${rs.c}44`, borderRadius: 6, padding: "1px 7px" }}>{rs.icon} {rs.label}</span>}
-                  <span style={{ marginLeft: "auto", fontSize: "0.72rem", color: isBro ? "#a21caf" : "#3b5bdb", fontWeight: 600, whiteSpace: "nowrap" }}>{isBro ? "이벤트 정보 →" : t.cpTableArrow}</span>
+                  <span style={{ marginLeft: "auto", fontSize: "0.72rem", color: isBro ? "#a21caf" : "#3b5bdb", fontWeight: 600, whiteSpace: "nowrap" }}>{isBro ? EVENT_L[lang].arrow : t.cpTableArrow}</span>
                 </button>
               );
             })}
