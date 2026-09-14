@@ -13,12 +13,20 @@ import TypeMatrix from "./TypeMatrix";
 import DualType from "./DualType";
 import CctGuide from "./CctGuide";
 import MovesetExamples from "./MovesetExamples";
+import { GUIDE_VOICE } from "../voices";
 
 // 전용 OG(opengraph-image.tsx)를 가진 슬러그 — 리다이렉트 없는 직접 URL로 연결.
 const OG_SLUGS = new Set(["type-chart", "cct"]);
 
 const SITE = "https://gblnote.com";
 const GUIDE_LABEL: Record<string, string> = { ko: "가이드", en: "Guide", ja: "ガイド", "zh-TW": "攻略" };
+// 레전드 한마디 블록 라벨 — 위 일반 설명과 달리 운영자 개인 의견임을 명시
+const VOICE_L: Record<Locale, { h: string; sub: string }> = {
+  ko: { h: "🎙 레전드 한마디 — GBL Note의 이견", sub: "표와 시뮬이 못 하는 말. 레전드에 도달한 운영자의 개인 의견이라 정답이 아닐 수 있습니다." },
+  en: { h: "🎙 A word from a Legend — GBL Note's take", sub: "What tables and sims can't tell you. The personal opinion of the site operator (Legend rank) — not necessarily the right answer." },
+  ja: { h: "🎙 レジェンドの一言 — GBL Noteの私見", sub: "表やシミュでは語れないこと。レジェンド到達の運営者の個人的意見なので、正解とは限りません。" },
+  "zh-TW": { h: "🎙 傳奇玩家的一句話 — GBL Note 的看法", sub: "表格和模擬說不出的話。這是達到傳奇段位的站長個人意見，不一定是正解。" },
+};
 
 export const revalidate = 86400;
 
@@ -57,6 +65,7 @@ export default function GuidePage({ params }: { params: { lang: string; slug: st
   const t = getGuideArticle(lang);
   const L = (p: string) => localizePath(lang, p);
   const c = guideContent(lang, g);
+  const voice = GUIDE_VOICE[params.slug]?.[lang] || GUIDE_VOICE[params.slug]?.ko;
   const others = Object.entries(GUIDES).filter(([s]) => s !== params.slug);
 
   const path = `/gbl/guide/${params.slug}`;
@@ -108,6 +117,20 @@ export default function GuidePage({ params }: { params: { lang: string; slug: st
           {params.slug === "type-chart" && <><TypeMatrix lang={lang} /><TypeChart lang={lang} /><DualType lang={lang} /></>}
           {params.slug === "cct" && <CctGuide lang={lang} />}
           {params.slug === "moveset" && <MovesetExamples lang={lang} />}
+
+          {/* 레전드 한마디 — 운영자의 개인 의견(자동생성형 설명과 분리된 개인의견형). voices.ts */}
+          {voice && voice.length > 0 && (
+            <section style={{ marginTop: 22, background: "linear-gradient(135deg,#fff7ed,#ffffff 60%)", border: "1px solid #fed7aa", borderLeft: "4px solid #f97316", borderRadius: 12, padding: "14px 16px" }}>
+              <div style={{ fontSize: "1rem", fontWeight: 900, color: "#9a3412" }}>{VOICE_L[lang].h}</div>
+              <div style={{ fontSize: "0.74rem", color: "#c2410c", marginTop: 3, marginBottom: 10 }}>{VOICE_L[lang].sub}</div>
+              {voice.map((v, i) => (
+                <div key={i} style={{ marginTop: i ? 12 : 0 }}>
+                  <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#0f172a" }}>Q. {v.q}</div>
+                  <p style={{ margin: "4px 0 0", fontSize: "0.9rem", color: "#334155", lineHeight: 1.85 }}>{v.a}</p>
+                </div>
+              ))}
+            </section>
+          )}
         </article>
 
 

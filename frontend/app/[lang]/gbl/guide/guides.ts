@@ -307,7 +307,7 @@ export const GUIDES: Record<string, Guide> = {
       "zh-TW": ["超級聯盟 CP", "高級聯盟 CP", "大師聯盟", "寶可夢GO 聯盟 限制", "GBL CP 限制"],
     },
     ko: {
-      title: "리그별 CP 제한 — 슈퍼·하이퍼·마스터리그",
+      title: "리그 안내 — 슈퍼·하이퍼·마스터리그 (CP 제한과 특징)",
       desc: "포켓몬 GO 배틀리그의 슈퍼리그(1500)·하이퍼리그(2500)·마스터리그(무제한) CP 제한과 각 리그 특징을 정리했습니다.",
       sections: [
         { p: "GBL의 세 리그는 참가할 수 있는 포켓몬의 CP(전투력) 상한이 다릅니다. 이 제한이 각 리그의 전략과 주력 포켓몬을 완전히 다르게 만듭니다." },
@@ -318,7 +318,7 @@ export const GUIDES: Record<string, Guide> = {
       ],
     },
     en: {
-      title: "Great, Ultra & Master League CP Limits — Pokémon GO",
+      title: "League Guide — Great, Ultra & Master League (CP Limits & Traits)",
       desc: "Pokémon GO Battle League CP limits: Great League CP limit 1500, Ultra League 2500, Master League no cap — and what makes each distinct.",
       sections: [
         { p: "GBL's three leagues each set a different CP (Combat Power) ceiling on the Pokémon that can enter. That single cap makes each league's strategy and go-to Pokémon completely different." },
@@ -329,7 +329,7 @@ export const GUIDES: Record<string, Guide> = {
       ],
     },
     ja: {
-      title: "リーグ別CP制限 — スーパー・ハイパー・マスターリーグ",
+      title: "リーグ案内 — スーパー・ハイパー・マスターリーグ（CP制限と特徴）",
       desc: "ポケモンGOバトルリーグのスーパーリーグ(1500)・ハイパーリーグ(2500)・マスターリーグ(無制限)のCP制限と、各リーグの特徴を整理しました。",
       sections: [
         { p: "GBLの3つのリーグは、参加できるポケモンのCP(戦闘力)の上限が異なります。この制限が、各リーグの戦略と主力ポケモンをまったく違うものにします。" },
@@ -340,7 +340,7 @@ export const GUIDES: Record<string, Guide> = {
       ],
     },
     "zh-TW": {
-      title: "各聯盟 CP 限制 — 超級·高級·大師聯盟",
+      title: "聯盟介紹 — 超級·高級·大師聯盟（CP限制與特色）",
       desc: "整理寶可夢 GO 對戰聯盟的超級聯盟（1500）·高級聯盟（2500）·大師聯盟（無限制）CP 限制與各聯盟特色。",
       sections: [
         { p: "GBL 三種聯盟可參加寶可夢的 CP（戰鬥力）上限各不相同。這個限制讓各聯盟的策略與主力寶可夢完全不同。" },
