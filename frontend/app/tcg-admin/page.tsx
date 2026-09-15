@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { isSuperAdmin, apiFetch, apiDownload } from "../../lib/api";
+import TrafficChart, { DailyTable } from "../gbl-admin/TrafficChart";
 
 // layout.tsx와 동일한 유효값(env 우선, 없으면 하드코딩 기본값 — 실제 배포 상태를 반영).
 const ADS = process.env.NEXT_PUBLIC_TCG_ADSENSE_CLIENT || "";
@@ -62,12 +63,12 @@ const LOCALE_LINKS = [
   { label: "繁體中文", href: "/zh-TW/tcg" },
 ];
 
-// ── 라이브 트래픽·도구사용 대시보드 (1st-party 자체 계측) ──────────────────
+// ── 라이브 트래픽·도구사용 대시보드 (1st-party 자체 계측) — gbl-admin과 같은 구성(지표 타일·라인차트·일별 표·상위 페이지/유입·언어별·공유) + tcg 전용 도구사용·페이지유형 ──
 type Traffic = {
   days: number;
-  summary: { pageviews: number; uniques: number; sessions: number; shares: number; downloads: number; tool_events: number };
+  summary: { pageviews: number; uniques: number; new_visitors: number; returning_visitors: number; sessions: number; avg_dwell: number; bounce_rate: number; shares: number; downloads: number; tool_events: number };
   active: { active_30m: number };
-  daily: { day: string; pageviews: number; uniques: number; sessions: number }[];
+  daily: { day: string; pageviews: number; uniques: number; new_visitors: number; sessions: number }[];
   langs: { lang: string; pageviews: number; uniques: number; sessions: number }[];
   pages: { type: string; pageviews: number; uniques: number }[];
   tools: { event: string; count: number }[];
@@ -84,16 +85,16 @@ const PAGE_LABEL: Record<string, string> = {
   "hand-sim": "핸드심", "pack-sim": "팩심", "deck-builder": "덱 빌더", counters: "카운터",
   guides: "가이드 목록", guide: "가이드", cards: "카드", other: "기타",
 };
-const LANG_LABEL: Record<string, string> = { ko: "🇰🇷 한국어", en: "🇬🇧 English", ja: "🇯🇵 日本語", "zh-TW": "🇹🇼 繁體" };
+const LANG_LABEL: Record<string, string> = { ko: "🇰🇷 한국어", en: "🇺🇸 English", ja: "🇯🇵 日本語", "zh-TW": "🇹🇼 繁體中文" };
+const LANG_COLOR: Record<string, string> = { ko: "#3b5bdb", en: "#0891b2", ja: "#db2777", "zh-TW": "#16a34a" };
+// 공유·다운로드 카드 라벨(ShareCard trackLabel = "deck:<id>" · "counter:<id>" · "matchup:<id>" · "pack:<set>:<pack>" · "weekly-briefing") — 접두어로 유형 표시
+const SHARE_PREFIX: Record<string, string> = { deck: "덱 상세 카드", counter: "카운터 결과", matchup: "매치업 카드", pack: "팩 추천 카드", "weekly-briefing": "주간 브리핑", "(기타)": "(기타·라벨없음)" };
+const shareLabel = (raw: string) => { const [p, ...rest] = raw.split(":"); const base = SHARE_PREFIX[p] || p; return rest.length ? `${base} · ${rest.join(":")}` : base; };
+const fmtDwell = (s: number) => { const t = Math.round(s || 0); return t >= 60 ? `${Math.floor(t / 60)}분 ${t % 60}초` : `${t}초`; };
+const periodLabel = (d: number) => (d === 0 ? "오늘" : `${d}일`);
 
-function Tile({ label, value, color }: { label: string; value: number; color: string }) {
-  return (
-    <div style={{ flex: "1 1 90px", background: "#fff", border: "1px solid #f1d5d5", borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
-      <div style={{ fontSize: "1.3rem", fontWeight: 900, color }}>{value.toLocaleString()}</div>
-      <div style={{ fontSize: "0.72rem", color: "#64748b", marginTop: 2 }}>{label}</div>
-    </div>
-  );
-}
+const BOX: React.CSSProperties = { background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem" };
+const BOX_H: React.CSSProperties = { fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 };
 
 function TrafficSection() {
   const [t, setT] = useState<Traffic | null>(null);
@@ -108,29 +109,31 @@ function TrafficSection() {
       .catch((e) => setErr(String((e as Error)?.message || e)));
   }, [days]);
 
-  const maxDaily = Math.max(1, ...(t?.daily || []).map((d) => d.pageviews));
+  const card: React.CSSProperties = { background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.75rem 0.4rem", textAlign: "center" };
 
   return (
-    <section style={CARD}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, flexWrap: "wrap" }}>
-        <h2 style={{ ...H2, margin: 0 }}>📊 실시간 트래픽 · 도구사용 (자체 계측)</h2>
+    <div style={{ marginBottom: "0.4rem" }}>
+      {/* 헤더 — 제목 · 기간 선택기(오늘/7/30/60) · 실시간 활성 (gbl-admin과 동일 배치) */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+        <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>📈 방문 통계 <span style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 600 }}>(자체 집계)</span></span>
+        <span style={{ display: "flex", gap: 4, background: "#f1f5f9", borderRadius: 8, padding: 3 }}>
+          {[0, 7, 30, 60].map((d) => (
+            <button key={d} onClick={() => setDays(d)}
+              style={{ border: "none", cursor: "pointer", fontSize: "0.72rem", fontWeight: 700, borderRadius: 6, padding: "3px 10px",
+                background: days === d ? "#dc2626" : "transparent", color: days === d ? "#fff" : "#64748b" }}>
+              {periodLabel(d)}
+            </button>
+          ))}
+        </span>
         {t && (
-          <span style={{ fontSize: "0.76rem", fontWeight: 800, color: "#16a34a", background: "#dcfce7", borderRadius: 12, padding: "3px 12px" }}>
+          <span style={{ marginLeft: "auto", fontSize: "0.78rem", fontWeight: 800, color: "#16a34a", background: "#dcfce7", borderRadius: 12, padding: "3px 12px" }}>
             🟢 실시간 활성 {t.active?.active_30m ?? 0}명 <span style={{ fontWeight: 500, color: "#4d7c53" }}>(30분)</span>
           </span>
         )}
-        <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
-          {[7, 30, 90].map((d) => (
-            <button key={d} onClick={() => setDays(d)} style={{
-              fontSize: "0.74rem", fontWeight: 700, padding: "4px 10px", borderRadius: 8, cursor: "pointer",
-              border: "1px solid #fbd8d8", background: days === d ? "#dc2626" : "#fff", color: days === d ? "#fff" : "#b91c1c",
-            }}>{d}일</button>
-          ))}
-        </div>
       </div>
 
       {err && (
-        <div style={{ fontSize: "0.78rem", color: "#b45309", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, padding: "8px 10px" }}>
+        <div style={{ fontSize: "0.78rem", color: "#b45309", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, padding: "8px 10px", marginBottom: 12 }}>
           트래픽 조회 실패: {err}<br />
           <span style={{ color: "#92400e" }}>→ Supabase에서 <code>backend/sql/077_tcg_visits.sql</code>를 실행했는지 확인하세요. 백엔드 배포 후 방문이 쌓이면 데이터가 나타납니다.</span>
         </div>
@@ -138,80 +141,148 @@ function TrafficSection() {
 
       {t && !err && (
         <>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-            <Tile label="페이지뷰" value={t.summary.pageviews} color="#dc2626" />
-            <Tile label="순방문자" value={t.summary.uniques} color="#0f172a" />
-            <Tile label="세션" value={t.summary.sessions} color="#0f172a" />
-            <Tile label="도구 사용" value={t.summary.tool_events} color="#7c3aed" />
-            <Tile label="공유" value={t.summary.shares} color="#0891b2" />
-          </div>
-
-          {/* 도구 사용 — tcg 특화 지표 */}
-          <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#334155", margin: "6px 0 6px" }}>🧰 도구 사용 (계산기 참여도)</div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
-            {t.tools.map((x) => (
-              <div key={x.event} style={{ flex: "1 1 120px", background: "#faf5ff", border: "1px solid #e9d5ff", borderRadius: 10, padding: "8px 10px" }}>
-                <div style={{ fontSize: "1.1rem", fontWeight: 900, color: "#7c3aed" }}>{x.count.toLocaleString()}</div>
-                <div style={{ fontSize: "0.72rem", color: "#6b21a8" }}>{TOOL_LABEL[x.event] || x.event}</div>
+          {/* 지표 타일 — gbl 9종 + tcg 전용 '도구 사용' */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(104px,1fr))", gap: 8, marginBottom: 12 }}>
+            {[
+              { l: "페이지뷰", v: t.summary.pageviews, c: "#3b5bdb" },
+              { l: "전체방문자", v: t.summary.uniques, c: "#0f172a" },
+              { l: "신규방문자", v: t.summary.new_visitors ?? 0, c: "#16a34a" },
+              { l: "재방문자", v: t.summary.returning_visitors ?? 0, c: "#0891b2" },
+              { l: "세션", v: t.summary.sessions, c: "#7c3aed" },
+              { l: "평균 체류", v: fmtDwell(t.summary.avg_dwell ?? 0), c: "#059669" },
+              { l: "이탈률", v: `${Math.round((t.summary.bounce_rate ?? 0) * 100)}%`, c: "#c2410c" },
+              { l: "공유", v: t.summary.shares, c: "#db2777" },
+              { l: "다운로드", v: t.summary.downloads, c: "#0891b2" },
+              { l: "도구 사용", v: t.summary.tool_events, c: "#dc2626" },
+            ].map((k) => (
+              <div key={k.l} style={card}>
+                <div style={{ fontSize: "1.3rem", fontWeight: 800, color: k.c }}>{k.v}</div>
+                <div style={{ fontSize: "0.7rem", color: "#64748b" }}>{k.l}</div>
               </div>
             ))}
           </div>
 
-          {/* 일별 추이(막대) */}
-          <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#334155", margin: "6px 0 6px" }}>📅 일별 페이지뷰</div>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height: 90, marginBottom: 14, overflowX: "auto" }}>
-            {(t.daily || []).map((d) => (
-              <div key={d.day} title={`${d.day} · ${d.pageviews}pv · ${d.uniques}명`} style={{ flex: "1 0 8px", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center" }}>
-                <div style={{ width: "100%", maxWidth: 18, height: `${Math.round((d.pageviews / maxDaily) * 76)}px`, minHeight: d.pageviews ? 2 : 0, background: "#dc2626", borderRadius: "3px 3px 0 0" }} />
-              </div>
-            ))}
-            {(!t.daily || t.daily.length === 0) && <span style={{ fontSize: "0.78rem", color: "#94a3b8" }}>아직 방문 데이터가 없습니다.</span>}
-          </div>
-
-          <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-            {/* 페이지 유형별 */}
-            <div style={{ flex: "1 1 240px" }}>
-              <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#334155", marginBottom: 6 }}>📄 페이지 유형별</div>
-              {t.pages.slice(0, 10).map((p) => (
-                <div key={p.type} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem", padding: "3px 0", borderTop: "1px solid #f9e8e8" }}>
-                  <span style={{ color: "#475569" }}>{PAGE_LABEL[p.type] || p.type}</span>
-                  <span style={{ fontWeight: 700, color: "#0f172a" }}>{p.pageviews.toLocaleString()} <span style={{ fontWeight: 400, color: "#94a3b8" }}>({p.uniques})</span></span>
-                </div>
-              ))}
-            </div>
-            {/* 언어별 */}
-            <div style={{ flex: "1 1 240px" }}>
-              <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#334155", marginBottom: 6 }}>🌐 언어별</div>
-              {t.langs.map((l) => (
-                <div key={l.lang} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem", padding: "3px 0", borderTop: "1px solid #f9e8e8" }}>
-                  <span style={{ color: "#475569" }}>{LANG_LABEL[l.lang] || l.lang}</span>
-                  <span style={{ fontWeight: 700, color: "#0f172a" }}>{l.pageviews.toLocaleString()} <span style={{ fontWeight: 400, color: "#94a3b8" }}>({l.uniques})</span></span>
-                </div>
-              ))}
-            </div>
-            {/* 유입경로 */}
-            <div style={{ flex: "1 1 240px" }}>
-              <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#334155", marginBottom: 6 }}>🔗 유입 경로 (referrer)</div>
-              {t.refs.slice(0, 8).map((r) => (
-                <div key={r.ref} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.78rem", padding: "3px 0", borderTop: "1px solid #f9e8e8" }}>
-                  <span style={{ color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 170 }}>{r.ref}</span>
-                  <span style={{ fontWeight: 700, color: "#0f172a" }}>{r.views.toLocaleString()}</span>
-                </div>
-              ))}
-              {t.refs.length === 0 && <div style={{ fontSize: "0.76rem", color: "#94a3b8", padding: "3px 0" }}>직접 유입뿐</div>}
-            </div>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14 }}>
+          {/* 상세 데이터 다운로드 — 멀티시트 XLSX(요약·일별·언어별·페이지유형·도구사용·페이지·유입경로·공유) */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12, alignItems: "center" }}>
             <button onClick={() => { setDlErr(""); apiDownload(`/api/tcg/admin/traffic/export?days=${days}`, `tcg-traffic-${days}d.xlsx`).catch((e) => setDlErr(String((e as Error)?.message || e))); }}
-              style={{ fontSize: "0.78rem", fontWeight: 700, color: "#dc2626", background: "#fee6e6", border: "1px solid #fbd8d8", borderRadius: 8, padding: "6px 12px", cursor: "pointer" }}>
-              ⬇️ XLSX 내보내기 ({days}일)
+              style={{ fontSize: "0.78rem", fontWeight: 800, color: "#fff", background: "linear-gradient(90deg,#16a34a,#059669)", border: "none", borderRadius: 9, padding: "7px 16px", cursor: "pointer" }}>
+              📥 전체 데이터 다운로드 (XLSX · {periodLabel(days)})
             </button>
-            {dlErr && <span style={{ fontSize: "0.74rem", color: "#dc2626" }}>{dlErr}</span>}
+            <span style={{ fontSize: "0.7rem", color: "#94a3b8" }}>시트 8개: 요약·일별·언어별·페이지유형·도구사용·페이지·유입경로·공유</span>
+            {dlErr && <span style={{ fontSize: "0.7rem", color: "#dc2626" }}>다운로드 실패: {dlErr}</span>}
+          </div>
+
+          {/* 일별 라인차트 + 일별 표 (gbl과 같은 컴포넌트) */}
+          {t.daily.length > 0 && <TrafficChart daily={t.daily} />}
+          {t.daily.length > 0 && <DailyTable daily={t.daily} />}
+
+          {/* 상위 페이지 · 유입 경로 */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>
+            <div style={BOX}>
+              <div style={BOX_H}>상위 페이지 ({periodLabel(days)})</div>
+              {t.paths.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음</div> : t.paths.slice(0, 8).map((p, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, fontSize: "0.76rem", padding: "3px 0" }}>
+                  <span style={{ color: "#94a3b8", minWidth: 14 }}>{i + 1}</span>
+                  <span style={{ flex: 1, color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.path}</span>
+                  <span style={{ fontWeight: 700, color: "#3b5bdb" }}>{p.views}</span>
+                </div>
+              ))}
+            </div>
+            <div style={BOX}>
+              <div style={BOX_H}>유입 경로 ({periodLabel(days)})</div>
+              {t.refs.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음 (직접 유입뿐)</div> : t.refs.slice(0, 8).map((r, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, fontSize: "0.76rem", padding: "3px 0" }}>
+                  <span style={{ color: "#94a3b8", minWidth: 14 }}>{i + 1}</span>
+                  <span style={{ flex: 1, color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.ref}</span>
+                  <span style={{ fontWeight: 700, color: "#7c3aed" }}>{r.views}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 🧰 도구 사용 — tcg 전용(계산기 참여도). gbl의 '앱 설치' 자리 */}
+          <div style={{ ...BOX, marginTop: 10 }}>
+            <div style={BOX_H}>🧰 도구 사용 ({periodLabel(days)}) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 계산기 참여도</span></div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 8 }}>
+              {t.tools.map((x) => (
+                <div key={x.event} style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 10, padding: "0.7rem 0.85rem" }}>
+                  <div style={{ fontSize: "1.15rem", fontWeight: 800, color: "#7c3aed" }}>{x.count.toLocaleString()}</div>
+                  <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#0f172a", marginTop: 2 }}>{TOOL_LABEL[x.event] || x.event}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 📄 페이지 유형별 — tcg 전용 */}
+          <div style={{ ...BOX, marginTop: 10 }}>
+            <div style={BOX_H}>📄 페이지 유형별 ({periodLabel(days)}) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 페이지뷰 (방문자)</span></div>
+            {t.pages.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음</div> : (() => {
+              const mx = Math.max(...t.pages.map((p) => p.pageviews), 1);
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {t.pages.slice(0, 12).map((p) => (
+                    <div key={p.type} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.76rem" }}>
+                      <span style={{ minWidth: 92, color: "#334155", fontWeight: 600 }}>{PAGE_LABEL[p.type] || p.type}</span>
+                      <div style={{ flex: 1, height: 12, background: "#eef2f8", borderRadius: 6, overflow: "hidden" }}>
+                        <div style={{ width: `${(p.pageviews / mx) * 100}%`, height: "100%", background: "#dc2626", borderRadius: 6 }} />
+                      </div>
+                      <span style={{ minWidth: 88, textAlign: "right", color: "#64748b" }}><b style={{ color: "#0f172a" }}>{p.pageviews.toLocaleString()}</b> ({p.uniques})</span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* 🌐 언어별 유입 (gbl과 동일 막대) */}
+          <div style={{ ...BOX, marginTop: 10 }}>
+            <div style={BOX_H}>🌐 언어별 유입 ({periodLabel(days)}) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 공개 페이지뷰</span></div>
+            {t.langs.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음</div> : (() => {
+              const totalPv = t.langs.reduce((a, l) => a + l.pageviews, 0) || 1;
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {t.langs.map((l) => {
+                    const pct = Math.round((l.pageviews / totalPv) * 100);
+                    const c = LANG_COLOR[l.lang] || "#64748b";
+                    return (
+                      <div key={l.lang} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.78rem" }}>
+                        <span style={{ minWidth: 92, fontWeight: 700, color: "#0f172a" }}>{LANG_LABEL[l.lang] || l.lang}</span>
+                        <div style={{ flex: 1, height: 12, background: "#eef2f8", borderRadius: 6, overflow: "hidden" }}>
+                          <div style={{ width: `${pct}%`, height: "100%", background: c, borderRadius: 6 }} />
+                        </div>
+                        <span style={{ fontWeight: 800, color: c, minWidth: 40, textAlign: "right" }}>{pct}%</span>
+                        <span style={{ color: "#64748b", minWidth: 128, textAlign: "right", fontSize: "0.72rem" }}>PV {l.pageviews.toLocaleString()} · 방문 {l.uniques.toLocaleString()}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* 📤 카드 유형별 공유·다운로드 (gbl과 동일 막대) */}
+          <div style={{ ...BOX, marginTop: 10 }}>
+            <div style={BOX_H}>📤 카드 유형별 공유·다운로드 ({periodLabel(days)}) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 바이럴 주도 콘텐츠</span></div>
+            {t.shares.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>아직 데이터 없음</div> : (() => {
+              const mx = Math.max(...t.shares.map((s) => s.total), 1);
+              return (
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {t.shares.map((s, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.76rem" }}>
+                      <span style={{ minWidth: 108, color: "#334155", fontWeight: 600 }}>{shareLabel(s.label)}</span>
+                      <div style={{ flex: 1, height: 16, background: "#f1f5f9", borderRadius: 5, overflow: "hidden", display: "flex" }}>
+                        <div style={{ width: `${(s.total / mx) * 100}%`, background: "linear-gradient(90deg,#0891b2,#db2777)", height: "100%" }} />
+                      </div>
+                      <span style={{ minWidth: 92, textAlign: "right", color: "#64748b" }}><b style={{ color: "#db2777" }}>📤{s.shares}</b> · <b style={{ color: "#0891b2" }}>💾{s.downloads}</b></span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         </>
       )}
-    </section>
+    </div>
   );
 }
 
