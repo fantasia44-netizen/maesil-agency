@@ -15,6 +15,11 @@ import { leagueShort, leagueName } from "../contentI18n";
 import type { SimDict } from "./dict";
 import type { Locale } from "../../../../lib/i18n";
 import { shareDataUrl } from "../raid/raidShareUtil";
+import { currentSeason as regCurrentSeason, seasonByNum, seasonShort } from "../seasons";
+
+// 시뮬 기본 시즌 — 공용 레지스트리의 현재 시즌(엔진이 가진 27/28 데이터로 클램프). 시즌 넘어가면 자동 롤오버.
+const ENGINE_SEASONS: SeasonNum[] = [27, 28];
+const DEFAULT_SEASON: SeasonNum = (regCurrentSeason().num >= 28 ? 28 : 27) as SeasonNum;
 
 const PKN = PKNAMES as unknown as Record<string, { ko: string; en: string; ja: string }>;
 const MN = MOVENAMES as unknown as Record<string, { ko: string; ja: string; en: string }>;
@@ -466,10 +471,12 @@ export default function SimView({ lang, t }: { lang: Locale; t: SimDict }) {
   const [ready, setReady] = useState(false);
   const [league, setLeague] = useState<League>("great");
   const [mode, setMode] = useState<"single" | "multi" | "matrix" | "team">("single");
-  const [season, setSeasonNum] = useState<SeasonNum>(27);
+  // 기본 시즌 = 공용 레지스트리(seasons.ts)의 현재 시즌(엔진이 지원하는 27/28로 클램프). 새 시즌 진입 시 자동 롤오버.
+  const [season, setSeasonNum] = useState<SeasonNum>(DEFAULT_SEASON);
   const list = useMemo(() => (ready ? pokemonList() : []), [ready, season]);
 
-  useEffect(() => { setReady(true); }, []);
+  // 마운트 시 엔진 시즌을 레지스트리 현재 시즌으로 맞춘 뒤 목록 로드(엔진 모듈 기본값은 27).
+  useEffect(() => { setSeason(DEFAULT_SEASON); setReady(true); }, []);
 
   // 시즌 전환: 엔진 데이터 스왑을 동기로 먼저 수행한 뒤 상태 갱신(→ list 재계산이 새 데이터로 실행됨).
   const changeSeason = (s: SeasonNum) => {
@@ -483,9 +490,9 @@ export default function SimView({ lang, t }: { lang: Locale; t: SimDict }) {
       <style>{`@media(max-width:640px){.sim-slots{grid-template-columns:1fr !important;}}`}</style>
       {/* 시즌 선택 (27 현재 / 28 미리보기) */}
       <div style={{ display: "flex", gap: 6, justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
-        {([27, 28] as SeasonNum[]).map((s) => {
+        {ENGINE_SEASONS.map((s) => {
           const on = season === s;
-          const isNew = s === 28;
+          const isNew = s === DEFAULT_SEASON; // 레지스트리 현재 시즌 = 강조(🌙·배지)
           return (
             <button key={s} onClick={() => changeSeason(s)}
               style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "0.38rem 0.9rem", borderRadius: 999,
@@ -493,17 +500,16 @@ export default function SimView({ lang, t }: { lang: Locale; t: SimDict }) {
                 fontSize: "0.8rem", fontWeight: 800, cursor: "pointer",
                 background: on ? (isNew ? "linear-gradient(135deg,#4c1d95,#6d28d9)" : "#0f172a") : "#fff",
                 color: on ? "#fff" : "#64748b" }}>
-              {isNew && "🌙"} {s === 27 ? t.seasonCur : t.seasonNew}
+              {isNew && "🌙"} {seasonShort(seasonByNum(s)!, lang)}
               {isNew && <span style={{ fontSize: "0.6rem", fontWeight: 900, background: on ? "rgba(255,255,255,.22)" : "#ede9fe", color: on ? "#fff" : "#6d28d9", borderRadius: 999, padding: "1px 6px" }}>{t.seasonNewBadge}</span>}
             </button>
           );
         })}
       </div>
-      {season === 28 && (
-        <div style={{ fontSize: "0.72rem", color: "#6d28d9", background: "#f5f3ff", border: "1px solid #ddd6fe", borderRadius: 10, padding: "7px 12px", marginBottom: 10, lineHeight: 1.55, textAlign: "center" }}>
-          {t.seasonNote}
-        </div>
-      )}
+      {/* 시즌 안내 — 현재 시즌: 데이터 기준 안내 / 이전 시즌: 아카이브 참고용 */}
+      <div style={{ fontSize: "0.72rem", color: season === DEFAULT_SEASON ? "#6d28d9" : "#64748b", background: season === DEFAULT_SEASON ? "#f5f3ff" : "#f8fafc", border: `1px solid ${season === DEFAULT_SEASON ? "#ddd6fe" : "#e2e8f0"}`, borderRadius: 10, padding: "7px 12px", marginBottom: 10, lineHeight: 1.55, textAlign: "center" }}>
+        {season === DEFAULT_SEASON ? t.seasonNote : t.seasonPastNote}
+      </div>
       {/* 리그 탭 — 코어 3리그 */}
       <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: season === 28 ? 6 : 10, flexWrap: "wrap" }}>
         {(["great", "ultra", "master"] as const).map((lg) => (

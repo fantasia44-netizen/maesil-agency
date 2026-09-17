@@ -2,6 +2,8 @@
 // league 필드에 이 key가 저장됨. 컵은 base 리그 풀 + 타입 제한으로 입력 풀을 좁힌다.
 // ※ 컵은 매 시즌 바뀌므로 새 시즌 시작 시 CUP_FORMATS를 갱신해야 함(관리자화 예정).
 
+import { currentSeason } from "./seasons";
+
 export type Format = {
   key: string;
   label: string;
@@ -27,8 +29,18 @@ export const MEGA_FORMATS: Format[] = [
   { key: "master_mega", label: "마스터리그 (메가)", base: "master", cup: true, note: "메가 허용" },
 ];
 
-// 시즌27(새로운 발걸음) 컵 일정 — 공식 기준. 다음 시즌엔 교체.
+// 컵 일정 — 공식 기준. 시즌별로 누적(키에 시즌 접미사 → 전적 기록 키 충돌 방지). activeCups()가 날짜로 현재 컵만 고름.
 export const CUP_FORMATS: Format[] = [
+  // ── 시즌28(황혼의 여정) — LEAGUE_SCHEDULE_BY_SEASON.s28과 동일 일정. 타입 제한은 공식 규칙 확인분만 기재(미확인=풀 전체).
+  { key: "cup_competitive_s28", label: "컴페티티브컵", base: "great", cup: true, start: "2026-09-16", end: "2026-09-23", note: "슈퍼" },
+  { key: "cup_retro_s28", label: "레트로컵", base: "great", cup: true, start: "2026-09-23", end: "2026-09-30", excludeTypes: ["dark", "steel", "fairy"], note: "슈퍼 · 악/강철/페어리 제외" },
+  { key: "cup_mega4_s28", label: "메가 4색컵", base: "great", cup: true, start: "2026-09-30", end: "2026-10-07", note: "슈퍼 · 메가" },
+  { key: "cup_little_s28", label: "리틀컵", base: "great", cup: true, start: "2026-10-14", end: "2026-10-21", note: "CP 500" },
+  { key: "cup_fantasy_s28", label: "판타지컵", base: "great", cup: true, start: "2026-10-21", end: "2026-10-28", allowTypes: ["dragon", "steel", "fairy"], note: "슈퍼 · 드래곤/강철/페어리" },
+  { key: "cup_mega_halloween_s28", label: "메가 할로윈컵", base: "great", cup: true, start: "2026-10-28", end: "2026-11-04", allowTypes: ["poison", "ghost", "bug", "dark", "fairy"], note: "슈퍼 · 독/고스트/벌레/악/페어리 · 메가" },
+  { key: "cup_champ_la_s28", label: "GO 챔피언십 LA컵", base: "great", cup: true, start: "2026-11-11", end: "2026-11-25", note: "슈퍼" },
+  { key: "cup_mega_catch_s28", label: "메가 캐치컵", base: "great", cup: true, start: "2026-11-25", end: "2026-12-01", note: "슈퍼 · 시즌 중 포획 · 메가" },
+  // ── 시즌27(새로운 발걸음) — 아카이브(전적 기록 키 유지)
   { key: "cup_scroll", label: "스크롤컵", base: "great", cup: true, start: "2026-08-18", end: "2026-08-26", allowTypes: ["water", "fighting", "dark"], note: "슈퍼 · 물/격투/악" },
   { key: "cup_evolution", label: "진화컵", base: "great", cup: true, start: "2026-08-11", end: "2026-08-19", note: "슈퍼 · 1회 진화(추가진화 가능)" },
   { key: "cup_nature", label: "네이처컵", base: "great", cup: true, start: "2026-08-04", end: "2026-08-12", allowTypes: ["fire", "water", "ice", "rock"], note: "슈퍼 · 불/물/얼음/바위" },
@@ -102,8 +114,8 @@ export const LEAGUE_SCHEDULE_BY_SEASON: Record<string, SchedulePeriod[]> = {
       { label: "마스터리그", base: "master" }, { label: "메가 캐치컵 (슈퍼리그)", base: "cup" }] },
   ],
 };
-// 하위호환 — 기존 참조(현재 시즌 로테이션)
-export const LEAGUE_SCHEDULE = LEAGUE_SCHEDULE_BY_SEASON.s27;
+// 하위호환 — 기존 참조(현재 시즌 로테이션). 레지스트리 현재 시즌 슬러그 기준, 스냅샷 없으면 마지막 등록 시즌.
+export const LEAGUE_SCHEDULE = LEAGUE_SCHEDULE_BY_SEASON[currentSeason().slug] || LEAGUE_SCHEDULE_BY_SEASON.s28;
 
 export const ALL_FORMATS = [...CORE_FORMATS, ...MEGA_FORMATS, ...CUP_FORMATS];
 export const FORMAT_BY_KEY: Record<string, Format> = Object.fromEntries(ALL_FORMATS.map((f) => [f.key, f]));

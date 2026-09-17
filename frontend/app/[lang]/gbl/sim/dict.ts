@@ -14,7 +14,7 @@ export type SimDict = {
   exportCsv: string; exportJson: string; sortRating: string; sortScore: string; advanced: string; auto: string; overall: string; keyMoves: string; noWins: string; pickTeam: string;
   shareBtn: string; downloadBtn: string; shareResult: string; shareMeta: string; shareMatrix: string; shareTeam: string;
   play: string; pause: string; replay: string;
-  seasonCur: string; seasonNew: string; seasonNewBadge: string; seasonNote: string;
+  seasonCur: string; seasonNew: string; seasonNewBadge: string; seasonNote: string; seasonPastNote: string;
   engineCredit: string;
   metaTitle: string; metaDesc: string; metaKeywords: string[]; ogTitle: string; ogDesc: string;
 };
@@ -36,8 +36,9 @@ const ko: SimDict = {
   exportCsv: "CSV 내보내기", exportJson: "JSON 내보내기", sortRating: "점수순", sortScore: "메타순", advanced: "개체값·레벨", auto: "자동", overall: "종합", keyMoves: "주요 기술", noWins: "결과 없음", pickTeam: "팀에 넣을 포켓몬을 선택하세요.",
   shareBtn: "공유하기", downloadBtn: "다운로드하기", shareResult: "PvP 배틀 결과", shareMeta: "메타 분석 결과", shareMatrix: "메타 매트릭스", shareTeam: "팀 스코어카드",
   play: "재생", pause: "일시정지", replay: "다시보기",
-  seasonCur: "시즌 27", seasonNew: "시즌 28", seasonNewBadge: "신규",
-  seasonNote: "🌙 황혼의 여정(9/9 시작) 리밸런스 미리보기 — PvPoke 사전 반영 데이터 기준. 시즌 시작 시 확정치로 갱신됩니다.",
+  seasonCur: "시즌 27", seasonNew: "시즌 28", seasonNewBadge: "현재",
+  seasonNote: "🌙 시즌 28 황혼의 여정 — 리밸런스 반영된 현재 시즌 데이터(PvPoke 게임마스터·메타) 기준입니다.",
+  seasonPastNote: "이전 시즌(27 새로운 발걸음) 데이터 — 참고용 아카이브. 현재 시즌은 위에서 시즌 28을 선택하세요.",
   engineCredit: "계산 엔진은 오픈소스 프로젝트 PvPoke(MIT 라이선스 · © 2019 pvpoke)를 기반으로 실제 배틀 메커니즘(데미지·에너지·실드 AI·베이팅)을 정밀 계산합니다.",
   metaTitle: "포켓몬고 PvP 배틀 시뮬레이터 · 개체값·기술 지정 | GBL Note",
   metaDesc: "포켓몬 GO 배틀리그 1:1 시뮬레이터. 두 포켓몬의 개체값(공/방/체)·기술·레벨·그림자·실드를 지정해 실제 배틀 결과를 계산. 슈퍼·하이퍼·마스터리그.",
@@ -62,8 +63,9 @@ const en: SimDict = {
   exportCsv: "Export CSV", exportJson: "Export JSON", sortRating: "By score", sortScore: "By meta", advanced: "IVs & level", auto: "Auto", overall: "Overall", keyMoves: "Key moves", noWins: "No results", pickTeam: "Pick Pokémon for your team.",
   shareBtn: "Share", downloadBtn: "Download", shareResult: "PvP Battle Result", shareMeta: "Meta Analysis", shareMatrix: "Meta Matrix", shareTeam: "Team Scorecard",
   play: "Play", pause: "Pause", replay: "Replay",
-  seasonCur: "Season 27", seasonNew: "Season 28", seasonNewBadge: "NEW",
-  seasonNote: "🌙 Twilight Trails (starts Sep 9) rebalance preview — based on PvPoke's pre-staged data. Updated to final values at season start.",
+  seasonCur: "Season 27", seasonNew: "Season 28", seasonNewBadge: "NOW",
+  seasonNote: "🌙 Season 28 Twilight Trails — current-season data with the rebalance applied (PvPoke game master & meta).",
+  seasonPastNote: "Previous season (27 New Beginnings) data — archive for reference. Pick Season 28 above for the current season.",
   engineCredit: "The battle engine is built on the open-source PvPoke project (MIT License · © 2019 pvpoke), computing real battle mechanics (damage, energy, shield AI & baiting) with precision.",
   metaTitle: "Pokémon GO PvP Battle Simulator · IVs & Moves | GBL Note",
   metaDesc: "Pokémon GO Battle League 1v1 simulator. Set each Pokémon's IVs (Atk/Def/Sta), moves, level, shadow and shields to compute the real outcome. Great, Ultra & Master League.",
@@ -88,8 +90,9 @@ const ja: SimDict = {
   exportCsv: "CSV出力", exportJson: "JSON出力", sortRating: "スコア順", sortScore: "メタ順", advanced: "個体値・レベル", auto: "自動", overall: "総合", keyMoves: "主な技", noWins: "結果なし", pickTeam: "チームに入れるポケモンを選択。",
   shareBtn: "シェア", downloadBtn: "ダウンロード", shareResult: "PvPバトル結果", shareMeta: "メタ分析結果", shareMatrix: "メタマトリックス", shareTeam: "チームスコア",
   play: "再生", pause: "一時停止", replay: "リプレイ",
-  seasonCur: "シーズン27", seasonNew: "シーズン28", seasonNewBadge: "新",
-  seasonNote: "🌙 黄昏の旅路(9/9開始)のリバランス先行プレビュー — PvPoke事前反映データに基づく。シーズン開始時に確定値へ更新します。",
+  seasonCur: "シーズン27", seasonNew: "シーズン28", seasonNewBadge: "現在",
+  seasonNote: "🌙 シーズン28 黄昏の旅路 — リバランス反映済みの現行シーズンデータ(PvPokeゲームマスター・メタ)基準。",
+  seasonPastNote: "前シーズン(27 新たな一歩)のデータ — 参考用アーカイブ。現行シーズンは上でシーズン28を選択。",
   engineCredit: "バトルエンジンはオープンソースの PvPoke(MITライセンス · © 2019 pvpoke)を基に、実際のバトル計算(ダメージ・エネルギー・シールドAI・釣り）を精密に行います。",
   metaTitle: "ポケモンGO PvP バトルシミュレーター · 個体値・技指定 | GBL Note",
   metaDesc: "ポケモンGO バトルリーグ 1vs1 シミュレーター。2匹の個体値(攻/防/HP)・技・レベル・シャドウ・シールドを指定して実際の結果を計算。スーパー・ハイパー・マスターリーグ。",
@@ -114,8 +117,9 @@ const zhTW: SimDict = {
   exportCsv: "匯出CSV", exportJson: "匯出JSON", sortRating: "評分順", sortScore: "環境順", advanced: "個體值·等級", auto: "自動", overall: "綜合", keyMoves: "主要招式", noWins: "無結果", pickTeam: "請選擇加入隊伍的寶可夢。",
   shareBtn: "分享", downloadBtn: "下載", shareResult: "PvP 對戰結果", shareMeta: "環境分析結果", shareMatrix: "環境矩陣", shareTeam: "隊伍評分表",
   play: "播放", pause: "暫停", replay: "重播",
-  seasonCur: "第27賽季", seasonNew: "第28賽季", seasonNewBadge: "新",
-  seasonNote: "🌙 黃昏旅途（9/9開始）改動搶先預覽 — 依 PvPoke 預先套用的資料。賽季開始時更新為最終數值。",
+  seasonCur: "第27賽季", seasonNew: "第28賽季", seasonNewBadge: "目前",
+  seasonNote: "🌙 第28賽季 黃昏旅途 — 已套用平衡調整的本賽季資料（PvPoke 遊戲主檔·環境）。",
+  seasonPastNote: "上一賽季（27 嶄新的一步）資料 — 僅供參考的封存。本賽季請在上方選擇第28賽季。",
   engineCredit: "計算引擎基於開源專案 PvPoke（MIT 授權 · © 2019 pvpoke），精密計算真實對戰機制（傷害·能量·護盾AI·誘盾）。",
   metaTitle: "寶可夢GO PvP 對戰模擬器 · 指定個體值·招式 | GBL Note",
   metaDesc: "寶可夢GO 對戰聯盟 1:1 模擬器。指定兩隻寶可夢的個體值（攻/防/HP）·招式·等級·暗影·護盾，計算真實對戰結果。超級·高級·大師聯盟。",
