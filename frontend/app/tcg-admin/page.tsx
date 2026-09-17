@@ -75,6 +75,7 @@ type Traffic = {
   paths: { path: string; views: number }[];
   refs: { ref: string; views: number }[];
   shares: { label: string; shares: number; downloads: number; total: number }[];
+  app?: { installs: number; installable: number; app_pageviews: number; direct_pageviews: number };
 };
 
 const TOOL_LABEL: Record<string, string> = {
@@ -154,6 +155,10 @@ function TrafficSection() {
               { l: "공유", v: t.summary.shares, c: "#db2777" },
               { l: "다운로드", v: t.summary.downloads, c: "#0891b2" },
               { l: "도구 사용", v: t.summary.tool_events, c: "#dc2626" },
+              // PWA 설치·앱 실행(gbl과 동일 지표): 설치 완료 / 설치가능 노출 / 설치앱으로 본 뷰
+              { l: "앱 설치", v: t.app?.installs ?? 0, c: "#16a34a" },
+              { l: "설치가능 노출", v: t.app?.installable ?? 0, c: "#64748b" },
+              { l: "앱 실행 뷰", v: t.app?.app_pageviews ?? 0, c: "#16a34a" },
             ].map((k) => (
               <div key={k.l} style={card}>
                 <div style={{ fontSize: "1.3rem", fontWeight: 800, color: k.c }}>{k.v}</div>

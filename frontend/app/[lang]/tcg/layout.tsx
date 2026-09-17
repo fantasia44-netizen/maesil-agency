@@ -3,6 +3,7 @@ import Script from "next/script";
 import TcgNav from "./TcgNav";
 import TcgFooter from "./TcgFooter";
 import TcgTracker from "./TcgTracker";
+import TcgPwa from "./TcgPwa";
 import { locales, localeMeta, isLocale, defaultLocale } from "../../../lib/i18n";
 import { getTcg } from "./dict";
 
@@ -32,7 +33,10 @@ export async function generateMetadata({ params }: { params: { lang: string } })
     metadataBase: new URL(SITE),
     title: m.title,
     description: m.description,
-    icons: { icon: "/tcg-icon.png", apple: "/tcg-icon.png", shortcut: "/tcg-icon.png" },
+    icons: { icon: "/tcg-icon.png", apple: "/icons/tcg-192.png", shortcut: "/tcg-icon.png" },
+    // PWA — 홈화면 설치·standalone 실행(gbl과 동일). 설치/앱 실행 지표는 TcgPwa·track("(앱)")으로 계측.
+    manifest: "/tcg-manifest.json",
+    appleWebApp: { capable: true, statusBarStyle: "default", title: "TCG Note" },
     openGraph: {
       title: m.ogTitle,
       description: m.ogDescription,
@@ -69,6 +73,7 @@ export default function TcgLayout({ children, params }: { children: React.ReactN
       {/* htmlLang 조기 주입 — 루트 layout의 <html lang>이 [lang]을 못 받아 "ko" 고정이라 로케일별 교정 */}
       <script dangerouslySetInnerHTML={{ __html: `document.documentElement.lang=${JSON.stringify(htmlLang)}` }} />
       <TcgTracker />
+      <TcgPwa />
       <TcgNav />
       {ADS_CLIENT && (
         <Script id="adsbygoogle-loader" async strategy="afterInteractive"

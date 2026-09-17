@@ -24,7 +24,8 @@ router = APIRouter(prefix="/api/tcg", tags=["tcg"])
 
 # 도구사용 이벤트(tcg 특화) — "계산기를 실제로 쓴다"는 신호(pageview·share·download에 더해).
 _TOOL_EVENTS = ("sim_run", "pack_open", "deck_build", "counter_search")
-_EVENTS = ("pageview", "share", "download") + _TOOL_EVENTS
+_APP_EVENTS = ("install", "installable")  # PWA 설치 지표(gbl과 동일): installable=설치가능 노출(분모), install=설치 완료(분자)
+_EVENTS = ("pageview", "share", "download") + _TOOL_EVENTS + _APP_EVENTS
 
 _LOCALES = ("en", "ja", "zh-TW")
 
@@ -161,6 +162,8 @@ def _aggregate(rows: list[dict], days: int, first_seen: dict[str, str] | None = 
     tools: dict[str, int] = defaultdict(int)
     share_c: dict[str, int] = defaultdict(int)
     dl_c: dict[str, int] = defaultdict(int)
+    # 앱 지표(gbl _app_metrics와 동일 의미): 설치 완료·설치가능 노출·설치앱 실행 뷰(ref="(앱)")·순수 직접 뷰(ref 없음)
+    app = {"installs": 0, "installable": 0, "app_pageviews": 0, "direct_pageviews": 0}
 
     all_visitors: set = set()
     all_sessions: set = set()
@@ -214,6 +217,14 @@ def _aggregate(rows: list[dict], days: int, first_seen: dict[str, str] | None = 
             ref = r.get("ref")
             if ref:
                 refs[ref] += 1
+            if ref == "(앱)":
+                app["app_pageviews"] += 1
+            elif not ref:
+                app["direct_pageviews"] += 1
+        elif ev == "install":
+            app["installs"] += 1
+        elif ev == "installable":
+            app["installable"] += 1
         elif ev in _TOOL_EVENTS:
             tools[ev] += 1
         elif ev == "share":
@@ -280,6 +291,7 @@ def _aggregate(rows: list[dict], days: int, first_seen: dict[str, str] | None = 
         "tools": tool_rows,
         "paths": [{"path": p, "views": c} for p, c in paths.most_common(300)],
         "refs": [{"ref": r, "views": c} for r, c in refs.most_common(100)],
+        "app": app,
         "shares": shares,
     }
 
@@ -360,6 +372,17 @@ def admin_traffic_export(days: int = 30, admin: UserContext = Depends(require_ad
     add_sheet("일별", agg["daily"], ["day", "pageviews", "uniques", "new_visitors", "sessions"])
     add_sheet("언어별", agg["langs"], ["lang", "pageviews", "uniques", "sessions"])
     add_sheet("페이지유형", agg["pages"], ["type", "pageviews", "uniques"])
+    _app = agg.get("app") or {}
+    _inst, _able = _app.get("installs", 0), _app.get("installable", 0)
+    _apv, _dpv = _app.get("app_pageviews", 0), _app.get("direct_pageviews", 0)
+    add_sheet("앱·설치", [
+        {"항목": "설치 완료 (install)", "값": _inst, "비고": "홈화면/데스크톱 PWA 설치"},
+        {"항목": "설치가능 노출 (installable)", "값": _able, "비고": "세션당 1회·주로 Android Chrome"},
+        {"항목": "설치율 — 노출 대비 (%)", "값": round(_inst / _able * 100, 1) if _able else 0, "비고": "installs / installable"},
+        {"항목": "앱 실행 페이지뷰", "값": _apv, "비고": "설치된 앱(standalone)으로 본 뷰"},
+        {"항목": "직접 링크 페이지뷰", "값": _dpv, "비고": "referrer 없는 순수 직접 방문"},
+        {"항목": "앱 실행 비중 (%)", "값": round(_apv / (_apv + _dpv) * 100, 1) if (_apv + _dpv) else 0, "비고": "앱 / (앱+직접)"},
+    ], ["항목", "값", "비고"])
     add_sheet("도구사용", agg["tools"], ["event", "count"])
     add_sheet("페이지", agg["paths"], ["path", "views"])
     add_sheet("유입경로", agg["refs"], ["ref", "views"])
