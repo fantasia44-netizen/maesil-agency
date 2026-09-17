@@ -52,9 +52,7 @@ function gblPaths(): [string, CF, number][] {
     ...Object.keys(GUIDES).map((slug) => [`/gbl/guide/${slug}`, "monthly", 0.6] as [string, CF, number]),
     // /gbl/board 는 noindex(로그인 게이트·UGC) → 사이트맵 제외
     ["/gbl/about", "monthly", 0.4],
-    ["/gbl/contact", "yearly", 0.3],
-    ["/gbl/privacy", "yearly", 0.3],
-    ["/gbl/terms", "yearly", 0.3],
+    // 문의·개인정보·약관은 사이트맵에서 제외(색인은 보수적으로 — 페이지·링크·index 태그는 그대로, "색인 주장"만 안 함)
   ];
 }
 
@@ -77,9 +75,7 @@ function tcgPaths(): [string, CF, number][] {
     ...TCG_GUIDES.map((g) => [`/tcg/guides/${g.slug}`, "monthly", 0.6] as [string, CF, number]),
     // /tcg/cards(카드 DB 유틸)는 린 런치 동안 noindex → 사이트맵 제외. 승인 후 추가 검토.
     ["/tcg/about", "monthly", 0.4],
-    ["/tcg/contact", "monthly", 0.4],
-    ["/tcg/privacy", "yearly", 0.3],
-    ["/tcg/terms", "yearly", 0.3],
+    // 문의·개인정보·약관은 사이트맵에서 제외(색인은 보수적으로 — 페이지·링크·index 태그는 그대로)
   ];
 }
 
