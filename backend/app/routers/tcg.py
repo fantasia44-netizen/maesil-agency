@@ -166,8 +166,10 @@ def _aggregate(rows: list[dict], days: int, first_seen: dict[str, str] | None = 
     daily_new: dict[str, set] = defaultdict(set)
     daily_sess: dict[str, set] = defaultdict(set)
     sess_cnt: dict[str, int] = defaultdict(int)
-    sess_first: dict[str, datetime] = {}
-    sess_last: dict[str, datetime] = {}
+    # 체류시간용 세션 시작·끝 시각. ⚠️ 아래 유입경로용 sess_first(세션키→(시각,리퍼러) 튜플)와 이름이 겹치면
+    #    datetime과 튜플이 한 dict에 섞여 TypeError → /admin/traffic 500 (2026-09-18 장애). 반드시 별도 이름 유지.
+    dwell_start: dict[str, datetime] = {}
+    dwell_end: dict[str, datetime] = {}
     lang_pv: dict[str, int] = defaultdict(int)
     lang_vis: dict[str, set] = defaultdict(set)
     lang_sess: dict[str, set] = defaultdict(set)
@@ -212,10 +214,10 @@ def _aggregate(rows: list[dict], days: int, first_seen: dict[str, str] | None = 
             if sess:
                 sess_cnt[sess] += 1
                 if ts:
-                    if sess not in sess_first or ts < sess_first[sess]:
-                        sess_first[sess] = ts
-                    if sess not in sess_last or ts > sess_last[sess]:
-                        sess_last[sess] = ts
+                    if sess not in dwell_start or ts < dwell_start[sess]:
+                        dwell_start[sess] = ts
+                    if sess not in dwell_end or ts > dwell_end[sess]:
+                        dwell_end[sess] = ts
             if day:
                 daily_pv[day] += 1
                 if vis:
@@ -268,7 +270,7 @@ def _aggregate(rows: list[dict], days: int, first_seen: dict[str, str] | None = 
     } for d in span]
 
     # 세션 체류·이탈 — 페이지뷰 1회 세션은 체류 0초(gbl SQL과 동일 정의)
-    durs = [(sess_last[s] - sess_first[s]).total_seconds() for s in sess_cnt if s in sess_first and s in sess_last]
+    durs = [(dwell_end[s] - dwell_start[s]).total_seconds() for s in sess_cnt if s in dwell_start and s in dwell_end]
     avg_dwell = round(sum(durs) / len(durs), 1) if durs else 0
     bounce_rate = round(sum(1 for s in sess_cnt if sess_cnt[s] == 1) / len(sess_cnt), 4) if sess_cnt else 0
     new_total = sum(1 for v in all_visitors if first_seen.get(v, cutoff_day) >= cutoff_day)
