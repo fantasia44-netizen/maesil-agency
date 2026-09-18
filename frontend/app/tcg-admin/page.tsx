@@ -73,7 +73,7 @@ type Traffic = {
   pages: { type: string; pageviews: number; uniques: number }[];
   tools: { event: string; count: number }[];
   paths: { path: string; views: number }[];
-  refs: { ref: string; views: number }[];
+  refs: { ref: string; visitors?: number; views: number }[];
   shares: { label: string; shares: number; downloads: number; total: number }[];
   app?: { installs: number; installable: number; app_pageviews: number; direct_pageviews: number };
 };
@@ -194,12 +194,14 @@ function TrafficSection() {
               ))}
             </div>
             <div style={BOX}>
-              <div style={BOX_H}>유입 경로 ({periodLabel(days)})</div>
-              {t.refs.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음 (직접 유입뿐)</div> : t.refs.slice(0, 8).map((r, i) => (
+              {/* 방문자 기준 — 세션의 첫 리퍼러로 귀속(gbl SQL 080과 동일 정의). 괄호 = 그 세션들의 페이지뷰 */}
+              <div style={BOX_H}>유입 경로 ({periodLabel(days)}) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· 방문자 (조회)</span></div>
+              {t.refs.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음</div> : t.refs.slice(0, 8).map((r, i) => (
                 <div key={i} style={{ display: "flex", gap: 8, fontSize: "0.76rem", padding: "3px 0" }}>
                   <span style={{ color: "#94a3b8", minWidth: 14 }}>{i + 1}</span>
                   <span style={{ flex: 1, color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.ref}</span>
-                  <span style={{ fontWeight: 700, color: "#7c3aed" }}>{r.views}</span>
+                  <span style={{ fontWeight: 700, color: "#7c3aed" }}>{r.visitors ?? r.views}</span>
+                  {r.visitors != null && <span style={{ color: "#94a3b8", minWidth: 40, textAlign: "right" }}>({r.views})</span>}
                 </div>
               ))}
             </div>

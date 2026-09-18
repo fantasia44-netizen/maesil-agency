@@ -600,7 +600,8 @@ def admin_traffic_export(days: int = 30, admin: UserContext = Depends(require_ad
 
     add_sheet("일별", daily, ["day", "pageviews", "uniques", "new_visitors", "sessions"])
     add_sheet("페이지", paths, ["path", "views"])
-    add_sheet("유입경로", refs, ["ref", "views"])
+    # SQL 080 이후: visitors=그 경로로 유입된 고유 방문자(세션 첫 리퍼러 귀속), views=그 세션들의 페이지뷰
+    add_sheet("유입경로", refs, ["ref", "visitors", "views"])
     add_sheet("언어별", langs, ["lang", "pageviews", "uniques", "sessions"])
     add_sheet("공유·다운로드", shares, ["label", "shares", "downloads", "total"])
 

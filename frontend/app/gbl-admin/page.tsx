@@ -24,7 +24,7 @@ type Traffic = {
   summary: { pageviews: number; uniques: number; new_visitors: number; returning_visitors: number; sessions: number; avg_dwell: number; bounce_rate: number; shares: number; downloads: number };
   active: { active_30m: number; pv_30m: number };
   paths: { path: string; views: number }[];
-  refs: { ref: string; views: number }[];
+  refs: { ref: string; visitors?: number; views: number }[];
   shares?: { label: string; shares: number; downloads: number; total: number }[];
   langs?: { lang: string; pageviews: number; uniques: number; sessions: number }[];
   app?: { installs: number; installable: number; app_pageviews: number; direct_pageviews: number };
@@ -312,12 +312,14 @@ export default function GblAdmin() {
               ))}
             </div>
             <div style={{ background: "#fff", border: "1px solid #eef2f0", borderRadius: 12, padding: "0.8rem" }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>유입 경로 ({traffic.days === 0 ? "오늘" : `${traffic.days}일`})</div>
+              {/* 방문자 기준 — 세션의 첫 리퍼러로 귀속(SQL 080). 080 미실행이면 visitors가 없어 기존 페이지뷰로 폴백 */}
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>유입 경로 ({traffic.days === 0 ? "오늘" : `${traffic.days}일`}) <span style={{ fontWeight: 500, color: "#94a3b8" }}>· {traffic.refs[0]?.visitors != null ? "방문자 (조회)" : "조회"}</span></div>
               {traffic.refs.length === 0 ? <div style={{ fontSize: "0.74rem", color: "#94a3b8" }}>데이터 없음</div> : traffic.refs.slice(0, 8).map((r, i) => (
                 <div key={i} style={{ display: "flex", gap: 8, fontSize: "0.76rem", padding: "3px 0" }}>
                   <span style={{ color: "#94a3b8", minWidth: 14 }}>{i + 1}</span>
                   <span style={{ flex: 1, color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.ref}</span>
-                  <span style={{ fontWeight: 700, color: "#7c3aed" }}>{r.views}</span>
+                  <span style={{ fontWeight: 700, color: "#7c3aed" }}>{r.visitors ?? r.views}</span>
+                  {r.visitors != null && <span style={{ color: "#94a3b8", minWidth: 40, textAlign: "right" }}>({r.views})</span>}
                 </div>
               ))}
             </div>

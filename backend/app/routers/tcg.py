@@ -92,6 +92,22 @@ def _parse_ts(v) -> datetime | None:
         return None
 
 
+_EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)  # created_at 파싱 실패 시 정렬용 기본값
+
+
+def _ref_rows(sess_first: dict, sess_pv: Counter, sess_vis: dict) -> list[dict]:
+    """유입 경로(방문자 기준) — 세션의 첫 페이지뷰 리퍼러로 귀속.
+    visitors=그 경로로 들어온 고유 방문자, views=그 세션들이 본 전체 페이지뷰(gbl SQL 080과 동일 정의)."""
+    ref_vis: dict[str, set] = defaultdict(set)
+    ref_views: Counter = Counter()
+    for sk, (_, ref) in sess_first.items():
+        ref_vis[ref].add(sess_vis.get(sk) or sk)
+        ref_views[ref] += sess_pv[sk]
+    rows = [{"ref": r, "visitors": len(v), "views": ref_views[r]} for r, v in ref_vis.items()]
+    rows.sort(key=lambda x: (-x["visitors"], -x["views"]))
+    return rows[:100]
+
+
 # ── 비콘 수집 ────────────────────────────────────────────────────────────
 class TrackIn(BaseModel):
     visitor: str | None = None
@@ -158,7 +174,10 @@ def _aggregate(rows: list[dict], days: int, first_seen: dict[str, str] | None = 
     page_pv: dict[str, int] = defaultdict(int)
     page_vis: dict[str, set] = defaultdict(set)
     paths = Counter()
-    refs = Counter()
+    # 유입 경로(방문자 기준) 집계용 — 세션키 → (첫 페이지뷰 시각, 그 리퍼러) / 페이지뷰 수 / 방문자
+    sess_first: dict = {}
+    sess_pv: Counter = Counter()
+    sess_vis: dict = {}
     tools: dict[str, int] = defaultdict(int)
     share_c: dict[str, int] = defaultdict(int)
     dl_c: dict[str, int] = defaultdict(int)
@@ -215,8 +234,14 @@ def _aggregate(rows: list[dict], days: int, first_seen: dict[str, str] | None = 
                 page_vis[pt].add(vis)
             paths[path] += 1
             ref = r.get("ref")
-            if ref:
-                refs[ref] += 1
+            # 유입 경로 = 세션의 첫 페이지뷰 리퍼러(방문자 기준). 사이트 내 이동(ref 빈값)이 '직접'으로 부풀지 않게 세션 단위로 귀속.
+            sk = sess or vis or f"row{total_pv}"
+            sess_pv[sk] += 1
+            if vis:
+                sess_vis[sk] = vis
+            tkey = ts or _EPOCH
+            if sk not in sess_first or tkey < sess_first[sk][0]:
+                sess_first[sk] = (tkey, ref or "(직접)")
             if ref == "(앱)":
                 app["app_pageviews"] += 1
             elif not ref:
@@ -290,7 +315,7 @@ def _aggregate(rows: list[dict], days: int, first_seen: dict[str, str] | None = 
         "pages": pages,
         "tools": tool_rows,
         "paths": [{"path": p, "views": c} for p, c in paths.most_common(300)],
-        "refs": [{"ref": r, "views": c} for r, c in refs.most_common(100)],
+        "refs": _ref_rows(sess_first, sess_pv, sess_vis),
         "app": app,
         "shares": shares,
     }
@@ -385,7 +410,7 @@ def admin_traffic_export(days: int = 30, admin: UserContext = Depends(require_ad
     ], ["항목", "값", "비고"])
     add_sheet("도구사용", agg["tools"], ["event", "count"])
     add_sheet("페이지", agg["paths"], ["path", "views"])
-    add_sheet("유입경로", agg["refs"], ["ref", "views"])
+    add_sheet("유입경로", agg["refs"], ["ref", "visitors", "views"])
     add_sheet("공유·다운로드", agg["shares"], ["label", "shares", "downloads", "total"])
 
     buf = io.BytesIO()
