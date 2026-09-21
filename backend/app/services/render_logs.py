@@ -71,6 +71,10 @@ EXCLUDE_PATTERNS: list[re.Pattern[str]] = [
     # 네이버 광고 API — 지표 준비중(code=20007)은 정상 비즈니스 응답
     re.compile(r'"code"\s*:\s*20007', re.I),
     re.compile(r'지표\s*준비중', re.I),
+    # 접근로그 404 (WordPress/PHP 스캐너 등) — 경로에 Exception/error.php 가 있어도 알림 아님
+    re.compile(r'HTTP/\d\.\d"\s+404\b'),
+    # 워커가 스스로 처리한 일시 오류 (다음 루프 재시도·낙관적 유지)
+    re.compile(r"(일시\s*오류|다음\s*루프\s*재시도|낙관적\s*유지)"),
 ]
 
 # 에러 패턴 → severity 매핑 (위에서부터 우선)
@@ -201,8 +205,32 @@ def classify(message: str) -> str | None:
             return None
     for sev, pat in SEVERITY_PATTERNS:
         if pat.search(clean):
-            return sev
+            return _cap_by_log_level(clean, sev)
     return None
+
+
+# 로그 자체가 명시한 레벨 — `[WARNING] module:` / `"level": "WARNING"` 형식
+_LEVEL_RE = re.compile(r'(?:\[(DEBUG|INFO|WARNING|WARN|ERROR|CRITICAL)\]|"level":\s*"(DEBUG|INFO|WARNING|WARN|ERROR|CRITICAL)")')
+
+
+def _cap_by_log_level(clean: str, sev: str) -> str | None:
+    """로그가 스스로 레벨을 밝힌 경우 키워드 매칭으로 그 위로 올리지 않는다.
+    예: `[WARNING] sync_worker: ... The read operation timed out` 은 timeout 키워드가 있어도 warning.
+    INFO/DEBUG 로 찍힌 줄은 키워드가 있어도 알림 대상이 아님. 5xx 응답은 예외(critical 유지)."""
+    m = _LEVEL_RE.search(clean)
+    if not m:
+        return sev
+    level = (m.group(1) or m.group(2) or "").upper()
+    if sev == "critical" and re.search(r'HTTP/\d\.\d"\s+5\d\d\b', clean):
+        return sev
+    if level in ("DEBUG", "INFO"):
+        return None
+    if level in ("WARNING", "WARN"):
+        return "warning" if SEV_RANK_LOCAL[sev] > SEV_RANK_LOCAL["warning"] else sev
+    return sev
+
+
+SEV_RANK_LOCAL = {"warning": 1, "error": 2, "critical": 3}
 
 
 def make_dedup_key(program_name: str, message: str) -> str:
