@@ -24,7 +24,9 @@ const L: Record<Locale, { title: string; pickL: string; counterH: string; counte
   "zh-TW": { title: "剋星查詢", pickL: "對手牌組", counterH: "🛡️ 剋制此牌組的牌組", counterP: "在實際賽事中對上此牌組勝率高的牌組(至少8場)。", favH: "⚔️ 有利對手", favP: "此牌組實際上常贏的對手。", wr: "勝率", rec: "戰績", none: "無足夠樣本的對戰資料", note: "對戰為Limitless賽事結果自行彙整 · 僅顯示8場以上", analyzed: "攻略", shareBeat: "的剋星", foot: "實際賽事對戰勝率" },
 };
 
-export default function CountersClient({ lang }: { lang: Locale }) {
+// analyzed = 공략 페이지가 실제로 있는 덱 id(서버에서 전달). 없는 덱은 링크 없이 이름만 — 404 내부 링크 방지.
+export default function CountersClient({ lang, analyzed }: { lang: Locale; analyzed: string[] }) {
+  const hasPage = new Set(analyzed);
   const t = L[lang];
   const [sel, setSel] = useState(PICKABLE[0]?.id || "");
   const dn = (id: string) => { const d = BY_ID[id]; return (d?.nm && d.nm[lang]) || d?.name || id; };
@@ -61,7 +63,9 @@ export default function CountersClient({ lang }: { lang: Locale }) {
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "7px 8px", borderTop: "1px solid #f6e0e0" }}>
         {d && <span style={{ background: TIER_COLOR[d.tier] || "#64748b", color: "#fff", borderRadius: 5, padding: "0 6px", fontSize: "0.7rem", fontWeight: 900 }}>{d.tier}</span>}
-        <Link href={L2(`/tcg/decks/${id}`)} style={{ flex: 1, fontSize: "0.85rem", fontWeight: 600, color: "#0f172a", textDecoration: "none", minWidth: 0 }}>{dn(id)}</Link>
+        {hasPage.has(id)
+          ? <Link href={L2(`/tcg/decks/${id}`)} style={{ flex: 1, fontSize: "0.85rem", fontWeight: 600, color: "#0f172a", textDecoration: "none", minWidth: 0 }}>{dn(id)}</Link>
+          : <span style={{ flex: 1, fontSize: "0.85rem", fontWeight: 600, color: "#0f172a", textDecoration: "none", minWidth: 0 }}>{dn(id)}</span>}
         <span style={{ fontWeight: 800, fontVariantNumeric: "tabular-nums", color: good ? "#16a34a" : "#dc2626" }}>{wr}%</span>
         <span style={{ minWidth: 44, textAlign: "right", fontSize: "0.76rem", color: "#94a3b8", fontVariantNumeric: "tabular-nums" }}>{w}–{l}</span>
       </div>

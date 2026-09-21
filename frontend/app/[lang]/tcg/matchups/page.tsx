@@ -1,6 +1,7 @@
 // 덱 상성 분석 — 내 덱 → 메타 상대별 승률 + 점유율 가중 기대 승률. counters(상대잡기)와 짝.
 import type { Metadata } from "next";
 import MatchupsClient from "./MatchupsClient";
+import { analyzedDeckIds } from "../decks/analysis";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../../lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +30,7 @@ export default function MatchupsPage({ params }: { params: { lang: string } }) {
   return (
     <div style={{ maxWidth: 860, margin: "0 auto", padding: "1.4rem 1rem 3rem" }}>
       <h1 style={{ margin: "0 0 10px", fontSize: "clamp(1.3rem,4.5vw,1.6rem)", fontWeight: 900, color: "#b91c1c" }}>{META[lang].h1}</h1>
-      <MatchupsClient lang={lang} />
+      <MatchupsClient lang={lang} analyzed={analyzedDeckIds()} />
     </div>
   );
 }

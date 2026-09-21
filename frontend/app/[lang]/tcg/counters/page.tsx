@@ -2,6 +2,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import CountersClient from "./CountersClient";
+import { analyzedDeckIds } from "../decks/analysis";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../../lib/i18n";
 
 export const revalidate = 3600;
@@ -28,7 +29,7 @@ export default function CountersPage({ params }: { params: { lang: string } }) {
       <div style={{ fontSize: "0.78rem", marginBottom: 6 }}><Link href={localizePath(lang, "/tcg")} style={{ color: "#dc2626", textDecoration: "none" }}>← TCG Note</Link></div>
       <h1 style={{ margin: "0 0 8px", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a" }}>{t.h1}</h1>
       <p style={{ margin: "0 0 16px", fontSize: "0.9rem", color: "#475569", lineHeight: 1.7 }}>{t.intro}</p>
-      <CountersClient lang={lang} />
+      <CountersClient lang={lang} analyzed={analyzedDeckIds()} />
     </div>
   );
 }

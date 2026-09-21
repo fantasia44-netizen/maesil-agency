@@ -1,6 +1,7 @@
 // 카드 개별 페이지 — SEO 롱테일. 카드정보 + 이 카드를 쓰는 메타 덱 + 필요 팩 + 관련 카드(독창 파생).
 // 레이아웃이 force-dynamic이라 요청 시 SSR(3879장 빌드 폭발 없음). 승인 전 noindex(env로 전환).
 import Link from "next/link";
+import { analyzedDeckIds } from "../../decks/analysis";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import CARDS from "../../data/cards.json";
@@ -56,6 +57,8 @@ function findCard(id: string): Card | undefined {
 }
 const cardId = (c: { s: string; n: number }) => `${c.s.toLowerCase()}-${c.n}`;
 const nameOf = (c: { name: string; nm?: Record<string, string> }, lang: Locale) => (c.nm && c.nm[lang]) || c.name;
+
+const ANALYZED = new Set(analyzedDeckIds());
 
 export function generateMetadata({ params }: { params: { lang: string; id: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
@@ -134,13 +137,17 @@ export default function CardPage({ params }: { params: { lang: string; id: strin
           <p style={{ margin: 0, fontSize: "0.84rem", color: "#94a3b8" }}>{t.usedNone}</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {usedIn.map((d) => (
-              <Link key={d.id} href={localizePath(lang, `/tcg/decks/${d.id}`)} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", background: "#fef6f5", border: "1px solid #fbd8d8", borderRadius: 8, padding: "7px 11px" }}>
+            {usedIn.map((d) => {
+              const inner = (<>
                 {d.tier && <span style={{ fontSize: "0.7rem", fontWeight: 900, color: "#fff", background: "#dc2626", borderRadius: 6, padding: "1px 8px" }}>{d.tier}</span>}
                 <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "#0f172a", flex: 1 }}>{nameOf(d, lang)}</span>
                 {d.winrate != null && <span style={{ fontSize: "0.78rem", fontWeight: 800, color: "#64748b" }}>{t.wr} {d.winrate}%</span>}
-              </Link>
-            ))}
+              </>);
+              // 공략 페이지가 있는 덱만 링크(없는 덱으로 가는 404 내부 링크 방지)
+              return ANALYZED.has(d.id)
+                ? <Link key={d.id} href={localizePath(lang, `/tcg/decks/${d.id}`)} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", background: "#fef6f5", border: "1px solid #fbd8d8", borderRadius: 8, padding: "7px 11px" }}>{inner}</Link>
+                : <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", background: "#fef6f5", border: "1px solid #fbd8d8", borderRadius: 8, padding: "7px 11px" }}>{inner}</div>;
+            })}
           </div>
         )}
       </div>

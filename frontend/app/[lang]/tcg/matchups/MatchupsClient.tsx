@@ -28,7 +28,9 @@ const L: Record<Locale, {
   "zh-TW": { title: "牌組對戰分析", intro: "選擇你的牌組，計算以對手使用率加權的『對環境期望勝率』。", pickL: "我的牌組", expWR: "對環境期望勝率", strong: "環境中強勢", even: "環境中普通", weak: "環境中偏弱", strongH: "⚔️ 有利對手", weakH: "🛡️ 不利對手(注意)", allH: "完整對戰", wr: "勝率", rec: "戰績", sh: "使用率", none: "無足夠樣本的對戰資料", method: "對環境期望勝率 = 各對手勝率以其使用率加權平均(至少8場)。越常遇到的對手權重越大。對戰為Limitless結果自行彙整。", cardTitle: "環境對戰", foot: "實際賽事對戰 × 使用率加權", vsField: "vs 目前環境" },
 };
 
-export default function MatchupsClient({ lang }: { lang: Locale }) {
+// analyzed = 공략 페이지가 실제로 있는 덱 id(서버에서 전달). 없는 덱은 링크 없이 이름만 — 404 내부 링크 방지.
+export default function MatchupsClient({ lang, analyzed }: { lang: Locale; analyzed: string[] }) {
+  const hasPage = new Set(analyzed);
   const t = L[lang];
   const [sel, setSel] = useState(PICKABLE[0]?.id || "");
   const dn = (id: string) => { const d = BY_ID[id]; return (d?.nm && d.nm[lang]) || d?.name || id; };
@@ -61,7 +63,9 @@ export default function MatchupsClient({ lang }: { lang: Locale }) {
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderTop: "1px solid #f6e0e0" }}>
         {d && <span style={{ background: TIER_COLOR[d.tier] || "#64748b", color: "#fff", borderRadius: 5, padding: "0 6px", fontSize: "0.7rem", fontWeight: 900 }}>{d.tier}</span>}
-        <Link href={L2(`/tcg/decks/${id}`)} style={{ flex: 1, fontSize: "0.85rem", fontWeight: 600, color: "#0f172a", textDecoration: "none", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{dn(id)}</Link>
+        {hasPage.has(id)
+          ? <Link href={L2(`/tcg/decks/${id}`)} style={{ flex: 1, fontSize: "0.85rem", fontWeight: 600, color: "#0f172a", textDecoration: "none", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{dn(id)}</Link>
+          : <span style={{ flex: 1, fontSize: "0.85rem", fontWeight: 600, color: "#0f172a", textDecoration: "none", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{dn(id)}</span>}
         <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{t.sh} {share}%</span>
         <span style={{ fontWeight: 800, fontVariantNumeric: "tabular-nums", color: c, minWidth: 40, textAlign: "right" }}>{wr}%</span>
         <span style={{ minWidth: 44, textAlign: "right", fontSize: "0.74rem", color: "#94a3b8", fontVariantNumeric: "tabular-nums" }}>{w}–{l}</span>
