@@ -15,6 +15,13 @@ export type TcgDict = {
   // 대화형 도구 — 홈 전면 노출용(덱빌더·카운터·팩시뮬·가이드). 심사자/크롤러가 '실기능 서비스'로 인식하게.
   tools: { h: string; items: { icon: string; t: string; d: string; href: string }[] };
   footerNote: string;
+  // 홈 "선언 블록" — 이 사이트가 무엇을 직접 계산하는지 + 실측 수치 + 원자료/자체 계산 구분. 심사·크롤러가 홈 한 장에서 사이트 성격을 읽게.
+  trust: {
+    h: string; intro: string;
+    stats: { tournaments: string; players: string; matches: string; decks: string; matchups: string; window: string; updated: string };
+    rawH: string; raw: string; oursH: string; ours: string[];
+    principle: string; more: string; method: string;
+  };
 };
 
 const ko: TcgDict = {
@@ -70,6 +77,18 @@ const ko: TcgDict = {
     ],
   },
   footerNote: "카드 데이터: 커뮤니티 공개 데이터셋 · 팬 제작 비공식 사이트",
+  trust: {
+    h: "실제 대회 데이터로 계산하는 포켓몬 카드 게임 Pocket 분석 서비스",
+    intro: "카드를 나열하는 사이트가 아닙니다. 공개 대회 결과를 직접 집계해 덱 점유율·승률·상대별 상성을 계산하고, 표본 보정을 거쳐 티어와 카운터를 산출합니다. 그 위에 대표 덱 운영법과 확률 계산기를 얹습니다.",
+    stats: { tournaments: "집계 대회", players: "참가자 표본", matches: "집계 경기", decks: "분석 덱", matchups: "매치업 조합", window: "집계 기간", updated: "최근 갱신" },
+    rawH: "원자료 (출처 표기)",
+    raw: "Limitless TCG 공개 대회 순위·대진표 (play.limitlesstcg.com)",
+    oursH: "TCG Note가 직접 계산하는 것",
+    ours: ["대회별 순위·대진을 덱 아키타입 단위로 집계·정규화", "점유율 · 승률 · 3/7/30일 추세", "Wilson 95% 하한으로 소표본 과대평가를 보정한 덱 티어", "상대별 매치업 행렬 → 카운터·메타 기대 승률", "덱 구성으로 첫패·콤보 확률 몬테카를로 계산"],
+    principle: "원칙: 실제 관측(대회 승률)과 계산 확률(시뮬)은 항상 구분해 표기하고, 모든 수치에 표본 수를 함께 보여줍니다.",
+    more: "사이트 소개·방법론 전체",
+    method: "티어·승률 읽는 법 (Wilson 보정)",
+  },
 };
 
 const en: TcgDict = {
@@ -125,6 +144,18 @@ const en: TcgDict = {
     ],
   },
   footerNote: "Card data: community open dataset · unofficial fan-made site",
+  trust: {
+    h: "Pokémon TCG Pocket analysis computed from real tournament data",
+    intro: "This is not a card list site. We aggregate public tournament results ourselves to compute deck share, win rates and per-opponent matchups, apply sample-size correction, and derive tiers and counters. On top of that we add deck game plans and probability calculators.",
+    stats: { tournaments: "Tournaments", players: "Player sample", matches: "Matches counted", decks: "Decks analyzed", matchups: "Matchup pairs", window: "Window", updated: "Last updated" },
+    rawH: "Raw data (attributed)",
+    raw: "Limitless TCG public tournament standings & pairings (play.limitlesstcg.com)",
+    oursH: "What TCG Note computes itself",
+    ours: ["Aggregate & normalize standings/pairings per deck archetype", "Share · win rate · 3/7/30-day trend", "Deck tiers corrected with the Wilson 95% lower bound (no small-sample overrating)", "Per-opponent matchup matrix → counters & meta expected win rate", "Monte-Carlo opening-hand & combo odds from deck composition"],
+    principle: "Principle: observed tournament win rates and simulated probabilities are always labeled separately, and every figure shows its sample size.",
+    more: "About & full methodology",
+    method: "How to read tiers & win rates (Wilson)",
+  },
 };
 
 const ja: TcgDict = {
@@ -180,6 +211,18 @@ const ja: TcgDict = {
     ],
   },
   footerNote: "カードデータ: コミュニティ公開データセット · ファン制作の非公式サイト",
+  trust: {
+    h: "実際の大会データから計算するポケモンカードゲーム Pocket 分析サービス",
+    intro: "カードを並べるサイトではありません。公開大会結果を自前で集計してデッキ使用率・勝率・相手別相性を計算し、サンプル補正を経てティアとカウンターを算出します。その上に代表デッキの立ち回りと確率計算機を載せています。",
+    stats: { tournaments: "集計大会", players: "参加者サンプル", matches: "集計試合", decks: "分析デッキ", matchups: "相性ペア", window: "集計期間", updated: "最終更新" },
+    rawH: "元データ (出典表記)",
+    raw: "Limitless TCG 公開大会の順位・対戦表 (play.limitlesstcg.com)",
+    oursH: "TCG Note が自ら計算するもの",
+    ours: ["順位・対戦をデッキアーキタイプ単位で集計・正規化", "使用率 · 勝率 · 3/7/30日トレンド", "Wilson 95%下限で小サンプルの過大評価を補正したデッキティア", "相手別相性マトリクス → カウンター・環境期待勝率", "デッキ構成から初手・コンボ確率をモンテカルロ計算"],
+    principle: "原則: 実測(大会勝率)と計算確率(シミュ)は常に区別して表記し、すべての数値にサンプル数を併記します。",
+    more: "サイト紹介・方法論の全文",
+    method: "ティア・勝率の読み方 (Wilson補正)",
+  },
 };
 
 const zhTW: TcgDict = {
@@ -235,6 +278,18 @@ const zhTW: TcgDict = {
     ],
   },
   footerNote: "卡片數據：社群公開資料集 · 粉絲製作非官方網站",
+  trust: {
+    h: "以實際比賽資料計算的 Pokémon TCG Pocket 分析服務",
+    intro: "這不是列卡片的網站。我們自行彙整公開比賽結果，計算牌組使用率、勝率與對手別相性，經樣本修正後得出分級與剋星；再加上代表牌組的打法與機率計算器。",
+    stats: { tournaments: "彙整比賽", players: "參賽者樣本", matches: "計入對局", decks: "分析牌組", matchups: "相性組合", window: "統計區間", updated: "最近更新" },
+    rawH: "原始資料（標示出處）",
+    raw: "Limitless TCG 公開比賽名次與對戰表 (play.limitlesstcg.com)",
+    oursH: "TCG Note 自行計算的部分",
+    ours: ["以牌組原型為單位彙整、正規化名次與對戰", "使用率 · 勝率 · 3/7/30 日趨勢", "以 Wilson 95% 下限修正小樣本高估的牌組分級", "對手別相性矩陣 → 剋星與環境期望勝率", "依牌組構成以蒙地卡羅計算起手與連段機率"],
+    principle: "原則：實測（比賽勝率）與計算機率（模擬）一律分開標示，所有數值都附上樣本數。",
+    more: "網站介紹與完整方法論",
+    method: "如何解讀分級與勝率（Wilson 修正）",
+  },
 };
 
 const DICTS: Record<Locale, TcgDict> = { ko, en, ja, "zh-TW": zhTW };

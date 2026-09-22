@@ -6,6 +6,22 @@ import { RISING, POPULAR, UNDERRATED, OVERRATED, type BDeck } from "./briefing/c
 import { analyzedDeckIds } from "./decks/analysis";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../lib/i18n";
 import { getTcg } from "./dict";
+import META from "./data/meta.json";
+import MATCHUPS from "./data/matchups.json";
+import DECKS from "./data/decks.json";
+
+// 선언 블록용 실제 집계 수치 — 데이터 파일에서 그대로(ingest 재실행 시 자동 갱신). 손으로 적는 숫자 없음.
+const _META = META as { generatedAt?: string; windowDays?: number; sampleTournaments?: number; samplePlayers?: number; sampleMatches?: number };
+const STAT = {
+  tournaments: _META.sampleTournaments ?? 0,
+  players: _META.samplePlayers ?? 0,
+  matches: _META.sampleMatches ?? 0,
+  decks: (DECKS as unknown[]).length,
+  matchups: Object.values(MATCHUPS as Record<string, Record<string, unknown>>).reduce((n, v) => n + Object.keys(v).length, 0),
+  window: _META.windowDays ?? 30,
+  updated: (_META.generatedAt || "").slice(0, 10),
+};
+const fmtN = (n: number) => n.toLocaleString("en-US");
 
 export const revalidate = 3600;
 
@@ -29,6 +45,7 @@ export default function TcgLandingPage({ params }: { params: { lang: string } })
   const L = (p: string) => localizePath(lang, p);
   const t = getTcg(lang);
   const m = BRIEF_L[lang];
+  const tr = t.trust;
   const analyzed = analyzedDeckIds();
   const cols = [
     { title: m.rising, color: "#16a34a", list: RISING, metric: (d: BDeck) => `${d.wr7 ?? d.winrate}% ${d.trend && d.trend.d > 0 ? "+" : ""}${d.trend ? d.trend.d : 0}%p` },
@@ -63,6 +80,43 @@ export default function TcgLandingPage({ params }: { params: { lang: string } })
           </nav>
         </div>
       </div>
+
+      {/* ── 선언 블록: 무엇을 직접 계산하는 사이트인지 + 실제 집계 수치(meta.json) + 원자료/자체계산 구분.
+             AdSense 1차 거절(9/21) 대응 — 심사 봇이 가져간 유일한 페이지가 홈이었고, 홈에 사이트 성격 설명이 없었음. ── */}
+      <section style={{ background: "#fff", borderBottom: `1px solid ${BORDER}`, padding: "1.2rem 1rem 1.1rem" }}>
+        <div style={{ maxWidth: 1040, margin: "0 auto" }}>
+          <h2 style={{ margin: "0 0 6px", fontSize: "1.02rem", fontWeight: 900, color: "#0f172a" }}>{tr.h}</h2>
+          <p style={{ margin: "0 0 12px", fontSize: "0.86rem", color: "#334155", lineHeight: 1.7, maxWidth: 820 }}>{tr.intro}</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(118px,1fr))", gap: 8, marginBottom: 12 }}>
+            {([
+              [tr.stats.tournaments, fmtN(STAT.tournaments)], [tr.stats.players, fmtN(STAT.players)], [tr.stats.matches, fmtN(STAT.matches)],
+              [tr.stats.decks, fmtN(STAT.decks)], [tr.stats.matchups, fmtN(STAT.matchups)], [tr.stats.window, `${STAT.window}d`], [tr.stats.updated, STAT.updated],
+            ] as [string, string][]).map(([k, v]) => (
+              <div key={k} style={{ background: "#fef7f5", border: `1px solid ${BORDER}`, borderRadius: 10, padding: "8px 10px" }}>
+                <div style={{ fontSize: "1.05rem", fontWeight: 900, color: "#b91c1c", fontVariantNumeric: "tabular-nums" }}>{v}</div>
+                <div style={{ fontSize: "0.68rem", color: "#64748b" }}>{k}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 10 }}>
+            <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 10, padding: "10px 12px" }}>
+              <div style={{ fontSize: "0.74rem", fontWeight: 800, color: "#64748b", marginBottom: 4 }}>{tr.rawH}</div>
+              <div style={{ fontSize: "0.82rem", color: "#334155" }}>{tr.raw}</div>
+            </div>
+            <div style={{ background: "#fff", border: `1px solid ${BORDER}`, borderLeft: "4px solid #dc2626", borderRadius: 10, padding: "10px 12px" }}>
+              <div style={{ fontSize: "0.74rem", fontWeight: 800, color: "#b91c1c", marginBottom: 4 }}>{tr.oursH}</div>
+              <ul style={{ margin: 0, paddingLeft: 18, fontSize: "0.82rem", color: "#334155", lineHeight: 1.65 }}>
+                {tr.ours.map((x) => <li key={x}>{x}</li>)}
+              </ul>
+            </div>
+          </div>
+          <p style={{ margin: "10px 0 0", fontSize: "0.78rem", color: "#7c2d12", lineHeight: 1.6 }}>{tr.principle}</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 8, fontSize: "0.8rem" }}>
+            <Link href={L("/tcg/about")} style={{ color: "#dc2626", fontWeight: 700, textDecoration: "none" }}>{tr.more} →</Link>
+            <Link href={L("/tcg/guides/reading-tier-winrate")} style={{ color: "#dc2626", fontWeight: 700, textDecoration: "none" }}>{tr.method} →</Link>
+          </div>
+        </div>
+      </section>
 
       {/* ── 직접 써보는 대화형 도구(실기능 서비스 신호 — 심사자/크롤러가 'DB복사'가 아님을 홈에서 즉시 인식) ── */}
       <div style={{ background: "#fff", padding: "1.2rem 1rem 0.4rem" }}>
