@@ -49,7 +49,9 @@ EXCLUDE_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"^\s*Downloading\b.*\.whl", re.I),
     # Render 배포 진행 로그 (정상 동작 — 에러 아님)
     re.compile(r"==>\s+\S", re.I),                             # ==> Running / ==> Build (위치 무관)
-    re.compile(r"\bgunicorn\b.*\b(--bind|--workers|--timeout|--worker-class|app:app)\b", re.I),  # gunicorn 기동 명령
+    re.compile(r"\bgunicorn\b.*(--bind|--workers|--timeout|--worker-class|app:app)", re.I),  # gunicorn 기동 명령
+    re.compile(r"Running\s+'?(gunicorn|uvicorn|npm|node|python)\b", re.I),   # Render 배포 시작 줄
+    re.compile(r"\b(Deploying|Build successful|Deploy live|Starting service)\b", re.I),
     re.compile(r"\[INFO\]\s+Listening at:", re.I),             # gunicorn 리스닝 시작
     re.compile(r"Booting worker with pid", re.I),              # gunicorn 워커 부트
     re.compile(r"Worker\s+(booting|exiting|timeout)", re.I),   # gunicorn 워커 상태
@@ -185,12 +187,16 @@ def _extract_title(msg: str, program_name: str) -> str:
 
 
 # ANSI 이스케이프 코드 제거 패턴 (Render 컬러 로그)
-_ANSI_ESC = re.compile(r'\x1b\[[0-9;]*[mBCDHJKSTfhlmnpsu]|\(B')
+# ANSI/제어문자 제거 — CSI(\x1b[...) 뿐 아니라 단독 ESC 도 지워야 한다.
+# (Render 배포 로그 "==>\x1b Running 'gunicorn …" 에서 단독 ESC 때문에 '==>\s' 제외 패턴이 빗나갔다)
+_ANSI_ESC = re.compile(r'\x1b\[[0-9;?]*[a-zA-Z]|\x1b\][^\x07]*\x07?|\x1b[@-Z\\-_]|\x1b|\(B')
+_CTRL_CHARS = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]')
 
 
 def _strip_ansi(text: str) -> str:
-    """ANSI 이스케이프 시퀀스 제거."""
-    return _ANSI_ESC.sub("", text)
+    """ANSI 이스케이프 시퀀스·제어문자 제거 후 공백 정리."""
+    cleaned = _CTRL_CHARS.sub("", _ANSI_ESC.sub("", text or ""))
+    return re.sub(r'[ \t]{2,}', ' ', cleaned)
 
 
 def classify(message: str) -> str | None:

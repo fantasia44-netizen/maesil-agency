@@ -25,6 +25,13 @@ CASES = [
     ('{"ts": "2026-09-17T16:16:23+09:00", "level": "WARNING", "module": "ext_auth", "msg": "[ExtAuth] 토큰 만료 — Exception"}', 'warning'),
     ('{"ts": "2026-09-21T04:15:00+09:00", "level": "INFO", "module": "scheduler", "msg": "[storage_cleanup] 완료 — errors=0 timeout"}', None),
     ('2026-09-21 10:13:10,399 [INFO] httpx: HTTP Request: POST https://x.supabase.co/rest/v1/rpc/claim_sync_job "HTTP/1.1 200 OK"', None),
+    # Render 배포 로그 — 단독 ESC 가 섞여도 제외 (2026-09-22 오알림)
+    ("==>\u001b Running 'gunicorn \"app:create_app()\" --workers 2 --threads 4 --timeout 600", None),
+    ("\u001b[36m==>\u001b[0m Running 'gunicorn \"app:create_app()\" --workers 2'", None),
+    ("\u001b Build successful \u001b", None),
+    ("==> Deploying...", None),
+    # 일시 장애로 스스로 복구되는 인증 타임아웃 — WARNING 으로 내려 알림 제외
+    ('{"level": "WARNING", "module": "app", "msg": "[AUTH] user_loader 일시 오류: Read timed out"}', None),
     # 진짜 에러는 그대로
     ('[2026-09-21 09:49:55,609] ERROR in orders: [로켓수동입력 재고차감 실패-저장중단] 2026-09-21 | 해서', 'error'),
     ('Traceback (most recent call last):\n  File "app.py", line 1\nValueError: boom', 'error'),
