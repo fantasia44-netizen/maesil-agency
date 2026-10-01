@@ -44,6 +44,65 @@ export type NeededCard = { key: string; name: string; nm?: Record<string, string
 export type PackRec = { set: string; pack: string; cards: NeededCard[]; coverage: number; hitRate: number; expPerPack: number };
 export type Plan = { packs: PackRec[]; unobtainable: NeededCard[]; totalNeeded: number; noRate: boolean };
 
+// ── 메타덱 완성하기 — 보유 카드를 빼고 "부족한 카드"만으로 팩 추천 ───────────────
+// 체크(보유)는 카드 단위로 공유되므로 한 번 체크하면 모든 덱에 반영된다(owned = "SET-번호" 집합).
+export type DeckCard = { key: string; name: string; nm?: Record<string, string>; r: string; set: string; num: number; count: number; packs: string[] };
+export type DeckNeed = { id: string; name: string; nm?: Record<string, string>; tier: string; share: number;
+  cards: DeckCard[]; have: number; total: number; missing: DeckCard[] };
+
+/** 덱의 카드 목록(카드DB와 매칭된 것만). 체크박스·완성도 계산 공용. */
+export function deckCards(deckId: string): DeckCard[] {
+  const d = DECK_BY_ID.get(deckId);
+  if (!d || !d.decklist) return [];
+  const out = new Map<string, DeckCard>();
+  for (const grp of [d.decklist.pokemon || [], d.decklist.trainer || []]) for (const cc of grp) {
+    const c = CARD_IDX.get(`${cc.set}-${cc.number}`);
+    if (!c) continue;
+    const k = `${c.s}-${c.n}`;
+    const prev = out.get(k);
+    out.set(k, { key: k, name: c.name, nm: c.nm, r: c.r, set: c.s, num: c.n,
+      count: Math.max(prev?.count || 0, cc.count || 1), packs: c.packs || [] });
+  }
+  return [...out.values()];
+}
+
+/** 전 메타덱의 완성도 — 보유 집합 기준. 완성·거의 완성 순으로 정렬해 "지금 만들 수 있는 덱"을 보여준다. */
+export function deckNeeds(owned: Set<string>): DeckNeed[] {
+  return PLANNABLE.map((d) => {
+    const cards = deckCards(d.id);
+    const missing = cards.filter((c) => !owned.has(c.key));
+    return { id: d.id, name: d.name, nm: d.nm, tier: d.tier, share: d.share,
+      cards, have: cards.length - missing.length, total: cards.length, missing };
+  }).sort((a, b) => (a.missing.length - b.missing.length) || (b.share - a.share));
+}
+
+/** 부족한 카드만으로 팩 추천 — planPacks와 같은 모델, 입력만 카드 목록. */
+export function planForCards(cards: DeckCard[]): Plan {
+  const packMap = new Map<string, NeededCard[]>();
+  const unobtainable: NeededCard[] = [];
+  let noRate = false;
+  for (const c of cards) {
+    const base = { key: c.key, name: c.name, nm: c.nm, r: c.r, set: c.set, count: c.count };
+    if (!c.packs.length) { unobtainable.push({ ...base, p: 0 }); continue; }
+    if (!RT[c.set]) noRate = true;
+    const card = CARD_IDX.get(c.key);
+    if (!card) continue;
+    for (const pk of c.packs) {
+      const arr = packMap.get(`${c.set}::${pk}`) || [];
+      arr.push({ ...base, p: cardPullProb(card, pk) });
+      packMap.set(`${c.set}::${pk}`, arr);
+    }
+  }
+  const packs: PackRec[] = [];
+  for (const [pkKey, cs] of packMap) {
+    const [set, pack] = pkKey.split("::");
+    cs.sort((a, b) => b.p - a.p || b.count - a.count);
+    packs.push({ set, pack, cards: cs, coverage: cs.length, hitRate: 1 - cs.reduce((a, c) => a * (1 - c.p), 1), expPerPack: cs.reduce((a, c) => a + c.p, 0) });
+  }
+  packs.sort((a, b) => b.coverage - a.coverage || b.hitRate - a.hitRate);
+  return { packs, unobtainable, totalNeeded: cards.length, noRate };
+}
+
 export function planPacks(deckIds: string[]): Plan {
   const need = new Map<string, { card: Card; count: number }>();
   let noRate = false;
@@ -80,4 +139,5 @@ export function planPacks(deckIds: string[]): Plan {
   return { packs, unobtainable, totalNeeded: need.size, noRate };
 }
 
-export const deckName = (d: Deck, lang: string) => (d.nm && d.nm[lang]) || d.name;
+// 이름만 쓰므로 Deck·DeckNeed 등 {name,nm}를 가진 무엇이든 받는다.
+export const deckName = (d: { name: string; nm?: Record<string, string> }, lang: string) => (d.nm && d.nm[lang]) || d.name;
