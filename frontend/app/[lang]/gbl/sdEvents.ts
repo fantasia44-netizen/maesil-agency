@@ -87,8 +87,9 @@ export function koMon(english: string): string {
     [/^Galarian\s+/i, "가라르 "], [/^Hisuian\s+/i, "히스이 "], [/^Paldean\s+/i, "팔데아 "],
   ];
   for (const [re, k] of pfs) { if (re.test(n)) { prefix = k; n = n.replace(re, ""); break; } }
-  n = n.replace(/\s*\(.*\)\s*$/, "");
-  return prefix + (EN_KO[n.toLowerCase()] || n);
+  n = n.replace(/\s*\(.*\)\s*$/, ""); // "(Altered)" 등 폼 괄호 제거
+  const xy = n.match(/\s+([XY])$/); if (xy) n = n.slice(0, xy.index); // 메가 리자몽 X/Y·뮤츠 X/Y — 접미 분리 후 조회
+  return prefix + (EN_KO[n.toLowerCase()] || n) + (xy ? ` ${xy[1]}` : "");
 }
 
 // 영문 포켓몬명 → 로케일 표시명(메가/섀도우/지역폼 접두는 사전 기반)
@@ -100,8 +101,9 @@ export function monLocal(lang: Locale, english: string, t: SDLabels): string {
   ];
   for (const [re, k] of pfs) { if (re.test(n)) { prefix = k; n = n.replace(re, ""); break; } }
   n = n.replace(/\s*\(.*\)\s*$/, "");
+  const xy = n.match(/\s+([XY])$/); if (xy) n = n.slice(0, xy.index);
   const key = n.toLowerCase();
-  return prefix + localName(lang, BY_EN[key], EN_KO[key] || n);
+  return prefix + localName(lang, BY_EN[key], EN_KO[key] || n) + (xy ? ` ${xy[1]}` : "");
 }
 
 // 이벤트명 전체 로케일화: 오버라이드맵 → 포켓몬명 → 유형어구 → 월이름 순 치환.

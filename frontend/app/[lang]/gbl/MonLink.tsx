@@ -1,6 +1,7 @@
-// 포켓몬 상세 링크 게이트 — 메타(색인 대상) 몬만 <Link>, 비메타·표본부족 몬은 같은 모양의 <div>(이름 표시만, 링크 없음).
-// 사이트가 구글에 "추천하는" URL 집합을 사이트맵·robots(noindex)·내부 링크 3곳에서 동일하게 압축하기 위함(indexGate.ts 한 소스).
-// ⚠️ UA·봇 판별 없음 — 사람과 봇에게 완전히 같은 HTML(클로킹 아님). 비메타 상세 페이지 자체는 그대로 열림(직접 URL·IV찾기·시뮬).
+// 포켓몬 상세 링크 게이트 — indexGate.hasDetailLink가 참이면 <Link>, 아니면 같은 모양의 <div>(이름 표시만, 링크 없음).
+// 2026-10-08부터 판정 = "상세 페이지가 존재하는가"(리그 상위 200). 그 전(9/15~10/7)은 "색인 대상인가"였음 — indexGate.LINK_ONLY_INDEXED로 전환.
+// 색인(사이트맵·noindex)은 링크와 별개로 indexGate.isMetaMon이 계속 결정 — 링크로 가는 비메타 상세는 noindex 페이지.
+// ⚠️ UA·봇 판별 없음 — 사람과 봇에게 완전히 같은 HTML(클로킹 아님).
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { hasDetailLink } from "./indexGate";

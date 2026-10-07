@@ -7,7 +7,7 @@ import DETAIL_S28 from "../gbl_detail_s28.json";
 import PKNAMES from "../pokedex_names.json";
 import { currentSeason } from "../seasons";
 import { typeLabel } from "../typeLabels";
-import { isMetaMon, linkMonId } from "../indexGate";
+import { isMetaMon, linkMonId, hasDetailLink, hasDetailPage } from "../indexGate";
 import type { Locale } from "../../../../lib/i18n";
 
 export type Buff = { self: number[] | null; opp: number[] | null; chance: number };
@@ -132,7 +132,7 @@ export function metaUsers(lang: Locale, m: Move): Record<string, UserRow[]> {
       const stab = types.includes(m.type);
       const dmg = pvpDamage(m.power, r.stats?.atk || 0, ref.def, stab, shadow);
       const linkId = linkMonId(lg, r.id);
-      const u: UserRow = { id: r.id, linkId, hasLink: isMetaMon(lg, linkId), name: snapName(lang, r), dex: r.dex || 0, types, shadow, tier: r.tier, score: r.score, rank,
+      const u: UserRow = { id: r.id, linkId, hasLink: hasDetailLink(lg, r.id), name: snapName(lang, r), dex: r.dex || 0, types, shadow, tier: r.tier, score: r.score, rank,
         dmg, pct: ref.hp ? Math.round((dmg / ref.hp) * 100) : 0, stab };
       if (m.kind === "charged" && r.mv) { u.fastId = r.mv.fast.id; u.fastTurns = r.mv.fast.turns; u.counts = (r.mv.charged.find((c) => c.id === m.id)?.counts || tausSeq(m.energy, r.mv.fast.gain, 3)).slice(0, 3); }
       if (m.kind === "fast" && r.mv) u.charged = r.mv.charged.map((c) => ({ id: c.id, counts: tausSeq(c.energy, m.gain, 3) }));
@@ -158,8 +158,10 @@ export const isIndexCandidate = (m: Move): boolean => INDEXABLE.has(m.id);
 export const isIndexableMove = (m: Move): boolean => MOVES_INDEX_OPEN && INDEXABLE.has(m.id);
 export const indexableMoveSlugs = (): string[] => (MOVES_INDEX_OPEN ? MOVES.filter((m) => INDEXABLE.has(m.id)).map((m) => m.slug) : []);
 
-// ── 배우는 포켓몬 링크 대상(색인되는 상세가 있는 리그) ─────────────────
+// ── 배우는 포켓몬 링크 대상 ─────────────────────────────────────────
+// 상세 페이지가 있는 리그로 연결(색인되는 리그 우선 → 없으면 페이지가 있는 첫 리그). 3리그 상위 200 어디에도 없는 종은 페이지가 없어 null.
 export function learnerLink(sid: string): { league: string; id: string } | null {
   for (const lg of CORE_LEAGUES) if (isMetaMon(lg, sid)) return { league: lg, id: sid };
+  for (const lg of CORE_LEAGUES) if (hasDetailLink(lg, sid) && hasDetailPage(lg, sid)) return { league: lg, id: linkMonId(lg, sid) };
   return null;
 }

@@ -129,6 +129,12 @@
 - 다음 후보: 기술별 "운영자 한마디"(GBL_MON_NOTES 방식 CSV) — 상세를 템플릿에서 고유 콘텐츠로 올리는 가장 확실한 수단.
 - **시즌 중 데이터 갱신 순서(전체)**: `py -3 scripts/gbl_compile_detail.py s28` → `node scripts/gbl/build_meta_mons.mjs` → `node scripts/gbl/import_mon_notes.mjs` → `node scripts/gbl/build_season28.mjs` → **`node scripts/gbl/build_moves.mjs`** → **`py -3 scripts/gbl_compile_raids.py` + `… megafinale`**(레이드는 별도 스크립트 — 10/7에 배틀 티어만 갱신해 그림자 제크로무가 레이드 표에 빠졌었음) → 빌드 → 커밋.
 
+### 2026-10-08 — 포켓몬 상세 내부 링크 재개방(사용자 결정) + 이름 누락 보정
+- **링크 재개방**: 9/15에 끊었던 비메타 포켓몬 상세 링크를 다시 엶. `indexGate.ts` `hasDetailLink` = "상세 페이지가 존재하면 링크"(`hasDetailPage`, 현재 시즌 리그 상위 200). 티어표·CMP·카운터·파트너·가이드·기술 도감(메타 채용·배우는 포켓몬) 전부 MonLink 한 판정이라 동시에 복구. 되돌리기 = `LINK_ONLY_INDEXED = true`.
+- **색인은 그대로**: 비메타 상세는 여전히 noindex·사이트맵 제외(`isMetaMon`). 링크만 연 것. 색인까지 여는 건 9월 강등 원인(템플릿 2,400 URL)의 재현이라 별도 판단 필요 — 열려면 GSC 구글 노출 회복 확인 후 리그·티어 단위로 나눠서.
+- 페이지가 아예 없는 종(3리그 상위 200 밖 — 후딘·팬텀·에이스번 등 기술 도감 1,051종 중 770종)은 링크 불가(원래도 페이지가 없었음). 전 종 페이지를 새로 만드는 건 별개 작업.
+- **이름 보정**: `pokedex_names.json`·`pokedex_ko.json`·`name_en_ko.json`이 dex 1008에서 끊겨 과미르·차데스·그우린차·과미드라가 영문 표기 → dex 1009~1025 17종 4개국어 추가(PokeAPI 공식명). 레이드 일정의 "메가 Charizard X/Y" → 접미 X/Y 분리 후 조회하도록 `sdEvents.ts`·`raid/schedule/page.tsx` 수정(메가 리자몽 X/Y, 스프라이트도 폼별로 정상).
+
 ### 사장님이 이어서 할 것 (순서 무관, 급하지 않음)
 0. **URL 검사 → 색인 요청 20개**(9/14 채팅에 목록) — 오늘 10, 내일 10.
 1. `GBL_MON_NOTES.csv`에 위 미노트(일반 폼) 행 추가 후 작성 — 우선순위: 자동문 남은 S/A 11장 → 그다음 noindex된 B 8장(쓰면 자동 색인 복귀). 규칙·예시: `GBL_MON_NOTES_README.md`. **"표에 없는 말 하나"** 필수(회피 상대 / 팀 역할 / 요즘 메타 평가). 후반 노트가 "타입→약점→기술" 나열로 굳어지는 경향 있었음 — 킹드라·나인테일·마릴리·깨비드릴조는 한 문장씩 보강 권장. 작성 후 `node scripts/gbl/import_mon_notes.mjs` → Claude에게 "ko 노트 번역 채워줘".

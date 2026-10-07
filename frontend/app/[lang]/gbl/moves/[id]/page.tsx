@@ -1,6 +1,6 @@
 // 기술 상세 — 수치 · 타수표 · 이번 시즌 메타 채용 포켓몬(타수·예상 데미지) · 상성 · 배우는 포켓몬. 서버렌더.
 // 자동 문장 없음: 전부 표/수치(9월 '가치 낮은 콘텐츠' 교훈 — 문장은 사람이, 데이터는 표로).
-// 색인: movesData.isIndexableMove (스위치 꺼짐=전부 noindex). 포켓몬 링크는 MonLink/learnerLink로 색인 대상만.
+// 색인: movesData.isIndexableMove (스위치 꺼짐=전부 noindex). 포켓몬 링크는 MonLink/learnerLink — 상세 페이지가 있는 종 전부(indexGate.hasDetailLink).
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";

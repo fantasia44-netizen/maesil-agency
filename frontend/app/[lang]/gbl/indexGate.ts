@@ -47,9 +47,15 @@ export function isMetaMon(league: string, id: string): boolean {
   // (노트를 쓰면 자동으로 색인 복귀: gbl_mon_notes.json 기준)
   return hasNote(league, id) || ["S", "A"].includes(tierOf(league, id));
 }
-// 내부 링크 게이트 — 링크 목적지(통합 그림자→기본 폼)가 색인 대상일 때만 상세 링크를 건다(MonLink.tsx).
-// 티어표·CMP·카운터·파트너·가이드 그리드 전부 이 판정 하나를 씀 → 사이트맵·noindex·내부 링크가 같은 URL 집합을 가리킴.
-export const hasDetailLink = (league: string, id: string): boolean => isMetaMon(league, linkMonId(league, id));
+// 내부 링크 게이트(MonLink.tsx) — 티어표·CMP·카운터·파트너·가이드 그리드·기술 도감이 전부 이 판정 하나를 씀.
+//  · 2026-09-15~10-07: 색인 대상(메타)일 때만 링크 — AdSense 심사 봇(AdsBot)이 링크를 타고 얇은 페이지를 표본으로 뽑는 걸 막으려던 조치.
+//  · 2026-10-08(승인 후, 사용자 결정): 다시 개방 — 상세 페이지가 "존재하면" 링크. 색인은 그대로(비메타는 noindex·사이트맵 제외, isMetaMon).
+//  되돌리려면 LINK_ONLY_INDEXED = true 한 줄.
+export const LINK_ONLY_INDEXED = false;
+// 상세 페이지 존재 여부 = 현재 시즌 스냅샷(리그 상위 200)에 링크 목적지(통합 그림자→기본 폼)가 있는가. 없는 종은 페이지 자체가 없어 링크하면 404.
+export const hasDetailPage = (league: string, id: string): boolean => !!CUR_IDS[league]?.has(linkMonId(league, id));
+export const hasDetailLink = (league: string, id: string): boolean =>
+  LINK_ONLY_INDEXED ? isMetaMon(league, linkMonId(league, id)) : hasDetailPage(league, id);
 // 사이트맵용 — 현재 시즌 스냅샷 기준 색인 대상 id 목록(페이지의 robots 판정과 같은 소스·같은 시즌).
 export const indexableMonIds = (league: string): string[] => (CUR[league] || []).map((e) => e.id).filter((id) => isMetaMon(league, id));
 const NOTES = MON_NOTES as Record<string, Record<string, unknown>>;

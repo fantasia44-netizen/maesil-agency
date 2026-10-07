@@ -46,7 +46,8 @@ function koMon(english: string): string {
   const pfs: [RegExp, string][] = [[/^Mega\s+/i, "메가 "], [/^Shadow\s+/i, "섀도우 "], [/^Armored\s+/i, "아머드 "], [/^Alolan\s+/i, "알로라 "], [/^Galarian\s+/i, "가라르 "], [/^Hisuian\s+/i, "히스이 "], [/^Paldean\s+/i, "팔데아 "]];
   for (const [re, k] of pfs) { if (re.test(n)) { prefix = k; n = n.replace(re, ""); break; } }
   n = n.replace(/\s*\(.*\)\s*$/, ""); // "(Altered)" 등 폼 괄호 제거
-  return prefix + (EN_KO[n.toLowerCase()] || n);
+  const xy = n.match(/\s+([XY])$/); if (xy) n = n.slice(0, xy.index); // 메가 리자몽 X/Y·뮤츠 X/Y — 접미 분리 후 조회
+  return prefix + (EN_KO[n.toLowerCase()] || n) + (xy ? ` ${xy[1]}` : "");
 }
 // 영문 포켓몬명 → 로케일 표시명(접두는 사전 기반)
 function monLocal(lang: Locale, english: string, t: ScheduleDict): string {
@@ -55,8 +56,9 @@ function monLocal(lang: Locale, english: string, t: ScheduleDict): string {
   const pfs: [RegExp, string][] = [[/^Mega\s+/i, t.pfx.mega], [/^Shadow\s+/i, t.pfx.shadow], [/^Armored\s+/i, armored], [/^Alolan\s+/i, t.pfx.alola], [/^Galarian\s+/i, t.pfx.galar], [/^Hisuian\s+/i, t.pfx.hisui], [/^Paldean\s+/i, t.pfx.paldea]];
   for (const [re, k] of pfs) { if (re.test(n)) { prefix = k; n = n.replace(re, ""); break; } }
   n = n.replace(/\s*\(.*\)\s*$/, "");
+  const xy = n.match(/\s+([XY])$/); if (xy) n = n.slice(0, xy.index);
   const key = n.toLowerCase();
-  return prefix + localName(lang, BY_EN[key], EN_KO[key] || n);
+  return prefix + localName(lang, BY_EN[key], EN_KO[key] || n) + (xy ? ` ${xy[1]}` : "");
 }
 // 이벤트명 전체 로케일화
 function localEventName(lang: Locale, name: string, t: ScheduleDict): string {
