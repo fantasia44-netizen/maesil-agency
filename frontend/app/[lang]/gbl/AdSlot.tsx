@@ -7,7 +7,9 @@ import { getUser } from "../../../lib/api";
 // NEXT_PUBLIC_ADSENSE_CLIENT(ca-pub-...) 가 설정돼야 실제 노출.
 // 미설정 시(로컬·미승인) 아무것도 렌더 안 함 → 개발 중 방해 없음.
 const CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
-const DEFAULT_SLOT = process.env.NEXT_PUBLIC_ADSENSE_SLOT || "";
+// 기본 광고 단위 = AdSense "gblnote" 디스플레이(반응형) 단위, 2026-10-07 승인 후 생성. env로 덮어쓰기 가능.
+// 슬롯 ID는 공개 HTML에 그대로 나가는 값이라 비밀 아님. 자동 광고는 하단 앵커만 켜 두고 본문은 이 단위 1자리/페이지.
+const DEFAULT_SLOT = process.env.NEXT_PUBLIC_ADSENSE_SLOT || "2865049988";
 
 let scriptInjected = false;
 function ensureScript(client: string) {
