@@ -19,6 +19,7 @@ import { getCmp } from "./dict";
 import { cmpAnalysis } from "../../leagueAnalysis";
 import { linkMonId } from "../../indexGate";
 import MonLink from "../../MonLink";
+import { moveById as dexMove } from "../../moves/movesData";
 import { currentSeason, seasonBySlug, selectableSeasons, seasonShort, statusOf } from "../../seasons";
 
 export const revalidate = 600;
@@ -187,11 +188,14 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
       const f = fastById.get(fid);
       const isDef = fid === mv.fast.id;
       return {
-        fast: { label: moveLabel(lang, fid), color: moveColor(fid), turns: f?.turns ?? mv.fast.turns },
-        charged: mv.charged.map((c) => ({ label: moveLabel(lang, c.id), color: moveColor(c.id), counts: isDef ? c.counts : tausSeq(c.energy, f?.gain ?? mv.fast.gain) })),
+        fast: { id: fid, label: moveLabel(lang, fid), color: moveColor(fid), turns: f?.turns ?? mv.fast.turns },
+        charged: mv.charged.map((c) => ({ id: c.id, label: moveLabel(lang, c.id), color: moveColor(c.id), counts: isDef ? c.counts : tausSeq(c.energy, f?.gain ?? mv.fast.gain) })),
       };
     });
   };
+
+  // 기술 도감 경로(도감에 없는 변형은 null → 링크 없이 표시)
+  const movePath = (id: string): string | null => { const m = dexMove(id); return m ? L(`/gbl/moves/${m.slug}`) : null; };
 
   const wrap: React.CSSProperties = {
     minHeight: "100dvh",
@@ -308,9 +312,11 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
               const atk = d.stats.atk || 0;
               const mv = buildMoves(d);
               return (
-                <MonLink key={d.id} league={params.league} id={d.id} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, d.id)}`) + detQ}
-                  style={{ textDecoration: "none", color: "inherit", display: "flex", flexDirection: "column", gap: 5,
+                <div key={d.id} style={{ display: "flex", flexDirection: "column", gap: 5,
                     background: `linear-gradient(160deg, ${c1}14, #ffffff 62%)`, border: `1px solid ${BORDER}`, borderLeft: `3px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
+                  {/* 헤더+타입 = 포켓몬 상세 링크 / 아래 기술 = 기술 도감 링크(카드 전체를 <a>로 감싸지 않음 — 중첩 링크 방지) */}
+                  <MonLink league={params.league} id={d.id} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, d.id)}`) + detQ}
+                    style={{ textDecoration: "none", color: "inherit", display: "flex", flexDirection: "column", gap: 5 }}>
                   {/* 순위·스프라이트·이름·티어·공격력 */}
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     <span style={{ fontSize: "0.72rem", fontWeight: 800, color: i < 3 ? "#dc2626" : "#94a3b8", minWidth: 20 }}>#{i + 1}</span>
@@ -329,20 +335,24 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
                       <span key={t} style={{ fontSize: "0.58rem", fontWeight: 700, color: "#fff", background: TYPE_COLOR[t] || "#94a3b8", padding: "1px 6px", borderRadius: 5 }}>{typeLabel(lang, t)}</span>
                     ))}
                   </div>
+                  </MonLink>
                   {/* 추천 기술 + 타수(자동) — FAST_EXTRA 지정 몬은 추가 빠른기술 변형도 함께 */}
                   {mv && mv.map((v, vi) => (
                     <div key={vi} style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: vi === 0 ? 1 : 4, ...(vi > 0 ? { paddingTop: 4, borderTop: "1px dashed #e3e8f2" } : {}) }}>
-                      <span style={{ alignSelf: "flex-start", fontSize: "0.66rem", fontWeight: 700, color: "#fff", background: v.fast.color, padding: "1px 7px", borderRadius: 6 }}>{v.fast.label} <span style={{ opacity: 0.9, fontWeight: 800 }}>{v.fast.turns}{turnUnit}</span></span>
+                      {(() => { const fp = movePath(v.fast.id); const fst: React.CSSProperties = { alignSelf: "flex-start", fontSize: "0.66rem", fontWeight: 700, color: "#fff", background: v.fast.color, padding: "1px 7px", borderRadius: 6, textDecoration: "none" };
+                        const inner = <>{v.fast.label} <span style={{ opacity: 0.9, fontWeight: 800 }}>{v.fast.turns}{turnUnit}</span></>;
+                        return fp ? <Link prefetch={false} href={fp} style={fst}>{inner}</Link> : <span style={fst}>{inner}</span>; })()}
                       {v.charged.map((c, ci) => (
                         <div key={ci} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "0.68rem" }}>
                           <span style={{ width: 7, height: 7, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
-                          <span style={{ color: "#334155", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 92 }}>{c.label}</span>
+                          {movePath(c.id) ? <Link prefetch={false} href={movePath(c.id)!} style={{ color: "#334155", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 92, textDecoration: "none" }}>{c.label}</Link>
+                            : <span style={{ color: "#334155", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 92 }}>{c.label}</span>}
                           <span style={{ marginLeft: "auto", fontFamily: "ui-monospace, monospace", color: "#94a3b8", fontWeight: 700, letterSpacing: "-0.3px" }}>{c.counts.join("·")}{hitsUnit && <span style={{ fontSize: "0.6rem" }}>{hitsUnit}</span>}</span>
                         </div>
                       ))}
                     </div>
                   ))}
-                </MonLink>
+                </div>
               );
             })}
           </div>

@@ -24,8 +24,7 @@ import { buildAnalysis, HEADINGS } from "./analysis";
 import { currentSeason, seasonBySlug } from "../../../seasons";
 import { isMetaMon, mergedShadowBase, mergedVariantsOf, linkMonId } from "../../../indexGate";
 import MonLink from "../../../MonLink";
-import { moveById as dexMove, moveName as dexMoveName } from "../../../moves/movesData";
-import { getMoves } from "../../../moves/dict";
+import { moveById as dexMove } from "../../../moves/movesData";
 import MON_NOTES from "../../../gbl_mon_notes.json";
 import PARTNERS from "../../../gbl_partners.json";
 
@@ -246,14 +245,15 @@ function TypeBadges({ lang, types }: { lang: Locale; types: string[] }) {
   );
 }
 
+// 기술 도감 경로(로케일 포함). 도감에 없는 변형은 undefined → 링크 없이 표시.
+const moveHref = (lang: Locale, id: string): string | undefined => { const m = dexMove(id); return m ? localizePath(lang, `/gbl/moves/${m.slug}`) : undefined; };
+
 function MoveChip({ lang, id }: { lang: Locale; id: string }) {
   const mv = MOVES[baseMoveId(id)];
   const c = mv ? (TYPE_COLOR[mv.type] || "#64748b") : "#64748b";
-  return (
-    <span style={{ fontSize: "0.72rem", fontWeight: 600, padding: "2px 9px", borderRadius: 10, background: c + "22", color: c, border: `1px solid ${c}55`, whiteSpace: "nowrap" }}>
-      {moveLabel(lang, id)}
-    </span>
-  );
+  const st: React.CSSProperties = { fontSize: "0.72rem", fontWeight: 600, padding: "2px 9px", borderRadius: 10, background: c + "22", color: c, border: `1px solid ${c}55`, whiteSpace: "nowrap", textDecoration: "none" };
+  const href = moveHref(lang, id);
+  return href ? <Link href={href} style={st}>{moveLabel(lang, id)}</Link> : <span style={st}>{moveLabel(lang, id)}</span>;
 }
 
 // 카운터/매치업 상대 카드(상세로 링크). rating = 이 페이지 주인공 기준 배틀 레이팅(500=대등).
@@ -532,7 +532,7 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
               <div style={cardStyle}><div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{d.moveset.map((mid) => <MoveChip key={mid} lang={lang} id={mid} />)}</div></div>
             </>
           );
-          const disp = (mid: string) => { const mm = MOVES[baseMoveId(mid)]; return { id: mid, label: moveLabel(lang, mid), color: mm ? (TYPE_COLOR[mm.type] || "#64748b") : "#94a3b8" }; };
+          const disp = (mid: string) => { const mm = MOVES[baseMoveId(mid)]; return { id: mid, label: moveLabel(lang, mid), color: mm ? (TYPE_COLOR[mm.type] || "#64748b") : "#94a3b8", href: moveHref(lang, mid) }; };
           const recCharged = new Set(d.mv.charged.map((c) => c.id));
           const fastsRaw = d.mv.fasts && d.mv.fasts.length ? d.mv.fasts : [d.mv.fast];
           const fasts: FastOpt[] = fastsRaw.map((f) => ({ ...disp(f.id), gain: f.gain, turns: f.turns }));
@@ -541,22 +541,6 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
           return <MovesetShare share={shareBase} fasts={fasts} charged={charged} defaultFastId={d.mv.fast.id}
             movesetH={`${name} ${pk.movesetH}`} h2Style={h2} cardStyle={cardStyle}
             panelLabels={{ fastLabel: pk.fastLabel, chargedHint: pk.chargedHint, energyUnit: pk.energyUnit, hitsUnit: pk.hitsUnit, fastTurns: pk.fastTurns, recTag: pk.recTag, altFastHint: pk.altFastHint }} />;
-        })()}
-
-        {/* 기술 도감 연결 — 추천 기술배치의 각 기술 상세(타수표·메타 채용·예상 데미지)로 */}
-        {(() => {
-          const list = (d.moveset || []).map((mid) => dexMove(mid)).filter((x): x is NonNullable<typeof x> => !!x);
-          if (!list.length) return null;
-          return (
-            <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-              <Link href={L("/gbl/moves")} style={{ fontSize: "0.74rem", fontWeight: 700, color: "#3b5bdb", textDecoration: "none" }}>{getMoves(lang).navLabel} ›</Link>
-              {list.map((mv) => { const mc = TYPE_COLOR[mv.type] || "#64748b"; return (
-                <Link key={mv.id} href={L(`/gbl/moves/${mv.slug}`)} style={{ fontSize: "0.72rem", fontWeight: 600, padding: "2px 9px", borderRadius: 10, textDecoration: "none", background: mc + "1c", color: mc, border: `1px solid ${mc}50`, whiteSpace: "nowrap" }}>
-                  {dexMoveName(lang, mv)}
-                </Link>
-              ); })}
-            </div>
-          );
         })()}
 
         {/* 카운터 (이 포켓몬에게 강한 상대) — 상단 배치 */}

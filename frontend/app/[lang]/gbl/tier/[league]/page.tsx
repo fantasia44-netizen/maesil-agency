@@ -21,6 +21,7 @@ import { currentSeason, seasonBySlug, selectableSeasons, seasonShort, statusOf }
 import { formDexById } from "../../sprite";
 import { linkMonId } from "../../indexGate";
 import MonLink from "../../MonLink";
+import { moveById as dexMove } from "../../moves/movesData";
 
 export const revalidate = 600;
 
@@ -158,14 +159,15 @@ function Sprite({ id, size = 34 }: { id: string; size?: number }) {
   return <img src={spriteUrl(m)} alt={m?.ko || id} width={size} height={size} style={{ imageRendering: "pixelated" }} />;
 }
 
+// 기술 도감(/gbl/moves/[id]) 경로 — 도감에 없는 변형(_PLUS 등)은 기본 기술로, 그래도 없으면 null(링크 없이 표시).
+const movePath = (id: string): string | null => { const m = dexMove(id); return m ? `/gbl/moves/${m.slug}` : null; };
+
 function MoveChip({ id, lang }: { id: string; lang: Locale }) {
   const mv = MOVES[baseMoveId(id)];
   const c = mv ? (TYPE_COLOR[mv.type] || "#64748b") : "#64748b";
-  return (
-    <span style={{ fontSize: "0.68rem", fontWeight: 600, padding: "1px 7px", borderRadius: 10, background: c + "22", color: c, border: `1px solid ${c}55`, whiteSpace: "nowrap" }}>
-      {moveLabel(lang, id)}
-    </span>
-  );
+  const st: React.CSSProperties = { fontSize: "0.68rem", fontWeight: 600, padding: "1px 7px", borderRadius: 10, background: c + "22", color: c, border: `1px solid ${c}55`, whiteSpace: "nowrap", textDecoration: "none" };
+  const p = movePath(id);
+  return p ? <Link prefetch={false} href={localizePath(lang, p)} style={st}>{moveLabel(lang, id)}</Link> : <span style={st}>{moveLabel(lang, id)}</span>;
 }
 
 // 스킬/타수 — CMP(/gbl/cmp)와 동일 규칙. 타수 = 차지기술 발동까지 빠른기술 횟수(에너지 이월).
@@ -191,8 +193,8 @@ function buildMoves(d: Detail, lang: Locale) {
     const f = fastById.get(fid);
     const isDef = fid === mv.fast.id;
     return {
-      fast: { label: moveLabel(lang, fid), color: moveColor(fid), turns: f?.turns ?? mv.fast.turns },
-      charged: mv.charged.map((c) => ({ label: moveLabel(lang, c.id), color: moveColor(c.id), counts: isDef ? c.counts : tausSeq(c.energy, f?.gain ?? mv.fast.gain) })),
+      fast: { id: fid, label: moveLabel(lang, fid), color: moveColor(fid), turns: f?.turns ?? mv.fast.turns },
+      charged: mv.charged.map((c) => ({ id: c.id, label: moveLabel(lang, c.id), color: moveColor(c.id), counts: isDef ? c.counts : tausSeq(c.energy, f?.gain ?? mv.fast.gain) })),
     };
   });
 }
@@ -343,8 +345,9 @@ export default async function TierPage({ params, searchParams }: { params: { lan
                   const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
                   const c2 = TYPE_COLOR[types[1]] || c1;
                   return (
-                    <MonLink key={d.id} league={params.league} id={d.id} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, d.id)}`) + detQ} style={{ textDecoration: "none", color: "inherit", display: "block", background: `linear-gradient(100deg, ${c1}26 0%, ${c2}18 42%, #ffffff 88%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div key={d.id} style={{ background: `linear-gradient(100deg, ${c1}26 0%, ${c2}18 42%, #ffffff 88%)`, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "8px 10px" }}>
+                      {/* 헤더(스프라이트·이름·점수) = 포켓몬 상세 링크. 아래 기술 칩은 기술 도감 링크라 카드 전체를 <a>로 감싸지 않음(중첩 링크 방지). */}
+                      <MonLink league={params.league} id={d.id} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, d.id)}`) + detQ} style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: 8 }}>
                         <span style={{ width: 36, height: 36, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
                           ...(isShadow ? { background: "radial-gradient(circle, #a855f7ee 0%, #7c3aed99 42%, transparent 72%)", borderRadius: "50%" } : {}) }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -362,17 +365,19 @@ export default async function TierPage({ params, searchParams }: { params: { lan
                           )}
                           <span style={{ fontSize: "0.74rem", color: "#94a3b8" }}>{t.scoreLabel} {d.score}</span>
                         </span>
-                      </div>
+                      </MonLink>
                       {/* 추천 기술 + 타수(CMP 방식) — 데이터 없으면 기존 기술칩 폴백 */}
                       {mvRows ? (
                         <div style={{ marginTop: 6, paddingLeft: 44, display: "flex", flexDirection: "column", gap: 3 }}>
                           {mvRows.map((v, vi) => (
                             <div key={vi} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 6, ...(vi > 0 ? { paddingTop: 3, borderTop: "1px dashed #e3e8f2" } : {}) }}>
-                              <span style={{ fontSize: "0.66rem", fontWeight: 700, color: "#fff", background: v.fast.color, padding: "1px 7px", borderRadius: 6, whiteSpace: "nowrap" }}>{v.fast.label} <span style={{ opacity: 0.9, fontWeight: 800 }}>{v.fast.turns}{TURN_UNIT[lang] ?? "턴"}</span></span>
+                              {(() => { const fp = movePath(v.fast.id); const fst: React.CSSProperties = { fontSize: "0.66rem", fontWeight: 700, color: "#fff", background: v.fast.color, padding: "1px 7px", borderRadius: 6, whiteSpace: "nowrap", textDecoration: "none" };
+                                const inner = <>{v.fast.label} <span style={{ opacity: 0.9, fontWeight: 800 }}>{v.fast.turns}{TURN_UNIT[lang] ?? "턴"}</span></>;
+                                return fp ? <Link prefetch={false} href={L(fp)} style={fst}>{inner}</Link> : <span style={fst}>{inner}</span>; })()}
                               {v.charged.map((c, ci) => (
                                 <span key={ci} style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "0.68rem" }}>
                                   <span style={{ width: 7, height: 7, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
-                                  <span style={{ color: "#334155", fontWeight: 600, whiteSpace: "nowrap" }}>{c.label}</span>
+                                  {movePath(c.id) ? <Link prefetch={false} href={L(movePath(c.id)!)} style={{ color: "#334155", fontWeight: 600, whiteSpace: "nowrap", textDecoration: "none" }}>{c.label}</Link> : <span style={{ color: "#334155", fontWeight: 600, whiteSpace: "nowrap" }}>{c.label}</span>}
                                   <span style={{ fontFamily: "ui-monospace, monospace", color: "#94a3b8", fontWeight: 700, letterSpacing: "-0.3px" }}>{c.counts.join("·")}<span style={{ fontSize: "0.6rem" }}>{HITS_UNIT[lang] ?? "타"}</span></span>
                                 </span>
                               ))}
@@ -384,7 +389,7 @@ export default async function TierPage({ params, searchParams }: { params: { lan
                           {d.moveset.map((mid) => <MoveChip key={mid} id={mid} lang={lang} />)}
                         </div>
                       )}
-                    </MonLink>
+                    </div>
                   );
                 })}
               </div>

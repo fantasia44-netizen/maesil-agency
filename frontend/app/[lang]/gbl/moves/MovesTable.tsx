@@ -54,7 +54,7 @@ function KindTable({ rows, cols, visible, noResult }: { rows: MoveRow[]; cols: C
           {sorted.map((r) => (
             <tr key={r.slug}>
               {cols.map((c) => {
-                if (c.key === "name") return <td key="name" style={td}><Link href={r.href} style={{ color: "#1d4ed8", fontWeight: 700, textDecoration: "none" }}>{r.name}</Link></td>;
+                if (c.key === "name") return <td key="name" style={td}><Link prefetch={false} href={r.href} style={{ color: "#1d4ed8", fontWeight: 700, textDecoration: "none" }}>{r.name}</Link></td>;
                 if (c.key === "type") return <td key="type" style={td}><TypeChip type={r.type} label={r.typeLabel} /></td>;
                 if (c.key === "effect") return <td key="effect" style={{ ...td, fontSize: "0.7rem", color: "#64748b", whiteSpace: "normal", minWidth: 120 }}>{r.effect}</td>;
                 const v = r[c.key];
@@ -139,7 +139,7 @@ export default function MovesTable({ rows, types, labels }: { rows: MoveRow[]; t
                 </div>
                 <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                   {list.map((r) => (
-                    <Link key={r.slug} href={r.href} style={{ fontSize: "0.74rem", fontWeight: 600, padding: "2px 9px", borderRadius: 10, textDecoration: "none", background: c + "18", color: c, border: `1px solid ${c}44`, whiteSpace: "nowrap" }}>
+                    <Link prefetch={false} key={r.slug} href={r.href} style={{ fontSize: "0.74rem", fontWeight: 600, padding: "2px 9px", borderRadius: 10, textDecoration: "none", background: c + "18", color: c, border: `1px solid ${c}44`, whiteSpace: "nowrap" }}>
                       {r.name}{r.users > 0 && <span style={{ marginLeft: 4, fontSize: "0.62rem", opacity: 0.75 }}>{r.users}</span>}
                     </Link>
                   ))}

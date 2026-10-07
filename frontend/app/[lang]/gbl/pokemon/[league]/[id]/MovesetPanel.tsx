@@ -2,8 +2,10 @@
 // 추천 기술배치 + 스킬 타수 — 빠른기술(노멀기) 선택 시 차지 타수를 즉석 재계산.
 // 데이터: 서버(page.tsx)에서 이름·타입색 해석해 prop으로 전달. 타수만 클라 계산.
 // 선택 상태(sel)는 상위(MovesetShare)에서 관리 — 공유/저장 카드와 동기화.
+// href(기술 도감 경로)가 있으면 차지 칩은 링크, 빠른 기술은 선택 버튼이라 옆에 "기술명 ›" 링크를 따로 둔다(버튼 안 링크 금지).
+import Link from "next/link";
 
-export type MoveDisp = { id: string; label: string; color: string };
+export type MoveDisp = { id: string; label: string; color: string; href?: string };
 export type FastOpt = MoveDisp & { gain: number; turns: number };
 export type ChargedOpt = MoveDisp & { energy: number; rec: boolean };
 export type PanelLabels = {
@@ -24,13 +26,10 @@ export function tausSeq(cost: number, gain: number, n = 5): number[] {
   return seq;
 }
 
-function Chip({ m, dim }: { m: MoveDisp; dim?: boolean }) {
+function Chip({ m, dim, link }: { m: MoveDisp; dim?: boolean; link?: boolean }) {
   const c = m.color;
-  return (
-    <span style={{ fontSize: "0.72rem", fontWeight: 600, padding: "2px 9px", borderRadius: 10, background: c + (dim ? "14" : "22"), color: c, border: `1px solid ${c}${dim ? "33" : "55"}`, whiteSpace: "nowrap", opacity: dim ? 0.85 : 1 }}>
-      {m.label}
-    </span>
-  );
+  const st: React.CSSProperties = { fontSize: "0.72rem", fontWeight: 600, padding: "2px 9px", borderRadius: 10, background: c + (dim ? "14" : "22"), color: c, border: `1px solid ${c}${dim ? "33" : "55"}`, whiteSpace: "nowrap", opacity: dim ? 0.85 : 1, textDecoration: "none" };
+  return link && m.href ? <Link href={m.href} style={st}>{m.label}</Link> : <span style={st}>{m.label}</span>;
 }
 
 export default function MovesetPanel({ fasts, charged, sel, onSel, labels }: {
@@ -54,6 +53,7 @@ export default function MovesetPanel({ fasts, charged, sel, onSel, labels }: {
           );
         })}
         <span style={{ fontSize: "0.72rem", color: "#64748b" }}>{selFast.turns}{labels.fastTurns}{selFast.gain}</span>
+        {selFast.href && <Link href={selFast.href} style={{ fontSize: "0.72rem", fontWeight: 700, color: "#3b5bdb", textDecoration: "none", whiteSpace: "nowrap" }}>{selFast.label} ›</Link>}
       </div>
       {fasts.length > 1 && <div style={{ fontSize: "0.68rem", color: "#94a3b8", margin: "0 0 8px 60px" }}>{labels.altFastHint}</div>}
 
@@ -63,7 +63,7 @@ export default function MovesetPanel({ fasts, charged, sel, onSel, labels }: {
           const counts = tausSeq(c.energy, selFast.gain);
           return (
             <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <Chip m={c} dim={!c.rec} />
+              <Chip m={c} dim={!c.rec} link />
               {c.rec && <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#3b5bdb", background: "#e8eeff", borderRadius: 5, padding: "1px 5px" }}>{labels.recTag}</span>}
               <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{c.energy} {labels.energyUnit}</span>
               <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 3 }}>

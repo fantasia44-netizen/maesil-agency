@@ -45,7 +45,7 @@ export function generateMetadata({ params }: { params: { lang: string; id: strin
 function MoveChipLink({ lang, m, L }: { lang: Locale; m: Move; L: (p: string) => string }) {
   const c = TYPE_COLOR[m.type] || "#64748b";
   return (
-    <Link href={L(`/gbl/moves/${m.slug}`)} style={{ fontSize: "0.72rem", fontWeight: 600, padding: "2px 8px", borderRadius: 10, textDecoration: "none", background: c + "1c", color: c, border: `1px solid ${c}50`, whiteSpace: "nowrap" }}>
+    <Link prefetch={false} href={L(`/gbl/moves/${m.slug}`)} style={{ fontSize: "0.72rem", fontWeight: 600, padding: "2px 8px", borderRadius: 10, textDecoration: "none", background: c + "1c", color: c, border: `1px solid ${c}50`, whiteSpace: "nowrap" }}>
       {moveName(lang, m)}
     </Link>
   );
