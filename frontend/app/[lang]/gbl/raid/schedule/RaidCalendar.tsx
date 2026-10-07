@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { track } from "../../../../../lib/track";
 import { monSprite, formDex } from "../../sprite";
 import { loadLogo, drawBrandFooter, shareDataUrl } from "../raidShareUtil";
@@ -586,7 +587,7 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: "1.05rem", fontWeight: 900, color: "#0f172a" }}>{cpBoss.name}{cpBoss.shiny ? " ✨" : ""}</div>
                   <div style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{t.cpModalSub}</div>
-                  {cpBoss.href && <a href={cpBoss.href} style={{ display: "inline-block", marginTop: 4, fontSize: "0.76rem", fontWeight: 800, color: "#1d4ed8", textDecoration: "none" }}>{DEX_LINK[lang] || DEX_LINK.ko}</a>}
+                  {cpBoss.href && <Link href={cpBoss.href} prefetch={false} style={{ display: "inline-block", marginTop: 4, fontSize: "0.76rem", fontWeight: 800, color: "#1d4ed8", textDecoration: "none" }}>{DEX_LINK[lang] || DEX_LINK.ko}</Link>}
                 </div>
                 <button onClick={() => setCpBoss(null)} style={{ border: "none", background: "#f1f5f9", color: "#64748b", borderRadius: 8, width: 30, height: 30, cursor: "pointer", fontSize: "1rem", flexShrink: 0 }}>✕</button>
               </div>

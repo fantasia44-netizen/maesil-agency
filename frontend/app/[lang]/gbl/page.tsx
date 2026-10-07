@@ -5,8 +5,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../lib/i18n";
 import { leagueName } from "./contentI18n";
-import { monName } from "./meta/monNames";
+import { monName, MON as ALL_MON } from "./meta/monNames";
 import { dexPathIn } from "./dexHub";
+import { snapNameOf } from "./indexGate";
 import GblLandingClient from "./GblLandingClient";
 import { CORE_FORMATS, MEGA_FORMATS, activeCups, todayISO, type Format } from "./formats";
 
@@ -18,6 +19,11 @@ export function generateMetadata({ params }: { params: { lang: string } }): Meta
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   return { alternates: { canonical: localizePath(lang, "/gbl"), languages: hreflangLanguages("/gbl") } };
 }
+
+// 홈 티저(클라이언트, 마스터리그 실측 TOP3)용 현지화 이름표 — 티어표 데이터에 있는 포켓몬(타입 보유)만 내려 용량을 줄인다. 한국어는 클라이언트 데이터로 충분.
+const TEASER_IDS = Object.values(ALL_MON).filter((m) => m.types.length > 0).map((m) => m.id);
+const teaserNames = (lang: Locale): Record<string, string> | undefined =>
+  lang === "ko" ? undefined : Object.fromEntries(TEASER_IDS.map((id) => [id, snapNameOf(lang, id) || monName(lang, id)]));   // 스냅샷 이름 우선(폼 명칭 포함)
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 // 코어 3리그 + 메가(메가마리 등) + 진행 중 컵. 데이터 없는 포맷은 아래서 자동 숨김(total>0).
@@ -151,7 +157,7 @@ export default async function GblLandingPage({ params }: { params: { lang: strin
         </div>
       </div>
 
-      <GblLandingClient />
+      <GblLandingClient names={teaserNames(lang)} />
 
       {/* ── #6 GBL Note 자체 분석(원본 3종) — SSR 노출(원본성 신호). 브랜드 로고 히어로 아래 배치 ── */}
       <div style={{ background: "linear-gradient(180deg,#f7f9fd,#f7f9fd)", padding: "0.5rem 1rem 0.5rem" }}>

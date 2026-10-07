@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import RAIDS from "../gbl_raids.json";
 import RAIDS_MF from "../gbl_raids_megafinale.json";
-import { RAID_DEFAULT_VER } from "../dexHub";
+import { RAID_DEFAULT_VER, zhNameOfSid } from "../dexHub";
 import AdSlot from "../AdSlot";
 import { monSprite } from "../sprite";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
@@ -13,8 +13,9 @@ import { getRaidHub } from "./dict";
 
 export const revalidate = 600;
 
-type Row = { name: string; nameEn: string; nameJa: string; dex: number; dps: number; mega: string; shadow: boolean };
-const rName = (lang: Locale, r: Row) => (lang === "en" ? r.nameEn : lang === "ja" ? r.nameJa : lang === "zh-TW" ? r.nameEn : r.name) || r.name;
+type Row = { name: string; nameEn: string; nameJa: string; sid?: string; dex: number; dps: number; mega: string; shadow: boolean };
+// zh-TW는 행에 이름이 없어 speciesId로 조립(超級·暗影 포함). 예전엔 영어 이름이 그대로 나왔음.
+const rName = (lang: Locale, r: Row) => (lang === "en" ? r.nameEn : lang === "ja" ? r.nameJa : lang === "zh-TW" ? ((r.sid && zhNameOfSid(r.sid)) || r.nameEn) : r.name) || r.name;
 type RaidData = { meta: { generated: string; typeKo: Record<string, string> }; types: Record<string, Row[]> };
 // 타입별 페이지(raid/[type])의 기본 탭과 같은 버전에서 1위를 뽑는다 — 예전엔 여기만 "이전(일반)" 표를 봐서
 // 목록엔 "악 1위 메가 마기라스"인데 들어가면 메가 개굴닌자가 1위로 나오는 불일치가 있었음.

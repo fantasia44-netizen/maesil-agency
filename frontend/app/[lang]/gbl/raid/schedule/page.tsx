@@ -4,7 +4,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import PKN from "../../pokedex_names.json";
 import NAME_EN_KO from "../../name_en_ko.json";
-import { dexPathOfDex } from "../../dexHub";
+import { dexPathOfBoss } from "../../dexHub";
+import { localizeEventName } from "../../sdEvents";
 import RaidCalendarClient from "./RaidCalendarClient";
 import { type CalEvent, type CalBoss } from "./RaidCalendar";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
@@ -73,46 +74,19 @@ function localEventName(lang: Locale, name: string, t: ScheduleDict): string {
   const mons = s ? s.split(/,\s*and\s+|,\s*|\s+and\s+/).filter(Boolean).map((x) => monLocal(lang, x, t)).join("·") : "";
   return (mons ? mons + " " : "") + suffix;
 }
-const EN_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-// 비-레이드 이벤트명 로케일화: 오버라이드맵 → 포켓몬명 → 유형어구 → 월이름 순 치환.
-// 피드가 영어 전용이라 반복 요소만 자동 번역, 일회성 캠페인명은 evtNameMap 수동 매핑.
-function localMajorName(lang: Locale, name: string, t: ScheduleDict): string {
-  const clean = name.replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
-  if (lang === "en") return clean;
-  if (t.evtNameMap[clean]) return t.evtNameMap[clean];
-  // 1) 포켓몬명 치환(단어 단위) — Mega/Shadow 등 접두 포함 2단어는 monLocal 경유
-  let s = clean.replace(/\b(Mega|Shadow|Alolan|Galarian|Hisuian|Paldean)\s+[A-Za-zé.'-]+/g, (m) => monLocal(lang, m, t));
-  s = s.replace(/[A-Za-zé][A-Za-zé.'-]*/g, (w) => {
-    const k = w.toLowerCase().replace(/[^a-zé]/g, "");
-    return BY_EN[k] ? localName(lang, BY_EN[k], w) : w;
-  });
-  // 2) 유형 어구 치환(긴 것 우선)
-  const P: [RegExp, string][] = [
-    [/Super Mega Raid Day/gi, t.sfxSuperMega], [/Mega Raid Day/gi, t.sfxMega],
-    [/Raid Hour/gi, t.sfxRaidHour], [/Raid Day/gi, t.sfxRaidDay],
-    [/Community Day Classic/gi, `${t.evtType["community-day"]} ${t.evtClassic}`],
-    [/Community Day/gi, t.evtType["community-day"]],
-    [/Spotlight Hour/gi, t.evtType["pokemon-spotlight-hour"]],
-    [/Max Battle Day/gi, t.evtType["max-battles"]],
-    [/during Max Monday/gi, t.evtType["max-mondays"]], [/Max Monday/gi, t.evtType["max-mondays"]],
-    [/GO Pass/gi, t.evtType["go-pass"]], [/GO Fest/gi, t.evtType["pokemon-go-fest"]],
-    [/Dynamax/gi, t.dynamax],
-  ];
-  for (const [re, to] of P) s = s.replace(re, to);
-  // 3) 월 이름 치환
-  EN_MONTHS.forEach((m, i) => { s = s.replace(new RegExp(`\\b${m}\\b`, "gi"), t.months[i]); });
-  return s.replace(/\s{2,}/g, " ").trim();
-}
+// 비-레이드 이벤트명 로케일화 — 전체 이벤트 달력(/gbl/events)과 같은 공용 함수(sdEvents.localizeEventName).
+// 예전엔 여기 사본이 따로 있어 나열 구분(", and")·부화 데이·타임 챌린지 등이 빠져 반쯤만 번역됐음.
+const localMajorName = (lang: Locale, name: string, t: ScheduleDict): string => localizeEventName(lang, name, t);
 function rotInfo(name: string, t: ScheduleDict): { title: string; variant: "star" | "shadow" | "mega" } {
   if (/Mega Raid/i.test(name)) return { title: t.rotMegaTitle, variant: "mega" };
   if (/Shadow Raid/i.test(name)) return { title: t.rotShadowTitle, variant: "shadow" };
   return { title: t.rotStarTitle, variant: "star" };
 }
 // 보스(도감 번호) → 도감 상세 경로(로케일 포함). 달력은 클라이언트라 서버에서 계산해 CalBoss.href로 전달.
-const dexHref = (lang: Locale, dex: string | number): string | undefined => { const p = dex ? dexPathOfDex(dex) : null; return p ? localizePath(lang, p) : undefined; };
+const dexHref = (lang: Locale, dex: string | number, en?: string): string | undefined => { const p = dex ? dexPathOfBoss(dex, en) : null; return p ? localizePath(lang, p) : undefined; };
 function bossesOf(lang: Locale, e: EventItem, t: ScheduleDict): CalBoss[] {
   return (e.extraData?.raidbattles?.bosses || []).map((b) => ({
-    ko: koMon(b.name), name: monLocal(lang, b.name, t), dex: dexOf(b.image), image: b.image, shiny: !!b.canBeShiny, href: dexHref(lang, dexOf(b.image)),
+    ko: koMon(b.name), name: monLocal(lang, b.name, t), dex: dexOf(b.image), image: b.image, shiny: !!b.canBeShiny, href: dexHref(lang, dexOf(b.image), b.name),
   }));
 }
 
@@ -166,7 +140,7 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
   ];
   for (const r of PAST_RAIDS) {
     calEvents.push({ kind: "rotation", variant: r.variant, title: rotInfo(r.variant === "mega" ? "Mega Raid" : r.variant === "shadow" ? "Shadow Raid" : "", t).title, start: r.start, end: r.end,
-      bosses: r.bosses.map((b) => ({ ko: koMon(b.en), name: monLocal(lang, b.en, t), dex: b.dex, image: "", shiny: b.shiny, href: dexHref(lang, b.dex) })) });
+      bosses: r.bosses.map((b) => ({ ko: koMon(b.en), name: monLocal(lang, b.en, t), dex: b.dex, image: "", shiny: b.shiny, href: dexHref(lang, b.dex, b.en) })) });
   }
 
   // ── 메가 어센션(2026-08-31~09-04, LeekDuck 공식) — 이 기간 5성·그림자·정규 메가 중단, 메가 레이드가 대체 ──
@@ -197,7 +171,7 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
   const maLabel = lang === "en" ? "Mega Ascension" : lang === "ja" ? "メガアセンション" : lang === "zh-TW" ? "超級進化盛典" : "메가 어센션";
   for (const r of MEGA_ASCENSION) {
     calEvents.push({ kind: "rotation", variant: "mega", title: `${t.rotMegaTitle} · ${maLabel}`, start: r.start, end: r.end,
-      bosses: r.bosses.map((b) => ({ ko: koMon(b.en), name: monLocal(lang, b.en, t), dex: b.dex, image: "", shiny: true, href: dexHref(lang, b.dex) })) });
+      bosses: r.bosses.map((b) => ({ ko: koMon(b.en), name: monLocal(lang, b.en, t), dex: b.dex, image: "", shiny: true, href: dexHref(lang, b.dex, b.en) })) });
   }
 
   // KST(UTC+9) 벽시계 날짜 — 서버가 UTC라도 한국 '오늘'이 맞도록(새벽 0~9시 하루 밀림 방지)

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import POKEDEX from "../../pokedex_ko.json";
-import { dexPathOfDex } from "../../dexHub";
+import { dexPathOfBoss } from "../../dexHub";
 import PKN from "../../pokedex_names.json";
 import STATSJSON from "../../pokedex_stats.json";
 import CpTable from "./CpTable";
@@ -13,6 +13,12 @@ import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale }
 import { typeLabel } from "../../typeLabels";
 import { localName } from "../../contentI18n";
 import { getBosses, type BossesDict } from "./dict";
+const SHINY_L: Record<Locale, { title: string; alt: string }> = {
+  ko: { title: "색이 다른 포켓몬 등장 가능", alt: "색이 다른 모습" },
+  en: { title: "Shiny available", alt: "shiny" },
+  ja: { title: "色違いが出現", alt: "色違い" },
+  "zh-TW": { title: "可遇到異色", alt: "異色" },
+};
 
 export const revalidate = 600; // 6시간마다 갱신(보스 로테이션 반영)
 
@@ -248,9 +254,9 @@ export default async function BossesPage({ params }: { params: { lang: string } 
                                   <img src={pokeSprite(fdex)} alt={bossName(lang, b, t)} width={46} height={46} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
                                 </div>
                                 {shinyOk && (
-                                  <div style={{ position: "relative", width: 46, height: 46, display: "flex", alignItems: "center", justifyContent: "center", ...aura }} title="shiny available">
+                                  <div style={{ position: "relative", width: 46, height: 46, display: "flex", alignItems: "center", justifyContent: "center", ...aura }} title={SHINY_L[lang].title}>
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img src={shinySprite(fdex)} alt={`${bossName(lang, b, t)} shiny`} width={46} height={46} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
+                                    <img src={shinySprite(fdex)} alt={`${bossName(lang, b, t)} ${SHINY_L[lang].alt}`} width={46} height={46} style={{ imageRendering: "pixelated", objectFit: "contain" }} />
                                     <span style={{ position: "absolute", top: -3, right: -2, fontSize: "0.66rem" }}>✨</span>
                                   </div>
                                 )}
@@ -259,7 +265,7 @@ export default async function BossesPage({ params }: { params: { lang: string } 
                           })()}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                              {(() => { const dp = dexPathOfDex(dexOf(b.image)); const nst: React.CSSProperties = { fontSize: "0.98rem", fontWeight: 800, color: "#0f172a", textDecoration: "none" };
+                              {(() => { const dp = dexPathOfBoss(dexOf(b.image), `${b.name} (${(b.image.match(/\.f([A-Z_0-9]+)\./)?.[1] || "").replace(/_/g, " ")})`); const nst: React.CSSProperties = { fontSize: "0.98rem", fontWeight: 800, color: "#0f172a", textDecoration: "none" };
                                 return dp ? <Link href={L(dp)} prefetch={false} style={nst}>{bossName(lang, b, t)} <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#3b5bdb" }}>›</span></Link> : <span style={nst}>{bossName(lang, b, t)}</span>; })()}
                               <span style={{ display: "flex", gap: 3 }}>
                                 {types.map((ty) => (

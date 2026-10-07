@@ -21,7 +21,7 @@ import { currentSeason, seasonBySlug, selectableSeasons, seasonShort, statusOf }
 import { formDexById } from "../../sprite";
 import { linkMonId } from "../../indexGate";
 import MonLink from "../../MonLink";
-import { moveById as dexMove } from "../../moves/movesData";
+import { moveExact as dexMove } from "../../moves/movesData";
 
 export const revalidate = 600;
 

@@ -5,7 +5,8 @@ import Link from "next/link";
 import { localizePath, type Locale } from "../../../lib/i18n";
 import { leagueShort } from "./contentI18n";
 import { typeLabel, TYPE_COLOR } from "./typeLabels";
-import { standings, raidRanksOfDex } from "./dexHub";
+import { standings, raidRanksOfForm, ivKeyOf } from "./dexHub";
+import { siblingForm } from "./indexGate";
 import { PUBLISHED_ANALYSIS } from "./iv/analysis/published";
 
 const T: Record<Locale, { h: string; battle: string; raid: string; iv: string; rank: (n: number) => string; shadow: string; mega: string; ivCheck: string; ivDeep: string; noRank: string; raidAll: string }> = {
@@ -16,12 +17,21 @@ const T: Record<Locale, { h: string; battle: string; raid: string; iv: string; r
 };
 const TIER_COLOR: Record<string, string> = { S: "#dc2626", A: "#ea580c", B: "#ca8a04", C: "#16a34a", D: "#64748b" };
 const BORDER = "#e3e8f2";
+// 통합되지 않고 따로 페이지가 있는 짝(일반 ↔ 그림자)으로 가는 칩
+const SIB: Record<Locale, { base: string; shadow: string }> = {
+  ko: { base: "일반 폼 →", shadow: "🌑 그림자 폼 →" },
+  en: { base: "Regular form →", shadow: "🌑 Shadow form →" },
+  ja: { base: "通常のすがた →", shadow: "🌑 シャドウ →" },
+  "zh-TW": { base: "一般形態 →", shadow: "🌑 暗影形態 →" },
+};
 
 export default function DexHub({ lang, id, dex, league }: { lang: Locale; id: string; dex: number; league: string }) {
   const t = T[lang];
   const L = (p: string) => localizePath(lang, p);
   const st = standings(id);
-  const raids = raidRanksOfDex(dex).slice(0, 8);
+  const raids = raidRanksOfForm(dex, id).slice(0, 8);
+  const ivKey = ivKeyOf(id);
+  const sib = league ? siblingForm(league, id) : null;
   const baseId = id.replace(/_shadow$/, "");
   const row: React.CSSProperties = { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" };
   const label: React.CSSProperties = { fontSize: "0.72rem", fontWeight: 800, color: "#64748b", minWidth: 58 };
@@ -44,10 +54,11 @@ export default function DexHub({ lang, id, dex, league }: { lang: Locale; id: st
             <span style={{ fontWeight: 600, color: "#64748b" }}>{t.rank(s.rank)}</span>
           </Link>
         ))}
+        {sib && <Link href={L(`/gbl/pokemon/${league}/${sib.id}`)} style={chip()}>{sib.shadow ? SIB[lang].shadow : SIB[lang].base}</Link>}
         {st.length > 0 && league && <Link href={L(`/gbl/tier/${league}`)} style={{ fontSize: "0.72rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>{leagueShort(lang, league)} →</Link>}
       </div>
 
-      {/* 레이드 — 이 포켓몬(일반·섀도우·메가)의 딜러표 순위 */}
+      {/* 레이드 — 이 폼(일반·섀도우·메가)의 딜러표 순위. 다른 폼(화이트 큐레무 등)은 그 폼 페이지에서 */}
       {raids.length > 0 && (
         <div style={row}>
           <span style={label}>{t.raid}</span>
@@ -67,10 +78,10 @@ export default function DexHub({ lang, id, dex, league }: { lang: Locale; id: st
       )}
 
       {/* IV — 순위 체커(이 포켓몬 선택 상태로) + 타협 개체 분석(발행된 종만) */}
-      {dex > 0 && (
+      {dex > 0 && (ivKey || PUBLISHED_ANALYSIS.has(baseId)) && (
         <div style={row}>
           <span style={label}>{t.iv}</span>
-          <Link href={`${L("/gbl/iv")}?p=${dex}`} style={chip()}>{t.ivCheck}</Link>
+          {ivKey && <Link href={`${L("/gbl/iv")}?p=${encodeURIComponent(ivKey)}`} style={chip()}>{t.ivCheck}</Link>}
           {PUBLISHED_ANALYSIS.has(baseId) && <Link href={L(`/gbl/iv/${baseId}`)} style={chip()}>{t.ivDeep}</Link>}
         </div>
       )}

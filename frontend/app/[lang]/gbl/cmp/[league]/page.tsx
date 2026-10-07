@@ -19,7 +19,7 @@ import { getCmp } from "./dict";
 import { cmpAnalysis } from "../../leagueAnalysis";
 import { linkMonId } from "../../indexGate";
 import MonLink from "../../MonLink";
-import { moveById as dexMove } from "../../moves/movesData";
+import { moveExact as dexMove } from "../../moves/movesData";
 import { currentSeason, seasonBySlug, selectableSeasons, seasonShort, statusOf } from "../../seasons";
 
 export const revalidate = 600;

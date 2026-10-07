@@ -6,12 +6,13 @@ import { redirect } from "next/navigation";
 import { isLocale, defaultLocale, localizePath, type Locale } from "../../../../../lib/i18n";
 import { dexPathIn } from "../../dexHub";
 
+const LEAGUES = ["great", "ultra", "master", "great_mega", "ultra_mega", "master_mega"];
 export const metadata: Metadata = { robots: { index: false, follow: true } };
 
 export default function DexRedirect({ params, searchParams }: { params: { lang: string; id: string }; searchParams?: { l?: string } }) {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const id = /^[a-z0-9_]{2,60}$/.test(params.id) ? params.id : "";
-  const league = searchParams?.l && /^[a-z_]{4,12}$/.test(searchParams.l) ? searchParams.l : "";
+  const league = searchParams?.l && LEAGUES.includes(searchParams.l) ? searchParams.l : "";   // 허용 리그만(임의 문자열은 무시)
   const path = id ? dexPathIn(league, id) : null;
   // 해석 실패(기록에만 있는 표기 등) → 그 리그 티어표로. 404보다 낫다.
   redirect(localizePath(lang, path || `/gbl/tier/${["great", "ultra", "master"].includes(league) ? league : "great"}`));

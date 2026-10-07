@@ -295,7 +295,7 @@ export default function MoveDetail({ params }: { params: { lang: string; id: str
           <h2 style={{ fontSize: "0.95rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>{t.explainH}</h2>
           <p style={{ margin: 0, fontSize: "0.82rem", color: "#475569", lineHeight: 1.75 }}>{t.explainBody(GM_DATE)}</p>
         </div>
-        <p style={{ margin: "10px 0 0", fontSize: "0.7rem", color: "#b0b8c4" }}>{MOVES.length} moves · PvPoke gamemaster {GM_DATE}</p>
+        <p style={{ margin: "10px 0 0", fontSize: "0.7rem", color: "#b0b8c4" }}>{({ ko: `기술 ${MOVES.length}개 · PvPoke 게임마스터 ${GM_DATE}`, en: `${MOVES.length} moves · PvPoke gamemaster ${GM_DATE}`, ja: `技 ${MOVES.length}件 · PvPoke ゲームマスター ${GM_DATE}`, "zh-TW": `招式 ${MOVES.length} 個 · PvPoke gamemaster ${GM_DATE}` } as Record<string, string>)[lang]}</p>
       </div>
     </div>
   );

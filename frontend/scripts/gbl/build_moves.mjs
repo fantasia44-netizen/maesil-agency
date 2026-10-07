@@ -24,7 +24,7 @@ const AFF = {
   en: { reg: { _alolan: "Alolan ", _galarian: "Galarian ", _hisuian: "Hisuian ", _paldean: "Paldean " }, white: "White ", black: "Black ",
         origin: " (Origin)", therian: " (Therian)", crowned_sword: " (Crowned Sword)", crowned_shield: " (Crowned Shield)", dusk_mane: " (Dusk Mane)", dawn_wings: " (Dawn Wings)", hero: " (Hero)" },
   ja: { reg: { _alolan: "アローラ", _galarian: "ガラル", _hisuian: "ヒスイ", _paldean: "パルデア" }, white: "ホワイト", black: "ブラック",
-        origin: "（オリジンフォルム）", therian: "（れいじゅうフォルム）", crowned_sword: " (けんのおう)", crowned_shield: " (たてのおう)", dusk_mane: " (たそがれのたてがみ)", dawn_wings: " (あかつきのつばさ)", hero: " (れきせんのゆうしゃ)" },
+        origin: "（オリジンフォルム）", therian: "（れいじゅうフォルム）", crowned_sword: "（けんのおう）", crowned_shield: "（たてのおう）", dusk_mane: "（たそがれのたてがみ）", dawn_wings: "（あかつきのつばさ）", hero: "（れきせんのゆうしゃ）" },
   "zh-TW": { reg: { _alolan: "阿羅拉", _galarian: "伽勒爾", _hisuian: "洗翠", _paldean: "帕底亞" }, white: "焰白", black: "闇黑",
         origin: "（起源）", therian: "（靈獸）", crowned_sword: "（劍之王）", crowned_shield: "（盾之王）", dusk_mane: "（黃昏之鬃）", dawn_wings: "（拂曉之翼）", hero: "（百戰勇者）" },
 };
@@ -126,6 +126,29 @@ writeFileSync(join(GBL, "gbl_moves.json"), JSON.stringify(out));
   const byId = Object.fromEntries(gm.pokemon.map((p) => [p.speciesId, p]));
   const mvById = Object.fromEntries(gm.moves.map((m) => [m.moveId, m]));
   const unranked = {};
+  // 진화 계열 보정 — PvPoke 게임마스터의 표기 문제를 여기서 흡수(그대로 쓰면 진화 칩이 조용히 사라지거나 방향이 뒤집힘).
+  //  · 오타·세분 폼 id(lycranroc_dusk, toxtricity_amped/low_key) → 실제 종 id
+  //  · 페이지가 없는 중간 단계(spewpa 등)는 그 다음 진화로 건너뜀
+  //  · 부모/진화가 뒤집혀 실린 항목(차데스 ← 그우린차)은 FAM_FIX로 교정
+  const FAM_ALIAS = { lycranroc_dusk: "lycanroc_dusk", toxtricity_amped: "toxtricity", toxtricity_low_key: "toxtricity" };
+  const FAM_FIX = { poltchageist: { evo: ["sinistcha"] } };
+  const famWarn = [];
+  const total = (id) => { const b = byId[id]?.baseStats; return b ? b.atk + b.def + b.hp : 0; };
+  const resolveEvo = (id, depth = 0) => {
+    const t = FAM_ALIAS[id] || id;
+    if (species[t]) return [t];
+    const next = byId[t]?.family?.evolutions || [];
+    if (!next.length || depth > 3) { famWarn.push(`진화 id 미해결: ${id}`); return []; }
+    return next.flatMap((n) => resolveEvo(n, depth + 1));
+  };
+  const famOf = (sid, p) => {
+    if (FAM_FIX[sid]) return FAM_FIX[sid];
+    const parent = p.family?.parent ? (FAM_ALIAS[p.family.parent] || p.family.parent) : null;
+    const evo = [...new Set((p.family?.evolutions || []).flatMap((e) => resolveEvo(e)))].filter((e) => e !== sid);
+    // 부모(진화 전)의 종족값 합이 자신보다 크면 방향이 뒤집혔을 가능성 → 경고만(자동 교정은 안 함. 확인 후 FAM_FIX에 추가)
+    if (parent && total(parent) > total(sid)) famWarn.push(`부모가 더 강함(뒤집힘 의심): ${sid} ← ${parent}`);
+    return { ...(parent ? { parent } : {}), ...(evo.length ? { evo } : {}) };
+  };
   for (const sid of Object.keys(species)) {
     if (ranked.has(sid)) continue;
     const p = byId[sid]; if (!p) continue;
@@ -138,13 +161,32 @@ writeFileSync(join(GBL, "gbl_moves.json"), JSON.stringify(out));
       fast: (p.fastMoves || []).filter((m) => mvById[m]?.energyGain > 0).map((m) => ({ id: m, gain: mvById[m].energyGain, turns: mvById[m].turns || 1 })),
       charged: (p.chargedMoves || []).filter((m) => mvById[m]?.energy > 0).map((m) => ({ id: m, energy: mvById[m].energy })),
       ...(eliteSet.size ? { elite: [...eliteSet] } : {}),
-      ...(p.family?.parent ? { parent: p.family.parent } : {}),
-      ...(p.family?.evolutions?.length ? { evo: p.family.evolutions } : {}),
+      ...famOf(sid, p),
     };
   }
   writeFileSync(join(GBL, "gbl_unranked.json"), JSON.stringify(unranked));
   const cp = Object.values(unranked).filter((u) => u.reason === "cp").length;
   console.log(`gbl_unranked.json — 랭킹 밖 ${Object.keys(unranked).length}종 (CP 미달 ${cp} · 랭킹 미수록 ${Object.keys(unranked).length - cp})`);
+  if (famWarn.length) console.log(`[warn] 진화 계열 ${famWarn.length}건: ${[...new Set(famWarn)].join(" / ")}`);
+}
+
+// ── IV 체커 키 표(gbl_iv_keys.json) — 상세 페이지 id → IV 체커의 포켓몬 키(도감번호 또는 f:<폼id>).
+// 체커 데이터(pokedex_stats.json = 도감번호별 기본 폼, gbl_form_stats.json = 폼별)와 게임마스터 종족값이 "정확히 같은" 것만 짝짓는다.
+// 짝이 없는 폼(알로라 라이츄·테오키스 디펜스폼 등 체커 미수록)은 표에 넣지 않음 → 상세의 "IV 순위 보기" 링크를 숨긴다(다른 폼 수치로 열리는 것 방지).
+{
+  const STATS = J("pokedex_stats.json"), FSTATS = J("gbl_form_stats.json");
+  const keys = {}; const none = [];
+  for (const p of pool) {
+    if (isMega(p) || !p.baseStats) continue;
+    const b = p.baseStats, same = (x) => x && x.a === b.atk && x.d === b.def && x.s === b.hp;
+    const own = FSTATS.find((x) => x.id === p.speciesId);
+    if (own) { keys[p.speciesId] = "f:" + own.id; continue; }
+    if (same(STATS[String(p.dex)])) { keys[p.speciesId] = String(p.dex); continue; }
+    const alt = FSTATS.find((x) => x.dex === p.dex && same(x));
+    if (alt) keys[p.speciesId] = "f:" + alt.id; else none.push(p.speciesId);
+  }
+  writeFileSync(join(GBL, "gbl_iv_keys.json"), JSON.stringify(keys));
+  console.log(`gbl_iv_keys.json — IV 체커 연결 ${Object.keys(keys).length}종 · 체커 미수록 ${none.length}종`);
 }
 const fast = moves.filter((m) => m.kind === "fast").length;
 console.log(`gbl_moves.json — 기술 ${moves.length} (빠른 ${fast} · 차지 ${moves.length - fast}) · 포켓몬 ${Object.keys(species).length} · gm ${gm.timestamp}`);

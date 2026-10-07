@@ -7,6 +7,8 @@ import { notFound } from "next/navigation";
 import { MON, monName, spriteUrl } from "../monNames";
 import MonLink from "../../MonLink";
 import { linkMonId } from "../../indexGate";
+import { dexPathIn } from "../../dexHub";
+import { Fragment } from "react";
 import AdSlot from "../../AdSlot";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../../../lib/i18n";
 import { leagueName, leagueShort } from "../../contentI18n";
@@ -72,10 +74,10 @@ export function generateMetadata({ params }: { params: { lang: string; league: s
 const CARD = "#ffffff";
 const BORDER = "#e3e8f2";
 
-function Sprite({ id, size = 30 }: { id: string; size?: number }) {
+function Sprite({ id, size = 30, lang }: { id: string; size?: number; lang: Locale }) {
   const m = MON[id];
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={spriteUrl(m)} alt={m?.ko || id} width={size} height={size} style={{ imageRendering: "pixelated" }} />;
+  return <img src={spriteUrl(m)} alt={monName(lang, id)} width={size} height={size} style={{ imageRendering: "pixelated" }} />;
 }
 
 export default async function LeagueMetaPage({ params }: { params: { lang: string; league: string } }) {
@@ -153,9 +155,9 @@ export default async function LeagueMetaPage({ params }: { params: { lang: strin
                 return (
                   <MonLink key={mm.speciesId} league={params.league} id={mm.speciesId} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, mm.speciesId)}`)} style={{ display: "flex", alignItems: "center", gap: 8, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "5px 10px", textDecoration: "none", color: "inherit" }}>
                     <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#a855f7" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
-                    <Sprite id={mm.speciesId} size={30} />
+                    <Sprite lang={lang} id={mm.speciesId} size={30} />
                     <span style={{ fontSize: "0.86rem", fontWeight: 600, minWidth: 88, color: "#0f172a" }}>
-                      {m?.shadow && <span style={{ color: "#7c3aed" }}>{t.shadowWord}</span>}{monName(lang, mm.speciesId)}
+                      {m?.shadow && !/그림자|섀도우|shadow|シャドウ|暗影/i.test(monName(lang, mm.speciesId)) && <span style={{ color: "#7c3aed" }}>{t.shadowWord}</span>}{monName(lang, mm.speciesId)}
                     </span>
                     <div style={{ flex: 1, height: 8, background: "#e5eaf3", borderRadius: 4, overflow: "hidden" }}>
                       <div style={{ width: `${Math.round((mm.count / maxMon) * 100)}%`, height: "100%", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)" }} />
@@ -173,18 +175,21 @@ export default async function LeagueMetaPage({ params }: { params: { lang: strin
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {decks.map((d, i) => {
                 const pct = Math.round((d.count / total) * 100);
-                const names = d.deck.map((id) => monName(lang, id)).join(" · ");
                 return (
                   <div key={i} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "7px 10px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#a855f7" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
-                      <div style={{ display: "flex", gap: 2 }}>{d.deck.map((id) => <Sprite key={id} id={id} size={32} />)}</div>
+                      <div style={{ display: "flex", gap: 2 }}>{d.deck.map((id) => <Sprite lang={lang} key={id} id={id} size={32} />)}</div>
                       <span style={{ marginLeft: "auto", fontSize: "1rem", fontWeight: 800, color: "#a855f7" }}>{pct}%</span>
                     </div>
                     <div style={{ height: 6, background: "#e5eaf3", borderRadius: 3, margin: "6px 0 4px", overflow: "hidden" }}>
                       <div style={{ width: `${Math.round((d.count / maxDeck) * 100)}%`, height: "100%", background: "linear-gradient(90deg,#7c3aed,#a855f7)" }} />
                     </div>
-                    <div style={{ fontSize: "0.72rem", color: "#64748b", lineHeight: 1.4 }}>{names}</div>
+                    <div style={{ fontSize: "0.72rem", color: "#64748b", lineHeight: 1.4 }}>
+                      {d.deck.map((id, j) => { const dp = dexPathIn(params.league, id); return (
+                        <Fragment key={`${id}-${j}`}>{j > 0 && " · "}{dp ? <Link href={L(dp)} prefetch={false} style={{ color: "#475569", fontWeight: 600, textDecoration: "none" }}>{monName(lang, id)}</Link> : monName(lang, id)}</Fragment>
+                      ); })}
+                    </div>
                   </div>
                 );
               })}

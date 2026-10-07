@@ -23,10 +23,14 @@ const DATA = RAW as unknown as { generatedAt: string; gmTimestamp: string; speci
 export const MOVES: Move[] = DATA.moves;
 export const MOVES_GENERATED = DATA.generatedAt;
 export const GM_DATE = (DATA.gmTimestamp || "").slice(0, 10);
-const BY_SLUG: Record<string, Move> = Object.fromEntries(MOVES.map((m) => [m.slug, m]));
-const BY_ID: Record<string, Move> = Object.fromEntries(MOVES.map((m) => [m.id, m]));
+// null-prototype — /gbl/moves/constructor 같은 주소가 Object.prototype 값을 "기술"로 집어 500이 나던 것 방지(이제 404).
+const BY_SLUG: Record<string, Move> = Object.assign(Object.create(null), Object.fromEntries(MOVES.map((m) => [m.slug, m])));
+const BY_ID: Record<string, Move> = Object.assign(Object.create(null), Object.fromEntries(MOVES.map((m) => [m.id, m])));
 export const moveBySlug = (slug: string): Move | undefined => BY_SLUG[slug];
+// 이름·타입 표시용 — 메가 리그의 강화판(_PLUS)은 원본 기술로 떨어뜨려 이름을 얻는다.
 export const moveById = (id: string): Move | undefined => BY_ID[id] || BY_ID[id.replace(/_PLUS$/, "")];
+// 링크용 — 정확히 그 기술의 페이지가 있을 때만. 강화판(_PLUS)은 에너지·위력이 원본과 달라(폭발펀치+ 80 vs 45) 원본 페이지로 보내면 수치가 어긋난다.
+export const moveExact = (id: string): Move | undefined => BY_ID[id];
 export const FAST = MOVES.filter((m) => m.kind === "fast");
 export const CHARGED = MOVES.filter((m) => m.kind === "charged");
 

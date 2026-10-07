@@ -135,7 +135,7 @@ _AFFIX = {
            "mega": "メガ", "megaX": "X", "megaY": "Y", "primal": "ゲンシ",
            "white": "ホワイト", "black": "ブラック", "shadow": "シャドウ",
            "origin": "（オリジンフォルム）", "therian": "（れいじゅうフォルム）",
-           "crowned_sword": " (けんのおう)", "crowned_shield": " (たてのおう)", "dusk_mane": " (たそがれのたてがみ)", "dawn_wings": " (あかつきのつばさ)", "hero": " (れきせんのゆうしゃ)"},
+           "crowned_sword": "（けんのおう）", "crowned_shield": "（たてのおう）", "dusk_mane": "（たそがれのたてがみ）", "dawn_wings": "（あかつきのつばさ）", "hero": "（れきせんのゆうしゃ）"},
     "zh-TW": {"reg": {"_alolan": "阿羅拉", "_galarian": "伽勒爾", "_hisuian": "洗翠", "_paldean": "帕底亞"},
            "mega": "超級", "megaX": " X", "megaY": " Y", "primal": "原始",
            "white": "焰白", "black": "闇黑", "shadow": "暗影",

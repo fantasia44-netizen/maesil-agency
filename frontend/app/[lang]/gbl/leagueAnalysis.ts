@@ -3,6 +3,12 @@
 // 데이터가 갱신되면 문장도 자연히 바뀜(고정 템플릿 아님).
 import { type Locale } from "../../../lib/i18n";
 
+// 받침 유무에 맞춘 조사(은/는) — "멜메탈는" 방지. 이름 끝이 괄호면 그 안의 마지막 글자, 영문(X·Y 등)이면 발음 기준(L·M·N·R만 받침).
+const eunNeun = (w: string): string => {
+  const ch = w.replace(/[\s)）\]]+$/g, "").slice(-1); const c = ch.charCodeAt(0);
+  if (c >= 0xAC00 && c <= 0xD7A3) return (c - 0xAC00) % 28 !== 0 ? "은" : "는";
+  return /[lmnrLMNR]/.test(ch) ? "은" : "는";
+};
 type TierItem = { id: string; tier: string; score: number };
 type CmpItem = { id: string; atk: number };
 
@@ -27,8 +33,8 @@ export function tierAnalysis(
     ko: {
       dist: `이번 ${lgName} 티어표는 S티어 ${sCount}종, A티어 ${aCount}종으로 구성됩니다.`,
       top: topId ? ` 실측 픽률 1위는 ${name(topId)}(${topPct}%)로, 티어 평가가 실전에서도 통하는지 바로 대조할 수 있습니다.` : "",
-      hi: highTierLowPick ? ` 이론 평가가 높은 ${name(highTierLowPick.id)}는 실측 등장이 드물어, 상위 티어라도 실전 채택은 갈립니다.` : "",
-      lo: lowTierHighPick ? ` 반대로 ${name(lowTierHighPick.id)}는 티어는 낮게 평가되지만 실측에선 꾸준히 보여, 이론과 실전의 간극을 드러냅니다.` : "",
+      hi: highTierLowPick ? ` 이론 평가가 높은 ${name(highTierLowPick.id)}${eunNeun(name(highTierLowPick.id))} 실측 등장이 드물어, 상위 티어라도 실전 채택은 갈립니다.` : "",
+      lo: lowTierHighPick ? ` 반대로 ${name(lowTierHighPick.id)}${eunNeun(name(lowTierHighPick.id))} 티어는 낮게 평가되지만 실측에선 꾸준히 보여, 이론과 실전의 간극을 드러냅니다.` : "",
     },
     en: {
       dist: `This ${lgName} tier list has ${sCount} S-tier and ${aCount} A-tier Pokémon.`,

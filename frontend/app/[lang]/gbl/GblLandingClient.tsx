@@ -37,7 +37,8 @@ function HubCard({ h }: { h: Card }) {
   );
 }
 
-export default function GblLandingClient() {
+// names = 서버가 내려준 현지화 이름표(비한국어 로케일만). 이 파일의 gbl_data엔 한국어 이름만 있어 예전엔 영어·일본어·중국어 홈에도 한글 이름이 나왔음.
+export default function GblLandingClient({ names }: { names?: Record<string, string> }) {
   const raw = String(useParams()?.lang || defaultLocale);
   const lang: Locale = isLocale(raw) ? raw : defaultLocale;
   const t = getDict(lang).landing;
@@ -140,7 +141,7 @@ export default function GblLandingClient() {
                     <span style={{ fontSize: "0.72rem", fontWeight: 800, color: "#94a3b8", minWidth: 16 }}>{i + 1}</span>
                     <img src={spriteUrl(m)} alt="" width={26} height={26} style={{ imageRendering: "pixelated" }}
                       onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }} />
-                    <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#0f172a", flex: 1 }}>{m?.ko || mm.speciesId}</span>
+                    <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#0f172a", flex: 1 }}>{names?.[mm.speciesId] || m?.ko || mm.speciesId}</span>
                     <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#3b5bdb" }}>{pct}%</span>
                   </Link>
                 );

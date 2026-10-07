@@ -10,24 +10,29 @@ import UNRANKED from "./gbl_unranked.json";
 import MON_NOTES from "./gbl_mon_notes.json";
 import { currentSeason } from "./seasons";
 
+// 프로토타입 키(constructor·__proto__ 등)가 리그·id 자리에 들어와도 조회가 항상 undefined가 되게 null-prototype 사본을 쓴다.
+// (일반 객체면 CUR_IDS["constructor"]가 함수라 .has 호출에서 500이 났음 → 이제 404)
+const bare = <T,>(o: Record<string, T>): Record<string, T> => Object.assign(Object.create(null), o);
+
 const LEAGUES = (META as { leagues: Record<string, string[]> }).leagues;
-const SETS: Record<string, Set<string>> = Object.fromEntries(Object.entries(LEAGUES).map(([l, ids]) => [l, new Set(ids)]));
+const SETS: Record<string, Set<string>> = bare(Object.fromEntries(Object.entries(LEAGUES).map(([l, ids]) => [l, new Set(ids)])));
 
 // 현재 시즌 상세 스냅샷의 리그→id 집합 (그림자 통합 판정 기준). 시즌 스냅샷을 추가하면 여기도 등록.
 const SNAP_BY_SLUG: Record<string, unknown> = { s27: DETAIL, s28: DETAIL_S28 };
-const CUR = (SNAP_BY_SLUG[currentSeason().slug] || DETAIL_S28) as Record<string, { id: string; tier?: string; dex?: number }[]>;
-const CUR_IDS: Record<string, Set<string>> = Object.fromEntries(Object.entries(CUR).map(([l, arr]) => [l, new Set(arr.map((e) => e.id))]));
+const CUR = bare((SNAP_BY_SLUG[currentSeason().slug] || DETAIL_S28) as Record<string, { id: string; tier?: string; dex?: number }[]>);
+const CUR_IDS: Record<string, Set<string>> = bare(Object.fromEntries(Object.entries(CUR).map(([l, arr]) => [l, new Set(arr.map((e) => e.id))])));
 
 // 확장 스냅샷 — 리그 201위 이후 전 종(gbl_compile_detail.py가 gbl_detail_ext_<시즌>.json으로 출력). 상세 페이지 "존재" 판정·조회 전용.
 // 티어표·CMP·색인 판정·그림자 통합은 계속 상위 200(CUR)만 본다 → 확장 종은 전부 noindex·사이트맵 제외(isMetaMon이 CUR 티어를 요구).
 const EXT_BY_SLUG: Record<string, unknown> = { s28: DETAIL_EXT_S28 };
-const EXT = (EXT_BY_SLUG[currentSeason().slug] || {}) as Record<string, { id: string; tier?: string; rank?: number; dex?: number }[]>;
-const EXT_IDS: Record<string, Set<string>> = Object.fromEntries(Object.entries(EXT).map(([l, arr]) => [l, new Set(arr.map((e) => e.id))]));
+// 새 시즌을 seasons.ts에 올렸는데 확장 스냅샷 등록이 늦으면 → 직전 스냅샷으로 폴백(안 그러면 201위 이후 1,251개 페이지가 한꺼번에 404).
+const EXT = bare((EXT_BY_SLUG[currentSeason().slug] || DETAIL_EXT_S28) as Record<string, { id: string; tier?: string; rank?: number; dex?: number }[]>);
+const EXT_IDS: Record<string, Set<string>> = bare(Object.fromEntries(Object.entries(EXT).map(([l, arr]) => [l, new Set(arr.map((e) => e.id))])));
 export const extDetail = (league: string, id: string): unknown => (EXT[league] || []).find((e) => e.id === id);
 export const extRows = (): Record<string, { id: string }[]> => EXT;
 // 랭킹 밖(어느 리그 랭킹에도 없는 미진화 등) — 기본 정보 페이지. 리그 무관 데이터라 가장 낮은 리그(great) 경로 한 곳에만 둔다.
 export const UNRANKED_LEAGUE = "great";
-const UNRANKED_MAP = UNRANKED as unknown as Record<string, unknown>;
+const UNRANKED_MAP = bare(UNRANKED as unknown as Record<string, unknown>);
 export const unrankedDetail = (league: string, id: string): unknown => (league === UNRANKED_LEAGUE ? UNRANKED_MAP[id] : undefined);
 // 상세 페이지가 있는 전 종의 (id, dex) — 도감 번호 → 대표 speciesId 매핑용(dexHub.ts).
 export function speciesDexPairs(): { id: string; dex: number }[] {
@@ -41,7 +46,7 @@ export function speciesDexPairs(): { id: string; dex: number }[] {
 // 현재 시즌에 기본 폼이 있으면 → 그림자 URL은 기본 폼으로 301, 내부 링크도 기본 폼으로(과거 시즌 ?s= 은 상세 페이지가 폴백 처리).
 // 기본 폼 페이지가 없는 그림자(니로우 그림자 등)는 통합 대상 아님(자기 페이지 유지). 반환: 기본 폼 id 또는 null.
 // 사이즈 폼 등 티어·점수·기술이 사실상 같은 폼도 대표 폼으로 통합(제목·설명까지 동일한 중복 페이지 방지). 대표 폼 = 노트가 있는 폼.
-const FORM_MERGE: Record<string, string> = { gourgeist_super: "gourgeist_large", gourgeist_average: "gourgeist_large", gourgeist_small: "gourgeist_large" };
+const FORM_MERGE: Record<string, string> = bare({ gourgeist_super: "gourgeist_large", gourgeist_average: "gourgeist_large", gourgeist_small: "gourgeist_large" });
 export function mergedShadowBase(league: string, id: string): string | null {
   const base = id.endsWith("_shadow") ? id.replace(/_shadow$/, "") : FORM_MERGE[id];
   if (!base) return null;
@@ -50,8 +55,25 @@ export function mergedShadowBase(league: string, id: string): string | null {
 // 대표 폼 페이지에 요약으로 얹을 통합 변형 id 목록(그림자 + 사이즈 폼), 현재 시즌에 있는 것만.
 export function mergedVariantsOf(league: string, id: string): string[] {
   const out = [`${id}_shadow`, ...Object.entries(FORM_MERGE).filter(([, b]) => b === id).map(([v]) => v)];
-  return out.filter((v) => CUR_IDS[league]?.has(v));
+  // "실제로 이 페이지로 통합된" 변형만 — 기본 폼이 201위 이후(확장)면 그림자는 통합되지 않고 자기 페이지를 유지하므로 제외
+  // (예전엔 그림자가 상위 200에 있기만 하면 "여기로 통합됐습니다"를 띄워, 22쌍에서 사실과 다른 안내가 나갔음).
+  return out.filter((v) => CUR_IDS[league]?.has(v) && mergedShadowBase(league, v) === id);
 }
+// 통합되지 않고 따로 페이지가 있는 짝(일반 ↔ 그림자) — 서로 오갈 수 있게 상세의 허브 카드에서 링크.
+export function siblingForm(league: string, id: string): { id: string; shadow: boolean } | null {
+  const has = (x: string) => !!(CUR_IDS[league]?.has(x) || EXT_IDS[league]?.has(x));
+  if (!has(id) || mergedShadowBase(league, id)) return null;
+  if (id.endsWith("_shadow")) { const base = id.replace(/_shadow$/, ""); return has(base) ? { id: base, shadow: false } : null; }
+  const sh = `${id}_shadow`;
+  return has(sh) && !mergedShadowBase(league, sh) ? { id: sh, shadow: true } : null;
+}
+// 스냅샷의 4개국어 표시명(폼 명칭 포함: 자시안（검왕）·화이트 큐레무 등) — 행에 그 언어 이름이 없는 화면용(레이드 표 zh-TW, 홈 티저).
+type RowNames = { id: string; ko?: string; en?: string; ja?: string; "zh-TW"?: string };
+const NAMES: Record<string, Record<string, string | undefined>> = Object.create(null);
+for (const src of [CUR, EXT]) for (const arr of Object.values(src)) for (const r of arr as RowNames[]) if (!NAMES[r.id]) NAMES[r.id] = { ko: r.ko, en: r.en, ja: r.ja, "zh-TW": r["zh-TW"] };
+for (const [id, u] of Object.entries(UNRANKED_MAP)) { const n = (u as { n?: Record<string, string> }).n; if (n && !NAMES[id]) NAMES[id] = n; }
+export const snapNameOf = (lang: string, id: string): string | undefined => NAMES[id]?.[lang] || undefined;
+export const zhNameOf = (id: string): string | undefined => snapNameOf("zh-TW", id);
 // 링크용 id — 통합된 그림자는 기본 폼으로(내부 301 방지).
 // 상위 200 밖의 그림자는 확장 스냅샷에 행이 없음(기본 폼이 있으면 생략) → 기본 폼 페이지로 연결.
 export const linkMonId = (league: string, id: string): string => {
@@ -111,7 +133,7 @@ export function isIndexableMon(league: string, id: string): boolean {
   return !!CUR_IDS[league]?.has(id) || (INDEX_EXT && !!EXT_IDS[league]?.has(id));
 }
 // 사이트맵용 — 현재 시즌 스냅샷 기준 색인 대상 id 목록(페이지의 robots 판정과 같은 소스·같은 시즌).
-export const indexableMonIds = (league: string): string[] => [...(CUR[league] || []), ...(EXT[league] || [])].map((e) => e.id).filter((id) => isIndexableMon(league, id));
+export const indexableMonIds = (league: string): string[] => [...new Set([...(CUR[league] || []), ...(EXT[league] || [])].map((e) => e.id))].filter((id) => isIndexableMon(league, id));
 const NOTES = MON_NOTES as Record<string, Record<string, unknown>>;
 const hasNote = (league: string, id: string) => !!NOTES[league]?.[id] || !!NOTES[league]?.[`${id}_shadow`];
 const tierOf = (league: string, id: string) => (CUR[league] || []).find((e) => e.id === id)?.tier || "";

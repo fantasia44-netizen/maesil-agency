@@ -33,7 +33,8 @@ function KindTable({ rows, cols, visible, noResult }: { rows: MoveRow[]; cols: C
     return [...rows].sort((a, b) => {
       const x = a[k], y = b[k];
       const d = typeof x === "number" && typeof y === "number" ? x - y : String(x).localeCompare(String(y));
-      return d * sort.dir || b.users - a.users || a.name.localeCompare(b.name);
+      // 동률 정렬은 slug 코드 순 — localeCompare는 서버(en)와 브라우저(ko·zh) 정렬 규칙이 달라 하이드레이션 불일치가 났음
+      return d * sort.dir || b.users - a.users || (a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0);
     });
   }, [rows, sort]);
   const onSort = (key: keyof MoveRow, num?: boolean) => setSort((s) => (s.key === key ? { key, dir: s.dir === 1 ? -1 : 1 } : { key, dir: num ? -1 : 1 }));

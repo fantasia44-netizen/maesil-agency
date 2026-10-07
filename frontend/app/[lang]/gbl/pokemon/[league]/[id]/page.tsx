@@ -26,7 +26,7 @@ import { isMetaMon, isIndexableMon, mergedShadowBase, mergedVariantsOf, linkMonI
 import UnrankedView, { unrankedMetadata, type Unranked } from "./UnrankedView";
 import DexHub from "../../../DexHubCard";
 import MonLink from "../../../MonLink";
-import { moveById as dexMove } from "../../../moves/movesData";
+import { moveExact as dexMove } from "../../../moves/movesData";
 import MON_NOTES from "../../../gbl_mon_notes.json";
 import PARTNERS from "../../../gbl_partners.json";
 
@@ -183,6 +183,7 @@ function dynMetaDesc(lang: Locale, d: Detail, name: string, lgName: string, pr?:
 
 export async function generateMetadata({ params, searchParams }: { params: { lang: string; league: string; id: string }; searchParams?: { s?: string } }): Promise<Metadata> {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
+  if (!LEAGUE_KEYS.includes(params.league)) return { title: "GBL Note", robots: { index: false, follow: true } };
   const d = findDetail(params.league, params.id, resolveSeasonSlug(searchParams?.s));
   if (!d) { const u = unrankedDetail(params.league, params.id) as Unranked | undefined; if (u) return unrankedMetadata(lang, params.id, u); }
   if (!LEAGUE_KEYS.includes(params.league) || !d) return { title: "GBL Note" };
@@ -232,13 +233,13 @@ const FORM_NOTE: Record<Locale, string> = {
   "zh-TW": "此尺寸形態頁面已併入此頁。分級、配招、剋星相同，只有種族值略有不同。",
 };
 
-function Sprite({ id, size = 40 }: { id: string; size?: number }) {
+function Sprite({ id, size = 40, lang }: { id: string; size?: number; lang?: Locale }) {
   const m = MON[id];
   // 메가 등 MON 미등록 상대는 상세 인덱스(NAMEIDX)의 dex + 폼 보정으로 스프라이트 해석.
   const dex = m?.dex ?? NAMEIDX[id]?.dex;
   const src = spriteUrl(m) || (dex ? `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${formDexById(id, dex)}.png` : "");
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt={m?.ko || id} width={size} height={size} style={{ imageRendering: "pixelated" }} />;
+  return <img src={src} alt={lang ? locName(lang, id) : (m?.ko || id)} width={size} height={size} style={{ imageRendering: "pixelated" }} />;
 }
 
 function TypeBadges({ lang, types }: { lang: Locale; types: string[] }) {
@@ -272,7 +273,7 @@ function OppRow({ lang, league, id, rating, ratingTitle, seasonQ = "" }: { lang:
     <MonLink league={league} id={id} href={localizePath(lang, `/gbl/pokemon/${league}/${linkMonId(league, id)}`) + seasonQ} style={{ textDecoration: "none",
       display: "flex", alignItems: "center", gap: 8, background: `linear-gradient(100deg, ${c1}20, #ffffff 80%)`,
       border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c1}`, borderRadius: 10, padding: "6px 10px" }}>
-      <Sprite id={id} size={32} />
+      <Sprite id={id} size={32} lang={lang} />
       <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#0f172a" }}>{locName(lang, id)}</span>
       <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: "0.72rem", fontWeight: 800, color: rc, background: rc + "1a", padding: "1px 7px", borderRadius: 8 }} title={ratingTitle}>{rating}</span>
@@ -285,12 +286,18 @@ function OppRow({ lang, league, id, rating, ratingTitle, seasonQ = "" }: { lang:
 export default async function PokemonDetail({ params, searchParams }: { params: { lang: string; league: string; id: string }; searchParams?: { s?: string } }) {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const seasonSlug = resolveSeasonSlug(searchParams?.s);
+  if (!LEAGUE_KEYS.includes(params.league)) notFound();   // 리그 자리에 이상한 값(constructor 등) → 스냅샷 조회 전에 404
   // 그림자 폼 페이지 통합 — 기본 폼 페이지가 있으면 그림자 URL은 기본 폼으로 301(중복 페이지 제거, indexGate.ts).
   // 과거 시즌(?s=)에 기본 폼이 없으면 그림자 페이지를 그대로 렌더(404 방지).
   const mergedBase = mergedShadowBase(params.league, params.id);
   const linkTarget = linkMonId(params.league, params.id);  // 상위 200 밖 그림자(확장 스냅샷에 행 없음)도 기본 폼으로
   if (!mergedBase && linkTarget !== params.id && findDetail(params.league, linkTarget, seasonSlug)) permanentRedirect(localizePath(lang, `/gbl/pokemon/${params.league}/${linkTarget}`));
   if (mergedBase && findDetail(params.league, mergedBase, seasonSlug)) permanentRedirect(localizePath(lang, `/gbl/pokemon/${params.league}/${mergedBase}`) + (searchParams?.s ? `?s=${encodeURIComponent(searchParams.s)}` : ""));
+  // 현재 시즌에 기본 폼 행이 없고 그림자만 있는 종(슈퍼리그 그림자 제크로무 등) — 기본 폼 URL은 그림자 페이지로 308.
+  // (예전엔 그림자 데이터를 제목 "GBL Note"·canonical 없이 그대로 렌더해 같은 내용의 주소가 둘이었음)
+  if (seasonSlug === currentSeason().slug && !params.id.endsWith("_shadow") && !findDetail(params.league, params.id, seasonSlug)
+    && !unrankedDetail(params.league, params.id) && findDetail(params.league, `${params.id}_shadow`, seasonSlug))
+    permanentRedirect(localizePath(lang, `/gbl/pokemon/${params.league}/${params.id}_shadow`));
   // 기본 폼 URL인데 그 시즌 스냅샷에 그림자만 있으면(통합 링크 + 과거 시즌) 그림자 데이터로 렌더.
   const d = findDetail(params.league, params.id, seasonSlug) || (params.id.endsWith("_shadow") ? undefined : findDetail(params.league, `${params.id}_shadow`, seasonSlug));
   // 어느 리그 랭킹에도 없는 종(미진화 등) → 기본 정보 페이지(종족값·최대 CP·배우는 기술·진화)
@@ -512,7 +519,7 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {partners.p.map((x) => (
                 <MonLink key={x.id} league={params.league} id={x.id} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, x.id)}`) + seasonQ} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", background: "#f7f9fd", border: `1px solid ${BORDER}`, borderRadius: 10, padding: "6px 10px", flexWrap: "wrap" }}>
-                  <Sprite id={x.id} size={32} />
+                  <Sprite id={x.id} size={32} lang={lang} />
                   <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "#0f172a" }}>{locName(lang, x.id)}</span>
                   {x.covers.length > 0 && <span style={{ marginLeft: "auto", fontSize: "0.72rem", color: "#64748b" }}>{PT[lang].covers}: {x.covers.map((c) => locName(lang, c)).join(" · ")}</span>}
                 </MonLink>

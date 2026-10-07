@@ -39,9 +39,9 @@ const BORDER = "#e3e8f2";
 
 const PAGE_SIZE = 20;
 
-function Sprite({ id, size = 30 }: { id: string; size?: number }) {
+function Sprite({ id, size = 30, lang }: { id: string; size?: number; lang: Locale }) {
   const m = MON[id];
-  return <img src={spriteUrl(m)} alt={m?.ko || id} width={size} height={size}
+  return <img src={spriteUrl(m)} alt={monName(lang, id)} width={size} height={size}
     style={{ imageRendering: "pixelated" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }} />;
 }
 
@@ -76,9 +76,9 @@ function MonList({ meta, maxMon, lang, t, league }: { meta: Meta; maxMon: number
         return (
           <Link key={mm.speciesId} href={`${localizePath(lang, `/gbl/dex/${mm.speciesId}`)}?l=${league}`} prefetch={false} style={{ display: "flex", alignItems: "center", gap: 8, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "5px 10px", textDecoration: "none", color: "inherit" }}>
             <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#a855f7" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
-            <Sprite id={mm.speciesId} size={30} />
+            <Sprite lang={lang} id={mm.speciesId} size={30} />
             <span style={{ fontSize: "0.86rem", fontWeight: 600, minWidth: 88, color: "#0f172a" }}>
-              {m?.shadow && <span style={{ color: "#7c3aed" }}>{t.shadowWord}</span>}{monName(lang, mm.speciesId)}
+              {m?.shadow && !/그림자|섀도우|shadow|シャドウ|暗影/i.test(monName(lang, mm.speciesId)) && <span style={{ color: "#7c3aed" }}>{t.shadowWord}</span>}{monName(lang, mm.speciesId)}
             </span>
             <div style={{ flex: 1, height: 8, background: "#e5eaf3", borderRadius: 4, overflow: "hidden" }}>
               <div style={{ width: `${Math.round((mm.count / maxMon) * 100)}%`, height: "100%", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)" }} />
@@ -93,7 +93,7 @@ function MonList({ meta, maxMon, lang, t, league }: { meta: Meta; maxMon: number
   );
 }
 
-function DeckList({ meta, maxDeck, lang, t }: { meta: Meta; maxDeck: number; lang: Locale; t: MetaHubDict }) {
+function DeckList({ meta, maxDeck, lang, t, league }: { meta: Meta; maxDeck: number; lang: Locale; t: MetaHubDict; league: string }) {
   const [page, setPage] = useState(0);
   useEffect(() => { setPage(0); }, [meta]);
   const pages = Math.ceil(meta.top_decks.length / PAGE_SIZE);
@@ -105,18 +105,21 @@ function DeckList({ meta, maxDeck, lang, t }: { meta: Meta; maxDeck: number; lan
       {meta.top_decks.slice(start, start + PAGE_SIZE).map((d, idx) => {
         const i = start + idx;
         const pct = Math.round((d.count / meta.total) * 100);
-        const names = d.deck.map((id) => monName(lang, id)).join(" · ");
         return (
           <div key={i} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "7px 10px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#a855f7" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
-              <div style={{ display: "flex", gap: 2 }}>{d.deck.map((id) => <Sprite key={id} id={id} size={32} />)}</div>
+              <div style={{ display: "flex", gap: 2 }}>{d.deck.map((id) => <Sprite lang={lang} key={id} id={id} size={32} />)}</div>
               <span style={{ marginLeft: "auto", fontSize: "1rem", fontWeight: 800, color: "#a855f7" }}>{pct}%</span>
             </div>
             <div style={{ height: 6, background: "#e5eaf3", borderRadius: 3, margin: "6px 0 4px", overflow: "hidden" }}>
               <div style={{ width: `${Math.round((d.count / maxDeck) * 100)}%`, height: "100%", background: "linear-gradient(90deg,#7c3aed,#a855f7)" }} />
             </div>
-            <div style={{ fontSize: "0.72rem", color: "#64748b", lineHeight: 1.4 }}>{names}</div>
+            <div style={{ fontSize: "0.72rem", color: "#64748b", lineHeight: 1.4 }}>
+              {d.deck.map((id, j) => (
+                <span key={`${id}-${j}`}>{j > 0 && " · "}<Link href={`${localizePath(lang, `/gbl/dex/${id}`)}?l=${league}`} prefetch={false} style={{ color: "#475569", fontWeight: 600, textDecoration: "none" }}>{monName(lang, id)}</Link></span>
+              ))}
+            </div>
           </div>
         );
       })}
@@ -210,7 +213,7 @@ export default function MetaHubClient() {
             </div>
             <div>
               <h2 style={h2}>{t.deckTop}</h2>
-              <DeckList meta={meta} maxDeck={maxDeck} lang={lang} t={t} />
+              <DeckList meta={meta} maxDeck={maxDeck} lang={lang} t={t} league={league} />
             </div>
           </div>
         ) : (
@@ -224,7 +227,7 @@ export default function MetaHubClient() {
                     background: view === k ? "rgba(79,140,255,.16)" : CARD, color: view === k ? "#3b5bdb" : "#64748b" }}>{label}</button>
               ))}
             </div>
-            {view === "mon" ? <MonList meta={meta} maxMon={maxMon} lang={lang} t={t} league={league} /> : <DeckList meta={meta} maxDeck={maxDeck} lang={lang} t={t} />}
+            {view === "mon" ? <MonList meta={meta} maxMon={maxMon} lang={lang} t={t} league={league} /> : <DeckList meta={meta} maxDeck={maxDeck} lang={lang} t={t} league={league} />}
           </>
         )}
 
