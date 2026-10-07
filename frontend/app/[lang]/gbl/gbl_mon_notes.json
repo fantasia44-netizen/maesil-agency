@@ -336,6 +336,18 @@
    "ja": "ほのおタイプのキュウコンはひのこでゲージが非常に速く溜まり、ウェザーボール・エナジーボールでほのお技とくさ技を素早く撃てる。速くて強い攻撃が持ち味。",
    "zh-TW": "火系九尾用火花集能極快，搭配氣象球和能量球能快速打出火系和草系攻擊，快而強的進攻是牠的長處。"
   },
+  "altaria_shadow": {
+   "ko": "드래곤/비행 타입으로 튼튼한체력 빠른공격, 얼음 2중약점이지만 슈퍼리그엔 얼음이별로없고 전기에도 중립이라 선봉으로 페어리만 피하면 대부분 상대가 가능한 포켓몬",
+   "en": "Dragon/Flying with solid bulk and fast pressure. Double-weak to Ice, but Ice is rare in Great League and it's neutral to Electric, so as a lead it handles most matchups as long as you avoid Fairy.",
+   "ja": "ドラゴン/ひこうで耐久が高く攻撃も速い。こおり4倍弱点だがスーパーリーグにこおりは少なく、でんきにも等倍なので、先発でフェアリーさえ避ければほとんどの相手に対応できる。",
+   "zh-TW": "龍/飛行，耐久紮實、出招快。雖然冰系四倍弱點，但超級聯盟冰系很少，對電系也是一般傷害，先鋒只要避開妖精，大多數對手都能應付。"
+  },
+  "corviknight_shadow": {
+   "ko": "강철/비행의 아머까오는 튼튼한 체력을 바탕으로 모래뿌리기 땅공격을 기본으로 하며, 악타입 보복과, 공격을 올려주는 에어커터를 주로 사용한다, 페어리를 잡기위해 아이언헤드를 사용하기도한다",
+   "en": "Steel/Flying Corviknight leans on its bulk, using the Ground fast move Sand Attack, the Dark move Payback and Attack-boosting Air Cutter as its core, with Iron Head sometimes added to handle Fairies.",
+   "ja": "はがね/ひこうのアーマーガアは高い耐久を軸に、じめん技すなかけを通常技に、あく技しっぺがえしと攻撃を上げるエアカッターを主に使う。フェアリー対策にアイアンヘッドを採用することも。",
+   "zh-TW": "鋼/飛行的鋼鎧鴉以紮實耐久為本，小招用地面招潑沙，主要使用惡系以牙還牙和能提升攻擊的空氣利刃，有時也帶鐵頭對付妖精。"
+  },
   "quagsire_shadow": {
    "ko": "풀 이중약점을 제외하곤 약점이 없고, 차징이 빨리차는 머드샷을 장착해서, 아쿠아테일, 스톤엣지, 어느기술을 쓸지 잘모르기 때문에 상대하는 측에서 아주 까다로운 포켓몬",
    "en": "No weaknesses apart from a double weakness to Grass. Runs fast-charging Mud Shot, and because the opponent can't tell whether Aqua Tail or Stone Edge is coming, it's a very awkward Pokémon to face.",
@@ -348,17 +360,23 @@
    "ja": "みず/はがねでかくとう・じめん・でんきが弱点だが、溜まりの速いハイドロカノンとひこう技でくさ/かくとうも牽制できるため、先発でよく使われる。",
    "zh-TW": "水/鋼，弱點是格鬥·地面·電，但集能快的加農水炮加上飛行招式也能牽制草/格鬥，是很常見的先鋒。"
   },
-  "corviknight_shadow": {
-   "ko": "강철/비행의 아머까오는 튼튼한 체력을 바탕으로 모래뿌리기 땅공격을 기본으로 하며, 악타입 보복과, 공격을 올려주는 에어커터를 주로 사용한다, 페어리를 잡기위해 아이언헤드를 사용하기도한다",
-   "en": "Steel/Flying Corviknight leans on its bulk, using the Ground fast move Sand Attack, the Dark move Payback and Attack-boosting Air Cutter as its core, with Iron Head sometimes added to handle Fairies.",
-   "ja": "はがね/ひこうのアーマーガアは高い耐久を軸に、じめん技すなかけを通常技に、あく技しっぺがえしと攻撃を上げるエアカッターを主に使う。フェアリー対策にアイアンヘッドを採用することも。",
-   "zh-TW": "鋼/飛行的鋼鎧鴉以紮實耐久為本，小招用地面招潑沙，主要使用惡系以牙還牙和能提升攻擊的空氣利刃，有時也帶鐵頭對付妖精。"
+  "malamar_shadow": {
+   "ko": "벌레2중약점이지만 벌레타입이 많지는않아서 선봉에 많이나오며, 사이코웨이브로 격투몬에게 기본타를 쌔게 때리며, 속임수 엄청난힘을 주로쓰면서 엄청난힘을 쓰면서 도망다니는 플레이를 많이하지만, 파괴광선을 익혀서 한방 날리는 유저도있으니 주의해야함",
+   "en": "Double-weak to Bug, but Bug types aren't common, so it shows up a lot in the lead. Psywave hits Fighting types hard with fast-move damage. Mostly runs Foul Play + Superpower and plays hit-and-run with Superpower, but watch out — some players learn Hyper Beam for a one-shot nuke.",
+   "ja": "むしが二重弱点だがむしタイプは多くないため先発によく出てくる。サイコウェーブでかくとうに通常技を強く当て、イカサマ・ばかぢからを主に使い、ばかぢからを撃って逃げ回る立ち回りが多いが、はかいこうせんを覚えて一発撃ってくる人もいるので注意。",
+   "zh-TW": "蟲系雙重弱點，但蟲系不多所以常當先鋒。精神波對格鬥系小招打得很痛，主要用欺詐·蠻力，常放蠻力再換走跑掉，但也有玩家學破壞光線一發轟出來，要小心。"
   },
-  "altaria_shadow": {
-   "ko": "드래곤/비행 타입으로 튼튼한체력 빠른공격, 얼음 2중약점이지만 슈퍼리그엔 얼음이별로없고 전기에도 중립이라 선봉으로 페어리만 피하면 대부분 상대가 가능한 포켓몬",
-   "en": "Dragon/Flying with solid bulk and fast pressure. Double-weak to Ice, but Ice is rare in Great League and it's neutral to Electric, so as a lead it handles most matchups as long as you avoid Fairy.",
-   "ja": "ドラゴン/ひこうで耐久が高く攻撃も速い。こおり4倍弱点だがスーパーリーグにこおりは少なく、でんきにも等倍なので、先発でフェアリーさえ避ければほとんどの相手に対応できる。",
-   "zh-TW": "龍/飛行，耐久紮實、出招快。雖然冰系四倍弱點，但超級聯盟冰系很少，對電系也是一般傷害，先鋒只要避開妖精，大多數對手都能應付。"
+  "charjabug_shadow": {
+   "ko": "전기/벌레 타입으로 불꽃바위 약점이지만 불꽃은 비행몬들이 많아서 전기로 싸울수있고, 방전/시저크로스를 주로 사용하기때문에 물,비행,풀,악,에스퍼 유리한 타입이 많아서 많이 사용되는 포켓몬",
+   "en": "Electric/Bug typing is weak to Fire and Rock, but Fire types are mostly Flying, so it can fight them with Electric. It mainly runs Discharge and X-Scissor, which cover Water, Flying, Grass, Dark and Psychic — lots of favorable matchups, so it sees a lot of use.",
+   "ja": "でんき/むしでほのお・いわが弱点だが、ほのおはひこう持ちが多いのででんきで戦える。ほうでん・シザークロスを主に使うため、みず・ひこう・くさ・あく・エスパーと有利なタイプが多く、よく使われる。",
+   "zh-TW": "電/蟲屬性怕火·岩石，但火系多半帶飛行，可以用電打。主要用放電·十字剪，對水·飛行·草·惡·超能力都有利，所以很常被使用。"
+  },
+  "forretress_shadow": {
+   "ko": "불꽃 이중약점만 안만나게되면 어떤타입과도 잘싸우고, 암성봉인으로 상대 공격력약화, 모래 뿌리기로 상대방어감소까지 할수있어 체력도 튼튼하며 선봉으로 아주 좋은포켓몬",
+   "en": "As long as it avoids its double Fire weakness it fights well against any type. Rock Tomb lowers the opponent's Attack and Sand Tomb lowers their Defense, and with its solid bulk it's an excellent lead.",
+   "ja": "ほのお4倍弱点さえ踏まなければどのタイプとも渡り合える。がんせきふうじで相手の攻撃を、すなじごくで防御を下げられ、耐久も高いので先発として非常に優秀。",
+   "zh-TW": "只要不碰上火系四倍弱點，對任何屬性都打得不錯。岩石封鎖降低對手攻擊、流沙深淵降低防禦，耐久也紮實，是很棒的先鋒。"
   },
   "feraligatr_shadow": {
    "ko": "물타입으로 풀과 전기에 약점이지만, 빠른 차징인 새도클로를 익혀서, 빠르고 강한 하이드로캐논을 주로사용하며 비행과/드래곤을 상대하기위해 냉동빔을 쓸수도있고, 고스트를 잡기위해 깨물어부수기도 익힐수있으며, 공격방어 둘다 훌륭하다.",
@@ -366,11 +384,11 @@
    "ja": "みずタイプでくさ・でんきが弱点だが、溜まりの速いシャドークローから強力なハイドロカノンを連発できる。ひこう・ドラゴン対策にれいとうビーム、ゴースト対策にかみくだくも選べ、攻守ともに優秀。",
    "zh-TW": "水系，弱草和電，但靠集能快的暗影爪能連發強力加農水炮，可帶冰凍光束對付飛行/龍，也能學咬碎打幽靈，攻守都很優秀。"
   },
-  "malamar_shadow": {
-   "ko": "벌레2중약점이지만 벌레타입이 많지는않아서 선봉에 많이나오며, 사이코웨이브로 격투몬에게 기본타를 쌔게 때리며, 속임수 엄청난힘을 주로쓰면서 엄청난힘을 쓰면서 도망다니는 플레이를 많이하지만, 파괴광선을 익혀서 한방 날리는 유저도있으니 주의해야함",
-   "en": "Double-weak to Bug, but Bug types aren't common, so it shows up a lot in the lead. Psywave hits Fighting types hard with fast-move damage. Mostly runs Foul Play + Superpower and plays hit-and-run with Superpower, but watch out — some players learn Hyper Beam for a one-shot nuke.",
-   "ja": "むしが二重弱点だがむしタイプは多くないため先発によく出てくる。サイコウェーブでかくとうに通常技を強く当て、イカサマ・ばかぢからを主に使い、ばかぢからを撃って逃げ回る立ち回りが多いが、はかいこうせんを覚えて一発撃ってくる人もいるので注意。",
-   "zh-TW": "蟲系雙重弱點，但蟲系不多所以常當先鋒。精神波對格鬥系小招打得很痛，主要用欺詐·蠻力，常放蠻力再換走跑掉，但也有玩家學破壞光線一發轟出來，要小心。"
+  "hippowdon_shadow": {
+   "ko": "모래뿌리기를 주로 사용하며, 대지의힘, 웨더볼을 주로 사용하는데, 26년 월드챔피언이 그림자 하마돈이 우승시켜주었다고 할정도로 극찬한 포켓몬",
+   "en": "Mainly runs Sand Attack with Earth Power and Weather Ball. The 2026 World Champion praised Shadow Hippowdon so highly they credited it with winning them the title.",
+   "ja": "すなかけを主に使い、だいちのちから・ウェザーボールを主に使う。2026年のワールドチャンピオンがシャドウカバルドンのおかげで優勝できたと言うほど絶賛したポケモン。",
+   "zh-TW": "主要用潑沙，大招主要用大地之力·氣象球。2026年世界冠軍盛讚暗影河馬獸，甚至說是牠帶自己拿下冠軍。"
   },
   "kingdra_shadow": {
    "ko": "물/드래곤타입으로 용의숨결을 사용하며, 스피드스타와 파도타기를 주로 사용한다. 빠른 물공격과 노멀공격으로 인기있는 포켓몬",
@@ -378,23 +396,11 @@
    "ja": "みず/ドラゴンでりゅうのいぶきを使い、スピードスターとなみのりを主に使う。速いみず技とノーマル技で人気のポケモン。",
    "zh-TW": "水/龍，使用龍息，主要打高速星星和衝浪。靠快速的水系和一般系攻擊而受歡迎的寶可夢。"
   },
-  "hippowdon_shadow": {
-   "ko": "모래뿌리기를 주로 사용하며, 대지의힘, 웨더볼을 주로 사용하는데, 26년 월드챔피언이 그림자 하마돈이 우승시켜주었다고 할정도로 극찬한 포켓몬",
-   "en": "Mainly runs Sand Attack with Earth Power and Weather Ball. The 2026 World Champion praised Shadow Hippowdon so highly they credited it with winning them the title.",
-   "ja": "すなかけを主に使い、だいちのちから・ウェザーボールを主に使う。2026年のワールドチャンピオンがシャドウカバルドンのおかげで優勝できたと言うほど絶賛したポケモン。",
-   "zh-TW": "主要用潑沙，大招主要用大地之力·氣象球。2026年世界冠軍盛讚暗影河馬獸，甚至說是牠帶自己拿下冠軍。"
-  },
   "lapras_shadow": {
    "ko": "격투 전기가 약점이지만, 사이코웨이브 기본기로 격투에게도 카운터 평타를 날릴수있으며 튼튼한 체력을 바탕으로 안정적으로 플레이를할수가있는 장점이이 있는 포켓몬",
    "en": "Weak to Fighting and Electric, but with Psywave as its fast move it can counter-hit Fighting types too, and its big bulk lets it play very steadily.",
    "ja": "かくとう・でんきが弱点だが、通常技サイコウェーブでかくとうにも反撃でき、高い耐久を活かして安定して立ち回れるのが強み。",
    "zh-TW": "弱點是格鬥·電，但小招精神波可以反打格鬥系，加上厚實的耐久，能打得很穩定。"
-  },
-  "swampert_shadow": {
-   "ko": "풀이 이중약점이지만, 빠른차징 머드샷으로 차징을 채워서 하이드로캐논을 주로 사용하는데, 지진을 익혀서 강한 땅공격을 하기도하고, 오물웨이브로 독공격하는 유저도 있으니 페어리 유저라면 조심해야함",
-   "en": "Double-weak to Grass, but it charges fast with Mud Shot and mostly fires Hydro Cannon. Some learn Earthquake for strong Ground damage, and some run Sludge Wave for Poison damage — Fairy users should be careful.",
-   "ja": "くさが二重弱点だが、回転の速いマッドショットでゲージを貯めてハイドロカノンを主に使う。じしんを覚えて強いじめん攻撃をすることも、ヘドロウェーブでどく攻撃をする人もいるので、フェアリー使いは注意。",
-   "zh-TW": "草系雙重弱點，但用集氣快的泥巴射擊蓄能主要放加農水炮。也有人學地震打強力地面攻擊，或帶污泥波打毒攻擊，用妖精的玩家要小心。"
   },
   "dusclops_shadow": {
    "ko": "단일 고스트속성이며 튼튼한 체력과 빠른차징 병상첨병을사용하며, 약하지만 빠른공격 섀도펀치와, 냉동펀치로 비행,풀타입에도 강하고, 같은 고스트타입과 자주 싸우게되는 포켓몬",
@@ -408,11 +414,11 @@
    "ja": "こおりの通常技こなゆきを主に使い、素早く撃てるウェザーボール(こおり)でひこう・くさに非常に強い。フェアリーも持つのでかくとうにも押されないが、はがねが二重弱点なのではがねは避け、デカヌチャンを見たら逃げるべき。",
    "zh-TW": "主要用冰系小招細雪，能快速施放的冰系氣象球對飛行·草非常強。有妖精屬性所以對格鬥也不會輸，但鋼系雙重弱點，要避開鋼系，看到巨鍛匠就該跑。"
   },
-  "forretress_shadow": {
-   "ko": "불꽃 이중약점만 안만나게되면 어떤타입과도 잘싸우고, 암성봉인으로 상대 공격력약화, 모래 뿌리기로 상대방어감소까지 할수있어 체력도 튼튼하며 선봉으로 아주 좋은포켓몬",
-   "en": "As long as it avoids its double Fire weakness it fights well against any type. Rock Tomb lowers the opponent's Attack and Sand Tomb lowers their Defense, and with its solid bulk it's an excellent lead.",
-   "ja": "ほのお4倍弱点さえ踏まなければどのタイプとも渡り合える。がんせきふうじで相手の攻撃を、すなじごくで防御を下げられ、耐久も高いので先発として非常に優秀。",
-   "zh-TW": "只要不碰上火系四倍弱點，對任何屬性都打得不錯。岩石封鎖降低對手攻擊、流沙深淵降低防禦，耐久也紮實，是很棒的先鋒。"
+  "swampert_shadow": {
+   "ko": "풀이 이중약점이지만, 빠른차징 머드샷으로 차징을 채워서 하이드로캐논을 주로 사용하는데, 지진을 익혀서 강한 땅공격을 하기도하고, 오물웨이브로 독공격하는 유저도 있으니 페어리 유저라면 조심해야함",
+   "en": "Double-weak to Grass, but it charges fast with Mud Shot and mostly fires Hydro Cannon. Some learn Earthquake for strong Ground damage, and some run Sludge Wave for Poison damage — Fairy users should be careful.",
+   "ja": "くさが二重弱点だが、回転の速いマッドショットでゲージを貯めてハイドロカノンを主に使う。じしんを覚えて強いじめん攻撃をすることも、ヘドロウェーブでどく攻撃をする人もいるので、フェアリー使いは注意。",
+   "zh-TW": "草系雙重弱點，但用集氣快的泥巴射擊蓄能主要放加農水炮。也有人學地震打強力地面攻擊，或帶污泥波打毒攻擊，用妖精的玩家要小心。"
   },
   "talonflame_shadow": {
    "ko": "슈퍼리그의 칠색조와 비교되며, 바위에 약하지만, 강한 기본기 불태우기로 강한평타와, 공업해주는 니트로차지를 주로 쓰지만, 공중날기, 브레이브버드 2비행공격을 쓰는 유저도 있어서 잘쓰는 유저만나면 매우 까다로움",
@@ -885,6 +891,12 @@
    "en": "The #2 pick of Season 27. It doesn't lose to Fairies, fights Dragons well, and even beat Lunala — the strongest Pokémon of Season 27. Nothing was nerfed for Season 28, so expect it to stay very popular.",
    "ja": "シーズン27ピック率2位のレシラム。フェアリーにも押されず、ドラゴンともよく戦い、ルナアーラすら倒したシーズン27最強のポケモン。シーズン28でもナーフされていないため、引き続き多くの支持を集めそう。",
    "zh-TW": "第27季使用率第2的萊希拉姆。不輸妖精、跟龍系也打得好，連露奈雅拉都能贏，是第27季最強的寶可夢。第28季也沒被削弱，預計會繼續受到喜愛。"
+  },
+  "zekrom_shadow": {
+   "ko": "27시즌 초반에 레시라무와 비슷하게 많이사용되었지만 시즌 지나감으로 레시라무보다 사용빈도가 많이 떨어졌지만, 크로스썬더, 깨물어부수기, 역린을 익힐수있어, 루나아라와 같은 드래곤끼리 전투도 가능한 포켓몬",
+   "en": "Early in Season 27 it was used about as much as Reshiram, but as the season went on its usage fell well behind Reshiram's. It can learn Fusion Bolt, Crunch and Outrage, so it can also take Dragon-vs-Dragon fights like the one against Lunala.",
+   "ja": "シーズン27序盤はレシラムと同じくらい使われたが、シーズンが進むにつれレシラムより使用頻度が大きく落ちた。クロスサンダー・かみくだく・げきりんを覚えられ、ルナアーラのようなドラゴン同士の戦いも可能。",
+   "zh-TW": "第27季初和萊希拉姆一樣常被使用，但隨季節推進使用率遠低於萊希拉姆。能學交錯閃電、咬碎、逆麟，也能打像露奈雅拉這種龍系對龍系的戰鬥。"
   },
   "metagross_shadow": {
    "ko": "강철/에스퍼 타입으로 고스트,땅,불꽃,악 약점이지만, 강한 강철레거시 기술 코멧펀치와, 지진으로 드래곤견제도 잘하며 강철, 고스트에게도 이기는 포켓몬",

@@ -2,13 +2,15 @@
 // 산출물: sim/pvpoke/gamemaster_s28.json + meta_{great,ultra,master}_s28.json
 // 실행:  node scripts/gbl/build_season28.mjs
 // ※ 시즌 시작(2026-09-09) 전후 PvPoke가 데이터를 확정하면 재실행해 갱신.
+// ⚠️ 시즌 시작 후 PvPoke는 시즌 브랜치를 master에 병합하고 시즌 브랜치는 멈춤(twilight-trails 마지막 커밋 2026-09-08).
+//    시즌 중 신규 폼(그림자 제크로무 10/4)은 master에만 있으므로 시작된 시즌은 master에서 받음(gbl_compile_detail.py와 동일).
 import { writeFileSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const OUT = join(__dir, "../../app/[lang]/gbl/sim/pvpoke");
-const BRANCH = "twilight-trails";
+const BRANCH = "master"; // 시즌 시작 전엔 "twilight-trails"(미리보기), 시작 후엔 master
 const RAW = (p) => `https://raw.githubusercontent.com/pvpoke/pvpoke/${BRANCH}/src/data/${p}`;
 
 const RANK = { great: "rankings-1500", ultra: "rankings-2500", master: "rankings-10000" };

@@ -23,8 +23,11 @@ GBL = os.path.join(REPO, "frontend", "app", "[lang]", "gbl")
 #   python scripts/gbl_compile_detail.py         → gbl_detail.json (현재)
 #   python scripts/gbl_compile_detail.py s28      → gbl_detail_s28.json (다음 시즌 미리보기)
 # 새 시즌 발표 시 SEASON_BRANCH에 slug→브랜치 한 줄만 추가.
+# ⚠️ PvPoke는 시즌 시작 후 시즌 브랜치를 master에 병합하고 시즌 브랜치는 그대로 멈춤(twilight-trails 마지막 커밋 2026-09-08).
+#    시즌 중 신규 폼(그림자 제크로무 10/4 등)은 master에만 들어오므로, 시작된 시즌은 master에서 받아야 함.
+#    → 시즌 시작 전(미리보기)엔 시즌 브랜치, 시작 후엔 "master"로 바꿔 재실행.
 SEASON = sys.argv[1] if len(sys.argv) > 1 else ""
-SEASON_BRANCH = {"": "master", "s28": "twilight-trails"}
+SEASON_BRANCH = {"": "master", "s28": "master"}  # s28: 2026-09-09 시작 → master가 현행 데이터(10/7 전환)
 BRANCH = SEASON_BRANCH.get(SEASON, "master")
 SUFFIX = f"_{SEASON}" if SEASON else ""
 
