@@ -24,6 +24,8 @@ import { buildAnalysis, HEADINGS } from "./analysis";
 import { currentSeason, seasonBySlug } from "../../../seasons";
 import { isMetaMon, mergedShadowBase, mergedVariantsOf, linkMonId } from "../../../indexGate";
 import MonLink from "../../../MonLink";
+import { moveById as dexMove, moveName as dexMoveName } from "../../../moves/movesData";
+import { getMoves } from "../../../moves/dict";
 import MON_NOTES from "../../../gbl_mon_notes.json";
 import PARTNERS from "../../../gbl_partners.json";
 
@@ -539,6 +541,22 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
           return <MovesetShare share={shareBase} fasts={fasts} charged={charged} defaultFastId={d.mv.fast.id}
             movesetH={`${name} ${pk.movesetH}`} h2Style={h2} cardStyle={cardStyle}
             panelLabels={{ fastLabel: pk.fastLabel, chargedHint: pk.chargedHint, energyUnit: pk.energyUnit, hitsUnit: pk.hitsUnit, fastTurns: pk.fastTurns, recTag: pk.recTag, altFastHint: pk.altFastHint }} />;
+        })()}
+
+        {/* 기술 도감 연결 — 추천 기술배치의 각 기술 상세(타수표·메타 채용·예상 데미지)로 */}
+        {(() => {
+          const list = (d.moveset || []).map((mid) => dexMove(mid)).filter((x): x is NonNullable<typeof x> => !!x);
+          if (!list.length) return null;
+          return (
+            <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+              <Link href={L("/gbl/moves")} style={{ fontSize: "0.74rem", fontWeight: 700, color: "#3b5bdb", textDecoration: "none" }}>{getMoves(lang).navLabel} ›</Link>
+              {list.map((mv) => { const mc = TYPE_COLOR[mv.type] || "#64748b"; return (
+                <Link key={mv.id} href={L(`/gbl/moves/${mv.slug}`)} style={{ fontSize: "0.72rem", fontWeight: 600, padding: "2px 9px", borderRadius: 10, textDecoration: "none", background: mc + "1c", color: mc, border: `1px solid ${mc}50`, whiteSpace: "nowrap" }}>
+                  {dexMoveName(lang, mv)}
+                </Link>
+              ); })}
+            </div>
+          );
         })()}
 
         {/* 카운터 (이 포켓몬에게 강한 상대) — 상단 배치 */}

@@ -121,6 +121,14 @@
 - 수정: `scripts/gbl_compile_detail.py` SEASON_BRANCH s28→master, `frontend/scripts/gbl/build_season28.mjs` BRANCH master. **규칙: 시즌 시작 전 미리보기만 시즌 브랜치, 시작되면 master.**
 - 시즌 중 갱신 순서(월 1회 또는 신규 폼 소식 때): `py -3 scripts/gbl_compile_detail.py s28` → `node scripts/gbl/build_meta_mons.mjs` → `node scripts/gbl/import_mon_notes.mjs` → `node scripts/gbl/build_season28.mjs` → 빌드 → 커밋. 갱신 전 스냅샷 백업해 "노트 있는 몬 이탈 0" 확인(이번: 0, 색인 118→123).
 
+### 2026-10-07 (밤) — 기술 도감 신설 `/gbl/moves` (승인 후 첫 페이지 확장)
+- **구성**: 허브 `/gbl/moves`(전 기술 수치표·정렬·타입 필터·타입별 트리·이번 시즌 메타 채용 TOP) + 상세 `/gbl/moves/[id]` 322개(빠른 96·차지 226). 상세 = 수치 타일(순위) · **타수표**(같이 배우는 기술별, 에너지 이월) · **메타 채용 포켓몬**(리그별 티어·추천 조합 타수·**예상 데미지**) · 타입 상성 · 배우는 포켓몬 전체(레거시 ★) · 같은 타입 기술. 포켓몬 상세의 추천 기술배치 아래에 각 기술 링크.
+- **자동 문장 없음** — 전부 표/수치(9월 교훈). 예상 데미지 = 리그 상위 100위(D 제외)의 방어·HP 중앙값 상대에 PvP 공식(자속 1.2·그림자 1.2·보정 1.3·중립).
+- **파일**: `scripts/gbl/build_moves.mjs` → `gbl_moves.json` / `moves/movesData.ts`(계산·색인 게이트, 서버 전용) · `dict.ts`(4개국어) · `page.tsx` · `MovesTable.tsx`(클라) · `[id]/page.tsx`.
+- **⚠️ 색인은 단계적으로**: 상세 322×4=1,288 URL은 9월 강등 원인(템플릿 2,400 URL)과 같은 모양 → **지금은 상세 전부 noindex,follow + 사이트맵 제외, 허브만 색인**(사이트맵 +4). 여는 법: Render gbl 프론트 env `NEXT_PUBLIC_GBL_INDEX_MOVES=1` → "색인 포켓몬이 추천 기술배치로 쓰는 기술" **151개(×4=604 URL)**만 색인·사이트맵 편입, 나머지 171개는 계속 noindex. **여는 조건(권고)**: GSC에서 구글 노출이 회복세인지 먼저 확인 + 허브가 색인된 뒤. 한 번에 604가 부담이면 `movesData.ts`의 INDEXABLE 조건을 좁혀(예: 채용 3종 이상) 나눠서.
+- 다음 후보: 기술별 "운영자 한마디"(GBL_MON_NOTES 방식 CSV) — 상세를 템플릿에서 고유 콘텐츠로 올리는 가장 확실한 수단.
+- **시즌 중 데이터 갱신 순서(전체)**: `py -3 scripts/gbl_compile_detail.py s28` → `node scripts/gbl/build_meta_mons.mjs` → `node scripts/gbl/import_mon_notes.mjs` → `node scripts/gbl/build_season28.mjs` → **`node scripts/gbl/build_moves.mjs`** → **`py -3 scripts/gbl_compile_raids.py` + `… megafinale`**(레이드는 별도 스크립트 — 10/7에 배틀 티어만 갱신해 그림자 제크로무가 레이드 표에 빠졌었음) → 빌드 → 커밋.
+
 ### 사장님이 이어서 할 것 (순서 무관, 급하지 않음)
 0. **URL 검사 → 색인 요청 20개**(9/14 채팅에 목록) — 오늘 10, 내일 10.
 1. `GBL_MON_NOTES.csv`에 위 미노트(일반 폼) 행 추가 후 작성 — 우선순위: 자동문 남은 S/A 11장 → 그다음 noindex된 B 8장(쓰면 자동 색인 복귀). 규칙·예시: `GBL_MON_NOTES_README.md`. **"표에 없는 말 하나"** 필수(회피 상대 / 팀 역할 / 요즘 메타 평가). 후반 노트가 "타입→약점→기술" 나열로 굳어지는 경향 있었음 — 킹드라·나인테일·마릴리·깨비드릴조는 한 문장씩 보강 권장. 작성 후 `node scripts/gbl/import_mon_notes.mjs` → Claude에게 "ko 노트 번역 채워줘".

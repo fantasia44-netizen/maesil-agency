@@ -4,6 +4,7 @@ import RAIDS from "./[lang]/gbl/gbl_raids.json";
 import { GUIDES } from "./[lang]/gbl/guide/guides";
 import { IV_ANALYSIS } from "./[lang]/gbl/iv/analysis/registry";
 import { indexableMonIds } from "./[lang]/gbl/indexGate";
+import { indexableMoveSlugs } from "./[lang]/gbl/moves/movesData";
 import { analyzedDeckIds } from "./[lang]/tcg/decks/analysis";
 import { GUIDES as TCG_GUIDES } from "./[lang]/tcg/guides/guides";
 import { locales, localeMeta, localizePath, defaultLocale } from "../lib/i18n";
@@ -43,6 +44,9 @@ function gblPaths(): [string, CF, number][] {
     ["/gbl/events", "daily", 0.8],
     // 포켓몬 개별 — 색인 게이트 통과분만(현재 시즌 스냅샷, 페이지 robots 판정과 동일 소스). 나머지는 페이지 유지·noindex(indexGate.ts).
     ...LEAGUES.flatMap((l) => indexableMonIds(l).map((id) => [`/gbl/pokemon/${l}/${id}`, "weekly", 0.6] as [string, CF, number])),
+    // 기술 도감 — 허브는 항상, 상세는 색인 스위치(NEXT_PUBLIC_GBL_INDEX_MOVES=1)가 켜졌을 때 메타 채용 기술만(movesData.ts).
+    ["/gbl/moves", "weekly", 0.7],
+    ...indexableMoveSlugs().map((s) => [`/gbl/moves/${s}`, "weekly", 0.5] as [string, CF, number]),
     ["/gbl/raid", "weekly", 0.9],
     ["/gbl/raid/bosses", "daily", 0.8],
     ["/gbl/raid/schedule", "daily", 0.8],
