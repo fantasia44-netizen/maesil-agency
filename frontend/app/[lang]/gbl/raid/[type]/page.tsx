@@ -1,6 +1,7 @@
 // 레이드(PvE) 속성별 어택커 티어표 — 서버렌더(ISR) SEO 페이지.
 // 게임마스터(오픈데이터)로 계산한 DPS·내구 랭킹. PvP(배틀리그)와 별개, 일반 레이드 파밍용.
 import Link from "next/link";
+import { Fragment } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import RAIDS from "../../gbl_raids.json";
@@ -224,7 +225,10 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
             {rows.map((r, i) => {
               const tier = RAID_TIER(r.rel);
               return (
-                <div key={`${r.name}-${i}`} style={{ background: CARD, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c}`, borderRadius: 10, padding: "8px 10px" }}>
+                <Fragment key={`${r.name}-${i}`}>
+                {/* 광고 1자리 — 상위 5마리 아래(목록 끝은 모바일 78% 지점이라 노출 안 됨) */}
+                {i === 5 && <AdSlot />}
+                <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c}`, borderRadius: 10, padding: "8px 10px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
                     <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "#94a3b8", width: 22, textAlign: "center" }}>{i + 1}</span>
                     <span style={{ fontSize: "0.9rem", fontWeight: 900, color: "#fff", background: TIER_COLOR[tier], minWidth: 24, height: 24, borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center" }}>{tier}</span>
@@ -262,12 +266,11 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
                     </span>
                   </div>
                 </div>
+                </Fragment>
               );
             })}
           </div>
         )}
-
-        <AdSlot />
 
         <div style={{ marginTop: 24, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
           <h2 style={{ fontSize: "0.95rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>{d.explainerH}</h2>

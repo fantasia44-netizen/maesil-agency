@@ -507,6 +507,9 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
           </div>
         )}
 
+        {/* 광고 1자리 — 노트·파트너 아래, 기술배치 위(페이지 끝 68% 지점에서 이동) */}
+        <AdSlot />
+
         {/* 공유/저장 카드 + 추천 기술배치 — 빠른기술 선택 상태 공유(패널서 바꾸면 카드도 갱신) */}
         {(() => {
           const cardStyle = { background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "11px 12px" } as const;
@@ -608,8 +611,6 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
             </p>
           </>
         )}
-
-        <AdSlot />
 
         {/* 설명 */}
         <div style={{ marginTop: 22, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>

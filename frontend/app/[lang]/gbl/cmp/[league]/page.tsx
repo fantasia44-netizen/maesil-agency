@@ -293,6 +293,9 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
           />
         )}
 
+        {/* 광고 1자리 — 공유 카드와 순위 그리드 사이(그리드 72장 아래였던 자리는 모바일에서 90% 지점이라 노출 안 됨) */}
+        {list.length > 0 && <AdSlot />}
+
         {list.length === 0 ? (
           <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem 1rem" }}>데이터 준비 중입니다.</div>
         ) : (
@@ -344,8 +347,6 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
             })}
           </div>
         )}
-
-        <div style={{ marginTop: 22 }}><AdSlot /></div>
 
         <div style={{ marginTop: 8, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
           <h2 style={{ fontSize: "0.95rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>{t.explainerH}</h2>

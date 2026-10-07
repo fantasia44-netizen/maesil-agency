@@ -388,12 +388,11 @@ export default async function TierPage({ params, searchParams }: { params: { lan
                   );
                 })}
               </div>
+              {/* 광고 1자리 — 첫 티어 그룹(S) 바로 아래(모바일에서 페이지 끝 ~12,000px까지 안 내려가도 보이는 위치) */}
+              {ti === 0 && <AdSlot />}
             </div>
           ))
         )}
-
-
-        <AdSlot />
 
         <div style={{ marginTop: 24, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
           <h2 style={{ fontSize: "0.95rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>{t.explainerH}</h2>
