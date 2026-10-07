@@ -6,6 +6,7 @@ import META from "./gbl_meta_mons.json";
 import DETAIL from "./gbl_detail.json";
 import DETAIL_S28 from "./gbl_detail_s28.json";
 import DETAIL_EXT_S28 from "./gbl_detail_ext_s28.json";
+import UNRANKED from "./gbl_unranked.json";
 import MON_NOTES from "./gbl_mon_notes.json";
 import { currentSeason } from "./seasons";
 
@@ -24,6 +25,10 @@ const EXT = (EXT_BY_SLUG[currentSeason().slug] || {}) as Record<string, { id: st
 const EXT_IDS: Record<string, Set<string>> = Object.fromEntries(Object.entries(EXT).map(([l, arr]) => [l, new Set(arr.map((e) => e.id))]));
 export const extDetail = (league: string, id: string): unknown => (EXT[league] || []).find((e) => e.id === id);
 export const extRows = (): Record<string, { id: string }[]> => EXT;
+// 랭킹 밖(어느 리그 랭킹에도 없는 미진화 등) — 기본 정보 페이지. 리그 무관 데이터라 가장 낮은 리그(great) 경로 한 곳에만 둔다.
+export const UNRANKED_LEAGUE = "great";
+const UNRANKED_MAP = UNRANKED as unknown as Record<string, unknown>;
+export const unrankedDetail = (league: string, id: string): unknown => (league === UNRANKED_LEAGUE ? UNRANKED_MAP[id] : undefined);
 
 // 그림자(_shadow) 페이지 통합 — 그림자는 기본 폼과 노트·해설이 같아 "중복 페이지"로 읽히므로 페이지 자체를 없앰.
 // 현재 시즌에 기본 폼이 있으면 → 그림자 URL은 기본 폼으로 301, 내부 링크도 기본 폼으로(과거 시즌 ?s= 은 상세 페이지가 폴백 처리).
@@ -71,7 +76,7 @@ export function isMetaMon(league: string, id: string): boolean {
 //  되돌리려면 LINK_ONLY_INDEXED = true 한 줄.
 export const LINK_ONLY_INDEXED = false;
 // 상세 페이지 존재 여부 = 현재 시즌 스냅샷(상위 200) 또는 확장 스냅샷(201위 이후)에 링크 목적지가 있는가. 랭킹에 아예 없는 종만 false(링크하면 404).
-export const hasDetailPage = (league: string, id: string): boolean => { const t = linkMonId(league, id); return !!(CUR_IDS[league]?.has(t) || EXT_IDS[league]?.has(t)); };
+export const hasDetailPage = (league: string, id: string): boolean => { const t = linkMonId(league, id); return !!(CUR_IDS[league]?.has(t) || EXT_IDS[league]?.has(t) || unrankedDetail(league, t)); };
 export const hasDetailLink = (league: string, id: string): boolean =>
   LINK_ONLY_INDEXED ? isMetaMon(league, linkMonId(league, id)) : hasDetailPage(league, id);
 // 사이트맵용 — 현재 시즌 스냅샷 기준 색인 대상 id 목록(페이지의 robots 판정과 같은 소스·같은 시즌).

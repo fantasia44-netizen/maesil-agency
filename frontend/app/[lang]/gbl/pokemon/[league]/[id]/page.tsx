@@ -22,7 +22,8 @@ import { typeLabel } from "../../../typeLabels";
 import { getPoke } from "./dict";
 import { buildAnalysis, HEADINGS } from "./analysis";
 import { currentSeason, seasonBySlug } from "../../../seasons";
-import { isMetaMon, mergedShadowBase, mergedVariantsOf, linkMonId, extDetail, extRows } from "../../../indexGate";
+import { isMetaMon, mergedShadowBase, mergedVariantsOf, linkMonId, extDetail, extRows, unrankedDetail } from "../../../indexGate";
+import UnrankedView, { unrankedMetadata, type Unranked } from "./UnrankedView";
 import MonLink from "../../../MonLink";
 import { moveById as dexMove } from "../../../moves/movesData";
 import MON_NOTES from "../../../gbl_mon_notes.json";
@@ -182,6 +183,7 @@ function dynMetaDesc(lang: Locale, d: Detail, name: string, lgName: string, pr?:
 export async function generateMetadata({ params, searchParams }: { params: { lang: string; league: string; id: string }; searchParams?: { s?: string } }): Promise<Metadata> {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const d = findDetail(params.league, params.id, resolveSeasonSlug(searchParams?.s));
+  if (!d) { const u = unrankedDetail(params.league, params.id) as Unranked | undefined; if (u) return unrankedMetadata(lang, params.id, u); }
   if (!LEAGUE_KEYS.includes(params.league) || !d) return { title: "GBL Note" };
   const lgName = leagueName(lang, params.league);
   const name = dispName(lang, d);
@@ -290,6 +292,8 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
   if (mergedBase && findDetail(params.league, mergedBase, seasonSlug)) permanentRedirect(localizePath(lang, `/gbl/pokemon/${params.league}/${mergedBase}`) + (searchParams?.s ? `?s=${encodeURIComponent(searchParams.s)}` : ""));
   // 기본 폼 URL인데 그 시즌 스냅샷에 그림자만 있으면(통합 링크 + 과거 시즌) 그림자 데이터로 렌더.
   const d = findDetail(params.league, params.id, seasonSlug) || (params.id.endsWith("_shadow") ? undefined : findDetail(params.league, `${params.id}_shadow`, seasonSlug));
+  // 어느 리그 랭킹에도 없는 종(미진화 등) → 기본 정보 페이지(종족값·최대 CP·배우는 기술·진화)
+  if (!d) { const u = unrankedDetail(params.league, params.id) as Unranked | undefined; if (u) return <UnrankedView lang={lang} id={params.id} u={u} />; }
   if (!LEAGUE_KEYS.includes(params.league) || !d) notFound();
   // 통합된 변형(그림자·사이즈 폼)의 요약(티어·점수·종족값) — 대표 폼 페이지 안에서 한 블록씩 보여줌.
   const variants = d.id.endsWith("_shadow") ? [] : mergedVariantsOf(params.league, d.id).map((vid) => ({ vid, vd: findDetail(params.league, vid, seasonSlug) })).filter((x) => x.vd) as { vid: string; vd: Detail }[];

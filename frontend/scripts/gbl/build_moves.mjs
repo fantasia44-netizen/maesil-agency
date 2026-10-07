@@ -116,6 +116,36 @@ for (const k of Object.keys(species)) if (!usedSpecies.has(k)) delete species[k]
 
 const out = { generatedAt: new Date().toISOString().slice(0, 10), gmTimestamp: gm.timestamp, species, moves };
 writeFileSync(join(GBL, "gbl_moves.json"), JSON.stringify(out));
+
+// ── 랭킹 밖 포켓몬(gbl_unranked.json) — PvPoke 리그 랭킹(상위 200 + 확장) 어디에도 없는 종의 기본 정보 페이지용.
+// 대부분 미진화(레벨 50·15/15/15로도 CP 1,500 미달)라 배틀 데이터가 없음 → 종족값·최대 CP·배우는 기술·진화만 싣는다.
+{
+  const ranked = new Set();
+  for (const f of ["gbl_detail_s28.json", "gbl_detail_ext_s28.json"]) { const d = J(f); for (const lg of ["great", "ultra", "master"]) for (const r of d[lg] || []) ranked.add(r.id); }
+  const CPM50 = 0.84029999;   // 레벨 50 CP 배수
+  const byId = Object.fromEntries(gm.pokemon.map((p) => [p.speciesId, p]));
+  const mvById = Object.fromEntries(gm.moves.map((m) => [m.moveId, m]));
+  const unranked = {};
+  for (const sid of Object.keys(species)) {
+    if (ranked.has(sid)) continue;
+    const p = byId[sid]; if (!p) continue;
+    const b = p.baseStats || { atk: 0, def: 0, hp: 0 };
+    const maxCp = Math.max(10, Math.floor(((b.atk + 15) * Math.sqrt(b.def + 15) * Math.sqrt(b.hp + 15) * CPM50 * CPM50) / 10));
+    const eliteSet = new Set([...(p.eliteMoves || []), ...(p.legacyMoves || [])]);
+    unranked[sid] = {
+      dex: p.dex, types: species[sid].types, n: species[sid].n, stats: b, maxCp,
+      reason: maxCp < 1500 ? "cp" : "unlisted",
+      fast: (p.fastMoves || []).filter((m) => mvById[m]?.energyGain > 0).map((m) => ({ id: m, gain: mvById[m].energyGain, turns: mvById[m].turns || 1 })),
+      charged: (p.chargedMoves || []).filter((m) => mvById[m]?.energy > 0).map((m) => ({ id: m, energy: mvById[m].energy })),
+      ...(eliteSet.size ? { elite: [...eliteSet] } : {}),
+      ...(p.family?.parent ? { parent: p.family.parent } : {}),
+      ...(p.family?.evolutions?.length ? { evo: p.family.evolutions } : {}),
+    };
+  }
+  writeFileSync(join(GBL, "gbl_unranked.json"), JSON.stringify(unranked));
+  const cp = Object.values(unranked).filter((u) => u.reason === "cp").length;
+  console.log(`gbl_unranked.json — 랭킹 밖 ${Object.keys(unranked).length}종 (CP 미달 ${cp} · 랭킹 미수록 ${Object.keys(unranked).length - cp})`);
+}
 const fast = moves.filter((m) => m.kind === "fast").length;
 console.log(`gbl_moves.json — 기술 ${moves.length} (빠른 ${fast} · 차지 ${moves.length - fast}) · 포켓몬 ${Object.keys(species).length} · gm ${gm.timestamp}`);
 const noName = moves.filter((m) => LANGS.some((l) => !m.n[l] || m.n[l] === m.id));
