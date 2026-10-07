@@ -1,6 +1,6 @@
 // 포켓몬 상세 페이지 색인 게이트 — 구글 "가치 낮은 콘텐츠" 대응(URL 다이어트).
 // PvPoke 편집 메타(+마스터 점수 보강)에 든 몬만 index. 나머지는 페이지·데이터·IV찾기 전부 그대로 두고
-// robots noindex,follow + 사이트맵 제외만 적용(사용자 영향 없음, 구글 검색 노출만 압축).
+// robots noindex,follow + 사이트맵 제외만 적용(사용자 영향 없음). ※ 10/8부터 색인 범위는 아래 isIndexableMon(상위 200 전부).
 // 리스트 갱신: node scripts/gbl/build_meta_mons.mjs
 import META from "./gbl_meta_mons.json";
 import DETAIL from "./gbl_detail.json";
@@ -79,8 +79,20 @@ export const LINK_ONLY_INDEXED = false;
 export const hasDetailPage = (league: string, id: string): boolean => { const t = linkMonId(league, id); return !!(CUR_IDS[league]?.has(t) || EXT_IDS[league]?.has(t) || unrankedDetail(league, t)); };
 export const hasDetailLink = (league: string, id: string): boolean =>
   LINK_ONLY_INDEXED ? isMetaMon(league, linkMonId(league, id)) : hasDetailPage(league, id);
+// ── 색인 범위 ──────────────────────────────────────────────────────────
+// isMetaMon = "메타 포켓몬"(노트 박스·추천 파트너·분석 등 본문 구성 판정)으로 계속 쓰고, 색인 여부는 isIndexableMon이 따로 결정.
+//  · 2026-09-12~10-07: 색인 = 메타만(URL 다이어트, 사이트맵 포켓몬 123종).
+//  · 2026-10-08(사용자 결정 — AdSense 승인 후 "구글 노출은 무시하고 계속 확장"): 코어 3리그 상위 200 전부 색인·사이트맵 복귀.
+//    확장(201위 이후)·랭킹 밖 페이지는 계속 noindex. 되돌리려면 INDEX_TOP200 = false 한 줄.
+export const INDEX_TOP200 = true;
+export function isIndexableMon(league: string, id: string): boolean {
+  if (isMetaMon(league, id)) return true;
+  if (!INDEX_TOP200 || !SETS[league]) return false;       // 메가 리그 등은 대상 아님
+  if (mergedShadowBase(league, id)) return false;          // 통합된 그림자·사이즈 폼은 308
+  return !!CUR_IDS[league]?.has(id);
+}
 // 사이트맵용 — 현재 시즌 스냅샷 기준 색인 대상 id 목록(페이지의 robots 판정과 같은 소스·같은 시즌).
-export const indexableMonIds = (league: string): string[] => (CUR[league] || []).map((e) => e.id).filter((id) => isMetaMon(league, id));
+export const indexableMonIds = (league: string): string[] => (CUR[league] || []).map((e) => e.id).filter((id) => isIndexableMon(league, id));
 const NOTES = MON_NOTES as Record<string, Record<string, unknown>>;
 const hasNote = (league: string, id: string) => !!NOTES[league]?.[id] || !!NOTES[league]?.[`${id}_shadow`];
 const tierOf = (league: string, id: string) => (CUR[league] || []).find((e) => e.id === id)?.tier || "";

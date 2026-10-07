@@ -22,7 +22,7 @@ import { typeLabel } from "../../../typeLabels";
 import { getPoke } from "./dict";
 import { buildAnalysis, HEADINGS } from "./analysis";
 import { currentSeason, seasonBySlug } from "../../../seasons";
-import { isMetaMon, mergedShadowBase, mergedVariantsOf, linkMonId, extDetail, extRows, unrankedDetail } from "../../../indexGate";
+import { isMetaMon, isIndexableMon, mergedShadowBase, mergedVariantsOf, linkMonId, extDetail, extRows, unrankedDetail } from "../../../indexGate";
 import UnrankedView, { unrankedMetadata, type Unranked } from "./UnrankedView";
 import MonLink from "../../../MonLink";
 import { moveById as dexMove } from "../../../moves/movesData";
@@ -195,7 +195,7 @@ export async function generateMetadata({ params, searchParams }: { params: { lan
   const desc = dynMetaDesc(lang, d, name, lgName, pr) || `${name} · ${lgName} — ${pk.metaDesc}`;
   return {
     // 색인 게이트 — PvPoke 편집 메타 밖 몬은 noindex,follow (페이지·데이터·IV찾기 유지, 구글 노출만 제외)
-    ...(isMetaMon(params.league, d.id) ? {} : { robots: { index: false, follow: true } }),
+    ...(isIndexableMon(params.league, d.id) ? {} : { robots: { index: false, follow: true } }),
     title: `${name} ${lgName} ${pk.metaTitle.replace(" | GBL Note", "")} | GBL Note`,
     description: desc,
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },

@@ -151,12 +151,13 @@ export function usageCount(m: Move): number { return USAGE[m.id]?.size || 0; }
 // 기술 상세는 322개 × 4로케일 = 1,288 URL — 9월 강등의 원인(포켓몬 템플릿 2,400 URL)과 같은 모양이라 단계적으로 연다.
 //  · 스위치 꺼짐(기본): 상세 전부 noindex,follow + 사이트맵 제외. 허브(/gbl/moves)만 색인.
 //  · 스위치 켜짐(NEXT_PUBLIC_GBL_INDEX_MOVES=1): "색인 대상 메타 포켓몬이 추천 기술배치로 쓰는 기술"만 색인(나머지는 계속 noindex).
-export const MOVES_INDEX_OPEN = process.env.NEXT_PUBLIC_GBL_INDEX_MOVES === "1";
+// 2026-10-08(사용자 결정): 기본 개방 — 기술 상세 322개 전부 색인·사이트맵. 닫으려면 env NEXT_PUBLIC_GBL_INDEX_MOVES=0.
+export const MOVES_INDEX_OPEN = process.env.NEXT_PUBLIC_GBL_INDEX_MOVES !== "0";
 const INDEXABLE = new Set<string>();
 for (const lg of CORE_LEAGUES) for (const { row } of metaRows(lg)) if (isMetaMon(lg, linkMonId(lg, row.id))) for (const id of row.moveset || []) if (BY_ID[id]) INDEXABLE.add(id);
 export const isIndexCandidate = (m: Move): boolean => INDEXABLE.has(m.id);
-export const isIndexableMove = (m: Move): boolean => MOVES_INDEX_OPEN && INDEXABLE.has(m.id);
-export const indexableMoveSlugs = (): string[] => (MOVES_INDEX_OPEN ? MOVES.filter((m) => INDEXABLE.has(m.id)).map((m) => m.slug) : []);
+export const isIndexableMove = (_m: Move): boolean => MOVES_INDEX_OPEN;
+export const indexableMoveSlugs = (): string[] => (MOVES_INDEX_OPEN ? MOVES.map((m) => m.slug) : []);
 
 // ── 배우는 포켓몬 링크 대상 ─────────────────────────────────────────
 // 상세 페이지가 있는 리그로 연결(색인되는 리그 우선 → 없으면 페이지가 있는 첫 리그). 3리그 상위 200 어디에도 없는 종은 페이지가 없어 null.
