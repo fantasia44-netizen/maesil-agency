@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import PKN from "../../pokedex_names.json";
 import NAME_EN_KO from "../../name_en_ko.json";
+import { dexPathOfDex } from "../../dexHub";
 import RaidCalendarClient from "./RaidCalendarClient";
 import { type CalEvent, type CalBoss } from "./RaidCalendar";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
@@ -107,9 +108,11 @@ function rotInfo(name: string, t: ScheduleDict): { title: string; variant: "star
   if (/Shadow Raid/i.test(name)) return { title: t.rotShadowTitle, variant: "shadow" };
   return { title: t.rotStarTitle, variant: "star" };
 }
+// 보스(도감 번호) → 도감 상세 경로(로케일 포함). 달력은 클라이언트라 서버에서 계산해 CalBoss.href로 전달.
+const dexHref = (lang: Locale, dex: string | number): string | undefined => { const p = dex ? dexPathOfDex(dex) : null; return p ? localizePath(lang, p) : undefined; };
 function bossesOf(lang: Locale, e: EventItem, t: ScheduleDict): CalBoss[] {
   return (e.extraData?.raidbattles?.bosses || []).map((b) => ({
-    ko: koMon(b.name), name: monLocal(lang, b.name, t), dex: dexOf(b.image), image: b.image, shiny: !!b.canBeShiny,
+    ko: koMon(b.name), name: monLocal(lang, b.name, t), dex: dexOf(b.image), image: b.image, shiny: !!b.canBeShiny, href: dexHref(lang, dexOf(b.image)),
   }));
 }
 
@@ -163,7 +166,7 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
   ];
   for (const r of PAST_RAIDS) {
     calEvents.push({ kind: "rotation", variant: r.variant, title: rotInfo(r.variant === "mega" ? "Mega Raid" : r.variant === "shadow" ? "Shadow Raid" : "", t).title, start: r.start, end: r.end,
-      bosses: r.bosses.map((b) => ({ ko: koMon(b.en), name: monLocal(lang, b.en, t), dex: b.dex, image: "", shiny: b.shiny })) });
+      bosses: r.bosses.map((b) => ({ ko: koMon(b.en), name: monLocal(lang, b.en, t), dex: b.dex, image: "", shiny: b.shiny, href: dexHref(lang, b.dex) })) });
   }
 
   // ── 메가 어센션(2026-08-31~09-04, LeekDuck 공식) — 이 기간 5성·그림자·정규 메가 중단, 메가 레이드가 대체 ──
@@ -194,7 +197,7 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
   const maLabel = lang === "en" ? "Mega Ascension" : lang === "ja" ? "メガアセンション" : lang === "zh-TW" ? "超級進化盛典" : "메가 어센션";
   for (const r of MEGA_ASCENSION) {
     calEvents.push({ kind: "rotation", variant: "mega", title: `${t.rotMegaTitle} · ${maLabel}`, start: r.start, end: r.end,
-      bosses: r.bosses.map((b) => ({ ko: koMon(b.en), name: monLocal(lang, b.en, t), dex: b.dex, image: "", shiny: true })) });
+      bosses: r.bosses.map((b) => ({ ko: koMon(b.en), name: monLocal(lang, b.en, t), dex: b.dex, image: "", shiny: true, href: dexHref(lang, b.dex) })) });
   }
 
   // KST(UTC+9) 벽시계 날짜 — 서버가 UTC라도 한국 '오늘'이 맞도록(새벽 0~9시 하루 밀림 방지)

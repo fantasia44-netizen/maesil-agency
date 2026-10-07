@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import POKEDEX from "../../pokedex_ko.json";
+import { dexPathOfDex } from "../../dexHub";
 import PKN from "../../pokedex_names.json";
 import STATSJSON from "../../pokedex_stats.json";
 import CpTable from "./CpTable";
@@ -258,7 +259,8 @@ export default async function BossesPage({ params }: { params: { lang: string } 
                           })()}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                              <span style={{ fontSize: "0.98rem", fontWeight: 800, color: "#0f172a" }}>{bossName(lang, b, t)}</span>
+                              {(() => { const dp = dexPathOfDex(dexOf(b.image)); const nst: React.CSSProperties = { fontSize: "0.98rem", fontWeight: 800, color: "#0f172a", textDecoration: "none" };
+                                return dp ? <Link href={L(dp)} prefetch={false} style={nst}>{bossName(lang, b, t)} <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#3b5bdb" }}>›</span></Link> : <span style={nst}>{bossName(lang, b, t)}</span>; })()}
                               <span style={{ display: "flex", gap: 3 }}>
                                 {types.map((ty) => (
                                   <span key={ty} style={{ fontSize: "0.6rem", fontWeight: 700, color: "#fff", background: TYPE_COLOR[ty] || "#94a3b8", padding: "1px 6px", borderRadius: 6 }}>{typeLabel(lang, ty)}</span>

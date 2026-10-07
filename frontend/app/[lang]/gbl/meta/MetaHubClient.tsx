@@ -61,7 +61,7 @@ function Pager({ page, pages, onPage, t }: { page: number; pages: number; onPage
   );
 }
 
-function MonList({ meta, maxMon, lang, t }: { meta: Meta; maxMon: number; lang: Locale; t: MetaHubDict }) {
+function MonList({ meta, maxMon, lang, t, league }: { meta: Meta; maxMon: number; lang: Locale; t: MetaHubDict; league: string }) {
   const [page, setPage] = useState(0);
   useEffect(() => { setPage(0); }, [meta]);
   const pages = Math.ceil(meta.top_mons.length / PAGE_SIZE);
@@ -74,7 +74,7 @@ function MonList({ meta, maxMon, lang, t }: { meta: Meta; maxMon: number; lang: 
         const m = MON[mm.speciesId];
         const pct = Math.round((mm.count / meta.total) * 100);
         return (
-          <div key={mm.speciesId} style={{ display: "flex", alignItems: "center", gap: 8, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "5px 10px" }}>
+          <Link key={mm.speciesId} href={`${localizePath(lang, `/gbl/dex/${mm.speciesId}`)}?l=${league}`} prefetch={false} style={{ display: "flex", alignItems: "center", gap: 8, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "5px 10px", textDecoration: "none", color: "inherit" }}>
             <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#a855f7" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
             <Sprite id={mm.speciesId} size={30} />
             <span style={{ fontSize: "0.86rem", fontWeight: 600, minWidth: 88, color: "#0f172a" }}>
@@ -84,7 +84,7 @@ function MonList({ meta, maxMon, lang, t }: { meta: Meta; maxMon: number; lang: 
               <div style={{ width: `${Math.round((mm.count / maxMon) * 100)}%`, height: "100%", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)" }} />
             </div>
             <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#3b5bdb", minWidth: 38, textAlign: "right" }}>{pct}%</span>
-          </div>
+          </Link>
         );
       })}
     </div>
@@ -206,7 +206,7 @@ export default function MetaHubClient() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 22, alignItems: "start" }}>
             <div>
               <h2 style={h2}>{t.monTop}</h2>
-              <MonList meta={meta} maxMon={maxMon} lang={lang} t={t} />
+              <MonList meta={meta} maxMon={maxMon} lang={lang} t={t} league={league} />
             </div>
             <div>
               <h2 style={h2}>{t.deckTop}</h2>
@@ -224,7 +224,7 @@ export default function MetaHubClient() {
                     background: view === k ? "rgba(79,140,255,.16)" : CARD, color: view === k ? "#3b5bdb" : "#64748b" }}>{label}</button>
               ))}
             </div>
-            {view === "mon" ? <MonList meta={meta} maxMon={maxMon} lang={lang} t={t} /> : <DeckList meta={meta} maxDeck={maxDeck} lang={lang} t={t} />}
+            {view === "mon" ? <MonList meta={meta} maxMon={maxMon} lang={lang} t={t} league={league} /> : <DeckList meta={meta} maxDeck={maxDeck} lang={lang} t={t} />}
           </>
         )}
 

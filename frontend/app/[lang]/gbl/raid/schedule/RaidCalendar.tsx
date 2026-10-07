@@ -22,7 +22,8 @@ function cpAt(st: { a: number; d: number; s: number }, iv: number[], cpm: number
   return Math.max(10, Math.floor((st.a + iv[0]) * Math.sqrt(st.d + iv[1]) * Math.sqrt(st.s + iv[2]) * cpm * cpm / 10));
 }
 
-export type CalBoss = { ko: string; name: string; dex: string; image: string; shiny: boolean };
+export type CalBoss = { ko: string; name: string; dex: string; image: string; shiny: boolean; href?: string };  // href = 도감 상세(서버 계산)
+const DEX_LINK: Record<string, string> = { ko: "도감 · 배틀·레이드 정보 →", en: "Pokédex · battle & raid info →", ja: "図鑑 · バトル・レイド情報 →", "zh-TW": "圖鑑 · 對戰·團體戰資訊 →" };
 export type RotVariant = "star" | "shadow" | "mega";
 export type CalEvent = {
   kind: "rotation" | "hour" | "day";
@@ -585,6 +586,7 @@ export default function RaidCalendar({ events, majorEvents, today, t, lang: lang
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: "1.05rem", fontWeight: 900, color: "#0f172a" }}>{cpBoss.name}{cpBoss.shiny ? " ✨" : ""}</div>
                   <div style={{ fontSize: "0.72rem", color: "#94a3b8" }}>{t.cpModalSub}</div>
+                  {cpBoss.href && <a href={cpBoss.href} style={{ display: "inline-block", marginTop: 4, fontSize: "0.76rem", fontWeight: 800, color: "#1d4ed8", textDecoration: "none" }}>{DEX_LINK[lang] || DEX_LINK.ko}</a>}
                 </div>
                 <button onClick={() => setCpBoss(null)} style={{ border: "none", background: "#f1f5f9", color: "#64748b", borderRadius: 8, width: 30, height: 30, cursor: "pointer", fontSize: "1rem", flexShrink: 0 }}>✕</button>
               </div>

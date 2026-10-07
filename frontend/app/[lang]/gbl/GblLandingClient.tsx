@@ -136,13 +136,13 @@ export default function GblLandingClient() {
                 const m = MON[mm.speciesId];
                 const pct = Math.round((mm.count / teaser.total) * 100);
                 return (
-                  <div key={mm.speciesId} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Link key={mm.speciesId} href={`${L(`/gbl/dex/${mm.speciesId}`)}?l=master`} prefetch={false} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "inherit" }}>
                     <span style={{ fontSize: "0.72rem", fontWeight: 800, color: "#94a3b8", minWidth: 16 }}>{i + 1}</span>
                     <img src={spriteUrl(m)} alt="" width={26} height={26} style={{ imageRendering: "pixelated" }}
                       onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = "hidden"; }} />
                     <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#0f172a", flex: 1 }}>{m?.ko || mm.speciesId}</span>
                     <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#3b5bdb" }}>{pct}%</span>
-                  </div>
+                  </Link>
                 );
               })}
             </div>

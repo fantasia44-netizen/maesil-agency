@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../lib/i18n";
 import { leagueName } from "./contentI18n";
 import { monName } from "./meta/monNames";
+import { dexPathIn } from "./dexHub";
 import GblLandingClient from "./GblLandingClient";
 import { CORE_FORMATS, MEGA_FORMATS, activeCups, todayISO, type Format } from "./formats";
 
@@ -186,7 +187,8 @@ export default async function GblLandingPage({ params }: { params: { lang: strin
                       return (
                         <li key={mm.speciesId} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.82rem" }}>
                           <span style={{ fontWeight: 800, color: i < 3 ? "#a855f7" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
-                          <span style={{ flex: 1, color: "#0f172a", fontWeight: 600 }}>{monName(lang, mm.speciesId)}</span>
+                          {(() => { const dp = dexPathIn(fmt.cup ? "" : fmt.key, mm.speciesId); const nst: React.CSSProperties = { flex: 1, color: "#0f172a", fontWeight: 600, textDecoration: "none" };
+                            return dp ? <Link href={L(dp)} style={nst}>{monName(lang, mm.speciesId)}</Link> : <span style={nst}>{monName(lang, mm.speciesId)}</span>; })()}
                           <span style={{ fontWeight: 700, color: "#3b5bdb" }}>{pct}%</span>
                         </li>
                       );

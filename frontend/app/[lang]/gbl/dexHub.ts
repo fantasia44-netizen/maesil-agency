@@ -6,7 +6,7 @@
 // 티어표·CMP(MonLink)는 "보고 있던 리그의 상세"로 가는 게 맞아 이 규칙을 쓰지 않는다. 리그 맥락이 없는 화면만 사용.
 import RAIDS from "./gbl_raids.json";
 import RAIDS_MF from "./gbl_raids_megafinale.json";
-import { leagueStanding, speciesDexPairs, unrankedDetail, UNRANKED_LEAGUE } from "./indexGate";
+import { leagueStanding, speciesDexPairs, unrankedDetail, UNRANKED_LEAGUE, hasDetailPage, linkMonId } from "./indexGate";
 
 export const CORE_LEAGUES = ["great", "ultra", "master"] as const;
 const TIER_ORDER: Record<string, number> = { S: 0, A: 1, B: 2, C: 3, D: 4 };
@@ -34,6 +34,11 @@ export function bestDetail(rawId: string): { league: string; id: string } | null
   return null;
 }
 export const dexPath = (rawId: string): string | null => { const b = bestDetail(rawId); return b ? `/gbl/pokemon/${b.league}/${b.id}` : null; };
+// 리그 맥락이 있는 화면(실측 메타 등) — 그 리그에 페이지가 있으면 그쪽, 없으면 대표 상세.
+export const dexPathIn = (league: string, rawId: string): string | null =>
+  league && hasDetailPage(league, rawId) ? `/gbl/pokemon/${league}/${linkMonId(league, rawId)}` : dexPath(rawId);
+// 도감 번호만 아는 화면(레이드 보스·일정) — 대표 종의 상세.
+export const dexPathOfDex = (dex: number | string): string | null => { const sid = baseSidOfDex(dex); return sid ? dexPath(sid) : null; };
 
 // 도감 번호 → 대표 speciesId. 폼이 여럿이면 기본 폼(접미 없는 id → 기본 폼 접미 → 가장 짧은 id) 순으로 고른다.
 const DEFAULT_FORM = /_(altered|incarnate|midday|hero|ordinary|aria|standard|land|average|male|baile|full_belly|single_strike|plant|overcast)$/;
