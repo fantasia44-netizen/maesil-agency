@@ -66,9 +66,11 @@ const FORM_LABEL: Record<string, Record<string, string>> = {
   keldeo_resolute: { ko: " (각오)", en: " (Resolute)", ja: "（覚悟）", "zh-TW": "（覺悟）" },
   keldeo_ordinary: { ko: " (평범)", en: " (Ordinary)", ja: "（いつも）", "zh-TW": "（平常）" },
 };
-const dispNameOf = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?: string; dex?: number }) => {
-  const suf = FORM_LABEL[d.id]?.[lang] || "";
+const dispNameOf = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?: string; "zh-TW"?: string; dex?: number }) => {
+  // s28+ 행은 이름에 공식 폼 명칭이 들어 있음(우라오스 (연격의 태세)) → 임시 라벨은 폼 표기가 없는 구 시즌 행에만.
+  const suf = /[（(]/.test(d.ko || "") ? "" : (FORM_LABEL[d.id]?.[lang] || "");
   if (lang === "zh-TW") {
+    if (d["zh-TW"]) return d["zh-TW"];
     const dex = d.dex ?? MON[d.id]?.dex;
     const zh = dex != null ? (PKNAMES as Record<string, Record<string, string>>)[String(dex)]?.["zh-TW"] : undefined;
     if (zh) return zh + suf;

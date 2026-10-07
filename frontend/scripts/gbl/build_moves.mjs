@@ -15,6 +15,7 @@ const MN = J("pvp_move_names.json");          // id → {ko,en,ja,zh-TW}
 const GDM = J("gbl_data.json").moves;          // id → {ko,en,ja,type,kind} (ko는 9세대 정식명 교정본·잠재파워 타입 표기)
 const PN = J("pokedex_names.json");            // dex → {ko,en,ja,zh-TW}
 const FORMS = Object.fromEntries(J("gbl_forms.json").map((f) => [f.id, f])); // 메가·원시 4개국어 이름
+const FORM_NAMES = J("gbl_form_names.json"); // 그 밖의 폼 공식 명칭(build_form_names.mjs) — full이면 완성형, 아니면 "기본명 (라벨)"
 
 // ── 포켓몬 표시명(4개국어) — gbl_compile_detail.py의 _disp와 같은 규칙(+zh-TW). 미지원 폼은 기본 종 이름으로 떨어짐.
 const AFF = {
@@ -34,6 +35,12 @@ function dispName(sid, dex, lang) {
   const base = PN[String(dex)]?.[lang] || PN[String(dex)]?.en;
   if (!base) return null;
   const a = AFF[lang];
+  const fn = FORM_NAMES[sid];
+  if (fn && fn[lang]) {
+    if (fn.full) return fn[lang];
+    const reg0 = Object.entries(a.reg).find(([suf]) => sid.includes(suf))?.[1] || "";
+    return lang === "ja" || lang === "zh-TW" ? `${reg0}${base}（${fn[lang]}）` : `${reg0}${base} (${fn[lang]})`;
+  }
   if (f) { // 메가·원시인데 해당 언어 이름이 없을 때(zh-TW 등) — 접두만
     const pre = f.primal ? { ko: "원시 ", en: "Primal ", ja: "ゲンシ", "zh-TW": "原始" }[lang] : { ko: "메가 ", en: "Mega ", ja: "メガ", "zh-TW": "超級" }[lang];
     const xy = /_mega_x$/.test(sid) ? " X" : /_mega_y$/.test(sid) ? " Y" : "";

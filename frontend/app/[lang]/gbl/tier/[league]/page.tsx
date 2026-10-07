@@ -60,8 +60,9 @@ const spriteUrl = (m?: Mon) =>
   m ? (m.sprite || `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${m.dex}.png`) : "";
 const nameOf = (id: string) => MON[id]?.ko || id;
 // zh-TW 포켓몬명 — 데이터 엔트리에 zh-TW 필드가 없어 dex로 pokedex_names에서 보완.
-const dispNameOf = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?: string; dex?: number }, prefix = "") => {
+const dispNameOf = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?: string; "zh-TW"?: string; dex?: number }, prefix = "") => {
   if (lang === "zh-TW") {
+    if (d["zh-TW"]) return d["zh-TW"];   // s28+ 행은 zh-TW(폼·暗影 포함) 내장
     const zh = d.dex != null ? (PKNAMES as Record<string, Record<string, string>>)[String(d.dex)]?.["zh-TW"] : undefined;
     if (zh) return prefix + zh;
   }

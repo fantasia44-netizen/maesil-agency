@@ -22,7 +22,7 @@ import { typeLabel } from "../../../typeLabels";
 import { getPoke } from "./dict";
 import { buildAnalysis, HEADINGS } from "./analysis";
 import { currentSeason, seasonBySlug } from "../../../seasons";
-import { isMetaMon, mergedShadowBase, mergedVariantsOf, linkMonId } from "../../../indexGate";
+import { isMetaMon, mergedShadowBase, mergedVariantsOf, linkMonId, extDetail, extRows } from "../../../indexGate";
 import MonLink from "../../../MonLink";
 import { moveById as dexMove } from "../../../moves/movesData";
 import MON_NOTES from "../../../gbl_mon_notes.json";
@@ -45,8 +45,8 @@ const spriteUrl = (m?: Mon) =>
 const nameOf = (id: string) => MON[id]?.ko || id;
 const zhMon = (dex?: number) => dex != null ? (PKNAMES as Record<string, Record<string, string>>)[String(dex)]?.["zh-TW"] : undefined;
 // 데이터 엔트리에 zh-TW 이름이 없어 dex로 pokedex_names에서 보완.
-const dispName = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?: string; dex?: number }, prefix = "") => {
-  if (lang === "zh-TW") { const zh = zhMon(d.dex); if (zh) return prefix + zh; }
+const dispName = (lang: Locale, d: { id: string; ko?: string; en?: string; ja?: string; "zh-TW"?: string; dex?: number }, prefix = "") => {
+  if (lang === "zh-TW") { if (d["zh-TW"]) return d["zh-TW"]; const zh = zhMon(d.dex); if (zh) return prefix + zh; }  // 행에 zh-TW(폼·暗影 포함)가 있으면 그대로
   return localName(lang, d, prefix + nameOf(d.id));
 };
 // 로케일별 기술명 (ko/en/ja/zh-TW) — zh-TW는 pvp_move_names(id)로 보완.
@@ -84,7 +84,7 @@ const eunNeun = (w: string) => (hasBatchim(w) ? "은" : "는");
 type Opp = { id: string; r: number };
 type Mv = { fast: { id: string; gain: number; turns: number }; charged: { id: string; energy: number; counts: number[] }[];
   fasts?: { id: string; gain: number; turns: number }[]; chargedAll?: { id: string; energy: number }[] };
-type Detail = { id: string; score: number; tier: string; moveset: string[]; mv: Mv | null; counters: Opp[]; wins: Opp[]; scores: number[]; stats: Record<string, number>; ko?: string; en?: string; ja?: string; dex?: number; types?: string[] };
+type Detail = { id: string; score: number; tier: string; moveset: string[]; mv: Mv | null; counters: Opp[]; wins: Opp[]; scores: number[]; stats: Record<string, number>; ko?: string; en?: string; ja?: string; "zh-TW"?: string; dex?: number; types?: string[] };
 // 시즌별 상세 스냅샷(티어/CMP와 동일 시리즈). 상세페이지도 시즌을 반영해야 티어(s28 미리보기)와 일치.
 const DET_BY_SLUG: Record<string, Record<string, Detail[]>> = {
   s27: DETAIL as unknown as Record<string, Detail[]>,
@@ -101,13 +101,16 @@ function resolveSeasonSlug(s?: string): string {
 // 리그·시즌별 상세 스냅샷 — 메가 리그는 s28 전용, 코어 리그는 선택 시즌 반영.
 const detFor = (league: string, slug: string): Record<string, Detail[]> =>
   league.endsWith("_mega") ? DET_BY_SLUG.s28 : (DET_BY_SLUG[slug] || DET_BY_SLUG.s27);
-const findDetail = (league: string, id: string, slug: string) => (detFor(league, slug)[league] || []).find((d) => d.id === id);
+// 상위 200에 없으면 현재 시즌에 한해 확장 스냅샷(201위 이후 전 종)에서 찾는다 — 전 포켓몬 상세 페이지.
+const findDetail = (league: string, id: string, slug: string): Detail | undefined =>
+  (detFor(league, slug)[league] || []).find((d) => d.id === id) || (slug === currentSeason().slug ? (extDetail(league, id) as Detail | undefined) : undefined);
 // 상대(카운터/이기는 상대) id → 로케일별 이름. 이름·dex는 시즌 무관 → 전 시즌·전 리그 유니온 인덱싱.
-const NAMEIDX: Record<string, { ko?: string; en?: string; ja?: string; dex?: number }> = {};
-for (const snap of Object.values(DET_BY_SLUG)) for (const arr of Object.values(snap)) for (const e of arr) if (!NAMEIDX[e.id]) NAMEIDX[e.id] = { ko: e.ko, en: e.en, ja: e.ja, dex: e.dex };
+// 최신 시즌(s28)·확장 행을 먼저 넣어 폼 이름·zh-TW가 있는 쪽이 우선되게 한다(구 시즌 행엔 없음).
+const NAMEIDX: Record<string, { ko?: string; en?: string; ja?: string; "zh-TW"?: string; dex?: number }> = {};
+for (const snap of [DET_BY_SLUG.s28, extRows() as unknown as Record<string, Detail[]>, ...Object.values(DET_BY_SLUG)]) for (const arr of Object.values(snap)) for (const e of arr) if (!NAMEIDX[e.id]) NAMEIDX[e.id] = { ko: e.ko, en: e.en, ja: e.ja, "zh-TW": e["zh-TW"], dex: e.dex };
 const locName = (lang: Locale, id: string) => {
   const e = NAMEIDX[id];
-  if (lang === "zh-TW") { const zh = zhMon(e?.dex ?? MON[id]?.dex); if (zh) return zh; }
+  if (lang === "zh-TW") { const zh = e?.["zh-TW"] || zhMon(e?.dex ?? MON[id]?.dex); if (zh) return zh; }
   if (e && (e.ko || e.en || e.ja)) return localName(lang, e, MON[id]?.ko || id);
   return MON[id]?.ko || id;
 };
@@ -282,6 +285,8 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
   // 그림자 폼 페이지 통합 — 기본 폼 페이지가 있으면 그림자 URL은 기본 폼으로 301(중복 페이지 제거, indexGate.ts).
   // 과거 시즌(?s=)에 기본 폼이 없으면 그림자 페이지를 그대로 렌더(404 방지).
   const mergedBase = mergedShadowBase(params.league, params.id);
+  const linkTarget = linkMonId(params.league, params.id);  // 상위 200 밖 그림자(확장 스냅샷에 행 없음)도 기본 폼으로
+  if (!mergedBase && linkTarget !== params.id && findDetail(params.league, linkTarget, seasonSlug)) permanentRedirect(localizePath(lang, `/gbl/pokemon/${params.league}/${linkTarget}`));
   if (mergedBase && findDetail(params.league, mergedBase, seasonSlug)) permanentRedirect(localizePath(lang, `/gbl/pokemon/${params.league}/${mergedBase}`) + (searchParams?.s ? `?s=${encodeURIComponent(searchParams.s)}` : ""));
   // 기본 폼 URL인데 그 시즌 스냅샷에 그림자만 있으면(통합 링크 + 과거 시즌) 그림자 데이터로 렌더.
   const d = findDetail(params.league, params.id, seasonSlug) || (params.id.endsWith("_shadow") ? undefined : findDetail(params.league, `${params.id}_shadow`, seasonSlug));

@@ -136,7 +136,18 @@ _AFFIX = {
            "white": "ホワイト", "black": "ブラック", "shadow": "シャドウ",
            "origin": "（オリジンフォルム）", "therian": "（れいじゅうフォルム）",
            "crowned_sword": " (けんのおう)", "crowned_shield": " (たてのおう)", "dusk_mane": " (たそがれのたてがみ)", "dawn_wings": " (あかつきのつばさ)", "hero": " (れきせんのゆうしゃ)"},
+    "zh-TW": {"reg": {"_alolan": "阿羅拉", "_galarian": "伽勒爾", "_hisuian": "洗翠", "_paldean": "帕底亞"},
+           "mega": "超級", "megaX": " X", "megaY": " Y", "primal": "原始",
+           "white": "焰白", "black": "闇黑", "shadow": "暗影",
+           "origin": "（起源）", "therian": "（靈獸）",
+           "crowned_sword": "（劍之王）", "crowned_shield": "（盾之王）", "dusk_mane": "（黃昏之鬃）", "dawn_wings": "（拂曉之翼）", "hero": "（百戰勇者）"},
 }
+# 그 밖의 폼(테오키스 디펜스폼·로토무 5종·루가루암 3종 …) 공식 명칭 4개국어 — frontend/scripts/gbl/build_form_names.mjs 산출물.
+# 값이 full이면 완성된 이름(히트로토무), 아니면 라벨 → "테오키스 (디펜스폼)".
+try:
+    FORM_NAMES = json.load(open(os.path.join(GBL, "gbl_form_names.json"), encoding="utf-8"))
+except Exception:
+    FORM_NAMES = {}
 
 
 def i18n_map(url: str) -> dict:
@@ -153,10 +164,18 @@ def _dex_name(names: dict, dex) -> str | None:
     return names.get(f"pokemon_name_{int(dex):04d}") or names.get(f"pokemon_name_{int(dex)}")
 
 
-def _disp(sid: str, base: str | None, aff: dict) -> str | None:
+def _disp(sid: str, base: str | None, aff: dict, lang: str = "ko") -> str | None:
     """base 표시명 + 폼 접두/접미. base 없으면 None."""
     if not base:
         return None
+    form = FORM_NAMES.get(sid[:-7] if sid.endswith("_shadow") else sid)
+    if form and form.get(lang):
+        if form.get("full"):
+            name = form[lang]
+        else:
+            reg0 = next((v for suf, v in aff["reg"].items() if suf in sid), "")
+            name = f"{reg0}{base}（{form[lang]}）" if lang in ("ja", "zh-TW") else f"{reg0}{base} ({form[lang]})"
+        return (aff["shadow"] + name) if sid.endswith("_shadow") else name
     reg = next((v for suf, v in aff["reg"].items() if suf in sid), "")
     if "_mega_x" in sid: name = aff["mega"] + base + aff["megaX"]
     elif "_mega_y" in sid: name = aff["mega"] + base + aff["megaY"]
@@ -176,18 +195,26 @@ def _disp(sid: str, base: str | None, aff: dict) -> str | None:
     return name
 
 
+try:  # dex → {ko,en,ja,zh-TW} — zh-TW 기본명 + PokeMiners i18n에 아직 없는 신규 종(en/ja) 폴백
+    PDN = json.load(open(os.path.join(GBL, "pokedex_names.json"), encoding="utf-8"))
+except Exception:
+    PDN = {}
+
+
 def disp_names(sid: str, sp: dict, pdko: dict, names: dict) -> tuple:
-    """speciesId → (ko, en, ja, dex, types[]). 언어별 base를 각 소스에서 조회.
-    ko는 하위호환 위해 기존과 동일하게 pokedex_ko.json만 사용(바이트 동일 보장)."""
+    """speciesId → (ko, en, ja, zh-TW, dex, types[]). 언어별 base를 각 소스에서 조회."""
     p = sp.get(sid, {})
     dex = p.get("dex")
-    base_ko = pdko.get(str(dex)) if dex is not None else None
-    base_en = _dex_name(names["en"], dex)
-    base_ja = _dex_name(names["ja"], dex)
+    pn = PDN.get(str(dex), {}) if dex is not None else {}
+    base_ko = (pdko.get(str(dex)) if dex is not None else None) or pn.get("ko")
+    base_en = _dex_name(names["en"], dex) or pn.get("en")
+    base_ja = _dex_name(names["ja"], dex) or pn.get("ja")
+    base_zh = pn.get("zh-TW")
     types = [t for t in (p.get("types") or []) if t and t != "none"]
-    return (_disp(sid, base_ko, _AFFIX["ko"]),
-            _disp(sid, base_en, _AFFIX["en"]),
-            _disp(sid, base_ja, _AFFIX["ja"]),
+    return (_disp(sid, base_ko, _AFFIX["ko"], "ko"),
+            _disp(sid, base_en, _AFFIX["en"], "en"),
+            _disp(sid, base_ja, _AFFIX["ja"], "ja"),
+            _disp(sid, base_zh, _AFFIX["zh-TW"], "zh-TW"),
             dex, types)
 
 
@@ -200,7 +227,28 @@ def main() -> None:
     names = {lang: i18n_map(url) for lang, url in I18N.items()}  # ko/en/ja 다국어 i18n
     print(f"i18n keys: ko={len(names['ko'])} en={len(names['en'])} ja={len(names['ja'])}")
 
+    def build_row(r: dict, mx: float) -> dict:
+        dko, den, dja, dzh, ddex, dtypes = disp_names(r["speciesId"], sp, pdko, names)
+        return {
+            "id": r["speciesId"],
+            "ko": dko, "en": den, "ja": dja, "zh-TW": dzh, "dex": ddex, "types": dtypes,  # 자체 내장(gbl_data 미커버 대비)
+            "score": round(r.get("score") or 0),
+            "tier": tier_of(r.get("score") or 0, mx),
+            "moveset": r.get("moveset", []),
+            "mv": moveset_detail(r.get("moveset", []), MV, sp.get(r["speciesId"])),  # 빠른기술 획득·턴 + 차지별 타수 + 전체 기술풀
+            # 매치업 레이팅(500=대등, >500 우세, <500 열세)
+            "counters": [{"id": c["opponent"], "r": c["rating"]} for c in (r.get("counters") or [])[:5]],
+            "wins": [{"id": c["opponent"], "r": c["rating"]} for c in (r.get("matchups") or [])[:5]],
+            # 역할 점수 [선봉, 마무리, 교체, 차지, 공격, 일관성] (PvPoke scores 순서)
+            "scores": [round(x, 1) for x in (r.get("scores") or [])],
+            # atk는 CMP 우선권 판정용이라 소수1자리 유지(정수 반올림 시 동점 왜곡)
+            "stats": {k: (round(v, 1) if k == "atk" else round(v))
+                      for k, v in (r.get("stats") or {}).items()
+                      if k in ("atk", "def", "hp", "product")},
+        }
+
     out = {}
+    ext = {}   # 201위 이후(코어 3리그) — 상세 페이지 전용. 티어표·CMP·색인 판정은 계속 상위 TOP_N만 사용.
     for league, (fmt, fn) in SOURCES.items():
         try:
             base = MEGA_RANK_BASE if fmt == "mega" else RANK_BASE
@@ -209,31 +257,19 @@ def main() -> None:
             print(f"[skip] {league} ({fmt}/{fn}): {e}")
             continue
         # score가 null인 엔트리(메가 일부 랭킹에 존재) 방어 — .get은 키가 있으면 default 대신 null 반환.
-        ranks = [r for r in raw if (r.get("score") or 0) > 0][:TOP_N]
+        ranked = [r for r in raw if (r.get("score") or 0) > 0]
+        ranks = ranked[:TOP_N]
         if not ranks:
             print(f"[skip] {league}: 랭킹 0종")
             continue
         mx = max((r.get("score") or 0) for r in ranks)
-        mons = []
-        for r in ranks:
-            dko, den, dja, ddex, dtypes = disp_names(r["speciesId"], sp, pdko, names)
-            mons.append({
-                "id": r["speciesId"],
-                "ko": dko, "en": den, "ja": dja, "dex": ddex, "types": dtypes,  # 자체 내장(gbl_data 미커버 대비)
-                "score": round(r.get("score") or 0),
-                "tier": tier_of(r.get("score") or 0, mx),
-                "moveset": r.get("moveset", []),
-                "mv": moveset_detail(r.get("moveset", []), MV, sp.get(r["speciesId"])),  # 빠른기술 획득·턴 + 차지별 타수 + 전체 기술풀
-                # 매치업 레이팅(500=대등, >500 우세, <500 열세)
-                "counters": [{"id": c["opponent"], "r": c["rating"]} for c in (r.get("counters") or [])[:5]],
-                "wins": [{"id": c["opponent"], "r": c["rating"]} for c in (r.get("matchups") or [])[:5]],
-                # 역할 점수 [선봉, 마무리, 교체, 차지, 공격, 일관성] (PvPoke scores 순서)
-                "scores": [round(x, 1) for x in (r.get("scores") or [])],
-                # atk는 CMP 우선권 판정용이라 소수1자리 유지(정수 반올림 시 동점 왜곡)
-                "stats": {k: (round(v, 1) if k == "atk" else round(v))
-                          for k, v in (r.get("stats") or {}).items()
-                          if k in ("atk", "def", "hp", "product")},
-            })
+        mons = [build_row(r, mx) for r in ranks]
+        # 201위 이후 — 전 종 상세 페이지용. 그림자는 기본 폼이 랭킹 어디든 있으면 생략(기본 폼 페이지로 연결 · 중복 페이지 방지).
+        if SEASON and fmt == "all":
+            all_ids = {r["speciesId"] for r in ranked}
+            rest = [r for r in ranked[TOP_N:]
+                    if not (r["speciesId"].endswith("_shadow") and r["speciesId"][:-7] in all_ids)]
+            ext[league] = [dict(build_row(r, mx), rank=ranked.index(r) + 1) for r in rest]
         # 섀도우는 종족값(및 CMP 공격 스탯)이 일반폼과 동일해야 함(섀도우 배수는 데미지에만 적용).
         # PvPoke가 IV 최적화를 따로 해 미세차가 생기므로 base 폼 스탯으로 통일.
         by_id = {m["id"]: m for m in mons}
@@ -257,6 +293,14 @@ def main() -> None:
     dest = os.path.join(GBL, f"gbl_detail{SUFFIX}.json")
     json.dump(out, open(dest, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"saved {dest} ({os.path.getsize(dest)} bytes)  [branch={BRANCH}]")
+    if ext:
+        edest = os.path.join(GBL, f"gbl_detail_ext{SUFFIX}.json")
+        json.dump(ext, open(edest, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+        print(f"saved {edest} ({os.path.getsize(edest)} bytes)  " + " ".join(f"{k}=+{len(v)}" for k, v in ext.items()))
+    noname = sorted({m["id"] for src in (out, ext) for lg in src.values() for m in lg
+                     if not (m.get("ko") and m.get("en") and m.get("ja") and m.get("zh-TW"))})
+    if noname:
+        print(f"[warn] 4개국어 이름이 비는 speciesId {len(noname)}개: {noname[:12]}")
 
     # 포켓몬 이름은 시즌 불변 → 시즌 스냅샷(SUFFIX)에서는 pokedex_names.json 재생성 생략.
     if SUFFIX:
@@ -270,7 +314,10 @@ def main() -> None:
         ja = _dex_name(names["ja"], dex)
         if not en: miss_en.append(k)
         if not ja: miss_ja.append(k)
-        pdnames[k] = {"ko": pdko[k], "en": en, "ja": ja}
+        prev = PDN.get(k, {})
+        pdnames[k] = {"ko": pdko[k], "en": en or prev.get("en"), "ja": ja or prev.get("ja")}
+        if prev.get("zh-TW"):
+            pdnames[k]["zh-TW"] = prev["zh-TW"]   # zh-TW는 PokeMiners에 없어 기존 값을 보존(덮어써서 지우던 버그 방지)
     ndest = os.path.join(GBL, "pokedex_names.json")
     json.dump(pdnames, open(ndest, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"saved {ndest} ({len(pdnames)} dex, {os.path.getsize(ndest)} bytes)")

@@ -5,6 +5,7 @@
 import META from "./gbl_meta_mons.json";
 import DETAIL from "./gbl_detail.json";
 import DETAIL_S28 from "./gbl_detail_s28.json";
+import DETAIL_EXT_S28 from "./gbl_detail_ext_s28.json";
 import MON_NOTES from "./gbl_mon_notes.json";
 import { currentSeason } from "./seasons";
 
@@ -15,6 +16,14 @@ const SETS: Record<string, Set<string>> = Object.fromEntries(Object.entries(LEAG
 const SNAP_BY_SLUG: Record<string, unknown> = { s27: DETAIL, s28: DETAIL_S28 };
 const CUR = (SNAP_BY_SLUG[currentSeason().slug] || DETAIL_S28) as Record<string, { id: string; tier?: string }[]>;
 const CUR_IDS: Record<string, Set<string>> = Object.fromEntries(Object.entries(CUR).map(([l, arr]) => [l, new Set(arr.map((e) => e.id))]));
+
+// 확장 스냅샷 — 리그 201위 이후 전 종(gbl_compile_detail.py가 gbl_detail_ext_<시즌>.json으로 출력). 상세 페이지 "존재" 판정·조회 전용.
+// 티어표·CMP·색인 판정·그림자 통합은 계속 상위 200(CUR)만 본다 → 확장 종은 전부 noindex·사이트맵 제외(isMetaMon이 CUR 티어를 요구).
+const EXT_BY_SLUG: Record<string, unknown> = { s28: DETAIL_EXT_S28 };
+const EXT = (EXT_BY_SLUG[currentSeason().slug] || {}) as Record<string, { id: string }[]>;
+const EXT_IDS: Record<string, Set<string>> = Object.fromEntries(Object.entries(EXT).map(([l, arr]) => [l, new Set(arr.map((e) => e.id))]));
+export const extDetail = (league: string, id: string): unknown => (EXT[league] || []).find((e) => e.id === id);
+export const extRows = (): Record<string, { id: string }[]> => EXT;
 
 // 그림자(_shadow) 페이지 통합 — 그림자는 기본 폼과 노트·해설이 같아 "중복 페이지"로 읽히므로 페이지 자체를 없앰.
 // 현재 시즌에 기본 폼이 있으면 → 그림자 URL은 기본 폼으로 301, 내부 링크도 기본 폼으로(과거 시즌 ?s= 은 상세 페이지가 폴백 처리).
@@ -32,7 +41,16 @@ export function mergedVariantsOf(league: string, id: string): string[] {
   return out.filter((v) => CUR_IDS[league]?.has(v));
 }
 // 링크용 id — 통합된 그림자는 기본 폼으로(내부 301 방지).
-export const linkMonId = (league: string, id: string): string => mergedShadowBase(league, id) ?? id;
+// 상위 200 밖의 그림자는 확장 스냅샷에 행이 없음(기본 폼이 있으면 생략) → 기본 폼 페이지로 연결.
+export const linkMonId = (league: string, id: string): string => {
+  const merged = mergedShadowBase(league, id);
+  if (merged) return merged;
+  if (id.endsWith("_shadow") && !CUR_IDS[league]?.has(id) && !EXT_IDS[league]?.has(id)) {
+    const base = id.replace(/_shadow$/, "");
+    if (CUR_IDS[league]?.has(base) || EXT_IDS[league]?.has(base)) return base;
+  }
+  return id;
+};
 
 // 메가 리그(*_mega) 등 리스트에 없는 리그는 false → noindex(사이트맵에도 원래 없음).
 // 통합된 그림자는 false(어차피 301). 기본 폼은 자신 또는 (통합된) 그림자가 메타면 true — 그림자 단독 메타(드래피온 등)의 노트가 기본 폼 페이지에서 색인되도록.
@@ -52,8 +70,8 @@ export function isMetaMon(league: string, id: string): boolean {
 //  · 2026-10-08(승인 후, 사용자 결정): 다시 개방 — 상세 페이지가 "존재하면" 링크. 색인은 그대로(비메타는 noindex·사이트맵 제외, isMetaMon).
 //  되돌리려면 LINK_ONLY_INDEXED = true 한 줄.
 export const LINK_ONLY_INDEXED = false;
-// 상세 페이지 존재 여부 = 현재 시즌 스냅샷(리그 상위 200)에 링크 목적지(통합 그림자→기본 폼)가 있는가. 없는 종은 페이지 자체가 없어 링크하면 404.
-export const hasDetailPage = (league: string, id: string): boolean => !!CUR_IDS[league]?.has(linkMonId(league, id));
+// 상세 페이지 존재 여부 = 현재 시즌 스냅샷(상위 200) 또는 확장 스냅샷(201위 이후)에 링크 목적지가 있는가. 랭킹에 아예 없는 종만 false(링크하면 404).
+export const hasDetailPage = (league: string, id: string): boolean => { const t = linkMonId(league, id); return !!(CUR_IDS[league]?.has(t) || EXT_IDS[league]?.has(t)); };
 export const hasDetailLink = (league: string, id: string): boolean =>
   LINK_ONLY_INDEXED ? isMetaMon(league, linkMonId(league, id)) : hasDetailPage(league, id);
 // 사이트맵용 — 현재 시즌 스냅샷 기준 색인 대상 id 목록(페이지의 robots 판정과 같은 소스·같은 시즌).

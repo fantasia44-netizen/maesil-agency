@@ -1,0 +1,408 @@
+{
+ "burmy_plant": {
+  "ko": "초목도롱",
+  "en": "Plant Cloak",
+  "ja": "くさきのミノ",
+  "zh-TW": "草木蓑衣"
+ },
+ "burmy_sandy": {
+  "ko": "모래땅도롱",
+  "en": "Sandy Cloak",
+  "ja": "すなちのミノ",
+  "zh-TW": "砂土蓑衣"
+ },
+ "burmy_trash": {
+  "ko": "슈레도롱",
+  "en": "Trash Cloak",
+  "ja": "ゴミのミノ",
+  "zh-TW": "垃圾蓑衣"
+ },
+ "castform_rainy": {
+  "ko": "빗방울의 모습",
+  "en": "Rainy Form",
+  "ja": "あまみずのすがた",
+  "zh-TW": "雨水的樣子"
+ },
+ "castform_snowy": {
+  "ko": "설운의 모습",
+  "en": "Snowy Form",
+  "ja": "ゆきぐものすがた",
+  "zh-TW": "雪雲的樣子"
+ },
+ "castform_sunny": {
+  "ko": "태양의 모습",
+  "en": "Sunny Form",
+  "ja": "たいようのすがた",
+  "zh-TW": "太陽的樣子"
+ },
+ "cherrim_overcast": {
+  "ko": "네거폼",
+  "en": "Overcast Form",
+  "ja": "ネガフォルム",
+  "zh-TW": "陰天形態"
+ },
+ "cherrim_sunny": {
+  "ko": "포지폼",
+  "en": "Sunshine Form",
+  "ja": "ポジフォルム",
+  "zh-TW": "晴天形態"
+ },
+ "deoxys_attack": {
+  "ko": "어택폼",
+  "en": "Attack Forme",
+  "ja": "アタックフォルム",
+  "zh-TW": "攻擊形態"
+ },
+ "deoxys_defense": {
+  "ko": "디펜스폼",
+  "en": "Defense Forme",
+  "ja": "ディフェンスフォルム",
+  "zh-TW": "防禦形態"
+ },
+ "deoxys_speed": {
+  "ko": "스피드폼",
+  "en": "Speed Forme",
+  "ja": "スピードフォルム",
+  "zh-TW": "速度形態"
+ },
+ "genesect_burn": {
+  "ko": "블레이즈카세트",
+  "en": "Burn Drive",
+  "ja": "ブレイズカセット",
+  "zh-TW": "火焰卡帶"
+ },
+ "genesect_chill": {
+  "ko": "프리즈카세트",
+  "en": "Chill Drive",
+  "ja": "フリーズカセット",
+  "zh-TW": "冰凍卡帶"
+ },
+ "genesect_douse": {
+  "ko": "아쿠아카세트",
+  "en": "Douse Drive",
+  "ja": "アクアカセット",
+  "zh-TW": "水流卡帶"
+ },
+ "genesect_shock": {
+  "ko": "번개카세트",
+  "en": "Shock Drive",
+  "ja": "イナズマカセット",
+  "zh-TW": "閃電卡帶"
+ },
+ "gourgeist_average": {
+  "ko": "보통 사이즈",
+  "en": "Average Size",
+  "ja": "ふつうのサイズ",
+  "zh-TW": "普通尺寸"
+ },
+ "gourgeist_large": {
+  "ko": "큰 사이즈",
+  "en": "Large Size",
+  "ja": "おおきいサイズ",
+  "zh-TW": "大尺寸"
+ },
+ "gourgeist_small": {
+  "ko": "작은 사이즈",
+  "en": "Small Size",
+  "ja": "ちいさいサイズ",
+  "zh-TW": "小尺寸"
+ },
+ "gourgeist_super": {
+  "ko": "특대 사이즈",
+  "en": "Super Size",
+  "ja": "とくだいサイズ",
+  "zh-TW": "特大尺寸"
+ },
+ "hoopa_unbound": {
+  "ko": "굴레를 벗어난 후파",
+  "en": "Hoopa Unbound",
+  "ja": "ときはなたれしフーパ",
+  "zh-TW": "解放胡帕",
+  "full": true
+ },
+ "indeedee_female": {
+  "ko": "암컷의 모습",
+  "en": "Female",
+  "ja": "メスのすがた",
+  "zh-TW": "雌性的樣子"
+ },
+ "indeedee_male": {
+  "ko": "수컷의 모습",
+  "en": "Male",
+  "ja": "オスのすがた",
+  "zh-TW": "雄性的樣子"
+ },
+ "keldeo_ordinary": {
+  "ko": "평상시 모습",
+  "en": "Ordinary Form",
+  "ja": "いつものすがた",
+  "zh-TW": "平常的樣子"
+ },
+ "keldeo_resolute": {
+  "ko": "각오의 모습",
+  "en": "Resolute Form",
+  "ja": "かくごのすがた",
+  "zh-TW": "覺悟的樣子"
+ },
+ "lycanroc_dusk": {
+  "ko": "황혼의 모습",
+  "en": "Dusk Form",
+  "ja": "たそがれのすがた",
+  "zh-TW": "黃昏的樣子"
+ },
+ "lycanroc_midday": {
+  "ko": "한낮의 모습",
+  "en": "Midday Form",
+  "ja": "まひるのすがた",
+  "zh-TW": "白晝的樣子"
+ },
+ "lycanroc_midnight": {
+  "ko": "한밤중의 모습",
+  "en": "Midnight Form",
+  "ja": "まよなかのすがた",
+  "zh-TW": "黑夜的樣子"
+ },
+ "meowstic_female": {
+  "ko": "암컷의 모습",
+  "en": "Female",
+  "ja": "メスのすがた",
+  "zh-TW": "雌性的樣子"
+ },
+ "mewtwo_armored": {
+  "ko": "아머드 뮤츠",
+  "en": "Armored Mewtwo",
+  "ja": "アーマードミュウツー",
+  "zh-TW": "裝甲超夢",
+  "full": true
+ },
+ "oinkologne_female": {
+  "ko": "암컷의 모습",
+  "en": "Female",
+  "ja": "メスのすがた",
+  "zh-TW": "雌性的樣子"
+ },
+ "oricorio_baile": {
+  "ko": "이글이글스타일",
+  "en": "Baile Style",
+  "ja": "めらめらスタイル",
+  "zh-TW": "熱辣熱辣風格"
+ },
+ "oricorio_pau": {
+  "ko": "훌라훌라스타일",
+  "en": "Pa’u Style",
+  "ja": "ふらふらスタイル",
+  "zh-TW": "呼拉呼拉風格"
+ },
+ "oricorio_pom_pom": {
+  "ko": "파칙파칙스타일",
+  "en": "Pom-Pom Style",
+  "ja": "ぱちぱちスタイル",
+  "zh-TW": "啪滋啪滋風格"
+ },
+ "oricorio_sensu": {
+  "ko": "하늘하늘스타일",
+  "en": "Sensu Style",
+  "ja": "まいまいスタイル",
+  "zh-TW": "輕盈輕盈風格"
+ },
+ "pikachu_5th_anniversary": {
+  "ko": "5주년",
+  "en": "5th Anniversary",
+  "ja": "5周年",
+  "zh-TW": "5週年"
+ },
+ "pikachu_flying": {
+  "ko": "플라잉",
+  "en": "Flying",
+  "ja": "そらをとぶ",
+  "zh-TW": "飛翔"
+ },
+ "pikachu_horizons": {
+  "ko": "호라이즌 캡틴",
+  "en": "Horizons",
+  "ja": "キャプテン",
+  "zh-TW": "地平線"
+ },
+ "pikachu_kariyushi": {
+  "ko": "가리유시",
+  "en": "Kariyushi",
+  "ja": "かりゆし",
+  "zh-TW": "嘉利吉"
+ },
+ "pikachu_libre": {
+  "ko": "마스크드",
+  "en": "Libre",
+  "ja": "マスクド",
+  "zh-TW": "面罩摔角手"
+ },
+ "pikachu_pop_star": {
+  "ko": "아이돌",
+  "en": "Pop Star",
+  "ja": "アイドル",
+  "zh-TW": "偶像"
+ },
+ "pikachu_rock_star": {
+  "ko": "하드록",
+  "en": "Rock Star",
+  "ja": "ハードロック",
+  "zh-TW": "硬搖滾"
+ },
+ "pikachu_shaymin": {
+  "ko": "쉐이미 스카프",
+  "en": "Shaymin Scarf",
+  "ja": "シェイミスカーフ",
+  "zh-TW": "謝米圍巾"
+ },
+ "pumpkaboo_average": {
+  "ko": "보통 사이즈",
+  "en": "Average Size",
+  "ja": "ふつうのサイズ",
+  "zh-TW": "普通尺寸"
+ },
+ "pumpkaboo_large": {
+  "ko": "큰 사이즈",
+  "en": "Large Size",
+  "ja": "おおきいサイズ",
+  "zh-TW": "大尺寸"
+ },
+ "pumpkaboo_small": {
+  "ko": "작은 사이즈",
+  "en": "Small Size",
+  "ja": "ちいさいサイズ",
+  "zh-TW": "小尺寸"
+ },
+ "pumpkaboo_super": {
+  "ko": "특대 사이즈",
+  "en": "Super Size",
+  "ja": "とくだいサイズ",
+  "zh-TW": "特大尺寸"
+ },
+ "rotom_fan": {
+  "ko": "스핀로토무",
+  "en": "Fan Rotom",
+  "ja": "スピンロトム",
+  "zh-TW": "旋轉洛托姆",
+  "full": true
+ },
+ "rotom_frost": {
+  "ko": "프로스트로토무",
+  "en": "Frost Rotom",
+  "ja": "フロストロトム",
+  "zh-TW": "結冰洛托姆",
+  "full": true
+ },
+ "rotom_heat": {
+  "ko": "히트로토무",
+  "en": "Heat Rotom",
+  "ja": "ヒートロトム",
+  "zh-TW": "加熱洛托姆",
+  "full": true
+ },
+ "rotom_mow": {
+  "ko": "커트로토무",
+  "en": "Mow Rotom",
+  "ja": "カットロトム",
+  "zh-TW": "切割洛托姆",
+  "full": true
+ },
+ "rotom_wash": {
+  "ko": "워시로토무",
+  "en": "Wash Rotom",
+  "ja": "ウォッシュロトム",
+  "zh-TW": "清洗洛托姆",
+  "full": true
+ },
+ "shaymin_land": {
+  "ko": "랜드폼",
+  "en": "Land Forme",
+  "ja": "ランドフォルム",
+  "zh-TW": "陸上形態"
+ },
+ "shaymin_sky": {
+  "ko": "스카이폼",
+  "en": "Sky Forme",
+  "ja": "スカイフォルム",
+  "zh-TW": "天空形態"
+ },
+ "tatsugiri_curly": {
+  "ko": "젖힌 모습",
+  "en": "Curly Form",
+  "ja": "そったすがた",
+  "zh-TW": "上弓姿勢"
+ },
+ "tatsugiri_droopy": {
+  "ko": "늘어진 모습",
+  "en": "Droopy Form",
+  "ja": "たれたすがた",
+  "zh-TW": "下垂姿勢"
+ },
+ "tatsugiri_stretchy": {
+  "ko": "뻗은 모습",
+  "en": "Stretchy Form",
+  "ja": "のびたすがた",
+  "zh-TW": "平挺姿勢"
+ },
+ "tauros_aqua": {
+  "ko": "팔데아 켄타로스 (워터종)",
+  "en": "Paldean Tauros (Aqua Breed)",
+  "ja": "パルデアケンタロス（ウォーターしゅ）",
+  "zh-TW": "帕底亞肯泰羅（水瀾種）",
+  "full": true
+ },
+ "tauros_blaze": {
+  "ko": "팔데아 켄타로스 (블레이즈종)",
+  "en": "Paldean Tauros (Blaze Breed)",
+  "ja": "パルデアケンタロス（ブレイズしゅ）",
+  "zh-TW": "帕底亞肯泰羅（火熾種）",
+  "full": true
+ },
+ "tauros_combat": {
+  "ko": "팔데아 켄타로스 (컴뱃종)",
+  "en": "Paldean Tauros (Combat Breed)",
+  "ja": "パルデアケンタロス（コンバットしゅ）",
+  "zh-TW": "帕底亞肯泰羅（鬥戰種）",
+  "full": true
+ },
+ "urshifu_rapid_strike": {
+  "ko": "연격의 태세",
+  "en": "Rapid Strike Style",
+  "ja": "れんげきのかた",
+  "zh-TW": "連擊流"
+ },
+ "urshifu_single_strike": {
+  "ko": "일격의 태세",
+  "en": "Single Strike Style",
+  "ja": "いちげきのかた",
+  "zh-TW": "一擊流"
+ },
+ "wormadam_plant": {
+  "ko": "초목도롱",
+  "en": "Plant Cloak",
+  "ja": "くさきのミノ",
+  "zh-TW": "草木蓑衣"
+ },
+ "wormadam_sandy": {
+  "ko": "모래땅도롱",
+  "en": "Sandy Cloak",
+  "ja": "すなちのミノ",
+  "zh-TW": "砂土蓑衣"
+ },
+ "wormadam_trash": {
+  "ko": "슈레도롱",
+  "en": "Trash Cloak",
+  "ja": "ゴミのミノ",
+  "zh-TW": "垃圾蓑衣"
+ },
+ "zygarde_10": {
+  "ko": "10%폼",
+  "en": "10% Forme",
+  "ja": "１０％フォルム",
+  "zh-TW": "１０％形態"
+ },
+ "zygarde_complete": {
+  "ko": "퍼펙트폼",
+  "en": "Complete Forme",
+  "ja": "パーフェクトフォルム",
+  "zh-TW": "完全體形態"
+ }
+}

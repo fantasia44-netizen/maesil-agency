@@ -88,7 +88,7 @@ export function countRows(m: Move): CountRow[] {
 
 // ── 메타 채용(현재 시즌 추천 기술배치) ─────────────────────────────────
 type ChargedMv = { id: string; energy: number; counts: number[] };
-type Snap = { id: string; ko?: string; en?: string; ja?: string; dex?: number; types?: string[]; score: number; tier: string; moveset: string[];
+type Snap = { id: string; ko?: string; en?: string; ja?: string; "zh-TW"?: string; dex?: number; types?: string[]; score: number; tier: string; moveset: string[];
   stats?: { atk?: number; def?: number; hp?: number }; mv?: { fast: { id: string; gain: number; turns: number }; charged: ChargedMv[] } };
 const SNAP_BY_SLUG: Record<string, unknown> = { s27: DETAIL, s28: DETAIL_S28 };
 const SNAP = (SNAP_BY_SLUG[currentSeason().slug] || DETAIL_S28) as Record<string, Snap[]>;
@@ -119,7 +119,7 @@ export type UserRow = {
   dmg: number; pct: number; stab: boolean;
 };
 function snapName(lang: Locale, r: Snap): string {
-  if (lang === "zh-TW") { const zh = r.dex != null ? PKN[String(r.dex)]?.["zh-TW"] : undefined; if (zh) return (r.id.endsWith("_shadow") ? "暗影" : "") + zh; }
+  if (lang === "zh-TW") { if (r["zh-TW"]) return r["zh-TW"]; const zh = r.dex != null ? PKN[String(r.dex)]?.["zh-TW"] : undefined; if (zh) return (r.id.endsWith("_shadow") ? "暗影" : "") + zh; }
   return (lang === "en" ? r.en : lang === "ja" ? r.ja : r.ko) || r.en || r.ko || r.id;
 }
 export function metaUsers(lang: Locale, m: Move): Record<string, UserRow[]> {
