@@ -109,9 +109,9 @@
  },
  "BEAK_BLAST": {
   "ko": "부리캐논",
-  "ja": "Beak Blast",
+  "ja": "くちばしキャノン",
   "en": "Beak Blast",
-  "zh-TW": "Beak Blast"
+  "zh-TW": "鳥嘴加農炮"
  },
  "BEHEMOTH_BASH": {
   "ko": "거수탄",
@@ -264,10 +264,10 @@
   "zh-TW": "撒嬌"
  },
  "CHILLING_WATER": {
-  "ko": "차가운물",
-  "ja": "Chilling Water",
+  "ko": "찬물끼얹기",
+  "ja": "ひやみず",
   "en": "Chilling Water",
-  "zh-TW": "Chilling Water"
+  "zh-TW": "潑冷水"
  },
  "CLANGING_SCALES": {
   "ko": "스케일노이즈",
@@ -367,9 +367,9 @@
  },
  "DIVE": {
   "ko": "다이빙",
-  "ja": "Dive",
+  "ja": "ダイビング",
   "en": "Dive",
-  "zh-TW": "Dive"
+  "zh-TW": "潛水"
  },
  "DOOM_DESIRE": {
   "ko": "파멸의소원",
@@ -462,10 +462,10 @@
   "zh-TW": "直衝鑽"
  },
  "DRUM_BEATING": {
-  "ko": "Drum Beating",
-  "ja": "Drum Beating",
+  "ko": "드럼어택",
+  "ja": "ドラムアタック",
   "en": "Drum Beating",
-  "zh-TW": "Drum Beating"
+  "zh-TW": "鼓擊"
  },
  "DYNAMAX_CANNON": {
   "ko": "다이맥스포",
@@ -673,9 +673,9 @@
  },
  "FUTURE_SIGHT": {
   "ko": "미래예지",
-  "ja": "Future Sight",
+  "ja": "みらいよち",
   "en": "Future Sight",
-  "zh-TW": "Future Sight"
+  "zh-TW": "預知未來"
  },
  "FUTURE_SIGHT_PLUS": {
   "ko": "Future Sight+",
@@ -691,9 +691,9 @@
  },
  "GIGATON_HAMMER": {
   "ko": "거대해머",
-  "ja": "Gigaton Hammer",
+  "ja": "デカハンマー",
   "en": "Gigaton Hammer",
-  "zh-TW": "Gigaton Hammer"
+  "zh-TW": "巨力錘"
  },
  "GIGA_DRAIN": {
   "ko": "기가드레인",
@@ -715,9 +715,9 @@
  },
  "GLAIVE_RUSH": {
   "ko": "대검돌격",
-  "ja": "Glaive Rush",
+  "ja": "きょけんとつげき",
   "en": "Glaive Rush",
-  "zh-TW": "Glaive Rush"
+  "zh-TW": "巨劍突擊"
  },
  "GRASS_KNOT": {
   "ko": "풀묶기",
@@ -1141,9 +1141,9 @@
  },
  "MIND_BLOWN": {
   "ko": "깜짝헤드",
-  "ja": "Mind Blown",
+  "ja": "ビックリヘッド",
   "en": "Mind Blown",
-  "zh-TW": "Mind Blown"
+  "zh-TW": "驚爆大頭"
  },
  "MIRROR_COAT": {
   "ko": "미러코트",
@@ -1303,9 +1303,9 @@
  },
  "PLASMA_FISTS": {
   "ko": "플라스마피스트",
-  "ja": "Plasma Fists",
+  "ja": "プラズマフィスト",
   "en": "Plasma Fists",
-  "zh-TW": "Plasma Fists"
+  "zh-TW": "等離子閃電拳"
  },
  "PLAY_ROUGH": {
   "ko": "치근거리기",
@@ -1434,10 +1434,10 @@
   "zh-TW": "精神波"
  },
  "PYRO_BALL": {
-  "ko": "Pyro Ball",
-  "ja": "Pyro Ball",
+  "ko": "화염볼",
+  "ja": "かえんボール",
   "en": "Pyro Ball",
-  "zh-TW": "Pyro Ball"
+  "zh-TW": "火焰球"
  },
  "QUICK_ATTACK": {
   "ko": "전광석화",
@@ -1573,9 +1573,9 @@
  },
  "SECRET_SWORD": {
   "ko": "신비의칼",
-  "ja": "Secret Sword",
+  "ja": "しんぴのつるぎ",
   "en": "Secret Sword",
-  "zh-TW": "Secret Sword"
+  "zh-TW": "神秘之劍"
  },
  "SEED_BOMB": {
   "ko": "씨폭탄",
@@ -1686,10 +1686,10 @@
   "zh-TW": "大聲咆哮"
  },
  "SNIPE_SHOT": {
-  "ko": "Snipe Shot",
-  "ja": "Snipe Shot",
+  "ko": "노려맞히기",
+  "ja": "ねらいうち",
   "en": "Snipe Shot",
-  "zh-TW": "Snipe Shot"
+  "zh-TW": "狙擊"
  },
  "SOLAR_BEAM": {
   "ko": "솔라빔",
@@ -1836,10 +1836,10 @@
   "zh-TW": "高科技光炮"
  },
  "TECHNO_BLAST_DOUSE": {
-  "ko": "Techno Blast (Douse)",
-  "ja": "Techno Blast (Douse)",
+  "ko": "테크노버스터",
+  "ja": "テクノバスター",
   "en": "Techno Blast (Douse)",
-  "zh-TW": "Techno Blast (Douse)"
+  "zh-TW": "高科技光炮"
  },
  "TECHNO_BLAST_NORMAL": {
   "ko": "테크노버스터",
@@ -2083,14 +2083,14 @@
  },
  "AEGISLASH_CHARGE_AIR_SLASH": {
   "ko": "에어슬래시",
-  "ja": "Air Slash",
+  "ja": "エアスラッシュ",
   "en": "Air Slash",
-  "zh-TW": "Air Slash"
+  "zh-TW": "空氣斬"
  },
  "AEGISLASH_CHARGE_PSYCHO_CUT": {
   "ko": "사이코커터",
-  "ja": "Psycho Cut",
+  "ja": "サイコカッター",
   "en": "Psycho Cut",
-  "zh-TW": "Psycho Cut"
+  "zh-TW": "精神利刃"
  }
 }

@@ -108,13 +108,24 @@ def pretty(mid: str) -> str:
     return " ".join(w.capitalize() for w in re.sub(r"_FAST$", "", mid or "").split("_"))
 
 
-def _move_name(names: dict, num: str | None, mid: str) -> str:
-    """i18n 맵에서 기술명(패딩/무패딩 키 시도), 없으면 영문 pretty 폴백."""
+# PokeMiners i18n에 아직 없는 신규 기술(거대해머·대검돌격·깜짝헤드 등)은 영문으로 떨어졌음 →
+# 사이트 공용 기술명 사전(pvp_move_names.json, 공식 명칭 대조본)으로 2차 폴백.
+try:
+    _LOCAL_NAMES = json.load(open(os.path.join(GBL, "pvp_move_names.json"), encoding="utf-8"))
+except Exception:
+    _LOCAL_NAMES = {}
+_LOCAL_ALIAS = {"FUTURESIGHT": "FUTURE_SIGHT", "PYROBALL": "PYRO_BALL", "TECHNO_BLAST_WATER": "TECHNO_BLAST_DOUSE"}
+
+
+def _move_name(names: dict, num: str | None, mid: str, lang: str = "") -> str:
+    """i18n 맵에서 기술명(패딩/무패딩 키 시도) → 없으면 로컬 사전 → 그래도 없으면 영문 pretty."""
     if num:
         v = names.get(f"move_name_{num}") or names.get(f"move_name_{int(num)}")
         if v:
             return v
-    return pretty(mid)
+    key = re.sub(r"_FAST$", "", mid or "")
+    local = _LOCAL_NAMES.get(_LOCAL_ALIAS.get(key, key), {}).get(lang)
+    return local or pretty(mid)
 
 
 def load_pve_moves(gm: list, ko: dict, en: dict, ja: dict) -> dict:
@@ -137,9 +148,9 @@ def load_pve_moves(gm: list, ko: dict, en: dict, ja: dict) -> dict:
             "power": float(ms.get("power") or 0),
             "dur": float(ms.get("durationMs") or 0) / 1000.0,
             "energy": float(ms.get("energyDelta") or 0),
-            "ko": _move_name(ko, num, mid),
-            "en": _move_name(en, num, mid),
-            "ja": _move_name(ja, num, mid),
+            "ko": _move_name(ko, num, mid, "ko"),
+            "en": _move_name(en, num, mid, "en"),
+            "ja": _move_name(ja, num, mid, "ja"),
         }
     return out
 
