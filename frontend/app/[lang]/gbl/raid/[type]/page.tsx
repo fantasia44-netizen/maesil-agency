@@ -16,6 +16,7 @@ import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale }
 import { typeLabel } from "../../typeLabels";
 import { getDict } from "../../dictionaries";
 import { getRaidType } from "./dict";
+import { dexPath, RAID_DEFAULT_VER } from "../../dexHub";
 
 // 로케일별 이름/기술명 선택(레이드 행 필드: name/nameEn/nameJa, fastKo/fastEn/fastJa 등)
 // zh-TW: 포켓몬명은 dex로 pokedex_names, 기술명은 영문명→ID로 pvp_move_names에서 보완(메가/그림자는 뱃지 별도 표시).
@@ -29,7 +30,7 @@ const rowCharged = (lang: Locale, r: Row) => (lang === "en" ? r.chargedEn : lang
 export const revalidate = 600;
 
 type Row = {
-  name: string; nameEn: string; nameJa: string; dex: number; shadow: boolean; mega: string; primal: boolean; legacy: boolean; upcoming: boolean;
+  name: string; nameEn: string; nameJa: string; sid?: string; dex: number; shadow: boolean; mega: string; primal: boolean; legacy: boolean; upcoming: boolean;
   fast: string; charged: string; fastKo: string; chargedKo: string; fastEn: string; chargedEn: string; fastJa: string; chargedJa: string;
   fastType: string; chargedType: string;
   dps: number; tdo: number; er: number; rel: number; atk: number; def: number; hp: number; types: string[];
@@ -43,7 +44,7 @@ const TYPES = Object.keys(RD.types);
 
 // 레이드 딜러 버전(메타). 이벤트 시작으로 기본=메가 피날레(현재 진행중). 이벤트 종료 시 DEFAULT_VER를 "current"로 되돌리면 됨.
 const RAID_BY_VER: Record<string, RaidData> = { current: RAIDS as unknown as RaidData, megafinale: RAIDS_MF as unknown as RaidData };
-const DEFAULT_VER = "megafinale"; // 현재 진행중인 메타(이벤트 종료 시 "current"로)
+const DEFAULT_VER = RAID_DEFAULT_VER; // 현재 진행중인 메타 — dexHub.ts 한 곳에서 관리(도감의 레이드 순위와 같은 버전)
 const RAID_VERSIONS: { slug: string; isNew?: boolean; label: Record<string, string> }[] = [
   { slug: "megafinale", label: { ko: "메가 피날레", en: "Mega Finale", ja: "メガフィナーレ", "zh-TW": "超級大結局" } },
   { slug: "current", label: { ko: "이전(일반)", en: "Previous", ja: "以前(通常)", "zh-TW": "先前(一般)" } },
@@ -239,7 +240,8 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
                     </span>
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a" }}>{rowName(lang, r)}</span>
+                        {(() => { const dp = r.sid ? dexPath(r.sid) : null; const st: React.CSSProperties = { fontSize: "0.9rem", fontWeight: 700, color: "#0f172a", textDecoration: "none" };
+                          return dp ? <Link href={L(dp)} prefetch={false} style={st}>{rowName(lang, r)}</Link> : <span style={st}>{rowName(lang, r)}</span>; })()}
                         <VariantBadge r={r} d={d} stabType={type} />
                       </div>
                       <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 3 }}>

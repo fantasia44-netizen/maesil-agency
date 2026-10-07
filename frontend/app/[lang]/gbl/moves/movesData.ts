@@ -7,7 +7,8 @@ import DETAIL_S28 from "../gbl_detail_s28.json";
 import PKNAMES from "../pokedex_names.json";
 import { currentSeason } from "../seasons";
 import { typeLabel } from "../typeLabels";
-import { isMetaMon, linkMonId, hasDetailLink, hasDetailPage } from "../indexGate";
+import { isMetaMon, linkMonId, hasDetailLink } from "../indexGate";
+import { bestDetail } from "../dexHub";
 import type { Locale } from "../../../../lib/i18n";
 
 export type Buff = { self: number[] | null; opp: number[] | null; chance: number };
@@ -161,8 +162,4 @@ export const indexableMoveSlugs = (): string[] => (MOVES_INDEX_OPEN ? MOVES.map(
 
 // ── 배우는 포켓몬 링크 대상 ─────────────────────────────────────────
 // 상세 페이지가 있는 리그로 연결(색인되는 리그 우선 → 없으면 페이지가 있는 첫 리그). 3리그 상위 200 어디에도 없는 종은 페이지가 없어 null.
-export function learnerLink(sid: string): { league: string; id: string } | null {
-  for (const lg of CORE_LEAGUES) if (isMetaMon(lg, sid)) return { league: lg, id: sid };
-  for (const lg of CORE_LEAGUES) if (hasDetailLink(lg, sid) && hasDetailPage(lg, sid)) return { league: lg, id: linkMonId(lg, sid) };
-  return null;
-}
+export function learnerLink(sid: string): { league: string; id: string } | null { return bestDetail(sid); }

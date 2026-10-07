@@ -15,13 +15,13 @@ const SETS: Record<string, Set<string>> = Object.fromEntries(Object.entries(LEAG
 
 // 현재 시즌 상세 스냅샷의 리그→id 집합 (그림자 통합 판정 기준). 시즌 스냅샷을 추가하면 여기도 등록.
 const SNAP_BY_SLUG: Record<string, unknown> = { s27: DETAIL, s28: DETAIL_S28 };
-const CUR = (SNAP_BY_SLUG[currentSeason().slug] || DETAIL_S28) as Record<string, { id: string; tier?: string }[]>;
+const CUR = (SNAP_BY_SLUG[currentSeason().slug] || DETAIL_S28) as Record<string, { id: string; tier?: string; dex?: number }[]>;
 const CUR_IDS: Record<string, Set<string>> = Object.fromEntries(Object.entries(CUR).map(([l, arr]) => [l, new Set(arr.map((e) => e.id))]));
 
 // 확장 스냅샷 — 리그 201위 이후 전 종(gbl_compile_detail.py가 gbl_detail_ext_<시즌>.json으로 출력). 상세 페이지 "존재" 판정·조회 전용.
 // 티어표·CMP·색인 판정·그림자 통합은 계속 상위 200(CUR)만 본다 → 확장 종은 전부 noindex·사이트맵 제외(isMetaMon이 CUR 티어를 요구).
 const EXT_BY_SLUG: Record<string, unknown> = { s28: DETAIL_EXT_S28 };
-const EXT = (EXT_BY_SLUG[currentSeason().slug] || {}) as Record<string, { id: string }[]>;
+const EXT = (EXT_BY_SLUG[currentSeason().slug] || {}) as Record<string, { id: string; tier?: string; rank?: number; dex?: number }[]>;
 const EXT_IDS: Record<string, Set<string>> = Object.fromEntries(Object.entries(EXT).map(([l, arr]) => [l, new Set(arr.map((e) => e.id))]));
 export const extDetail = (league: string, id: string): unknown => (EXT[league] || []).find((e) => e.id === id);
 export const extRows = (): Record<string, { id: string }[]> => EXT;
@@ -29,6 +29,13 @@ export const extRows = (): Record<string, { id: string }[]> => EXT;
 export const UNRANKED_LEAGUE = "great";
 const UNRANKED_MAP = UNRANKED as unknown as Record<string, unknown>;
 export const unrankedDetail = (league: string, id: string): unknown => (league === UNRANKED_LEAGUE ? UNRANKED_MAP[id] : undefined);
+// 상세 페이지가 있는 전 종의 (id, dex) — 도감 번호 → 대표 speciesId 매핑용(dexHub.ts).
+export function speciesDexPairs(): { id: string; dex: number }[] {
+  const seen = new Map<string, number>();
+  for (const src of [CUR, EXT]) for (const lg of ["great", "ultra", "master"]) for (const r of src[lg] || []) if (r.dex && !seen.has(r.id)) seen.set(r.id, r.dex);
+  for (const [id, u] of Object.entries(UNRANKED_MAP)) { const dex = (u as { dex?: number }).dex; if (dex && !seen.has(id)) seen.set(id, dex); }
+  return [...seen].map(([id, dex]) => ({ id, dex }));
+}
 
 // 그림자(_shadow) 페이지 통합 — 그림자는 기본 폼과 노트·해설이 같아 "중복 페이지"로 읽히므로 페이지 자체를 없앰.
 // 현재 시즌에 기본 폼이 있으면 → 그림자 URL은 기본 폼으로 301, 내부 링크도 기본 폼으로(과거 시즌 ?s= 은 상세 페이지가 폴백 처리).
@@ -57,6 +64,15 @@ export const linkMonId = (league: string, id: string): string => {
   return id;
 };
 
+// 리그 안에서의 위치 — 상위 200이면 티어·순위, 201위 이후면 확장 행의 티어·순위. 그 리그에 페이지가 없으면 null.
+export function leagueStanding(league: string, id: string): { id: string; tier: string; rank: number; ext: boolean } | null {
+  const t = linkMonId(league, id);
+  const i = (CUR[league] || []).findIndex((e) => e.id === t);
+  if (i >= 0) return { id: t, tier: CUR[league][i].tier || "", rank: i + 1, ext: false };
+  const e = (EXT[league] || []).find((x) => x.id === t);
+  return e ? { id: t, tier: e.tier || "", rank: e.rank || 0, ext: true } : null;
+}
+
 // 메가 리그(*_mega) 등 리스트에 없는 리그는 false → noindex(사이트맵에도 원래 없음).
 // 통합된 그림자는 false(어차피 301). 기본 폼은 자신 또는 (통합된) 그림자가 메타면 true — 그림자 단독 메타(드래피온 등)의 노트가 기본 폼 페이지에서 색인되도록.
 export function isMetaMon(league: string, id: string): boolean {
@@ -83,16 +99,19 @@ export const hasDetailLink = (league: string, id: string): boolean =>
 // isMetaMon = "메타 포켓몬"(노트 박스·추천 파트너·분석 등 본문 구성 판정)으로 계속 쓰고, 색인 여부는 isIndexableMon이 따로 결정.
 //  · 2026-09-12~10-07: 색인 = 메타만(URL 다이어트, 사이트맵 포켓몬 123종).
 //  · 2026-10-08(사용자 결정 — AdSense 승인 후 "구글 노출은 무시하고 계속 확장"): 코어 3리그 상위 200 전부 색인·사이트맵 복귀.
-//    확장(201위 이후)·랭킹 밖 페이지는 계속 noindex. 되돌리려면 INDEX_TOP200 = false 한 줄.
+//    되돌리려면 INDEX_TOP200 = false 한 줄.
+//  · 같은 날 추가 결정("심사 때문에 감춰둘 이유가 없다, 원래 구조 전부 복구"): 확장(201위 이후)도 색인 — INDEX_EXT.
+//    랭킹 밖(미진화 등) 기본 정보 페이지와 메가 리그 상세만 noindex 유지.
 export const INDEX_TOP200 = true;
+export const INDEX_EXT = true;
 export function isIndexableMon(league: string, id: string): boolean {
   if (isMetaMon(league, id)) return true;
   if (!INDEX_TOP200 || !SETS[league]) return false;       // 메가 리그 등은 대상 아님
   if (mergedShadowBase(league, id)) return false;          // 통합된 그림자·사이즈 폼은 308
-  return !!CUR_IDS[league]?.has(id);
+  return !!CUR_IDS[league]?.has(id) || (INDEX_EXT && !!EXT_IDS[league]?.has(id));
 }
 // 사이트맵용 — 현재 시즌 스냅샷 기준 색인 대상 id 목록(페이지의 robots 판정과 같은 소스·같은 시즌).
-export const indexableMonIds = (league: string): string[] => (CUR[league] || []).map((e) => e.id).filter((id) => isIndexableMon(league, id));
+export const indexableMonIds = (league: string): string[] => [...(CUR[league] || []), ...(EXT[league] || [])].map((e) => e.id).filter((id) => isIndexableMon(league, id));
 const NOTES = MON_NOTES as Record<string, Record<string, unknown>>;
 const hasNote = (league: string, id: string) => !!NOTES[league]?.[id] || !!NOTES[league]?.[`${id}_shadow`];
 const tierOf = (league: string, id: string) => (CUR[league] || []).find((e) => e.id === id)?.tier || "";

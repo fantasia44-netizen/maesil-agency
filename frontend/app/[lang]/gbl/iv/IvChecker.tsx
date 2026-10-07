@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import STATSJSON from "../pokedex_stats.json";
 import NAMESJSON from "../pokedex_names.json";
 import FORMSJSON from "../gbl_form_stats.json";
@@ -42,9 +43,12 @@ const LEAGUES: { key: string; c: string }[] = [
 ];
 const localName = (lang: Locale, p: { ko: string; en: string; ja: string; "zh-TW"?: string }) => (lang === "en" ? p.en : lang === "ja" ? p.ja : lang === "zh-TW" ? (p["zh-TW"] || p.en) : p.ko);
 
-export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
+// initialKey: ?p=<도감번호|키> 로 들어오면 그 포켓몬을 선택한 상태로 시작(도감 → IV 이동).
+// dexPaths: 포켓몬 키 → 도감(상세) 경로("리그/id"). 서버(page.tsx)가 도감 허브 규칙으로 계산해 전달.
+const DEX_LABEL: Record<string, string> = { ko: "도감 · 배틀·레이드 정보 →", en: "Pokédex · battle & raid info →", ja: "図鑑 · バトル・レイド情報 →", "zh-TW": "圖鑑 · 對戰·團體戰資訊 →" };
+export default function IvChecker({ lang, t, initialKey, dexPaths, dexBase }: { lang: Locale; t: IvDict; initialKey?: string; dexPaths?: Record<string, string>; dexBase?: string }) {
   const [q, setQ] = useState("");
-  const [selKey, setSelKey] = useState<string | null>(null);
+  const [selKey, setSelKey] = useState<string | null>(initialKey && POKELIST.some((p) => p.key === initialKey) ? initialKey : null);
   const [league, setLeague] = useState("great");
   const [bb, setBb] = useState(false);
   const [iv, setIv] = useState({ a: "", d: "", s: "" });
@@ -199,6 +203,11 @@ export default function IvChecker({ lang, t }: { lang: Locale; t: IvDict }) {
               <div style={{ fontSize: "1.15rem", fontWeight: 900, color: "#0f172a" }}>{localName(lang, picked)}</div>
               <div style={{ fontSize: "0.72rem", color: "#94a3b8" }}>#{picked.dex} · {picked.a}/{picked.d}/{picked.s}</div>
             </div>
+            {dexPaths?.[picked.key] && (
+              <Link href={`${dexBase || "/gbl/pokemon"}/${dexPaths[picked.key]}`} style={{ marginLeft: "auto", fontSize: "0.78rem", fontWeight: 800, color: "#1d4ed8", background: "#eef2ff", border: "1px solid #c7d2fe", borderRadius: 10, padding: "6px 12px", textDecoration: "none", whiteSpace: "nowrap" }}>
+                {DEX_LABEL[lang] || DEX_LABEL.ko}
+              </Link>
+            )}
           </div>
 
           {/* 리그 탭 + 베프 */}

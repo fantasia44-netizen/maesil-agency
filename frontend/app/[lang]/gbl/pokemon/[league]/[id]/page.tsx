@@ -24,6 +24,7 @@ import { buildAnalysis, HEADINGS } from "./analysis";
 import { currentSeason, seasonBySlug } from "../../../seasons";
 import { isMetaMon, isIndexableMon, mergedShadowBase, mergedVariantsOf, linkMonId, extDetail, extRows, unrankedDetail } from "../../../indexGate";
 import UnrankedView, { unrankedMetadata, type Unranked } from "./UnrankedView";
+import DexHub from "../../../DexHubCard";
 import MonLink from "../../../MonLink";
 import { moveById as dexMove } from "../../../moves/movesData";
 import MON_NOTES from "../../../gbl_mon_notes.json";
@@ -430,6 +431,9 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
             </div>
           )}
         </div>
+
+        {/* 도감 허브 — 같은 포켓몬의 다른 리그 · 레이드 순위 · IV (어디서 들어와도 여기서 다 연결) */}
+        {!params.league.endsWith("_mega") && <DexHub lang={lang} id={d.id} dex={hdex || 0} league={params.league} />}
 
         {/* 타협개체 심층 분석 링크 — 발행된 몬만(독창 콘텐츠 발견 경로) */}
         {PUBLISHED_ANALYSIS.has(d.id) && (

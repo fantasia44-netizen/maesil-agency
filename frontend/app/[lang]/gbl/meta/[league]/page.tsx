@@ -5,6 +5,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MON, monName, spriteUrl } from "../monNames";
+import MonLink from "../../MonLink";
+import { linkMonId } from "../../indexGate";
 import AdSlot from "../../AdSlot";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../../../lib/i18n";
 import { leagueName, leagueShort } from "../../contentI18n";
@@ -149,7 +151,7 @@ export default async function LeagueMetaPage({ params }: { params: { lang: strin
                 const pct = Math.round((mm.count / total) * 100);
                 const m = MON[mm.speciesId];
                 return (
-                  <div key={mm.speciesId} style={{ display: "flex", alignItems: "center", gap: 8, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "5px 10px" }}>
+                  <MonLink key={mm.speciesId} league={params.league} id={mm.speciesId} href={L(`/gbl/pokemon/${params.league}/${linkMonId(params.league, mm.speciesId)}`)} style={{ display: "flex", alignItems: "center", gap: 8, background: CARD, border: `1px solid ${BORDER}`, borderRadius: 10, padding: "5px 10px", textDecoration: "none", color: "inherit" }}>
                     <span style={{ fontSize: "0.74rem", fontWeight: 800, color: i < 3 ? "#a855f7" : "#94a3b8", minWidth: 22 }}>#{i + 1}</span>
                     <Sprite id={mm.speciesId} size={30} />
                     <span style={{ fontSize: "0.86rem", fontWeight: 600, minWidth: 88, color: "#0f172a" }}>
@@ -159,7 +161,7 @@ export default async function LeagueMetaPage({ params }: { params: { lang: strin
                       <div style={{ width: `${Math.round((mm.count / maxMon) * 100)}%`, height: "100%", background: "linear-gradient(90deg,#3b5bdb,#7c3aed)" }} />
                     </div>
                     <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#3b5bdb", minWidth: 38, textAlign: "right" }}>{pct}%</span>
-                  </div>
+                  </MonLink>
                 );
               })}
             </div>

@@ -6,6 +6,19 @@ import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale }
 import { getIv } from "./dict";
 import { IV_ANALYSIS } from "./analysis/registry";
 import { formDexById } from "../sprite";
+import STATS from "../pokedex_stats.json";
+import FORM_STATS from "../gbl_form_stats.json";
+import MEGA_STATS from "../gbl_mega_stats.json";
+import { bestDetail, baseSidOfDex } from "../dexHub";
+
+// IV 체커의 포켓몬 키(도감번호 / f:<폼id> / m:<메가id>) → 도감 경로("리그/id"). 클라이언트엔 이 표만 내려보낸다(스냅샷 JSON 미포함).
+const DEX_PATHS: Record<string, string> = {};
+{
+  const put = (key: string, sid: string | null) => { const b = sid ? bestDetail(sid) : null; if (b) DEX_PATHS[key] = `${b.league}/${b.id}`; };
+  for (const dex of Object.keys(STATS as Record<string, unknown>)) put(dex, baseSidOfDex(dex));
+  for (const f of FORM_STATS as unknown as { id: string }[]) put("f:" + f.id, f.id);
+  for (const m of MEGA_STATS as unknown as { id: string }[]) put("m:" + m.id, m.id);
+}
 
 const PUBLISHED_IV = Object.values(IV_ANALYSIS).filter((e) => e.published);
 const ivSprite = (dex: number) => `https://lnhagockqvgradbqvqrh.supabase.co/storage/v1/object/public/gbl-sprites/${dex}.png`;
@@ -38,7 +51,9 @@ export function generateMetadata({ params }: { params: { lang: string } }): Meta
 
 const CARD = "#fff", BORDER = "#e3e8f2";
 
-export default function IvPage({ params }: { params: { lang: string } }) {
+export default function IvPage({ params, searchParams }: { params: { lang: string }; searchParams?: { p?: string } }) {
+  // ?p=<도감번호> — 도감(상세)에서 넘어올 때 그 포켓몬을 선택한 상태로 연다. 형식이 안 맞으면 무시.
+  const initialKey = searchParams?.p && /^(\d{1,4}|[fm]:[a-z0-9_]{2,40})$/.test(searchParams.p) ? searchParams.p : undefined;
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getIv(lang);
   const L = (p: string) => localizePath(lang, p);
@@ -54,7 +69,7 @@ export default function IvPage({ params }: { params: { lang: string } }) {
         <h1 style={{ margin: "0.2rem 0", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3, letterSpacing: "-0.3px" }}>{t.h1}</h1>
         <p style={{ margin: "0.4rem 0 1rem", fontSize: "0.88rem", color: "#475569", lineHeight: 1.7 }}>{t.intro}</p>
 
-        <IvChecker lang={lang} t={t} />
+        <IvChecker lang={lang} t={t} initialKey={initialKey} dexPaths={DEX_PATHS} dexBase={localizePath(lang, "/gbl/pokemon")} />
 
         {/* 타협개체 심층 분석 — 독창 콘텐츠 발견 경로(내부링크) */}
         {PUBLISHED_IV.length > 0 && (

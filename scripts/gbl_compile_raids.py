@@ -347,6 +347,7 @@ def main():
             rows.append({
                 "type": bt, "dps": round(dps, 1), "tdo": round(tdo), "er": round(er, 1),
                 "name": nm["ko"], "nameEn": nm["en"], "nameJa": nm["ja"],
+                "sid": sid,  # PvPoke speciesId — 딜러표 행 → 포켓몬 도감(상세) 링크용
                 "dex": dex, "shadow": shadow, "mega": mega, "primal": primal, "types": types_list,
                 "legacy": is_legacy, "upcoming": upcoming, "fast": v["fast"], "charged": charged_id,
                 "atk": round(atk), "def": round(deff), "hp": round(hp),

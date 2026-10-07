@@ -11,6 +11,7 @@ import { typeLabel, TYPE_COLOR } from "../../../typeLabels";
 import { localizePath, hreflangLanguages, type Locale } from "../../../../../../lib/i18n";
 import { moveById, moveName, learnerLink, speciesName } from "../../../moves/movesData";
 import { getMoves } from "../../../moves/dict";
+import DexHub from "../../../DexHubCard";
 
 export type Unranked = {
   dex: number; types: string[]; n: Record<string, string>; stats: { atk: number; def: number; hp: number }; maxCp: number; reason: "cp" | "unlisted";
@@ -112,6 +113,8 @@ export default function UnrankedView({ lang, id, u }: { lang: Locale; id: string
         <p style={{ margin: "10px 0 0", padding: "0.85rem 1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, fontSize: "0.86rem", color: "#334155", lineHeight: 1.8 }}>
           {u.reason === "cp" ? t.whyCp(name, u.maxCp) : t.whyUnlisted(name)}
         </p>
+
+        <DexHub lang={lang} id={id} dex={u.dex} league="" />
 
         {(parents.length > 0 || evos.length > 0) && (
           <>
