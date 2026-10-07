@@ -116,6 +116,11 @@
   2. **수동 단위**: AdSense → 광고 → 광고 단위별 → 디스플레이 광고 생성 → 슬롯 ID(숫자 10자리)를 Render gbl 프론트 env `NEXT_PUBLIC_ADSENSE_SLOT`에 넣고 재배포 → AdSlot 21곳(티어·CMP·메타·포켓몬·레이드·IV·가이드·앱)에 송출.
 - 관리자(super_admin) 로그인 상태에선 AdSlot이 의도적으로 안 보임 — 확인은 시크릿 창.
 
+### 2026-10-07 — 티어 데이터 갱신 규칙 (그림자 제크로무 누락으로 발견)
+- PvPoke는 시즌 시작 후 시즌 브랜치(twilight-trails)를 master에 병합하고 시즌 브랜치는 **멈춤**(9/8 마지막). 시즌 중 신규 폼(그림자 제크로무 10/4)은 master에만 들어옴 → 우리 S28 스냅샷에 한 달간 누락.
+- 수정: `scripts/gbl_compile_detail.py` SEASON_BRANCH s28→master, `frontend/scripts/gbl/build_season28.mjs` BRANCH master. **규칙: 시즌 시작 전 미리보기만 시즌 브랜치, 시작되면 master.**
+- 시즌 중 갱신 순서(월 1회 또는 신규 폼 소식 때): `py -3 scripts/gbl_compile_detail.py s28` → `node scripts/gbl/build_meta_mons.mjs` → `node scripts/gbl/import_mon_notes.mjs` → `node scripts/gbl/build_season28.mjs` → 빌드 → 커밋. 갱신 전 스냅샷 백업해 "노트 있는 몬 이탈 0" 확인(이번: 0, 색인 118→123).
+
 ### 사장님이 이어서 할 것 (순서 무관, 급하지 않음)
 0. **URL 검사 → 색인 요청 20개**(9/14 채팅에 목록) — 오늘 10, 내일 10.
 1. `GBL_MON_NOTES.csv`에 위 미노트(일반 폼) 행 추가 후 작성 — 우선순위: 자동문 남은 S/A 11장 → 그다음 noindex된 B 8장(쓰면 자동 색인 복귀). 규칙·예시: `GBL_MON_NOTES_README.md`. **"표에 없는 말 하나"** 필수(회피 상대 / 팀 역할 / 요즘 메타 평가). 후반 노트가 "타입→약점→기술" 나열로 굳어지는 경향 있었음 — 킹드라·나인테일·마릴리·깨비드릴조는 한 문장씩 보강 권장. 작성 후 `node scripts/gbl/import_mon_notes.mjs` → Claude에게 "ko 노트 번역 채워줘".
