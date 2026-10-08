@@ -10,6 +10,14 @@ const MV = JSON.parse(fs.readFileSync(G + 'pvp_move_names.json', 'utf8'));
 const LANGMAP = { ko: 'ko', ja: 'ja-Hrkt', 'zh-TW': 'zh-Hant' };
 const norm = (s) => (s || '').replace(/[\s'’.\-·・（）()]/g, '').toLowerCase();
 
+// PokéAPI 쪽이 구버전/오류인 것으로 확인된 건 — 우리 값이 맞으므로 재지적하지 않는다.
+// 형식: "<대상ID>|<로케일>": "확인 경위"
+const VERIFIED_OURS = {
+  // 2026-10-09 사장님 인게임 확인: 한국어 공식 표기는 "깨트리기". PokéAPI는 "깨뜨리다"(구번역).
+  'BRICK_BREAK|ko': '사장님 인게임 확인(2026-10-09)',
+};
+const isKnown = (key) => Object.prototype.hasOwnProperty.call(VERIFIED_OURS, key);
+
 async function j(url) { const r = await fetch(url); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
 function pick(names, lang) {
   const want = LANGMAP[lang];
@@ -34,7 +42,7 @@ function pick(names, lang) {
         const ours = PK[String(d)]?.[l];
         if (!official || !ours) { skip.pokemon++; continue; }
         cmp.pokemon++;
-        if (norm(official) !== norm(ours)) bad.pokemon.push(`#${d} [${l}] 우리="${ours}" 공식="${official}"`);
+        if (norm(official) !== norm(ours) && !isKnown(`${d}|${l}`)) bad.pokemon.push(`#${d} [${l}] 우리="${ours}" 공식="${official}"`);
       }
     } catch { skip.pokemon += 3; }
   }
@@ -52,7 +60,7 @@ function pick(names, lang) {
         const ours = MV[id]?.[l];
         if (!official || !ours) { skip.move++; continue; }
         cmp.move++;
-        if (norm(official) !== norm(ours)) bad.move.push(`${id} [${l}] 우리="${ours}" 공식="${official}"`);
+        if (norm(official) !== norm(ours) && !isKnown(`${id}|${l}`)) bad.move.push(`${id} [${l}] 우리="${ours}" 공식="${official}"`);
       }
     } catch { skip.move += 3; }
   }
@@ -83,4 +91,10 @@ function pick(names, lang) {
   show('pokemon', '포켓몬 이름', sample.length);
   show('move', '기술 이름', msample.length);
   show('type', '타입 이름', TYPES.length);
+  const kn = Object.entries(VERIFIED_OURS);
+  if (kn.length) {
+    console.log(`
+■ 확인 완료 예외 ${kn.length}건(우리 값이 맞음 — 재지적 안 함)`);
+    for (const [k, why] of kn) console.log(`   ${k} — ${why}`);
+  }
 })();

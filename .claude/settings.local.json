@@ -473,7 +473,8 @@
       "Bash(awk '/^■ app\\\\/\\\\[lang\\\\]\\\\/gbl/{p=1} /^■ app\\\\/\\\\[lang\\\\]\\\\/tcg/{p=0} p')",
       "Bash(node scripts/gbl/audit_render_i18n.cjs)",
       "Bash(curl -s --max-time 180 \"http://localhost:3000/en/gbl/meta\" -o s.html)",
-      "Bash(node scripts/gbl/audit_terms.cjs 40)"
+      "Bash(node scripts/gbl/audit_terms.cjs 40)",
+      "Bash(git commit -q -m 'chore\\(gbl-i18n\\): 용어 검증 예외 등록 — BRICK_BREAK ko '\\\\''깨트리기'\\\\''\\(사장님 인게임 확인\\) *)"
     ]
   }
 }
