@@ -18,6 +18,7 @@ export type EventsDict = SDLabels & {
   weekdays: string[];
   dateRange: string; dateSingle: string; timeRange: string;
   tagSpawns: string; tagResearch: string; detailLink: string;
+  bonusH: string; codeH: string;
   // 이번 주 이벤트 공유 카드
   shareBtn: string; saveBtn: string; building: string; shareCardTitle: string; shareCardWeek: string; shareFileTitle: string;
   // 월 달력(EventCalendar)
@@ -49,6 +50,7 @@ const ko: EventsDict = {
   weekdays: ["일", "월", "화", "수", "목", "금", "토"],
   dateRange: "{m1}/{d1}({w1}) ~ {m2}/{d2}({w2})", dateSingle: "{m}/{d}({w})", timeRange: "{h1}:{mm1} ~ {h2}:{mm2}",
   tagSpawns: "출현↑", tagResearch: "리서치", detailLink: "상세",
+  bonusH: "🎁 이벤트 보너스", codeH: "🎟 프로모코드",
   shareBtn: "📤 이번 주 이벤트 공유", saveBtn: "💾 저장", building: "생성 중…", shareCardTitle: "이번 주 포켓몬 GO 이벤트", shareCardWeek: "이번 주", shareFileTitle: "포켓몬고 이번 주 이벤트",
   calTitle: "{y}년 {month} 이벤트", calShareBtn: "📤 {month} 달력 공유", calShareSub: "포켓몬 GO 이벤트 달력",
   calOngoingH: "상시 진행 (2주 넘는 장기)", calNoEvent: "이 날은 예정된 이벤트가 없습니다.",
@@ -93,6 +95,7 @@ const en: EventsDict = {
   weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
   dateRange: "{m1}/{d1} ({w1}) – {m2}/{d2} ({w2})", dateSingle: "{m}/{d} ({w})", timeRange: "{h1}:{mm1} – {h2}:{mm2}",
   tagSpawns: "Spawns", tagResearch: "Research", detailLink: "Details",
+  bonusH: "🎁 Event bonuses", codeH: "🎟 Promo code",
   shareBtn: "📤 Share this week", saveBtn: "💾 Save", building: "Generating…", shareCardTitle: "This Week in Pokémon GO", shareCardWeek: "This week", shareFileTitle: "Pokémon GO events this week",
   calTitle: "{month} {y} Events", calShareBtn: "📤 Share {month}", calShareSub: "Pokémon GO event calendar",
   calOngoingH: "Running all month (over 2 weeks)", calNoEvent: "Nothing scheduled on this day.",
@@ -127,6 +130,7 @@ const ja: EventsDict = {
   weekdays: ["日", "月", "火", "水", "木", "金", "土"],
   dateRange: "{m1}/{d1}({w1}) 〜 {m2}/{d2}({w2})", dateSingle: "{m}/{d}({w})", timeRange: "{h1}:{mm1} 〜 {h2}:{mm2}",
   tagSpawns: "出現↑", tagResearch: "リサーチ", detailLink: "詳細",
+  bonusH: "🎁 イベントボーナス", codeH: "🎟 プロモコード",
   shareBtn: "📤 今週のイベントを共有", saveBtn: "💾 保存", building: "生成中…", shareCardTitle: "今週のポケモンGO イベント", shareCardWeek: "今週", shareFileTitle: "ポケモンGO 今週のイベント",
   calTitle: "{y}年{month} イベント", calShareBtn: "📤 {month}のカレンダーを共有", calShareSub: "ポケモンGO イベントカレンダー",
   calOngoingH: "常時開催(2週間超の長期)", calNoEvent: "この日に予定されたイベントはありません。",
@@ -168,6 +172,7 @@ const zhTW: EventsDict = {
   weekdays: ["日", "一", "二", "三", "四", "五", "六"],
   dateRange: "{m1}/{d1}（{w1}）~ {m2}/{d2}（{w2}）", dateSingle: "{m}/{d}（{w}）", timeRange: "{h1}:{mm1} ~ {h2}:{mm2}",
   tagSpawns: "出現↑", tagResearch: "研究", detailLink: "詳細",
+  bonusH: "🎁 活動獎勵", codeH: "🎟 促銷代碼",
   shareBtn: "📤 分享本週活動", saveBtn: "💾 儲存", building: "產生中…", shareCardTitle: "本週寶可夢 GO 活動", shareCardWeek: "本週", shareFileTitle: "寶可夢GO 本週活動",
   calTitle: "{y}年{month} 活動", calShareBtn: "📤 分享{month}行事曆", calShareSub: "寶可夢GO 活動行事曆",
   calOngoingH: "長期進行（超過兩週）", calNoEvent: "這天沒有預定的活動。",

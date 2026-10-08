@@ -6,12 +6,19 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { saveDataUrl, shareDataUrl } from "../raid/raidShareUtil";
 import { track } from "../../../../lib/track";
+import EventExtras from "./EventExtras";
 import type { EventsDict } from "./dict";
 import type { Locale } from "../../../../lib/i18n";
 
 export type ViewEvent = {
   id: string; type: string; filterKey: string; emoji: string; name: string;
   start: string; end: string; link?: string; image?: string; spawns?: boolean; research?: boolean;
+  // 피드에서 꺼낸 실제 내용 — 메인/등장 포켓몬(우리 스프라이트), 보너스(로케일화), 프로모코드.
+  // 스포트라이트·커뮤니티 데이·레이드에만 들어온다(일반 이벤트는 피드에 상세가 없음).
+  mons?: { name: string; image: string; shiny?: boolean }[];
+  bonuses?: string[];
+  codes?: string[];
+  notes?: string[];
 };
 export type ViewEggMon = { name: string; dex: string; image: string; shiny: boolean; regional: boolean; gift: boolean };
 export type ViewEgg = { dist: string; adventure: boolean; mons: ViewEggMon[] };
@@ -113,7 +120,8 @@ export default function EventsView({ events, eggs, t, filterTypes }: { events: V
   const Card = ({ e }: { e: ViewEvent }) => {
     const isLive = status(e) === "live";
     const inner = (
-      <div style={{ display: "flex", alignItems: "center", gap: 11, background: CARD, border: `1px solid ${isLive ? "#fecaca" : BORDER}`, borderLeft: `4px solid ${isLive ? "#ef4444" : "#3b5bdb"}`, borderRadius: 12, padding: "10px 12px" }}>
+      <div style={{ background: CARD, border: `1px solid ${isLive ? "#fecaca" : BORDER}`, borderLeft: `4px solid ${isLive ? "#ef4444" : "#3b5bdb"}`, borderRadius: 12, padding: "10px 12px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
         <span style={{ fontSize: "1.7rem", width: 46, textAlign: "center", flexShrink: 0 }}>{e.emoji}</span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
@@ -127,6 +135,8 @@ export default function EventsView({ events, eggs, t, filterTypes }: { events: V
         <div style={{ textAlign: "right", flexShrink: 0 }}>
           <div style={{ fontSize: "0.72rem", fontWeight: 800, color: isLive ? "#ef4444" : "#64748b" }}>{badge(e)}</div>
         </div>
+      </div>
+      <EventExtras e={e} t={t} compact />
       </div>
     );
     return inner;

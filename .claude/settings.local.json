@@ -436,7 +436,17 @@
       "Bash(curl -s \"http://localhost:3000/gbl/pokemon/great/oranguru\")",
       "Bash(curl -s \"http://localhost:3000/gbl/pokemon/great/oranguru\" -o scratch_o.html)",
       "Bash(rm -f scratch_o.html)",
-      "Bash(curl -s \"https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.json\" -o scratch_ev.json)"
+      "Bash(curl -s \"https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.json\" -o scratch_ev.json)",
+      "Bash(rm -f frontend/scratch_ev.json)",
+      "Bash(git commit -q -m 'chore: 임시 피드 덤프 파일 제거\\(실수 커밋\\) *)",
+      "Bash(mkdir -p \"/c/Users/USER/AppData/Local/Temp/claude/C--maesil-agency/d5b3e42d-3e00-422d-ba80-c92b56d39dda/scratchpad\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.json\" -o ev.json)",
+      "Bash(curl -s \"http://localhost:3000/gbl/events\" -o /dev/null -w \"%{http_code}\\\\n\" --max-time 120)",
+      "Bash(curl -s -o p3357.png \"https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/pokemon/25_f3357.png\")",
+      "Bash(curl -s -o p3361.png \"https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/pokemon/25_f3361.png\")",
+      "Bash(git mv *)",
+      "Bash(mv \"app/[lang]/gbl/events/eventExtras.ts\" \"app/[lang]/gbl/events/eventManual.ts\")",
+      "Bash(curl -s \"http://localhost:3000/gbl/events\" -o /dev/null --max-time 180 -w \"%{http_code}\\\\n\")"
     ]
   }
 }

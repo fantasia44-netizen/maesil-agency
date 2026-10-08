@@ -4,10 +4,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import EventsView, { type ViewEvent, type ViewEgg } from "./EventsView";
 import EventCalendarClient from "./EventCalendarClient";
-import { getSDEvents, getSDEggs, localizeEventName, monLocal, koMon, dexOf } from "../sdEvents";
+import { getSDEvents, getSDEggs, localizeEventName, localizeBonus, monLocal, koMon, dexOf } from "../sdEvents";
 import { monSprite } from "../sprite";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
 import { getEvents as getDict, FILTER_TYPES } from "./dict";
+import { manualExtra, uiconSprite } from "./eventManual";
 
 export const revalidate = 3600; // 1시간마다 피드 갱신
 
@@ -54,6 +55,19 @@ export default async function EventsPage({ params }: { params: { lang: string } 
     .filter((e) => TYPE_META[e.eventType])
     .map((e) => {
       const meta = TYPE_META[e.eventType];
+      const x = e.extraData;
+      // 메인/등장 포켓몬 — 피드 이미지 URL에서 dex만 뽑아 우리 스프라이트로 그린다(leekduck CDN 미사용).
+      const mon = (m: { name: string; image: string; canBeShiny?: boolean }) =>
+        ({ name: monLocal(lang, m.name, t), image: monSprite(koMon(m.name), dexOf(m.image)), shiny: !!m.canBeShiny });
+      const mons = x?.spotlight?.name && x.spotlight.image
+        ? [mon({ name: x.spotlight.name, image: x.spotlight.image, canBeShiny: x.spotlight.canBeShiny })]
+        : (x?.communityday?.spawns || []).map((sp) => mon(sp));
+      // 피드에 상세가 없는 일반 이벤트는 수동표(eventExtras)로 보강 — 없으면 아무것도 안 붙는다.
+      const man = manualExtra(e.eventID);
+      const bonuses = [
+        ...(x?.spotlight?.bonus ? [x.spotlight.bonus] : []),
+        ...(x?.communityday?.bonuses || []).map((b) => b.text),
+      ].map((b) => localizeBonus(lang, b));
       return {
         id: e.eventID,
         type: e.eventType,
@@ -65,6 +79,12 @@ export default async function EventsPage({ params }: { params: { lang: string } 
         // 외부(leekduck) 링크·배너 미사용 — 데이터만 재번역해 자체 표시(트래픽 유출·타사 창작물 회피)
         spawns: e.extraData?.generic?.hasSpawns,
         research: e.extraData?.generic?.hasFieldResearchTasks,
+        ...(mons.length || man?.mons?.length
+          ? { mons: [...mons, ...(man?.mons || []).map((m) => ({ name: m.name[lang] || m.name.en, image: uiconSprite(m.file), shiny: m.shiny }))] }
+          : {}),
+        ...(bonuses.length || man?.bonuses ? { bonuses: [...bonuses, ...(man?.bonuses?.[lang] || [])] } : {}),
+        ...(x?.promocodes?.length ? { codes: x.promocodes } : {}),
+        ...(man?.notes ? { notes: man.notes[lang] || man.notes.en } : {}),
       };
     });
 

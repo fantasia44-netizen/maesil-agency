@@ -19,7 +19,20 @@ export type SDEvent = {
   image?: string;
   start: string; // 현지 벽시계(타임존 없음) — 스포트라이트=현지 18시 등
   end: string;
-  extraData?: { generic?: SDExtraGeneric; raidbattles?: { bosses?: { name: string; image: string; canBeShiny?: boolean }[] } };
+  extraData?: {
+    generic?: SDExtraGeneric;
+    raidbattles?: { bosses?: { name: string; image: string; canBeShiny?: boolean }[] };
+    // 스포트라이트 아워 — 메인 포켓몬 + 보너스("2× Catch Candy")
+    spotlight?: { name?: string; image?: string; canBeShiny?: boolean; bonus?: string };
+    // 커뮤니티 데이 — 등장 포켓몬 + 보너스 목록(+ 각주)
+    communityday?: {
+      spawns?: { name: string; image: string }[];
+      bonuses?: { text: string; image?: string }[];
+      bonusDisclaimers?: string[];
+      shinies?: { name: string; image: string }[];
+    };
+    promocodes?: string[];
+  };
 };
 
 export type SDEgg = {
@@ -185,6 +198,59 @@ export function localizeEventName(lang: Locale, name: string, t: SDLabels): stri
   // 3) 월 이름 치환
   EN_MONTHS.forEach((m, i) => { s = s.replace(new RegExp(`\\b${m}\\b`, "gi"), t.months[i]); });
   return s.replace(/\s{2,}/g, " ").trim();
+}
+
+
+// ── 이벤트 보너스 문구 로케일화 ──────────────────────────────────────────
+// 피드(ScrapedDuck)의 보너스 텍스트는 어휘가 좁고 반복적이라 패턴 치환으로 충분하다.
+// 못 맞춘 문구는 원문(영어) 그대로 둔다 — 틀린 번역보다 원문이 낫다.
+const BONUS: Record<string, [RegExp, string][]> = {
+  ko: [
+    [/^Increased Spawns$/i, "출현 증가"],
+    [/^(\d+)\s*[x×]\s*Catch XP\*?$/i, "포획 XP $1배"],
+    [/^(\d+)\s*[x×]\s*Catch Candy\*?$/i, "포획 사탕 $1배"],
+    [/^(\d+)\s*[x×]\s*Catch Stardust\*?$/i, "포획 별의모래 $1배"],
+    [/^(\d+)\s*[x×]\s*Transfer Candy\*?$/i, "전송 사탕 $1배"],
+    [/^(\d+)\s*[x×]\s*Evolution XP\*?$/i, "진화 XP $1배"],
+    [/^(\d+)-hour Incense\*?$/i, "디퓨저 $1시간"],
+    [/^(\d+)-hour Lures?\*?$/i, "루어모듈 $1시간"],
+    [/^(\d+)x Chance for Trainers level (\d+) and up to receive Candy XL.*$/i, "레벨 $2 이상 포획 시 이상한사탕 XL 획득 확률 $1배"],
+    [/^One additional Special Trade.*$/i, "특별 교환 1회 추가 (하루 최대 2회)"],
+    [/^Trades made will require (\d+)% less Stardust.*$/i, "교환 별의모래 $1% 감소"],
+  ],
+  ja: [
+    [/^Increased Spawns$/i, "出現増加"],
+    [/^(\d+)\s*[x×]\s*Catch XP\*?$/i, "捕獲XP $1倍"],
+    [/^(\d+)\s*[x×]\s*Catch Candy\*?$/i, "捕獲アメ $1倍"],
+    [/^(\d+)\s*[x×]\s*Catch Stardust\*?$/i, "捕獲ほしのすな $1倍"],
+    [/^(\d+)\s*[x×]\s*Transfer Candy\*?$/i, "転送アメ $1倍"],
+    [/^(\d+)\s*[x×]\s*Evolution XP\*?$/i, "進化XP $1倍"],
+    [/^(\d+)-hour Incense\*?$/i, "おこう $1時間"],
+    [/^(\d+)-hour Lures?\*?$/i, "ルアーモジュール $1時間"],
+    [/^(\d+)x Chance for Trainers level (\d+) and up to receive Candy XL.*$/i, "レベル$2以上の捕獲でふしぎなアメXL獲得確率 $1倍"],
+    [/^One additional Special Trade.*$/i, "スペシャルトレード1回追加（1日最大2回）"],
+    [/^Trades made will require (\d+)% less Stardust.*$/i, "交換に必要なほしのすな $1%減"],
+  ],
+  "zh-TW": [
+    [/^Increased Spawns$/i, "出現增加"],
+    [/^(\d+)\s*[x×]\s*Catch XP\*?$/i, "捕捉XP $1倍"],
+    [/^(\d+)\s*[x×]\s*Catch Candy\*?$/i, "捕捉糖果 $1倍"],
+    [/^(\d+)\s*[x×]\s*Catch Stardust\*?$/i, "捕捉星塵 $1倍"],
+    [/^(\d+)\s*[x×]\s*Transfer Candy\*?$/i, "傳送糖果 $1倍"],
+    [/^(\d+)\s*[x×]\s*Evolution XP\*?$/i, "進化XP $1倍"],
+    [/^(\d+)-hour Incense\*?$/i, "薰香 $1小時"],
+    [/^(\d+)-hour Lures?\*?$/i, "誘餌模組 $1小時"],
+    [/^(\d+)x Chance for Trainers level (\d+) and up to receive Candy XL.*$/i, "$2級以上捕捉時獲得糖果XL機率 $1倍"],
+    [/^One additional Special Trade.*$/i, "額外一次特別交換（每日最多兩次）"],
+    [/^Trades made will require (\d+)% less Stardust.*$/i, "交換所需星塵減少 $1%"],
+  ],
+};
+export function localizeBonus(lang: Locale, text: string): string {
+  const raw = text.replace(/\s+/g, " ").trim();
+  if (lang === "en") return raw;
+  const star = /\*\s*$/.test(raw) ? "*" : "";
+  for (const [re, to] of BONUS[lang] || []) if (re.test(raw)) return raw.replace(re, to) + star;
+  return raw;
 }
 
 // KST(UTC+9) 벽시계 '오늘' — 서버 UTC라도 한국 오늘 기준(새벽 밀림 방지)

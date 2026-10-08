@@ -12,6 +12,7 @@ import { useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { saveDataUrl, shareDataUrl } from "../raid/raidShareUtil";
 import { track } from "../../../../lib/track";
+import EventExtras from "./EventExtras";
 import type { EventsDict } from "./dict";
 import type { ViewEvent } from "./EventsView";
 
@@ -142,13 +143,15 @@ export default function EventCalendar({ events, t }: { events: ViewEvent[]; t: E
 
   // ── 그리드(화면·이미지 공용) ──
   const Grid = ({ forImage }: { forImage?: boolean }) => {
-    const DNUM_H = forImage ? 22 : 20, BAND_H = forImage ? 22 : 21, MIN_H = forImage ? 54 : 48;
+    const DNUM_H = forImage ? 22 : 20, BAND_H = forImage ? 22 : 21, BADGE_H = forImage ? 22 : 20, MIN_H = forImage ? 54 : 48;
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
         {weeks.map((wk, wi) => {
           const bands = bandsOfWeek(wk);
           const laneN = bands.length ? Math.max(...bands.map((b) => b.lane)) + 1 : 0;
-          const rowH = Math.max(MIN_H, DNUM_H + laneN * BAND_H + 4);
+          // 배지는 밴드 레인 "아래" 전용 줄에 둔다(겹쳐 보이지 않게) → 행 높이에 배지 줄도 포함.
+          const badgeTop = DNUM_H + laneN * BAND_H;
+          const rowH = Math.max(MIN_H, badgeTop + BADGE_H + 2);
           return (
             <div key={wi} style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3 }}>
               {wk.map((dk, col) => {
@@ -172,7 +175,7 @@ export default function EventCalendar({ events, t }: { events: ViewEvent[]; t: E
                       <span style={{ position: "absolute", top: 4, left: 6, zIndex: 3, fontSize: "0.64rem", fontWeight: 700, lineHeight: 1, color: wdow === 0 ? "#f87171" : wdow === 6 ? "#93c5fd" : "#94a3b8" }}>{day}</span>
                     )}
                     {evs.length > 0 && (
-                      <span style={{ position: "absolute", bottom: 2, right: 3, zIndex: 7, display: "flex", gap: 1, lineHeight: 1 }}>
+                      <span style={{ position: "absolute", top: badgeTop, left: 0, right: 0, zIndex: 7, display: "flex", justifyContent: "center", gap: 1, lineHeight: 1 }}>
                         {evs.slice(0, 3).map((e) => (
                           <span key={e.id} title={e.name} style={{ fontSize: "0.86rem" }}>{e.emoji}</span>
                         ))}
@@ -294,12 +297,13 @@ export default function EventCalendar({ events, t }: { events: ViewEvent[]; t: E
               {selList.map((e) => {
                 const h = hueOf(e.filterKey);
                 return (
-                  <div key={e.id} style={{ display: "flex", alignItems: "center", gap: 9, borderLeft: `3px solid ${h.c}`, paddingLeft: 9 }}>
+                  <div key={e.id} style={{ display: "flex", gap: 9, borderLeft: `3px solid ${h.c}`, paddingLeft: 9 }}>
                     <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>{e.emoji}</span>
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ fontSize: "0.7rem", fontWeight: 800, color: h.c }}>{t.evtType[e.type] || ""}</div>
                       <div style={{ fontSize: "0.88rem", fontWeight: 800, color: INK, lineHeight: 1.3 }}>{e.name}</div>
                       <div style={{ fontSize: "0.74rem", color: SUB }}>{rangeLabel(e)}</div>
+                      <EventExtras e={e} t={t} />
                     </div>
                   </div>
                 );
