@@ -1,7 +1,7 @@
 // 레이드 딜러 허브(속성 인덱스) 페이지 문구(3개국어).
 export type RaidHubDict = {
   navPvp: string; h1: string; intro: string;
-  schedH: string; schedP: string; bossH: string; bossP: string;
+  schedH: string; schedP: string; bossH: string; bossP: string; movesH: string; movesP: string;
   rankPrefix: string;
   explainerH: string; explainerBody: string; updateLabel: string;
   metaTitle: string; metaDesc: string; ogTitle: string; ogDesc: string;
@@ -13,6 +13,7 @@ const ko: RaidHubDict = {
   intro: "레이드에 넣을 속성별 최강 공격수를 DPS 순으로 정리했습니다. 잡으려는 레이드 보스의 약점 속성을 고르면, 그 타입 딜러 순위와 추천 기술배치가 나옵니다. 메가진화·섀도우 포함.",
   schedH: "레이드 스케줄", schedP: "5성·메가 로테이션 기간 + 레이드 아워·데이 일정",
   bossH: "지금 보스 · 100% CP", bossP: "현재 5성·메가 보스와 100% 개체 CP, 약점 딜러까지",
+  movesH: "레이드 기술 도감", movesP: "기술별 위력·시전 시간·DPS, 그 기술을 가장 세게 쓰는 포켓몬",
   rankPrefix: "1위 ",
   explainerH: "레이드 딜러, 이렇게 고르세요",
   explainerBody: "레이드 보스마다 약점 속성이 있습니다. 예를 들어 물 타입 보스에는 풀·전기 딜러가 강하죠. 위에서 보스 약점 속성을 눌러 상위 딜러를 확인하고, 가진 포켓몬 중 순위가 높은 걸 넣으면 됩니다. 메가진화 1마리를 넣으면 같은 속성 딜러 전체가 강해집니다. 순위는 공개 게임 데이터로 계산한 DPS 기준입니다.",
@@ -28,6 +29,7 @@ const en: RaidHubDict = {
   intro: "The best attackers for raids, by type, ranked by DPS. Pick the raid boss's weakness type to see that type's attacker ranking and recommended movesets. Megas and Shadows included.",
   schedH: "Raid Schedule", schedP: "5★/Mega rotation periods + Raid Hour/Day schedule",
   bossH: "Current bosses · 100% CP", bossP: "Current 5★/Mega bosses with 100% IV catch CP and their counters",
+  movesH: "Raid Move Dex", movesP: "Power, duration and DPS per move, and the Pokémon that hit hardest with it",
   rankPrefix: "#1 ",
   explainerH: "How to pick raid attackers",
   explainerBody: "Every raid boss has weakness types — e.g., Grass and Electric attackers are strong against a Water boss. Tap the boss's weakness type above to see the top attackers, and use the highest-ranked one you own. Adding one Mega boosts all attackers of the same type. Rankings are DPS calculated from public game data.",
@@ -43,6 +45,7 @@ const ja: RaidHubDict = {
   intro: "レイド向けの属性別最強アタッカーをDPS順に整理。倒したいレイドボスの弱点属性を選ぶと、そのタイプのアタッカー順位と推奨技構成が出ます。メガ・シャドウ含む。",
   schedH: "レイドスケジュール", schedP: "5★・メガ ローテ期間 + レイドアワー・デイ日程",
   bossH: "現在のボス · 100%CP", bossP: "現在の5★・メガボスと100%個体CP、弱点アタッカーまで",
+  movesH: "レイド技図鑑", movesP: "技ごとの威力・発動時間・DPSと、その技で最も火力が出るポケモン",
   rankPrefix: "1位 ",
   explainerH: "レイドアタッカーの選び方",
   explainerBody: "レイドボスには弱点属性があります。例えば水タイプのボスには草・電気アタッカーが強い。上でボスの弱点属性を押して上位アタッカーを確認し、手持ちで順位の高いものを入れましょう。メガを1体入れると同属性アタッカー全体が強化されます。順位は公開ゲームデータで計算したDPS基準です。",
@@ -58,6 +61,7 @@ const zhTW: RaidHubDict = {
   intro: "依 DPS 順序整理各屬性最強的團體戰攻擊手。選擇要打的頭目弱點屬性，就會顯示該屬性的攻擊手排名與推薦招式配置。含超級進化·暗影。",
   schedH: "團體戰時程", schedP: "五星·超級輪替期間 + 團體戰時刻·日 時程",
   bossH: "當前頭目 · 100% CP", bossP: "當前五星·超級頭目與 100% 個體 CP，以及剋制攻擊手",
+  movesH: "團體戰招式圖鑑", movesP: "各招式的威力·施放時間·DPS，以及用它輸出最高的寶可夢",
   rankPrefix: "第1名 ",
   explainerH: "團體戰攻擊手這樣選",
   explainerBody: "每個團體戰頭目都有弱點屬性。例如水屬性頭目，草·電攻擊手就很強。點上方頭目弱點屬性查看前段攻擊手，從手上寶可夢挑排名高的放入即可。放入一隻超級進化，同屬性攻擊手整體都會變強。排名以公開遊戲資料計算的 DPS 為準。",

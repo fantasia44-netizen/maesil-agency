@@ -18,6 +18,7 @@ import { gameName } from "../../contentI18n";
 import { getDict } from "../../dictionaries";
 import { getRaidType } from "./dict";
 import { dexPath, RAID_DEFAULT_VER, zhNameOfSid } from "../../dexHub";
+import { raidMoveById } from "../moves/raidMovesData";
 
 // 로케일별 이름/기술명 선택(레이드 행 필드: name/nameEn/nameJa, fastKo/fastEn/fastJa 등)
 // zh-TW: 포켓몬명은 dex로 pokedex_names, 기술명은 영문명→ID로 pvp_move_names에서 보완(메가/그림자는 뱃지 별도 표시).
@@ -103,6 +104,11 @@ export function generateMetadata({ params, searchParams }: { params: { lang: str
 const CARD = "#ffffff";
 const BORDER = "#e3e8f2";
 
+// 기술 칩 — 레이드 기술 도감에 그 기술 페이지가 있으면 링크(없으면 같은 모양의 span).
+function MoveTag({ id, lang, st, children }: { id: string; lang: Locale; st: React.CSSProperties; children: React.ReactNode }) {
+  const rm = raidMoveById(id);
+  return rm ? <Link prefetch={false} href={localizePath(lang, `/gbl/raid/moves/${rm.m.slug}`)} style={st}>{children}</Link> : <span style={st}>{children}</span>;
+}
 function Badge({ text, bg, title }: { text: string; bg: string; title?: string }) {
   return <span title={title} style={{ fontSize: "0.6rem", fontWeight: 800, color: "#fff", background: bg, padding: "1px 6px", borderRadius: 6, whiteSpace: "nowrap", ...(title ? { cursor: "help" } : {}) }}>{text}</span>;
 }
@@ -251,10 +257,10 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
                       </div>
                       <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 3 }}>
                         {(() => { const fc = TYPE_COLOR[r.fastType] || "#64748b"; return (
-                          <span style={{ fontSize: "0.66rem", fontWeight: 600, padding: "1px 6px", borderRadius: 9, background: fc + "22", color: fc, border: `1px solid ${fc}55`, whiteSpace: "nowrap" }}>{rowFast(lang, r)}</span>
+                          <MoveTag id={r.fast} lang={lang} st={{ fontSize: "0.66rem", fontWeight: 600, padding: "1px 6px", borderRadius: 9, background: fc + "22", color: fc, border: `1px solid ${fc}55`, whiteSpace: "nowrap", textDecoration: "none" }}>{rowFast(lang, r)}</MoveTag>
                         ); })()}
                         {(() => { const cc = TYPE_COLOR[r.chargedType] || c; return (
-                          <span style={{ fontSize: "0.66rem", fontWeight: 600, padding: "1px 6px", borderRadius: 9, background: cc + "22", color: cc, border: `1px solid ${cc}55`, whiteSpace: "nowrap" }}>{rowCharged(lang, r)}{r.legacy && <span style={{ color: "#d97706" }}>*</span>}</span>
+                          <MoveTag id={r.charged} lang={lang} st={{ fontSize: "0.66rem", fontWeight: 600, padding: "1px 6px", borderRadius: 9, background: cc + "22", color: cc, border: `1px solid ${cc}55`, whiteSpace: "nowrap", textDecoration: "none" }}>{rowCharged(lang, r)}{r.legacy && <span style={{ color: "#d97706" }}>*</span>}</MoveTag>
                         ); })()}
                       </div>
                     </div>

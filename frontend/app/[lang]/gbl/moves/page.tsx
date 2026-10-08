@@ -8,6 +8,7 @@ import MovesTable, { type MoveRow } from "./MovesTable";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
 import { typeLabel, TYPE_COLOR } from "../typeLabels";
 import { getMoves } from "./dict";
+import { getRaidMoves } from "../raid/moves/dict";
 import { buffText } from "./fmt";
 import { MOVES, FAST, CHARGED, GM_DATE, moveName, dpt, ept, dpe, usageCount } from "./movesData";
 
@@ -73,6 +74,7 @@ export default function MovesHub({ params }: { params: { lang: string } }) {
           <Link href={L("/gbl")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>← GBL Note</Link>
           <Link href={L("/gbl/tier/great")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>{t.navTier}</Link>
           <Link href={L("/gbl/guide/moveset")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>{t.navGuide}</Link>
+          <Link href={L("/gbl/raid/moves")} style={{ fontSize: "0.82rem", color: "#ea580c", textDecoration: "none", fontWeight: 700 }}>🔥 {getRaidMoves(lang).navLabel} →</Link>
         </div>
 
         <h1 style={{ margin: "0.2rem 0", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>{t.hubH1}</h1>

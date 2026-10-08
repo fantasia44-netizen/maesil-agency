@@ -205,6 +205,8 @@ var ja = {
   dynamax: "\u30C0\u30A4\u30DE\u30C3\u30AF\u30B9",
   evtClassic: "\u30AF\u30E9\u30B7\u30C3\u30AF",
   evtNameMap: {
+    "LEGO Stores and Pok\xE9mon GO": "\u30EC\u30B4\u30B9\u30C8\u30A2 & \u30DD\u30B1\u30E2\u30F3GO",
+    "Pok\xE9monXP & 2026 Worlds": "Pok\xE9monXP & 2026 \u4E16\u754C\u5927\u4F1A",
     "Ultra Unlock: Water Festival": "\u30A6\u30EB\u30C8\u30E9\u30A2\u30F3\u30ED\u30C3\u30AF: \u30A6\u30A9\u30FC\u30BF\u30FC\u30D5\u30A7\u30B9\u30C6\u30A3\u30D0\u30EB",
     "Mega Ascension": "\u30E1\u30AC\u30A2\u30BB\u30F3\u30B7\u30E7\u30F3",
     "10th Anniversary Celebration - Perfect Mewtwo Timed Research": "10\u5468\u5E74\u8A18\u5FF5 \xB7 \u30D1\u30FC\u30D5\u30A7\u30AF\u30C8\u30DF\u30E5\u30A6\u30C4\u30FC \u30BF\u30A4\u30E0\u30C1\u30E3\u30EC\u30F3\u30B8",
@@ -280,6 +282,12 @@ var zhTW = {
   dynamax: "\u6975\u5DE8\u5316",
   evtClassic: "\u7D93\u5178",
   evtNameMap: {
+    "LEGO Stores and Pok\xE9mon GO": "\u6A02\u9AD8\u5546\u5E97 & \u5BF6\u53EF\u5922GO",
+    "Ultra Unlock: Water Festival": "\u7A76\u6975\u89E3\u9396\uFF1A\u6C34\u4E4B\u6176\u5178",
+    "Pok\xE9monXP & 2026 Worlds": "Pok\xE9monXP & 2026 \u4E16\u754C\u9326\u6A19\u8CFD",
+    "Mega Ascension": "\u8D85\u7D1A\u9032\u5316\u98DB\u5347",
+    "10th Anniversary Celebration - Perfect Mewtwo Timed Research": "10\u9031\u5E74\u7D00\u5FF5 \xB7 \u5B8C\u7F8E\u8D85\u5922\u9650\u6642\u8ABF\u67E5",
+    "Twitch Drops for 2026 Pok\xE9mon World Championships": "2026 \u4E16\u754C\u9326\u6A19\u8CFD Twitch \u6389\u5BF6",
     "Twilight Trails": "\u9EC3\u660F\u65C5\u9014",
     "adidas \xD7 Pok\xE9mon Timed Research": "adidas \xD7 \u5BF6\u53EF\u5922 \u9650\u6642\u8ABF\u67E5"
   },
@@ -675,6 +683,8 @@ var ko4 = {
   schedP: "5\uC131\xB7\uBA54\uAC00 \uB85C\uD14C\uC774\uC158 \uAE30\uAC04 + \uB808\uC774\uB4DC \uC544\uC6CC\xB7\uB370\uC774 \uC77C\uC815",
   bossH: "\uC9C0\uAE08 \uBCF4\uC2A4 \xB7 100% CP",
   bossP: "\uD604\uC7AC 5\uC131\xB7\uBA54\uAC00 \uBCF4\uC2A4\uC640 100% \uAC1C\uCCB4 CP, \uC57D\uC810 \uB51C\uB7EC\uAE4C\uC9C0",
+  movesH: "\uB808\uC774\uB4DC \uAE30\uC220 \uB3C4\uAC10",
+  movesP: "\uAE30\uC220\uBCC4 \uC704\uB825\xB7\uC2DC\uC804 \uC2DC\uAC04\xB7DPS, \uADF8 \uAE30\uC220\uC744 \uAC00\uC7A5 \uC138\uAC8C \uC4F0\uB294 \uD3EC\uCF13\uBAAC",
   rankPrefix: "1\uC704 ",
   explainerH: "\uB808\uC774\uB4DC \uB51C\uB7EC, \uC774\uB807\uAC8C \uACE0\uB974\uC138\uC694",
   explainerBody: "\uB808\uC774\uB4DC \uBCF4\uC2A4\uB9C8\uB2E4 \uC57D\uC810 \uC18D\uC131\uC774 \uC788\uC2B5\uB2C8\uB2E4. \uC608\uB97C \uB4E4\uC5B4 \uBB3C \uD0C0\uC785 \uBCF4\uC2A4\uC5D0\uB294 \uD480\xB7\uC804\uAE30 \uB51C\uB7EC\uAC00 \uAC15\uD558\uC8E0. \uC704\uC5D0\uC11C \uBCF4\uC2A4 \uC57D\uC810 \uC18D\uC131\uC744 \uB20C\uB7EC \uC0C1\uC704 \uB51C\uB7EC\uB97C \uD655\uC778\uD558\uACE0, \uAC00\uC9C4 \uD3EC\uCF13\uBAAC \uC911 \uC21C\uC704\uAC00 \uB192\uC740 \uAC78 \uB123\uC73C\uBA74 \uB429\uB2C8\uB2E4. \uBA54\uAC00\uC9C4\uD654 1\uB9C8\uB9AC\uB97C \uB123\uC73C\uBA74 \uAC19\uC740 \uC18D\uC131 \uB51C\uB7EC \uC804\uCCB4\uAC00 \uAC15\uD574\uC9D1\uB2C8\uB2E4. \uC21C\uC704\uB294 \uACF5\uAC1C \uAC8C\uC784 \uB370\uC774\uD130\uB85C \uACC4\uC0B0\uD55C DPS \uAE30\uC900\uC785\uB2C8\uB2E4.",
@@ -692,6 +702,8 @@ var en4 = {
   schedP: "5\u2605/Mega rotation periods + Raid Hour/Day schedule",
   bossH: "Current bosses \xB7 100% CP",
   bossP: "Current 5\u2605/Mega bosses with 100% IV catch CP and their counters",
+  movesH: "Raid Move Dex",
+  movesP: "Power, duration and DPS per move, and the Pok\xE9mon that hit hardest with it",
   rankPrefix: "#1 ",
   explainerH: "How to pick raid attackers",
   explainerBody: "Every raid boss has weakness types \u2014 e.g., Grass and Electric attackers are strong against a Water boss. Tap the boss's weakness type above to see the top attackers, and use the highest-ranked one you own. Adding one Mega boosts all attackers of the same type. Rankings are DPS calculated from public game data.",
@@ -709,6 +721,8 @@ var ja4 = {
   schedP: "5\u2605\u30FB\u30E1\u30AC \u30ED\u30FC\u30C6\u671F\u9593 + \u30EC\u30A4\u30C9\u30A2\u30EF\u30FC\u30FB\u30C7\u30A4\u65E5\u7A0B",
   bossH: "\u73FE\u5728\u306E\u30DC\u30B9 \xB7 100%CP",
   bossP: "\u73FE\u5728\u306E5\u2605\u30FB\u30E1\u30AC\u30DC\u30B9\u3068100%\u500B\u4F53CP\u3001\u5F31\u70B9\u30A2\u30BF\u30C3\u30AB\u30FC\u307E\u3067",
+  movesH: "\u30EC\u30A4\u30C9\u6280\u56F3\u9451",
+  movesP: "\u6280\u3054\u3068\u306E\u5A01\u529B\u30FB\u767A\u52D5\u6642\u9593\u30FBDPS\u3068\u3001\u305D\u306E\u6280\u3067\u6700\u3082\u706B\u529B\u304C\u51FA\u308B\u30DD\u30B1\u30E2\u30F3",
   rankPrefix: "1\u4F4D ",
   explainerH: "\u30EC\u30A4\u30C9\u30A2\u30BF\u30C3\u30AB\u30FC\u306E\u9078\u3073\u65B9",
   explainerBody: "\u30EC\u30A4\u30C9\u30DC\u30B9\u306B\u306F\u5F31\u70B9\u5C5E\u6027\u304C\u3042\u308A\u307E\u3059\u3002\u4F8B\u3048\u3070\u6C34\u30BF\u30A4\u30D7\u306E\u30DC\u30B9\u306B\u306F\u8349\u30FB\u96FB\u6C17\u30A2\u30BF\u30C3\u30AB\u30FC\u304C\u5F37\u3044\u3002\u4E0A\u3067\u30DC\u30B9\u306E\u5F31\u70B9\u5C5E\u6027\u3092\u62BC\u3057\u3066\u4E0A\u4F4D\u30A2\u30BF\u30C3\u30AB\u30FC\u3092\u78BA\u8A8D\u3057\u3001\u624B\u6301\u3061\u3067\u9806\u4F4D\u306E\u9AD8\u3044\u3082\u306E\u3092\u5165\u308C\u307E\u3057\u3087\u3046\u3002\u30E1\u30AC\u30921\u4F53\u5165\u308C\u308B\u3068\u540C\u5C5E\u6027\u30A2\u30BF\u30C3\u30AB\u30FC\u5168\u4F53\u304C\u5F37\u5316\u3055\u308C\u307E\u3059\u3002\u9806\u4F4D\u306F\u516C\u958B\u30B2\u30FC\u30E0\u30C7\u30FC\u30BF\u3067\u8A08\u7B97\u3057\u305FDPS\u57FA\u6E96\u3067\u3059\u3002",
@@ -726,6 +740,8 @@ var zhTW4 = {
   schedP: "\u4E94\u661F\xB7\u8D85\u7D1A\u8F2A\u66FF\u671F\u9593 + \u5718\u9AD4\u6230\u6642\u523B\xB7\u65E5 \u6642\u7A0B",
   bossH: "\u7576\u524D\u982D\u76EE \xB7 100% CP",
   bossP: "\u7576\u524D\u4E94\u661F\xB7\u8D85\u7D1A\u982D\u76EE\u8207 100% \u500B\u9AD4 CP\uFF0C\u4EE5\u53CA\u524B\u5236\u653B\u64CA\u624B",
+  movesH: "\u5718\u9AD4\u6230\u62DB\u5F0F\u5716\u9451",
+  movesP: "\u5404\u62DB\u5F0F\u7684\u5A01\u529B\xB7\u65BD\u653E\u6642\u9593\xB7DPS\uFF0C\u4EE5\u53CA\u7528\u5B83\u8F38\u51FA\u6700\u9AD8\u7684\u5BF6\u53EF\u5922",
   rankPrefix: "\u7B2C1\u540D ",
   explainerH: "\u5718\u9AD4\u6230\u653B\u64CA\u624B\u9019\u6A23\u9078",
   explainerBody: "\u6BCF\u500B\u5718\u9AD4\u6230\u982D\u76EE\u90FD\u6709\u5F31\u9EDE\u5C6C\u6027\u3002\u4F8B\u5982\u6C34\u5C6C\u6027\u982D\u76EE\uFF0C\u8349\xB7\u96FB\u653B\u64CA\u624B\u5C31\u5F88\u5F37\u3002\u9EDE\u4E0A\u65B9\u982D\u76EE\u5F31\u9EDE\u5C6C\u6027\u67E5\u770B\u524D\u6BB5\u653B\u64CA\u624B\uFF0C\u5F9E\u624B\u4E0A\u5BF6\u53EF\u5922\u6311\u6392\u540D\u9AD8\u7684\u653E\u5165\u5373\u53EF\u3002\u653E\u5165\u4E00\u96BB\u8D85\u7D1A\u9032\u5316\uFF0C\u540C\u5C6C\u6027\u653B\u64CA\u624B\u6574\u9AD4\u90FD\u6703\u8B8A\u5F37\u3002\u6392\u540D\u4EE5\u516C\u958B\u904A\u6232\u8CC7\u6599\u8A08\u7B97\u7684 DPS \u70BA\u6E96\u3002",
@@ -1030,7 +1046,14 @@ var zhTW5 = {
   evtType: { "community-day": "\u793E\u7FA4\u65E5", "pokemon-spotlight-hour": "\u805A\u7126\u6642\u523B", "max-mondays": "\u6975\u5DE8\u661F\u671F\u4E00", "max-battles": "\u6975\u5DE8\u6230\u65E5", "pokemon-go-fest": "GO Fest", "event": "\u6D3B\u52D5", "research": "\u7814\u7A76", "go-pass": "GO Pass" },
   dynamax: "\u6975\u5DE8\u5316",
   evtClassic: "\u7D93\u5178",
-  evtNameMap: {},
+  evtNameMap: {
+    "LEGO Stores and Pok\xE9mon GO": "\u6A02\u9AD8\u5546\u5E97 & \u5BF6\u53EF\u5922GO",
+    "Ultra Unlock: Water Festival": "\u7A76\u6975\u89E3\u9396\uFF1A\u6C34\u4E4B\u6176\u5178",
+    "Pok\xE9monXP & 2026 Worlds": "Pok\xE9monXP & 2026 \u4E16\u754C\u9326\u6A19\u8CFD",
+    "Mega Ascension": "\u8D85\u7D1A\u9032\u5316\u98DB\u5347",
+    "10th Anniversary Celebration - Perfect Mewtwo Timed Research": "10\u9031\u5E74\u7D00\u5FF5 \xB7 \u5B8C\u7F8E\u8D85\u5922\u9650\u6642\u8ABF\u67E5",
+    "Twitch Drops for 2026 Pok\xE9mon World Championships": "2026 \u4E16\u754C\u9326\u6A19\u8CFD Twitch \u6389\u5BF6"
+  },
   monthBossesH: "\u{1F4CB} {m}\u6708 \u767B\u5834\u982D\u76EE",
   cpTableArrow: "CP\u8868 \u2192",
   rotationH: "\u{1F525} \u982D\u76EE\u8F2A\u66FF\u671F\u9593",
@@ -1844,6 +1867,326 @@ var zh = {
 var D = { ko: ko10, en: en10, ja: ja10, "zh-TW": zh };
 var getMoves = (lang) => D[lang] || ko10;
 
+// app/[lang]/gbl/raid/moves/dict.ts
+var ko11 = {
+  navLabel: "\uB808\uC774\uB4DC \uAE30\uC220 \uB3C4\uAC10",
+  navRaid: "\u{1F525} \uB808\uC774\uB4DC \uB51C\uB7EC \uD2F0\uC5B4",
+  navBattle: "\u2694\uFE0F \uBC30\uD2C0 \uAE30\uC220 \uB3C4\uAC10",
+  kindFast: "\uB178\uBA40 \uAE30\uC220",
+  kindCharged: "\uC2A4\uD398\uC15C \uAE30\uC220",
+  secUnit: "\uCD08",
+  power: "\uC704\uB825",
+  duration: "\uC2DC\uC804 \uC2DC\uAC04",
+  energyGain: "\uD68D\uB4DD \uC5D0\uB108\uC9C0",
+  energyCost: "\uD544\uC694 \uC5D0\uB108\uC9C0",
+  bars: (n) => `\uAC8C\uC774\uC9C0 ${n}\uCE78`,
+  dpsLong: "DPS \xB7 \uCD08\uB2F9 \uC704\uB825",
+  epsLong: "EPS \xB7 \uCD08\uB2F9 \uC5D0\uB108\uC9C0",
+  dpeLong: "DPE \xB7 \uC5D0\uB108\uC9C0\uB2F9 \uC704\uB825",
+  windowAt: "\uB370\uBBF8\uC9C0 \uBC1C\uC0DD \uC2DC\uC810",
+  hubMetaTitle: "\uD3EC\uCF13\uBAAC\uACE0 \uB808\uC774\uB4DC \uAE30\uC220 \uB3C4\uAC10 \u2014 \uC704\uB825\xB7\uC2DC\uC804 \uC2DC\uAC04\xB7DPS\xB7\uC4F0\uB294 \uD3EC\uCF13\uBAAC | GBL Note",
+  hubMetaDesc: (f, c) => `\uD3EC\uCF13\uBAAC\uACE0 \uB808\uC774\uB4DC\xB7\uCCB4\uC721\uAD00\uC5D0\uC11C \uC4F0\uB294 \uB178\uBA40 \uAE30\uC220 ${f}\uAC1C\xB7\uC2A4\uD398\uC15C \uAE30\uC220 ${c}\uAC1C\uC758 \uC704\uB825\xB7\uC2DC\uC804 \uC2DC\uAC04\xB7\uC5D0\uB108\uC9C0\xB7DPS\uB97C \uD55C \uD45C\uB85C. \uAE30\uC220\uB9C8\uB2E4 \uAC00\uC7A5 \uC138\uAC8C \uC4F0\uB294 \uD3EC\uCF13\uBAAC \uC21C\uC704\uC640 \uBC30\uD2C0\uB9AC\uADF8 \uC218\uCE58\uC640\uC758 \uCC28\uC774\uAE4C\uC9C0.`,
+  hubH1: "\uD3EC\uCF13\uBAAC\uACE0 \uB808\uC774\uB4DC \uAE30\uC220 \uB3C4\uAC10 \u2014 \uC704\uB825 \xB7 \uC2DC\uC804 \uC2DC\uAC04 \xB7 DPS",
+  hubIntro1: (f, c) => `\uB808\uC774\uB4DC\xB7\uCCB4\uC721\uAD00\uC5D0\uC11C \uC4F0\uB294 \uB178\uBA40 \uAE30\uC220 ${f}\uAC1C\uC640 \uC2A4\uD398\uC15C \uAE30\uC220 ${c}\uAC1C\uC758 \uC218\uCE58\uC785\uB2C8\uB2E4. \uAC19\uC740 \uAE30\uC220\uC774\uB77C\uB3C4 \uBC30\uD2C0\uB9AC\uADF8\uC640\uB294 \uC704\uB825\xB7\uC5D0\uB108\uC9C0\xB7\uC18D\uB3C4\uAC00 \uB530\uB85C \uC815\uD574\uC838 \uC788\uC2B5\uB2C8\uB2E4. \uBC30\uD2C0\uC740 \uD134 \uB2E8\uC704\uB85C, \uB808\uC774\uB4DC\uB294 \uCD08 \uB2E8\uC704\uB85C \uC6C0\uC9C1\uC785\uB2C8\uB2E4. \uAE30\uC220\uC744 \uB204\uB974\uBA74 \uADF8 \uAE30\uC220\uC744 \uAC00\uC7A5 \uC138\uAC8C \uC4F0\uB294 \uD3EC\uCF13\uBAAC \uC21C\uC704\uC640 \uBC30\uD2C0 \uC218\uCE58 \uBE44\uAD50\uAC00 \uB098\uC635\uB2C8\uB2E4.`,
+  hubIntro2: "DPS = \uC704\uB825 \xF7 \uC2DC\uC804 \uC2DC\uAC04, EPS = \uD68D\uB4DD \uC5D0\uB108\uC9C0 \xF7 \uC2DC\uC804 \uC2DC\uAC04, DPE = \uC704\uB825 \xF7 \uD544\uC694 \uC5D0\uB108\uC9C0. \uC2A4\uD398\uC15C \uAE30\uC220\uC740 \uC5D0\uB108\uC9C0 100\uC774 \uAC8C\uC774\uC9C0 1\uCE78, 50\uC774 2\uCE78, 33\uC774 3\uCE78\uC785\uB2C8\uB2E4. \uBA38\uB9AC\uAE00\uC744 \uB204\uB974\uBA74 \uADF8 \uC218\uCE58\uB85C \uC815\uB82C\uB429\uB2C8\uB2E4.",
+  topUsedH: "\uB808\uC774\uB4DC \uB51C\uB7EC \uD2F0\uC5B4\uD45C\uC5D0 \uAC00\uC7A5 \uB9CE\uC774 \uC624\uB978 \uAE30\uC220",
+  topUsedSub: "18\uD0C0\uC785 \uB51C\uB7EC \uD2F0\uC5B4\uD45C(\uD0C0\uC785\uBCC4 \uC0C1\uC704 30)\uC758 \uCD94\uCC9C \uAE30\uC220\uBC30\uCE58 \uC9D1\uACC4",
+  usedSuffix: (n) => `${n}\uC885 \uCC44\uC6A9`,
+  viewTable: "\uD45C\uB85C \uBCF4\uAE30",
+  viewTree: "\uD0C0\uC785\uBCC4\uB85C \uBCF4\uAE30",
+  all: "\uC804\uCCB4",
+  searchPh: "\uAE30\uC220 \uC774\uB984 \uAC80\uC0C9\u2026",
+  shown: (n, t) => `${t}\uAC1C \uC911 ${n}\uAC1C`,
+  colName: "\uAE30\uC220",
+  colType: "\uD0C0\uC785",
+  colUsers: "\uB51C\uB7EC\uD45C \uCC44\uC6A9",
+  sortHint: "\uBA38\uB9AC\uAE00\uC744 \uB204\uB974\uBA74 \uC815\uB82C",
+  noResult: "\uC870\uAC74\uC5D0 \uB9DE\uB294 \uAE30\uC220\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.",
+  hubExplainH: "\uC218\uCE58\uB294 \uC5B4\uB514\uC11C \uB098\uC628 \uAC74\uAC00\uC694?",
+  hubExplainBody: (d) => `\uC704\uB825\xB7\uC2DC\uC804 \uC2DC\uAC04\xB7\uC5D0\uB108\uC9C0\uB294 \uACF5\uAC1C \uAC8C\uC784 \uB370\uC774\uD130(PokeMiners \uAC8C\uC784\uB9C8\uC2A4\uD130, ${d} \uAE30\uC900)\uC758 \uB808\uC774\uB4DC\xB7\uCCB4\uC721\uAD00 \uC218\uCE58\uC785\uB2C8\uB2E4. \uBC30\uD2C0\uB9AC\uADF8 \uC218\uCE58\uB294 \uB530\uB85C \uC788\uC73C\uBA70 \uBC30\uD2C0 \uAE30\uC220 \uB3C4\uAC10\uC5D0\uC11C \uBCFC \uC218 \uC788\uC2B5\uB2C8\uB2E4. DPS\xB7EPS\xB7DPE\uC640 \uD3EC\uCF13\uBAAC\uBCC4 \uC21C\uC704\uB294 GBL Note\uAC00 \uADF8 \uC218\uCE58\uB85C \uACC4\uC0B0\uD588\uC2B5\uB2C8\uB2E4. \uBC38\uB7F0\uC2A4 \uD328\uCE58\uAC00 \uC788\uC73C\uBA74 \uB2E4\uC2DC \uACC4\uC0B0\uD574 \uAC31\uC2E0\uD569\uB2C8\uB2E4.`,
+  back: "\u2190 \uB808\uC774\uB4DC \uAE30\uC220 \uB3C4\uAC10",
+  metaTitle: (n) => `\uD3EC\uCF13\uBAAC\uACE0 ${n} \uB808\uC774\uB4DC \uC704\uB825\xB7DPS\xB7\uC4F0\uB294 \uD3EC\uCF13\uBAAC | GBL Note`,
+  metaDesc: (n, k) => `${n}(${k})\uC758 \uB808\uC774\uB4DC\xB7\uCCB4\uC721\uAD00 \uC704\uB825\xB7\uC2DC\uC804 \uC2DC\uAC04\xB7\uC5D0\uB108\uC9C0\xB7DPS, \uC774 \uAE30\uC220\uC744 \uAC00\uC7A5 \uC138\uAC8C \uC4F0\uB294 \uD3EC\uCF13\uBAAC \uC21C\uC704, \uBC30\uD2C0\uB9AC\uADF8 \uC218\uCE58\uC640\uC758 \uCC28\uC774.`,
+  h1Suffix: "\uB808\uC774\uB4DC \uC218\uCE58 \xB7 DPS \xB7 \uC4F0\uB294 \uD3EC\uCF13\uBAAC",
+  rankOf: (r, t) => `${t}\uAC1C \uC911 ${r}\uC704`,
+  vsH: "\uB808\uC774\uB4DC \uC218\uCE58\uC640 \uBC30\uD2C0 \uC218\uCE58 \uBE44\uAD50",
+  vsSub: "\uAC19\uC740 \uAE30\uC220\uC774\uB77C\uB3C4 \uB808\uC774\uB4DC\xB7\uCCB4\uC721\uAD00\uACFC \uBC30\uD2C0\uB9AC\uADF8\uB294 \uC218\uCE58\uAC00 \uB530\uB85C \uC815\uD574\uC838 \uC788\uC2B5\uB2C8\uB2E4. \uB808\uC774\uB4DC\uC5D0\uC11C \uAC15\uD55C \uAE30\uC220\uC774 \uBC30\uD2C0\uC5D0\uC11C\uB3C4 \uAC15\uD55C \uAC83\uC740 \uC544\uB2D9\uB2C8\uB2E4.",
+  vsRaid: "\uB808\uC774\uB4DC \xB7 \uCCB4\uC721\uAD00",
+  vsBattle: "\uBC30\uD2C0\uB9AC\uADF8",
+  vsLink: "\uBC30\uD2C0 \uD0C0\uC218 \xB7 \uC0AC\uC6A9 \uD3EC\uCF13\uBAAC \uBCF4\uAE30 \u2192",
+  colSpeed: "\uC18D\uB3C4",
+  turnsText: (t, s) => `${t}\uD134 (${s}\uCD08)`,
+  instant: "\uC989\uC2DC \uBC1C\uB3D9",
+  topH: (n) => `${n} \u2014 \uAC00\uC7A5 \uC138\uAC8C \uC4F0\uB294 \uD3EC\uCF13\uBAAC`,
+  topSub: "\uC774 \uAE30\uC220\uC744 \uD3EC\uD568\uD55C \uCD5C\uACE0 \uC870\uD569\uC758 DPS \uC21C\uC704\uC785\uB2C8\uB2E4. \uB51C\uB7EC \uD2F0\uC5B4\uD45C\uC640 \uAC19\uC740 \uAE30\uC900(\uB808\uBCA8 40 \xB7 \uAC1C\uCCB4\uAC12 15 \xB7 \uC0C1\uB300 \uBC29\uC5B4 180 \xB7 \uC2A4\uD398\uC15C \uAE30\uC220 \uD0C0\uC785\uC774 \uC57D\uC810\uC778 \uBCF4\uC2A4)\uC774\uBA70, \uBA54\uAC00 \uD53C\uB0A0\uB808 \uAC19\uC740 \uC774\uBCA4\uD2B8 \uBC84\uD504\uB294 \uB123\uC9C0 \uC54A\uC740 \uAE30\uBCF8 \uC218\uCE58\uC785\uB2C8\uB2E4.",
+  topCount: (s, t) => `\uBC30\uC6B8 \uC218 \uC788\uB294 ${t}\uC885(\uC100\uB3C4\uC6B0\xB7\uBA54\uAC00 \uD3EC\uD568) \uC911 \uC0C1\uC704 ${s}\uC885`,
+  colRank: "\uC21C\uC704",
+  colMon: "\uD3EC\uCF13\uBAAC",
+  colPairFast: "\uD568\uAED8 \uC4F0\uB294 \uB178\uBA40 \uAE30\uC220",
+  colPairCharged: "\uD568\uAED8 \uC4F0\uB294 \uC2A4\uD398\uC15C \uAE30\uC220",
+  colCycle: "\uD55C \uC0AC\uC774\uD074",
+  cycleText: (n, s) => `\uB178\uBA40 ${n}\uD68C + \uC2A4\uD398\uC15C 1\uD68C \xB7 ${s}\uCD08`,
+  colDps: "\uC0AC\uC774\uD074 DPS",
+  noTop: "\uCD9C\uC2DC\uB41C \uD3EC\uCF13\uBAAC \uC911 \uC774 \uAE30\uC220\uC744 \uB808\uC774\uB4DC\uC5D0\uC11C \uC4F8 \uC218 \uC788\uB294 \uC885\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.",
+  shadow: "\uC100\uB3C4\uC6B0 ",
+  legacyLegend: "\u2605 = \uB808\uAC70\uC2DC(\uC5D8\uB9AC\uD2B8 \uAE30\uC220\uBA38\uC2E0\xB7\uC774\uBCA4\uD2B8 \uD55C\uC815)",
+  tableH: (n) => `${n} \u2014 \uB51C\uB7EC \uD2F0\uC5B4\uD45C \uCC44\uC6A9`,
+  tableSub: (v) => `\uD0C0\uC785\uBCC4 \uB51C\uB7EC \uD2F0\uC5B4\uD45C(${v} \uAE30\uC900, \uD0C0\uC785\uB9C8\uB2E4 \uC0C1\uC704 30)\uC5D0\uC11C \uC774 \uAE30\uC220\uC774 \uCD94\uCC9C \uAE30\uC220\uBC30\uCE58\uC5D0 \uB4E4\uC5B4\uAC04 \uD3EC\uCF13\uBAAC\uC785\uB2C8\uB2E4.`,
+  colTypeRank: "\uD0C0\uC785 \xB7 \uC21C\uC704",
+  rankText: (n) => `${n}\uC704`,
+  noTable: "\uC9C0\uAE08 \uB51C\uB7EC \uD2F0\uC5B4\uD45C(\uD0C0\uC785\uBCC4 \uC0C1\uC704 30)\uC758 \uCD94\uCC9C \uAE30\uC220\uBC30\uCE58\uC5D0\uB294 \uC774 \uAE30\uC220\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.",
+  verMega: "\uBA54\uAC00 \uD53C\uB0A0\uB808",
+  verCurrent: "\uC77C\uBC18",
+  effH: (t) => `${t} \uD0C0\uC785 \uAE30\uC220\uC758 \uC0C1\uC131`,
+  effSuper: "\uD6A8\uACFC\uAC00 \uAD49\uC7A5\uD568 \xD71.6",
+  effResist: "\uD6A8\uACFC\uAC00 \uBCC4\uB85C \xD70.625",
+  effDouble: "\uC774\uC911 \uBC18\uAC10 \xD70.39",
+  effNone: "\uD574\uB2F9 \uC5C6\uC74C",
+  relatedH: (t, k) => `${t} \uD0C0\uC785\uC758 \uB2E4\uB978 ${k} \u2014 \uB808\uC774\uB4DC \uC218\uCE58`,
+  explainH: "\uC774 \uD398\uC774\uC9C0\uC758 \uC22B\uC790\uB294 \uC5B4\uB5BB\uAC8C \uACC4\uC0B0\uD588\uB098\uC694?",
+  explainBody: (d) => `\uC704\uB825\xB7\uC2DC\uC804 \uC2DC\uAC04\xB7\uC5D0\uB108\uC9C0\uB294 \uACF5\uAC1C \uAC8C\uC784 \uB370\uC774\uD130(PokeMiners \uAC8C\uC784\uB9C8\uC2A4\uD130, ${d} \uAE30\uC900)\uC758 \uB808\uC774\uB4DC\xB7\uCCB4\uC721\uAD00 \uC218\uCE58\uC785\uB2C8\uB2E4. \uB370\uBBF8\uC9C0\uB294 floor(0.5 \xD7 \uC704\uB825 \xD7 \uACF5\uACA9 \xF7 \uBC29\uC5B4 \xD7 \uC790\uC18D 1.2 \xD7 \uC0C1\uC131) + 1 \uB85C \uACC4\uC0B0\uD558\uACE0, \uC0AC\uC774\uD074 DPS\uB294 \uB178\uBA40 \uAE30\uC220\uB85C \uC5D0\uB108\uC9C0\uB97C \uBAA8\uC544 \uC2A4\uD398\uC15C \uAE30\uC220\uC744 \uD55C \uBC88 \uC4F0\uAE30\uAE4C\uC9C0\uC758 \uCD1D \uB370\uBBF8\uC9C0\uB97C \uAC78\uB9B0 \uC2DC\uAC04\uC73C\uB85C \uB098\uB208 \uAC12\uC785\uB2C8\uB2E4. \uC100\uB3C4\uC6B0\uB294 \uACF5\uACA9 1.2\uBC30\uC785\uB2C8\uB2E4. \uC2E4\uC81C \uB808\uC774\uB4DC\uC5D0\uC11C\uB294 \uBCF4\uC2A4\uC758 \uD0C0\uC785\xB7\uAE30\uC220\xB7\uD68C\uD53C\uC5D0 \uB530\uB77C \uB2EC\uB77C\uC9C0\uBBC0\uB85C \uD3EC\uCF13\uBAAC\uB07C\uB9AC \uBE44\uAD50\uD558\uB294 \uCC38\uACE0\uAC12\uC73C\uB85C \uBCF4\uC138\uC694.`,
+  footer: (n, d) => `\uB808\uC774\uB4DC \uAE30\uC220 ${n}\uAC1C \xB7 \uAC8C\uC784 \uB370\uC774\uD130 ${d}`
+};
+var en11 = {
+  navLabel: "Raid Move Dex",
+  navRaid: "\u{1F525} Raid Attacker Tiers",
+  navBattle: "\u2694\uFE0F Battle Move Dex",
+  kindFast: "Fast Move",
+  kindCharged: "Charged Move",
+  secUnit: "s",
+  power: "Power",
+  duration: "Duration",
+  energyGain: "Energy gain",
+  energyCost: "Energy cost",
+  bars: (n) => `${n}-bar`,
+  dpsLong: "DPS \xB7 power per second",
+  epsLong: "EPS \xB7 energy per second",
+  dpeLong: "DPE \xB7 power per energy",
+  windowAt: "Damage lands at",
+  hubMetaTitle: "Pok\xE9mon GO Raid Move Dex \u2014 Power, Duration, DPS & Best Users | GBL Note",
+  hubMetaDesc: (f, c) => `Raid and Gym stats for ${f} Fast Moves and ${c} Charged Moves in Pok\xE9mon GO: power, duration, energy and DPS in one table, the Pok\xE9mon that hit hardest with each move, and how the numbers differ from GO Battle League.`,
+  hubH1: "Pok\xE9mon GO Raid Move Dex \u2014 Power, Duration & DPS",
+  hubIntro1: (f, c) => `Raid and Gym stats for ${f} Fast Moves and ${c} Charged Moves. The same move has separate power, energy and speed values in GO Battle League: battles run in turns, raids run in seconds. Tap a move to see which Pok\xE9mon hit hardest with it and how it compares to its battle stats.`,
+  hubIntro2: "DPS = power \xF7 duration, EPS = energy gain \xF7 duration, DPE = power \xF7 energy cost. For Charged Moves, 100 energy is a 1-bar move, 50 is 2-bar and 33 is 3-bar. Tap a column header to sort by it.",
+  topUsedH: "Moves that appear most in the raid attacker tiers",
+  topUsedSub: "Counted from recommended movesets across the 18 type tier lists (top 30 per type)",
+  usedSuffix: (n) => `${n} users`,
+  viewTable: "Table",
+  viewTree: "By type",
+  all: "All",
+  searchPh: "Search move name\u2026",
+  shown: (n, t) => `${n} of ${t}`,
+  colName: "Move",
+  colType: "Type",
+  colUsers: "Tier-list users",
+  sortHint: "Tap a header to sort",
+  noResult: "No moves match these filters.",
+  hubExplainH: "Where do these numbers come from?",
+  hubExplainBody: (d) => `Power, duration and energy are the Raid and Gym values from public game data (PokeMiners game master, as of ${d}). GO Battle League uses separate values, shown in the Battle Move Dex. DPS, EPS, DPE and the per-Pok\xE9mon rankings are calculated by GBL Note from those values and are recalculated after balance changes.`,
+  back: "\u2190 Raid Move Dex",
+  metaTitle: (n) => `${n} in Pok\xE9mon GO Raids \u2014 Power, DPS & Best Users | GBL Note`,
+  metaDesc: (n, k) => `Raid and Gym stats for ${n} (${k}): power, duration, energy and DPS, the Pok\xE9mon that hit hardest with it, and how it differs from its GO Battle League stats.`,
+  h1Suffix: "Raid stats, DPS & best users",
+  rankOf: (r, t) => `#${r} of ${t}`,
+  vsH: "Raid stats vs. battle stats",
+  vsSub: "The same move has separate values for Raids and Gyms and for GO Battle League. A move that is strong in raids is not necessarily strong in battles.",
+  vsRaid: "Raids \xB7 Gyms",
+  vsBattle: "Battle League",
+  vsLink: "See battle counts and users \u2192",
+  colSpeed: "Speed",
+  turnsText: (t, s) => `${t} turn${t === 1 ? "" : "s"} (${s}s)`,
+  instant: "Instant",
+  topH: (n) => `${n} \u2014 Pok\xE9mon that hit hardest with it`,
+  topSub: "Ranked by DPS of the best moveset that includes this move. Same assumptions as the raid attacker tiers (Level 40, 15 IVs, target Defense 180, a boss weak to the Charged Move's type). These are base values without event buffs such as Mega Finale.",
+  topCount: (s, t) => `Top ${s} of ${t} that can learn it (Shadow and Mega included)`,
+  colRank: "Rank",
+  colMon: "Pok\xE9mon",
+  colPairFast: "Paired Fast Move",
+  colPairCharged: "Paired Charged Move",
+  colCycle: "One cycle",
+  cycleText: (n, s) => `${n} fast + 1 charged \xB7 ${s}s`,
+  colDps: "Cycle DPS",
+  noTop: "No released Pok\xE9mon can use this move in raids.",
+  shadow: "Shadow ",
+  legacyLegend: "\u2605 = legacy (Elite TM / event-exclusive)",
+  tableH: (n) => `${n} \u2014 in the raid attacker tiers`,
+  tableSub: (v) => `Pok\xE9mon whose recommended moveset includes this move in the type tier lists (${v}, top 30 per type).`,
+  colTypeRank: "Type \xB7 rank",
+  rankText: (n) => `#${n}`,
+  noTable: "No recommended moveset in the current raid attacker tiers (top 30 per type) uses this move.",
+  verMega: "Mega Finale",
+  verCurrent: "standard",
+  effH: (t) => `${t}-type move effectiveness`,
+  effSuper: "Super effective \xD71.6",
+  effResist: "Not very effective \xD70.625",
+  effDouble: "Double resisted \xD70.39",
+  effNone: "None",
+  relatedH: (t, k) => `Other ${t}-type ${k}s \u2014 raid stats`,
+  explainH: "How are these numbers calculated?",
+  explainBody: (d) => `Power, duration and energy are the Raid and Gym values from public game data (PokeMiners game master, as of ${d}). Damage is floor(0.5 \xD7 power \xD7 Attack \xF7 Defense \xD7 STAB 1.2 \xD7 effectiveness) + 1. Cycle DPS is the total damage of charging with the Fast Move and firing the Charged Move once, divided by the time it takes. Shadow Pok\xE9mon get 1.2\xD7 Attack. Real raids vary with the boss's type, moves and dodging, so treat these as values for comparing Pok\xE9mon.`,
+  footer: (n, d) => `${n} raid moves \xB7 game data ${d}`
+};
+var ja11 = {
+  navLabel: "\u30EC\u30A4\u30C9\u6280\u56F3\u9451",
+  navRaid: "\u{1F525} \u30EC\u30A4\u30C9\u30A2\u30BF\u30C3\u30AB\u30FC",
+  navBattle: "\u2694\uFE0F \u30D0\u30C8\u30EB\u6280\u56F3\u9451",
+  kindFast: "\u30CE\u30FC\u30DE\u30EB\u30A2\u30BF\u30C3\u30AF",
+  kindCharged: "\u30B9\u30DA\u30B7\u30E3\u30EB\u30A2\u30BF\u30C3\u30AF",
+  secUnit: "\u79D2",
+  power: "\u5A01\u529B",
+  duration: "\u767A\u52D5\u6642\u9593",
+  energyGain: "\u7372\u5F97\u30A8\u30CD\u30EB\u30AE\u30FC",
+  energyCost: "\u5FC5\u8981\u30A8\u30CD\u30EB\u30AE\u30FC",
+  bars: (n) => `${n}\u30B2\u30FC\u30B8`,
+  dpsLong: "DPS \xB7 1\u79D2\u3042\u305F\u308A\u5A01\u529B",
+  epsLong: "EPS \xB7 1\u79D2\u3042\u305F\u308A\u30A8\u30CD\u30EB\u30AE\u30FC",
+  dpeLong: "DPE \xB7 \u30A8\u30CD\u30EB\u30AE\u30FC\u3042\u305F\u308A\u5A01\u529B",
+  windowAt: "\u30C0\u30E1\u30FC\u30B8\u767A\u751F",
+  hubMetaTitle: "\u30DD\u30B1\u30E2\u30F3GO \u30EC\u30A4\u30C9\u6280\u56F3\u9451 \u2014 \u5A01\u529B\u30FB\u767A\u52D5\u6642\u9593\u30FBDPS\u30FB\u4F7F\u3046\u30DD\u30B1\u30E2\u30F3 | GBL Note",
+  hubMetaDesc: (f, c) => `\u30DD\u30B1\u30E2\u30F3GO\u306E\u30EC\u30A4\u30C9\u30FB\u30B8\u30E0\u3067\u4F7F\u3046\u30CE\u30FC\u30DE\u30EB\u30A2\u30BF\u30C3\u30AF${f}\u7A2E\u30FB\u30B9\u30DA\u30B7\u30E3\u30EB\u30A2\u30BF\u30C3\u30AF${c}\u7A2E\u306E\u5A01\u529B\u30FB\u767A\u52D5\u6642\u9593\u30FB\u30A8\u30CD\u30EB\u30AE\u30FC\u30FBDPS\u3092\u4E00\u89A7\u3067\u3002\u6280\u3054\u3068\u306B\u6700\u3082\u706B\u529B\u304C\u51FA\u308B\u30DD\u30B1\u30E2\u30F3\u306E\u9806\u4F4D\u3068\u3001GO\u30D0\u30C8\u30EB\u30EA\u30FC\u30B0\u306E\u6570\u5024\u3068\u306E\u9055\u3044\u3082\u3002`,
+  hubH1: "\u30DD\u30B1\u30E2\u30F3GO \u30EC\u30A4\u30C9\u6280\u56F3\u9451 \u2014 \u5A01\u529B \xB7 \u767A\u52D5\u6642\u9593 \xB7 DPS",
+  hubIntro1: (f, c) => `\u30EC\u30A4\u30C9\u30FB\u30B8\u30E0\u3067\u4F7F\u3046\u30CE\u30FC\u30DE\u30EB\u30A2\u30BF\u30C3\u30AF${f}\u7A2E\u3068\u30B9\u30DA\u30B7\u30E3\u30EB\u30A2\u30BF\u30C3\u30AF${c}\u7A2E\u306E\u6570\u5024\u3067\u3059\u3002\u540C\u3058\u6280\u3067\u3082\u3001GO\u30D0\u30C8\u30EB\u30EA\u30FC\u30B0\u3068\u306F\u5A01\u529B\u30FB\u30A8\u30CD\u30EB\u30AE\u30FC\u30FB\u901F\u3055\u304C\u5225\u306B\u6C7A\u3081\u3089\u308C\u3066\u3044\u307E\u3059\u3002\u30D0\u30C8\u30EB\u306F\u30BF\u30FC\u30F3\u5358\u4F4D\u3001\u30EC\u30A4\u30C9\u306F\u79D2\u5358\u4F4D\u3067\u52D5\u304D\u307E\u3059\u3002\u6280\u3092\u62BC\u3059\u3068\u3001\u305D\u306E\u6280\u3067\u6700\u3082\u706B\u529B\u304C\u51FA\u308B\u30DD\u30B1\u30E2\u30F3\u306E\u9806\u4F4D\u3068\u30D0\u30C8\u30EB\u6570\u5024\u3068\u306E\u6BD4\u8F03\u304C\u898B\u3089\u308C\u307E\u3059\u3002`,
+  hubIntro2: "DPS = \u5A01\u529B \xF7 \u767A\u52D5\u6642\u9593\u3001EPS = \u7372\u5F97\u30A8\u30CD\u30EB\u30AE\u30FC \xF7 \u767A\u52D5\u6642\u9593\u3001DPE = \u5A01\u529B \xF7 \u5FC5\u8981\u30A8\u30CD\u30EB\u30AE\u30FC\u3002\u30B9\u30DA\u30B7\u30E3\u30EB\u30A2\u30BF\u30C3\u30AF\u306F\u30A8\u30CD\u30EB\u30AE\u30FC100\u304C1\u30B2\u30FC\u30B8\u300150\u304C2\u30B2\u30FC\u30B8\u300133\u304C3\u30B2\u30FC\u30B8\u3067\u3059\u3002\u898B\u51FA\u3057\u3092\u62BC\u3059\u3068\u305D\u306E\u6570\u5024\u3067\u4E26\u3073\u66FF\u3048\u307E\u3059\u3002",
+  topUsedH: "\u30EC\u30A4\u30C9\u30A2\u30BF\u30C3\u30AB\u30FC\u30C6\u30A3\u30A2\u306B\u6700\u3082\u591A\u304F\u8F09\u3063\u3066\u3044\u308B\u6280",
+  topUsedSub: "18\u30BF\u30A4\u30D7\u306E\u30A2\u30BF\u30C3\u30AB\u30FC\u30C6\u30A3\u30A2(\u30BF\u30A4\u30D7\u5225\u4E0A\u4F4D30)\u306E\u63A8\u5968\u6280\u69CB\u6210\u3092\u96C6\u8A08",
+  usedSuffix: (n) => `${n}\u7A2E\u304C\u63A1\u7528`,
+  viewTable: "\u8868\u3067\u898B\u308B",
+  viewTree: "\u30BF\u30A4\u30D7\u5225\u306B\u898B\u308B",
+  all: "\u3059\u3079\u3066",
+  searchPh: "\u6280\u540D\u3092\u691C\u7D22\u2026",
+  shown: (n, t) => `${t}\u4EF6\u4E2D ${n}\u4EF6`,
+  colName: "\u6280",
+  colType: "\u30BF\u30A4\u30D7",
+  colUsers: "\u30C6\u30A3\u30A2\u63A1\u7528",
+  sortHint: "\u898B\u51FA\u3057\u3092\u62BC\u3059\u3068\u4E26\u3073\u66FF\u3048",
+  noResult: "\u6761\u4EF6\u306B\u5408\u3046\u6280\u304C\u3042\u308A\u307E\u305B\u3093\u3002",
+  hubExplainH: "\u3053\u306E\u6570\u5024\u306E\u51FA\u3069\u3053\u308D\u306F?",
+  hubExplainBody: (d) => `\u5A01\u529B\u30FB\u767A\u52D5\u6642\u9593\u30FB\u30A8\u30CD\u30EB\u30AE\u30FC\u306F\u516C\u958B\u30B2\u30FC\u30E0\u30C7\u30FC\u30BF(PokeMiners\u30B2\u30FC\u30E0\u30DE\u30B9\u30BF\u30FC\u3001${d}\u6642\u70B9)\u306E\u30EC\u30A4\u30C9\u30FB\u30B8\u30E0\u7528\u306E\u6570\u5024\u3067\u3059\u3002GO\u30D0\u30C8\u30EB\u30EA\u30FC\u30B0\u306E\u6570\u5024\u306F\u5225\u3067\u3001\u30D0\u30C8\u30EB\u6280\u56F3\u9451\u3067\u78BA\u8A8D\u3067\u304D\u307E\u3059\u3002DPS\u30FBEPS\u30FBDPE\u3068\u30DD\u30B1\u30E2\u30F3\u5225\u306E\u9806\u4F4D\u306FGBL Note\u304C\u305D\u306E\u6570\u5024\u304B\u3089\u8A08\u7B97\u3057\u307E\u3057\u305F\u3002\u30D0\u30E9\u30F3\u30B9\u8ABF\u6574\u304C\u3042\u308C\u3070\u518D\u8A08\u7B97\u3057\u3066\u66F4\u65B0\u3057\u307E\u3059\u3002`,
+  back: "\u2190 \u30EC\u30A4\u30C9\u6280\u56F3\u9451",
+  metaTitle: (n) => `\u30DD\u30B1\u30E2\u30F3GO ${n} \u30EC\u30A4\u30C9\u5A01\u529B\u30FBDPS\u30FB\u4F7F\u3046\u30DD\u30B1\u30E2\u30F3 | GBL Note`,
+  metaDesc: (n, k) => `${n}(${k})\u306E\u30EC\u30A4\u30C9\u30FB\u30B8\u30E0\u3067\u306E\u5A01\u529B\u30FB\u767A\u52D5\u6642\u9593\u30FB\u30A8\u30CD\u30EB\u30AE\u30FC\u30FBDPS\u3001\u3053\u306E\u6280\u3067\u6700\u3082\u706B\u529B\u304C\u51FA\u308B\u30DD\u30B1\u30E2\u30F3\u306E\u9806\u4F4D\u3001GO\u30D0\u30C8\u30EB\u30EA\u30FC\u30B0\u306E\u6570\u5024\u3068\u306E\u9055\u3044\u3002`,
+  h1Suffix: "\u30EC\u30A4\u30C9\u6570\u5024 \xB7 DPS \xB7 \u4F7F\u3046\u30DD\u30B1\u30E2\u30F3",
+  rankOf: (r, t) => `${t}\u7A2E\u4E2D ${r}\u4F4D`,
+  vsH: "\u30EC\u30A4\u30C9\u6570\u5024\u3068\u30D0\u30C8\u30EB\u6570\u5024\u306E\u6BD4\u8F03",
+  vsSub: "\u540C\u3058\u6280\u3067\u3082\u3001\u30EC\u30A4\u30C9\u30FB\u30B8\u30E0\u3068GO\u30D0\u30C8\u30EB\u30EA\u30FC\u30B0\u3067\u306F\u6570\u5024\u304C\u5225\u306B\u6C7A\u3081\u3089\u308C\u3066\u3044\u307E\u3059\u3002\u30EC\u30A4\u30C9\u3067\u5F37\u3044\u6280\u304C\u30D0\u30C8\u30EB\u3067\u3082\u5F37\u3044\u3068\u306F\u9650\u308A\u307E\u305B\u3093\u3002",
+  vsRaid: "\u30EC\u30A4\u30C9 \xB7 \u30B8\u30E0",
+  vsBattle: "\u30D0\u30C8\u30EB\u30EA\u30FC\u30B0",
+  vsLink: "\u30D0\u30C8\u30EB\u306E\u56DE\u6570\u30FB\u4F7F\u3046\u30DD\u30B1\u30E2\u30F3\u3092\u898B\u308B \u2192",
+  colSpeed: "\u901F\u3055",
+  turnsText: (t, s) => `${t}\u30BF\u30FC\u30F3(${s}\u79D2)`,
+  instant: "\u5373\u6642\u767A\u52D5",
+  topH: (n) => `${n} \u2014 \u6700\u3082\u706B\u529B\u304C\u51FA\u308B\u30DD\u30B1\u30E2\u30F3`,
+  topSub: "\u3053\u306E\u6280\u3092\u542B\u3080\u6700\u826F\u306E\u6280\u69CB\u6210\u306EDPS\u9806\u4F4D\u3067\u3059\u3002\u30A2\u30BF\u30C3\u30AB\u30FC\u30C6\u30A3\u30A2\u3068\u540C\u3058\u6761\u4EF6(\u30EC\u30D9\u30EB40 \xB7 \u500B\u4F53\u502415 \xB7 \u76F8\u624B\u306E\u9632\u5FA1180 \xB7 \u30B9\u30DA\u30B7\u30E3\u30EB\u30A2\u30BF\u30C3\u30AF\u306E\u30BF\u30A4\u30D7\u304C\u5F31\u70B9\u306E\u30DC\u30B9)\u3067\u3001\u30E1\u30AC\u30D5\u30A3\u30CA\u30FC\u30EC\u306A\u3069\u306E\u30A4\u30D9\u30F3\u30C8\u5F37\u5316\u3092\u542B\u307E\u306A\u3044\u57FA\u672C\u306E\u6570\u5024\u3067\u3059\u3002",
+  topCount: (s, t) => `\u899A\u3048\u3089\u308C\u308B${t}\u7A2E(\u30B7\u30E3\u30C9\u30A6\u30FB\u30E1\u30AC\u3092\u542B\u3080)\u306E\u3046\u3061\u4E0A\u4F4D${s}\u7A2E`,
+  colRank: "\u9806\u4F4D",
+  colMon: "\u30DD\u30B1\u30E2\u30F3",
+  colPairFast: "\u7D44\u307F\u5408\u308F\u305B\u308B\u30CE\u30FC\u30DE\u30EB\u30A2\u30BF\u30C3\u30AF",
+  colPairCharged: "\u7D44\u307F\u5408\u308F\u305B\u308B\u30B9\u30DA\u30B7\u30E3\u30EB\u30A2\u30BF\u30C3\u30AF",
+  colCycle: "1\u30B5\u30A4\u30AF\u30EB",
+  cycleText: (n, s) => `\u30CE\u30FC\u30DE\u30EB${n}\u56DE + \u30B9\u30DA\u30B7\u30E3\u30EB1\u56DE \xB7 ${s}\u79D2`,
+  colDps: "\u30B5\u30A4\u30AF\u30EBDPS",
+  noTop: "\u5B9F\u88C5\u6E08\u307F\u306E\u30DD\u30B1\u30E2\u30F3\u306B\u3001\u3053\u306E\u6280\u3092\u30EC\u30A4\u30C9\u3067\u4F7F\u3048\u308B\u3082\u306E\u306F\u3044\u307E\u305B\u3093\u3002",
+  shadow: "\u30B7\u30E3\u30C9\u30A6",
+  legacyLegend: "\u2605=\u30EC\u30AC\u30B7\u30FC(\u3059\u3054\u3044\u308F\u3056\u30DE\u30B7\u30F3\u30FB\u30A4\u30D9\u30F3\u30C8\u9650\u5B9A)",
+  tableH: (n) => `${n} \u2014 \u30A2\u30BF\u30C3\u30AB\u30FC\u30C6\u30A3\u30A2\u3067\u306E\u63A1\u7528`,
+  tableSub: (v) => `\u30BF\u30A4\u30D7\u5225\u30A2\u30BF\u30C3\u30AB\u30FC\u30C6\u30A3\u30A2(${v}\u3001\u5404\u30BF\u30A4\u30D7\u4E0A\u4F4D30)\u3067\u3001\u63A8\u5968\u6280\u69CB\u6210\u306B\u3053\u306E\u6280\u304C\u5165\u3063\u3066\u3044\u308B\u30DD\u30B1\u30E2\u30F3\u3067\u3059\u3002`,
+  colTypeRank: "\u30BF\u30A4\u30D7 \xB7 \u9806\u4F4D",
+  rankText: (n) => `${n}\u4F4D`,
+  noTable: "\u73FE\u5728\u306E\u30A2\u30BF\u30C3\u30AB\u30FC\u30C6\u30A3\u30A2(\u30BF\u30A4\u30D7\u5225\u4E0A\u4F4D30)\u306E\u63A8\u5968\u6280\u69CB\u6210\u306B\u3053\u306E\u6280\u306F\u3042\u308A\u307E\u305B\u3093\u3002",
+  verMega: "\u30E1\u30AC\u30D5\u30A3\u30CA\u30FC\u30EC",
+  verCurrent: "\u901A\u5E38",
+  effH: (t) => `${t}\u30BF\u30A4\u30D7\u6280\u306E\u76F8\u6027`,
+  effSuper: "\u3053\u3046\u304B\u306F\u3070\u3064\u3050\u3093 \xD71.6",
+  effResist: "\u3044\u307E\u3072\u3068\u3064 \xD70.625",
+  effDouble: "\u4E8C\u91CD\u8010\u6027 \xD70.39",
+  effNone: "\u306A\u3057",
+  relatedH: (t, k) => `${t}\u30BF\u30A4\u30D7\u306E\u307B\u304B\u306E${k} \u2014 \u30EC\u30A4\u30C9\u6570\u5024`,
+  explainH: "\u3053\u306E\u30DA\u30FC\u30B8\u306E\u6570\u5024\u306F\u3069\u3046\u8A08\u7B97\u3057\u3066\u3044\u308B?",
+  explainBody: (d) => `\u5A01\u529B\u30FB\u767A\u52D5\u6642\u9593\u30FB\u30A8\u30CD\u30EB\u30AE\u30FC\u306F\u516C\u958B\u30B2\u30FC\u30E0\u30C7\u30FC\u30BF(PokeMiners\u30B2\u30FC\u30E0\u30DE\u30B9\u30BF\u30FC\u3001${d}\u6642\u70B9)\u306E\u30EC\u30A4\u30C9\u30FB\u30B8\u30E0\u7528\u306E\u6570\u5024\u3067\u3059\u3002\u30C0\u30E1\u30FC\u30B8\u306F floor(0.5 \xD7 \u5A01\u529B \xD7 \u653B\u6483 \xF7 \u9632\u5FA1 \xD7 \u30BF\u30A4\u30D7\u4E00\u81F41.2 \xD7 \u76F8\u6027) + 1 \u3067\u8A08\u7B97\u3057\u3001\u30B5\u30A4\u30AF\u30EBDPS\u306F\u30CE\u30FC\u30DE\u30EB\u30A2\u30BF\u30C3\u30AF\u3067\u30A8\u30CD\u30EB\u30AE\u30FC\u3092\u305F\u3081\u3066\u30B9\u30DA\u30B7\u30E3\u30EB\u30A2\u30BF\u30C3\u30AF\u30921\u56DE\u4F7F\u3046\u307E\u3067\u306E\u5408\u8A08\u30C0\u30E1\u30FC\u30B8\u3092\u3001\u304B\u304B\u3063\u305F\u6642\u9593\u3067\u5272\u3063\u305F\u5024\u3067\u3059\u3002\u30B7\u30E3\u30C9\u30A6\u306F\u653B\u64831.2\u500D\u3067\u3059\u3002\u5B9F\u969B\u306E\u30EC\u30A4\u30C9\u3067\u306F\u30DC\u30B9\u306E\u30BF\u30A4\u30D7\u30FB\u6280\u30FB\u56DE\u907F\u3067\u5909\u308F\u308B\u305F\u3081\u3001\u30DD\u30B1\u30E2\u30F3\u540C\u58EB\u3092\u6BD4\u3079\u308B\u76EE\u5B89\u3068\u3057\u3066\u3054\u89A7\u304F\u3060\u3055\u3044\u3002`,
+  footer: (n, d) => `\u30EC\u30A4\u30C9\u6280 ${n}\u4EF6 \xB7 \u30B2\u30FC\u30E0\u30C7\u30FC\u30BF ${d}`
+};
+var zh2 = {
+  navLabel: "\u5718\u9AD4\u6230\u62DB\u5F0F\u5716\u9451",
+  navRaid: "\u{1F525} \u5718\u9AD4\u6230\u653B\u64CA\u624B\u6392\u884C",
+  navBattle: "\u2694\uFE0F \u5C0D\u6230\u62DB\u5F0F\u5716\u9451",
+  kindFast: "\u4E00\u822C\u62DB\u5F0F",
+  kindCharged: "\u7279\u6B8A\u62DB\u5F0F",
+  secUnit: "\u79D2",
+  power: "\u5A01\u529B",
+  duration: "\u65BD\u653E\u6642\u9593",
+  energyGain: "\u7372\u5F97\u80FD\u91CF",
+  energyCost: "\u6240\u9700\u80FD\u91CF",
+  bars: (n) => `${n}\u683C\u80FD\u91CF\u689D`,
+  dpsLong: "DPS \xB7 \u6BCF\u79D2\u5A01\u529B",
+  epsLong: "EPS \xB7 \u6BCF\u79D2\u80FD\u91CF",
+  dpeLong: "DPE \xB7 \u6BCF\u9EDE\u80FD\u91CF\u5A01\u529B",
+  windowAt: "\u50B7\u5BB3\u767C\u751F\u6642\u9593",
+  hubMetaTitle: "\u5BF6\u53EF\u5922GO \u5718\u9AD4\u6230\u62DB\u5F0F\u5716\u9451 \u2014 \u5A01\u529B\xB7\u65BD\u653E\u6642\u9593\xB7DPS\xB7\u4F7F\u7528\u5BF6\u53EF\u5922 | GBL Note",
+  hubMetaDesc: (f, c) => `\u5BF6\u53EF\u5922GO\u5718\u9AD4\u6230\xB7\u9053\u9928\u4F7F\u7528\u7684\u4E00\u822C\u62DB\u5F0F${f}\u7A2E\xB7\u7279\u6B8A\u62DB\u5F0F${c}\u7A2E\uFF0C\u5A01\u529B\xB7\u65BD\u653E\u6642\u9593\xB7\u80FD\u91CF\xB7DPS\u4E00\u8868\u6574\u7406\u3002\u6BCF\u500B\u62DB\u5F0F\u8F38\u51FA\u6700\u9AD8\u7684\u5BF6\u53EF\u5922\u6392\u540D\uFF0C\u4EE5\u53CA\u8207GO\u5C0D\u6230\u806F\u76DF\u6578\u503C\u7684\u5DEE\u7570\u3002`,
+  hubH1: "\u5BF6\u53EF\u5922GO \u5718\u9AD4\u6230\u62DB\u5F0F\u5716\u9451 \u2014 \u5A01\u529B \xB7 \u65BD\u653E\u6642\u9593 \xB7 DPS",
+  hubIntro1: (f, c) => `\u5718\u9AD4\u6230\xB7\u9053\u9928\u4F7F\u7528\u7684\u4E00\u822C\u62DB\u5F0F${f}\u7A2E\u8207\u7279\u6B8A\u62DB\u5F0F${c}\u7A2E\u7684\u6578\u503C\u3002\u540C\u4E00\u500B\u62DB\u5F0F\u5728GO\u5C0D\u6230\u806F\u76DF\u7684\u5A01\u529B\xB7\u80FD\u91CF\xB7\u901F\u5EA6\u662F\u53E6\u5916\u8A2D\u5B9A\u7684\u3002\u5C0D\u6230\u4EE5\u56DE\u5408\u8A08\u7B97\uFF0C\u5718\u9AD4\u6230\u4EE5\u79D2\u8A08\u7B97\u3002\u9EDE\u9078\u62DB\u5F0F\u53EF\u67E5\u770B\u7528\u8A72\u62DB\u5F0F\u8F38\u51FA\u6700\u9AD8\u7684\u5BF6\u53EF\u5922\u6392\u540D\uFF0C\u4EE5\u53CA\u8207\u5C0D\u6230\u6578\u503C\u7684\u6BD4\u8F03\u3002`,
+  hubIntro2: "DPS = \u5A01\u529B \xF7 \u65BD\u653E\u6642\u9593\uFF0CEPS = \u7372\u5F97\u80FD\u91CF \xF7 \u65BD\u653E\u6642\u9593\uFF0CDPE = \u5A01\u529B \xF7 \u6240\u9700\u80FD\u91CF\u3002\u7279\u6B8A\u62DB\u5F0F\u7684\u80FD\u91CF100\u70BA1\u683C\u300150\u70BA2\u683C\u300133\u70BA3\u683C\u3002\u9EDE\u9078\u6B04\u4F4D\u6A19\u984C\u53EF\u4F9D\u8A72\u6578\u503C\u6392\u5E8F\u3002",
+  topUsedH: "\u5718\u9AD4\u6230\u653B\u64CA\u624B\u6392\u884C\u4E2D\u6700\u5E38\u51FA\u73FE\u7684\u62DB\u5F0F",
+  topUsedSub: "\u7D71\u8A0818\u5C6C\u6027\u653B\u64CA\u624B\u6392\u884C(\u5404\u5C6C\u6027\u524D30\u540D)\u7684\u63A8\u85A6\u62DB\u5F0F\u914D\u7F6E",
+  usedSuffix: (n) => `${n}\u7A2E\u63A1\u7528`,
+  viewTable: "\u8868\u683C",
+  viewTree: "\u4F9D\u5C6C\u6027",
+  all: "\u5168\u90E8",
+  searchPh: "\u641C\u5C0B\u62DB\u5F0F\u540D\u7A31\u2026",
+  shown: (n, t) => `${t}\u9805\u4E2D ${n}\u9805`,
+  colName: "\u62DB\u5F0F",
+  colType: "\u5C6C\u6027",
+  colUsers: "\u6392\u884C\u63A1\u7528",
+  sortHint: "\u9EDE\u9078\u6A19\u984C\u53EF\u6392\u5E8F",
+  noResult: "\u6C92\u6709\u7B26\u5408\u689D\u4EF6\u7684\u62DB\u5F0F\u3002",
+  hubExplainH: "\u9019\u4E9B\u6578\u503C\u5F9E\u54EA\u88E1\u4F86?",
+  hubExplainBody: (d) => `\u5A01\u529B\xB7\u65BD\u653E\u6642\u9593\xB7\u80FD\u91CF\u70BA\u516C\u958B\u904A\u6232\u8CC7\u6599(PokeMiners\u904A\u6232\u4E3B\u6A94\uFF0C${d})\u4E2D\u5718\u9AD4\u6230\xB7\u9053\u9928\u7684\u6578\u503C\u3002GO\u5C0D\u6230\u806F\u76DF\u7684\u6578\u503C\u53E6\u5916\u8A2D\u5B9A\uFF0C\u53EF\u5728\u5C0D\u6230\u62DB\u5F0F\u5716\u9451\u67E5\u770B\u3002DPS\xB7EPS\xB7DPE\u8207\u5404\u5BF6\u53EF\u5922\u6392\u540D\u7531GBL Note\u4F9D\u9019\u4E9B\u6578\u503C\u8A08\u7B97\uFF0C\u5E73\u8861\u8ABF\u6574\u5F8C\u6703\u91CD\u65B0\u8A08\u7B97\u66F4\u65B0\u3002`,
+  back: "\u2190 \u5718\u9AD4\u6230\u62DB\u5F0F\u5716\u9451",
+  metaTitle: (n) => `\u5BF6\u53EF\u5922GO ${n} \u5718\u9AD4\u6230\u5A01\u529B\xB7DPS\xB7\u4F7F\u7528\u5BF6\u53EF\u5922 | GBL Note`,
+  metaDesc: (n, k) => `${n}(${k})\u5728\u5718\u9AD4\u6230\xB7\u9053\u9928\u7684\u5A01\u529B\xB7\u65BD\u653E\u6642\u9593\xB7\u80FD\u91CF\xB7DPS\uFF0C\u7528\u9019\u500B\u62DB\u5F0F\u8F38\u51FA\u6700\u9AD8\u7684\u5BF6\u53EF\u5922\u6392\u540D\uFF0C\u4EE5\u53CA\u8207GO\u5C0D\u6230\u806F\u76DF\u6578\u503C\u7684\u5DEE\u7570\u3002`,
+  h1Suffix: "\u5718\u9AD4\u6230\u6578\u503C \xB7 DPS \xB7 \u4F7F\u7528\u5BF6\u53EF\u5922",
+  rankOf: (r, t) => `${t}\u9805\u4E2D\u7B2C${r}\u540D`,
+  vsH: "\u5718\u9AD4\u6230\u6578\u503C\u8207\u5C0D\u6230\u6578\u503C\u6BD4\u8F03",
+  vsSub: "\u540C\u4E00\u500B\u62DB\u5F0F\u5728\u5718\u9AD4\u6230\xB7\u9053\u9928\u8207GO\u5C0D\u6230\u806F\u76DF\u7684\u6578\u503C\u662F\u5206\u958B\u8A2D\u5B9A\u7684\u3002\u5718\u9AD4\u6230\u5F37\u7684\u62DB\u5F0F\uFF0C\u5728\u5C0D\u6230\u4E2D\u4E0D\u4E00\u5B9A\u5F37\u3002",
+  vsRaid: "\u5718\u9AD4\u6230 \xB7 \u9053\u9928",
+  vsBattle: "\u5C0D\u6230\u806F\u76DF",
+  vsLink: "\u67E5\u770B\u5C0D\u6230\u6240\u9700\u6B21\u6578\xB7\u4F7F\u7528\u5BF6\u53EF\u5922 \u2192",
+  colSpeed: "\u901F\u5EA6",
+  turnsText: (t, s) => `${t}\u56DE\u5408(${s}\u79D2)`,
+  instant: "\u7ACB\u5373\u767C\u52D5",
+  topH: (n) => `${n} \u2014 \u8F38\u51FA\u6700\u9AD8\u7684\u5BF6\u53EF\u5922`,
+  topSub: "\u5305\u542B\u6B64\u62DB\u5F0F\u7684\u6700\u4F73\u62DB\u5F0F\u914D\u7F6EDPS\u6392\u540D\u3002\u689D\u4EF6\u8207\u653B\u64CA\u624B\u6392\u884C\u76F8\u540C(\u7B49\u7D1A40 \xB7 \u500B\u9AD4\u503C15 \xB7 \u5C0D\u624B\u9632\u79A6180 \xB7 \u5F31\u9EDE\u70BA\u7279\u6B8A\u62DB\u5F0F\u5C6C\u6027\u7684\u982D\u76EE)\uFF0C\u70BA\u4E0D\u542B\u8D85\u7D1A\u5927\u7D50\u5C40\u7B49\u6D3B\u52D5\u52A0\u6210\u7684\u57FA\u672C\u6578\u503C\u3002",
+  topCount: (s, t) => `\u53EF\u5B78\u6703\u7684${t}\u7A2E(\u542B\u6697\u5F71\xB7\u8D85\u7D1A\u9032\u5316)\u4E2D\u524D${s}\u540D`,
+  colRank: "\u6392\u540D",
+  colMon: "\u5BF6\u53EF\u5922",
+  colPairFast: "\u642D\u914D\u7684\u4E00\u822C\u62DB\u5F0F",
+  colPairCharged: "\u642D\u914D\u7684\u7279\u6B8A\u62DB\u5F0F",
+  colCycle: "\u4E00\u500B\u5FAA\u74B0",
+  cycleText: (n, s) => `\u4E00\u822C${n}\u6B21 + \u7279\u6B8A1\u6B21 \xB7 ${s}\u79D2`,
+  colDps: "\u5FAA\u74B0DPS",
+  noTop: "\u5DF2\u63A8\u51FA\u7684\u5BF6\u53EF\u5922\u4E2D\uFF0C\u6C92\u6709\u80FD\u5728\u5718\u9AD4\u6230\u4F7F\u7528\u6B64\u62DB\u5F0F\u7684\u3002",
+  shadow: "\u6697\u5F71",
+  legacyLegend: "\u2605=\u50B3\u627F(\u53B2\u5BB3\u62DB\u5F0F\u5B78\u7FD2\u5668\xB7\u6D3B\u52D5\u9650\u5B9A)",
+  tableH: (n) => `${n} \u2014 \u653B\u64CA\u624B\u6392\u884C\u63A1\u7528`,
+  tableSub: (v) => `\u5728\u5404\u5C6C\u6027\u653B\u64CA\u624B\u6392\u884C(${v}\uFF0C\u5404\u5C6C\u6027\u524D30\u540D)\u4E2D\uFF0C\u63A8\u85A6\u62DB\u5F0F\u914D\u7F6E\u5305\u542B\u6B64\u62DB\u5F0F\u7684\u5BF6\u53EF\u5922\u3002`,
+  colTypeRank: "\u5C6C\u6027 \xB7 \u6392\u540D",
+  rankText: (n) => `\u7B2C${n}\u540D`,
+  noTable: "\u76EE\u524D\u653B\u64CA\u624B\u6392\u884C(\u5404\u5C6C\u6027\u524D30\u540D)\u7684\u63A8\u85A6\u62DB\u5F0F\u914D\u7F6E\u4E2D\u6C92\u6709\u6B64\u62DB\u5F0F\u3002",
+  verMega: "\u8D85\u7D1A\u5927\u7D50\u5C40",
+  verCurrent: "\u4E00\u822C",
+  effH: (t) => `${t}\u5C6C\u6027\u62DB\u5F0F\u7684\u76F8\u524B`,
+  effSuper: "\u6548\u679C\u7D55\u4F73 \xD71.6",
+  effResist: "\u6548\u679C\u4E0D\u597D \xD70.625",
+  effDouble: "\u96D9\u91CD\u62B5\u6297 \xD70.39",
+  effNone: "\u7121",
+  relatedH: (t, k) => `${t}\u5C6C\u6027\u7684\u5176\u4ED6${k} \u2014 \u5718\u9AD4\u6230\u6578\u503C`,
+  explainH: "\u9019\u9801\u7684\u6578\u503C\u600E\u9EBC\u7B97\u7684?",
+  explainBody: (d) => `\u5A01\u529B\xB7\u65BD\u653E\u6642\u9593\xB7\u80FD\u91CF\u70BA\u516C\u958B\u904A\u6232\u8CC7\u6599(PokeMiners\u904A\u6232\u4E3B\u6A94\uFF0C${d})\u4E2D\u5718\u9AD4\u6230\xB7\u9053\u9928\u7684\u6578\u503C\u3002\u50B7\u5BB3\u4EE5 floor(0.5 \xD7 \u5A01\u529B \xD7 \u653B\u64CA \xF7 \u9632\u79A6 \xD7 \u5C6C\u6027\u4E00\u81F41.2 \xD7 \u76F8\u524B) + 1 \u8A08\u7B97\uFF0C\u5FAA\u74B0DPS\u662F\u7528\u4E00\u822C\u62DB\u5F0F\u7D2F\u7A4D\u80FD\u91CF\u5F8C\u65BD\u653E\u4E00\u6B21\u7279\u6B8A\u62DB\u5F0F\u7684\u7E3D\u50B7\u5BB3\uFF0C\u9664\u4EE5\u6240\u82B1\u7684\u6642\u9593\u3002\u6697\u5F71\u5BF6\u53EF\u5922\u653B\u64CA1.2\u500D\u3002\u5BE6\u969B\u5718\u9AD4\u6230\u6703\u56E0\u982D\u76EE\u7684\u5C6C\u6027\xB7\u62DB\u5F0F\xB7\u9583\u907F\u800C\u4E0D\u540C\uFF0C\u8ACB\u7576\u4F5C\u5BF6\u53EF\u5922\u4E4B\u9593\u6BD4\u8F03\u7684\u53C3\u8003\u503C\u3002`,
+  footer: (n, d) => `\u5718\u9AD4\u6230\u62DB\u5F0F ${n}\u500B \xB7 \u904A\u6232\u8CC7\u6599 ${d}`
+};
+var D2 = { ko: ko11, en: en11, ja: ja11, "zh-TW": zh2 };
+var getRaidMoves = (lang) => D2[lang] || ko11;
+
 // app/[lang]/gbl/guide/dict.ts
 var idxKo = {
   back: "\u2190 GBL Note",
@@ -1983,7 +2326,7 @@ function getGuideArticle(lang) {
 }
 
 // app/[lang]/gbl/iv/dict.ts
-var ko11 = {
+var ko12 = {
   navBack: "\u2190 GBL Note",
   navTier: "\u{1F3C6} \uD2F0\uC5B4\uD45C",
   h1: "\uD3EC\uCF13\uBAAC\uACE0 PvP IV \uC21C\uC704 \uCCB4\uCEE4",
@@ -2008,7 +2351,7 @@ var ko11 = {
   thAtk: "\uACF5\uACA9",
   thDef: "\uBC29\uC5B4",
   thHp: "\uCCB4\uB825",
-  thProduct: "Product",
+  thProduct: "\uC2A4\uD0EF\uACF1",
   topNote: "\uC0C1\uC704 100\uC704\uAE4C\uC9C0 \uD45C\uC2DC \xB7 \uB0B4 IV\uB294 \uC704\uC5D0\uC11C \uC870\uD68C",
   explainerH: "IV \uC21C\uC704\uB780?",
   explainerBody: "PvP(GBL)\uC5D0\uC11C\uB294 \uB9AC\uADF8 CP \uC81C\uD55C(\uC288\uD37C 1500\xB7\uD558\uC774\uD37C 2500) \uC548\uC5D0\uC11C \uC2A4\uD0EF\uACF1(\uACF5\uACA9\xD7\uBC29\uC5B4\xD7\uCCB4\uB825)\uC774 \uB192\uC744\uC218\uB85D \uAC15\uD569\uB2C8\uB2E4. CP \uC81C\uD55C\uC774 \uC788\uC73C\uBA74 \uACF5\uACA9 \uC885\uC871\uAC12\uC774 \uB0AE\uC740 \uAC1C\uCCB4\uAC00 \uB354 \uB192\uC740 \uB808\uBCA8\uAE4C\uC9C0 \uC62C\uB77C\uAC00 \uBC29\uC5B4\xB7\uCCB4\uB825\uC774 \uCEE4\uC838 \uC21C\uC704\uAC00 \uB192\uC544\uC9D1\uB2C8\uB2E4. \uB9C8\uC2A4\uD130\uB9AC\uADF8\uB294 \uC81C\uD55C\uC774 \uC5C6\uC5B4 15/15/15\uAC00 \uD56D\uC0C1 1\uC704\uC785\uB2C8\uB2E4.",
@@ -2026,7 +2369,7 @@ var ko11 = {
   ogTitle: "\uD3EC\uCF13\uBAAC\uACE0 PvP IV \uC21C\uC704 \uCCB4\uCEE4",
   ogDesc: "\uB9AC\uADF8\uBCC4 \uCD5C\uC801 IV\uB97C \uC2A4\uD0EF\uACF1 \uC21C\uC704\uB85C"
 };
-var en11 = {
+var en12 = {
   navBack: "\u2190 GBL Note",
   navTier: "\u{1F3C6} Tier list",
   h1: "Pok\xE9mon GO PvP IV Rank Checker",
@@ -2051,7 +2394,7 @@ var en11 = {
   thAtk: "Atk",
   thDef: "Def",
   thHp: "HP",
-  thProduct: "Product",
+  thProduct: "Stat Product",
   topNote: "Top 100 shown \xB7 look up your IV above",
   explainerH: "What is IV rank?",
   explainerBody: "In PvP (GBL), within the league CP cap (Great 1500, Ultra 2500), a higher stat product (Attack \xD7 Defense \xD7 HP) is stronger. With a CP cap, a lower Attack base lets the Pok\xE9mon reach a higher level, gaining Defense and HP, so it ranks higher. Master League has no cap, so 15/15/15 is always #1.",
@@ -2069,7 +2412,7 @@ var en11 = {
   ogTitle: "Pok\xE9mon GO PvP IV Rank Checker",
   ogDesc: "Best IVs by league, ranked by stat product"
 };
-var ja11 = {
+var ja12 = {
   navBack: "\u2190 GBL Note",
   navTier: "\u{1F3C6} \u30C6\u30A3\u30A2\u8868",
   h1: "\u30DD\u30B1\u30E2\u30F3GO PvP \u500B\u4F53\u5024\u30E9\u30F3\u30AF\u30C1\u30A7\u30C3\u30AB\u30FC",
@@ -2094,7 +2437,7 @@ var ja11 = {
   thAtk: "\u653B",
   thDef: "\u9632",
   thHp: "HP",
-  thProduct: "Product",
+  thProduct: "\u30B9\u30C6\u7A4D",
   topNote: "\u4E0A\u4F4D100\u4F4D\u307E\u3067\u8868\u793A \xB7 \u81EA\u5206\u306E\u500B\u4F53\u5024\u306F\u4E0A\u3067\u7167\u4F1A",
   explainerH: "\u500B\u4F53\u5024\u30E9\u30F3\u30AF\u3068\u306F\uFF1F",
   explainerBody: "PvP(GBL)\u3067\u306F\u30EA\u30FC\u30B0\u306ECP\u5236\u9650(\u30B9\u30FC\u30D1\u30FC1500\u30FB\u30CF\u30A4\u30D1\u30FC2500)\u5185\u3067\u3001\u30B9\u30C6\u30FC\u30BF\u30B9\u7A4D(\u653B\xD7\u9632\xD7HP)\u304C\u9AD8\u3044\u307B\u3069\u5F37\u529B\u3067\u3059\u3002CP\u5236\u9650\u304C\u3042\u308B\u3068\u3001\u3053\u3046\u3052\u304D\u7A2E\u65CF\u5024\u304C\u4F4E\u3044\u500B\u4F53\u307B\u3069\u9AD8\u3044\u30EC\u30D9\u30EB\u307E\u3067\u4E0A\u3052\u3089\u308C\u3001\u9632\u5FA1\u30FBHP\u304C\u5897\u3048\u3066\u9806\u4F4D\u304C\u4E0A\u304C\u308A\u307E\u3059\u3002\u30DE\u30B9\u30BF\u30FC\u306F\u5236\u9650\u306A\u3057\u306E\u305F\u308115/15/15\u304C\u5E38\u306B1\u4F4D\u3067\u3059\u3002",
@@ -2137,7 +2480,7 @@ var zhTW10 = {
   thAtk: "\u653B\u64CA",
   thDef: "\u9632\u79A6",
   thHp: "HP",
-  thProduct: "Product",
+  thProduct: "\u6578\u503C\u7A4D",
   topNote: "\u986F\u793A\u524D 100 \u540D \xB7 \u6211\u7684 IV \u65BC\u4E0A\u65B9\u67E5\u8A62",
   explainerH: "IV \u6392\u540D\u662F\u4EC0\u9EBC\uFF1F",
   explainerBody: "\u5728 PvP(GBL) \u4E2D\uFF0C\u65BC\u806F\u76DF CP \u9650\u5236\uFF08\u8D85\u7D1A 1500\xB7\u9AD8\u7D1A 2500\uFF09\u5167\uFF0C\u80FD\u529B\u503C\u4E58\u7A4D\uFF08\u653B\u64CA\xD7\u9632\u79A6\xD7HP\uFF09\u8D8A\u9AD8\u8D8A\u5F37\u3002\u6709 CP \u9650\u5236\u6642\uFF0C\u653B\u64CA\u7A2E\u65CF\u503C\u4F4E\u7684\u500B\u9AD4\u53EF\u5347\u5230\u66F4\u9AD8\u7B49\u7D1A\uFF0C\u9632\u79A6\xB7HP \u66F4\u5927\u800C\u6392\u540D\u66F4\u9AD8\u3002\u5927\u5E2B\u806F\u76DF\u6C92\u6709\u9650\u5236\uFF0C15/15/15 \u6C38\u9060\u7B2C\u4E00\u3002",
@@ -2155,13 +2498,13 @@ var zhTW10 = {
   ogTitle: "\u5BF6\u53EF\u5922GO PvP IV \u6392\u540D\u6AA2\u67E5\u5668",
   ogDesc: "\u4EE5\u80FD\u529B\u503C\u4E58\u7A4D\u6392\u540D\u986F\u793A\u5404\u806F\u76DF\u6700\u4F73 IV"
 };
-var M3 = { ko: ko11, en: en11, ja: ja11, "zh-TW": zhTW10 };
+var M3 = { ko: ko12, en: en12, ja: ja12, "zh-TW": zhTW10 };
 function getIv(lang) {
-  return M3[lang] || ko11;
+  return M3[lang] || ko12;
 }
 
 // app/[lang]/gbl/trade/dict.ts
-var ko12 = {
+var ko13 = {
   navBack: "\u2190 GBL Note",
   h1: "\uD3EC\uCF13\uBAAC GO \uAD50\uD658 \uBAA9\uB85D \uBA54\uC774\uCEE4",
   intro: "\uC6D0\uD558\uB294 \uD3EC\uCF13\uBAAC\uACFC \uC904 \uC218 \uC788\uB294 \uD3EC\uCF13\uBAAC\uC744 \uACE8\uB77C \uAD50\uD658 \uBAA9\uB85D \uC774\uBBF8\uC9C0\uB97C \uB9CC\uB4DC\uC138\uC694. \uC774\uB85C\uCE58\xB7\uCF54\uC2A4\uD2AC\xB7\uB2E4\uC774\uB9E5\uC2A4\uAE4C\uC9C0 \uB123\uC5B4 \uCE74\uD398\xB7\uC624\uD508\uCC44\uD305\uC5D0 \uACF5\uC720\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.",
@@ -2197,7 +2540,7 @@ var ko12 = {
   ogTitle: "\uD3EC\uCF13\uBAAC\uACE0 \uAD50\uD658 \uBAA9\uB85D \uBA54\uC774\uCEE4",
   ogDesc: "\uCF54\uC2A4\uD2AC\xB7\uC774\uB85C\uCE58 \uB123\uC5B4 \uAD50\uD658 \uBAA9\uB85D \uC774\uBBF8\uC9C0 \uB9CC\uB4E4\uAE30"
 };
-var en12 = {
+var en13 = {
   navBack: "\u2190 GBL Note",
   h1: "Pok\xE9mon GO Trade List Maker",
   intro: "Pick the Pok\xE9mon you want and can offer, then make a trade-list image. Add shinies, costumes and Dynamax, and share it to your community.",
@@ -2233,7 +2576,7 @@ var en12 = {
   ogTitle: "Pok\xE9mon GO Trade List Maker",
   ogDesc: "Make trade-list images with costumes & shinies"
 };
-var ja12 = {
+var ja13 = {
   navBack: "\u2190 GBL Note",
   h1: "\u30DD\u30B1\u30E2\u30F3GO \u4EA4\u63DB\u30EA\u30B9\u30C8\u30E1\u30FC\u30AB\u30FC",
   intro: "\u6B32\u3057\u3044\u30DD\u30B1\u30E2\u30F3\u3068\u51FA\u305B\u308B\u30DD\u30B1\u30E2\u30F3\u3092\u9078\u3093\u3067\u4EA4\u63DB\u30EA\u30B9\u30C8\u753B\u50CF\u3092\u4F5C\u6210\u3002\u8272\u9055\u3044\u30FB\u30B3\u30B9\u30C1\u30E5\u30FC\u30E0\u30FB\u30C0\u30A4\u30DE\u30C3\u30AF\u30B9\u3092\u5165\u308C\u3066\u30B3\u30DF\u30E5\u30CB\u30C6\u30A3\u306B\u5171\u6709\u3067\u304D\u307E\u3059\u3002",
@@ -2305,13 +2648,13 @@ var zhTW11 = {
   ogTitle: "\u5BF6\u53EF\u5922GO \u4EA4\u63DB\u6E05\u55AE\xB7\u4EA4\u63DB\u5716\u7522\u751F\u5668",
   ogDesc: "\u52A0\u5165\u9020\u578B\xB7\u7570\u8272\u88FD\u4F5C\u4EA4\u63DB\u6E05\u55AE\xB7\u4EA4\u63DB\u5716"
 };
-var M4 = { ko: ko12, en: en12, ja: ja12, "zh-TW": zhTW11 };
+var M4 = { ko: ko13, en: en13, ja: ja13, "zh-TW": zhTW11 };
 function getTrade(lang) {
-  return M4[lang] || ko12;
+  return M4[lang] || ko13;
 }
 
 // app/[lang]/gbl/sim/dict.ts
-var ko13 = {
+var ko14 = {
   navBack: "\u2190 GBL Note",
   h1: "\uD3EC\uCF13\uBAAC GO PvP \uBC30\uD2C0 \uC2DC\uBBAC\uB808\uC774\uD130",
   intro: "\uB450 \uD3EC\uCF13\uBAAC\uC744 \uBD99\uC5EC\uBCF4\uC138\uC694. \uAC1C\uCCB4\uAC12(\uACF5/\uBC29/\uCCB4)\xB7\uAE30\uC220\xB7\uB808\uBCA8\xB7\uADF8\uB9BC\uC790\xB7\uC2E4\uB4DC\uAE4C\uC9C0 \uC9C0\uC815\uD574 \uC2E4\uC81C \uBC30\uD2C0 \uACB0\uACFC\uB97C \uACC4\uC0B0\uD569\uB2C8\uB2E4.",
@@ -2394,7 +2737,7 @@ var ko13 = {
   ogTitle: "\uD3EC\uCF13\uBAAC\uACE0 PvP \uBC30\uD2C0 \uC2DC\uBBAC\uB808\uC774\uD130",
   ogDesc: "\uAC1C\uCCB4\uAC12\xB7\uAE30\uC220 \uC9C0\uC815 1:1 \uBC30\uD2C0 \uACC4\uC0B0"
 };
-var en13 = {
+var en14 = {
   navBack: "\u2190 GBL Note",
   h1: "Pok\xE9mon GO PvP Battle Simulator",
   intro: "Pit two Pok\xE9mon against each other. Set IVs (Atk/Def/Sta), moves, level, shadow and shields to compute the real battle outcome.",
@@ -2477,7 +2820,7 @@ var en13 = {
   ogTitle: "Pok\xE9mon GO PvP Battle Simulator",
   ogDesc: "1v1 battle calc with custom IVs & moves"
 };
-var ja13 = {
+var ja14 = {
   navBack: "\u2190 GBL Note",
   h1: "\u30DD\u30B1\u30E2\u30F3GO PvP \u30D0\u30C8\u30EB\u30B7\u30DF\u30E5\u30EC\u30FC\u30BF\u30FC",
   intro: "2\u5339\u306E\u30DD\u30B1\u30E2\u30F3\u3092\u5BFE\u6226\u3002\u500B\u4F53\u5024(\u653B/\u9632/HP)\u30FB\u6280\u30FB\u30EC\u30D9\u30EB\u30FB\u30B7\u30E3\u30C9\u30A6\u30FB\u30B7\u30FC\u30EB\u30C9\u3092\u6307\u5B9A\u3057\u3066\u5B9F\u969B\u306E\u30D0\u30C8\u30EB\u7D50\u679C\u3092\u8A08\u7B97\u3057\u307E\u3059\u3002",
@@ -2643,13 +2986,13 @@ var zhTW12 = {
   ogTitle: "\u5BF6\u53EF\u5922GO PvP \u5C0D\u6230\u6A21\u64EC\u5668",
   ogDesc: "\u6307\u5B9A\u500B\u9AD4\u503C\xB7\u62DB\u5F0F\u76841:1\u5C0D\u6230\u8A08\u7B97"
 };
-var M5 = { ko: ko13, en: en13, ja: ja13, "zh-TW": zhTW12 };
+var M5 = { ko: ko14, en: en14, ja: ja14, "zh-TW": zhTW12 };
 function getSim(lang) {
-  return M5[lang] || ko13;
+  return M5[lang] || ko14;
 }
 
 // app/[lang]/gbl/app/dict.ts
-var ko14 = {
+var ko15 = {
   gateH1: "\u{1F4DD} \uB0B4 \uBC30\uD2C0 \uAE30\uB85D",
   gateTitle: "\uD68C\uC6D0 \uC804\uC6A9 \uAE30\uB2A5\uC785\uB2C8\uB2E4",
   gateDescPre: "\uB0B4 \uBC30\uD2C0 \uAE30\uB85D\xB7\uC804\uC801 \uAD00\uB9AC\uB294 ",
@@ -2763,7 +3106,7 @@ var ko14 = {
   editSaved: "\u2705 \uC218\uC815\uB428",
   recordSaved: "\u2705 \uAE30\uB85D \uC800\uC7A5\uB428"
 };
-var en14 = {
+var en15 = {
   gateH1: "\u{1F4DD} My battle log",
   gateTitle: "Members-only feature",
   gateDescPre: "Logging battles and tracking your record is for ",
@@ -2877,7 +3220,7 @@ var en14 = {
   editSaved: "\u2705 Updated",
   recordSaved: "\u2705 Log saved"
 };
-var ja14 = {
+var ja15 = {
   gateH1: "\u{1F4DD} \u81EA\u5206\u306E\u30D0\u30C8\u30EB\u8A18\u9332",
   gateTitle: "\u4F1A\u54E1\u5C02\u7528\u6A5F\u80FD\u3067\u3059",
   gateDescPre: "\u30D0\u30C8\u30EB\u8A18\u9332\u30FB\u6226\u7E3E\u7BA1\u7406\u306F",
@@ -3105,13 +3448,13 @@ var zhTW13 = {
   editSaved: "\u2705 \u5DF2\u4FEE\u6539",
   recordSaved: "\u2705 \u8A18\u9304\u5DF2\u5132\u5B58"
 };
-var M6 = { ko: ko14, en: en14, ja: ja14, "zh-TW": zhTW13 };
+var M6 = { ko: ko15, en: en15, ja: ja15, "zh-TW": zhTW13 };
 function getApp(lang) {
-  return M6[lang] || ko14;
+  return M6[lang] || ko15;
 }
 
 // app/[lang]/gbl/dictionaries/ko.ts
-var ko15 = {
+var ko16 = {
   meta: {
     title: "GBL Note \u2014 \uD3EC\uCF13\uBAACGO \uB808\uC774\uB4DC\xB7\uBC30\uD2C0\xB7\uD2F0\uC5B4\xB7CP \uC62C\uC778\uC6D0",
     description: "\uD3EC\uCF13\uBAAC GO \uB808\uC774\uB4DC \uB51C\uB7EC \uD2F0\uC5B4\xB7\uBCF4\uC2A4 100% CP\xB7\uB808\uC774\uB4DC \uC77C\uC815, \uBC30\uD2C0\uB9AC\uADF8 \uD2F0\uC5B4\xB7\uC2E4\uCE21 \uBA54\uD0C0, \uB0B4 \uC804\uC801 \uAE30\uB85D\uAE4C\uC9C0. \uD3EC\uCF13\uBAAC\uACE0 \uC885\uD569 \uC815\uBCF4\xB7\uB3C4\uAD6C.",
@@ -3190,10 +3533,10 @@ var ko15 = {
     terms: "\uC774\uC6A9\uC57D\uAD00"
   }
 };
-var ko_default = ko15;
+var ko_default = ko16;
 
 // app/[lang]/gbl/dictionaries/en.ts
-var en15 = {
+var en16 = {
   meta: {
     title: "GBL Note \u2014 Pok\xE9mon GO Raids, Battle, Tiers & CP All-in-One",
     description: "Pok\xE9mon GO raid attacker tiers, boss 100% CP, raid schedule, Battle League tiers & encounter meta, plus your battle log. All-in-one GO toolkit.",
@@ -3272,10 +3615,10 @@ var en15 = {
     terms: "Terms"
   }
 };
-var en_default = en15;
+var en_default = en16;
 
 // app/[lang]/gbl/dictionaries/ja.ts
-var ja15 = {
+var ja16 = {
   meta: {
     title: "GBL Note \u2014 \u30DD\u30B1\u30E2\u30F3GO \u30EC\u30A4\u30C9\u30FB\u30D0\u30C8\u30EB\u30FB\u30C6\u30A3\u30A2\u30FBCP \u30AA\u30FC\u30EB\u30A4\u30F3\u30EF\u30F3",
     description: "\u30DD\u30B1\u30E2\u30F3GO\u306E\u30EC\u30A4\u30C9\u30A2\u30BF\u30C3\u30AB\u30FC\u30C6\u30A3\u30A2\u30FB\u30DC\u30B9100%CP\u30FB\u30EC\u30A4\u30C9\u30B9\u30B1\u30B8\u30E5\u30FC\u30EB\u3001\u30D0\u30C8\u30EB\u30EA\u30FC\u30B0\u306E\u30C6\u30A3\u30A2\u30FB\u5B9F\u6E2C\u30E1\u30BF\u3001\u81EA\u5206\u306E\u6226\u7E3E\u307E\u3067\u3002\u30DD\u30B1\u30E2\u30F3GO\u7DCF\u5408\u30C4\u30FC\u30EB\u3002",
@@ -3354,7 +3697,7 @@ var ja15 = {
     terms: "\u5229\u7528\u898F\u7D04"
   }
 };
-var ja_default = ja15;
+var ja_default = ja16;
 
 // app/[lang]/gbl/dictionaries/zh-TW.ts
 var zhTW14 = {
@@ -3452,7 +3795,7 @@ function getDict(lang) {
 }
 
 // app/[lang]/gbl/pokemon/[league]/[id]/dict.ts
-var ko16 = {
+var ko17 = {
   navTier: "\u{1F3C6} \uD2F0\uC5B4\uD45C",
   navCmp: "\u26A1 CMP \uC21C\uC704",
   navMeta: "\u{1F4CA} \uC2E4\uCE21 \uBA54\uD0C0",
@@ -3506,7 +3849,7 @@ var ko16 = {
     loseLabel: "\uC9C0\uB294 \uC0C1\uB300(\uCE74\uC6B4\uD130)"
   }
 };
-var en16 = {
+var en17 = {
   navTier: "\u{1F3C6} Tier list",
   navCmp: "\u26A1 CMP ranking",
   navMeta: "\u{1F4CA} Encounter meta",
@@ -3560,7 +3903,7 @@ var en16 = {
     loseLabel: "Loses to (counters)"
   }
 };
-var ja16 = {
+var ja17 = {
   navTier: "\u{1F3C6} \u30C6\u30A3\u30A2\u8868",
   navCmp: "\u26A1 CMP\u30E9\u30F3\u30AD\u30F3\u30B0",
   navMeta: "\u{1F4CA} \u5B9F\u6E2C\u30E1\u30BF",
@@ -3668,9 +4011,9 @@ var zhTW15 = {
     loseLabel: "\u843D\u6557\u5C0D\u624B\uFF08\u524B\u661F\uFF09"
   }
 };
-var P = { ko: ko16, en: en16, ja: ja16, "zh-TW": zhTW15 };
+var P = { ko: ko17, en: en17, ja: ja17, "zh-TW": zhTW15 };
 function getPoke(lang) {
-  return P[lang] || ko16;
+  return P[lang] || ko17;
 }
 
 // scripts/gbl/audit_i18n.ts
@@ -3687,6 +4030,7 @@ var PACKS = {
   "\uC2E4\uCE21 \uBA54\uD0C0 \uD5C8\uBE0C": getMetaHub,
   "\uC2E4\uCE21 \uBA54\uD0C0 \uB9AC\uADF8": getLeagueMeta,
   "\uAE30\uC220 \uB3C4\uAC10": getMoves,
+  "\uB808\uC774\uB4DC \uAE30\uC220 \uB3C4\uAC10": getRaidMoves,
   "\uAC00\uC774\uB4DC \uBAA9\uB85D": getGuideIndex,
   "\uAC00\uC774\uB4DC \uBCF8\uBB38": getGuideArticle,
   "IV": getIv,
@@ -3721,12 +4065,12 @@ var ALLOW = /^(GBL Note|gblnote\.com|PvPoke|Pokémon GO|CP|IV|XL|DPS|TDO|CMP|XP|
 var problems = 0;
 for (const [name, get] of Object.entries(PACKS)) {
   const byLocale = Object.fromEntries(LOCALES.map((l) => [l, paths(get(l))]));
-  const ko17 = byLocale.ko;
+  const ko18 = byLocale.ko;
   const msgs = [];
   for (const l of LOCALES) {
     if (l === "ko") continue;
-    const miss = [...ko17.keys()].filter((k) => !byLocale[l].has(k));
-    const extra = [...byLocale[l].keys()].filter((k) => !ko17.has(k));
+    const miss = [...ko18.keys()].filter((k) => !byLocale[l].has(k));
+    const extra = [...byLocale[l].keys()].filter((k) => !ko18.has(k));
     if (miss.length) msgs.push(`  [${l}] \uD0A4 \uB204\uB77D ${miss.length}: ${miss.slice(0, 6).join(", ")}${miss.length > 6 ? " \u2026" : ""}`);
     if (extra.length) msgs.push(`  [${l}] ko\uC5D0 \uC5C6\uB294 \uD0A4 ${extra.length}: ${extra.slice(0, 6).join(", ")}${extra.length > 6 ? " \u2026" : ""}`);
   }

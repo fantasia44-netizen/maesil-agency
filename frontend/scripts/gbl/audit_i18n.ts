@@ -12,6 +12,7 @@ import { getCmp } from "../../app/[lang]/gbl/cmp/[league]/dict";
 import { getMetaHub } from "../../app/[lang]/gbl/meta/dict";
 import { getLeagueMeta } from "../../app/[lang]/gbl/meta/[league]/dict";
 import { getMoves } from "../../app/[lang]/gbl/moves/dict";
+import { getRaidMoves } from "../../app/[lang]/gbl/raid/moves/dict";
 import { getGuideIndex, getGuideArticle } from "../../app/[lang]/gbl/guide/dict";
 import { getIv } from "../../app/[lang]/gbl/iv/dict";
 import { getTrade } from "../../app/[lang]/gbl/trade/dict";
@@ -35,6 +36,7 @@ const PACKS: Record<string, (l: never) => unknown> = {
   "실측 메타 허브": getMetaHub,
   "실측 메타 리그": getLeagueMeta,
   "기술 도감": getMoves,
+  "레이드 기술 도감": getRaidMoves,
   "가이드 목록": getGuideIndex,
   "가이드 본문": getGuideArticle,
   "IV": getIv,

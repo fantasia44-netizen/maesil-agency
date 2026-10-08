@@ -1,0 +1,156 @@
+"use client";
+// 레이드 기술 도감 표 — 종류 탭(스페셜/노멀) · 타입 필터 · 이름 검색 · 머리글 정렬 · 타입별 보기.
+// 행 데이터는 서버(page.tsx)에서 이름·수치를 다 풀어 plain row로 받는다. 배틀 기술 도감 표(moves/MovesTable.tsx)와 같은 구조, 열만 레이드 수치.
+// 두 종류 표를 모두 SSR로 내보내고 display로만 전환 → 비활성 탭의 기술 링크도 HTML에 존재.
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { TYPE_COLOR } from "../../typeLabels";
+
+export type RaidMoveRow = {
+  slug: string; href: string; name: string; alt: string; type: string; typeLabel: string; kind: "fast" | "charged";
+  power: number; dur: number; energy: number; bars: string; dps: number; eps: number; dpe: number; users: number;
+};
+export type RaidTableLabels = {
+  kindFast: string; kindCharged: string; viewTable: string; viewTree: string; all: string; searchPh: string; sortHint: string; noResult: string;
+  colName: string; colType: string; power: string; duration: string; energyCost: string; energyGain: string; colUsers: string; secUnit: string;
+  shown: string; // {n}/{t} 치환
+};
+type Col = { key: keyof RaidMoveRow; label: string; num?: boolean };
+
+const BORDER = "#e3e8f2";
+const th: React.CSSProperties = { padding: "7px 6px", fontSize: "0.68rem", fontWeight: 700, color: "#64748b", whiteSpace: "nowrap", borderBottom: `1px solid ${BORDER}`, background: "#f8fafc", cursor: "pointer", userSelect: "none" };
+const td: React.CSSProperties = { padding: "6px 6px", fontSize: "0.78rem", color: "#334155", borderBottom: "1px solid #f1f5f9", whiteSpace: "nowrap" };
+
+function TypeChip({ type, label }: { type: string; label: string }) {
+  const c = TYPE_COLOR[type] || "#94a3b8";
+  return <span style={{ fontSize: "0.64rem", fontWeight: 700, color: "#fff", background: c, padding: "1px 6px", borderRadius: 6, whiteSpace: "nowrap" }}>{label}</span>;
+}
+// 동률은 slug 코드 순 — localeCompare는 서버·브라우저 정렬 규칙이 달라 하이드레이션이 어긋난다.
+const bySlug = (a: RaidMoveRow, b: RaidMoveRow) => (a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0);
+
+function KindTable({ rows, cols, visible, noResult, secUnit }: { rows: RaidMoveRow[]; cols: Col[]; visible: boolean; noResult: string; secUnit: string }) {
+  const [sort, setSort] = useState<{ key: keyof RaidMoveRow; dir: 1 | -1 }>({ key: "users", dir: -1 });
+  const sorted = useMemo(() => {
+    const k = sort.key;
+    return [...rows].sort((a, b) => {
+      const x = a[k], y = b[k];
+      const d = typeof x === "number" && typeof y === "number" ? x - y : (String(x) < String(y) ? -1 : String(x) > String(y) ? 1 : 0);
+      return d * sort.dir || b.users - a.users || b.dps - a.dps || bySlug(a, b);
+    });
+  }, [rows, sort]);
+  const onSort = (key: keyof RaidMoveRow, num?: boolean) => setSort((s) => (s.key === key ? { key, dir: s.dir === 1 ? -1 : 1 } : { key, dir: num ? -1 : 1 }));
+  return (
+    <div style={{ display: visible ? "block" : "none", overflowX: "auto", background: "#fff", border: `1px solid ${BORDER}`, borderRadius: 12 }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
+        <thead>
+          <tr>
+            {cols.map((c) => (
+              <th key={String(c.key)} onClick={() => onSort(c.key, c.num)} style={{ ...th, textAlign: c.num ? "right" : "left" }}>
+                {c.label}{sort.key === c.key ? (sort.dir === -1 ? " ▼" : " ▲") : ""}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {sorted.length === 0 && <tr><td colSpan={cols.length} style={{ ...td, textAlign: "center", color: "#94a3b8", padding: "1.6rem" }}>{noResult}</td></tr>}
+          {sorted.map((r) => (
+            <tr key={r.slug}>
+              {cols.map((c) => {
+                if (c.key === "name") return <td key="name" style={td}><Link prefetch={false} href={r.href} style={{ color: "#c2410c", fontWeight: 700, textDecoration: "none" }}>{r.name}</Link></td>;
+                if (c.key === "type") return <td key="type" style={td}><TypeChip type={r.type} label={r.typeLabel} /></td>;
+                const v = r[c.key];
+                const strong = c.key === "dps" || c.key === "eps" || c.key === "dpe";
+                const text = c.key === "dur" ? `${v}${secUnit}` : c.key === "users" && v === 0 ? "–" : c.key === "energy" && r.kind === "charged" ? <>{v} <span style={{ color: "#94a3b8", fontWeight: 500 }}>· {r.bars}</span></> : v;
+                return <td key={String(c.key)} style={{ ...td, textAlign: "right", fontVariantNumeric: "tabular-nums", fontWeight: strong ? 700 : 500 }}>{text}</td>;
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default function RaidMovesTable({ rows, types, labels }: { rows: RaidMoveRow[]; types: { key: string; label: string }[]; labels: RaidTableLabels }) {
+  const [kind, setKind] = useState<"charged" | "fast">("charged");
+  const [type, setType] = useState("");
+  const [q, setQ] = useState("");
+  const [view, setView] = useState<"table" | "tree">("table");
+
+  const filtered = useMemo(() => {
+    const ql = q.trim().toLowerCase();
+    return rows.filter((r) => (!type || r.type === type) && (!ql || r.name.toLowerCase().includes(ql) || r.alt.toLowerCase().includes(ql)));
+  }, [rows, type, q]);
+  const fast = filtered.filter((r) => r.kind === "fast"), charged = filtered.filter((r) => r.kind === "charged");
+  const total = rows.filter((r) => r.kind === kind).length, shown = (kind === "fast" ? fast : charged).length;
+
+  const fastCols: Col[] = [
+    { key: "name", label: labels.colName }, { key: "type", label: labels.colType },
+    { key: "power", label: labels.power, num: true }, { key: "dur", label: labels.duration, num: true }, { key: "energy", label: labels.energyGain, num: true },
+    { key: "dps", label: "DPS", num: true }, { key: "eps", label: "EPS", num: true }, { key: "users", label: labels.colUsers, num: true },
+  ];
+  const chargedCols: Col[] = [
+    { key: "name", label: labels.colName }, { key: "type", label: labels.colType },
+    { key: "power", label: labels.power, num: true }, { key: "dur", label: labels.duration, num: true }, { key: "energy", label: labels.energyCost, num: true },
+    { key: "dps", label: "DPS", num: true }, { key: "dpe", label: "DPE", num: true }, { key: "users", label: labels.colUsers, num: true },
+  ];
+  const tab = (on: boolean): React.CSSProperties => ({ padding: "7px 14px", borderRadius: 16, fontSize: "0.82rem", fontWeight: 800, cursor: "pointer", border: `1px solid ${on ? "#c2410c" : BORDER}`, background: on ? "#c2410c" : "#fff", color: on ? "#fff" : "#64748b" });
+  const chip = (on: boolean, c?: string): React.CSSProperties => ({ padding: "4px 10px", borderRadius: 14, fontSize: "0.72rem", fontWeight: 700, cursor: "pointer", border: `1px solid ${on ? (c || "#ea580c") : BORDER}`, background: on ? (c || "#ea580c") : "#fff", color: on ? "#fff" : "#64748b" });
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+        <button onClick={() => setKind("charged")} style={tab(kind === "charged")}>{labels.kindCharged} {rows.filter((r) => r.kind === "charged").length}</button>
+        <button onClick={() => setKind("fast")} style={tab(kind === "fast")}>{labels.kindFast} {rows.filter((r) => r.kind === "fast").length}</button>
+        <span style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
+          <button onClick={() => setView("table")} style={chip(view === "table")}>{labels.viewTable}</button>
+          <button onClick={() => setView("tree")} style={chip(view === "tree")}>{labels.viewTree}</button>
+        </span>
+      </div>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={labels.searchPh}
+          style={{ flex: "1 1 200px", fontSize: "0.85rem", padding: "7px 11px", borderRadius: 9, border: `1px solid ${BORDER}`, background: "#fff", color: "#0f172a" }} />
+      </div>
+      <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 8 }}>
+        <button onClick={() => setType("")} style={chip(type === "")}>{labels.all}</button>
+        {types.map((t) => <button key={t.key} onClick={() => setType(type === t.key ? "" : t.key)} style={chip(type === t.key, TYPE_COLOR[t.key])}>{t.label}</button>)}
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.7rem", color: "#94a3b8", marginBottom: 6 }}>
+        <span>{labels.shown.replace("{n}", String(shown)).replace("{t}", String(total))}</span>
+        {view === "table" && <span>{labels.sortHint}</span>}
+      </div>
+
+      {/* 표 보기 — 두 종류 모두 DOM에 유지(링크 SSR) */}
+      <div style={{ display: view === "table" ? "block" : "none" }}>
+        <KindTable rows={charged} cols={chargedCols} visible={kind === "charged"} noResult={labels.noResult} secUnit={labels.secUnit} />
+        <KindTable rows={fast} cols={fastCols} visible={kind === "fast"} noResult={labels.noResult} secUnit={labels.secUnit} />
+      </div>
+
+      {/* 타입별 보기 — 타입 › 기술(DPS 높은 순, 숫자 = DPS). 전환했을 때만 렌더 */}
+      {view === "tree" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {types.filter((t) => !type || t.key === type).map((t) => {
+            const list = (kind === "fast" ? fast : charged).filter((r) => r.type === t.key).sort((a, b) => b.dps - a.dps || bySlug(a, b));
+            if (!list.length) return null;
+            const c = TYPE_COLOR[t.key] || "#94a3b8";
+            return (
+              <div key={t.key} style={{ background: "#fff", border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c}`, borderRadius: 10, padding: "8px 10px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                  <TypeChip type={t.key} label={t.label} /><span style={{ fontSize: "0.7rem", color: "#94a3b8" }}>{list.length}</span>
+                </div>
+                <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                  {list.map((r) => (
+                    <Link prefetch={false} key={r.slug} href={r.href} style={{ fontSize: "0.74rem", fontWeight: 600, padding: "2px 9px", borderRadius: 10, textDecoration: "none", background: c + "18", color: c, border: `1px solid ${c}44`, whiteSpace: "nowrap" }}>
+                      {r.name}<span style={{ marginLeft: 4, fontSize: "0.62rem", opacity: 0.75 }}>{r.dps}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+          {(kind === "fast" ? fast : charged).length === 0 && <div style={{ textAlign: "center", color: "#94a3b8", padding: "1.6rem" }}>{labels.noResult}</div>}
+        </div>
+      )}
+    </div>
+  );
+}

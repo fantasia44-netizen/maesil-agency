@@ -5,6 +5,7 @@ import { GUIDES } from "./[lang]/gbl/guide/guides";
 import { IV_ANALYSIS } from "./[lang]/gbl/iv/analysis/registry";
 import { indexableMonIds } from "./[lang]/gbl/indexGate";
 import { indexableMoveSlugs } from "./[lang]/gbl/moves/movesData";
+import { raidMoveSlugs } from "./[lang]/gbl/raid/moves/raidMovesData";
 import { analyzedDeckIds } from "./[lang]/tcg/decks/analysis";
 import { GUIDES as TCG_GUIDES } from "./[lang]/tcg/guides/guides";
 import { locales, localeMeta, localizePath, defaultLocale } from "../lib/i18n";
@@ -50,6 +51,9 @@ function gblPaths(): [string, CF, number][] {
     ["/gbl/raid", "weekly", 0.9],
     ["/gbl/raid/bosses", "daily", 0.8],
     ["/gbl/raid/schedule", "daily", 0.8],
+    // 레이드 기술 도감 — 배틀 기술 도감과 같은 기술 목록에 레이드·체육관 수치(위력·시전 시간·DPS)와 포켓몬별 순위.
+    ["/gbl/raid/moves", "weekly", 0.7],
+    ...raidMoveSlugs().map((s) => [`/gbl/raid/moves/${s}`, "weekly", 0.5] as [string, CF, number]),
     ...RAID_TYPES.map((t) => [`/gbl/raid/${t}`, "weekly", 0.8] as [string, CF, number]),
     ["/gbl/schedule", "weekly", 0.7],
     ["/gbl/guide", "weekly", 0.7],

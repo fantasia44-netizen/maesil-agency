@@ -13,6 +13,8 @@ import { leagueName } from "../../contentI18n";
 import { typeLabel, TYPE_COLOR } from "../../typeLabels";
 import { ALL_TYPES, typeMult } from "../../pokemon/[league]/[id]/typeChart";
 import { getMoves } from "../dict";
+import { getRaidMoves } from "../../raid/moves/dict";
+import { raidMoveById } from "../../raid/moves/raidMovesData";
 import { buffText, turnsToSec } from "../fmt";
 import {
   MOVES, FAST, CHARGED, GM_DATE, CORE_LEAGUES, moveBySlug, moveById, moveName, speciesName, dpt, ept, dpe, rankIn,
@@ -120,6 +122,8 @@ export default function MoveDetail({ params }: { params: { lang: string; id: str
           <Link href={L("/gbl/moves")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none", fontWeight: 700 }}>{t.back}</Link>
           <Link href={L("/gbl/tier/great")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>{t.navTier}</Link>
           <Link href={L("/gbl/guide/moveset")} style={{ fontSize: "0.82rem", color: "#3b5bdb", textDecoration: "none" }}>{t.navGuide}</Link>
+          {/* 같은 기술의 레이드·체육관 수치(위력·시전 시간·DPS)는 별도 페이지 — 배틀 수치와 전혀 다름 */}
+          {raidMoveById(m.id) && <Link href={L(`/gbl/raid/moves/${m.slug}`)} style={{ fontSize: "0.82rem", color: "#ea580c", textDecoration: "none", fontWeight: 700 }}>🔥 {getRaidMoves(lang).navLabel} →</Link>}
         </div>
 
         {/* 헤더 */}
