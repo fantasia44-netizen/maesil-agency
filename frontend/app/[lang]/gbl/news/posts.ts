@@ -35,6 +35,7 @@ export type Post = {
   published: string;            // YYYY-MM-DD
   updated?: string;
   mons?: string[];              // 머리 그림으로 쓸 포켓몬(speciesId) — 도감 링크가 걸린다
+  covers?: string[];            // 이 글이 다룬 소재 키(이벤트 피드의 eventID 등) — scripts/gbl/news_candidates.mjs가 "이미 쓴 소재"를 거를 때 본다
   sources?: { label: string; url?: string }[];
   ko: PostContent; en?: PostContent; ja?: PostContent; "zh-TW"?: PostContent;
 };
@@ -42,7 +43,7 @@ export type Post = {
 export const POSTS: Post[] = [
   // ───────────────────────────────────────────────────────────────────────
   {
-    slug: "dialga-raid-guide-2026-10", cat: "raid", published: "2026-10-09", mons: ["dialga"],
+    slug: "dialga-raid-guide-2026-10", cat: "raid", published: "2026-10-09", mons: ["dialga"], covers: ["raid:dialga:2026-10"],
     sources: [{ label: "일정: LeekDuck 이벤트 피드(ScrapedDuck)" }, { label: "약점·추천 딜러·CP: GBL Note 자체 계산" }],
     ko: {
       title: "포켓몬고 디아루가 레이드 공략 — 약점·추천 딜러·100% CP (10월 14~20일)",
@@ -98,7 +99,7 @@ export const POSTS: Post[] = [
   },
   // ───────────────────────────────────────────────────────────────────────
   {
-    slug: "fc-seoul-2026", cat: "event", published: "2026-10-09", mons: ["charmander", "charizard"],
+    slug: "fc-seoul-2026", cat: "event", published: "2026-10-09", mons: ["charmander", "charizard"], covers: ["fc-seoul-2026"],
     sources: [{ label: "포켓몬 GO 공식 뉴스(한국어) — FC서울 2026", url: "https://pokemongo.com/ko/news/fc-seoul-2026" }, { label: "리자몽 딜러 순위: GBL Note 자체 계산" }],
     ko: {
       title: "포켓몬고 FC서울 이벤트 2026 — 10월 24일 서울월드컵경기장 보상·레이드 정리",
@@ -126,7 +127,7 @@ export const POSTS: Post[] = [
   },
   // ───────────────────────────────────────────────────────────────────────
   {
-    slug: "halloween-2026-part-1", cat: "event", published: "2026-10-09", mons: ["pikachu", "zubat", "sinistea"],
+    slug: "halloween-2026-part-1", cat: "event", published: "2026-10-09", mons: ["pikachu", "zubat", "sinistea"], covers: ["halloween-2026-part-1"],
     sources: [{ label: "일정: LeekDuck 이벤트 피드(ScrapedDuck)" }, { label: "코스튬·출현 정보: 포켓몬 GO 공식 뉴스 등 2곳 이상 교차 확인" }],
     ko: {
       title: "포켓몬고 할로윈 2026 파트 1 — 일정·신규 코스튬 3종·이로치 정리",
@@ -153,7 +154,7 @@ export const POSTS: Post[] = [
   },
   // ───────────────────────────────────────────────────────────────────────
   {
-    slug: "wild-area-2026-global-dynamax-dialga-palkia", cat: "event", published: "2026-10-09", mons: ["dialga", "palkia"],
+    slug: "wild-area-2026-global-dynamax-dialga-palkia", cat: "event", published: "2026-10-09", mons: ["dialga", "palkia"], covers: ["pokemon-go-wild-area-2026-global", "pokemon-go-wild-area-2026-sendai-japan", "pokemon-go-wild-area-2026-mexico-city"],
     sources: [{ label: "일정: LeekDuck 이벤트 피드(ScrapedDuck)" }, { label: "다이맥스 데뷔·로케이션 배경 조건: 포켓몬 GO 공식 뉴스 등 2곳 이상 교차 확인" }],
     ko: {
       title: "포켓몬고 와일드 에어리어 2026 글로벌 — 다이맥스 디아루가·펄기아 데뷔 (11월 14~15일)",

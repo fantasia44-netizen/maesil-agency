@@ -1,0 +1,200 @@
+# GBL Note 뉴스 발행 지침 (예약 작업용)
+
+gblnote.com의 뉴스 섹션(`/gbl/news`)에 **하루 한 번, 글 1건**을 써서 발행하는 작업의 지침서다.
+예약 작업은 매번 이 문서를 처음부터 읽고 그대로 따른다. 사람이 손으로 글을 쓸 때도 같은 규칙을 쓴다.
+
+- 목적: 네이버 검색 유입. 구글은 신경 쓰지 않는다(2026-10-08 사장님 결정).
+- 참고 모델: 포켓몬고 개인 블로그(글 약 700개 · 2년 · 일 700~1,000명). 글이 짧고, 제목이 "포켓몬고 ○○"으로 시작하며, 주제는 **이벤트 소식**과 **레이드 보스 공략**.
+- 우리의 강점: 딜러 티어표 · 도감 · 레이드 기술 도감 데이터. 글의 숫자는 이 데이터에서 자동으로 채운다.
+- 속도: **하루 1건**(같은 날 시작하는 보스가 둘이면 최대 2건). 한꺼번에 많이 찍어내지 않는다 — "차근차근"이 사장님 방침.
+
+---
+
+## 1. 절대 규칙
+
+1. **확인된 사실만 쓴다.** 모르는 것은 쓰지 않는다. 그럴듯하게 지어내지 않는다.
+   - 일정·보스·스포트라이트 포켓몬·보너스 = 이벤트 피드(`news_candidates.mjs` 출력)
+   - 보상·코스튬·출현 조건 같은 상세 = `frontend/app/[lang]/gbl/events/eventManual.ts`에 있는 내용, 또는 **공식 뉴스를 포함해 2곳 이상에서 일치**하는 내용
+   - 순위·CP·기술 수치 = 사이트 데이터(자동 블록 또는 JSON을 직접 읽어 계산)
+   - 확인하지 못한 소재는 건너뛴다. 건너뛰는 것이 틀린 글보다 낫다.
+2. **숫자를 기억으로 적지 않는다.** 자동 블록을 쓰거나, 저장소의 JSON을 node로 읽어 계산한 값만 적는다. 손으로 적은 숫자에는 "YYYY년 M월 D일 기준"을 붙인다.
+3. **날짜와 요일은 `news_candidates.mjs`가 출력한 문자열을 그대로 쓴다.** 요일을 직접 계산하지 않는다.
+4. **운영자의 경험을 지어내지 않는다.** "직접 써 보니", "제 경험상" 같은 1인칭 체험 문장 금지. 운영자 의견이 필요한 글은 쓰지 않는다.
+5. **이미 있는 페이지를 그대로 베껴 쓴 글을 만들지 않는다.** 포켓몬 상세 · 타입별 딜러표와 내용이 같은 글은 네이버가 유사문서로 묶는다. 글에는 반드시 **시점**(이번 주 보스, 이번 이벤트)이나 **여러 페이지를 가로지르는 정리**가 있어야 한다.
+6. **다른 사이트의 문장을 옮기지 않는다.** 사실만 가져오고 문장은 새로 쓴다. 출처는 `sources`에 적는다.
+7. 한국어 글만 쓴다(`ko`). 다른 언어 필드는 넣지 않는다.
+8. `news/posts.ts`와 `GBL_NEWS_LOG.md` 말고는 고치지 않는다. 다른 파일을 고쳐야만 글이 되는 소재는 건너뛰고 로그에 이유를 적는다.
+9. 이미 발행한 글의 `slug`는 바꾸지 않는다. 기존 글을 지우지 않는다.
+
+---
+
+## 2. 실행 절차
+
+작업 폴더는 `C:\maesil-agency`. 셸 명령은 Bash 도구(Git Bash) 기준이다.
+
+### 2-1. 준비
+```bash
+cd /c/maesil-agency && git status --short && git fetch origin && git rev-list --left-right --count HEAD...origin/main
+```
+- 작업 트리에 `.claude/settings.local.json` 말고 다른 변경이 있으면 **중단**한다(누가 작업 중). 로그에 적고 끝낸다.
+- 원격보다 뒤처져 있으면 `git pull --ff-only origin main`. `.claude/settings.local.json` 때문에 막히면 아래 순서로 푼다(양쪽이 허용 목록에 항목을 추가만 하는 파일이라 합집합이면 된다).
+  ```bash
+  cp .claude/settings.local.json "$TEMP/settings.local.mine.json" && git checkout -- .claude/settings.local.json && git pull --ff-only origin main && node scripts/merge_claude_perms.cjs .claude/settings.local.json "$TEMP/settings.local.mine.json"
+  ```
+- `main` 브랜치가 아니면 중단한다.
+
+### 2-2. 소재 고르기
+```bash
+cd /c/maesil-agency/frontend && node scripts/gbl/news_candidates.mjs 14
+```
+`[미작성]` 표시가 붙은 것 중에서 **아래 순서의 첫 번째**를 고른다. 하루 1건.
+
+1. **레이드 보스 공략(A)** — 지금 진행 중이거나 **3일 안에 시작**하는 보스. 5성 → 메가 → 섀도우 순. 시작일이 가까운 것부터.
+2. **스포트라이트 아워(B)** — **2일 안**에 열리는 것.
+3. **커뮤니티 데이(C)** — **5일 안**에 열리고, 피드에 등장 포켓몬이 공개된 것.
+4. **주간 일정 정리(E)** — 그 주에 아직 없으면. 월요일이 가장 좋고, 늦어도 수요일까지만 쓴다.
+5. **그 밖의 이벤트(D)** — **7일 안**에 시작하고, 상세가 `eventManual.ts`에 있거나 2곳 이상에서 확인되는 것. `max-mondays` · `twitch-drops` · `go-pass` · 유성우류는 쓰지 않는다(쓸 내용이 이름과 시간뿐).
+6. **레이드 보스 공략(A)** — 14일 안에 시작하는 나머지 보스(미리 쓰기).
+7. **데이터 정리 글** — 4장의 목록에서 아직 안 쓴 것 하나.
+
+아무것도 없으면 글을 쓰지 않고 로그에 "소재 없음"만 남기고 끝낸다.
+
+- `⚠ sid 못 찾음` / `⚠ 자동 블록 미지원 sid`가 붙은 소재는 건너뛴다.
+- 같은 날 시작하는 5성 보스와 메가 보스가 둘 다 미작성이면 그날은 2건까지 쓴다.
+
+### 2-3. 글 쓰기
+`frontend/app/[lang]/gbl/news/posts.ts`의 `POSTS` 배열 **맨 위**에 항목을 추가한다. 파일 머리말의 규칙과 기존 글을 먼저 읽는다. 3장의 틀을 따른다.
+
+- `slug`와 `covers`는 `news_candidates.mjs`가 알려 준 값을 그대로 쓴다. **`covers`를 빼먹으면 내일 같은 글을 또 쓰게 된다.**
+- `published`는 오늘 날짜(`news_candidates.mjs` 첫 줄의 "오늘").
+- `mons`에는 글의 주인공 포켓몬 speciesId 1~3개. 섀도우는 `_shadow`를 붙이면 보라색 배경이 된다.
+- 편집은 Edit 도구로 한다. 셸에서 `node -e`로 파일을 고치지 않는다(역슬래시가 깨진다).
+
+### 2-4. 검증 → 발행
+```bash
+cd /c/maesil-agency/frontend && npx tsc --noEmit -p . && rm -rf .next && npm run build 2>&1 | grep -iE "error|failed|Compiled" ; rm -rf .next
+```
+- 타입 검사와 빌드가 둘 다 통과해야 한다(빌드가 글 페이지를 미리 렌더하므로 블록이 깨지면 여기서 실패한다). 실패하면 고치고, 못 고치면 **글을 되돌리고**(`git checkout -- "frontend/app/[lang]/gbl/news/posts.ts"`) 로그에 적고 끝낸다.
+- 로컬 dev 서버(미리보기)가 켜져 있으면 빌드 전에 끈다. 켠 채로 빌드하면 `.next`가 꼬인다.
+
+커밋 메시지는 Write 도구로 임시 파일에 쓴 뒤 `-F`로 넘긴다(따옴표 문제 방지).
+```bash
+cd /c/maesil-agency && git add "frontend/app/[lang]/gbl/news/posts.ts" GBL_NEWS_LOG.md && git commit -q -F "<메시지 파일>" && git push -q origin main
+```
+- 메시지 첫 줄: `feat(gbl-news): <글 제목 요약>`
+- **`.claude/settings.local.json`은 절대 스테이징하지 않는다.** `git add -A`나 `git add .`를 쓰지 않는다.
+
+### 2-5. 배포 확인
+Render가 `main`을 자동 배포한다(보통 2~4분). 아래를 백그라운드 명령으로 돌려 반영을 기다린다.
+```bash
+for i in $(seq 1 40); do c=$(curl -s -m 30 -o /dev/null -w "%{http_code}" "https://gblnote.com/gbl/news/<slug>?cb=$RANDOM"); [ "$c" = "200" ] && break; sleep 20; done; echo "final=$c"
+```
+반영되면:
+```bash
+cd /c/maesil-agency/frontend && node scripts/gbl/news_verify.mjs https://gblnote.com <slug>
+```
+- "전부 통과"가 나와야 한다. 실패하면 원인을 고쳐 다시 올리고, 못 고치면 `git revert --no-edit HEAD && git push origin main`으로 내린다.
+- 통과하면 Bing·네이버에 알린다: `node scripts/indexnow.mjs gblnote.com https://gblnote.com/gbl/news/<slug> https://gblnote.com/gbl/news`
+
+### 2-6. 기록
+`GBL_NEWS_LOG.md` 맨 아래에 한 줄을 추가한다(글을 쓰지 않은 날도 한 줄).
+```
+- 2026-10-12 · raid · dialga-raid-guide-2026-10 · 포켓몬고 디아루가 레이드 공략 … · 출처: 피드+사이트 데이터 · 검증 통과
+- 2026-10-13 · (건너뜀) 소재 없음
+```
+글을 쓴 날은 이 로그 줄을 **같은 커밋에** 넣는다. 다른 문서(`GBL_RECOVERY.md` 등)는 건드리지 않는다.
+
+마지막으로 무엇을 발행했는지(제목 · 주소), 또는 왜 건너뛰었는지를 한두 문장으로 보고하고 끝낸다.
+
+---
+
+## 3. 글 틀
+
+공통:
+- 제목은 **"포켓몬고 "로 시작**하고, 사람들이 검색할 말(포켓몬 이름 · "레이드 공략" · "약점" · "100% CP" · 날짜)을 넣는다. 60자 안팎.
+- 본문은 짧게. 문단 2~4문장, 전체 1,000~1,800자(자동 블록 제외). 첫 문단에 **언제 · 무엇**을 바로 쓴다.
+- 문체는 "~입니다 / ~합니다". 과장("역대급", "무조건", "필수!")과 감탄사 · 이모지 금지.
+- 문장 속 링크: `[[/gbl/raid/fighting|격투 딜러 순위]]`. 글마다 관련 도구로 가는 링크를 3개 이상 넣는다.
+- `keywords` 4~6개, `tools` 3~4개, `sources`는 반드시.
+
+### 3-A. 레이드 보스 공략 (`cat: "raid"`)
+기존 글 `dialga-raid-guide-2026-10`이 본보기다. 블록 순서:
+1. `p` — 언제부터 언제까지 몇 성 레이드인지, 레이드 아워, 이로치 여부(피드 값 그대로).
+2. `{ boss: "<sid>" }` — 타입 · 약점 · 반감 · 100% CP 카드(자동).
+3. `h` + `p` — 약점에 대한 한두 문단. **카드에 나온 약점 목록을 보고** 쓴다. 이중 약점(×2.56)이 있으면 반드시 짚는다. 헷갈리기 쉬운 점(드래곤인데 드래곤이 약점이 아님 등)이 있으면 쓴다.
+4. `h` + `p` + `{ counters: { boss: "<sid>", n: 10 } }` — 추천 딜러(자동). 문단에는 약점 타입별 딜러표 링크를 넣는다(`/gbl/raid/<타입>`).
+5. `h` + `p` + `{ dex: "<기본 폼 sid>" }` — 잡은 뒤 배틀리그 · 레이드에서의 쓸모(자동 카드). 숫자를 손으로 적지 않는다.
+6. `note` — 100% CP의 뜻과 "수치는 GBL Note 자체 계산".
+
+- **메가 보스**: `boss`·`counters`에는 메가 sid(`charizard_mega_y`), `dex`와 `mons`에는 기본 폼 sid(`charizard`). 글에 "메가 레이드에서 잡히는 것은 기본 폼이고, 100% CP도 기본 폼 기준"이라고 쓴다. 메가 X · Y가 같이 나오면 한 글에 두 카드를 넣지 말고 글을 따로 쓴다(약점이 다르다).
+- **섀도우 보스**: `boss`·`counters`·`dex`에는 기본 폼 sid, `mons`에는 `<sid>_shadow`. 제목과 첫 문단에 "섀도우"를 밝힌다.
+- 보스의 기술, 인원수, 날씨 등 **데이터에 없는 것은 쓰지 않는다.**
+
+### 3-B. 스포트라이트 아워 (`cat: "event"`)
+1. `p` — 날짜 · 시간(오후 6시~7시 현지 시각) · 주인공 포켓몬 · 보너스 · 이로치 여부.
+2. `h` + `p` — 보너스를 어떻게 쓰면 좋은지 한 문단(아래 보너스 표의 뜻 그대로. 추측 금지).
+3. `h` + `{ dex: "<sid>" }` — 그 포켓몬의 배틀리그 · 레이드 쓸모(자동 카드). 진화형이 있으면 `{ dex: "<진화형 sid>" }`도. 진화형은 `frontend/app/[lang]/gbl/sim/pvpoke/gamemaster_s28.json`의 `family.evolutions`에서 확인한다.
+4. `note` — 시간은 현지 시각 기준.
+
+보너스 원문 → 한국어(이 표에 없는 보너스는 실서버 `https://gblnote.com/gbl/events`에 표시된 한국어 표현을 쓴다):
+
+| 원문 | 한국어 |
+|---|---|
+| 2× Catch Candy | 포획 시 사탕 2배 |
+| 2× Transfer Candy | 박사에게 보낼 때 사탕 2배 |
+| 2× Catch Stardust | 포획 시 별의모래 2배 |
+| 2× Catch XP | 포획 시 XP 2배 |
+| 2× Evolution XP | 진화 시 XP 2배 |
+
+### 3-C. 커뮤니티 데이 (`cat: "event"`)
+피드의 등장 포켓몬 · 시간 · 보너스만으로 쓴다. 보너스는 실서버 이벤트 달력의 한국어 표현을 쓴다. 커뮤니티 데이 한정 기술 등 피드에 없는 내용은 2곳 이상에서 확인될 때만. `{ dex: "<sid>" }`와 진화형 카드를 넣는다.
+
+### 3-D. 이벤트 소식 (`cat: "event"`)
+기존 글 `fc-seoul-2026`, `halloween-2026-part-1`이 본보기다. `eventManual.ts`의 `notes` · `bonuses`를 풀어 쓰고, 같은 기간의 레이드 보스가 있으면 `{ boss }` 카드와 링크를 붙인다. 맥스 배틀 글에는 레이드 딜러표(`counters`)를 쓰지 않는다(맥스 배틀에는 다이맥스 포켓몬만 나간다) — `{ weak: "<sid>" }`만.
+
+### 3-E. 주간 일정 정리 (`cat: "event"`)
+slug `weekly-<월요일 날짜>`. 제목 예: "포켓몬고 10월 3주차 일정 정리 — 레이드 보스 · 스포트라이트 · 이벤트". 그 주(월~일)에 걸치는 A~D 항목을 `ul`로 날짜순 나열하고, 이미 쓴 공략 글이 있으면 `[[/gbl/news/<slug>|…]]`로 연결한다. 5성 보스에는 `{ boss }` 카드 하나.
+
+---
+
+## 4. 데이터 정리 글 목록 (시점 소재가 없는 날)
+
+한 번씩만 쓴다. 숫자는 **반드시 JSON을 node로 읽어** 뽑고, 표(`{ table }`)에 넣은 뒤 "YYYY년 M월 D일 기준"을 적는다. `covers`에 아래 키를 적는다.
+데이터 파일은 `frontend/app/[lang]/gbl/` 아래: 딜러표 `gbl_raids_megafinale.json`(기본 탭) · `gbl_raids.json`, 레이드 기술 `gbl_raid_moves.json`, 배틀 기술 `gbl_moves.json`, 티어 `gbl_detail_s28.json`.
+
+| 키 | 주제 | 뽑는 법 |
+|---|---|---|
+| `data:legacy-raid-attackers` | 레거시 기술이 필요한 레이드 딜러 — 엘리트 기술머신을 어디에 쓸까 | 딜러표에서 `legacy: true`인 행을 타입별 상위 5위 안에서 |
+| `data:shadow-raid-top` | 섀도우 레이드 딜러 순위 | 딜러표 전 타입에서 `shadow: true` 행을 종합(`er`) 순 15개 |
+| `data:mega-priority` | 메가진화 우선순위 — 타입별 1위 메가 | 타입별 표에서 `mega`가 있는 첫 행 |
+| `data:raid-strongest-charged` | 레이드에서 가장 센 스페셜 기술 | `gbl_raid_moves.json`에서 위력 ÷ 시전 시간 상위 10 |
+| `data:raid-fastest-energy` | 레이드에서 에너지가 가장 빨리 차는 노멀 기술 | 같은 파일에서 에너지 ÷ 시전 시간 상위 10 |
+| `data:raid-vs-battle-moves` | 레이드와 배틀에서 평가가 갈리는 기술 | 두 기술 파일에서 순위 차이가 큰 것 |
+| `data:type-top1-summary` | 18타입 레이드 딜러 1위 한눈에 | 타입별 표의 1위 |
+| `data:master-tier-s28` | 시즌 28 마스터리그 S · A티어 정리 | `gbl_detail_s28.json`의 `master`에서 tier S · A |
+| `data:great-tier-s28` | 시즌 28 슈퍼리그 S · A티어 정리 | 같은 파일 `great` |
+| `data:ultra-tier-s28` | 시즌 28 하이퍼리그 S · A티어 정리 | 같은 파일 `ultra` |
+
+표의 포켓몬 이름은 딜러표 행의 `name`(한국어), 기술 이름은 `gbl_moves.json`의 `n.ko`를 쓴다. 표마다 원본 페이지 링크를 붙인다.
+이 목록이 다 떨어지면 새 주제를 만들지 말고 로그에 "데이터 정리 글 소진"이라고 적는다(사장님이 목록을 채운다).
+
+---
+
+## 5. 도구
+
+| 명령 (frontend 폴더에서) | 용도 |
+|---|---|
+| `node scripts/gbl/news_candidates.mjs [일수]` | 소재 뽑기 — 날짜 · 요일 · sid · slug · covers 키 |
+| `node scripts/gbl/news_verify.mjs <base> <slug>` | 글 렌더 · 내부 링크 · 목록/RSS/사이트맵 확인 |
+| `node scripts/indexnow.mjs gblnote.com <url…>` | Bing · 네이버에 새 주소 알리기 |
+
+자동 블록(글의 숫자를 사이트 데이터에서 채움 — `news/posts.ts` 머리말 참고):
+`{ boss }` · `{ weak }` · `{ counters }` · `{ raidTop }` · `{ dex }`
+
+## 6. 멈추는 조건
+
+아래 중 하나면 아무것도 발행하지 않고, 로그에 이유를 적고 끝낸다.
+- 작업 트리에 다른 사람의 변경이 있다 / `main`이 아니다 / pull이 안 된다
+- 이벤트 피드를 못 받는다
+- 타입 검사나 빌드가 실패하고 글 문제로 고쳐지지 않는다
+- 고른 소재의 사실을 확인할 수 없다(→ 다음 순위 소재로 넘어가고, 그것도 없으면 종료)

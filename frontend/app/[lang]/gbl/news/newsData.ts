@@ -4,6 +4,7 @@ import RAIDS from "../gbl_raids.json";
 import RAIDS_MF from "../gbl_raids_megafinale.json";
 import STATS from "../pokedex_stats.json";
 import FORM_STATS from "../gbl_form_stats.json";
+import FORMS from "../gbl_forms.json";
 import { speciesOf, speciesName, moveExact, type Move } from "../moves/movesData";
 import { dexPath, ivKeyOf, RAID_DEFAULT_VER, zhNameOfSid } from "../dexHub";
 import { ALL_TYPES, typeMult } from "../pokemon/[league]/[id]/typeChart";
@@ -25,12 +26,22 @@ function baseStats(sid: string): St | null {
 const cpAt = (s: St, cpm: number) => Math.floor(((s.a + 15) * Math.sqrt(s.d + 15) * Math.sqrt(s.s + 15) * cpm * cpm) / 10);
 export type BossInfo = { sid: string; name: string; dex: number; types: string[]; weak: { type: string; mult: number }[]; resist: { type: string; mult: number }[]; cp20: number; cp25: number; href: string | null };
 const multVs = (atk: string, types: string[]) => types.reduce((m, t) => m * typeMult(atk, t), 1);
+// 보스의 이름·도감번호·타입 — 일반 종은 기술 도감 데이터, 메가·원시는 gbl_forms.json(타입이 기본 폼과 다르다: 메가 리자몽 X = 불꽃·드래곤).
+// 메가 레이드에서 잡히는 건 기본 폼이라 100% CP는 기본 폼 종족값으로 계산된다(ivKeyOf가 메가 접미를 떼 줌).
+type FormRow = { id: string; ko: string; en: string; ja: string; dex: number; types: string[] };
+const FORM_BY_ID: Record<string, FormRow> = Object.assign(Object.create(null), Object.fromEntries((FORMS as unknown as FormRow[]).map((f) => [f.id, f])));
+function bossBase(lang: Locale, sid: string): { name: string; dex: number; types: string[] } | null {
+  const f = FORM_BY_ID[sid];
+  if (f) return { name: (lang === "zh-TW" ? zhNameOfSid(sid) : lang === "en" ? f.en : lang === "ja" ? f.ja : f.ko) || f.en, dex: f.dex, types: f.types.filter((t) => t && t !== "none") };
+  const sp = speciesOf(sid);
+  return sp ? { name: speciesName(lang, sid), dex: sp.dex, types: sp.types } : null;
+}
 export function bossInfo(lang: Locale, sid: string): BossInfo | null {
-  const sp = speciesOf(sid); if (!sp) return null;
+  const sp = bossBase(lang, sid); if (!sp) return null;
   const all = ALL_TYPES.map((t) => ({ type: t, mult: Math.round(multVs(t, sp.types) * 1000) / 1000 }));
   const st = baseStats(sid);
   return {
-    sid, name: speciesName(lang, sid), dex: sp.dex, types: sp.types,
+    sid, name: sp.name, dex: sp.dex, types: sp.types,
     weak: all.filter((x) => x.mult > 1).sort((a, b) => b.mult - a.mult),
     resist: all.filter((x) => x.mult < 1).sort((a, b) => a.mult - b.mult),
     cp20: st ? cpAt(st, CPM20) : 0, cp25: st ? cpAt(st, CPM25) : 0, href: dexPath(sid),
@@ -45,7 +56,7 @@ const toRow = (lang: Locale, r: Row, type: string, mult: number): AttackerRow =>
   fast: moveExact(r.fast), charged: moveExact(r.charged), fastId: r.fast, chargedId: r.charged, dps: r.dps, er: r.er, href: r.sid ? dexPath(r.sid) : null,
 });
 export function countersFor(lang: Locale, bossSid: string, n = 10): AttackerRow[] {
-  const sp = speciesOf(bossSid); if (!sp) return [];
+  const sp = bossBase(lang, bossSid); if (!sp) return [];
   const best = new Map<string, AttackerRow & { score: number }>();
   for (const t of ALL_TYPES) {
     const mult = multVs(t, sp.types); if (mult <= 1) continue;
