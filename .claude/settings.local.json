@@ -457,7 +457,9 @@
       "Bash(curl -s --max-time 60 \"https://gblnote.com/gbl/events\" -o live.html)",
       "Bash(curl -s --max-time 240 \"http://localhost:3000/gbl/events\" -o /dev/null -w \"%{http_code}\\\\n\")",
       "Bash(node scratch_fix2.cjs)",
-      "Bash(rm -f scratch_fix2.cjs)"
+      "Bash(rm -f scratch_fix2.cjs)",
+      "Bash(npx esbuild *)",
+      "Bash(node scripts/gbl/build_iv.cjs groudon 28)"
     ]
   }
 }

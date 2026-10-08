@@ -17,14 +17,14 @@ import { typeLabel } from "../../typeLabels";
 import { gameName } from "../../contentI18n";
 import { getDict } from "../../dictionaries";
 import { getRaidType } from "./dict";
-import { dexPath, RAID_DEFAULT_VER, zhBaseNameOfSid } from "../../dexHub";
+import { dexPath, RAID_DEFAULT_VER, zhNameOfSid } from "../../dexHub";
 
 // 로케일별 이름/기술명 선택(레이드 행 필드: name/nameEn/nameJa, fastKo/fastEn/fastJa 등)
 // zh-TW: 포켓몬명은 dex로 pokedex_names, 기술명은 영문명→ID로 pvp_move_names에서 보완(메가/그림자는 뱃지 별도 표시).
 const _pkZh = (dex: number) => (PKNAMES as Record<string, Record<string, string>>)[String(dex)]?.["zh-TW"];
 const _mvId = (en: string) => en.trim().replace(/\*+$/, "").trim().toUpperCase().replace(/[^A-Z0-9]+/g, "_");
 const _mvZh = (en?: string) => en ? (MOVENAMES as Record<string, Record<string, string>>)[_mvId(en)]?.["zh-TW"] : undefined;
-const rowName = (lang: Locale, r: Row) => (lang === "en" ? r.nameEn : lang === "ja" ? r.nameJa : lang === "zh-TW" ? ((r.sid && zhBaseNameOfSid(r.sid)) || _pkZh(r.dex) || r.nameEn) : r.name) || r.name;   // 폼 명칭 포함(焰白酋雷姆 등)
+const rowName = (lang: Locale, r: Row) => (lang === "en" ? r.nameEn : lang === "ja" ? r.nameJa : lang === "zh-TW" ? ((r.sid && zhNameOfSid(r.sid)) || _pkZh(r.dex) || r.nameEn) : r.name) || r.name;   // 폼 명칭 + 超級/暗影/原始 접두 포함 — 접두가 빠지면 메가 뮤츠 X/Y가 둘 다 "超夢", 그림자/일반 제크로무가 둘 다 "捷克羅姆"로 보임
 const rowFast = (lang: Locale, r: Row) => (lang === "en" ? r.fastEn : lang === "ja" ? r.fastJa : lang === "zh-TW" ? (_mvZh(r.fastEn) || r.fastEn || r.fastKo) : r.fastKo) || r.fastKo;
 const rowCharged = (lang: Locale, r: Row) => (lang === "en" ? r.chargedEn : lang === "ja" ? r.chargedJa : lang === "zh-TW" ? (_mvZh(r.chargedEn) || r.chargedEn || r.chargedKo) : r.chargedKo) || r.chargedKo;
 

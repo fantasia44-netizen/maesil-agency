@@ -1,8 +1,13 @@
 // GBL 개체값 타협 분석 프리컴퓨트 — PvPoke 엔진 헤드리스 실행.
 // 마스터 메타(100) 전수 시뮬 + CMP 미러/라이벌 대결 + 베스트버디(L51) + HP 사다리.
 // 실행: esbuild 번들 후  node build_iv.cjs <speciesId>
-import { runMulti, runBattle, pokemonById } from "../../app/[lang]/gbl/sim/pvpoke/index.ts";
+import { runMulti, runBattle, pokemonById, setSeason, currentSeason } from "../../app/[lang]/gbl/sim/pvpoke/index.ts";
 import { writeFileSync } from "node:fs";
+
+// 시즌 — 엔진 기본값은 27이라 명시하지 않으면 지난 시즌 메타로 돌아간다(S27 결과가 한 달 넘게 박혀 있던 원인).
+// 사용: node build_iv.cjs <speciesId> [시즌번호]   예) node build_iv.cjs groudon 28
+const SEASON_NUM = Number(process.argv[3] || 28);
+setSeason(SEASON_NUM);
 
 const dexOf = (id) => { try { return pokemonById(id)?.dex ?? null; } catch { return null; } };
 
@@ -109,7 +114,8 @@ const bbAnalysis = analyze(true); // 내 베파 vs 상대 노베파(L50)
 }
 
 const out = {
-  speciesId: TARGET, dex: dexOf(TARGET), league: LEAGUE, metaLimit: META_LIMIT, rival: RIVAL, rivalDex: RIVAL ? dexOf(RIVAL) : null,
+  speciesId: TARGET, dex: dexOf(TARGET), league: LEAGUE, metaLimit: META_LIMIT, season: currentSeason(),
+  rival: RIVAL, rivalDex: RIVAL ? dexOf(RIVAL) : null,
   normal: analyze(false),
   bestBuddy: bbAnalysis,
   cmp: {
@@ -122,7 +128,7 @@ const path = `scripts/gbl/out_${TARGET}.json`;
 writeFileSync(path, JSON.stringify(out, null, 2), "utf-8");
 
 // 콘솔 요약
-console.log(`\n═══ ${TARGET} 마스터 개체값 분석 (메타 ${META_LIMIT}, 실드 0/1/2) ═══`);
+console.log(`\n═══ ${TARGET} 마스터 개체값 분석 (시즌 ${currentSeason()}, 메타 ${META_LIMIT}, 실드 0/1/2) ═══`);
 for (const [mode, key] of [["일반 L50", "normal"], ["베스트버디 L51", "bestBuddy"]]) {
   const a = out[key];
   console.log(`\n[${mode}] 백 CP ${a.hundo.cp} 스탯 ${JSON.stringify(a.hundo.stats)}`);
