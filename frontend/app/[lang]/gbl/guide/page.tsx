@@ -1,5 +1,6 @@
 // GBL 가이드 목록 — 서버렌더 SEO(3개국어).
 import Link from "next/link";
+import AdSlot from "../AdSlot";
 import type { Metadata } from "next";
 import { isLocale, defaultLocale, localizePath, hreflangLanguages, type Locale } from "../../../../lib/i18n";
 import { GUIDES, guideContent } from "./guides";
@@ -72,6 +73,9 @@ export default function GuideIndex({ params }: { params: { lang: string } }) {
             </div>
           </div>
         )}
+
+        {/* 본문 광고 1자리 — 분석 묶음과 가이드 목록 사이 */}
+        <AdSlot />
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {list.map(([slug, g]) => {

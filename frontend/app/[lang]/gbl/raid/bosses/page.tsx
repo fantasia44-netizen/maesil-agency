@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import POKEDEX from "../../pokedex_ko.json";
 import { dexPathOfBoss } from "../../dexHub";
+import AdSlot from "../../AdSlot";
 import PKN from "../../pokedex_names.json";
 import STATSJSON from "../../pokedex_stats.json";
 import CpTable from "./CpTable";
@@ -324,6 +325,9 @@ export default async function BossesPage({ params }: { params: { lang: string } 
             );
           })
         )}
+
+        {/* 본문 광고 1자리 — 보스 목록 아래 */}
+        <AdSlot />
 
         <div style={{ marginTop: 24, padding: "1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12 }}>
           <h2 style={{ fontSize: "0.95rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>{t.explainH}</h2>

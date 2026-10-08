@@ -9,6 +9,7 @@ import { monName, MON as ALL_MON } from "./meta/monNames";
 import { dexPathIn } from "./dexHub";
 import { snapNameOf } from "./indexGate";
 import GblLandingClient from "./GblLandingClient";
+import AdSlot from "./AdSlot";
 import { CORE_FORMATS, MEGA_FORMATS, activeCups, todayISO, type Format } from "./formats";
 
 export const revalidate = 600;
@@ -176,6 +177,9 @@ export default async function GblLandingPage({ params }: { params: { lang: strin
           </div>
         </div>
       </div>
+
+      {/* 본문 광고 1자리 — 자체 분석 묶음과 실측 TOP5 사이 */}
+      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 1rem" }}><AdSlot /></div>
 
       {/* ── 서버렌더 실측 TOP5 스트립(크롤러가 읽는 고유 데이터 + 내부링크) — 인터랙티브 랜딩 아래 배치 ── */}
       {cols.length > 0 && (

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import PKN from "../../pokedex_names.json";
 import NAME_EN_KO from "../../name_en_ko.json";
 import { dexPathOfBoss } from "../../dexHub";
+import AdSlot from "../../AdSlot";
 import { localizeEventName } from "../../sdEvents";
 import RaidCalendarClient from "./RaidCalendarClient";
 import { type CalEvent, type CalBoss } from "./RaidCalendar";
@@ -299,6 +300,9 @@ export default async function RaidSchedulePage({ params }: { params: { lang: str
             </div>
           </>
         )}
+
+        {/* 본문 광고 1자리 — 달력 아래 */}
+        <AdSlot />
 
         {/* 서버렌더 SEO 아젠다 — 크롤러가 JS 없이 읽는 보스·날짜 텍스트(달력은 ssr:false) */}
         {agenda.length > 0 && (

@@ -2,6 +2,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import IvChecker from "./IvChecker";
+import AdSlot from "../AdSlot";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
 import { getIv } from "./dict";
 import { IV_ANALYSIS } from "./analysis/registry";
@@ -91,6 +92,9 @@ export default function IvPage({ params, searchParams }: { params: { lang: strin
             </div>
           </div>
         )}
+
+        {/* 본문 광고 1자리 — 체커의 입력·결과 사이엔 넣지 않는다(실수 클릭 방지) */}
+        <AdSlot />
 
         <div style={{ marginTop: 22, padding: "1rem 1.1rem", background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14 }}>
           <h2 style={{ fontSize: "0.95rem", fontWeight: 800, margin: "0 0 6px", color: "#0f172a" }}>{t.explainerH}</h2>

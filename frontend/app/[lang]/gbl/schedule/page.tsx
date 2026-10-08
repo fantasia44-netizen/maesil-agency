@@ -1,5 +1,6 @@
 // GBL 시즌 스케줄표 — 서버렌더 SEO. 공식 리그 로테이션 일정(formats.ts, 시즌마다 갱신).
 import Link from "next/link";
+import AdSlot from "../AdSlot";
 import type { Metadata } from "next";
 import { LEAGUE_SCHEDULE_BY_SEASON, type SchedulePeriod } from "../formats";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
@@ -253,6 +254,9 @@ export default function SchedulePage({ params, searchParams }: { params: { lang:
             })}
           </>
         )}
+
+        {/* 본문 광고 1자리 — 이벤트·보너스와 리그 로테이션 사이 */}
+        <AdSlot />
 
         {/* ── 리그 로테이션 타임라인 ── */}
         <h2 style={{ fontSize: "1.1rem", fontWeight: 900, color: "#0f172a", margin: "1.7rem 0 10px", letterSpacing: "-0.3px" }}>{t.rotationH2}</h2>

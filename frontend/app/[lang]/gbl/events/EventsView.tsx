@@ -1,4 +1,5 @@
 "use client";
+import AdSlot from "../AdSlot";
 // 이벤트 달력 클라이언트 뷰 — 유형 필터 + 진행중/예정 분리 + 알(부화) 섹션.
 // ScrapedDuck 시간은 현지 벽시계(타임존 없음)라 클라이언트 Date로 비교(사용자 로컬=이벤트 로컬).
 // 진행중/예정 판정은 하이드레이션 안전하게 마운트 후(now 설정) 수행.
@@ -163,6 +164,9 @@ export default function EventsView({ events, eggs, t, filterTypes }: { events: V
       {live.length === 0
         ? <div style={{ fontSize: "0.82rem", color: "#94a3b8", padding: "0.4rem 0 0.8rem" }}>{t.emptyLive}</div>
         : <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>{live.map((e) => <Card key={e.id} e={e} />)}</div>}
+
+      {/* 본문 광고 1자리 — 진행 중 목록과 예정 목록 사이 */}
+      <AdSlot />
 
       {/* 예정 */}
       <h2 style={{ fontSize: "1rem", fontWeight: 900, color: INK, margin: "14px 0 8px" }}>{t.upcomingH}</h2>
