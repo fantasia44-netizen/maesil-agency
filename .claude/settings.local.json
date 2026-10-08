@@ -435,7 +435,8 @@
       "Bash(curl -s \"http://localhost:3000/gbl/tier/great\")",
       "Bash(curl -s \"http://localhost:3000/gbl/pokemon/great/oranguru\")",
       "Bash(curl -s \"http://localhost:3000/gbl/pokemon/great/oranguru\" -o scratch_o.html)",
-      "Bash(rm -f scratch_o.html)"
+      "Bash(rm -f scratch_o.html)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.json\" -o scratch_ev.json)"
     ]
   }
 }

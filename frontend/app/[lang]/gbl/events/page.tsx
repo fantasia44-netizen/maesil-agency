@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import EventsView, { type ViewEvent, type ViewEgg } from "./EventsView";
+import EventCalendarClient from "./EventCalendarClient";
 import { getSDEvents, getSDEggs, localizeEventName, monLocal, koMon, dexOf } from "../sdEvents";
 import { monSprite } from "../sprite";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
@@ -17,11 +18,15 @@ const TYPE_META: Record<string, { emoji: string; filter: string }> = {
   // raid-battles(5성/메가/그림자 다주 로테이션)는 /gbl/raid/schedule에서 다룸 — 중복 제외. 시간 특정 아워/데이만.
   "raid-hour": { emoji: "⏰", filter: "raid" },
   "raid-day": { emoji: "🎉", filter: "raid" },
-  "max-mondays": { emoji: "🔴", filter: "max" },
-  "max-battles": { emoji: "🔴", filter: "max" },
+  // 맥스 2종·레이드 아워는 원래 전부 붉은 원형이라 칸 안에서 구별이 안 됐음 → 모양이 다른 글리프로.
+  "max-mondays": { emoji: "🟥", filter: "max" },
+  "max-battles": { emoji: "💥", filter: "max" },
   "pokemon-go-fest": { emoji: "🎪", filter: "event" },
   "event": { emoji: "🎈", filter: "event" },
   "research": { emoji: "🔍", filter: "research" },
+  // 장기(2주 초과) — 달력에선 칸을 먹지 않고 "상시 진행" 줄로, 목록에선 진행 중에 노출.
+  "season": { emoji: "🌙", filter: "event" },
+  "go-pass": { emoji: "🎫", filter: "event" },
 };
 
 const EGG_ORDER = ["1 km", "2 km", "5 km", "7 km", "10 km", "12 km"];
@@ -101,7 +106,10 @@ export default async function EventsPage({ params }: { params: { lang: string } 
         {events.length === 0 && eggs.length === 0 ? (
           <div style={{ textAlign: "center", color: "#94a3b8", padding: "3rem 1rem" }}>{t.loadFail}</div>
         ) : (
-          <EventsView events={events} eggs={eggs} t={t} lang={lang} filterTypes={[...FILTER_TYPES]} />
+          <>
+            <EventCalendarClient events={events} t={t} />
+            <EventsView events={events} eggs={eggs} t={t} lang={lang} filterTypes={[...FILTER_TYPES]} />
+          </>
         )}
 
         <div style={{ marginTop: 24, textAlign: "center", fontSize: "0.72rem", color: "#94a3b8" }}>

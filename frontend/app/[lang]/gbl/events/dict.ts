@@ -20,6 +20,9 @@ export type EventsDict = SDLabels & {
   tagSpawns: string; tagResearch: string; detailLink: string;
   // 이번 주 이벤트 공유 카드
   shareBtn: string; saveBtn: string; building: string; shareCardTitle: string; shareCardWeek: string; shareFileTitle: string;
+  // 월 달력(EventCalendar)
+  calTitle: string; calShareBtn: string; calShareSub: string; calOngoingH: string; calNoEvent: string;
+  calLegendBand: string; calLegendBadge: string; calLegendOngoing: string;
   // 알(부화) 섹션
   eggH: string; eggIntro: string; eggShiny: string; eggRegional: string; eggGift: string; eggAdventure: string;
   // 메타
@@ -47,6 +50,9 @@ const ko: EventsDict = {
   dateRange: "{m1}/{d1}({w1}) ~ {m2}/{d2}({w2})", dateSingle: "{m}/{d}({w})", timeRange: "{h1}:{mm1} ~ {h2}:{mm2}",
   tagSpawns: "출현↑", tagResearch: "리서치", detailLink: "상세",
   shareBtn: "📤 이번 주 이벤트 공유", saveBtn: "💾 저장", building: "생성 중…", shareCardTitle: "이번 주 포켓몬 GO 이벤트", shareCardWeek: "이번 주", shareFileTitle: "포켓몬고 이번 주 이벤트",
+  calTitle: "{y}년 {month} 이벤트", calShareBtn: "📤 {month} 달력 공유", calShareSub: "포켓몬 GO 이벤트 달력",
+  calOngoingH: "상시 진행 (2주 넘는 장기)", calNoEvent: "이 날은 예정된 이벤트가 없습니다.",
+  calLegendBand: "━ 가로 띠 = 여러 날 이벤트", calLegendBadge: "이모지 = 그날 하루(아워·데이)", calLegendOngoing: "장기 캠페인은 위 상시 진행 줄",
   eggH: "🥚 부화 알 (거리별)", eggIntro: "현재 알에서 부화하는 포켓몬입니다.", eggShiny: "이로치", eggRegional: "지역한정", eggGift: "선물", eggAdventure: "어드벤처싱크",
   // ── SDLabels (레이드 스케줄과 동일) ──
   pfx: { mega: "메가 ", shadow: "섀도우 ", alola: "알로라 ", galar: "가라르 ", hisui: "히스이 ", paldea: "팔데아 " },
@@ -60,6 +66,8 @@ const ko: EventsDict = {
     "Mega Ascension": "메가 어센션",
     "10th Anniversary Celebration - Perfect Mewtwo Timed Research": "10주년 기념 · 퍼펙트 뮤츠 타임 리서치",
     "Twitch Drops for 2026 Pokémon World Championships": "2026 세계대회 트위치 드롭스",
+    "Twilight Trails": "황혼의 여정",
+    "adidas × Pokémon Timed Research": "adidas × 포켓몬 타임 챌린지",
   },
   sfxSuperMega: "슈퍼 메가 레이드 데이", sfxMega: "메가 레이드 데이", sfxRaidHour: "레이드 아워", sfxRaidDay: "레이드 데이",
   metaTitle: "포켓몬고 이벤트 달력 · 커뮤니티데이·스포트라이트·부화알 | GBL Note",
@@ -86,6 +94,9 @@ const en: EventsDict = {
   dateRange: "{m1}/{d1} ({w1}) – {m2}/{d2} ({w2})", dateSingle: "{m}/{d} ({w})", timeRange: "{h1}:{mm1} – {h2}:{mm2}",
   tagSpawns: "Spawns", tagResearch: "Research", detailLink: "Details",
   shareBtn: "📤 Share this week", saveBtn: "💾 Save", building: "Generating…", shareCardTitle: "This Week in Pokémon GO", shareCardWeek: "This week", shareFileTitle: "Pokémon GO events this week",
+  calTitle: "{month} {y} Events", calShareBtn: "📤 Share {month}", calShareSub: "Pokémon GO event calendar",
+  calOngoingH: "Running all month (over 2 weeks)", calNoEvent: "Nothing scheduled on this day.",
+  calLegendBand: "━ bar = multi-day event", calLegendBadge: "emoji = single day (hour/day)", calLegendOngoing: "long campaigns are in the row above",
   eggH: "🥚 Egg Hatches (by distance)", eggIntro: "Pokémon currently hatching from eggs.", eggShiny: "Shiny", eggRegional: "Regional", eggGift: "Gift", eggAdventure: "Adventure Sync",
   pfx: { mega: "Mega ", shadow: "Shadow ", alola: "Alolan ", galar: "Galarian ", hisui: "Hisuian ", paldea: "Paldean " },
   evtType: { "community-day": "Community Day", "pokemon-spotlight-hour": "Spotlight Hour", "max-mondays": "Max Monday", "max-battles": "Max Battle Day", "pokemon-go-fest": "GO Fest", "event": "Event", "research": "Research", "go-pass": "GO Pass", "raid-battles": "Raid", "raid-hour": "Raid Hour", "raid-day": "Raid Day", "go-battle-league": "GO Battle League", "season": "Season" },
@@ -117,6 +128,9 @@ const ja: EventsDict = {
   dateRange: "{m1}/{d1}({w1}) 〜 {m2}/{d2}({w2})", dateSingle: "{m}/{d}({w})", timeRange: "{h1}:{mm1} 〜 {h2}:{mm2}",
   tagSpawns: "出現↑", tagResearch: "リサーチ", detailLink: "詳細",
   shareBtn: "📤 今週のイベントを共有", saveBtn: "💾 保存", building: "生成中…", shareCardTitle: "今週のポケモンGO イベント", shareCardWeek: "今週", shareFileTitle: "ポケモンGO 今週のイベント",
+  calTitle: "{y}年{month} イベント", calShareBtn: "📤 {month}のカレンダーを共有", calShareSub: "ポケモンGO イベントカレンダー",
+  calOngoingH: "常時開催(2週間超の長期)", calNoEvent: "この日に予定されたイベントはありません。",
+  calLegendBand: "━ 帯 = 複数日イベント", calLegendBadge: "絵文字 = その日だけ(アワー・デイ)", calLegendOngoing: "長期キャンペーンは上の常時開催欄",
   eggH: "🥚 タマゴ孵化(距離別)", eggIntro: "現在タマゴから孵化するポケモンです。", eggShiny: "色違い", eggRegional: "地域限定", eggGift: "ギフト", eggAdventure: "アドベンチャーシンク",
   pfx: { mega: "メガ ", shadow: "シャドウ ", alola: "アローラ ", galar: "ガラル ", hisui: "ヒスイ ", paldea: "パルデア " },
   evtType: { "community-day": "コミュニティ・デイ", "pokemon-spotlight-hour": "スポットライトアワー", "max-mondays": "マックスマンデー", "max-battles": "マックスバトルデイ", "pokemon-go-fest": "GOフェス", "event": "イベント", "research": "リサーチ", "go-pass": "GOパス", "raid-battles": "レイド", "raid-hour": "レイドアワー", "raid-day": "レイドデイ", "go-battle-league": "GOバトルリーグ", "season": "シーズン" },
@@ -127,6 +141,8 @@ const ja: EventsDict = {
     "Mega Ascension": "メガアセンション",
     "10th Anniversary Celebration - Perfect Mewtwo Timed Research": "10周年記念 · パーフェクトミュウツー タイムチャレンジ",
     "Twitch Drops for 2026 Pokémon World Championships": "2026 世界大会 Twitchドロップ",
+    "Twilight Trails": "黄昏の旅路",
+    "adidas × Pokémon Timed Research": "adidas × ポケモン タイムチャレンジ",
   },
   sfxSuperMega: "スーパーメガレイドデイ", sfxMega: "メガレイドデイ", sfxRaidHour: "レイドアワー", sfxRaidDay: "レイドデイ",
   metaTitle: "ポケモンGO イベントカレンダー · コミュデイ・スポットライト・タマゴ | GBL Note",
@@ -153,12 +169,18 @@ const zhTW: EventsDict = {
   dateRange: "{m1}/{d1}（{w1}）~ {m2}/{d2}（{w2}）", dateSingle: "{m}/{d}（{w}）", timeRange: "{h1}:{mm1} ~ {h2}:{mm2}",
   tagSpawns: "出現↑", tagResearch: "研究", detailLink: "詳細",
   shareBtn: "📤 分享本週活動", saveBtn: "💾 儲存", building: "產生中…", shareCardTitle: "本週寶可夢 GO 活動", shareCardWeek: "本週", shareFileTitle: "寶可夢GO 本週活動",
+  calTitle: "{y}年{month} 活動", calShareBtn: "📤 分享{month}行事曆", calShareSub: "寶可夢GO 活動行事曆",
+  calOngoingH: "長期進行（超過兩週）", calNoEvent: "這天沒有預定的活動。",
+  calLegendBand: "━ 橫條 = 多日活動", calLegendBadge: "表情符號 = 當日限定（時刻·日）", calLegendOngoing: "長期活動在上方長期進行列",
   eggH: "🥚 孵化蛋（依距離）", eggIntro: "目前從蛋孵化的寶可夢。", eggShiny: "異色", eggRegional: "地區限定", eggGift: "禮物", eggAdventure: "冒險同步",
   pfx: { mega: "超級", shadow: "暗影", alola: "阿羅拉", galar: "伽勒爾", hisui: "洗翠", paldea: "帕底亞" },
   evtType: { "community-day": "社群日", "pokemon-spotlight-hour": "聚焦時刻", "max-mondays": "極巨星期一", "max-battles": "極巨戰日", "pokemon-go-fest": "GO Fest", "event": "活動", "research": "研究", "go-pass": "GO Pass", "raid-battles": "團體戰", "raid-hour": "團體戰時刻", "raid-day": "團體戰日", "go-battle-league": "GO 對戰聯盟", "season": "賽季" },
   months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
   dynamax: "極巨化", evtClassic: "經典",
-  evtNameMap: {},
+  evtNameMap: {
+    "Twilight Trails": "黃昏旅途",
+    "adidas × Pokémon Timed Research": "adidas × 寶可夢 限時調查",
+  },
   sfxSuperMega: "超級進化團體戰日", sfxMega: "超級團體戰日", sfxRaidHour: "團體戰時刻", sfxRaidDay: "團體戰日",
   metaTitle: "寶可夢GO 活動行事曆 · 社群日·聚焦時刻·孵蛋 | GBL Note",
   metaDesc: "寶可夢 GO 活動一目瞭然。社群日·聚焦時刻·團體戰·極巨戰·孵蛋時程以進行中/預定自動更新。當地時間為準。",
