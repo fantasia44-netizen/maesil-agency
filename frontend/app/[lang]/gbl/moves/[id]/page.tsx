@@ -136,7 +136,8 @@ export default function MoveDetail({ params }: { params: { lang: string; id: str
           <h1 style={{ margin: 0, fontSize: "1.45rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>
             {name} <span style={{ fontSize: "0.92rem", fontWeight: 700, color: "#64748b" }}>— {t.h1Suffix}</span>
           </h1>
-          {otherNames.length > 0 && <div style={{ marginTop: 3, fontSize: "0.76rem", color: "#94a3b8" }}>{otherNames.join(" · ")}</div>}
+          {/* 다른 언어의 기술 이름 병기(검색·대조용, 의도된 표기) — data-i18n-ok: 언어팩 렌더 검사가 누출로 세지 않게 */}
+          {otherNames.length > 0 && <div data-i18n-ok="" style={{ marginTop: 3, fontSize: "0.76rem", color: "#94a3b8" }}>{otherNames.join(" · ")}</div>}
         </div>
 
         {/* 수치 타일 */}

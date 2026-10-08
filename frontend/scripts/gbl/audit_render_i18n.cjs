@@ -10,12 +10,19 @@ const PATHS = [
   '/gbl/pokemon/great/melmetal', '/gbl/iv', '/gbl/iv/groudon', '/gbl/iv/ursaluna',
   '/gbl/guide', '/gbl/guide/type-chart', '/gbl/guide/moveset', '/gbl/trade',
   '/gbl/sim', '/gbl/about', '/gbl/privacy', '/gbl/terms', '/gbl/schedule',
+  // 2026-10-09 추가: 레이드 기술 도감 · 배틀 기술 상세 · 도감 허브 카드(레이드 기술 줄) · 폼 페이지 · 랭킹 밖 페이지
+  '/gbl/raid/moves', '/gbl/raid/moves/psystrike', '/gbl/raid/moves/counter', '/gbl/raid/moves/hidden_power_fire',
+  '/gbl/moves/psystrike', '/gbl/pokemon/master/giratina_origin', '/gbl/pokemon/master/mewtwo', '/gbl/pokemon/great/charmander',
+  '/gbl/raid/fire', '/gbl/tier/master', '/gbl/cmp/master', '/gbl/meta/master',
+  // 뉴스(/gbl/news)는 번역 글이 있는 언어만 열리므로 여기서 보지 않는다(없는 언어는 404가 정상).
 ];
 const LOCALES = ['en', 'ja', 'zh-TW'];
 const HANGUL = /[가-힣]/;
 
 // 한국어가 남아도 되는 자리(브랜드·고유명사 없음 — 전부 누출로 본다)
+// data-i18n-ok = 일부러 여러 언어를 함께 적은 자리(기술 페이지의 "다른 언어 이름" 줄 등) — 누출로 세지 않는다.
 const STRIP = [
+  /<(\w+)[^>]*\bdata-i18n-ok\b[^>]*>[^<]*<\/\1>/g,
   /<script[\s\S]*?<\/script>/g, /<style[\s\S]*?<\/style>/g,
   /<!--[\s\S]*?-->/g,
 ];

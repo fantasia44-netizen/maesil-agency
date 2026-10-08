@@ -6,7 +6,7 @@ const path = require('path');
 
 const ROOTS = ['app/[lang]/gbl', 'app/[lang]/tcg'];
 // 값 자체가 4개국어 표를 담고 있는 데이터/사전 모듈
-const SKIP_FILE = /(dict\.ts|dictionaries[\\/]|guides\.ts|eventManual\.ts|registry\.ts|articleGen\.ts|oppNames\.ts|eventBrochures\.ts|contentI18n\.ts|typeLabels\.ts|seasons\.ts|sdEvents\.ts|monNames\.ts|dexHub\.ts|leagueAnalysis\.ts|guideLinks\.ts|formats\.ts|analysis\.ts|sprite\.ts|indexGate\.ts|monSlug\.ts)/;
+const SKIP_FILE = /(dict\.ts|dictionaries[\\/]|guides\.ts|news[\\/]posts\.ts|eventManual\.ts|registry\.ts|articleGen\.ts|oppNames\.ts|eventBrochures\.ts|contentI18n\.ts|typeLabels\.ts|seasons\.ts|sdEvents\.ts|monNames\.ts|dexHub\.ts|leagueAnalysis\.ts|guideLinks\.ts|formats\.ts|analysis\.ts|sprite\.ts|indexGate\.ts|monSlug\.ts)/;
 const HANGUL = /[가-힣]/;
 const KANA = /[぀-ヿ]/;
 
