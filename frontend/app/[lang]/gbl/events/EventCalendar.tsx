@@ -197,7 +197,7 @@ export default function EventCalendar({ events, t }: { events: ViewEvent[]; t: E
                     display: "flex", alignItems: "center", gap: 4, padding: "0 6px", overflow: "hidden", pointerEvents: "none", zIndex: 1,
                   }}>
                     <span style={{ fontSize: "0.68rem", fontWeight: 800, color: h.c, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {b.startsHere ? `${b.e.emoji} ${b.e.name}` : b.e.name}
+                      {b.startsHere ? `${b.e.emoji} ${chipLabel(b.e.name)}` : chipLabel(b.e.name)}
                     </span>
                   </div>
                 );
@@ -216,6 +216,49 @@ export default function EventCalendar({ events, t }: { events: ViewEvent[]; t: E
       ))}
     </div>
   );
+
+  // 다음 달 미리보기 — 달력 기본이 이번 달이라 11월 와일드 에어리어 같은 게 안 보인다는 지적.
+  // 매주 반복(스포트라이트·레이드 아워·맥스 먼데이)은 빼고 "새로운 것"만 칩으로, 누르면 그 달·그 날로 이동.
+  const RECURRING = new Set(["pokemon-spotlight-hour", "raid-hour", "max-mondays"]);
+  const nextMonth = cur.m === 12 ? { y: cur.y + 1, m: 1 } : { y: cur.y, m: cur.m + 1 };
+  const nStart = +new Date(nextMonth.y, nextMonth.m - 1, 1), nEnd = +new Date(nextMonth.y, nextMonth.m, 1);
+  const nextList = [...bandEvents, ...dayEvents]
+    .filter((e) => !RECURRING.has(e.type) && +new Date(e.start) >= nStart && +new Date(e.start) < nEnd)
+    .sort((a2, b2) => +new Date(a2.start) - +new Date(b2.start))
+    .slice(0, 6);
+  const jumpTo = (e: ViewEvent) => { setCur(nextMonth); setSel(dayKeyOf(e.start)); };
+  // 칩 라벨 — 게임명 접두와 연도를 떼서 "구분되는 부분"이 말줄임에 먹히지 않게.
+  // ("포켓몬 GO 와일드 에어리어 2026: 센다이 • 도호쿠" → "와일드 에어리어: 센다이 • 도호쿠")
+  const chipLabel = (n: string) =>
+    n.replace(/^(포켓몬 GO|Pokémon GO|ポケモンGO|寶可夢GO)\s*/, "")
+      .replace(/\s*\b20\d\d\b/g, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+
+  const NextPreview = () => {
+    if (nextList.length === 0) return null;
+    return (
+      <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px dashed ${BORDER}` }}>
+        <div style={{ fontSize: "0.7rem", fontWeight: 800, color: SUB, marginBottom: 5 }}>
+          {tpl(t.calNextH, { month: monthName(nextMonth.m), m: nextMonth.m, y: nextMonth.y })}
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+          {nextList.map((e) => {
+            const h = hueOf(e.filterKey), d = new Date(e.start);
+            return (
+              <button key={e.id} onClick={() => jumpTo(e)}
+                style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#fff", border: `1px solid ${h.c}40`, borderLeft: `3px solid ${h.c}`,
+                  borderRadius: 8, padding: "4px 9px", cursor: "pointer", fontSize: "0.73rem", fontWeight: 700, color: "#334155" }}>
+                <span>{e.emoji}</span>
+                <span style={{ color: h.c, fontWeight: 800 }}>{d.getMonth() + 1}/{d.getDate()}</span>
+                <span style={{ maxWidth: 210, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{chipLabel(e.name)}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
 
   // 이모지 범례 — 이번 달에 실제로 쓰인 유형만. 칸의 이모지가 뭘 뜻하는지 바로 읽히게(달력의 핵심 난점).
   const TypeLegend = () => {
@@ -283,6 +326,8 @@ export default function EventCalendar({ events, t }: { events: ViewEvent[]; t: E
       <div style={{ display: "flex", gap: 9, marginTop: 5, fontSize: "0.64rem", color: "#94a3b8", flexWrap: "wrap" }}>
         <span>{t.calLegendBand}</span><span>{t.calLegendBadge}</span><span>{t.calLegendOngoing}</span>
       </div>
+
+      <NextPreview />
 
       {/* 선택일 상세 */}
       {sel && (

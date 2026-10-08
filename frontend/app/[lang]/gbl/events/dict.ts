@@ -23,6 +23,7 @@ export type EventsDict = SDLabels & {
   shareBtn: string; saveBtn: string; building: string; shareCardTitle: string; shareCardWeek: string; shareFileTitle: string;
   // 월 달력(EventCalendar)
   calTitle: string; calShareBtn: string; calShareSub: string; calOngoingH: string; calNoEvent: string;
+  calNextH: string;
   calLegendBand: string; calLegendBadge: string; calLegendOngoing: string;
   // 알(부화) 섹션
   eggH: string; eggIntro: string; eggShiny: string; eggRegional: string; eggGift: string; eggAdventure: string;
@@ -54,6 +55,7 @@ const ko: EventsDict = {
   shareBtn: "📤 이번 주 이벤트 공유", saveBtn: "💾 저장", building: "생성 중…", shareCardTitle: "이번 주 포켓몬 GO 이벤트", shareCardWeek: "이번 주", shareFileTitle: "포켓몬고 이번 주 이벤트",
   calTitle: "{y}년 {month} 이벤트", calShareBtn: "📤 {month} 달력 공유", calShareSub: "포켓몬 GO 이벤트 달력",
   calOngoingH: "상시 진행 (2주 넘는 장기)", calNoEvent: "이 날은 예정된 이벤트가 없습니다.",
+  calNextH: "다음 달 {month} 주요 이벤트 — 눌러서 이동",
   calLegendBand: "━ 가로 띠 = 여러 날 이벤트", calLegendBadge: "이모지 = 그날 하루(아워·데이)", calLegendOngoing: "장기 캠페인은 위 상시 진행 줄",
   eggH: "🥚 부화 알 (거리별)", eggIntro: "현재 알에서 부화하는 포켓몬입니다.", eggShiny: "이로치", eggRegional: "지역한정", eggGift: "선물", eggAdventure: "어드벤처싱크",
   // ── SDLabels (레이드 스케줄과 동일) ──
@@ -99,6 +101,7 @@ const en: EventsDict = {
   shareBtn: "📤 Share this week", saveBtn: "💾 Save", building: "Generating…", shareCardTitle: "This Week in Pokémon GO", shareCardWeek: "This week", shareFileTitle: "Pokémon GO events this week",
   calTitle: "{month} {y} Events", calShareBtn: "📤 Share {month}", calShareSub: "Pokémon GO event calendar",
   calOngoingH: "Running all month (over 2 weeks)", calNoEvent: "Nothing scheduled on this day.",
+  calNextH: "Coming in {month} — tap to jump",
   calLegendBand: "━ bar = multi-day event", calLegendBadge: "emoji = single day (hour/day)", calLegendOngoing: "long campaigns are in the row above",
   eggH: "🥚 Egg Hatches (by distance)", eggIntro: "Pokémon currently hatching from eggs.", eggShiny: "Shiny", eggRegional: "Regional", eggGift: "Gift", eggAdventure: "Adventure Sync",
   pfx: { mega: "Mega ", shadow: "Shadow ", alola: "Alolan ", galar: "Galarian ", hisui: "Hisuian ", paldea: "Paldean " },
@@ -134,6 +137,7 @@ const ja: EventsDict = {
   shareBtn: "📤 今週のイベントを共有", saveBtn: "💾 保存", building: "生成中…", shareCardTitle: "今週のポケモンGO イベント", shareCardWeek: "今週", shareFileTitle: "ポケモンGO 今週のイベント",
   calTitle: "{y}年{month} イベント", calShareBtn: "📤 {month}のカレンダーを共有", calShareSub: "ポケモンGO イベントカレンダー",
   calOngoingH: "常時開催(2週間超の長期)", calNoEvent: "この日に予定されたイベントはありません。",
+  calNextH: "来月 {month} の主なイベント — タップで移動",
   calLegendBand: "━ 帯 = 複数日イベント", calLegendBadge: "絵文字 = その日だけ(アワー・デイ)", calLegendOngoing: "長期キャンペーンは上の常時開催欄",
   eggH: "🥚 タマゴ孵化(距離別)", eggIntro: "現在タマゴから孵化するポケモンです。", eggShiny: "色違い", eggRegional: "地域限定", eggGift: "ギフト", eggAdventure: "アドベンチャーシンク",
   pfx: { mega: "メガ ", shadow: "シャドウ ", alola: "アローラ ", galar: "ガラル ", hisui: "ヒスイ ", paldea: "パルデア " },
@@ -176,6 +180,7 @@ const zhTW: EventsDict = {
   shareBtn: "📤 分享本週活動", saveBtn: "💾 儲存", building: "產生中…", shareCardTitle: "本週寶可夢 GO 活動", shareCardWeek: "本週", shareFileTitle: "寶可夢GO 本週活動",
   calTitle: "{y}年{month} 活動", calShareBtn: "📤 分享{month}行事曆", calShareSub: "寶可夢GO 活動行事曆",
   calOngoingH: "長期進行（超過兩週）", calNoEvent: "這天沒有預定的活動。",
+  calNextH: "下個月 {month} 主要活動 — 點擊前往",
   calLegendBand: "━ 橫條 = 多日活動", calLegendBadge: "表情符號 = 當日限定（時刻·日）", calLegendOngoing: "長期活動在上方長期進行列",
   eggH: "🥚 孵化蛋（依距離）", eggIntro: "目前從蛋孵化的寶可夢。", eggShiny: "異色", eggRegional: "地區限定", eggGift: "禮物", eggAdventure: "冒險同步",
   pfx: { mega: "超級", shadow: "暗影", alola: "阿羅拉", galar: "伽勒爾", hisui: "洗翠", paldea: "帕底亞" },
