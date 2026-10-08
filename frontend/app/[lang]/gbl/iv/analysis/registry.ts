@@ -72,7 +72,7 @@ export type IvEntry = {
 
 // ── 그란돈 — "공격 15는 절대조건, 나머지는 관대" ──────────────────────────────
 const groudon_ko: Article = {
-  title: "그란돈 개체값 타협점 — 마스터리그, 어디까지 괜찮을까",
+  title: "그란돈 개체값 — 공격 15 필수 · 타협선 15/13/14 (마스터리그)",
   hook: "박스에 그란돈, 아직 안 보내셨죠? XL 겨우 모아서 강화하려는데 100%가 안 떴다면 — 강화 버튼 누르기 전에 딱 30초. 이 개체 그냥 키워도 되는지, 시뮬 돌려서 정리해뒀습니다.",
   lead: "그란돈은 공격 15만 지키면 방어·체력은 꽤 풀어줘도 됩니다. 다만 이 '공격 15'는 타협 대상이 아니라 절대조건입니다. 마스터리그 상위 100종을 배틀 시뮬레이터로 전수 대입하고, 미러전·라이벌 대면·베스트파트너까지 계산한 결과를 아래에 정리했습니다.",
   compromise: "15 / 13 / 14",
@@ -113,7 +113,7 @@ const groudon_ko: Article = {
 };
 
 const groudon_en: Article = {
-  title: "Groudon IV Compromise — How Far Can You Go in Master League?",
+  title: "Groudon IVs — Attack 15 Required · Line 15/13/14 (Master League)",
   hook: "Still got a Groudon sitting in your box? Finally scraped the XL together but it didn't come out 100%? Before you hit power-up — 30 seconds. Here's whether that spread is fine to build, straight from the sim.",
   lead: "For Groudon, as long as attack is 15 you can be relaxed about defense and HP. But that attack 15 isn't a compromise — it's a hard requirement. Below is the result of running the top 100 of the Master League meta through a battle simulator, plus the mirror, the same-stat rival, and best buddy.",
   compromise: "15 / 13 / 14",

@@ -17,6 +17,9 @@ export type BossesDict = {
   dataSource: string; privacy: string;
   pfx: { mega: string; shadow: string; hisui: string; alola: string; galar: string; paldea: string; origin: string };
   metaTitle: string; metaDesc: string; metaKeywords: string[]; ogTitle: string; ogDesc: string;
+  // 검색결과에서 "지금 뭐가 나오나"가 바로 보이게 — 제목/설명에 현재 보스 이름을 주입.
+  metaTitleF: (names: string) => string;
+  metaDescF: (names: string) => string;
 };
 
 const ko: BossesDict = {
@@ -63,6 +66,8 @@ const ko: BossesDict = {
   metaDesc: "지금 열리는 포켓몬 GO 5성·메가 레이드 보스 목록. 보스별 개체값(IV)별 포획 CP표 — 100개체(15/15/15) CP를 일반·날씨부스트 기준으로 확인. 약점 속성·추천 딜러까지. 자동 업데이트.",
   metaKeywords: ["포켓몬고 레이드 보스", "100 CP", "100개체 CP", "레이드 CP표", "개체값 CP", "15 15 15 CP", "5성 레이드", "메가 레이드", "포켓몬고 꿀박"],
   ogTitle: "포켓몬고 현재 레이드 보스 · 100% CP", ogDesc: "5성·메가·3성 보스 100% CP + 약점 딜러",
+  metaTitleF: (names) => `포켓몬고 현재 레이드 보스 — ${names} · 100% CP표 | GBL Note`,
+  metaDescF: (names) => `지금 열린 레이드 보스: ${names}. 보스별 개체값(IV)별 포획 CP표 — 100개체(15/15/15) CP를 일반·날씨부스트 기준으로 확인. 약점 속성·추천 딜러까지.`,
 };
 
 const en: BossesDict = {
@@ -109,6 +114,8 @@ const en: BossesDict = {
   metaDesc: "Live Pokémon GO 5-star and Mega raid bosses. Per-IV catch CP table for each boss — check the 100% (15/15/15) CP, normal and weather-boosted.",
   metaKeywords: ["pokemon go raid bosses", "100 IV CP", "hundo CP", "raid CP table", "IV CP", "15 15 15 CP", "5-star raid", "mega raid", "pokemon go raid"],
   ogTitle: "Pokémon GO Current Raid Bosses · 100% CP", ogDesc: "5-star, Mega and 3-star boss 100% CP + weakness attackers",
+  metaTitleF: (names) => `Pokémon GO Raid Bosses Now — ${names} · 100% CP | GBL Note`,
+  metaDescF: (names) => `Live raid bosses right now: ${names}. Per-IV catch CP table for each boss — 100% (15/15/15) CP, normal and weather-boosted, plus weaknesses and attackers.`,
 };
 
 const ja: BossesDict = {
@@ -155,6 +162,8 @@ const ja: BossesDict = {
   metaDesc: "開催中のポケモンGO 5★・メガレイドボス一覧。ボスごとの個体値(IV)別 捕獲CP表 — 100%(15/15/15)CPを通常・天候ブースト基準で確認。弱点タイプ・おすすめアタッカーまで。自動更新。",
   metaKeywords: ["ポケモンGO レイドボス", "100% CP", "個体値CP", "レイドCP表", "IV CP", "15 15 15 CP", "5★レイド", "メガレイド", "ポケモンGO"],
   ogTitle: "ポケモンGO 現在のレイドボス · 100% CP", ogDesc: "5★・メガ・3★ボスの100% CP + 弱点アタッカー",
+  metaTitleF: (names) => `ポケモンGO 現在のレイドボス — ${names}・100% CP表 | GBL Note`,
+  metaDescF: (names) => `開催中のレイドボス: ${names}。ボスごとの個体値(IV)別 捕獲CP表 — 100%(15/15/15)CPを通常・天候ブースト基準で確認。弱点タイプ・おすすめアタッカーまで。`,
 };
 
 const zhTW: BossesDict = {
@@ -201,6 +210,8 @@ const zhTW: BossesDict = {
   metaDesc: "現正開放的寶可夢 GO 五星·超級團體戰頭目清單。各頭目依個體值(IV)的捕捉 CP 表 — 以一般·天氣加成確認 100 個體（15/15/15）CP。含弱點屬性·推薦攻擊手。自動更新。",
   metaKeywords: ["寶可夢GO 團體戰頭目", "100 CP", "100個體 CP", "團體戰 CP表", "個體值 CP", "15 15 15 CP", "五星團體戰", "超級團體戰"],
   ogTitle: "寶可夢GO 當前團體戰頭目 · 100% CP", ogDesc: "五星·超級·三星頭目 100% CP + 弱點攻擊手",
+  metaTitleF: (names) => `寶可夢GO 當前團體戰頭目 — ${names}・100% CP 表 | GBL Note`,
+  metaDescF: (names) => `現正開放的頭目：${names}。各頭目依個體值的捕捉 CP 表 — 以一般·天氣加成確認 100 個體（15/15/15）CP。含弱點屬性·推薦攻擊手。`,
 };
 
 const B = { ko, en, ja, "zh-TW": zhTW } as const;

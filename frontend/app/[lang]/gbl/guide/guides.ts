@@ -30,7 +30,7 @@ export const GUIDES: Record<string, Guide> = {
       "zh-TW": ["寶可夢GO 屬性相剋表", "寶可夢GO 弱點表", "寶可夢GO 屬性弱點", "寶可夢GO 相剋", "寶可夢GO 雙重弱點", "GO 屬性倍率"],
     },
     ko: {
-      title: "포켓몬GO 타입 상성·약점표 — 18타입 한눈에 (GO 배율 기준)",
+      title: "포켓몬고 타입 상성표 · 약점표 — 18타입 전체 (GO 배율)",
       desc: "포켓몬 GO 배틀리그·레이드의 18타입 약점·반감·이중반감·공격 강점을 한 표로 정리했습니다. 원작과 다른 GO 배율(효과굉장 ×1.6, 반감 ×0.625, 이중약점 ×2.56, 이중반감 ×0.39) 기준입니다.",
       sections: [
         { p: "타입 상성은 배틀리그(PvP)든 레이드(PvE)든 승패의 핵심입니다. 상대의 약점을 찌르는 기술은 데미지가 크게 오르고, 반감·이중반감 관계면 크게 줄어듭니다. 아래에 18타입 각각의 약점·반감·이중반감·공격 강점을 표로 정리했으니, 교체 타이밍과 기술 선택에 활용하세요." },
@@ -40,7 +40,7 @@ export const GUIDES: Record<string, Guide> = {
       ],
     },
     en: {
-      title: "Pokémon GO Type Chart & Weakness Table — All 18 Types (GO Multipliers)",
+      title: "Pokémon GO Type Chart — All 18 Type Weaknesses (GO Multipliers)",
       desc: "The weaknesses, resistances, double-resists and offensive coverage of all 18 types for Pokémon GO's Battle League and raids, in one chart — using GO's multipliers (super-effective ×1.6, resist ×0.625, double weak ×2.56, double resist ×0.39).",
       sections: [
         { p: "Type matchups decide battles in both PvP (Battle League) and PvE (raids). Hitting a weakness boosts damage a lot; a resisted or double-resisted matchup cuts it hard. Below is every one of the 18 types with its weaknesses, resistances, double-resists and offensive coverage — use it for switch timing and move choices." },
@@ -50,7 +50,7 @@ export const GUIDES: Record<string, Guide> = {
       ],
     },
     ja: {
-      title: "ポケモンGO タイプ相性・弱点表 — 全18タイプ一覧（GO倍率）",
+      title: "ポケモンGO タイプ相性表・弱点表 — 全18タイプ（GO倍率）",
       desc: "ポケモンGOのバトルリーグ・レイド向けに、全18タイプの弱点・半減・二重半減・攻撃有利を1つの表に整理。原作と異なるGO倍率（効果抜群×1.6、半減×0.625、二重弱点×2.56、二重半減×0.39）基準です。",
       sections: [
         { p: "タイプ相性はPvP（バトルリーグ）でもPvE（レイド）でも勝敗の核心です。弱点を突く技はダメージが大きく上がり、半減・二重半減なら大きく下がります。以下に全18タイプの弱点・半減・二重半減・攻撃有利を表にまとめたので、交代タイミングや技選びに活用してください。" },
@@ -60,7 +60,7 @@ export const GUIDES: Record<string, Guide> = {
       ],
     },
     "zh-TW": {
-      title: "寶可夢GO 屬性相剋·弱點表 — 全18屬性一覽（GO倍率）",
+      title: "寶可夢GO 屬性相剋表·弱點表 — 全18屬性（GO倍率）",
       desc: "為寶可夢GO對戰聯盟·團體戰整理全18屬性的弱點·抵抗·雙重抵抗·攻擊剋制於一表。採用與原作不同的GO倍率（效果絕佳×1.6、抵抗×0.625、雙重弱點×2.56、雙重抵抗×0.39）。",
       sections: [
         { p: "屬性相剋在PvP（對戰聯盟）與PvE（團體戰）都是勝敗核心。攻擊弱點傷害大增，抵抗·雙重抵抗則大減。以下整理全18屬性的弱點·抵抗·雙重抵抗·攻擊剋制，供換場時機與招式選擇參考。" },

@@ -192,7 +192,14 @@ export function genArticle(
   ];
 
   // ── 후킹/리드/마무리 ──
-  const title = pk({ ko: `${nm} 개체값 타협점 — 마스터리그, 어디까지 괜찮을까`, en: `${nm} IV Compromise — How Far Can You Go in Master League?`, ja: `${nm} 個体値の妥協点 — マスターリーグ、どこまでOK？`, zh: `${nm} 個體值妥協點 — 大師聯盟能養到哪？` });
+  // 제목에 결론(타협선)을 그대로 넣는다 — 검색결과에서 답이 보이면 확인하러 들어온다.
+  const title = cmpFail
+    ? (onlyHundo
+      ? pk({ ko: `${nm} 개체값 — 공격 15 필수(미러 CMP) · 마스터리그 타협선`, en: `${nm} IVs — Attack 15 Required (Mirror CMP) · Master League`, ja: `${nm} 個体値 — 攻撃15必須(ミラーCMP)・マスターリーグ妥協線`, zh: `${nm} 個體值 — 攻擊15必須（鏡像CMP）·大師聯盟妥協線` })
+      : pk({ ko: `${nm} 개체값 — 공격 15 필수 · 타협선 ${compromise} (마스터리그)`, en: `${nm} IVs — Attack 15 Required · Line ${compromise} (Master League)`, ja: `${nm} 個体値 — 攻撃15必須・妥協ライン${compromise}(マスターリーグ)`, zh: `${nm} 個體值 — 攻擊15必須·妥協線${compromise}（大師聯盟）` }))
+    : onlyHundo
+      ? pk({ ko: `${nm} 개체값 — 100% 아니면 손해? 마스터리그 전수 시뮬`, en: `${nm} IVs — Do You Need a Hundo? Master League Full Sim`, ja: `${nm} 個体値 — 100%じゃないと損？マスターリーグ全数シミュ`, zh: `${nm} 個體值 — 不是100%就吃虧？大師聯盟全數模擬` })
+      : pk({ ko: `${nm} 개체값 타협점 — ${compromise}까지 100%와 동일 (마스터리그)`, en: `${nm} IV Compromise — ${compromise} Matches a Hundo (Master League)`, ja: `${nm} 個体値の妥協点 — ${compromise}まで100%と同じ(マスターリーグ)`, zh: `${nm} 個體值妥協點 — ${compromise}與100%相同（大師聯盟）` });
   const hook = pk({
     ko: `박스에 ${nm}, XL 겨우 모아 강화하려는데 100%가 안 떴다면 — 강화 버튼 누르기 전에 30초. 마스터 상위 100종을 전수 시뮬해서, 이 개체 그냥 키워도 되는지 정리해뒀습니다.`,
     en: `Got a ${nm} you've been scraping XL for, and it didn't come out 100%? Before you power up — 30 seconds. We simulated the entire Master top 100 to see whether that spread is fine to build.`,

@@ -9,6 +9,9 @@ export type TierDict = {
   emptyData: string;
   explainerH: string; explainerBody: string; loginLink: string;
   metaTitle: string; metaDesc: string; ogTitle: string; ogDesc: string;
+  // 검색결과에서 "지금 1위가 누구냐"가 바로 보이게 — 제목/설명에 현재 시즌 S티어 상위를 주입.
+  metaTitleF: (lg: string, top1: string, season: string) => string;
+  metaDescF: (lg: string, tops: string, season: string) => string;
 };
 
 const ko: TierDict = {
@@ -28,6 +31,8 @@ const ko: TierDict = {
   metaDesc: "S티어 최강 포켓몬은? 티어표(S/A/B) + 포켓몬별 추천 기술배치 + 유저 실측 픽률을 한눈에. 이론 랭킹과 실전 데이터를 함께 봐서 지금 뭘 키울지 바로 결정.",
   ogTitle: "최강 포켓몬 티어표 — 추천 기술 + 실측 픽률",
   ogDesc: "S/A/B 최강 티어 + 추천 기술 + 유저 실측 픽률",
+  metaTitleF: (lg, top1, season) => `포켓몬고 ${lg} 티어표 — 1위 ${top1} · ${season} | GBL Note`,
+  metaDescF: (lg, tops, season) => `${season} ${lg} S티어 상위: ${tops}. S/A/B 전체 티어표에 포켓몬별 추천 노멀·스페셜 기술과 유저 실측 픽률을 함께 표기했습니다.`,
 };
 
 const en: TierDict = {
@@ -47,6 +52,8 @@ const en: TierDict = {
   metaDesc: "(GBL) tier list (S/A/B). See each Pokémon's recommended moveset and real user pick rates. Theory rankings + real battle data combined.",
   ogTitle: "Tier List — movesets + real pick rates",
   ogDesc: "S/A/B tiers + recommended moves + real pick rates",
+  metaTitleF: (lg, top1) => `Pokémon GO ${lg} Tier List — #1 ${top1} | GBL Note`,
+  metaDescF: (lg, tops, season) => `${season} ${lg} top S-tier: ${tops}. Full S/A/B tier list with each Pokémon's recommended moveset and real user pick rates.`,
 };
 
 const ja: TierDict = {
@@ -66,6 +73,8 @@ const ja: TierDict = {
   metaDesc: "(GBL)ティア表(S/A/B)。各ポケモンの推奨技構成と実測ピック率を確認。理論ランキング + 実戦データ。",
   ogTitle: "ティア表 — 技構成 + 実測ピック率",
   ogDesc: "S/A/B ティア + 推奨技 + 実測ピック率",
+  metaTitleF: (lg, top1, season) => `ポケモンGO ${lg} ティア表 — 1位 ${top1}・${season} | GBL Note`,
+  metaDescF: (lg, tops, season) => `${season}${lg}のSティア上位: ${tops}。S/A/B全ティア表に、各ポケモンの推奨技構成と実測ピック率を併記しています。`,
 };
 
 const zhTW: TierDict = {
@@ -85,6 +94,8 @@ const zhTW: TierDict = {
   metaDesc: "對戰聯盟強度表（S/A/B）。查看各寶可夢的推薦招式配置與玩家實測使用率。理論排名 + 實戰資料結合。",
   ogTitle: "強度表 — 招式配置 + 實測使用率",
   ogDesc: "S/A/B 強度 + 推薦招式 + 實測使用率",
+  metaTitleF: (lg, top1, season) => `寶可夢GO ${lg} 強度表 — 第1名 ${top1}・${season} | GBL Note`,
+  metaDescF: (lg, tops, season) => `${season}${lg} S級前段：${tops}。完整 S/A/B 強度表，附各寶可夢推薦配招與玩家實測使用率。`,
 };
 
 const T = { ko, en, ja, "zh-TW": zhTW } as const;

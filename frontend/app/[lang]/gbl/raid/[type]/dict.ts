@@ -12,6 +12,9 @@ export type RaidTypeDict = {
   badgePrimal: string; badgeMega: string; badgeShadow: string; badgeUpcoming: string;
   badgeCoverage: string; badgeCoverageTip: string;
   metaTitle: string; metaDesc: string; ogTitle: string; ogDesc: string;
+  // 검색결과에서 "이 타입 1위가 누구냐"가 바로 보이게 — 제목/설명에 1위·상위 딜러를 주입.
+  metaTitleF: (ty: string, top1: string) => string;
+  metaDescF: (ty: string, tops: string) => string;
 };
 
 const ko: RaidTypeDict = {
@@ -31,6 +34,8 @@ const ko: RaidTypeDict = {
   badgeCoverage: "비자속", badgeCoverageTip: "자속(STAB)이 아닌 이 속성 커버기술로 딜하는 딜러입니다. 공격 종족값·내구가 높아 종합점수(ER) 상위권에 듭니다.",
   metaTitle: "포켓몬 티어 · 레이드 최강 딜러 DPS 순위표 | GBL Note",
   metaDesc: "레이드 최강 딜러 TOP 30 — 실측 DPS·내구(TDO) 종합 순위. 메가·원시·섀도우 포함, 딜러별 추천 기술배치까지 한눈에. 매주 자동 갱신.",
+  metaTitleF: (ty, top1) => `포켓몬고 ${ty} 레이드 딜러 순위 — 1위 ${top1} · DPS 티어표 | GBL Note`,
+  metaDescF: (ty, tops) => `${ty} 레이드 최강 딜러 순위 — 상위는 ${tops}. DPS·내구(TDO) 종합 순위에 메가·원시·섀도우까지 포함, 딜러별 추천 노멀·스페셜 기술도 함께 봅니다.`,
   ogTitle: "레이드 최강 딜러 티어표 — 실측 DPS 순위",
   ogDesc: "레이드 딜러 TOP 30 DPS·내구 순위 + 추천 기술",
 };
@@ -52,6 +57,8 @@ const en: RaidTypeDict = {
   badgeCoverage: "No STAB", badgeCoverageTip: "No same-type (STAB) bonus — hits with a coverage move of this type only. Its high stats keep the Overall score high, but real performance depends on the specific boss matchup.",
   metaTitle: "Pokémon Tier · Raid Attacker DPS Ranking | GBL Note",
   metaDesc: "Raid attacker DPS & bulk ranking. Includes Megas & Shadows with recommended movesets. Optimal raid farming lineups.",
+  metaTitleF: (ty, top1) => `Pokémon GO ${ty} Raid Attackers — #1 ${top1} (DPS Ranking)`,
+  metaDescF: (ty, tops) => `Best ${ty} raid attackers — top picks: ${tops}. DPS and bulk (TDO) ranking including Megas, Primals and Shadows, with each attacker’s recommended moveset.`,
   ogTitle: "Raid Attacker Tiers — DPS ranking",
   ogDesc: "Raid attacker DPS & bulk ranking + recommended moves",
 };
@@ -73,6 +80,8 @@ const ja: RaidTypeDict = {
   badgeCoverage: "不一致", badgeCoverageTip: "タイプ一致(STAB)ボーナスなし — この属性はサブ技のみで攻撃。高種族値で総合スコアは上位ですが、実戦性能は対象ボスとの相性次第です。",
   metaTitle: "ポケモン ティア · レイド最強アタッカー DPS順位 | GBL Note",
   metaDesc: "レイドアタッカーのDPS・耐久順位を掲載。メガ・シャドウ含む推奨技構成まで。弱点を突く最強アタッカーを一覧で確認でき、レイド周回の最適編成に役立ちます。",
+  metaTitleF: (ty, top1) => `ポケモンGO ${ty} レイドアタッカー順位 — 1位 ${top1}・DPS表 | GBL Note`,
+  metaDescF: (ty, tops) => `${ty}レイド最強アタッカー順位 — 上位は${tops}。DPS・耐久(TDO)の総合順位にメガ・原始・シャドウまで含め、アタッカーごとの推奨技構成も掲載。`,
   ogTitle: "レイドアタッカーティア — DPS順位",
   ogDesc: "レイドアタッカーDPS・耐久順位 + 推奨技",
 };
@@ -94,6 +103,8 @@ const zhTW: RaidTypeDict = {
   badgeCoverage: "非本屬", badgeCoverageTip: "以非屬性一致(STAB)的此屬性招式輸出的攻擊手。攻擊種族值·耐久高，因此進入綜合評分(ER)前段。",
   metaTitle: "寶可夢強度表 · 團體戰攻擊手 DPS 排名 | GBL Note",
   metaDesc: "團體戰攻擊手 DPS·耐久排名。含超級·暗影的推薦招式配置。刷團體戰最佳組合。",
+  metaTitleF: (ty, top1) => `寶可夢GO ${ty} 團體戰攻擊手排名 — 第1名 ${top1}・DPS 表 | GBL Note`,
+  metaDescF: (ty, tops) => `${ty}團體戰最強攻擊手排名 — 前段為${tops}。DPS·耐久(TDO)綜合排名，含超級·原始·暗影，並附各攻擊手推薦配招。`,
   ogTitle: "團體戰攻擊手強度表 — DPS 排名",
   ogDesc: "團體戰攻擊手 DPS·耐久排名 + 推薦招式",
 };

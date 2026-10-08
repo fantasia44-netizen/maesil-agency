@@ -12,7 +12,7 @@ import AdSlot from "../../AdSlot";
 import ListShare from "../../ListShare";
 import { GUIDE_CHIP } from "../../guideLinks";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
-import { leagueName, localName } from "../../contentI18n";
+import { leagueName, localName, gameName } from "../../contentI18n";
 import { typeLabel } from "../../typeLabels";
 import { getDict } from "../../dictionaries";
 import { getTier } from "./dict";
@@ -135,10 +135,15 @@ export function generateMetadata({ params, searchParams }: { params: { lang: str
   const season = resolveSeason(searchParams?.s);
   const isCurrent = season.slug === currentSeason().slug;
   const seasonTag = isCurrent ? "" : ` (${seasonShort(season, lang)})`;
+  // 검색결과 제목/설명에 실제 상위 포켓몬을 노출 — "티어표" 검색자가 알고 싶은 건 "지금 1위".
+  const sLabel = seasonShort(season, lang);
+  const det = (isMegaLeague(params.league) ? DETAIL_S28 : (DETAIL_BY_SLUG[season.slug] || DETAIL)) as Record<string, Detail[]>;
+  const top = (det[params.league] || []).slice(0, 3).map((d) => dispNameOf(lang, d));
+  const sep = lang === "en" ? ", " : lang === "ko" ? "·" : "・";
   // 캐노니컬은 항상 현재 시즌(파라미터 없는 URL). 비현재(미리보기/아카이브)는 색인 제외로 중복 방지.
   return {
-    title: `${lgName} ${t.metaTitle}${seasonTag}`,
-    description: `${lgName} ${t.metaDesc}`,
+    title: top.length ? t.metaTitleF(lgName, top[0], sLabel) : `${lgName} ${t.metaTitle}${seasonTag}`,
+    description: top.length ? t.metaDescF(lgName, top.join(sep), sLabel) : `${lgName} ${t.metaDesc}`,
     alternates: { canonical: localizePath(lang, `/gbl/tier/${params.league}`), languages: hreflangLanguages(`/gbl/tier/${params.league}`) },
     ...(isCurrent ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
@@ -288,7 +293,7 @@ export default async function TierPage({ params, searchParams }: { params: { lan
         )}
 
         <h1 style={{ margin: "0.2rem 0", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>
-          {lgName} {t.h1Suffix}
+          {gameName(lang)} {lgName} {t.h1Suffix}
         </h1>
         <p style={{ margin: "0.4rem 0 0.2rem", fontSize: "0.9rem", color: "#475569", lineHeight: 1.7 }}>
           {t.intro1}

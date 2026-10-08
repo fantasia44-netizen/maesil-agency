@@ -36,6 +36,13 @@ const LEAGUE: Record<Locale, Record<string, { name: string; short: string }>> = 
   },
 };
 
+// 게임명 — 각 언어권의 실제 검색어 표기. 제목·H1에 붙여 검색어와 문자열을 맞춘다.
+// (ko "포켓몬고" / ja "ポケモンGO" / zh-TW "寶可夢GO" 가 현지 실검 표기)
+const GAME: Record<Locale, string> = { ko: "포켓몬고", en: "Pokémon GO", ja: "ポケモンGO", "zh-TW": "寶可夢GO" };
+export function gameName(locale: Locale): string {
+  return GAME[locale] || GAME.ko;
+}
+
 export function leagueName(locale: Locale, key: string): string {
   return LEAGUE[locale]?.[key]?.name || LEAGUE.ko[key]?.name || key;
 }

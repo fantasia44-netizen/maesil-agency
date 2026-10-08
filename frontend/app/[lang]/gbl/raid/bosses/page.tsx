@@ -11,7 +11,7 @@ import ListShare from "../../ListShare";
 import { pokeSprite, shinySprite, formDex } from "../../sprite";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
 import { typeLabel } from "../../typeLabels";
-import { localName } from "../../contentI18n";
+import { localName, gameName } from "../../contentI18n";
 import { getBosses, type BossesDict } from "./dict";
 const SHINY_L: Record<Locale, { title: string; alt: string }> = {
   ko: { title: "색이 다른 포켓몬 등장 가능", alt: "색이 다른 모습" },
@@ -142,12 +142,30 @@ function bossName(lang: Locale, b: Boss, t: BossesDict): string {
 }
 
 const PATH = "/gbl/raid/bosses";
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+// 제목·설명에 넣을 보스 이름 — 5성·원시·엘리트·메가만(섀도우·1/3성 제외), 중복 제거.
+const META_TIERS = ["5-Star Raids", "Primal Raids", "Elite Raids", "Mega Raids"];
+async function metaBossNames(lang: Locale, t: BossesDict): Promise<string[]> {
+  const bosses = await getBosses2();
+  const out: string[] = [];
+  for (const tier of META_TIERS)
+    for (const b of bosses.filter((x) => x.tier === tier)) {
+      const n = bossName(lang, b, t);
+      if (n && !out.includes(n)) out.push(n);
+    }
+  return out;
+}
+export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getBosses(lang);
+  const names = await metaBossNames(lang, t);
+  const sep = lang === "en" ? ", " : lang === "ko" ? "·" : "・";
   return {
-    title: t.metaTitle,
-    description: t.metaDesc,
+    // 제목은 2마리 기준, 60자를 넘으면 1마리로 줄인다(검색결과 말줄임 방지).
+    title: names.length ? (() => {
+      const two = t.metaTitleF(names.slice(0, 2).join(sep));
+      return two.length <= 60 ? two : t.metaTitleF(names[0]);
+    })() : t.metaTitle,
+    description: names.length ? t.metaDescF(names.slice(0, 5).join(sep)) : t.metaDesc,
     keywords: t.metaKeywords,
     alternates: { canonical: localizePath(lang, PATH), languages: hreflangLanguages(PATH) },
     openGraph: { title: t.ogTitle, description: t.ogDesc, url: localizePath(lang, PATH), images: [`https://gblnote.com${localizePath(lang, PATH + "/opengraph-image")}`], type: "website" },
@@ -196,7 +214,7 @@ export default async function BossesPage({ params }: { params: { lang: string } 
         </div>
 
         <h1 style={{ margin: "0.2rem 0", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>
-          {t.h1}
+          {gameName(lang)} {t.h1}
         </h1>
         <p style={{ margin: "0.4rem 0 0.2rem", fontSize: "0.9rem", color: "#475569", lineHeight: 1.7 }}>
           {t.intro.map((s, i) => s.b ? <b key={i} style={{ color: "#334155" }}>{s.t}</b> : <span key={i}>{s.t}</span>)}

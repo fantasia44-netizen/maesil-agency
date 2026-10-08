@@ -14,6 +14,7 @@ import { GUIDE_CHIP } from "../../guideLinks";
 import { monSprite, formDex } from "../../sprite";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
 import { typeLabel } from "../../typeLabels";
+import { gameName } from "../../contentI18n";
 import { getDict } from "../../dictionaries";
 import { getRaidType } from "./dict";
 import { dexPath, RAID_DEFAULT_VER, zhBaseNameOfSid } from "../../dexHub";
@@ -80,9 +81,13 @@ export function generateMetadata({ params, searchParams }: { params: { lang: str
   const tName = typeLabel(lang, params.type);
   const d = getRaidType(lang);
   const isCurrent = !(searchParams?.v && searchParams.v !== "current" && RAID_BY_VER[searchParams.v]);
+  // 해당 타입 상위 딜러 이름 — 캐노니컬(기본 버전) 데이터 기준. 미출시(upcoming) 제외.
+  const ver = (searchParams?.v && RAID_BY_VER[searchParams.v]) ? searchParams.v : DEFAULT_VER;
+  const top = (RAID_BY_VER[ver]?.types?.[params.type] || []).filter((r) => !r.upcoming).slice(0, 3).map((r) => rowName(lang, r));
+  const sep = lang === "en" ? ", " : lang === "ko" ? "·" : "・";
   return {
-    title: `${tName} ${d.metaTitle}`,
-    description: `${tName} ${d.metaDesc}`,
+    title: top.length ? d.metaTitleF(tName, top[0]) : `${tName} ${d.metaTitle}`,
+    description: top.length ? d.metaDescF(tName, top.join(sep)) : `${tName} ${d.metaDesc}`,
     alternates: { canonical: localizePath(lang, `/gbl/raid/${params.type}`), languages: hreflangLanguages(`/gbl/raid/${params.type}`) },
     ...(isCurrent ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
@@ -180,7 +185,7 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
         </div>
 
         <h1 style={{ margin: "0.2rem 0", fontSize: "1.5rem", fontWeight: 900, color: "#0f172a", lineHeight: 1.3 }}>
-          <span style={{ color: c }}>{tName}{d.h1TypeWord}</span>{d.h1Rest}
+          {gameName(lang)} <span style={{ color: c }}>{tName}{d.h1TypeWord}</span>{d.h1Rest}
         </h1>
         <p style={{ margin: "0.4rem 0 0.2rem", fontSize: "0.9rem", color: "#475569", lineHeight: 1.7 }}>
           {d.intro1.replace("{t}", tName)}
