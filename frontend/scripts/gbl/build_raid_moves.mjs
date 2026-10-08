@@ -63,6 +63,7 @@ const r1 = (x) => { const y = x * 10, f = Math.floor(y); return (Math.abs(y - f 
 // 포켓몬별 (노멀, 스페셜) 전 조합의 사이클 DPS — 기술마다 "그 기술을 포함한 최고 조합"을 고른다.
 const best = {};   // moveId → [{ sid, pair, dps, n, t, fl }]
 const total = {};  // moveId → 그 기술을 배우는 대상 수
+const bestOf = {}; // speciesId → 그 포켓몬의 최고 조합 { f, c, dps, fl }
 for (const p of pool) {
   const sid = p.speciesId, types = new Set((p.types || []).filter((t) => t && t !== "none"));
   const atk = (p.baseStats.atk + 15) * CPM40 * (isShadow(p) ? SHADOW_ATK : 1);
@@ -81,6 +82,8 @@ for (const p of pool) {
       // 잠재파워 자신의 페이지에서는 그 타입을 가졌을 때의 값으로 계산해 보여 준다.
       if (!/^HIDDEN_POWER_/.test(f.id)) put(c.id, { sid, pair: f.id, dps, n, t, fl });
       put(f.id, { sid, pair: c.id, dps, n, t, fl });
+      // 이 포켓몬의 레이드 최고 기술배치(도감 페이지용) — 딜러표와 같은 조건이라 잠재파워 제외. 메가는 도감 페이지가 없어 뺀다.
+      if (!/^HIDDEN_POWER_/.test(f.id) && !isMega(p) && (!bestOf[sid] || dps > bestOf[sid].dps)) bestOf[sid] = { f: f.id, c: c.id, dps, fl };
     }
   }
   for (const x of [...fasts, ...chargeds]) total[x.id] = (total[x.id] || 0) + 1;
@@ -111,7 +114,10 @@ for (const sid of used) {
 }
 
 const stamp = pm.find((t) => t.data?.moveSettings) ? new Date().toISOString().slice(0, 10) : "";
-writeFileSync(join(GBL, "gbl_raid_moves.json"), JSON.stringify({ generatedAt: stamp, moves, names }));
+// 포켓몬별 최고 기술배치 — [노멀 id, 스페셜 id, 사이클 DPS, 레거시 플래그]. 두 기술 모두 페이지가 있는 것만.
+const bestSets = {};
+for (const [sid, b] of Object.entries(bestOf)) if (moves[b.f] && moves[b.c]) bestSets[sid] = [b.f, b.c, r1(b.dps), b.fl];
+writeFileSync(join(GBL, "gbl_raid_moves.json"), JSON.stringify({ generatedAt: stamp, moves, names, best: bestSets }));
 const ids = Object.keys(moves);
 console.log(`gbl_raid_moves.json — 기술 ${ids.length} (제외 ${skipped.length}: ${skipped.join(", ")}) · 이름 보충 ${Object.keys(names).length} · 대상 포켓몬 ${pool.length}`);
 const noUser = ids.filter((id) => !moves[id].top.length);

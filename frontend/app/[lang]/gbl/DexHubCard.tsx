@@ -8,6 +8,17 @@ import { typeLabel, TYPE_COLOR } from "./typeLabels";
 import { standings, raidRanksOfForm, ivKeyOf } from "./dexHub";
 import { siblingForm } from "./indexGate";
 import { PUBLISHED_ANALYSIS } from "./iv/analysis/published";
+import { moveName, type Move } from "./moves/movesData";
+import { bestRaidSet } from "./raid/moves/raidMovesData";
+
+// 레이드 기술 줄 — 이 포켓몬의 레이드 최고 기술배치(딜러 티어표와 같은 조건)와 각 기술의 레이드 수치 페이지 링크.
+// 딜러표(타입별 상위 30)에 못 든 포켓몬도 이 줄은 나온다 → 모든 도감 페이지에서 레이드 기술로 넘어갈 수 있음.
+const RS: Record<Locale, { label: string; dps: string; all: string }> = {
+  ko: { label: "레이드 기술", dps: "사이클 DPS", all: "레이드 기술 도감 →" },
+  en: { label: "Raid moves", dps: "Cycle DPS", all: "Raid Move Dex →" },
+  ja: { label: "レイド技", dps: "サイクルDPS", all: "レイド技図鑑 →" },
+  "zh-TW": { label: "團體戰招式", dps: "循環DPS", all: "團體戰招式圖鑑 →" },
+};
 
 const T: Record<Locale, { h: string; battle: string; raid: string; iv: string; rank: (n: number) => string; shadow: string; mega: string; ivCheck: string; ivDeep: string; noRank: string; raidAll: string }> = {
   ko: { h: "이 포켓몬의 다른 정보", battle: "배틀리그", raid: "레이드", iv: "개체값", rank: (n) => `${n}위`, shadow: "섀도우", mega: "메가", ivCheck: "IV 순위 보기 →", ivDeep: "타협 개체 분석 →", noRank: "랭킹 없음", raidAll: "딜러 티어 전체 →" },
@@ -30,6 +41,18 @@ export default function DexHub({ lang, id, dex, league }: { lang: Locale; id: st
   const L = (p: string) => localizePath(lang, p);
   const st = standings(id);
   const raids = raidRanksOfForm(dex, id).slice(0, 8);
+  const raidSet = bestRaidSet(id);
+  // 그림자 폼이 같은 기술배치를 쓰면 그 DPS도 옆에 적는다(그림자 페이지가 이 페이지로 통합된 종이 많아, 레이드 주력인 섀도우 수치가 빠지지 않게).
+  const shSet = !id.endsWith("_shadow") ? bestRaidSet(`${id}_shadow`) : null;
+  const shadowDps = raidSet && shSet && shSet.fast.id === raidSet.fast.id && shSet.charged.id === raidSet.charged.id ? shSet.dps : 0;
+  const moveChip = (m: Move, legacy: boolean) => {
+    const c = TYPE_COLOR[m.type] || "#64748b";
+    return (
+      <Link prefetch={false} href={L(`/gbl/raid/moves/${m.slug}`)} style={{ fontSize: "0.74rem", fontWeight: 700, padding: "2px 9px", borderRadius: 10, textDecoration: "none", whiteSpace: "nowrap", background: c + "1c", color: c, border: `1px solid ${c}50` }}>
+        {moveName(lang, m)}{legacy && <span style={{ color: "#d97706", marginLeft: 2 }}>★</span>}
+      </Link>
+    );
+  };
   const ivKey = ivKeyOf(id);
   const sib = league ? siblingForm(league, id) : null;
   const baseId = id.replace(/_shadow$/, "");
@@ -74,6 +97,18 @@ export default function DexHub({ lang, id, dex, league }: { lang: Locale; id: st
             );
           })}
           <Link href={L("/gbl/raid")} style={{ fontSize: "0.72rem", color: "#ea580c", textDecoration: "none", fontWeight: 700 }}>{t.raidAll}</Link>
+        </div>
+      )}
+
+      {/* 레이드 기술 — 최고 기술배치(노멀 + 스페셜)와 사이클 DPS. 기술을 누르면 레이드 수치 페이지로 */}
+      {raidSet && (
+        <div style={row}>
+          <span style={label}>{RS[lang].label}</span>
+          {moveChip(raidSet.fast, raidSet.legacyFast)}
+          <span style={{ fontSize: "0.72rem", color: "#94a3b8" }}>+</span>
+          {moveChip(raidSet.charged, raidSet.legacyCharged)}
+          <span style={{ fontSize: "0.72rem", color: "#64748b", fontWeight: 600 }}>{RS[lang].dps} <b style={{ color: "#0f172a" }}>{raidSet.dps.toFixed(1)}</b>{shadowDps > 0 && <> · <span style={{ color: "#6d28d9" }}>{t.shadow} <b>{shadowDps.toFixed(1)}</b></span></>}</span>
+          <Link href={L("/gbl/raid/moves")} style={{ fontSize: "0.72rem", color: "#ea580c", textDecoration: "none", fontWeight: 700 }}>{RS[lang].all}</Link>
         </div>
       )}
 

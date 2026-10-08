@@ -12,7 +12,8 @@ import type { Locale } from "../../../../../lib/i18n";
 type TopRaw = [string, string, number, number, number, number];
 type RawMove = { p: number; d: number; e: number; ws: number; we: number; n: number; top: TopRaw[] };
 type RawName = { ko: string; en: string; ja: string; "zh-TW": string; dex: number };
-const DATA = RAW as unknown as { generatedAt: string; moves: Record<string, RawMove>; names: Record<string, RawName> };
+// best = 포켓몬별 레이드 최고 기술배치 [노멀 id, 스페셜 id, 사이클 DPS, 레거시 플래그(1=스페셜, 2=노멀)]
+const DATA = RAW as unknown as { generatedAt: string; moves: Record<string, RawMove>; names: Record<string, RawName>; best: Record<string, [string, string, number, number]> };
 const own = (o: object, k: string) => Object.prototype.hasOwnProperty.call(o, k);
 
 export type RaidMove = { m: Move; power: number; dur: number; energy: number; ws: number; learners: number; top: TopRaw[] };
@@ -64,6 +65,17 @@ export function topUsers(lang: Locale, x: RaidMove): TopRow[] {
     pair: moveExact(pairId), pairId, dps: d, n, time,
     legacySelf: !!(fl & (isCharged ? 1 : 2)), legacyPair: !!(fl & (isCharged ? 2 : 1)),
   }));
+}
+
+// ── 포켓몬별 레이드 최고 기술배치(도감 → 레이드 기술 연결용) ──────────
+// 딜러 티어표와 같은 조건(레벨 40 · 상대 방어 180 · 스페셜 기술 타입이 약점)에서 사이클 DPS가 가장 높은 조합.
+// 표(타입별 상위 30)에 못 든 포켓몬도 값이 있다 — 모든 도감 페이지에서 레이드 기술로 넘어갈 수 있게.
+export type RaidSet = { fast: Move; charged: Move; dps: number; legacyFast: boolean; legacyCharged: boolean };
+export function bestRaidSet(sid: string): RaidSet | null {
+  if (!own(DATA.best || {}, sid)) return null;
+  const [f, c, d, fl] = DATA.best[sid];
+  const fast = moveExact(f), charged = moveExact(c);
+  return fast && charged && BY_ID[f] && BY_ID[c] ? { fast, charged, dps: d, legacyFast: !!(fl & 2), legacyCharged: !!(fl & 1) } : null;
 }
 
 // ── 딜러 티어표 채용(기본 버전의 타입별 상위 30) ───────────────────────
