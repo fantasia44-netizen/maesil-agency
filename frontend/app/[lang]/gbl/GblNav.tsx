@@ -5,6 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { locales, localeMeta, isLocale, defaultLocale, localizePath, type Locale } from "../../../lib/i18n";
+import { newsOpen } from "./news/locales";
 
 type Item = { path: string };
 type Group = { key: string; href: string; items?: Item[] };
@@ -14,6 +15,7 @@ const GROUPS: Group[] = [
     { path: "/gbl/raid" }, { path: "/gbl/raid/schedule" }, { path: "/gbl/raid/bosses" }, { path: "/gbl/raid/moves" }, { path: "/gbl/trade" },
   ] },
   { key: "events", href: "/gbl/events" },
+  { key: "news", href: "/gbl/news" },
   { key: "pvp", href: "/gbl/tier/master", items: [
     { path: "/gbl/tier/master" }, { path: "/gbl/meta" }, { path: "/gbl/sim" }, { path: "/gbl/cmp/master" }, { path: "/gbl/moves" }, { path: "/gbl/iv" }, { path: "/gbl/schedule" },
   ] },
@@ -26,7 +28,7 @@ const GROUPS: Group[] = [
 type Dict = { groups: Record<string, string>; items: Record<string, string>; menu: string; member: string };
 const T: Record<Locale, Dict> = {
   ko: {
-    groups: { raid: "레이드", events: "이벤트", pvp: "배틀리그", guide: "가이드", community: "커뮤니티" },
+    groups: { raid: "레이드", events: "이벤트", news: "뉴스", pvp: "배틀리그", guide: "가이드", community: "커뮤니티" },
     items: {
       "/gbl/raid": "딜러 티어", "/gbl/raid/schedule": "레이드 일정", "/gbl/raid/bosses": "보스 100% CP", "/gbl/raid/moves": "레이드 기술 도감",
       "/gbl/tier/master": "티어표", "/gbl/meta": "실측 메타", "/gbl/sim": "배틀 시뮬레이터", "/gbl/cmp/master": "CMP 우선권", "/gbl/moves": "배틀 기술 도감", "/gbl/iv": "PvP IV 순위", "/gbl/schedule": "시즌 일정",
@@ -35,7 +37,7 @@ const T: Record<Locale, Dict> = {
     menu: "메뉴", member: "회원",
   },
   en: {
-    groups: { raid: "Raids", events: "Events", pvp: "Battle League", guide: "Guides", community: "Community" },
+    groups: { raid: "Raids", events: "Events", news: "News", pvp: "Battle League", guide: "Guides", community: "Community" },
     items: {
       "/gbl/raid": "Attacker Tiers", "/gbl/raid/schedule": "Raid Schedule", "/gbl/raid/bosses": "Boss 100% CP", "/gbl/raid/moves": "Raid Move Dex",
       "/gbl/tier/master": "Tier List", "/gbl/meta": "Live Meta", "/gbl/sim": "Battle Simulator", "/gbl/cmp/master": "CMP Priority", "/gbl/moves": "Battle Move Dex", "/gbl/iv": "PvP IV Ranks", "/gbl/schedule": "Season Schedule",
@@ -44,7 +46,7 @@ const T: Record<Locale, Dict> = {
     menu: "Menu", member: "Members",
   },
   ja: {
-    groups: { raid: "レイド", events: "イベント", pvp: "バトルリーグ", guide: "ガイド", community: "コミュニティ" },
+    groups: { raid: "レイド", events: "イベント", news: "ニュース", pvp: "バトルリーグ", guide: "ガイド", community: "コミュニティ" },
     items: {
       "/gbl/raid": "アタッカー", "/gbl/raid/schedule": "レイド日程", "/gbl/raid/bosses": "ボス100%CP", "/gbl/raid/moves": "レイド技図鑑",
       "/gbl/tier/master": "ティア表", "/gbl/meta": "実測メタ", "/gbl/sim": "バトルシミュレーター", "/gbl/cmp/master": "CMP優先", "/gbl/moves": "バトル技図鑑", "/gbl/iv": "PvP個体値", "/gbl/schedule": "シーズン日程",
@@ -53,7 +55,7 @@ const T: Record<Locale, Dict> = {
     menu: "メニュー", member: "会員",
   },
   "zh-TW": {
-    groups: { raid: "團體戰", events: "活動", pvp: "對戰聯盟", guide: "攻略", community: "社群" },
+    groups: { raid: "團體戰", events: "活動", news: "新聞", pvp: "對戰聯盟", guide: "攻略", community: "社群" },
     items: {
       "/gbl/raid": "攻擊手排行", "/gbl/raid/schedule": "團體戰時程", "/gbl/raid/bosses": "頭目100%CP", "/gbl/raid/moves": "團體戰招式圖鑑",
       "/gbl/tier/master": "強度表", "/gbl/meta": "實測環境", "/gbl/sim": "對戰模擬器", "/gbl/cmp/master": "CMP先攻權", "/gbl/moves": "對戰招式圖鑑", "/gbl/iv": "PvP個體值排名", "/gbl/schedule": "賽季時程",
@@ -82,6 +84,7 @@ export default function GblNav() {
   const lang = localeOf(pathname);
   const t = T[lang] || T.ko;
   const L = (p: string) => localizePath(lang, p);
+  const groups = GROUPS.filter((g) => g.key !== "news" || newsOpen(lang));   // 뉴스는 글이 있는 언어에서만
 
   const [hover, setHover] = useState<string | null>(null);  // 데스크톱 드롭다운
   const [drawer, setDrawer] = useState(false);              // 모바일 드로어
@@ -112,7 +115,7 @@ export default function GblNav() {
 
           {/* ── 데스크톱 그룹 네비 ── */}
           <nav className="gnav-desk" style={{ alignItems: "center", gap: 2, marginLeft: 8 }}>
-            {GROUPS.map((g) => {
+            {groups.map((g) => {
               const active = isActive(g);
               const label = (
                 <Link href={L(g.href)} className="gnav-grpbtn"
@@ -178,7 +181,7 @@ export default function GblNav() {
         {/* ── 모바일 드로어 ── */}
         {drawer && (
           <div className="gnav-mob" style={{ flexDirection: "column", borderTop: `1px solid ${BORDER}`, background: "#fff", padding: "6px 10px 12px", maxHeight: "80vh", overflowY: "auto" }}>
-            {GROUPS.map((g) => {
+            {groups.map((g) => {
               if (!g.items) {
                 return (
                   <Link key={g.key} href={L(g.href)} onClick={() => setDrawer(false)}

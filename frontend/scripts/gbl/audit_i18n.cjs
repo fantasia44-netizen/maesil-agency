@@ -2187,6 +2187,154 @@ var zh2 = {
 var D2 = { ko: ko11, en: en11, ja: ja11, "zh-TW": zh2 };
 var getRaidMoves = (lang) => D2[lang] || ko11;
 
+// app/[lang]/gbl/news/dict.ts
+var ko12 = {
+  navLabel: "\uB274\uC2A4",
+  back: "\u2190 GBL Note",
+  listNav: "\uB274\uC2A4 \uBAA9\uB85D",
+  h1: "\uD3EC\uCF13\uBAAC\uACE0 \uB274\uC2A4 \xB7 \uACF5\uB7B5",
+  intro: "\uD3EC\uCF13\uBAAC GO\uC758 \uC774\uBCA4\uD2B8 \uC18C\uC2DD\uACFC \uB808\uC774\uB4DC \uBCF4\uC2A4 \uACF5\uB7B5\uC744 GBL Note \uB370\uC774\uD130\uC640 \uD568\uAED8 \uC815\uB9AC\uD569\uB2C8\uB2E4. \uAE00\uC5D0 \uB098\uC624\uB294 \uC21C\uC704\uC640 CP\uB294 \uB51C\uB7EC \uD2F0\uC5B4\uD45C\xB7\uB3C4\uAC10\uACFC \uAC19\uC740 \uB370\uC774\uD130\uC5D0\uC11C \uAC00\uC838\uC635\uB2C8\uB2E4.",
+  metaTitle: "\uD3EC\uCF13\uBAAC\uACE0 \uB274\uC2A4 \xB7 \uC774\uBCA4\uD2B8 \uC18C\uC2DD \xB7 \uB808\uC774\uB4DC \uBCF4\uC2A4 \uACF5\uB7B5 | GBL Note",
+  metaDesc: "\uD3EC\uCF13\uBAAC GO \uC774\uBCA4\uD2B8 \uC77C\uC815\uACFC \uBCF4\uC0C1, \uB808\uC774\uB4DC \uBCF4\uC2A4 \uC57D\uC810\xB7\uCD94\uCC9C \uB51C\uB7EC\xB7100% CP, \uC2E0\uADDC \uD3EC\uCF13\uBAAC \uC131\uB2A5 \uBD84\uC11D\uC744 GBL Note \uB370\uC774\uD130\uB85C \uC815\uB9AC\uD55C \uC18C\uC2DD \uBAA8\uC74C.",
+  titleSuffix: " | GBL Note",
+  cat: { raid: "\uB808\uC774\uB4DC \uACF5\uB7B5", event: "\uC774\uBCA4\uD2B8", analysis: "\uBD84\uC11D", battle: "\uBC30\uD2C0\uB9AC\uADF8" },
+  published: (d) => `${d} \uC791\uC131`,
+  updated: (d) => `${d} \uC218\uC815`,
+  toolsH: "\uD568\uAED8 \uBCF4\uBA74 \uC88B\uC740 \uB3C4\uAD6C",
+  moreH: "\uB2E4\uB978 \uC18C\uC2DD",
+  sourcesH: "\uCD9C\uCC98",
+  empty: "\uC544\uC9C1 \uC62C\uB77C\uC628 \uAE00\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.",
+  weakH: "\uC57D\uC810",
+  resistH: "\uBC18\uAC10",
+  doubleWeak: "\uC774\uC911 \uC57D\uC810",
+  upcoming: "\uCD9C\uC2DC \uC608\uC815",
+  cpLabel: "100% \uAC1C\uCCB4 CP",
+  cpBoost: "\uB0A0\uC528 \uBD80\uC2A4\uD2B8",
+  dexLink: "\uB3C4\uAC10 \uBCF4\uAE30 \u2192",
+  colRank: "\uC21C\uC704",
+  colMon: "\uD3EC\uCF13\uBAAC",
+  colType: "\uACF5\uACA9 \uD0C0\uC785",
+  colMoves: "\uCD94\uCC9C \uAE30\uC220",
+  colDps: "\uC0AC\uC774\uD074 DPS",
+  colOverall: "\uC885\uD569",
+  countersSub: "\uB51C\uB7EC \uD2F0\uC5B4\uD45C(\uB808\uBCA8 40 \xB7 \uAC1C\uCCB4\uAC12 15) \uAE30\uC900. \uC57D\uC810 \uD0C0\uC785 \uACF5\uACA9\uC218\uB97C \uD569\uCCD0 \uC885\uD569 \uC810\uC218 \uC21C\uC73C\uB85C \uC815\uB82C\uD588\uC2B5\uB2C8\uB2E4.",
+  raidTopSub: "\uB51C\uB7EC \uD2F0\uC5B4\uD45C(\uB808\uBCA8 40 \xB7 \uAC1C\uCCB4\uAC12 15) \uAE30\uC900 \uC885\uD569 \uC810\uC218 \uC21C.",
+  homeH: "\uCD5C\uC2E0 \uC18C\uC2DD",
+  homeMore: "\uB274\uC2A4 \uC804\uCCB4 \u2192",
+  rssTitle: "GBL Note \u2014 \uD3EC\uCF13\uBAAC\uACE0 \uB274\uC2A4 \xB7 \uACF5\uB7B5",
+  rssDesc: "\uD3EC\uCF13\uBAAC GO \uC774\uBCA4\uD2B8 \uC18C\uC2DD\uACFC \uB808\uC774\uB4DC \uBCF4\uC2A4 \uACF5\uB7B5"
+};
+var en12 = {
+  navLabel: "News",
+  back: "\u2190 GBL Note",
+  listNav: "All news",
+  h1: "Pok\xE9mon GO News & Guides",
+  intro: "Pok\xE9mon GO event news and raid boss guides, backed by GBL Note data. Rankings and CP values in each article come from the same data as the attacker tiers and the Pok\xE9dex pages.",
+  metaTitle: "Pok\xE9mon GO News \u2014 Events & Raid Boss Guides | GBL Note",
+  metaDesc: "Pok\xE9mon GO event schedules and rewards, raid boss weaknesses, best counters and 100% IV CP, and performance analysis of new Pok\xE9mon \u2014 all backed by GBL Note data.",
+  titleSuffix: " | GBL Note",
+  cat: { raid: "Raid guide", event: "Event", analysis: "Analysis", battle: "Battle League" },
+  published: (d) => `Published ${d}`,
+  updated: (d) => `Updated ${d}`,
+  toolsH: "Related tools",
+  moreH: "More news",
+  sourcesH: "Sources",
+  empty: "No articles yet.",
+  weakH: "Weak to",
+  resistH: "Resists",
+  doubleWeak: "double weakness",
+  upcoming: "Upcoming",
+  cpLabel: "100% IV CP",
+  cpBoost: "weather boosted",
+  dexLink: "Pok\xE9dex page \u2192",
+  colRank: "Rank",
+  colMon: "Pok\xE9mon",
+  colType: "Attack type",
+  colMoves: "Moveset",
+  colDps: "Cycle DPS",
+  colOverall: "Overall",
+  countersSub: "From the attacker tiers (Level 40, 15 IVs). Attackers of every weakness type are merged and sorted by overall score.",
+  raidTopSub: "From the attacker tiers (Level 40, 15 IVs), sorted by overall score.",
+  homeH: "Latest news",
+  homeMore: "All news \u2192",
+  rssTitle: "GBL Note \u2014 Pok\xE9mon GO News & Guides",
+  rssDesc: "Pok\xE9mon GO event news and raid boss guides"
+};
+var ja12 = {
+  navLabel: "\u30CB\u30E5\u30FC\u30B9",
+  back: "\u2190 GBL Note",
+  listNav: "\u30CB\u30E5\u30FC\u30B9\u4E00\u89A7",
+  h1: "\u30DD\u30B1\u30E2\u30F3GO \u30CB\u30E5\u30FC\u30B9\u30FB\u653B\u7565",
+  intro: "\u30DD\u30B1\u30E2\u30F3GO\u306E\u30A4\u30D9\u30F3\u30C8\u60C5\u5831\u3068\u30EC\u30A4\u30C9\u30DC\u30B9\u653B\u7565\u3092\u3001GBL Note\u306E\u30C7\u30FC\u30BF\u3068\u3042\u308F\u305B\u3066\u307E\u3068\u3081\u307E\u3059\u3002\u8A18\u4E8B\u5185\u306E\u9806\u4F4D\u3084CP\u306F\u3001\u30A2\u30BF\u30C3\u30AB\u30FC\u30C6\u30A3\u30A2\u3084\u56F3\u9451\u3068\u540C\u3058\u30C7\u30FC\u30BF\u304B\u3089\u53D6\u5F97\u3057\u3066\u3044\u307E\u3059\u3002",
+  metaTitle: "\u30DD\u30B1\u30E2\u30F3GO \u30CB\u30E5\u30FC\u30B9 \xB7 \u30A4\u30D9\u30F3\u30C8\u60C5\u5831 \xB7 \u30EC\u30A4\u30C9\u30DC\u30B9\u653B\u7565 | GBL Note",
+  metaDesc: "\u30DD\u30B1\u30E2\u30F3GO\u306E\u30A4\u30D9\u30F3\u30C8\u65E5\u7A0B\u3068\u5831\u916C\u3001\u30EC\u30A4\u30C9\u30DC\u30B9\u306E\u5F31\u70B9\u30FB\u304A\u3059\u3059\u3081\u30A2\u30BF\u30C3\u30AB\u30FC\u30FB100%\u500B\u4F53CP\u3001\u65B0\u30DD\u30B1\u30E2\u30F3\u306E\u6027\u80FD\u5206\u6790\u3092GBL Note\u306E\u30C7\u30FC\u30BF\u3067\u307E\u3068\u3081\u305F\u30CB\u30E5\u30FC\u30B9\u3002",
+  titleSuffix: " | GBL Note",
+  cat: { raid: "\u30EC\u30A4\u30C9\u653B\u7565", event: "\u30A4\u30D9\u30F3\u30C8", analysis: "\u5206\u6790", battle: "\u30D0\u30C8\u30EB\u30EA\u30FC\u30B0" },
+  published: (d) => `${d} \u516C\u958B`,
+  updated: (d) => `${d} \u66F4\u65B0`,
+  toolsH: "\u3042\u308F\u305B\u3066\u4F7F\u3048\u308B\u30C4\u30FC\u30EB",
+  moreH: "\u307B\u304B\u306E\u30CB\u30E5\u30FC\u30B9",
+  sourcesH: "\u51FA\u5178",
+  empty: "\u307E\u3060\u8A18\u4E8B\u304C\u3042\u308A\u307E\u305B\u3093\u3002",
+  weakH: "\u5F31\u70B9",
+  resistH: "\u534A\u6E1B",
+  doubleWeak: "\u4E8C\u91CD\u5F31\u70B9",
+  upcoming: "\u5B9F\u88C5\u4E88\u5B9A",
+  cpLabel: "100%\u500B\u4F53CP",
+  cpBoost: "\u5929\u5019\u30D6\u30FC\u30B9\u30C8",
+  dexLink: "\u56F3\u9451\u3092\u898B\u308B \u2192",
+  colRank: "\u9806\u4F4D",
+  colMon: "\u30DD\u30B1\u30E2\u30F3",
+  colType: "\u653B\u6483\u30BF\u30A4\u30D7",
+  colMoves: "\u304A\u3059\u3059\u3081\u6280",
+  colDps: "\u30B5\u30A4\u30AF\u30EBDPS",
+  colOverall: "\u7DCF\u5408",
+  countersSub: "\u30A2\u30BF\u30C3\u30AB\u30FC\u30C6\u30A3\u30A2(\u30EC\u30D9\u30EB40 \xB7 \u500B\u4F53\u502415)\u57FA\u6E96\u3002\u5F31\u70B9\u30BF\u30A4\u30D7\u306E\u30A2\u30BF\u30C3\u30AB\u30FC\u3092\u307E\u3068\u3081\u3001\u7DCF\u5408\u30B9\u30B3\u30A2\u9806\u306B\u4E26\u3079\u3066\u3044\u307E\u3059\u3002",
+  raidTopSub: "\u30A2\u30BF\u30C3\u30AB\u30FC\u30C6\u30A3\u30A2(\u30EC\u30D9\u30EB40 \xB7 \u500B\u4F53\u502415)\u57FA\u6E96\u306E\u7DCF\u5408\u30B9\u30B3\u30A2\u9806\u3002",
+  homeH: "\u6700\u65B0\u30CB\u30E5\u30FC\u30B9",
+  homeMore: "\u30CB\u30E5\u30FC\u30B9\u4E00\u89A7 \u2192",
+  rssTitle: "GBL Note \u2014 \u30DD\u30B1\u30E2\u30F3GO \u30CB\u30E5\u30FC\u30B9\u30FB\u653B\u7565",
+  rssDesc: "\u30DD\u30B1\u30E2\u30F3GO\u306E\u30A4\u30D9\u30F3\u30C8\u60C5\u5831\u3068\u30EC\u30A4\u30C9\u30DC\u30B9\u653B\u7565"
+};
+var zh3 = {
+  navLabel: "\u65B0\u805E",
+  back: "\u2190 GBL Note",
+  listNav: "\u65B0\u805E\u5217\u8868",
+  h1: "\u5BF6\u53EF\u5922GO \u65B0\u805E \xB7 \u653B\u7565",
+  intro: "\u4EE5 GBL Note \u7684\u8CC7\u6599\u6574\u7406\u5BF6\u53EF\u5922GO\u7684\u6D3B\u52D5\u6D88\u606F\u8207\u5718\u9AD4\u6230\u982D\u76EE\u653B\u7565\u3002\u6587\u7AE0\u4E2D\u7684\u6392\u540D\u8207CP\uFF0C\u53D6\u81EA\u8207\u653B\u64CA\u624B\u6392\u884C\u3001\u5716\u9451\u76F8\u540C\u7684\u8CC7\u6599\u3002",
+  metaTitle: "\u5BF6\u53EF\u5922GO \u65B0\u805E \xB7 \u6D3B\u52D5\u6D88\u606F \xB7 \u5718\u9AD4\u6230\u982D\u76EE\u653B\u7565 | GBL Note",
+  metaDesc: "\u4EE5 GBL Note \u8CC7\u6599\u6574\u7406\u5BF6\u53EF\u5922GO\u7684\u6D3B\u52D5\u6642\u7A0B\u8207\u734E\u52F5\u3001\u5718\u9AD4\u6230\u982D\u76EE\u5F31\u9EDE\xB7\u63A8\u85A6\u653B\u64CA\u624B\xB7100%\u500B\u9AD4CP\uFF0C\u4EE5\u53CA\u65B0\u5BF6\u53EF\u5922\u7684\u6027\u80FD\u5206\u6790\u3002",
+  titleSuffix: " | GBL Note",
+  cat: { raid: "\u5718\u9AD4\u6230\u653B\u7565", event: "\u6D3B\u52D5", analysis: "\u5206\u6790", battle: "\u5C0D\u6230\u806F\u76DF" },
+  published: (d) => `${d} \u767C\u5E03`,
+  updated: (d) => `${d} \u66F4\u65B0`,
+  toolsH: "\u76F8\u95DC\u5DE5\u5177",
+  moreH: "\u5176\u4ED6\u65B0\u805E",
+  sourcesH: "\u8CC7\u6599\u4F86\u6E90",
+  empty: "\u76EE\u524D\u9084\u6C92\u6709\u6587\u7AE0\u3002",
+  weakH: "\u5F31\u9EDE",
+  resistH: "\u62B5\u6297",
+  doubleWeak: "\u96D9\u91CD\u5F31\u9EDE",
+  upcoming: "\u5373\u5C07\u63A8\u51FA",
+  cpLabel: "100%\u500B\u9AD4CP",
+  cpBoost: "\u5929\u6C23\u52A0\u6210",
+  dexLink: "\u67E5\u770B\u5716\u9451 \u2192",
+  colRank: "\u6392\u540D",
+  colMon: "\u5BF6\u53EF\u5922",
+  colType: "\u653B\u64CA\u5C6C\u6027",
+  colMoves: "\u63A8\u85A6\u62DB\u5F0F",
+  colDps: "\u5FAA\u74B0DPS",
+  colOverall: "\u7D9C\u5408",
+  countersSub: "\u4F9D\u653B\u64CA\u624B\u6392\u884C(\u7B49\u7D1A40 \xB7 \u500B\u9AD4\u503C15)\u3002\u5408\u4F75\u5404\u5F31\u9EDE\u5C6C\u6027\u7684\u653B\u64CA\u624B\uFF0C\u4F9D\u7D9C\u5408\u8A55\u5206\u6392\u5E8F\u3002",
+  raidTopSub: "\u4F9D\u653B\u64CA\u624B\u6392\u884C(\u7B49\u7D1A40 \xB7 \u500B\u9AD4\u503C15)\u7684\u7D9C\u5408\u8A55\u5206\u6392\u5E8F\u3002",
+  homeH: "\u6700\u65B0\u6D88\u606F",
+  homeMore: "\u5168\u90E8\u65B0\u805E \u2192",
+  rssTitle: "GBL Note \u2014 \u5BF6\u53EF\u5922GO \u65B0\u805E \xB7 \u653B\u7565",
+  rssDesc: "\u5BF6\u53EF\u5922GO\u6D3B\u52D5\u6D88\u606F\u8207\u5718\u9AD4\u6230\u982D\u76EE\u653B\u7565"
+};
+var D3 = { ko: ko12, en: en12, ja: ja12, "zh-TW": zh3 };
+var getNews = (lang) => D3[lang] || ko12;
+
 // app/[lang]/gbl/guide/dict.ts
 var idxKo = {
   back: "\u2190 GBL Note",
@@ -2326,7 +2474,7 @@ function getGuideArticle(lang) {
 }
 
 // app/[lang]/gbl/iv/dict.ts
-var ko12 = {
+var ko13 = {
   navBack: "\u2190 GBL Note",
   navTier: "\u{1F3C6} \uD2F0\uC5B4\uD45C",
   h1: "\uD3EC\uCF13\uBAAC\uACE0 PvP IV \uC21C\uC704 \uCCB4\uCEE4",
@@ -2369,7 +2517,7 @@ var ko12 = {
   ogTitle: "\uD3EC\uCF13\uBAAC\uACE0 PvP IV \uC21C\uC704 \uCCB4\uCEE4",
   ogDesc: "\uB9AC\uADF8\uBCC4 \uCD5C\uC801 IV\uB97C \uC2A4\uD0EF\uACF1 \uC21C\uC704\uB85C"
 };
-var en12 = {
+var en13 = {
   navBack: "\u2190 GBL Note",
   navTier: "\u{1F3C6} Tier list",
   h1: "Pok\xE9mon GO PvP IV Rank Checker",
@@ -2412,7 +2560,7 @@ var en12 = {
   ogTitle: "Pok\xE9mon GO PvP IV Rank Checker",
   ogDesc: "Best IVs by league, ranked by stat product"
 };
-var ja12 = {
+var ja13 = {
   navBack: "\u2190 GBL Note",
   navTier: "\u{1F3C6} \u30C6\u30A3\u30A2\u8868",
   h1: "\u30DD\u30B1\u30E2\u30F3GO PvP \u500B\u4F53\u5024\u30E9\u30F3\u30AF\u30C1\u30A7\u30C3\u30AB\u30FC",
@@ -2498,13 +2646,13 @@ var zhTW10 = {
   ogTitle: "\u5BF6\u53EF\u5922GO PvP IV \u6392\u540D\u6AA2\u67E5\u5668",
   ogDesc: "\u4EE5\u80FD\u529B\u503C\u4E58\u7A4D\u6392\u540D\u986F\u793A\u5404\u806F\u76DF\u6700\u4F73 IV"
 };
-var M3 = { ko: ko12, en: en12, ja: ja12, "zh-TW": zhTW10 };
+var M3 = { ko: ko13, en: en13, ja: ja13, "zh-TW": zhTW10 };
 function getIv(lang) {
-  return M3[lang] || ko12;
+  return M3[lang] || ko13;
 }
 
 // app/[lang]/gbl/trade/dict.ts
-var ko13 = {
+var ko14 = {
   navBack: "\u2190 GBL Note",
   h1: "\uD3EC\uCF13\uBAAC GO \uAD50\uD658 \uBAA9\uB85D \uBA54\uC774\uCEE4",
   intro: "\uC6D0\uD558\uB294 \uD3EC\uCF13\uBAAC\uACFC \uC904 \uC218 \uC788\uB294 \uD3EC\uCF13\uBAAC\uC744 \uACE8\uB77C \uAD50\uD658 \uBAA9\uB85D \uC774\uBBF8\uC9C0\uB97C \uB9CC\uB4DC\uC138\uC694. \uC774\uB85C\uCE58\xB7\uCF54\uC2A4\uD2AC\xB7\uB2E4\uC774\uB9E5\uC2A4\uAE4C\uC9C0 \uB123\uC5B4 \uCE74\uD398\xB7\uC624\uD508\uCC44\uD305\uC5D0 \uACF5\uC720\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.",
@@ -2540,7 +2688,7 @@ var ko13 = {
   ogTitle: "\uD3EC\uCF13\uBAAC\uACE0 \uAD50\uD658 \uBAA9\uB85D \uBA54\uC774\uCEE4",
   ogDesc: "\uCF54\uC2A4\uD2AC\xB7\uC774\uB85C\uCE58 \uB123\uC5B4 \uAD50\uD658 \uBAA9\uB85D \uC774\uBBF8\uC9C0 \uB9CC\uB4E4\uAE30"
 };
-var en13 = {
+var en14 = {
   navBack: "\u2190 GBL Note",
   h1: "Pok\xE9mon GO Trade List Maker",
   intro: "Pick the Pok\xE9mon you want and can offer, then make a trade-list image. Add shinies, costumes and Dynamax, and share it to your community.",
@@ -2576,7 +2724,7 @@ var en13 = {
   ogTitle: "Pok\xE9mon GO Trade List Maker",
   ogDesc: "Make trade-list images with costumes & shinies"
 };
-var ja13 = {
+var ja14 = {
   navBack: "\u2190 GBL Note",
   h1: "\u30DD\u30B1\u30E2\u30F3GO \u4EA4\u63DB\u30EA\u30B9\u30C8\u30E1\u30FC\u30AB\u30FC",
   intro: "\u6B32\u3057\u3044\u30DD\u30B1\u30E2\u30F3\u3068\u51FA\u305B\u308B\u30DD\u30B1\u30E2\u30F3\u3092\u9078\u3093\u3067\u4EA4\u63DB\u30EA\u30B9\u30C8\u753B\u50CF\u3092\u4F5C\u6210\u3002\u8272\u9055\u3044\u30FB\u30B3\u30B9\u30C1\u30E5\u30FC\u30E0\u30FB\u30C0\u30A4\u30DE\u30C3\u30AF\u30B9\u3092\u5165\u308C\u3066\u30B3\u30DF\u30E5\u30CB\u30C6\u30A3\u306B\u5171\u6709\u3067\u304D\u307E\u3059\u3002",
@@ -2648,13 +2796,13 @@ var zhTW11 = {
   ogTitle: "\u5BF6\u53EF\u5922GO \u4EA4\u63DB\u6E05\u55AE\xB7\u4EA4\u63DB\u5716\u7522\u751F\u5668",
   ogDesc: "\u52A0\u5165\u9020\u578B\xB7\u7570\u8272\u88FD\u4F5C\u4EA4\u63DB\u6E05\u55AE\xB7\u4EA4\u63DB\u5716"
 };
-var M4 = { ko: ko13, en: en13, ja: ja13, "zh-TW": zhTW11 };
+var M4 = { ko: ko14, en: en14, ja: ja14, "zh-TW": zhTW11 };
 function getTrade(lang) {
-  return M4[lang] || ko13;
+  return M4[lang] || ko14;
 }
 
 // app/[lang]/gbl/sim/dict.ts
-var ko14 = {
+var ko15 = {
   navBack: "\u2190 GBL Note",
   h1: "\uD3EC\uCF13\uBAAC GO PvP \uBC30\uD2C0 \uC2DC\uBBAC\uB808\uC774\uD130",
   intro: "\uB450 \uD3EC\uCF13\uBAAC\uC744 \uBD99\uC5EC\uBCF4\uC138\uC694. \uAC1C\uCCB4\uAC12(\uACF5/\uBC29/\uCCB4)\xB7\uAE30\uC220\xB7\uB808\uBCA8\xB7\uADF8\uB9BC\uC790\xB7\uC2E4\uB4DC\uAE4C\uC9C0 \uC9C0\uC815\uD574 \uC2E4\uC81C \uBC30\uD2C0 \uACB0\uACFC\uB97C \uACC4\uC0B0\uD569\uB2C8\uB2E4.",
@@ -2737,7 +2885,7 @@ var ko14 = {
   ogTitle: "\uD3EC\uCF13\uBAAC\uACE0 PvP \uBC30\uD2C0 \uC2DC\uBBAC\uB808\uC774\uD130",
   ogDesc: "\uAC1C\uCCB4\uAC12\xB7\uAE30\uC220 \uC9C0\uC815 1:1 \uBC30\uD2C0 \uACC4\uC0B0"
 };
-var en14 = {
+var en15 = {
   navBack: "\u2190 GBL Note",
   h1: "Pok\xE9mon GO PvP Battle Simulator",
   intro: "Pit two Pok\xE9mon against each other. Set IVs (Atk/Def/Sta), moves, level, shadow and shields to compute the real battle outcome.",
@@ -2820,7 +2968,7 @@ var en14 = {
   ogTitle: "Pok\xE9mon GO PvP Battle Simulator",
   ogDesc: "1v1 battle calc with custom IVs & moves"
 };
-var ja14 = {
+var ja15 = {
   navBack: "\u2190 GBL Note",
   h1: "\u30DD\u30B1\u30E2\u30F3GO PvP \u30D0\u30C8\u30EB\u30B7\u30DF\u30E5\u30EC\u30FC\u30BF\u30FC",
   intro: "2\u5339\u306E\u30DD\u30B1\u30E2\u30F3\u3092\u5BFE\u6226\u3002\u500B\u4F53\u5024(\u653B/\u9632/HP)\u30FB\u6280\u30FB\u30EC\u30D9\u30EB\u30FB\u30B7\u30E3\u30C9\u30A6\u30FB\u30B7\u30FC\u30EB\u30C9\u3092\u6307\u5B9A\u3057\u3066\u5B9F\u969B\u306E\u30D0\u30C8\u30EB\u7D50\u679C\u3092\u8A08\u7B97\u3057\u307E\u3059\u3002",
@@ -2986,13 +3134,13 @@ var zhTW12 = {
   ogTitle: "\u5BF6\u53EF\u5922GO PvP \u5C0D\u6230\u6A21\u64EC\u5668",
   ogDesc: "\u6307\u5B9A\u500B\u9AD4\u503C\xB7\u62DB\u5F0F\u76841:1\u5C0D\u6230\u8A08\u7B97"
 };
-var M5 = { ko: ko14, en: en14, ja: ja14, "zh-TW": zhTW12 };
+var M5 = { ko: ko15, en: en15, ja: ja15, "zh-TW": zhTW12 };
 function getSim(lang) {
-  return M5[lang] || ko14;
+  return M5[lang] || ko15;
 }
 
 // app/[lang]/gbl/app/dict.ts
-var ko15 = {
+var ko16 = {
   gateH1: "\u{1F4DD} \uB0B4 \uBC30\uD2C0 \uAE30\uB85D",
   gateTitle: "\uD68C\uC6D0 \uC804\uC6A9 \uAE30\uB2A5\uC785\uB2C8\uB2E4",
   gateDescPre: "\uB0B4 \uBC30\uD2C0 \uAE30\uB85D\xB7\uC804\uC801 \uAD00\uB9AC\uB294 ",
@@ -3106,7 +3254,7 @@ var ko15 = {
   editSaved: "\u2705 \uC218\uC815\uB428",
   recordSaved: "\u2705 \uAE30\uB85D \uC800\uC7A5\uB428"
 };
-var en15 = {
+var en16 = {
   gateH1: "\u{1F4DD} My battle log",
   gateTitle: "Members-only feature",
   gateDescPre: "Logging battles and tracking your record is for ",
@@ -3220,7 +3368,7 @@ var en15 = {
   editSaved: "\u2705 Updated",
   recordSaved: "\u2705 Log saved"
 };
-var ja15 = {
+var ja16 = {
   gateH1: "\u{1F4DD} \u81EA\u5206\u306E\u30D0\u30C8\u30EB\u8A18\u9332",
   gateTitle: "\u4F1A\u54E1\u5C02\u7528\u6A5F\u80FD\u3067\u3059",
   gateDescPre: "\u30D0\u30C8\u30EB\u8A18\u9332\u30FB\u6226\u7E3E\u7BA1\u7406\u306F",
@@ -3448,13 +3596,13 @@ var zhTW13 = {
   editSaved: "\u2705 \u5DF2\u4FEE\u6539",
   recordSaved: "\u2705 \u8A18\u9304\u5DF2\u5132\u5B58"
 };
-var M6 = { ko: ko15, en: en15, ja: ja15, "zh-TW": zhTW13 };
+var M6 = { ko: ko16, en: en16, ja: ja16, "zh-TW": zhTW13 };
 function getApp(lang) {
-  return M6[lang] || ko15;
+  return M6[lang] || ko16;
 }
 
 // app/[lang]/gbl/dictionaries/ko.ts
-var ko16 = {
+var ko17 = {
   meta: {
     title: "GBL Note \u2014 \uD3EC\uCF13\uBAACGO \uB808\uC774\uB4DC\xB7\uBC30\uD2C0\xB7\uD2F0\uC5B4\xB7CP \uC62C\uC778\uC6D0",
     description: "\uD3EC\uCF13\uBAAC GO \uB808\uC774\uB4DC \uB51C\uB7EC \uD2F0\uC5B4\xB7\uBCF4\uC2A4 100% CP\xB7\uB808\uC774\uB4DC \uC77C\uC815, \uBC30\uD2C0\uB9AC\uADF8 \uD2F0\uC5B4\xB7\uC2E4\uCE21 \uBA54\uD0C0, \uB0B4 \uC804\uC801 \uAE30\uB85D\uAE4C\uC9C0. \uD3EC\uCF13\uBAAC\uACE0 \uC885\uD569 \uC815\uBCF4\xB7\uB3C4\uAD6C.",
@@ -3533,10 +3681,10 @@ var ko16 = {
     terms: "\uC774\uC6A9\uC57D\uAD00"
   }
 };
-var ko_default = ko16;
+var ko_default = ko17;
 
 // app/[lang]/gbl/dictionaries/en.ts
-var en16 = {
+var en17 = {
   meta: {
     title: "GBL Note \u2014 Pok\xE9mon GO Raids, Battle, Tiers & CP All-in-One",
     description: "Pok\xE9mon GO raid attacker tiers, boss 100% CP, raid schedule, Battle League tiers & encounter meta, plus your battle log. All-in-one GO toolkit.",
@@ -3615,10 +3763,10 @@ var en16 = {
     terms: "Terms"
   }
 };
-var en_default = en16;
+var en_default = en17;
 
 // app/[lang]/gbl/dictionaries/ja.ts
-var ja16 = {
+var ja17 = {
   meta: {
     title: "GBL Note \u2014 \u30DD\u30B1\u30E2\u30F3GO \u30EC\u30A4\u30C9\u30FB\u30D0\u30C8\u30EB\u30FB\u30C6\u30A3\u30A2\u30FBCP \u30AA\u30FC\u30EB\u30A4\u30F3\u30EF\u30F3",
     description: "\u30DD\u30B1\u30E2\u30F3GO\u306E\u30EC\u30A4\u30C9\u30A2\u30BF\u30C3\u30AB\u30FC\u30C6\u30A3\u30A2\u30FB\u30DC\u30B9100%CP\u30FB\u30EC\u30A4\u30C9\u30B9\u30B1\u30B8\u30E5\u30FC\u30EB\u3001\u30D0\u30C8\u30EB\u30EA\u30FC\u30B0\u306E\u30C6\u30A3\u30A2\u30FB\u5B9F\u6E2C\u30E1\u30BF\u3001\u81EA\u5206\u306E\u6226\u7E3E\u307E\u3067\u3002\u30DD\u30B1\u30E2\u30F3GO\u7DCF\u5408\u30C4\u30FC\u30EB\u3002",
@@ -3697,7 +3845,7 @@ var ja16 = {
     terms: "\u5229\u7528\u898F\u7D04"
   }
 };
-var ja_default = ja16;
+var ja_default = ja17;
 
 // app/[lang]/gbl/dictionaries/zh-TW.ts
 var zhTW14 = {
@@ -3795,7 +3943,7 @@ function getDict(lang) {
 }
 
 // app/[lang]/gbl/pokemon/[league]/[id]/dict.ts
-var ko17 = {
+var ko18 = {
   navTier: "\u{1F3C6} \uD2F0\uC5B4\uD45C",
   navCmp: "\u26A1 CMP \uC21C\uC704",
   navMeta: "\u{1F4CA} \uC2E4\uCE21 \uBA54\uD0C0",
@@ -3849,7 +3997,7 @@ var ko17 = {
     loseLabel: "\uC9C0\uB294 \uC0C1\uB300(\uCE74\uC6B4\uD130)"
   }
 };
-var en17 = {
+var en18 = {
   navTier: "\u{1F3C6} Tier list",
   navCmp: "\u26A1 CMP ranking",
   navMeta: "\u{1F4CA} Encounter meta",
@@ -3903,7 +4051,7 @@ var en17 = {
     loseLabel: "Loses to (counters)"
   }
 };
-var ja17 = {
+var ja18 = {
   navTier: "\u{1F3C6} \u30C6\u30A3\u30A2\u8868",
   navCmp: "\u26A1 CMP\u30E9\u30F3\u30AD\u30F3\u30B0",
   navMeta: "\u{1F4CA} \u5B9F\u6E2C\u30E1\u30BF",
@@ -4011,9 +4159,9 @@ var zhTW15 = {
     loseLabel: "\u843D\u6557\u5C0D\u624B\uFF08\u524B\u661F\uFF09"
   }
 };
-var P = { ko: ko17, en: en17, ja: ja17, "zh-TW": zhTW15 };
+var P = { ko: ko18, en: en18, ja: ja18, "zh-TW": zhTW15 };
 function getPoke(lang) {
-  return P[lang] || ko17;
+  return P[lang] || ko18;
 }
 
 // scripts/gbl/audit_i18n.ts
@@ -4031,6 +4179,7 @@ var PACKS = {
   "\uC2E4\uCE21 \uBA54\uD0C0 \uB9AC\uADF8": getLeagueMeta,
   "\uAE30\uC220 \uB3C4\uAC10": getMoves,
   "\uB808\uC774\uB4DC \uAE30\uC220 \uB3C4\uAC10": getRaidMoves,
+  "\uB274\uC2A4": getNews,
   "\uAC00\uC774\uB4DC \uBAA9\uB85D": getGuideIndex,
   "\uAC00\uC774\uB4DC \uBCF8\uBB38": getGuideArticle,
   "IV": getIv,
@@ -4065,12 +4214,12 @@ var ALLOW = /^(GBL Note|gblnote\.com|PvPoke|Pokémon GO|CP|IV|XL|DPS|TDO|CMP|XP|
 var problems = 0;
 for (const [name, get] of Object.entries(PACKS)) {
   const byLocale = Object.fromEntries(LOCALES.map((l) => [l, paths(get(l))]));
-  const ko18 = byLocale.ko;
+  const ko19 = byLocale.ko;
   const msgs = [];
   for (const l of LOCALES) {
     if (l === "ko") continue;
-    const miss = [...ko18.keys()].filter((k) => !byLocale[l].has(k));
-    const extra = [...byLocale[l].keys()].filter((k) => !ko18.has(k));
+    const miss = [...ko19.keys()].filter((k) => !byLocale[l].has(k));
+    const extra = [...byLocale[l].keys()].filter((k) => !ko19.has(k));
     if (miss.length) msgs.push(`  [${l}] \uD0A4 \uB204\uB77D ${miss.length}: ${miss.slice(0, 6).join(", ")}${miss.length > 6 ? " \u2026" : ""}`);
     if (extra.length) msgs.push(`  [${l}] ko\uC5D0 \uC5C6\uB294 \uD0A4 ${extra.length}: ${extra.slice(0, 6).join(", ")}${extra.length > 6 ? " \u2026" : ""}`);
   }

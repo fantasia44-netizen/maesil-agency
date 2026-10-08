@@ -6,6 +6,8 @@ import { IV_ANALYSIS } from "./[lang]/gbl/iv/analysis/registry";
 import { indexableMonIds } from "./[lang]/gbl/indexGate";
 import { indexableMoveSlugs } from "./[lang]/gbl/moves/movesData";
 import { raidMoveSlugs } from "./[lang]/gbl/raid/moves/raidMovesData";
+import { POSTS, postLangs } from "./[lang]/gbl/news/posts";
+import { NEWS_LOCALES } from "./[lang]/gbl/news/locales";
 import { analyzedDeckIds } from "./[lang]/tcg/decks/analysis";
 import { GUIDES as TCG_GUIDES } from "./[lang]/tcg/guides/guides";
 import { locales, localeMeta, localizePath, defaultLocale } from "../lib/i18n";
@@ -88,8 +90,25 @@ function tcgPaths(): [string, CF, number][] {
   ];
 }
 
+// 뉴스 — 목록은 뉴스가 열린 언어만, 글은 그 글의 번역이 있는 언어만. 글의 lastModified는 실제 작성·수정일.
+function newsEntries(base: string): MetadataRoute.Sitemap {
+  const alt = (path: string, ls: readonly (typeof locales)[number][]) => {
+    const out: Record<string, string> = {};
+    for (const l of ls) out[localeMeta[l].htmlLang] = `${base}${localizePath(l, path)}`;
+    out["x-default"] = `${base}${localizePath(defaultLocale, path)}`;
+    return out;
+  };
+  const out: MetadataRoute.Sitemap = [];
+  for (const l of NEWS_LOCALES) out.push({ url: `${base}${localizePath(l, "/gbl/news")}`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8, alternates: { languages: alt("/gbl/news", NEWS_LOCALES) } });
+  for (const p of POSTS) {
+    const ls = postLangs(p), path = `/gbl/news/${p.slug}`;
+    for (const l of ls) out.push({ url: `${base}${localizePath(l, path)}`, lastModified: new Date(`${p.updated || p.published}T09:00:00+09:00`), changeFrequency: "weekly", priority: 0.7, alternates: { languages: alt(path, ls) } });
+  }
+  return out;
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const host = (headers().get("host") || "").toLowerCase();
   if (host.includes("tcgnote")) return build("https://tcgnote.net", tcgPaths());
-  return build("https://gblnote.com", gblPaths());
+  return [...build("https://gblnote.com", gblPaths()), ...newsEntries("https://gblnote.com")];
 }

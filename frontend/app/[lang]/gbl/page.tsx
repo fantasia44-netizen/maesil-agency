@@ -10,6 +10,9 @@ import { dexPathIn } from "./dexHub";
 import { snapNameOf } from "./indexGate";
 import GblLandingClient from "./GblLandingClient";
 import AdSlot from "./AdSlot";
+import { getNews } from "./news/dict";
+import { newsOpen } from "./news/locales";
+import { postsFor, postContent } from "./news/posts";
 import { CORE_FORMATS, MEGA_FORMATS, activeCups, todayISO, type Format } from "./formats";
 
 export const revalidate = 600;
@@ -159,6 +162,26 @@ export default async function GblLandingPage({ params }: { params: { lang: strin
       </div>
 
       <GblLandingClient names={teaserNames(lang)} />
+
+      {/* ── 최신 소식 — 운영자 발행 뉴스·공략 3건(새 글이 홈에서 바로 발견되게) ── */}
+      {newsOpen(lang) && postsFor(lang).length > 0 && (() => { const nt = getNews(lang); return (
+        <div style={{ background: "#f7f9fd", padding: "0.6rem 1rem 0.2rem" }}>
+          <div style={{ maxWidth: 1040, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", margin: "0.4rem 0 8px" }}>
+              <h2 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>{nt.homeH}</h2>
+              <Link href={L("/gbl/news")} style={{ fontSize: "0.76rem", fontWeight: 700, color: "#3b5bdb", textDecoration: "none" }}>{nt.homeMore}</Link>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>
+              {postsFor(lang).slice(0, 3).map((p) => { const c = postContent(p, lang)!; return (
+                <Link key={p.slug} href={L(`/gbl/news/${p.slug}`)} style={{ display: "block", background: "#fff", border: `1px solid ${BORDER}`, borderLeft: "4px solid #ea580c", borderRadius: 10, padding: "0.7rem 0.9rem", textDecoration: "none" }}>
+                  <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "#c2410c", marginBottom: 3 }}>{nt.cat[p.cat]} · {p.updated || p.published}</div>
+                  <div style={{ fontSize: "0.86rem", fontWeight: 800, color: "#0f172a", lineHeight: 1.45 }}>{c.title}</div>
+                </Link>
+              ); })}
+            </div>
+          </div>
+        </div>
+      ); })()}
 
       {/* ── #6 GBL Note 자체 분석(원본 3종) — SSR 노출(원본성 신호). 브랜드 로고 히어로 아래 배치 ── */}
       <div style={{ background: "linear-gradient(180deg,#f7f9fd,#f7f9fd)", padding: "0.5rem 1rem 0.5rem" }}>
