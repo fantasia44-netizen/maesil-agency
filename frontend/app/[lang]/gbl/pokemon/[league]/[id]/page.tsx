@@ -461,8 +461,11 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
           </Link>
         )}
 
-        {/* 데이터 파생 분석 — 강점/약점/평가 3구조. **운영자 노트가 있으면 숨김**(템플릿 산문 대신 사람 판단 우선 = scaled content 인상 제거, GBL_RECOVERY 레버②). 노트 없는 메타몬만 자동 분석 노출. */}
-        {(isMeta ? (hasAnalysis && !noteText) : !!analysis.thinNote) && (
+        {/* 데이터 파생 분석 — 강점/약점/평가 3구조. **운영자 노트가 있으면 숨김**(사람 판단 우선, GBL_RECOVERY 레버②).
+            2026-10-09(사용자 결정 "새로 들어온 애들은 써보지 않아 쓸 말이 없다 → 자동 생성으로 채워라"):
+            메타몬(S/A·노트 보유)뿐 아니라 색인되는 전 종에 분석을 노출. 이전엔 비메타 페이지가
+            제목 + "분석 기준" + "실측 표본 부족"만 찍고 본문이 비어, "아래 분석은…"이라 쓴 뒤 아무것도 없었음. */}
+        {(hasAnalysis || !!analysis.thinNote) && !noteText && (
           <div style={{ marginTop: 14, background: `linear-gradient(180deg, ${c1}0d, #ffffff 60%)`, border: `1px solid ${BORDER}`, borderRadius: 12, padding: "0.9rem 1.05rem" }}>
             <h2 style={{ margin: "0 0 2px", fontSize: "0.95rem", fontWeight: 800, color: "#0f172a" }}>{aTitle}</h2>
             {/* 분석 기준 명시(#4) — "긁은 DB"가 아니라 두 데이터 소스 조합·해석임을 첫 화면에서 노출 */}
@@ -473,7 +476,7 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
                 {analysis.thinNote}
               </p>
             )}
-            {isMeta && analysis.strengths.length > 0 && (
+            {analysis.strengths.length > 0 && (
               <>
                 <h3 style={{ margin: "10px 0 4px", fontSize: "0.86rem", fontWeight: 800, color: "#15803d" }}>✔ {aH.strengths}</h3>
                 <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.84rem", color: "#334155", lineHeight: 1.75 }}>
@@ -481,7 +484,7 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
                 </ul>
               </>
             )}
-            {isMeta && analysis.weaknesses.length > 0 && (
+            {analysis.weaknesses.length > 0 && (
               <>
                 <h3 style={{ margin: "12px 0 4px", fontSize: "0.86rem", fontWeight: 800, color: "#b45309" }}>⚠ {aH.weaknesses}</h3>
                 <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.84rem", color: "#334155", lineHeight: 1.75 }}>
@@ -489,7 +492,7 @@ export default async function PokemonDetail({ params, searchParams }: { params: 
                 </ul>
               </>
             )}
-            {isMeta && analysis.verdict && (
+            {analysis.verdict && (
               <>
                 <h3 style={{ margin: "12px 0 4px", fontSize: "0.86rem", fontWeight: 800, color: "#3b5bdb" }}>{aH.verdict}</h3>
                 <p style={{ margin: 0, fontSize: "0.84rem", color: "#334155", lineHeight: 1.8 }}>{analysis.verdict}</p>

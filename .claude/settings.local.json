@@ -432,7 +432,10 @@
       "Bash(awk '/^### 2026-10/{p=1} p' GBL_RECOVERY.md)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" \"http://localhost:3000/ko/gbl/tier/great\")",
       "Bash(curl -s \"http://localhost:3000/ko/gbl/tier/great\")",
-      "Bash(curl -s \"http://localhost:3000/gbl/tier/great\")"
+      "Bash(curl -s \"http://localhost:3000/gbl/tier/great\")",
+      "Bash(curl -s \"http://localhost:3000/gbl/pokemon/great/oranguru\")",
+      "Bash(curl -s \"http://localhost:3000/gbl/pokemon/great/oranguru\" -o scratch_o.html)",
+      "Bash(rm -f scratch_o.html)"
     ]
   }
 }
