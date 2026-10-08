@@ -446,7 +446,8 @@
       "Bash(curl -s -o p3361.png \"https://raw.githubusercontent.com/WatWowMap/wwm-uicons/main/pokemon/25_f3361.png\")",
       "Bash(git mv *)",
       "Bash(mv \"app/[lang]/gbl/events/eventExtras.ts\" \"app/[lang]/gbl/events/eventManual.ts\")",
-      "Bash(curl -s \"http://localhost:3000/gbl/events\" -o /dev/null --max-time 180 -w \"%{http_code}\\\\n\")"
+      "Bash(curl -s \"http://localhost:3000/gbl/events\" -o /dev/null --max-time 180 -w \"%{http_code}\\\\n\")",
+      "Bash(git commit -q -m 'docs\\(gbl-events\\): 수동 보강 운영 규칙 명문화 \\(A안 — 큰 이벤트만 월 1~2건\\) *)"
     ]
   }
 }
