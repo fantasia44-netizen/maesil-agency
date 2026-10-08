@@ -145,6 +145,8 @@ const ja: EventsDict = {
   months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
   dynamax: "ダイマックス", evtClassic: "クラシック",
   evtNameMap: {
+    "LEGO Stores and Pokémon GO": "レゴストア & ポケモンGO",
+    "PokémonXP & 2026 Worlds": "PokémonXP & 2026 世界大会",
     "Ultra Unlock: Water Festival": "ウルトラアンロック: ウォーターフェスティバル",
     "Mega Ascension": "メガアセンション",
     "10th Anniversary Celebration - Perfect Mewtwo Timed Research": "10周年記念 · パーフェクトミュウツー タイムチャレンジ",
@@ -188,6 +190,12 @@ const zhTW: EventsDict = {
   months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
   dynamax: "極巨化", evtClassic: "經典",
   evtNameMap: {
+    "LEGO Stores and Pokémon GO": "樂高商店 & 寶可夢GO",
+    "Ultra Unlock: Water Festival": "究極解鎖：水之慶典",
+    "PokémonXP & 2026 Worlds": "PokémonXP & 2026 世界錦標賽",
+    "Mega Ascension": "超級進化飛升",
+    "10th Anniversary Celebration - Perfect Mewtwo Timed Research": "10週年紀念 · 完美超夢限時調查",
+    "Twitch Drops for 2026 Pokémon World Championships": "2026 世界錦標賽 Twitch 掉寶",
     "Twilight Trails": "黃昏旅途",
     "adidas × Pokémon Timed Research": "adidas × 寶可夢 限時調查",
   },

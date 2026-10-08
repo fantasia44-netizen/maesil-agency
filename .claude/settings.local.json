@@ -467,7 +467,13 @@
       "Bash(rm -f scratch_groudon.cjs)",
       "Bash(node scripts/gbl/verify_iv_integrity.cjs)",
       "Bash(curl -s --max-time 120 \"http://localhost:3000/gbl/iv\" -o s.html -w \"%{http_code}\\\\n\")",
-      "Bash(curl -s --max-time 120 \"http://localhost:3000/sitemap.xml\")"
+      "Bash(curl -s --max-time 120 \"http://localhost:3000/sitemap.xml\")",
+      "Bash(curl -s --max-time 90 \"https://gblnote.com/sitemap.xml\" -o live.xml -w \"http %{http_code}\\\\n\")",
+      "Bash(node scripts/gbl/audit_hardcode.cjs)",
+      "Bash(awk '/^■ app\\\\/\\\\[lang\\\\]\\\\/gbl/{p=1} /^■ app\\\\/\\\\[lang\\\\]\\\\/tcg/{p=0} p')",
+      "Bash(node scripts/gbl/audit_render_i18n.cjs)",
+      "Bash(curl -s --max-time 180 \"http://localhost:3000/en/gbl/meta\" -o s.html)",
+      "Bash(node scripts/gbl/audit_terms.cjs 40)"
     ]
   }
 }

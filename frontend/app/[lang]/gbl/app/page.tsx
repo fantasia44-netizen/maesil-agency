@@ -15,7 +15,7 @@ import { monSlug as _slug } from "../monSlug";
 import AdSlot from "../AdSlot";
 import ShareModal from "../ShareModal";
 import { track } from "../../../../lib/track";
-import { currentFormats, FORMAT_BY_KEY, ALL_FORMATS, todayISO, type Format } from "../formats";
+import { currentFormats, FORMAT_BY_KEY, ALL_FORMATS, todayISO, formatLabel, formatNote, type Format } from "../formats";
 import { isLocale, defaultLocale, localizePath, type Locale } from "../../../../lib/i18n";
 import { leagueName } from "../contentI18n";
 import { getApp, type AppDict } from "./dict";
@@ -142,7 +142,7 @@ const monName = (lang: Locale, m: Mon | null | undefined): string => {
   return m.ko;
 };
 const moveLabel = (lang: Locale, mv?: Move): string => mv ? (lang === "ko" ? mv.ko : lang === "ja" ? (mv.ja || mv.en || mv.ko) : lang === "zh-TW" ? ((mv as Record<string, string>)["zh-TW"] || mv.en || mv.ko) : (mv.en || mv.ko)) : "";
-const fmtLabel = (lang: Locale, f?: Format): string => f ? (f.cup ? f.label : leagueName(lang, f.base)) : "";
+const fmtLabel = (lang: Locale, f?: Format): string => f ? (f.cup ? formatLabel(f, lang) : leagueName(lang, f.base)) : "";
 const periodLabel = (t: AppDict, key: string): string =>
   key === "today" ? t.periodToday : key === "7" ? t.period7 : key === "30" ? t.period30
     : key === "season" ? t.periodSeason : t.periodAll;
@@ -1007,7 +1007,7 @@ export default function GblPage() {
         {formats.map((f) => {
           const on = league === f.key;
           return (
-            <button key={f.key} onClick={() => changeLeague(f.key)} title={f.note || ""}
+            <button key={f.key} onClick={() => changeLeague(f.key)} title={formatNote(f, lang)}
               style={{ flex: "1 1 70px", minWidth: 70, padding: "8px", borderRadius: 9, cursor: "pointer", fontWeight: 700, fontSize: "0.82rem",
                 border: on ? `1.5px solid ${f.cup ? "#7c3aed" : "#3b5bdb"}` : "1px solid #dbe2ee",
                 background: on ? (f.cup ? "rgba(124,58,237,.15)" : "rgba(79,140,255,.16)") : "#eef2f8", color: on ? (f.cup ? "#7c3aed" : "#3b5bdb") : "#64748b" }}>

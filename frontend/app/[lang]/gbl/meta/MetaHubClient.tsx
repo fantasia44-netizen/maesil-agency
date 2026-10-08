@@ -10,6 +10,7 @@ import { currentFormats, todayISO, type Format } from "../formats";
 import { SEASONS, SEASON_BY_SLUG, statusOf, seasonShort } from "../seasons";
 import { isLocale, defaultLocale, localizePath, type Locale } from "../../../../lib/i18n";
 import { leagueName, leagueShort } from "../contentI18n";
+import { formatLabel, formatNote } from "../formats";
 import { getMetaHub, type MetaHubDict } from "./dict";
 
 // MON·monName·spriteUrl은 ./monNames 공용(메가/원시·후파 언바운드 등 폼 이름·스프라이트 포함).
@@ -192,7 +193,7 @@ export default function MetaHubClient() {
         </p>
 
         <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-          {formats.map((f) => <button key={f.key} style={pill(league === f.key, f.cup)} title={f.note || ""} onClick={() => setLeague(f.key)}>{f.cup ? f.label : leagueName(lang, f.base)}</button>)}
+          {formats.map((f) => <button key={f.key} style={pill(league === f.key, f.cup)} title={formatNote(f, lang)} onClick={() => setLeague(f.key)}>{f.cup ? formatLabel(f, lang) : leagueName(lang, f.base)}</button>)}
         </div>
         <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
           {PERIODS.map((p) => <button key={p.key} style={pill(periodKey === p.key)} onClick={() => setPeriodKey(p.key)}>{periodLabel(t, p.key, lang)}</button>)}
