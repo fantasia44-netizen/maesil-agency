@@ -140,6 +140,67 @@ export const EVENT_EXTRAS: Record<string, ManualExtra> = {
   },
 };
 
+// ── 피드에 아예 없는 이벤트(지역 한정 등) ────────────────────────────────
+// ScrapedDuck(LeekDuck)은 영어권·글로벌 중심이라 한국 단독 이벤트는 들어오지 않는다.
+// (FC서울 2026은 공식 한국어 뉴스에만 있고 피드엔 0건) → 여기에 직접 적어 목록·달력에 합친다.
+// 날짜는 피드와 같은 "현지 벽시계"(타임존 없음) 표기를 쓴다: "2026-10-24T09:00:00.000"
+export type LocalEvent = ManualExtra & {
+  id: string;
+  type: string;                    // 피드 eventType과 같은 값 — 이모지·필터·라벨을 그대로 재사용
+  name: Record<Locale, string>;
+  start: string; end: string;
+  spawns?: boolean; research?: boolean;
+};
+
+export const LOCAL_EVENTS: LocalEvent[] = [
+  {
+    id: "fc-seoul-2026",
+    type: "event",
+    name: {
+      ko: "FC서울 × 포켓몬 GO 2026", en: "FC Seoul × Pokémon GO 2026",
+      ja: "FCソウル × ポケモンGO 2026", "zh-TW": "FC首爾 × 寶可夢GO 2026",
+    },
+    start: "2026-10-24T09:00:00.000", end: "2026-10-24T20:00:00.000",
+    spawns: true, research: true,
+    mons: [
+      { file: "4.png", name: { ko: "파이리", en: "Charmander", ja: "ヒトカゲ", "zh-TW": "小火龍" }, shiny: true },
+      { file: "6.png", name: { ko: "리자몽", en: "Charizard", ja: "リザードン", "zh-TW": "噴火龍" }, shiny: true },
+    ],
+    bonuses: {
+      ko: ["루어모듈 2시간 지속", "Nice 이상 포획 시 사탕 증가"],
+      en: ["Lure Modules last 2 hours", "More Candy for Nice-or-better throws"],
+      ja: ["ルアーモジュール2時間持続", "Nice以上の捕獲でアメ増加"],
+      "zh-TW": ["誘餌模組持續2小時", "Nice 以上捕捉時糖果增加"],
+    },
+    notes: {
+      ko: [
+        "서울월드컵경기장 일대 · 10/24(토) 09:00~20:00 (현장 부스 09:00~14:00)",
+        "별1 레이드 파이리 — 이벤트 로케이션 배경 · 리모트 레이드패스 사용 불가",
+        "무료 타임 챌린지: 8,042 XP · 별의모래 5,997 · 파이리 사탕 50 · 프리미엄 배틀패스 1, 로케이션 배경 리자몽 조우 (수령 ~11/7 20:00)",
+        "야생: 가디·아차모·델빌·레오꼬·냐오불(이로치 확률↑), 부스터(이로치 가능)",
+      ],
+      en: [
+        "Seoul World Cup Stadium area · Sat Oct 24, 09:00–20:00 KST (on-site booth 09:00–14:00)",
+        "One-star raid Charmander with the event Location Background · Remote Raid Passes can't be used",
+        "Free Timed Research: 8,042 XP · 5,997 Stardust · 50 Charmander Candy · 1 Premium Battle Pass, plus a Charizard encounter with the Location Background (claim by Nov 7, 20:00 KST)",
+        "Wild: Growlithe, Torchic, Houndour, Litleo, Litten (boosted shiny odds); Flareon (shiny possible)",
+      ],
+      ja: [
+        "ソウルワールドカップ競技場一帯 · 10/24(土) 09:00〜20:00(KST、現地ブースは09:00〜14:00)",
+        "1★レイドのヒトカゲにイベントのロケーション背景 · リモートレイドパスは使用不可",
+        "無料タイムチャレンジ: 8,042 XP · ほしのすな5,997 · ヒトカゲのアメ50 · プレミアムバトルパス1、ロケーション背景つきリザードンと遭遇(受取は11/7 20:00 KSTまで)",
+        "野生: ガーディ・アチャモ・デルビル・シシコ・ニャビー(色違い確率↑)、ブースター(色違いあり)",
+      ],
+      "zh-TW": [
+        "首爾世界盃競技場一帶 · 10/24（六）09:00~20:00（KST，現場攤位 09:00~14:00）",
+        "一星團體戰小火龍具活動地點背景 · 不可使用遠距團體戰入場券",
+        "免費限時調查：8,042 XP · 星塵 5,997 · 小火龍糖果 50 · 高級對戰入場券 1，並遇到具地點背景的噴火龍（領取至 11/7 20:00 KST）",
+        "野外：卡蒂狗·火稚雞·戴魯比·小獅獅·火斑喵（異色機率↑）、火伊布（可能異色）",
+      ],
+    },
+  },
+];
+
 export function manualExtra(eventID: string): ManualExtra | undefined {
   return EVENT_EXTRAS[eventID];
 }

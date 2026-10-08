@@ -8,7 +8,7 @@ import { getSDEvents, getSDEggs, localizeEventName, localizeBonus, monLocal, koM
 import { monSprite } from "../sprite";
 import { localizePath, hreflangLanguages, isLocale, defaultLocale, type Locale } from "../../../../lib/i18n";
 import { getEvents as getDict, FILTER_TYPES } from "./dict";
-import { manualExtra, uiconSprite } from "./eventManual";
+import { manualExtra, uiconSprite, LOCAL_EVENTS } from "./eventManual";
 
 export const revalidate = 3600; // 1시간마다 피드 갱신
 
@@ -89,6 +89,20 @@ export default async function EventsPage({ params }: { params: { lang: string } 
         ...(man?.notes ? { notes: man.notes[lang] || man.notes.en } : {}),
       };
     });
+
+  // 피드에 없는 지역 한정 이벤트(FC서울 등)를 같은 형식으로 합친다. 유형은 피드 eventType을 재사용.
+  for (const le of LOCAL_EVENTS) {
+    const meta = TYPE_META[le.type];
+    if (!meta) continue;
+    events.push({
+      id: le.id, type: le.type, filterKey: meta.filter, emoji: meta.emoji,
+      name: le.name[lang] || le.name.en, start: le.start, end: le.end,
+      spawns: le.spawns, research: le.research,
+      ...(le.mons?.length ? { mons: le.mons.map((m) => ({ name: m.name[lang] || m.name.en, image: uiconSprite(m.file), shiny: m.shiny })) } : {}),
+      ...(le.bonuses ? { bonuses: le.bonuses[lang] || le.bonuses.en } : {}),
+      ...(le.notes ? { notes: le.notes[lang] || le.notes.en } : {}),
+    });
+  }
 
   const eggs: ViewEgg[] = EGG_ORDER
     .map((dist) => {
