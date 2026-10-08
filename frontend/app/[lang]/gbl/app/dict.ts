@@ -141,7 +141,7 @@ const ko: AppDict = {
   cancel: "취소", reset: "초기화",
   saving: "저장 중…", saveEdit: "수정 저장", saveNew: "기록 저장",
   slotPre: "", slotSuf: "번",
-  fastLabel: "빠른 기술", chargedLabel: "차지 기술 (최대 2)",
+  fastLabel: "노멀 기술", chargedLabel: "스페셜 기술 (최대 2)",
   notePlaceholder: "개체 메모 (예: 3타에 지진, 실드 씀)",
   manualPlaceholder: "직접 입력 (목록에 없는 개체)",
   listBtn: "목록", changeBtn: "변경",

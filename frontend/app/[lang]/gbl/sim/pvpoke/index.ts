@@ -167,8 +167,8 @@ function makePoke(c: Cfg, i: number, battle: any, league: League): any {
   const rec = recommendedMoveset(id, league);
   const fast = c.fast || rec.fast;
   if (fast) p.selectMove("fast", fast);
-  // 차지무브: 사용자가 하나라도 지정하면 그 배열(빈 슬롯=단일무브 존중), 아니면 추천.
-  // ※ initialize()가 기본 차지무브 2개를 넣으므로, 빈 슬롯은 "none"으로 비워 잔류 방지(노스킬 반영).
+  // 스페셜 기술: 사용자가 하나라도 지정하면 그 배열(빈 슬롯=단일무브 존중), 아니면 추천.
+  // ※ initialize()가 기본 스페셜 기술 2개를 넣으므로, 빈 슬롯은 "none"으로 비워 잔류 방지(노스킬 반영).
   const chargedInput = (c.charged && c.charged.some(Boolean)) ? c.charged : rec.charged;
   const chargedWanted = (chargedInput || []).filter((m) => m && m !== "none");
   p.selectMove("charged", "none", 1); // 2번 슬롯 먼저 비움

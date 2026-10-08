@@ -138,7 +138,7 @@ export default function UnrankedView({ lang, id, u }: { lang: Locale; id: string
         </div>
 
         {/* 루브도(스케치로 전 기술 습득)는 빠른 96·차지 226개라 패널 대신 기술 도감 링크만.
-            (예전 조건 "빠른 기술 12개 이하"는 잠재파워 16타입을 가진 토게피·꼬몽울·치릴리의 기술 패널까지 숨겼음) */}
+            (예전 조건 "노멀 기술 12개 이하"는 잠재파워 16타입을 가진 토게피·꼬몽울·치릴리의 기술 패널까지 숨겼음) */}
         {fasts.length > 0 && charged.length > 0 && id !== "smeargle" && (
           <>
             <h2 style={h2}>{t.movesH(name)}</h2>

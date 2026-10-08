@@ -171,14 +171,14 @@ function MoveChip({ id, lang }: { id: string; lang: Locale }) {
   return p ? <Link prefetch={false} href={localizePath(lang, p)} style={st}>{moveLabel(lang, id)}</Link> : <span style={st}>{moveLabel(lang, id)}</span>;
 }
 
-// 스킬/타수 — CMP(/gbl/cmp)와 동일 규칙. 타수 = 차지기술 발동까지 빠른기술 횟수(에너지 이월).
+// 스킬/타수 — CMP(/gbl/cmp)와 동일 규칙. 타수 = 스페셜기술 발동까지 노멀기술 횟수(에너지 이월).
 const moveColor = (id: string) => TYPE_COLOR[MOVES[baseMoveId(id)]?.type] || "#94a3b8";
 const tausSeq = (cost: number, gain: number, n = 5): number[] => {
   if (!gain) return Array(n).fill(0); let energy = 0; const seq: number[] = [];
   for (let i = 0; i < n; i++) { const need = cost - energy; const t = need > 0 ? Math.ceil(need / gain) : 0; energy += t * gain - cost; seq.push(t); }
   return seq;
 };
-// 함께 보여줄 추가 빠른기술 변형(CMP와 동일)
+// 함께 보여줄 추가 노멀기술 변형(CMP와 동일)
 const FAST_EXTRA: Record<string, string[]> = {
   mewtwo_mega_x: ["COUNTER"], groudon_primal: ["MUD_SHOT"], garchomp_mega: ["MUD_SHOT"],
   kyurem_black: ["SHADOW_CLAW"], metagross_mega: ["FURY_CUTTER"],

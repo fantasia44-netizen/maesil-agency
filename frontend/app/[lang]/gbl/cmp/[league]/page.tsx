@@ -96,13 +96,13 @@ const moveLabel = (lang: Locale, id: string): string => {
   return id + plus;
 };
 const moveColor = (id: string) => TYPE_COLOR[MOVES[baseMoveId(id)]?.type] || "#94a3b8";
-// 타수 계산(에너지 이월) — 포켓몬 상세 tausSeq와 동일. 오버라이드 빠른기술로 차지 타수 재계산 시 사용.
+// 타수 계산(에너지 이월) — 포켓몬 상세 tausSeq와 동일. 오버라이드 노멀기술로 차지 타수 재계산 시 사용.
 const tausSeq = (cost: number, gain: number, n = 5): number[] => {
   if (!gain) return Array(n).fill(0); let energy = 0; const seq: number[] = [];
   for (let i = 0; i < n; i++) { const need = cost - energy; const t = need > 0 ? Math.ceil(need / gain) : 0; energy += t * gain - cost; seq.push(t); }
   return seq;
 };
-// 추가 빠른기술 변형 — 기본 추천 빠른기술 외에 "함께 보여줄" 빠른기술(그 기준 타수도 계산). 몬id → [추가 fast id들].
+// 추가 노멀기술 변형 — 기본 추천 노멀기술 외에 "함께 보여줄" 노멀기술(그 기준 타수도 계산). 몬id → [추가 fast id들].
 const FAST_EXTRA: Record<string, string[]> = {
   mewtwo_mega_x: ["COUNTER"],       // 사이코커터 + 카운터(기본기 카운터용)
   groudon_primal: ["MUD_SHOT"],     // 드래곤테일 + 머드샷
@@ -178,7 +178,7 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
   const nameById = (id: string) => (byId[id] ? dispNameOf(lang, byId[id]) : (MON[id]?.ko || id));
   const cmpText = cmpAnalysis(lang, lgName, list.map((d) => ({ id: d.id, atk: d.stats.atk || 0 })), nameById);
 
-  // 타수 단위(로케일) + 몬별 추천기술·타수 조립. 기본 자동(d.mv), FAST_OVERRIDE 지정 몬만 그 빠른기술로 타수 재계산.
+  // 타수 단위(로케일) + 몬별 추천기술·타수 조립. 기본 자동(d.mv), FAST_OVERRIDE 지정 몬만 그 노멀기술로 타수 재계산.
   const hitsUnit = ({ ko: "타", en: "", ja: "回", "zh-TW": "次" } as Record<string, string>)[lang] ?? "타";
   const turnUnit = ({ ko: "턴", en: "T", ja: "T", "zh-TW": "回" } as Record<string, string>)[lang] ?? "턴";
   const buildMoves = (d: Detail) => {
@@ -338,7 +338,7 @@ export default function CmpPage({ params, searchParams }: { params: { lang: stri
                     ))}
                   </div>
                   </MonLink>
-                  {/* 추천 기술 + 타수(자동) — FAST_EXTRA 지정 몬은 추가 빠른기술 변형도 함께 */}
+                  {/* 추천 기술 + 타수(자동) — FAST_EXTRA 지정 몬은 추가 노멀기술 변형도 함께 */}
                   {mv && mv.map((v, vi) => (
                     <div key={vi} style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: vi === 0 ? 1 : 4, ...(vi > 0 ? { paddingTop: 4, borderTop: "1px dashed #e3e8f2" } : {}) }}>
                       {(() => { const fp = movePath(v.fast.id); const fst: React.CSSProperties = { alignSelf: "flex-start", fontSize: "0.66rem", fontWeight: 700, color: "#fff", background: v.fast.color, padding: "1px 7px", borderRadius: 6, textDecoration: "none" };

@@ -68,7 +68,7 @@ export function cmpAnalysis(
   if (list.length < 3) return "";
   const [a, b, c] = list;
   const L = {
-    ko: `${lgName}의 CMP(공격 우선권)는 같은 턴에 차지 기술이 겹칠 때 공격 종족값이 높은 쪽이 먼저 발동하는 규칙입니다. 현재 CMP가 가장 높은 포켓몬은 ${name(a.id)}(공격 ${a.atk.toFixed(1)})이며 ${name(b.id)}·${name(c.id)}가 뒤를 잇습니다. 이 상위권은 미러전이나 라스트 대결에서 차지를 먼저 터뜨려 실드 유도와 마무리에서 유리해집니다.`,
+    ko: `${lgName}의 CMP(공격 우선권)는 같은 턴에 스페셜 기술이 겹칠 때 공격 종족값이 높은 쪽이 먼저 발동하는 규칙입니다. 현재 CMP가 가장 높은 포켓몬은 ${name(a.id)}(공격 ${a.atk.toFixed(1)})이며 ${name(b.id)}·${name(c.id)}가 뒤를 잇습니다. 이 상위권은 미러전이나 라스트 대결에서 차지를 먼저 터뜨려 실드 유도와 마무리에서 유리해집니다.`,
     en: `CMP (Charge Move Priority) in ${lgName} means that when two Pokémon fire a charged move on the same turn, the one with higher attack goes first. The highest-CMP Pokémon right now is ${name(a.id)} (attack ${a.atk.toFixed(1)}), followed by ${name(b.id)} and ${name(c.id)}. These top picks fire first in mirrors and last-Pokémon standoffs, gaining an edge in baiting shields and closing games.`,
     ja: `${lgName}のCMP(ゲージ優先度)は、同じターンにゲージ技が重なった時に攻撃種族値が高い方が先に発動する仕様です。現在CMPが最も高いのは${name(a.id)}(攻撃${a.atk.toFixed(1)})で、${name(b.id)}・${name(c.id)}が続きます。この上位陣はミラーやラスト対面で先にゲージを撃ててシールド誘導と締めで有利になります。`,
     "zh-TW": `${lgName}的CMP(放招優先權)是指同一回合特殊招式重疊時，攻擊種族值較高的一方先發動。目前CMP最高的是${name(a.id)}(攻擊${a.atk.toFixed(1)})，其後為${name(b.id)}·${name(c.id)}。這些上位在鏡像對戰或最後對面能先放招，於誘導護盾與收尾上取得優勢。`,

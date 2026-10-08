@@ -117,7 +117,7 @@ export function genArticle(
     sections.push({
       h: pk({ ko: "공격 15가 왜 중요한가 — 동시차징(CMP)", en: "Why attack 15 matters — CMP", ja: "攻撃15がなぜ重要か — 同時ゲージ（CMP）", zh: "為何攻擊15重要 — 同時充能（CMP）" }),
       body: pk({
-        ko: `마스터리그는 CP 제한이 없어 모두 최대 레벨입니다. 그래서 같은 포켓몬끼리(미러) 또는 종족값이 같은 상대와 같은 턴에 차지무브를 쏘면, 공격 실수치가 높은 쪽이 먼저 터집니다(동시차징·CMP). ${nm}${josa(nm, "을", "를")} 공격 14로 키우면 이 우선권 싸움에서 공격 15 상대에게 밀립니다. 실제 시뮬에서 공14 미러는 ${mirrorSeq}로 나왔습니다. 미러가 잦은 상위 메타에서는 공격 15가 사실상 필수입니다.`,
+        ko: `마스터리그는 CP 제한이 없어 모두 최대 레벨입니다. 그래서 같은 포켓몬끼리(미러) 또는 종족값이 같은 상대와 같은 턴에 스페셜 기술을 쏘면, 공격 실수치가 높은 쪽이 먼저 터집니다(동시차징·CMP). ${nm}${josa(nm, "을", "를")} 공격 14로 키우면 이 우선권 싸움에서 공격 15 상대에게 밀립니다. 실제 시뮬에서 공14 미러는 ${mirrorSeq}로 나왔습니다. 미러가 잦은 상위 메타에서는 공격 15가 사실상 필수입니다.`,
         en: `Master League has no CP cap, so everyone is max level. When same-species (mirror) or same-stat Pokémon fire a charged move on the same turn, the higher effective attack goes first (CMP). An attack-14 ${nm} loses that priority to an attack-15 opponent. In the sim, the attack-14 mirror came out ${mirrorSeq}. In a mirror-heavy meta, attack 15 is effectively mandatory.`,
         ja: `マスターリーグはCP制限がなく全員最大レベルです。同種（ミラー）や同種族値の相手と同じターンにゲージ技を撃つと、実効攻撃が高い方が先に発動します（同時ゲージ・CMP）。${nm}を攻撃14で育てると、この優先権争いで攻撃15の相手に負けます。実際のシミュでは攻撃14ミラーが ${mirrorSeq} でした。ミラーの多い上位メタでは攻撃15が事実上必須です。`,
         zh: `大師聯盟無CP上限，全員滿等。與同種（鏡像）或同種族值對手在同回合放特殊招式時，實際攻擊較高者先發動（同時充能·CMP）。將${nm}養成攻擊14，會在此優先權之爭輸給攻擊15對手。實際模擬中攻擊14鏡像為 ${mirrorSeq}。在鏡像多的上位環境，攻擊15實質必須。`,

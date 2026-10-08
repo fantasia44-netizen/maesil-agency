@@ -26,7 +26,7 @@ const LEAGUES: { key: string; ko: string; en: string; ja: string; "zh-TW": strin
 ];
 
 const LB: Record<Locale, { secH: string; fastL: string; chargedL: string; note: (n: string, lg: string, t: string) => string; gridH: string; cta: string }> = {
-  ko: { secH: "🎯 실전 예시 — 눌러서 각 포켓몬의 추천 기술배치 확인", fastL: "빠른 기술", chargedL: "차지 기술",
+  ko: { secH: "🎯 실전 예시 — 눌러서 각 포켓몬의 추천 기술배치 확인", fastL: "노멀 기술", chargedL: "스페셜 기술",
     note: (n, lg, t) => `${n} ${lg} ${t}티어의 추천 기술배치입니다. 위 기준(에너지·자속·커버리지)이 실제 포켓몬엔 이렇게 적용돼요. 눌러서 리그·실드별 상세를 확인하세요.`,
     gridH: "리그별 대표 포켓몬 — 눌러서 각자의 기술배치 확인", cta: "상세 보기 →" },
   en: { secH: "🎯 Worked examples — tap a Pokémon for its recommended moveset", fastL: "Fast", chargedL: "Charged",

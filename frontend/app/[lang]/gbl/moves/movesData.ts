@@ -35,7 +35,7 @@ export const FAST = MOVES.filter((m) => m.kind === "fast");
 export const CHARGED = MOVES.filter((m) => m.kind === "charged");
 
 // ── 이름 ─────────────────────────────────────────────────────────────
-// 같은 이름으로 떨어지는 변형(웨더볼·테크노버스터·잠재파워=타입별, 킬가르도 실드폼 전용 빠른기술)은 접미로 구분.
+// 같은 이름으로 떨어지는 변형(웨더볼·테크노버스터·잠재파워=타입별, 킬가르도 실드폼 전용 노멀기술)은 접미로 구분.
 const SHIELD: Record<Locale, string> = { ko: " (실드폼)", en: " (Shield Forme)", ja: "（シールドフォルム）", "zh-TW": "（盾牌形態）" };
 export function moveName(lang: Locale, m: Move): string {
   const base = m.n[lang] || m.n.en || m.id;
@@ -76,7 +76,7 @@ export function coLearned(m: Move): Move[] {
   return [...ids].map((id) => BY_ID[id]).filter((x) => x && x.kind === want);
 }
 export type CountRow = { key: string; gain: number; turns: number; energy: number; moves: Move[]; counts: number[]; firstTurns: number };
-// 차지 기술 → 빠른 기술의 (획득 에너지·턴) 조합별 타수 / 빠른 기술 → 차지 기술의 에너지 비용별 타수.
+// 스페셜 기술 → 노멀 기술의 (획득 에너지·턴) 조합별 타수 / 노멀 기술 → 스페셜 기술의 에너지 비용별 타수.
 export function countRows(m: Move): CountRow[] {
   const groups = new Map<string, CountRow>();
   for (const o of coLearned(m)) {
@@ -119,8 +119,8 @@ export function pvpDamage(power: number, atk: number, def: number, stab: boolean
 const PKN = PKNAMES as unknown as Record<string, Record<string, string>>;
 export type UserRow = {
   id: string; linkId: string; hasLink: boolean; name: string; dex: number; types: string[]; shadow: boolean; tier: string; score: number; rank: number;
-  fastId?: string; fastTurns?: number; counts?: number[];                  // 차지 기술 페이지: 이 포켓몬의 추천 빠른 기술과 그 타수
-  charged?: { id: string; counts: number[] }[];                            // 빠른 기술 페이지: 이 포켓몬의 추천 차지 기술들과 타수
+  fastId?: string; fastTurns?: number; counts?: number[];                  // 스페셜 기술 페이지: 이 포켓몬의 추천 노멀 기술과 그 타수
+  charged?: { id: string; counts: number[] }[];                            // 노멀 기술 페이지: 이 포켓몬의 추천 스페셜 기술들과 타수
   dmg: number; pct: number; stab: boolean;
 };
 function snapName(lang: Locale, r: Snap): string {

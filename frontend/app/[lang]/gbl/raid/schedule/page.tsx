@@ -91,12 +91,28 @@ function bossesOf(lang: Locale, e: EventItem, t: ScheduleDict): CalBoss[] {
 }
 
 const PATH = "/gbl/raid/schedule";
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+// 지금 열린 레이드 보스 이름을 메타 설명 앞에 붙인다 — 검색자가 알고 싶은 건 "지금 뭐가 나오나".
+// (네이버 실측: 이 페이지 노출 6,392에 CTR 0.7%로 가장 낮았음. 제목은 정적이라 설명으로 현재 보스를 노출.)
+async function currentBossLine(lang: Locale, t: ScheduleDict): Promise<string> {
+  try {
+    const now = Date.now();
+    const live = (await getEvents()).filter((e) => e.eventType === "raid-battles"
+      && Date.parse(e.start) <= now && now < Date.parse(e.end));
+    const names: string[] = [];
+    for (const e of live) for (const b of bossesOf(lang, e, t)) if (b.name && !names.includes(b.name)) names.push(b.name);
+    return names.slice(0, 5).join(" · ");
+  } catch {
+    return "";   // 피드 실패 시 정적 설명만 사용
+  }
+}
+
+export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getSchedule(lang);
+  const bosses = await currentBossLine(lang, t);
   return {
     title: t.metaTitle,
-    description: t.metaDesc,
+    description: bosses ? `${t.metaNow} ${bosses}. ${t.metaDesc}` : t.metaDesc,
     keywords: t.metaKeywords,
     alternates: { canonical: localizePath(lang, PATH), languages: hreflangLanguages(PATH) },
     openGraph: { title: t.ogTitle, description: t.ogDesc, url: localizePath(lang, PATH), images: [`https://gblnote.com${localizePath(lang, PATH + "/opengraph-image")}`], type: "website" },

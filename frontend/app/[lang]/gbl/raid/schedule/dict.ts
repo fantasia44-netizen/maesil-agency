@@ -38,7 +38,7 @@ export type ScheduleDict = {
   // 서버렌더 SEO 아젠다(크롤러가 JS 없이 보스·날짜 텍스트를 읽도록) — 달력은 ssr:false라 SSR HTML이 얇음
   seoAgendaH: string; seoAgendaLead: string;
   // 메타
-  metaTitle: string; metaDesc: string; metaKeywords: string[]; ogTitle: string; ogDesc: string;
+  metaTitle: string; metaDesc: string; metaNow: string; metaKeywords: string[]; ogTitle: string; ogDesc: string;
 };
 
 const ko: ScheduleDict = {
@@ -87,8 +87,9 @@ const ko: ScheduleDict = {
   cpModalSub: "개체값별 포획 CP", cpModalNoData: "이 보스의 CP 데이터가 아직 준비되지 않았어요.",
   seoAgendaH: "🔥 다가오는 레이드 로테이션",
   seoAgendaLead: "지금부터 예정된 5성 전설·메가·섀도우 레이드 보스와 기간입니다. 보스를 누르면 100% CP·약점 딜러로 이동합니다.",
-  metaTitle: "포켓몬고 레이드 일정 · 이번주 5성·메가 보스 달력 | GBL Note",
-  metaDesc: "포켓몬 GO 레이드 일정을 한눈에. 이번 주 5성 전설·메가·섀도우 레이드 보스와 로테이션 기간, 레이드 아워·데이를 날짜별로. 보스 100% CP·약점 딜러 바로가기. 매일 자동 업데이트.",
+  metaTitle: "포켓몬고 레이드 일정 — 지금 나오는 보스·이번주 로테이션 | GBL Note",
+  metaNow: "지금 열린 레이드:",
+  metaDesc: "이번 주 5성·메가·섀도우 로테이션과 레이드 아워를 날짜별로. 보스 100% CP·약점 딜러까지 바로. 매일 자동 갱신.",
   metaKeywords: ["포켓몬고 레이드 일정", "레이드 달력", "5성 레이드 로테이션", "메가 레이드 일정", "레이드 아워", "레이드 데이"],
   ogTitle: "포켓몬고 레이드 스케줄 달력", ogDesc: "5성·메가 로테이션 + 레이드 아워·데이",
 };
@@ -132,8 +133,9 @@ const en: ScheduleDict = {
   cpModalSub: "Catch CP by IV", cpModalNoData: "CP data for this boss isn't ready yet.",
   seoAgendaH: "🔥 Upcoming Raid Rotations",
   seoAgendaLead: "5★ legendary, Mega and Shadow raid bosses scheduled from now, with dates. Tap a boss for its 100% CP and best counters.",
-  metaTitle: "Pokémon GO Raid Schedule · This Week's 5★ & Mega Bosses | GBL Note",
-  metaDesc: "Pokémon GO raid schedule at a glance. This week's 5-star legendary, Mega and Shadow raid bosses with rotation dates, plus Raid Hour and Raid Day. 100% CP and best counters, auto-updated daily.",
+  metaTitle: "Pokémon GO Raid Schedule — Bosses Live Now & This Week | GBL Note",
+  metaNow: "Live raid bosses right now:",
+  metaDesc: "This week's 5★, Mega and Shadow rotation with Raid Hour dates. 100% CP and best counters. Auto-updated daily.",
   metaKeywords: ["pokemon go raid schedule", "raid calendar", "5-star raid rotation", "mega raid schedule", "raid hour", "raid day"],
   ogTitle: "Pokémon GO Raid Schedule Calendar", ogDesc: "5★ & Mega rotation + Raid Hour & Day",
 };
@@ -184,8 +186,9 @@ const ja: ScheduleDict = {
   cpModalSub: "個体値別 捕獲CP", cpModalNoData: "このボスのCPデータはまだ準備できていません。",
   seoAgendaH: "🔥 今後のレイドローテーション",
   seoAgendaLead: "今から予定されている5★伝説・メガ・シャドウレイドのボスと期間です。ボスをタップすると100% CP・弱点アタッカーへ移動します。",
-  metaTitle: "ポケモンGO レイド予定・日程カレンダー · 今週の5★・メガボス | GBL Note",
-  metaDesc: "ポケモンGOのレイド日程をひと目で。今週の5★伝説・メガ・シャドウレイドのボスとローテーション期間、レイドアワー・デイを日付ごとに。ボス100% CP・弱点アタッカーへ。毎日自動更新。",
+  metaTitle: "ポケモンGO レイド予定 — 今出ているボス・今週のローテ | GBL Note",
+  metaNow: "今開催中のレイド:",
+  metaDesc: "今週の5★・メガ・シャドウのローテとレイドアワーを日付ごとに。ボス100% CP・弱点アタッカーも。毎日自動更新。",
   metaKeywords: ["レイド予定", "ポケモンGO レイド予定", "ポケモンGO レイド日程", "レイドカレンダー", "5★レイド ローテーション", "メガレイド 日程", "レイドアワー", "レイドデイ"],
   ogTitle: "ポケモンGO レイドスケジュール カレンダー", ogDesc: "5★・メガローテーション + レイドアワー・デイ",
 };
@@ -229,8 +232,9 @@ const zhTW: ScheduleDict = {
   cpModalSub: "各個體值捕捉 CP", cpModalNoData: "此頭目的 CP 資料尚未準備。",
   seoAgendaH: "🔥 即將到來的團體戰輪替",
   seoAgendaLead: "從現在起排定的五星傳說·超級·暗影團體戰頭目與期間。點擊頭目可查看 100% CP·剋制攻擊手。",
-  metaTitle: "寶可夢GO 團體戰時程 · 本週五星·超級頭目 行事曆 | GBL Note",
-  metaDesc: "寶可夢GO團體戰時程一目了然。本週五星傳說·超級·暗影團體戰頭目與輪替期間，團體戰時刻·團體戰日。頭目100% CP·剋制攻擊手，每日自動更新。",
+  metaTitle: "寶可夢GO 團體戰時程 — 現在的頭目·本週輪替 | GBL Note",
+  metaNow: "現在開放的頭目：",
+  metaDesc: "本週五星·超級·暗影輪替與團體戰時刻，依日期整理。頭目100% CP·剋星攻擊手。每日自動更新。",
   metaKeywords: ["寶可夢GO 團體戰時程", "團體戰行事曆", "五星團體戰輪替", "超級團體戰時程", "團體戰時刻", "團體戰日"],
   ogTitle: "寶可夢GO 團體戰時程行事曆", ogDesc: "五星·超級輪替 + 團體戰時刻·日",
 };

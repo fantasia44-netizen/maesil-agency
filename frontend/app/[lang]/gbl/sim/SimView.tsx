@@ -306,7 +306,7 @@ function Timeline({ res, lang, t }: { res: any; lang: Locale; t: SimDict }) {
             {/* 플레이헤드 */}
             {!done && <div style={{ position: "absolute", left: `${(now / dur) * 100}%`, top: 0, bottom: 0, width: 2, background: "#0f172a", opacity: 0.5, transform: "translateX(-1px)" }} />}
           </div>
-          {/* 실제 사용한 차지무브 순서(로케일명·타입색·재생연동) */}
+          {/* 실제 사용한 스페셜 기술 순서(로케일명·타입색·재생연동) */}
           {(() => {
             const cs = evts.filter((e: any) => e.type && String(e.type).includes("charged"));
             if (!cs.length) return null;
@@ -351,7 +351,7 @@ function Timeline({ res, lang, t }: { res: any; lang: Locale; t: SimDict }) {
     </div>
   );
 }
-// 이벤트가 실제로 쓴 차지무브 식별(색·라벨용). 엔진 이벤트의 name(영문 무브명)으로 매칭 — 없으면 타입으로 폴백.
+// 이벤트가 실제로 쓴 스페셜 기술 식별(색·라벨용). 엔진 이벤트의 name(영문 무브명)으로 매칭 — 없으면 타입으로 폴백.
 function chargedIdOf(e: any, res: any, actor: number): string {
   const c = (actor === 0 ? res.a.charged : res.b.charged) || [];
   if (!c.length) return "";

@@ -7,7 +7,7 @@ import { isLocale, defaultLocale, type Locale } from "../../../../../lib/i18n";
 import { typeLabel } from "../../typeLabels";
 import ShareModal from "../../ShareModal";
 
-// CMP 3열 고밀도 공유 카드 — 순위·타입·티어·공격력 + 추천 빠른기술 + 차지기술별 타수.
+// CMP 3열 고밀도 공유 카드 — 순위·타입·티어·공격력 + 추천 노멀기술 + 스페셜기술별 타수.
 // 웹 그리드와 동일 데이터(page.tsx에서 조립해 prop 전달). Canvas로 렌더(스프라이트/공유는 raidShareUtil 재활용).
 export type CmpMoveDisp = { label: string; color: string; turns: number };
 export type CmpVariant = { fast: CmpMoveDisp; charged: { label: string; color: string; counts: number[] }[] };
@@ -104,7 +104,7 @@ export default function CmpShareDense({
           ctx.fillStyle = TYPE_COLOR[tp] || "#94a3b8"; ctx.beginPath(); ctx.roundRect(bx, by, bw, 26, 7); ctx.fill();
           ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.fillText(label, bx + bw / 2, by + 19); bx += bw + 5;
         }
-        // 변형(빠른기술 블록)들 — yc 누적으로 침범 없이 스택
+        // 변형(노멀기술 블록)들 — yc 누적으로 침범 없이 스택
         let yc = y + HEADER;
         it.variants.forEach((v, vi) => {
           if (vi) { yc += VGAP; ctx.strokeStyle = "#eef2f8"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x + 18, yc - VGAP / 2); ctx.lineTo(x + w - 16, yc - VGAP / 2); ctx.stroke(); }

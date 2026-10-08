@@ -1,8 +1,8 @@
 "use client";
-// 추천 기술배치 + 스킬 타수 — 빠른기술(노멀기) 선택 시 차지 타수를 즉석 재계산.
+// 추천 기술배치 + 스킬 타수 — 노멀기술(노멀기) 선택 시 차지 타수를 즉석 재계산.
 // 데이터: 서버(page.tsx)에서 이름·타입색 해석해 prop으로 전달. 타수만 클라 계산.
 // 선택 상태(sel)는 상위(MovesetShare)에서 관리 — 공유/저장 카드와 동기화.
-// href(기술 도감 경로)가 있으면 차지 칩은 링크, 빠른 기술은 선택 버튼이라 옆에 "기술명 ›" 링크를 따로 둔다(버튼 안 링크 금지).
+// href(기술 도감 경로)가 있으면 차지 칩은 링크, 노멀 기술은 선택 버튼이라 옆에 "기술명 ›" 링크를 따로 둔다(버튼 안 링크 금지).
 import Link from "next/link";
 
 export type MoveDisp = { id: string; label: string; color: string; href?: string };
@@ -39,7 +39,7 @@ export default function MovesetPanel({ fasts, charged, sel, onSel, labels }: {
   if (!selFast) return null;
   return (
     <div>
-      {/* 빠른기술(노멀기) 선택 — 대체기술 있으면 칩으로 전환 */}
+      {/* 노멀기술(노멀기) 선택 — 대체기술 있으면 칩으로 전환 */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
         <span style={{ fontSize: "0.72rem", color: "#94a3b8", minWidth: 52 }}>{labels.fastLabel}</span>
         {fasts.map((f) => {
