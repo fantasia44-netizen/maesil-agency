@@ -447,7 +447,11 @@
       "Bash(git mv *)",
       "Bash(mv \"app/[lang]/gbl/events/eventExtras.ts\" \"app/[lang]/gbl/events/eventManual.ts\")",
       "Bash(curl -s \"http://localhost:3000/gbl/events\" -o /dev/null --max-time 180 -w \"%{http_code}\\\\n\")",
-      "Bash(git commit -q -m 'docs\\(gbl-events\\): 수동 보강 운영 규칙 명문화 \\(A안 — 큰 이벤트만 월 1~2건\\) *)"
+      "Bash(git commit -q -m 'docs\\(gbl-events\\): 수동 보강 운영 규칙 명문화 \\(A안 — 큰 이벤트만 월 1~2건\\) *)",
+      "Bash(curl -s --max-time 200 \"http://localhost:3000/gbl/events\" -o s.html -w \"%{http_code}\\\\n\")",
+      "Bash(rm -f s.html)",
+      "Bash(node scratch_fix.cjs)",
+      "Bash(rm -f scratch_fix.cjs)"
     ]
   }
 }

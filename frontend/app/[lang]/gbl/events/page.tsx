@@ -23,6 +23,8 @@ const TYPE_META: Record<string, { emoji: string; filter: string }> = {
   "max-mondays": { emoji: "🟥", filter: "max" },
   "max-battles": { emoji: "💥", filter: "max" },
   "pokemon-go-fest": { emoji: "🎪", filter: "event" },
+  "pokemon-go-tour": { emoji: "🎪", filter: "event" },
+  "wild-area": { emoji: "🗺️", filter: "event" },
   "event": { emoji: "🎈", filter: "event" },
   "research": { emoji: "🔍", filter: "research" },
   // 장기(2주 초과) — 달력에선 칸을 먹지 않고 "상시 진행" 줄로, 목록에선 진행 중에 노출.

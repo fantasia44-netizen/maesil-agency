@@ -58,7 +58,7 @@ const ko: EventsDict = {
   eggH: "🥚 부화 알 (거리별)", eggIntro: "현재 알에서 부화하는 포켓몬입니다.", eggShiny: "이로치", eggRegional: "지역한정", eggGift: "선물", eggAdventure: "어드벤처싱크",
   // ── SDLabels (레이드 스케줄과 동일) ──
   pfx: { mega: "메가 ", shadow: "섀도우 ", alola: "알로라 ", galar: "가라르 ", hisui: "히스이 ", paldea: "팔데아 " },
-  evtType: { "community-day": "커뮤니티 데이", "pokemon-spotlight-hour": "스포트라이트 아워", "max-mondays": "맥스 먼데이", "max-battles": "맥스 배틀 데이", "pokemon-go-fest": "GO 페스트", "event": "이벤트", "research": "리서치", "go-pass": "GO 패스", "raid-battles": "레이드", "raid-hour": "레이드 아워", "raid-day": "레이드 데이", "go-battle-league": "GO 배틀리그", "season": "시즌" },
+  evtType: { "community-day": "커뮤니티 데이", "pokemon-spotlight-hour": "스포트라이트 아워", "max-mondays": "맥스 먼데이", "max-battles": "맥스 배틀 데이", "pokemon-go-fest": "GO 페스트", "event": "이벤트", "research": "리서치", "go-pass": "GO 패스", "raid-battles": "레이드", "raid-hour": "레이드 아워", "raid-day": "레이드 데이", "go-battle-league": "GO 배틀리그", "season": "시즌", "wild-area": "와일드 에어리어", "pokemon-go-tour": "GO 투어" },
   months: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
   dynamax: "다이맥스", evtClassic: "클래식",
   evtNameMap: {
@@ -102,7 +102,7 @@ const en: EventsDict = {
   calLegendBand: "━ bar = multi-day event", calLegendBadge: "emoji = single day (hour/day)", calLegendOngoing: "long campaigns are in the row above",
   eggH: "🥚 Egg Hatches (by distance)", eggIntro: "Pokémon currently hatching from eggs.", eggShiny: "Shiny", eggRegional: "Regional", eggGift: "Gift", eggAdventure: "Adventure Sync",
   pfx: { mega: "Mega ", shadow: "Shadow ", alola: "Alolan ", galar: "Galarian ", hisui: "Hisuian ", paldea: "Paldean " },
-  evtType: { "community-day": "Community Day", "pokemon-spotlight-hour": "Spotlight Hour", "max-mondays": "Max Monday", "max-battles": "Max Battle Day", "pokemon-go-fest": "GO Fest", "event": "Event", "research": "Research", "go-pass": "GO Pass", "raid-battles": "Raid", "raid-hour": "Raid Hour", "raid-day": "Raid Day", "go-battle-league": "GO Battle League", "season": "Season" },
+  evtType: { "community-day": "Community Day", "pokemon-spotlight-hour": "Spotlight Hour", "max-mondays": "Max Monday", "max-battles": "Max Battle Day", "pokemon-go-fest": "GO Fest", "event": "Event", "research": "Research", "go-pass": "GO Pass", "raid-battles": "Raid", "raid-hour": "Raid Hour", "raid-day": "Raid Day", "go-battle-league": "GO Battle League", "season": "Season", "wild-area": "Wild Area", "pokemon-go-tour": "GO Tour" },
   months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
   dynamax: "Dynamax", evtClassic: "Classic",
   evtNameMap: {},
@@ -137,7 +137,7 @@ const ja: EventsDict = {
   calLegendBand: "━ 帯 = 複数日イベント", calLegendBadge: "絵文字 = その日だけ(アワー・デイ)", calLegendOngoing: "長期キャンペーンは上の常時開催欄",
   eggH: "🥚 タマゴ孵化(距離別)", eggIntro: "現在タマゴから孵化するポケモンです。", eggShiny: "色違い", eggRegional: "地域限定", eggGift: "ギフト", eggAdventure: "アドベンチャーシンク",
   pfx: { mega: "メガ ", shadow: "シャドウ ", alola: "アローラ ", galar: "ガラル ", hisui: "ヒスイ ", paldea: "パルデア " },
-  evtType: { "community-day": "コミュニティ・デイ", "pokemon-spotlight-hour": "スポットライトアワー", "max-mondays": "マックスマンデー", "max-battles": "マックスバトルデイ", "pokemon-go-fest": "GOフェス", "event": "イベント", "research": "リサーチ", "go-pass": "GOパス", "raid-battles": "レイド", "raid-hour": "レイドアワー", "raid-day": "レイドデイ", "go-battle-league": "GOバトルリーグ", "season": "シーズン" },
+  evtType: { "community-day": "コミュニティ・デイ", "pokemon-spotlight-hour": "スポットライトアワー", "max-mondays": "マックスマンデー", "max-battles": "マックスバトルデイ", "pokemon-go-fest": "GOフェス", "event": "イベント", "research": "リサーチ", "go-pass": "GOパス", "raid-battles": "レイド", "raid-hour": "レイドアワー", "raid-day": "レイドデイ", "go-battle-league": "GOバトルリーグ", "season": "シーズン", "wild-area": "ワイルドエリア", "pokemon-go-tour": "GOツアー" },
   months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
   dynamax: "ダイマックス", evtClassic: "クラシック",
   evtNameMap: {
@@ -179,7 +179,7 @@ const zhTW: EventsDict = {
   calLegendBand: "━ 橫條 = 多日活動", calLegendBadge: "表情符號 = 當日限定（時刻·日）", calLegendOngoing: "長期活動在上方長期進行列",
   eggH: "🥚 孵化蛋（依距離）", eggIntro: "目前從蛋孵化的寶可夢。", eggShiny: "異色", eggRegional: "地區限定", eggGift: "禮物", eggAdventure: "冒險同步",
   pfx: { mega: "超級", shadow: "暗影", alola: "阿羅拉", galar: "伽勒爾", hisui: "洗翠", paldea: "帕底亞" },
-  evtType: { "community-day": "社群日", "pokemon-spotlight-hour": "聚焦時刻", "max-mondays": "極巨星期一", "max-battles": "極巨戰日", "pokemon-go-fest": "GO Fest", "event": "活動", "research": "研究", "go-pass": "GO Pass", "raid-battles": "團體戰", "raid-hour": "團體戰時刻", "raid-day": "團體戰日", "go-battle-league": "GO 對戰聯盟", "season": "賽季" },
+  evtType: { "community-day": "社群日", "pokemon-spotlight-hour": "聚焦時刻", "max-mondays": "極巨星期一", "max-battles": "極巨戰日", "pokemon-go-fest": "GO Fest", "event": "活動", "research": "研究", "go-pass": "GO Pass", "raid-battles": "團體戰", "raid-hour": "團體戰時刻", "raid-day": "團體戰日", "go-battle-league": "GO 對戰聯盟", "season": "賽季", "wild-area": "狂野地區", "pokemon-go-tour": "GO Tour" },
   months: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
   dynamax: "極巨化", evtClassic: "經典",
   evtNameMap: {

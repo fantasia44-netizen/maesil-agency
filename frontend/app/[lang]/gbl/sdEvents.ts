@@ -133,6 +133,9 @@ const EXTRA: Record<string, [RegExp, string][]> = {
     [/Hatch Day/gi, "부화 데이"], [/Timed Research/gi, "타임 챌린지"], [/Showers/gi, "유성우"],
     [/Southern Delta Aquariids/gi, "물병자리 델타 남쪽"], [/Eta Aquariids/gi, "물병자리 에타"],
     [/Orionids/gi, "오리온자리"], [/Leonids/gi, "사자자리"], [/Geminids/gi, "쌍둥이자리"], [/Perseids/gi, "페르세우스자리"],
+    [/Wild Area/gi, "와일드 에어리어"], [/GO Tour/gi, "GO 투어"],
+    [/Sendai/gi, "센다이"], [/Tohoku/gi, "도호쿠"], [/Mexico City/gi, "멕시코시티"], [/Los Angeles/gi, "로스앤젤레스"], [/Kaohsiung/gi, "가오슝"],
+    [/\bGlobal\b/gi, "글로벌"], [/\bAlola\b/gi, "알로라"],
     [/Pokémon GO/g, "포켓몬 GO"], [/Halloween/gi, "할로윈"], [/Part III\b/g, "파트 3"], [/Part II\b/g, "파트 2"], [/Part I\b/g, "파트 1"],
   ],
   ja: [
@@ -144,6 +147,9 @@ const EXTRA: Record<string, [RegExp, string][]> = {
     [/Hatch Day/gi, "ふかの日"], [/Timed Research/gi, "タイムチャレンジ"], [/Showers/gi, "流星群"],
     [/Southern Delta Aquariids/gi, "みずがめ座δ南"], [/Eta Aquariids/gi, "みずがめ座η"],
     [/Orionids/gi, "オリオン座"], [/Leonids/gi, "しし座"], [/Geminids/gi, "ふたご座"], [/Perseids/gi, "ペルセウス座"],
+    [/Wild Area/gi, "ワイルドエリア"], [/GO Tour/gi, "GOツアー"],
+    [/Sendai/gi, "仙台"], [/Tohoku/gi, "東北"], [/Mexico City/gi, "メキシコシティ"], [/Los Angeles/gi, "ロサンゼルス"], [/Kaohsiung/gi, "高雄"],
+    [/\bGlobal\b/gi, "グローバル"], [/\bAlola\b/gi, "アローラ"],
     [/Pokémon GO/g, "ポケモンGO"], [/Halloween/gi, "ハロウィン"], [/Part III\b/g, "パート3"], [/Part II\b/g, "パート2"], [/Part I\b/g, "パート1"],
   ],
   "zh-TW": [
@@ -155,6 +161,9 @@ const EXTRA: Record<string, [RegExp, string][]> = {
     [/Hatch Day/gi, "孵化日"], [/Timed Research/gi, "限時調查"], [/Showers/gi, "流星雨"],
     [/Southern Delta Aquariids/gi, "寶瓶座δ南"], [/Eta Aquariids/gi, "寶瓶座η"],
     [/Orionids/gi, "獵戶座"], [/Leonids/gi, "獅子座"], [/Geminids/gi, "雙子座"], [/Perseids/gi, "英仙座"],
+    [/Wild Area/gi, "狂野地區"], [/GO Tour/gi, "GO Tour"],
+    [/Sendai/gi, "仙台"], [/Tohoku/gi, "東北"], [/Mexico City/gi, "墨西哥城"], [/Los Angeles/gi, "洛杉磯"], [/Kaohsiung/gi, "高雄"],
+    [/\bGlobal\b/gi, "全球"], [/\bAlola\b/gi, "阿羅拉"],
     [/Pokémon GO/g, "寶可夢GO"], [/Halloween/gi, "萬聖節"], [/Part III\b/g, "第3部"], [/Part II\b/g, "第2部"], [/Part I\b/g, "第1部"],
   ],
 };

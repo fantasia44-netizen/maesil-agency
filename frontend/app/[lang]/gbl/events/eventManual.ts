@@ -44,6 +44,100 @@ export const EVENT_EXTRAS: Record<string, ManualExtra> = {
       "zh-TW": ["太空人皮卡丘 — 一星團體戰登場（可能異色）", "完成免費限時調查可遇到太空人皮卡丘 · 獎勵領取至 10/12"],
     },
   },
+
+  // ── 할로윈 2026 파트 1 (10/27 10:00 ~ 11/1 10:00 현지) ──
+  // 신규 코스튬 3종 데뷔. 코스튬 스프라이트는 이벤트 시작 전이라 UICONS에 아직 없음 → 기본 모습 + 고지.
+  // 에셋이 올라오면 file을 코스튬 파일명으로 바꾸고 notes의 마지막 줄을 지울 것.
+  "halloween-2026-part-1": {
+    mons: [
+      { file: "25.png", name: { ko: "코스튬 피카츄", en: "Costumed Pikachu", ja: "コスチュームピカチュウ", "zh-TW": "造型皮卡丘" }, shiny: true },
+      { file: "41.png", name: { ko: "코스튬 주뱃", en: "Costumed Zubat", ja: "コスチュームズバット", "zh-TW": "造型超音蝠" }, shiny: true },
+      { file: "854.png", name: { ko: "코스튬 데인차", en: "Costumed Sinistea", ja: "コスチュームヤバチャ", "zh-TW": "造型來悲茶" }, shiny: true },
+    ],
+    notes: {
+      ko: [
+        "신규 코스튬 3종 데뷔 — 피카츄(모자·케이프)·주뱃(실크햇)·데인차(리본), 전부 이로치 가능",
+        "코스튬 피카츄·데인차는 1성 레이드, 코스튬 주뱃은 야생 출현",
+        "야생에 해골몽·팽도리(할로윈 코스튬), 둥실라이드는 드물게",
+        "밤에 라벤더타운 리믹스 BGM · 고딕 의상 아바타 아이템(이벤트 후에도 상점 유지)",
+        "※ 코스튬 이미지는 게임 에셋 공개 후 반영 — 지금은 기본 모습",
+      ],
+      en: [
+        "Three new costumes debut — Pikachu (hat & capelet), Zubat (top hat), Sinistea (bow); all can be shiny",
+        "Costumed Pikachu and Sinistea appear in one-star raids; costumed Zubat is a wild encounter",
+        "Also wild: Duskull and Piplup in Halloween costumes, Drifblim more rarely",
+        "A Lavender Town remix plays at night · Gothic avatar items stay in the shop after the event",
+        "* Costume art will be shown once the game assets are published — base forms for now",
+      ],
+      ja: [
+        "新コスチューム3種デビュー — ピカチュウ（帽子・ケープ）・ズバット（シルクハット）・ヤバチャ（リボン）、すべて色違いあり",
+        "コスチュームピカチュウ・ヤバチャは1★レイド、コスチュームズバットは野生に出現",
+        "野生にヨマワル・ポッチャマ（ハロウィンコスチューム）、フワライドは低確率",
+        "夜はシオンタウンのリミックスBGM · ゴシック系アバターアイテムはイベント後もショップに残る",
+        "※ コスチューム画像はゲームアセット公開後に反映 — 現在は通常の姿",
+      ],
+      "zh-TW": [
+        "三種新造型登場 — 皮卡丘（帽子·披風）·超音蝠（高禮帽）·來悲茶（蝴蝶結），皆可能異色",
+        "造型皮卡丘·來悲茶於一星團體戰登場，造型超音蝠為野外遇見",
+        "野外另有夜巡靈·波加曼（萬聖節造型），隨風球機率較低",
+        "夜間播放紫苑鎮重混BGM · 哥德風虛擬人偶服飾活動後仍留在商店",
+        "※ 造型圖片待遊戲素材公開後更新 — 目前為一般外觀",
+      ],
+    },
+  },
+
+  // ── GO 와일드 에어리어 2026 글로벌 (11/14~11/15) ──
+  // 다이맥스 디아루가·펄기아 데뷔. 스프라이트는 기본 모습 + 이름에 "다이맥스"(게임 내 표기도 접두).
+  "pokemon-go-wild-area-2026-global": {
+    mons: [
+      { file: "483.png", name: { ko: "다이맥스 디아루가", en: "Dynamax Dialga", ja: "ダイマックス ディアルガ", "zh-TW": "極巨化 帝牙盧卡" } },
+      { file: "484.png", name: { ko: "다이맥스 펄기아", en: "Dynamax Palkia", ja: "ダイマックス パルキア", "zh-TW": "極巨化 帕路奇亞" } },
+    ],
+    notes: {
+      ko: [
+        "다이맥스 디아루가·펄기아 데뷔 — 11/14(토) 디아루가, 11/15(일) 펄기아 맥스 배틀",
+        "로케이션 배경은 현장 이벤트(센다이·멕시코시티)의 레이드·맥스 배틀에서만 — 원격 참가는 대상 아님",
+      ],
+      en: [
+        "Dynamax Dialga and Palkia debut — Dialga in Max Battles Sat Nov 14, Palkia Sun Nov 15",
+        "Location Backgrounds come only from in-person raids and Max Battles (Sendai / Mexico City) — remote play doesn't qualify",
+      ],
+      ja: [
+        "ダイマックス ディアルガ・パルキアがデビュー — 11/14(土)ディアルガ、11/15(日)パルキアのマックスバトル",
+        "ロケーション背景は現地イベント（仙台・メキシコシティ）のレイド・マックスバトルのみ — リモート参加は対象外",
+      ],
+      "zh-TW": [
+        "極巨化帝牙盧卡·帕路奇亞登場 — 11/14（六）帝牙盧卡、11/15（日）帕路奇亞極巨戰",
+        "地點背景僅限現場活動（仙台·墨西哥城）的團體戰·極巨戰 — 遠距參加不符資格",
+      ],
+    },
+  },
+
+  // ── GO 와일드 에어리어 2026 센다이·도호쿠 (11/6~11/8, 현장 티켓) ──
+  "pokemon-go-wild-area-2026-sendai-japan": {
+    mons: [
+      { file: "483.png", name: { ko: "다이맥스 디아루가", en: "Dynamax Dialga", ja: "ダイマックス ディアルガ", "zh-TW": "極巨化 帝牙盧卡" } },
+      { file: "484.png", name: { ko: "다이맥스 펄기아", en: "Dynamax Palkia", ja: "ダイマックス パルキア", "zh-TW": "極巨化 帕路奇亞" } },
+    ],
+    notes: {
+      ko: [
+        "현장 티켓 이벤트 — 11/6·7·8 중 하루, 10:00~18:00(JST), 센다이시 및 미야기현 일대",
+        "다이맥스 디아루가·펄기아가 맥스 배틀에 등장. 로케이션 배경은 현장 참가자만",
+      ],
+      en: [
+        "Ticketed in-person event — one of Nov 6/7/8, 10:00–18:00 JST, Sendai City and Miyagi Prefecture",
+        "Dynamax Dialga and Palkia appear in Max Battles; Location Backgrounds are for in-person play only",
+      ],
+      ja: [
+        "現地チケットイベント — 11/6・7・8のいずれか1日、10:00〜18:00(JST)、仙台市および宮城県一帯",
+        "ダイマックス ディアルガ・パルキアがマックスバトルに登場。ロケーション背景は現地参加者のみ",
+      ],
+      "zh-TW": [
+        "現場門票活動 — 11/6·7·8 擇一日，10:00~18:00（JST），仙台市與宮城縣一帶",
+        "極巨化帝牙盧卡·帕路奇亞於極巨戰登場。地點背景僅限現場參加者",
+      ],
+    },
+  },
 };
 
 export function manualExtra(eventID: string): ManualExtra | undefined {
