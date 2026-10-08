@@ -459,7 +459,15 @@
       "Bash(node scratch_fix2.cjs)",
       "Bash(rm -f scratch_fix2.cjs)",
       "Bash(npx esbuild *)",
-      "Bash(node scripts/gbl/build_iv.cjs groudon 28)"
+      "Bash(node scripts/gbl/build_iv.cjs groudon 28)",
+      "Bash(awk '{s+=$5; print $9, $5}' END'{print \"TOTAL\", s}')",
+      "Bash(time node scripts/gbl/build_iv.cjs ursaluna 28)",
+      "Bash(node scripts/gbl/run_iv_all.cjs 28)",
+      "Bash(node scratch_groudon.cjs)",
+      "Bash(rm -f scratch_groudon.cjs)",
+      "Bash(node scripts/gbl/verify_iv_integrity.cjs)",
+      "Bash(curl -s --max-time 120 \"http://localhost:3000/gbl/iv\" -o s.html -w \"%{http_code}\\\\n\")",
+      "Bash(curl -s --max-time 120 \"http://localhost:3000/sitemap.xml\")"
     ]
   }
 }

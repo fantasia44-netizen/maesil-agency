@@ -16,8 +16,13 @@ const META_LIMIT = 100;
 const SHIELDS = [0, 1, 2];
 const TARGET = process.argv[2] || "groudon";
 
-// 같은 종족값/CP 라이벌 — CMP(동시차징) 우선권 직접 대결용
-const RIVALS = { groudon: "kyogre", kyogre: "groudon" };
+// 같은 종족값/CP 라이벌 — CMP(동시차징) 우선권 직접 대결용.
+// 공격 실수치가 같으면 공격 IV 1 차이로 우선권이 갈리므로, 이 짝에서만 "공격 15 필수"가 증명된다.
+const RIVALS = {
+  groudon: "kyogre", kyogre: "groudon",
+  kyurem_white: "kyurem_black", kyurem_black: "kyurem_white",   // 둘 다 백 CP 5206
+  reshiram: "zekrom", zekrom: "reshiram",                       // 둘 다 백 CP 4565
+};
 const RIVAL = RIVALS[TARGET] || null;
 
 // 분석할 IV 스프레드 (공격 우선 · HP 사다리 15/15/1x 포함)

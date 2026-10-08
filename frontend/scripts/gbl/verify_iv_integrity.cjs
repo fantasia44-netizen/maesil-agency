@@ -1,4 +1,4 @@
-// 타협개체 분석 20종 데이터 무결성 검증.
+// 타협개체 분석 데이터 무결성 검증(발행 목록 기준 — published.ts와 동기).
 // 페이지명 = CMP명 = IV표명 = CP명 일치 여부 + 데이터 잔존값(잘못된 dex/rival/cp) 탐지.
 const fs = require("fs");
 const path = require("path");
@@ -12,13 +12,16 @@ const ENTRIES = [
   "palkia_origin", "kyogre", "zekrom", "zygarde_complete", "ho_oh", "eternatus",
   "dialga_origin", "rhyperior_shadow", "yveltal", "keldeo_resolute", "rhyperior",
   "metagross", "gholdengo", "garchomp",
+  // 시즌28 신규
+  "ursaluna", "kyurem_black", "reshiram_shadow", "lugia",
+  "zamazenta_crowned_shield", "ursaluna_shadow", "necrozma_dawn_wings", "marshadow",
 ];
 
 // registry.ts monNames() 로직 복제
 const NAME_AFFIX = {
   crowned_sword: [" (검왕)", "s"], crowned_shield: [" (방패왕)", "s"], origin: [" (오리진)", "s"],
   white: [" (화이트)", "s"], black: [" (블랙)", "s"], complete: [" (퍼펙트폼)", "s"],
-  resolute: [" (각오의 모습)", "s"], shadow: ["그림자 ", "p"],
+  resolute: [" (각오의 모습)", "s"], dawn_wings: [" (새벽의 날개)", "s"], dusk_mane: [" (황혼의 갈기)", "s"], shadow: ["그림자 ", "p"],
 };
 function nameKo(id, dex) {
   const base = (PKN[String(dex)] && (PKN[String(dex)].ko || PKN[String(dex)].en)) || id;

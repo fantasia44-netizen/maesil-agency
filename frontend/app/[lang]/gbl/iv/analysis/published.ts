@@ -6,4 +6,6 @@ export const PUBLISHED_ANALYSIS: ReadonlySet<string> = new Set([
   "palkia_origin", "kyogre", "zekrom", "zygarde_complete", "ho_oh", "eternatus",
   "dialga_origin", "rhyperior_shadow", "yveltal", "keldeo_resolute", "rhyperior",
   "metagross", "gholdengo", "garchomp",
+  "ursaluna", "kyurem_black", "reshiram_shadow", "lugia",
+  "zamazenta_crowned_shield", "ursaluna_shadow", "necrozma_dawn_wings", "marshadow",
 ]);

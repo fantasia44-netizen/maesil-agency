@@ -27,6 +27,20 @@ export const FORM_AFFIX: Record<string, Aff> = {
   "Black": { ko: " (블랙)", ja: "（ブラック）", zh: "（黑）", pos: "suffix" },
   "Dusk Mane": { ko: " (황혼의 갈기)", ja: "（たそがれのたてがみ）", zh: "（黃昏之鬃）", pos: "suffix" },
   "Dawn Wings": { ko: " (새벽의 날개)", ja: "（あかつきのつばさ）", zh: "（拂曉之翼）", pos: "suffix" },
+  // 게노세크트 카세트 — 시뮬은 "Chill"처럼 Drive 없이 주기도 해서 두 표기 모두 매핑
+  "Chill": { ko: " (프리즈카세트)", ja: "（フリーズカセット）", zh: "（冰凍卡帶）", pos: "suffix" },
+  "Chill Drive": { ko: " (프리즈카세트)", ja: "（フリーズカセット）", zh: "（冰凍卡帶）", pos: "suffix" },
+  "Shock": { ko: " (번개카세트)", ja: "（イナズマカセット）", zh: "（閃電卡帶）", pos: "suffix" },
+  "Shock Drive": { ko: " (번개카세트)", ja: "（イナズマカセット）", zh: "（閃電卡帶）", pos: "suffix" },
+  "Burn": { ko: " (블레이즈카세트)", ja: "（ブレイズカセット）", zh: "（火焰卡帶）", pos: "suffix" },
+  "Burn Drive": { ko: " (블레이즈카세트)", ja: "（ブレイズカセット）", zh: "（火焰卡帶）", pos: "suffix" },
+  "Douse": { ko: " (아쿠아카세트)", ja: "（アクアカセット）", zh: "（水流卡帶）", pos: "suffix" },
+  "Douse Drive": { ko: " (아쿠아카세트)", ja: "（アクアカセット）", zh: "（水流卡帶）", pos: "suffix" },
+  // 기본 폼 표기 — 시뮬이 괄호로 붙여주는 것들(미매핑이면 영어가 그대로 노출됐음)
+  "Altered": { ko: " (어나더폼)", ja: "（アナザーフォルム）", zh: "（別種）", pos: "suffix" },
+  "Ordinary": { ko: " (평상시 모습)", ja: "（いつものすがた）", zh: "（普通）", pos: "suffix" },
+  "Resolute": { ko: " (각오의 모습)", ja: "（かくごのすがた）", zh: "（覺悟）", pos: "suffix" },
+  "Aria": { ko: " (보이스폼)", ja: "（ボイスフォルム）", zh: "（歌聲）", pos: "suffix" },
   "Mega": { ko: "메가 ", ja: "メガ", zh: "超級", pos: "prefix" },
   "Primal": { ko: "원시 ", ja: "ゲンシ", zh: "原始", pos: "prefix" },
 };
