@@ -12,6 +12,7 @@ import { localizePath, hreflangLanguages, type Locale } from "../../../../../../
 import { moveById, moveName, learnerLink, speciesName } from "../../../moves/movesData";
 import { getMoves } from "../../../moves/dict";
 import DexHub from "../../../DexHubCard";
+import { INDEX_UNRANKED } from "../../../indexGate";
 
 export type Unranked = {
   dex: number; types: string[]; n: Record<string, string>; stats: { atk: number; def: number; hp: number }; maxCp: number; reason: "cp" | "unlisted";
@@ -64,7 +65,7 @@ export function unrankedMetadata(lang: Locale, id: string, u: Unranked): Metadat
   const t = T[lang]; const name = nameOf(lang, u); const path = `/gbl/pokemon/great/${id}`;
   return {
     title: t.title(name), description: t.desc(name, u.maxCp),
-    robots: { index: false, follow: true },
+    ...(INDEX_UNRANKED ? {} : { robots: { index: false, follow: true } }),
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
   };
 }

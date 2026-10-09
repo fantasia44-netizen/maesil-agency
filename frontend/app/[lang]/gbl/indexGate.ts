@@ -34,6 +34,10 @@ export const extRows = (): Record<string, { id: string }[]> => EXT;
 export const UNRANKED_LEAGUE = "great";
 const UNRANKED_MAP = bare(UNRANKED as unknown as Record<string, unknown>);
 export const unrankedDetail = (league: string, id: string): unknown => (league === UNRANKED_LEAGUE ? UNRANKED_MAP[id] : undefined);
+// 2026-10-10(사용자 결정 — "줄여 봤지만 한 달간 효과 없었다, 늘려서 직접 확인"): 랭킹 밖 239종도 색인·사이트맵에 편입.
+// 되돌리려면 INDEX_UNRANKED = false 한 줄(페이지 robots와 사이트맵이 같이 닫힘).
+export const INDEX_UNRANKED = true;
+export const unrankedIds = (): string[] => (INDEX_UNRANKED ? Object.keys(UNRANKED_MAP) : []);
 // 상세 페이지가 있는 전 종의 (id, dex) — 도감 번호 → 대표 speciesId 매핑용(dexHub.ts).
 export function speciesDexPairs(): { id: string; dex: number }[] {
   const seen = new Map<string, number>();
@@ -124,6 +128,7 @@ export const hasDetailLink = (league: string, id: string): boolean =>
 //    되돌리려면 INDEX_TOP200 = false 한 줄.
 //  · 같은 날 추가 결정("심사 때문에 감춰둘 이유가 없다, 원래 구조 전부 복구"): 확장(201위 이후)도 색인 — INDEX_EXT.
 //    랭킹 밖(미진화 등) 기본 정보 페이지와 메가 리그 상세만 noindex 유지.
+//  · 2026-10-10: 랭킹 밖도 색인(INDEX_UNRANKED, 위쪽). noindex로 남은 건 메가 리그 상세뿐.
 export const INDEX_TOP200 = true;
 export const INDEX_EXT = true;
 export function isIndexableMon(league: string, id: string): boolean {

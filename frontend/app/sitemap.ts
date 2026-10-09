@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import RAIDS from "./[lang]/gbl/gbl_raids.json";
 import { GUIDES } from "./[lang]/gbl/guide/guides";
 import { IV_ANALYSIS } from "./[lang]/gbl/iv/analysis/registry";
-import { indexableMonIds } from "./[lang]/gbl/indexGate";
+import { indexableMonIds, unrankedIds, UNRANKED_LEAGUE } from "./[lang]/gbl/indexGate";
 import { indexableMoveSlugs } from "./[lang]/gbl/moves/movesData";
 import { raidMoveSlugs } from "./[lang]/gbl/raid/moves/raidMovesData";
 import { POSTS, postLangs } from "./[lang]/gbl/news/posts";
@@ -47,6 +47,8 @@ function gblPaths(): [string, CF, number][] {
     ["/gbl/events", "daily", 0.8],
     // 포켓몬 개별 — 색인 게이트 통과분만(현재 시즌 스냅샷, 페이지 robots 판정과 동일 소스). 나머지는 페이지 유지·noindex(indexGate.ts).
     ...LEAGUES.flatMap((l) => indexableMonIds(l).map((id) => [`/gbl/pokemon/${l}/${id}`, "weekly", 0.6] as [string, CF, number])),
+    // 랭킹 밖(미진화 등) 기본 정보 페이지 — 색인 스위치 INDEX_UNRANKED가 켜졌을 때만(꺼지면 빈 목록).
+    ...unrankedIds().map((id) => [`/gbl/pokemon/${UNRANKED_LEAGUE}/${id}`, "weekly", 0.5] as [string, CF, number]),
     // 기술 도감 — 허브는 항상, 상세는 색인 스위치(NEXT_PUBLIC_GBL_INDEX_MOVES=1)가 켜졌을 때 메타 채용 기술만(movesData.ts).
     ["/gbl/moves", "weekly", 0.7],
     ...indexableMoveSlugs().map((s) => [`/gbl/moves/${s}`, "weekly", 0.5] as [string, CF, number]),
