@@ -50,6 +50,9 @@ export function middleware(req: NextRequest) {
   }
 
   const host = (req.headers.get("host") || "").toLowerCase();
+  // 옛 주소(gbl.maesil.net) → gblnote.com 301. 초기 이용자들이 옛 주소를 그대로 쓰는데, 그 호스트는 애드센스 미승인이라 광고가 안 나감(페이지뷰의 4%).
+  // 경로·쿼리 유지. 로그인 토큰은 브라우저 저장소(주소별)라 옮겨 온 이용자는 한 번 다시 로그인해야 함(기록은 서버에 있어 그대로).
+  if (host === "gbl.maesil.net") return NextResponse.redirect(new URL((pathname === "/" ? "/gbl" : pathname) + req.nextUrl.search, "https://gblnote.com"), 301);
   const hostSection = sectionForHost(host);
   const seg1 = pathname.split("/")[1];
 

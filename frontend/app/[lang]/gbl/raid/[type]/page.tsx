@@ -238,8 +238,8 @@ export default function RaidTypePage({ params, searchParams }: { params: { lang:
               const tier = RAID_TIER(r.rel);
               return (
                 <Fragment key={`${r.name}-${i}`}>
-                {/* 광고 1자리 — 상위 5마리 아래(목록 끝은 모바일 78% 지점이라 노출 안 됨) */}
-                {i === 5 && <AdSlot />}
+                {/* 광고 1자리 — 상위 3마리 아래. 2026-10-10: 5마리 아래 → 3마리 아래(휴대폰 조회 가능 비율 39%, 데스크톱 69% — 휴대폰에서 광고까지 내려가지 않음) */}
+                {i === 3 && <AdSlot />}
                 <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderLeft: `4px solid ${c}`, borderRadius: 10, padding: "8px 10px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
                     <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "#94a3b8", width: 22, textAlign: "center" }}>{i + 1}</span>
