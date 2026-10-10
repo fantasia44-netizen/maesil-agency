@@ -7,6 +7,7 @@ import { speciesOf, speciesName } from "../moves/movesData";
 import { dexPath, ivKeyOf, zhNameOfSid } from "../dexHub";
 import { counterRows, typeTopRows, multVs, type AttackerRow } from "../raid/counterCalc";
 import { ALL_TYPES } from "../pokemon/[league]/[id]/typeChart";
+import { rankIVs, LEAGUE_CAP } from "../iv/ivRank";
 import type { Locale } from "../../../../lib/i18n";
 
 // ── 보스 카드: 타입 · 약점(배율) · 반감 · 100% 개체 CP ────────────────────
@@ -51,4 +52,25 @@ export function countersFor(lang: Locale, bossSid: string, n = 10): AttackerRow[
 // 한 타입 딜러표의 상위 n.
 export function raidTopFor(lang: Locale, type: string, n = 8): AttackerRow[] {
   return typeTopRows(lang, type, n);
+}
+
+// ── 리그별 개체값 요약(이벤트로 잡은 개체를 볼 때 쓰는 "IV표") ───────────────
+// IV 순위 체커(iv/ivRank.ts)와 같은 계산: 리그 CP 제한 안에서 스탯 곱이 가장 큰 개체값(레벨 50까지). 개체값은 공격/방어/체력 순.
+// floor = 그 방법으로 얻을 때의 최소 개체값(알 · 레이드 · 리서치는 10, 야생은 0) — 0보다 크면 "그 범위 안의 최고"를 따로 보여 준다.
+export type IvPick = { iv: string; level: number; cp: number; rank: number };
+export type IvLeague = { league: string; top: IvPick[]; hundo: IvPick; floorBest: IvPick | null };
+export function ivSummary(lang: Locale, sid: string, floor = 0, n = 3): { name: string; leagues: IvLeague[] } | null {
+  const sp = bossBase(lang, sid), st = baseStats(sid);
+  if (!sp || !st) return null;
+  const pick = (r: { ia: number; id: number; is: number; level: number; cp: number; rank: number }): IvPick => ({ iv: `${r.ia}/${r.id}/${r.is}`, level: r.level, cp: r.cp, rank: r.rank });
+  const leagues = ["great", "ultra", "master"].map((league) => {
+    const rows = rankIVs(st, LEAGUE_CAP[league]);
+    const hundo = rows.find((r) => r.ia === 15 && r.id === 15 && r.is === 15);
+    const fb = floor > 0 ? rows.find((r) => r.ia >= floor && r.id >= floor && r.is >= floor) : undefined;
+    if (!hundo) return null;
+    // CP 제한이 없는 리그는 15/15/15가 1위다. 체력은 소수점을 버리기 때문에 15/15/14와 스탯 곱이 같게 나오는 종이 있어(동률), 표에는 15/15/15 한 줄만 1위로 둔다.
+    if (LEAGUE_CAP[league] == null) { const h = { ...pick(hundo), rank: 1 }; return { league, top: [h], hundo: h, floorBest: fb ? h : null }; }
+    return { league, top: rows.slice(0, n).map(pick), hundo: pick(hundo), floorBest: fb ? pick(fb) : null };
+  }).filter((x): x is IvLeague => !!x);
+  return leagues.length ? { name: sp.name, leagues } : null;
 }

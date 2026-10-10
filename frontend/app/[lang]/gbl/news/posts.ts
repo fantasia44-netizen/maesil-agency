@@ -11,6 +11,7 @@
 //      { counters: { boss: "dialga", n: 10 } }    추천 딜러 표(약점 타입 딜러표를 합쳐 종합 점수 순)
 //      { raidTop: { type: "electric", n: 8, mark: ["zekrom_shadow"] } }   한 타입 딜러표 상위 n(mark = 강조)
 //      { dex: "dialga" }                          도감 카드(배틀리그 순위·레이드 기술·IV 링크)
+//      { iv: { sid: "zoroark", floor: 0 } }       리그별 1위 개체값 표(IV 체커와 같은 계산). floor = 얻는 방법의 최소 개체값(알·레이드·리서치 10, 야생 0)
 // 4) 문장 안의 내부 링크는 [[/gbl/raid/electric|전기 딜러 순위]] 형식. 로케일 접두는 자동으로 붙는다.
 // 5) 사실은 확인된 것만. 일정은 이벤트 피드, 보상·코스튬 등은 공식 뉴스에서 교차 확인한 것(events/eventManual.ts의 원칙과 같음).
 //    출처는 sources에 적는다. 주소를 모르면 label만.
@@ -28,7 +29,8 @@ export type Block =
   | { weak: string }
   | { counters: { boss: string; n?: number } }
   | { raidTop: { type: string; n?: number; mark?: string[] } }
-  | { dex: string };
+  | { dex: string }
+  | { iv: { sid: string; floor?: number; n?: number } };
 export type PostContent = { title: string; desc: string; keywords?: string[]; blocks: Block[]; tools?: { path: string; label: string }[] };
 export type Post = {
   slug: string; cat: Cat;
@@ -41,6 +43,58 @@ export type Post = {
 };
 
 export const POSTS: Post[] = [
+  // ───────────────────────────────────────────────────────────────────────
+  {
+    slug: "zorua-guide-2026-10", cat: "analysis", published: "2026-10-11", mons: ["zorua", "zoroark"], covers: ["mon:zorua:2026-10"],
+    sources: [{ label: "일정: LeekDuck 이벤트 피드(ScrapedDuck)" }, { label: "개체값 순위·배틀리그 순위: GBL Note 자체 계산" }],
+    ko: {
+      title: "포켓몬고 조로아크 개체값 정리 — 리그별 IV표와 배틀리그 순위 (조로아 커뮤니티 데이)",
+      desc: "조로아 커뮤니티 데이에 잡은 개체 가운데 무엇을 진화시킬지 고를 때 보는 조로아크의 리그별 개체값 순위표와 배틀리그 순위를 GBL Note 데이터로 정리했습니다.",
+      keywords: ["포켓몬고 조로아 개체값", "조로아크 IV", "조로아크 개체값", "조로아 커뮤니티 데이", "조로아크 배틀리그"],
+      blocks: [
+        { p: "10월 10일(토) 오후 2시부터 5시까지 조로아 커뮤니티 데이가 열렸습니다. 그날 잡아 둔 조로아 가운데 어떤 개체를 조로아크로 진화시킬지 고를 때 볼 표를 정리했습니다." },
+        { h: "리그별로 순위가 높은 개체값" },
+        { p: "아래 표는 조로아크의 리그별 개체값 순위입니다. 개체값은 공격/방어/체력 순서입니다. 야생에서 잡은 포켓몬은 개체값이 0부터 15까지 고르게 나올 수 있어, 100% 개체가 아니어도 리그에 따라서는 순위가 더 높을 수 있습니다." },
+        { iv: { sid: "zoroark", floor: 0 } },
+        { p: "슈퍼리그와 하이퍼리그는 CP 제한이 있어서, 표에서 보듯 공격이 낮고 방어와 체력이 높은 개체가 위에 옵니다. 공격 개체값이 낮을수록 같은 CP 안에서 레벨을 더 올릴 수 있기 때문입니다. 마스터리그는 CP 제한이 없어 15/15/15가 가장 좋습니다. 가지고 있는 개체의 정확한 순위는 [[/gbl/iv|IV 순위 체커]]에 개체값을 넣으면 바로 나옵니다." },
+        { h: "배틀리그에서의 위치" },
+        { p: "조로아크의 리그별 순위와 추천 기술은 아래 카드에서 확인할 수 있습니다. 진화 전에 리그별 티어표에서 어느 리그에 쓸지 먼저 정해 두면 개체를 고르기 쉽습니다." },
+        { dex: "zoroark" },
+        { note: "개체값 순위는 IV 순위 체커와 같은 계산(리그 CP 제한 안에서 스탯 곱 기준, 레벨 50까지)이며, 순위와 수치는 GBL Note 자체 계산입니다." },
+      ],
+      tools: [
+        { path: "/gbl/iv", label: "IV 순위 체커" }, { path: "/gbl/tier/great", label: "슈퍼리그 티어표" },
+        { path: "/gbl/tier/ultra", label: "하이퍼리그 티어표" }, { path: "/gbl/events", label: "이벤트 달력" },
+      ],
+    },
+  },
+  // ───────────────────────────────────────────────────────────────────────
+  {
+    slug: "landorus-incarnate-raid-guide-2026-10", cat: "raid", published: "2026-10-11", mons: ["landorus_incarnate_shadow"], covers: ["raid:landorus_incarnate:2026-10"],
+    sources: [{ label: "일정: LeekDuck 이벤트 피드(ScrapedDuck)" }, { label: "주말에만 등장: LeekDuck · Snack Nap · Vice 공통" }, { label: "약점·추천 딜러·CP: GBL Note 자체 계산" }],
+    ko: {
+      title: "포켓몬고 섀도우 랜드로스 레이드 공략 — 약점·추천 딜러·100% CP (11월 3일까지 주말)",
+      desc: "10월 7일부터 11월 3일까지 주말마다 5성 섀도우 레이드에 나오는 섀도우 랜드로스(화신폼)의 약점, 추천 딜러 순위, 100% 개체 CP를 GBL Note 데이터로 정리했습니다.",
+      keywords: ["포켓몬고 섀도우 랜드로스", "섀도우 랜드로스 레이드", "랜드로스 약점", "섀도우 랜드로스 추천 포켓몬", "섀도우 랜드로스 100 CP"],
+      blocks: [
+        { p: "섀도우 랜드로스(화신폼)가 10월 7일(수) 오전 6시부터 11월 3일(화) 오후 10시까지 5성 섀도우 레이드에 나옵니다. 기간 내내 열리는 것이 아니라 주말에만 나옵니다. 이로치도 나올 수 있습니다." },
+        { boss: "landorus_incarnate" },
+        { h: "얼음이 이중 약점입니다" },
+        { p: "랜드로스는 땅·비행 타입이라 얼음 기술을 두 타입 모두 약점으로 받습니다. 물도 약점이지만 배율 차이가 커서, 얼음 딜러를 먼저 채우고 모자란 자리를 물 딜러로 메우는 편이 좋습니다. 비행 타입이 섞여 있어도 전기는 약점이 아닙니다. 땅 타입이 전기 기술을 거의 받지 않기 때문입니다." },
+        { h: "추천 딜러" },
+        { p: "아래는 GBL Note 딜러 티어표의 기술배치를 랜드로스의 타입 상성에 맞춰 다시 계산한 순위입니다. 메가·섀도우를 뺀 순위와 보스가 쓰는 기술은 [[/gbl/raid/boss/landorus_incarnate_shadow|섀도우 랜드로스 레이드 공략 페이지]]에 있습니다. 여기에 없는 포켓몬은 [[/gbl/raid/ice|얼음 딜러 순위]]와 [[/gbl/raid/water|물 딜러 순위]]에서 찾아보세요." },
+        { counters: { boss: "landorus_incarnate", n: 10 } },
+        { h: "잡은 뒤에는" },
+        { p: "잡은 랜드로스의 배틀리그 순위와 레이드 기술배치는 아래 카드에서 확인할 수 있습니다. 섀도우 포켓몬은 공격이 1.2배가 되는 대신 방어가 낮아져, 레이드 딜러로는 일반 개체보다 화력이 높고 버티는 시간은 짧습니다." },
+        { dex: "landorus_incarnate" },
+        { note: "100% 개체 CP는 레이드에서 잡았을 때(레벨 20, 날씨 부스트 시 레벨 25) 개체값 15/15/15의 CP이며, 섀도우 개체도 같은 값입니다. 순위와 수치는 GBL Note 자체 계산이며, 데이터를 갱신하면 이 글의 표도 함께 바뀝니다." },
+      ],
+      tools: [
+        { path: "/gbl/raid/boss/landorus_incarnate_shadow", label: "섀도우 랜드로스 공략 페이지" }, { path: "/gbl/raid/ice", label: "얼음 딜러 순위" },
+        { path: "/gbl/raid/water", label: "물 딜러 순위" }, { path: "/gbl/raid/bosses", label: "지금 보스 · 100% CP" },
+      ],
+    },
+  },
   // ───────────────────────────────────────────────────────────────────────
   {
     slug: "weekly-2026-10-12", cat: "event", published: "2026-10-11", mons: ["dialga", "stufful", "sandile"], covers: ["weekly:2026-10-12"],
@@ -56,7 +110,7 @@ export const POSTS: Post[] = [
           "10월 13일(화) 오후 10시까지: 5성 [[/gbl/raid/boss/yveltal|이벨타르]], 메가 레이드 [[/gbl/raid/boss/blastoise_mega|메가 거북왕]]",
           "10월 14일(수) 오전 6시 ~ 10월 20일(화) 오후 10시: 5성 [[/gbl/raid/boss/dialga|디아루가]], 메가 레이드 [[/gbl/raid/boss/dragonite_mega|메가 망나뇽]]",
           "10월 14일(수) 오후 6시 ~ 오후 7시: 디아루가 레이드 아워",
-          "11월 3일(화) 오후 10시까지: 섀도우 레이드 [[/gbl/raid/boss/landorus_incarnate_shadow|섀도우 랜드로스]]",
+          "11월 3일(화) 오후 10시까지, 주말에만: 섀도우 레이드 [[/gbl/raid/boss/landorus_incarnate_shadow|섀도우 랜드로스]] — [[/gbl/news/landorus-incarnate-raid-guide-2026-10|공략 글]]",
         ] },
         { p: "보스 이름을 누르면 약점, 그 보스에 맞춰 계산한 추천 포켓몬, 개체값별 CP를 볼 수 있습니다. 이번 주에 새로 나오는 5성 보스는 디아루가입니다." },
         { boss: "dialga" },

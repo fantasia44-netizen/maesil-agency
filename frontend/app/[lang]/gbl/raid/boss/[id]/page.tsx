@@ -183,6 +183,7 @@ export default async function BossGuidePage({ params }: { params: { lang: string
           <span style={stChip("#0f172a", "#fff")}>{t.kind[b.kind]}</span>
           {!status.ok ? <span style={stChip("#f1f5f9", "#64748b")}>{t.stUnknown}</span>
             : status.now ? <span style={stChip("#dcfce7", "#166534")}>{t.stNow}{status.until ? ` · ${t.stUntil(t.date(status.until))}` : ""}</span>
+            : status.weekend ? <span style={stChip("#ede9fe", "#5b21b6")}>{t.stWeekend(t.date(status.weekend.start), t.date(status.weekend.end))}</span>
             : status.next.length === 0 ? <span style={stChip("#f1f5f9", "#64748b")}>{t.stNone}</span> : null}
           {status.next.slice(0, 2).map((w) => <span key={w.start} style={stChip("#e0f2fe", "#075985")}>{t.stNext(t.date(w.start), t.date(w.end))}</span>)}
           {status.shiny && <span style={stChip("#fef9c3", "#854d0e")}>✨ {t.shiny}</span>}

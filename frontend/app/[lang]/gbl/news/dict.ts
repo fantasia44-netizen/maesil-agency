@@ -12,6 +12,7 @@ export type NewsDict = {
   weakH: string; resistH: string; doubleWeak: string; upcoming: string; cpLabel: string; cpBoost: string; dexLink: string;
   colRank: string; colMon: string; colType: string; colMoves: string; colDps: string; colOverall: string;
   countersSub: string; raidTopSub: string;
+  ivLeague: string; ivBest: string; ivHundo: string; ivFloor: (n: number) => string; ivRank: (n: number) => string; ivSub: string;
   // 홈·RSS
   homeH: string; homeMore: string; rssTitle: string; rssDesc: string;
 };
@@ -28,7 +29,8 @@ const ko: NewsDict = {
   toolsH: "함께 보면 좋은 도구", moreH: "다른 소식", sourcesH: "출처", empty: "아직 올라온 글이 없습니다.",
   weakH: "약점", resistH: "반감", doubleWeak: "이중 약점", upcoming: "출시 예정", cpLabel: "100% 개체 CP", cpBoost: "날씨 부스트", dexLink: "도감 보기 →",
   colRank: "순위", colMon: "포켓몬", colType: "공격 타입", colMoves: "추천 기술", colDps: "사이클 DPS", colOverall: "종합",
-  countersSub: "딜러 티어표(레벨 40 · 개체값 15) 기준. 약점 타입 공격수를 합쳐 종합 점수 순으로 정렬했습니다.",
+  countersSub: "딜러 티어표(레벨 40 · 개체값 15)의 기술배치를 이 보스의 타입 상성으로 다시 계산해 종합 점수 순으로 정렬했습니다.",
+  ivLeague: "리그", ivBest: "순위 높은 개체값 (공/방/체)", ivHundo: "15/15/15의 순위", ivFloor: (n) => `개체값 ${n} 이상 중 최고`, ivRank: (n) => `${n.toLocaleString("en-US")}위`, ivSub: "IV 순위 체커와 같은 계산입니다. 리그 CP 제한 안에서 스탯 곱이 가장 큰 개체값 순(레벨 50까지). 마스터리그는 CP 제한이 없어 15/15/15가 1위입니다.",
   raidTopSub: "딜러 티어표(레벨 40 · 개체값 15) 기준 종합 점수 순.",
   homeH: "최신 소식", homeMore: "뉴스 전체 →",
   rssTitle: "GBL Note — 포켓몬고 뉴스 · 공략", rssDesc: "포켓몬 GO 이벤트 소식과 레이드 보스 공략",
@@ -46,7 +48,8 @@ const en: NewsDict = {
   toolsH: "Related tools", moreH: "More news", sourcesH: "Sources", empty: "No articles yet.",
   weakH: "Weak to", resistH: "Resists", doubleWeak: "double weakness", upcoming: "Upcoming", cpLabel: "100% IV CP", cpBoost: "weather boosted", dexLink: "Pokédex page →",
   colRank: "Rank", colMon: "Pokémon", colType: "Attack type", colMoves: "Moveset", colDps: "Cycle DPS", colOverall: "Overall",
-  countersSub: "From the attacker tiers (Level 40, 15 IVs). Attackers of every weakness type are merged and sorted by overall score.",
+  countersSub: "Movesets from the attacker tiers (Level 40, 15 IVs), recalculated with this boss's type matchups and sorted by overall score.",
+  ivLeague: "League", ivBest: "Top-ranked IVs (Atk/Def/HP)", ivHundo: "Rank of 15/15/15", ivFloor: (n) => `Best with IVs ${n}+`, ivRank: (n) => `#${n.toLocaleString("en-US")}`, ivSub: "Same calculation as the IV rank checker: highest stat product within the league CP cap (up to level 50). Master League has no cap, so 15/15/15 is rank 1.",
   raidTopSub: "From the attacker tiers (Level 40, 15 IVs), sorted by overall score.",
   homeH: "Latest news", homeMore: "All news →",
   rssTitle: "GBL Note — Pokémon GO News & Guides", rssDesc: "Pokémon GO event news and raid boss guides",
@@ -64,7 +67,8 @@ const ja: NewsDict = {
   toolsH: "あわせて使えるツール", moreH: "ほかのニュース", sourcesH: "出典", empty: "まだ記事がありません。",
   weakH: "弱点", resistH: "半減", doubleWeak: "二重弱点", upcoming: "実装予定", cpLabel: "100%個体CP", cpBoost: "天候ブースト", dexLink: "図鑑を見る →",
   colRank: "順位", colMon: "ポケモン", colType: "攻撃タイプ", colMoves: "おすすめ技", colDps: "サイクルDPS", colOverall: "総合",
-  countersSub: "アタッカーティア(レベル40 · 個体値15)基準。弱点タイプのアタッカーをまとめ、総合スコア順に並べています。",
+  countersSub: "アタッカーティア(レベル40 · 個体値15)のわざ構成を、このボスのタイプ相性で計算し直し、総合スコア順に並べています。",
+  ivLeague: "リーグ", ivBest: "順位の高い個体値（攻撃/防御/HP）", ivHundo: "15/15/15の順位", ivFloor: (n) => `個体値${n}以上の中で最高`, ivRank: (n) => `${n.toLocaleString("en-US")}位`, ivSub: "個体値ランクチェッカーと同じ計算です。リーグのCP制限内でステータス積が最も大きい個体値の順（レベル50まで）。マスターリーグはCP制限がないため15/15/15が1位です。",
   raidTopSub: "アタッカーティア(レベル40 · 個体値15)基準の総合スコア順。",
   homeH: "最新ニュース", homeMore: "ニュース一覧 →",
   rssTitle: "GBL Note — ポケモンGO ニュース・攻略", rssDesc: "ポケモンGOのイベント情報とレイドボス攻略",
@@ -82,7 +86,8 @@ const zh: NewsDict = {
   toolsH: "相關工具", moreH: "其他新聞", sourcesH: "資料來源", empty: "目前還沒有文章。",
   weakH: "弱點", resistH: "抵抗", doubleWeak: "雙重弱點", upcoming: "即將推出", cpLabel: "100%個體CP", cpBoost: "天氣加成", dexLink: "查看圖鑑 →",
   colRank: "排名", colMon: "寶可夢", colType: "攻擊屬性", colMoves: "推薦招式", colDps: "循環DPS", colOverall: "綜合",
-  countersSub: "依攻擊手排行(等級40 · 個體值15)。合併各弱點屬性的攻擊手，依綜合評分排序。",
+  countersSub: "將攻擊手排行(等級40 · 個體值15)的招式組合依這隻頭目的屬性相剋重新計算，依綜合評分排序。",
+  ivLeague: "聯盟", ivBest: "排名最高的個體值（攻擊/防禦/HP）", ivHundo: "15/15/15的排名", ivFloor: (n) => `個體值${n}以上中最佳`, ivRank: (n) => `第${n.toLocaleString("en-US")}名`, ivSub: "與IV排名查詢相同的計算：在聯盟CP上限內能力值乘積最大的個體值順序（至等級50）。大師聯盟沒有CP上限，因此15/15/15為第1名。",
   raidTopSub: "依攻擊手排行(等級40 · 個體值15)的綜合評分排序。",
   homeH: "最新消息", homeMore: "全部新聞 →",
   rssTitle: "GBL Note — 寶可夢GO 新聞 · 攻略", rssDesc: "寶可夢GO活動消息與團體戰頭目攻略",

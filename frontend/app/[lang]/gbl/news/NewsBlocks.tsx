@@ -7,7 +7,8 @@ import { localizePath, type Locale } from "../../../../lib/i18n";
 import { typeLabel, TYPE_COLOR } from "../typeLabels";
 import { moveName, speciesOf, type Move } from "../moves/movesData";
 import { raidMoveById } from "../raid/moves/raidMovesData";
-import { bossInfo, countersFor, raidTopFor, type AttackerRow } from "./newsData";
+import { bossInfo, countersFor, raidTopFor, ivSummary, type AttackerRow } from "./newsData";
+import { leagueName } from "../contentI18n";
 import { bossGuidePath, GUIDE_LABEL } from "../raid/boss/bosses";
 import type { NewsDict } from "./dict";
 import type { Block } from "./posts";
@@ -133,6 +134,40 @@ function BossCard({ lang, t, sid, withCp }: { lang: Locale; t: NewsDict; sid: st
   );
 }
 
+function IvTable({ lang, t, sid, floor, n }: { lang: Locale; t: NewsDict; sid: string; floor: number; n: number }) {
+  const s = ivSummary(lang, sid, floor, n);
+  // 표가 조용히 비면 글에 구멍이 난 채 발행된다 — 빌드에서 걸리게 한다.
+  if (!s) throw new Error(`뉴스 { iv } 블록: 종족값을 찾을 수 없는 sid "${sid}"`);
+  const cell = (p: { iv: string; level: number; cp: number }) => <><b style={num}>{p.iv}</b> <span style={{ fontSize: "0.72rem", color: "#64748b", whiteSpace: "nowrap" }}>Lv {p.level} · CP {p.cp.toLocaleString("en-US")}</span></>;
+  return (
+    <div style={{ margin: "10px 0 16px" }}>
+      <div style={tableBox}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={th}>{t.ivLeague}</th>
+              <th style={th}>{t.ivBest}</th>
+              <th style={th}>{t.ivHundo}</th>
+              {floor > 0 && <th style={th}>{t.ivFloor(floor)}</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {s.leagues.map((l) => (
+              <tr key={l.league}>
+                <td style={{ ...td, fontWeight: 800, whiteSpace: "nowrap" }}>{leagueName(lang, l.league)}</td>
+                <td style={td}>{l.top.map((p, i) => <div key={p.iv} style={{ opacity: i === 0 ? 1 : 0.72 }}><span style={{ ...num, color: i === 0 ? "#dc2626" : "#94a3b8", marginRight: 5 }}>{i + 1}</span>{cell(p)}</div>)}</td>
+                <td style={td}><span style={num}>{t.ivRank(l.hundo.rank)}</span> <span style={{ fontSize: "0.72rem", color: "#64748b", whiteSpace: "nowrap" }}>Lv {l.hundo.level} · CP {l.hundo.cp.toLocaleString("en-US")}</span></td>
+                {floor > 0 && <td style={td}>{l.floorBest ? <>{cell(l.floorBest)} <span style={{ fontSize: "0.72rem", color: "#64748b" }}>({t.ivRank(l.floorBest.rank)})</span></> : "-"}</td>}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p style={{ margin: "6px 0 0", fontSize: "0.72rem", color: "#94a3b8", lineHeight: 1.6 }}>{t.ivSub}</p>
+    </div>
+  );
+}
+
 export default function NewsBlocks({ lang, t, blocks, adAfter, ad }: { lang: Locale; t: NewsDict; blocks: Block[]; adAfter?: number; ad?: React.ReactNode }) {
   return (
     <>
@@ -154,6 +189,7 @@ export default function NewsBlocks({ lang, t, blocks, adAfter, ad }: { lang: Loc
         else if ("weak" in b) el = <BossCard lang={lang} t={t} sid={b.weak} withCp={false} />;
         else if ("counters" in b) el = <AttackerTable lang={lang} t={t} rows={countersFor(lang, b.counters.boss, b.counters.n)} showType sub={t.countersSub} />;
         else if ("raidTop" in b) el = <AttackerTable lang={lang} t={t} rows={raidTopFor(lang, b.raidTop.type, b.raidTop.n)} showType={false} mark={b.raidTop.mark} sub={t.raidTopSub} />;
+        else if ("iv" in b) el = <IvTable lang={lang} t={t} sid={b.iv.sid} floor={b.iv.floor || 0} n={b.iv.n || 3} />;
         else if ("dex" in b) { const sp = speciesOf(b.dex.replace(/_shadow$/, "")); el = sp ? (
           <div style={{ margin: "6px 0 14px" }}>
             <div style={{ fontSize: "0.86rem", fontWeight: 800, color: "#0f172a" }}>{sp.n[lang] || sp.n.en}</div>

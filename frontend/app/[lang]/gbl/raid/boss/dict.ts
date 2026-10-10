@@ -10,7 +10,7 @@ export type BossDict = {
   metaTitle: (name: string, weak: string, cp: number) => string;
   metaDesc: (name: string, top: string, weak: string, cp20: number, cp25: number) => string;
   lead: (name: string, types: string, weak: string, top: string) => string;
-  stNow: string; stUntil: (end: string) => string; stNext: (start: string, end: string) => string; stNone: string; stUnknown: string; shiny: string;
+  stNow: string; stUntil: (end: string) => string; stNext: (start: string, end: string) => string; stNone: string; stUnknown: string; stWeekend: (start: string, end: string) => string; shiny: string;
   weakH: string; resistH: string; doubleWeak: string; cpH: string; cpNormal: string; cpBoost: string; bossWeather: (w: string) => string;
   atkWeatherH: string;
   countersH: (name: string) => string; countersSub: string;
@@ -48,7 +48,7 @@ const ko: BossDict = {
   metaTitle: (n, w, cp) => `포켓몬고 ${n} 레이드 공략 — 약점 ${w} · 100% CP ${cp}`,
   metaDesc: (n, top, w, a, b) => `${n} 레이드 약점은 ${w}. 추천 포켓몬 ${top}. 100% 개체 CP는 ${a}(날씨 부스트 ${b}). 보스 타입에 맞춰 다시 계산한 추천 순위와 기술배치, 보스가 쓰는 기술까지 정리했습니다.`,
   lead: (n, ty, w, top) => `${n}${josa(n, "은", "는")} ${ty} 타입 보스입니다. 약점 타입은 ${w}. 지금 딜러 데이터로 계산한 추천 1순위는 ${top}입니다. 아래 순위는 타입별 딜러표를 이 보스의 상성에 맞춰 다시 계산한 것입니다.`,
-  stNow: "지금 등장 중", stUntil: (e) => `${e}까지`, stNext: (s, e) => `등장 예정 ${s} ~ ${e}`, stNone: "지금은 레이드에 나오지 않습니다", stUnknown: "등장 여부를 확인하지 못했습니다", shiny: "색이 다른 포켓몬 가능",
+  stNow: "지금 등장 중", stUntil: (e) => `${e}까지`, stNext: (s, e) => `등장 예정 ${s} ~ ${e}`, stNone: "지금은 레이드에 나오지 않습니다", stWeekend: (s, e) => `주말에 등장 · ${s} ~ ${e}`, stUnknown: "등장 여부를 확인하지 못했습니다", shiny: "색이 다른 포켓몬 가능",
   weakH: "약점", resistH: "반감", doubleWeak: "이중 약점", cpH: "잡을 때 CP", cpNormal: "100% 개체", cpBoost: "날씨 부스트", bossWeather: (w) => `${w} 날씨면 레벨 25로 잡힙니다`,
   atkWeatherH: "약점 타입이 강해지는 날씨",
   countersH: (n) => `${n} 추천 포켓몬`, countersSub: "레벨 40 · 개체값 15 · 상대 방어 180 기준. 딜러 티어표의 기술배치를 이 보스의 타입 상성(노멀 기술·스페셜 기술 각각)으로 다시 계산했습니다. 종합은 화력과 버티는 시간을 함께 본 점수입니다.",
@@ -77,7 +77,7 @@ const en: BossDict = {
   metaTitle: (n, w, cp) => `${n} Raid Guide — Weak to ${w} · 100% CP ${cp}`,
   metaDesc: (n, top, w, a, b) => `${n} is weak to ${w}. Best counters: ${top}. 100% IV CP is ${a} (${b} weather boosted). Counter rankings recalculated for this boss's typing, with movesets and the boss's own moves.`,
   lead: (n, ty, w, top) => `${n} is a ${ty}-type boss. It is weak to ${w}, and the top counter in our current attacker data is ${top}. The ranking below is our per-type attacker table recalculated for this boss's type matchups.`,
-  stNow: "In raids now", stUntil: (e) => `until ${e}`, stNext: (s, e) => `Scheduled ${s} – ${e}`, stNone: "Not in raids right now", stUnknown: "Could not check current availability", shiny: "Shiny available",
+  stNow: "In raids now", stUntil: (e) => `until ${e}`, stNext: (s, e) => `Scheduled ${s} – ${e}`, stNone: "Not in raids right now", stWeekend: (s, e) => `Weekends · ${s} – ${e}`, stUnknown: "Could not check current availability", shiny: "Shiny available",
   weakH: "Weak to", resistH: "Resists", doubleWeak: "double weakness", cpH: "Catch CP", cpNormal: "100% IV", cpBoost: "Weather boosted", bossWeather: (w) => `Caught at level 25 in ${w} weather`,
   atkWeatherH: "Weather that boosts its weaknesses",
   countersH: (n) => `Best ${n} counters`, countersSub: "Level 40, 15 IVs, target defense 180. Each attacker's moveset from our tier table is recalculated with this boss's type matchups (fast and charged moves separately). Overall combines damage output and time survived.",
@@ -106,7 +106,7 @@ const ja: BossDict = {
   metaTitle: (n, w, cp) => `ポケモンGO ${n} レイド攻略 — 弱点 ${w}・100% CP ${cp}`,
   metaDesc: (n, top, w, a, b) => `${n}レイドの弱点は${w}。おすすめポケモンは${top}。個体値100%のCPは${a}（天候ブースト${b}）。ボスのタイプ相性で計算し直したおすすめ順位とわざ構成、ボスが使うわざをまとめました。`,
   lead: (n, ty, w, top) => `${n}は${ty}タイプのボスです。弱点は${w}で、現在のアタッカーデータで計算したおすすめ1位は${top}です。下の順位は、タイプ別アタッカー表をこのボスの相性で計算し直したものです。`,
-  stNow: "現在出現中", stUntil: (e) => `${e}まで`, stNext: (s, e) => `出現予定 ${s}〜${e}`, stNone: "現在レイドには出現していません", stUnknown: "出現状況を確認できませんでした", shiny: "色違いあり",
+  stNow: "現在出現中", stUntil: (e) => `${e}まで`, stNext: (s, e) => `出現予定 ${s}〜${e}`, stNone: "現在レイドには出現していません", stWeekend: (s, e) => `週末に出現 · ${s}〜${e}`, stUnknown: "出現状況を確認できませんでした", shiny: "色違いあり",
   weakH: "弱点", resistH: "いまひとつ", doubleWeak: "二重弱点", cpH: "ゲット時のCP", cpNormal: "個体値100%", cpBoost: "天候ブースト", bossWeather: (w) => `天候が${w}ならレベル25でゲットできます`,
   atkWeatherH: "弱点タイプが強くなる天候",
   countersH: (n) => `${n} おすすめポケモン`, countersSub: "レベル40・個体値15・相手の防御180が基準。アタッカー表のわざ構成を、このボスのタイプ相性（ノーマルアタック・スペシャルアタックそれぞれ）で計算し直しました。総合は火力と耐久時間を合わせた点数です。",
@@ -135,7 +135,7 @@ const zh: BossDict = {
   metaTitle: (n, w, cp) => `Pokémon GO ${n} 團體戰攻略 — 弱點 ${w}·100% CP ${cp}`,
   metaDesc: (n, top, w, a, b) => `${n}團體戰的弱點是${w}。推薦寶可夢：${top}。100%個體CP為${a}（天氣加成${b}）。依頭目屬性相剋重新計算的推薦排名與招式組合，以及頭目會使用的招式。`,
   lead: (n, ty, w, top) => `${n}是${ty}屬性頭目。弱點為${w}，以目前的攻擊手資料計算，推薦第一名是${top}。下方排名是將各屬性攻擊手表依這隻頭目的相剋重新計算的結果。`,
-  stNow: "目前出現中", stUntil: (e) => `至${e}`, stNext: (s, e) => `預定出現 ${s}～${e}`, stNone: "目前未在團體戰出現", stUnknown: "無法確認出現狀況", shiny: "可遇到異色",
+  stNow: "目前出現中", stUntil: (e) => `至${e}`, stNext: (s, e) => `預定出現 ${s}～${e}`, stNone: "目前未在團體戰出現", stWeekend: (s, e) => `週末出現 · ${s}～${e}`, stUnknown: "無法確認出現狀況", shiny: "可遇到異色",
   weakH: "弱點", resistH: "抵抗", doubleWeak: "雙重弱點", cpH: "捕捉時的CP", cpNormal: "100%個體", cpBoost: "天氣加成", bossWeather: (w) => `天氣為${w}時以等級25捕捉`,
   atkWeatherH: "讓弱點屬性變強的天氣",
   countersH: (n) => `${n} 推薦寶可夢`, countersSub: "以等級40·個體值15·對手防禦180為基準。將攻擊手表的招式組合依這隻頭目的屬性相剋（一般招式與特殊招式分別）重新計算。綜合是同時考量火力與存活時間的分數。",

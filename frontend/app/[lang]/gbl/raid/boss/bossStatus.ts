@@ -9,7 +9,7 @@ const EVENTS_URL = "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/
 type FeedBoss = { name: string; tier?: string; canBeShiny?: boolean };
 type FeedEvent = { name: string; eventType: string; start: string; end: string; extraData?: { raidbattles?: { bosses?: { name: string; canBeShiny?: boolean }[] } } };
 export type BossWindow = { start: string; end: string; raidHour: boolean };   // "YYYY-MM-DDTHH:mm" (한국 시각)
-export type BossStatus = { ok: boolean; now: boolean; until: string | null; next: BossWindow[]; shiny: boolean; checked: string };
+export type BossStatus = { ok: boolean; now: boolean; until: string | null; next: BossWindow[]; weekend: BossWindow | null; shiny: boolean; checked: string };
 
 async function getJson<T>(url: string): Promise<T | null> {
   try { const r = await fetch(url, { next: { revalidate: STATUS_REVALIDATE } }); return r.ok ? ((await r.json()) as T) : null; } catch { return null; }
@@ -42,7 +42,9 @@ export async function bossStatus(b: RaidBoss): Promise<BossStatus> {
   const live = wins.filter((w) => !w.raidHour && w.start <= now);
   return {
     ok: !!raids || !!events,
-    now: !!cur || live.length > 0,
+    // 섀도우 레이드는 기간 안의 주말에만 열린다(LeekDuck · Snack Nap · Vice 공통) — 기간만으로 "등장 중"이라 하지 않고 현재 보스 피드에 있을 때만.
+    now: !!cur || (b.kind !== "shadow" && live.length > 0),
+    weekend: b.kind === "shadow" && !cur && live.length > 0 ? live[0] : null,
     until: live.length ? live.map((w) => w.end).sort().pop()! : null,
     next: wins.filter((w) => w.start > now),
     shiny, checked: now.slice(0, 10),
