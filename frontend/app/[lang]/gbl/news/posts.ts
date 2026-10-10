@@ -45,6 +45,45 @@ export type Post = {
 export const POSTS: Post[] = [
   // ───────────────────────────────────────────────────────────────────────
   {
+    slug: "pokemon-x-adidas-2026", cat: "event", published: "2026-10-11", mons: ["lucario"], covers: ["pokemon-x-adidas-2026"],
+    sources: [
+      { label: "포켓몬 GO 공식 뉴스(한국어) — adidas × 포켓몬", url: "https://pokemongo.com/ko/news/pokemon-x-adidas-2026" },
+      { label: "일정: LeekDuck 이벤트 피드(ScrapedDuck)", url: "https://leekduck.com/events/pokemon-x-adidas-2026/" },
+      { label: "격투 딜러 순위·배틀리그 순위: GBL Note 자체 계산" },
+    ],
+    ko: {
+      title: "포켓몬고 아디다스 시간제한 리서치 — 받는 방법·루카리오 보상·의상 코드 정리 (1월 15일까지)",
+      desc: "2027년 1월 15일까지 참여 adidas 매장에서 받을 수 있는 포켓몬고 adidas × 포켓몬 시간제한 리서치의 받는 방법, 보상(루카리오·메가 에너지·의상), 프로모션 코드, 기한을 정리했습니다.",
+      keywords: ["포켓몬고 아디다스", "포켓몬고 adidas 리서치", "아디다스 포켓몬 코드", "포켓몬고 루카리오 리서치", "메가 루카리오 에너지"],
+      blocks: [
+        { p: "adidas × 포켓몬 시간제한 리서치가 9월 25일(금) 오전 10시부터 진행 중이며, 1월 15일(금) 오후 8시까지 받을 수 있습니다. 기간이 길어서 서두를 필요는 없지만, 받는 방법이 평소 이벤트와 달라 따로 정리했습니다." },
+        { h: "받는 방법 — 참여 매장에서 앱을 엽니다" },
+        { p: "이 리서치는 집에서 자동으로 들어오지 않습니다. 이벤트에 참여하는 adidas 매장에 가서 포켓몬 GO를 열어야 받을 수 있습니다. 어느 매장이 참여하는지는 공식 공지에 걸린 지도에서 확인할 수 있습니다. 공지 본문에는 나라별 매장 목록이 없으니, 가기 전에 지도에서 가까운 매장이 있는지 먼저 확인하세요." },
+        { h: "보상" },
+        { ul: [
+          "의상 아이템: adidas Pokémon Jacket, adidas Pokémon Cap",
+          "루카리오와의 만남",
+          "루카리오의 메가 에너지",
+          "XP와 별의모래",
+        ] },
+        { p: "과제별 수량은 공식 공지에 나와 있지 않아 이 글에도 적지 않았습니다. 받은 리서치는 2027년 2월 13일 오후 8시까지 과제를 끝내고 보상을 받아야 합니다. 리서치를 받는 기한(1월 15일)과 보상을 받는 기한이 다르다는 점만 기억해 두면 됩니다." },
+        { h: "매장에 가지 않아도 받는 의상 — 프로모션 코드" },
+        { p: "신발 의상 adidas Pokémon Megaride Shoes는 리서치와 별개입니다. Pokémon GO Web Store에서 코드 ADIDASxPOKEMON을 입력하면 받을 수 있고, 코드는 2027년 1월 15일까지 쓸 수 있습니다. 참여 매장이 가까이 없어도 이 의상은 받을 수 있습니다." },
+        { h: "루카리오와 메가 에너지, 어디에 쓸까" },
+        { p: "메가 에너지는 루카리오를 메가진화시킬 때 씁니다. 메가 루카리오가 격투 레이드 딜러 가운데 어디쯤인지는 아래 [[/gbl/raid/fighting|격투 딜러 순위]]에서 볼 수 있습니다. 격투는 10월 14일(수)부터 나오는 [[/gbl/raid/boss/dialga|디아루가]]의 약점이기도 합니다." },
+        { raidTop: { type: "fighting", n: 10, mark: ["lucario_mega", "lucario"] } },
+        { p: "보상으로 만난 루카리오를 어느 리그에 쓸지도 함께 보면 좋습니다. 루카리오의 배틀리그 순위와 추천 기술은 아래 카드에서, 가지고 있는 개체의 리그별 순위는 [[/gbl/iv|IV 순위 체커]]에서 확인하세요." },
+        { dex: "lucario" },
+        { note: "이벤트 내용은 포켓몬 GO 공식 한국어 뉴스 기준이며(2026년 10월 11일 확인), 시간은 현지 시각입니다. 딜러 순위와 배틀리그 순위는 GBL Note 자체 계산입니다. 다른 일정은 [[/gbl/events|이벤트 달력]]에서 볼 수 있습니다." },
+      ],
+      tools: [
+        { path: "/gbl/events", label: "이벤트 달력" }, { path: "/gbl/raid/fighting", label: "격투 딜러 순위" },
+        { path: "/gbl/iv", label: "IV 순위 체커" }, { path: "/gbl/tier/master", label: "마스터리그 티어표" },
+      ],
+    },
+  },
+  // ───────────────────────────────────────────────────────────────────────
+  {
     slug: "zorua-guide-2026-10", cat: "analysis", published: "2026-10-11", mons: ["zorua", "zoroark"], covers: ["mon:zorua:2026-10"],
     sources: [{ label: "일정: LeekDuck 이벤트 피드(ScrapedDuck)" }, { label: "개체값 순위·배틀리그 순위: GBL Note 자체 계산" }],
     ko: {
