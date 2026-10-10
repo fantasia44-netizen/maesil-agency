@@ -38,6 +38,15 @@ export function middleware(req: NextRequest) {
   // 정적 리소스·파일은 통과
   if (pathname.startsWith("/_next") || pathname.includes(".")) return NextResponse.next();
 
+  // 임시 진단(2026-10-11) — 싱가포르에서 오는 자동 접속의 정체 확인용. GA4에 하루 50~118명으로 잡히고 영어 기술 페이지를 1회씩 훑는데,
+  // 자체 통계에는 UA·IP가 없어 무엇인지 알 수 없다. 문서 요청만 서버 로그에 한 줄 남긴다(IP는 끝자리 가림). 정체를 확인하면 이 블록을 지운다.
+  if (req.headers.get("cf-ipcountry") === "SG" && !req.headers.has("next-url")) {
+    const ip = (req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for") || "").split(",")[0].trim().replace(/\.\d+$/, ".x");
+    console.log("[sg-visit]", JSON.stringify({ path: pathname, ua: req.headers.get("user-agent") || "", ip, ref: req.headers.get("referer") || "", lang: req.headers.get("accept-language") || "" }));
+  }
+  // 진단용 헤더 확인 — 이 UA로 한 번 호출하면 서버가 받는 헤더 이름을 로그에 남긴다(국가 헤더가 실제로 오는지 확인).
+  if ((req.headers.get("user-agent") || "") === "gblnote-diag") console.log("[diag-headers]", [...req.headers.keys()].join(","));
+
   // 검색봇의 RSC 프리페치(?_rsc=, Next-Router-Prefetch: 1)는 빈 응답 — 크롤 예산 보호.
   // 구글봇 렌더러가 페이지의 <Link>(티어표 139개 등)마다 프리페치를 쏴 GSC 크롤의 70%가 'text/x-component'(다른 파일 형식)로 소모됨.
   // 사람 브라우저는 UA가 안 맞아 그대로 프리페치. 봇은 실제 HTML 내비게이션에만 예산을 쓰게 됨.
