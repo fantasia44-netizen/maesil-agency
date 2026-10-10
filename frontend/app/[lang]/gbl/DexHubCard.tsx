@@ -8,6 +8,7 @@ import { typeLabel, TYPE_COLOR } from "./typeLabels";
 import { standings, raidRanksOfForm, ivKeyOf } from "./dexHub";
 import { siblingForm } from "./indexGate";
 import { PUBLISHED_ANALYSIS } from "./iv/analysis/published";
+import { bossGuidePath, GUIDE_LABEL, PRIMAL_LABEL } from "./raid/boss/bosses";
 import { moveName, type Move } from "./moves/movesData";
 import { bestRaidSet } from "./raid/moves/raidMovesData";
 
@@ -60,6 +61,9 @@ export default function DexHub({ lang, id, dex, league }: { lang: Locale; id: st
   const label: React.CSSProperties = { fontSize: "0.72rem", fontWeight: 800, color: "#64748b", minWidth: 58 };
   const chip = (on = false): React.CSSProperties => ({ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.76rem", fontWeight: 700, padding: "3px 10px", borderRadius: 12, textDecoration: "none", whiteSpace: "nowrap",
     border: `1px solid ${on ? "#3b5bdb" : BORDER}`, background: on ? "#eef2ff" : "#fff", color: on ? "#1d4ed8" : "#334155" });
+  // 이 포켓몬이 보스로 나오는 레이드의 공략 페이지(일반·메가·원시·섀도우)
+  const guides = ([["", ""], ["_mega", t.mega], ["_mega_x", `${t.mega} X`], ["_mega_y", `${t.mega} Y`], ["_primal", PRIMAL_LABEL[lang]], ["_shadow", t.shadow]] as [string, string][])
+    .map(([suf, tag]) => ({ path: bossGuidePath(baseId + suf), tag })).filter((g): g is { path: string; tag: string } => !!g.path);
   if (!st.length && !raids.length && !dex) return null;
 
   return (
@@ -82,7 +86,7 @@ export default function DexHub({ lang, id, dex, league }: { lang: Locale; id: st
       </div>
 
       {/* 레이드 — 이 폼(일반·섀도우·메가)의 딜러표 순위. 다른 폼(화이트 큐레무 등)은 그 폼 페이지에서 */}
-      {raids.length > 0 && (
+      {(raids.length > 0 || guides.length > 0) && (
         <div style={row}>
           <span style={label}>{t.raid}</span>
           {raids.map((r, i) => {
@@ -96,6 +100,7 @@ export default function DexHub({ lang, id, dex, league }: { lang: Locale; id: st
               </Link>
             );
           })}
+          {guides.map((g) => <Link key={g.path} href={L(g.path)} style={{ ...chip(), borderColor: "#fdba74", background: "#fff7ed", color: "#c2410c" }}>⚔️ {g.tag ? g.tag + " " : ""}{GUIDE_LABEL[lang]}</Link>)}
           <Link href={L("/gbl/raid")} style={{ fontSize: "0.72rem", color: "#ea580c", textDecoration: "none", fontWeight: 700 }}>{t.raidAll}</Link>
         </div>
       )}

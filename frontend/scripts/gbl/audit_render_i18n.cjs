@@ -14,6 +14,8 @@ const PATHS = [
   '/gbl/raid/moves', '/gbl/raid/moves/psystrike', '/gbl/raid/moves/counter', '/gbl/raid/moves/hidden_power_fire',
   '/gbl/moves/psystrike', '/gbl/pokemon/master/giratina_origin', '/gbl/pokemon/master/mewtwo', '/gbl/pokemon/great/charmander',
   '/gbl/raid/fire', '/gbl/tier/master', '/gbl/cmp/master', '/gbl/meta/master',
+  // 2026-10-10 추가: 보스별 레이드 공략(목록 · 5성 · 메가 · 원시 · 섀도우)
+  '/gbl/raid/boss', '/gbl/raid/boss/dialga', '/gbl/raid/boss/charizard_mega_x', '/gbl/raid/boss/groudon_primal', '/gbl/raid/boss/landorus_incarnate_shadow',
   // 뉴스(/gbl/news)는 번역 글이 있는 언어만 열리므로 여기서 보지 않는다(없는 언어는 404가 정상).
 ];
 const LOCALES = ['en', 'ja', 'zh-TW'];

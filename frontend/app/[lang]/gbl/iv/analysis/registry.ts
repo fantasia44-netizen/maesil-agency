@@ -33,7 +33,7 @@ import ZAMAZENTA_CS from "../data/zamazenta_crowned_shield.json";
 import URSALUNA_S from "../data/ursaluna_shadow.json";
 import NECROZMA_DW from "../data/necrozma_dawn_wings.json";
 import MARSHADOW from "../data/marshadow.json";
-// 10월 신규(그림자 레이드 데뷔)
+// 10월 신규(2026-10-02~05 GO로켓단 이벤트 — 비주기 보상으로 데뷔. 레이드 보스가 아님)
 import ZEKROM_S from "../data/zekrom_shadow.json";
 
 export type SimSpread = {
@@ -246,7 +246,7 @@ export const IV_ANALYSIS: Record<string, IvEntry> = {
   ursaluna: mk(URSALUNA), kyurem_black: mk(KYUREM_B), reshiram_shadow: mk(RESHIRAM_S),
   lugia: mk(LUGIA), zamazenta_crowned_shield: mk(ZAMAZENTA_CS), ursaluna_shadow: mk(URSALUNA_S),
   necrozma_dawn_wings: mk(NECROZMA_DW), marshadow: mk(MARSHADOW),
-  // 10월 그림자 레이드 신규 — 그림자 레시라무와 공격 실수치가 같아 서로 CMP 라이벌
+  // 10월 신규(비주기 보상) — 그림자 레시라무와 공격 실수치가 같아 서로 CMP 라이벌
   zekrom_shadow: mk(ZEKROM_S, "2026-10-10"),
 };
 

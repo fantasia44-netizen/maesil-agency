@@ -6,6 +6,7 @@ import { IV_ANALYSIS } from "./[lang]/gbl/iv/analysis/registry";
 import { indexableMonIds, unrankedIds, UNRANKED_LEAGUE } from "./[lang]/gbl/indexGate";
 import { indexableMoveSlugs } from "./[lang]/gbl/moves/movesData";
 import { raidMoveSlugs } from "./[lang]/gbl/raid/moves/raidMovesData";
+import { raidBossIds } from "./[lang]/gbl/raid/boss/bosses";
 import { POSTS, postLangs } from "./[lang]/gbl/news/posts";
 import { NEWS_LOCALES } from "./[lang]/gbl/news/locales";
 import { analyzedDeckIds } from "./[lang]/tcg/decks/analysis";
@@ -55,6 +56,9 @@ function gblPaths(): [string, CF, number][] {
     ["/gbl/raid", "weekly", 0.9],
     ["/gbl/raid/bosses", "daily", 0.8],
     ["/gbl/raid/schedule", "daily", 0.8],
+    // 보스별 레이드 공략 — 목록 + 보스마다 한 페이지(약점·보스 상성으로 계산한 추천 순위·100% CP). 대상은 raid/boss/bosses.ts.
+    ["/gbl/raid/boss", "daily", 0.8],
+    ...raidBossIds().map((id) => [`/gbl/raid/boss/${id}`, "daily", 0.7] as [string, CF, number]),
     // 레이드 기술 도감 — 배틀 기술 도감과 같은 기술 목록에 레이드·체육관 수치(위력·시전 시간·DPS)와 포켓몬별 순위.
     ["/gbl/raid/moves", "weekly", 0.7],
     ...raidMoveSlugs().map((s) => [`/gbl/raid/moves/${s}`, "weekly", 0.5] as [string, CF, number]),

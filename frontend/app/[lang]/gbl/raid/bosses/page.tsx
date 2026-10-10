@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import POKEDEX from "../../pokedex_ko.json";
 import { dexPathOfBoss } from "../../dexHub";
+import { raidBossByFeedName, GUIDE_LABEL } from "../boss/bosses";
 import AdSlot from "../../AdSlot";
 import PKN from "../../pokedex_names.json";
 import STATSJSON from "../../pokedex_stats.json";
@@ -256,6 +257,7 @@ export default async function BossesPage({ params }: { params: { lang: string } 
                     const c1 = TYPE_COLOR[types[0]] || "#cbd5e1";
                     const st = STATS[dexOf(b.image)];
                     const shinyOk = canBeShinyOf(b);
+                    const guide = raidBossByFeedName(b.name);
                     // 계산 100%가 피드값과 일치할 때만 IV표 노출(지역폼 등 종족값 불일치 방지)
                     const cpOk = !!st && Math.abs(cpAt(st, [15, 15, 15], CPM_L20) - b.combatPower.normal.max) <= 2;
                     return (
@@ -302,6 +304,11 @@ export default async function BossesPage({ params }: { params: { lang: string } 
                         </div>
                         {cpOk && st && (
                           <CpTable stats={st} hundoL20={cpAt(st, [15, 15, 15], CPM_L20)} hundoL25={cpAt(st, [15, 15, 15], CPM_L25)} name={bossName(lang, b, t)} accent={c1} dex={String(formDex(bossKo(b), dexOf(b.image)))} shiny={shinyOk} />
+                        )}
+                        {guide && (
+                          <div style={{ marginTop: 8 }}>
+                            <Link href={L(`/gbl/raid/boss/${guide.id}`)} style={{ fontSize: "0.78rem", fontWeight: 800, textDecoration: "none", color: "#fff", background: "#ea580c", borderRadius: 10, padding: "4px 12px" }}>{bossName(lang, b, t)} {GUIDE_LABEL[lang]} →</Link>
+                          </div>
                         )}
                         {weak.length > 0 && (
                           <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", marginTop: 8, paddingTop: 8, borderTop: `1px dashed ${BORDER}` }}>

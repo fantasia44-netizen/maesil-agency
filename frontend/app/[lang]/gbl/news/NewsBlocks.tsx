@@ -8,6 +8,7 @@ import { typeLabel, TYPE_COLOR } from "../typeLabels";
 import { moveName, speciesOf, type Move } from "../moves/movesData";
 import { raidMoveById } from "../raid/moves/raidMovesData";
 import { bossInfo, countersFor, raidTopFor, type AttackerRow } from "./newsData";
+import { bossGuidePath, GUIDE_LABEL } from "../raid/boss/bosses";
 import type { NewsDict } from "./dict";
 import type { Block } from "./posts";
 
@@ -116,7 +117,10 @@ function BossCard({ lang, t, sid, withCp }: { lang: Locale; t: NewsDict; sid: st
           <div style={{ fontSize: "1rem", fontWeight: 900, color: "#0f172a" }}>{b.name}</div>
           <div style={{ display: "flex", gap: 4, marginTop: 3 }}>{b.types.map((ty) => <TypeChip key={ty} lang={lang} type={ty} />)}</div>
         </div>
-        {b.href && <Link href={localizePath(lang, b.href)} style={{ marginLeft: "auto", fontSize: "0.76rem", fontWeight: 800, color: "#1d4ed8", textDecoration: "none" }}>{t.dexLink}</Link>}
+        <span style={{ marginLeft: "auto", display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {bossGuidePath(b.sid) && <Link href={localizePath(lang, bossGuidePath(b.sid)!)} style={{ fontSize: "0.76rem", fontWeight: 800, color: "#ea580c", textDecoration: "none" }}>{GUIDE_LABEL[lang]} →</Link>}
+          {b.href && <Link href={localizePath(lang, b.href)} style={{ fontSize: "0.76rem", fontWeight: 800, color: "#1d4ed8", textDecoration: "none" }}>{t.dexLink}</Link>}
+        </span>
       </div>
       <div style={line}><span style={{ ...lab, color: "#16a34a" }}>{t.weakH}</span><span style={{ display: "inline-flex", gap: 4, flexWrap: "wrap" }}>{b.weak.map((w) => <TypeChip key={w.type} lang={lang} type={w.type} mult={w.mult} t={t} />)}</span></div>
       <div style={line}><span style={{ ...lab, color: "#ea580c" }}>{t.resistH}</span><span style={{ display: "inline-flex", gap: 4, flexWrap: "wrap" }}>{b.resist.map((w) => <TypeChip key={w.type} lang={lang} type={w.type} mult={w.mult} />)}</span></div>

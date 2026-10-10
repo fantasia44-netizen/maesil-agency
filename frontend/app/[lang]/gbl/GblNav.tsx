@@ -12,7 +12,7 @@ type Group = { key: string; href: string; items?: Item[] };
 
 const GROUPS: Group[] = [
   { key: "raid", href: "/gbl/raid", items: [
-    { path: "/gbl/raid" }, { path: "/gbl/raid/schedule" }, { path: "/gbl/raid/bosses" }, { path: "/gbl/raid/moves" }, { path: "/gbl/trade" },
+    { path: "/gbl/raid" }, { path: "/gbl/raid/schedule" }, { path: "/gbl/raid/bosses" }, { path: "/gbl/raid/boss" }, { path: "/gbl/raid/moves" }, { path: "/gbl/trade" },
   ] },
   { key: "events", href: "/gbl/events" },
   { key: "news", href: "/gbl/news" },
@@ -30,7 +30,7 @@ const T: Record<Locale, Dict> = {
   ko: {
     groups: { raid: "레이드", events: "이벤트", news: "뉴스", pvp: "배틀리그", guide: "가이드", community: "커뮤니티" },
     items: {
-      "/gbl/raid": "딜러 티어", "/gbl/raid/schedule": "레이드 일정", "/gbl/raid/bosses": "보스 100% CP", "/gbl/raid/moves": "레이드 기술 도감",
+      "/gbl/raid": "딜러 티어", "/gbl/raid/schedule": "레이드 일정", "/gbl/raid/bosses": "보스 100% CP", "/gbl/raid/boss": "보스별 공략", "/gbl/raid/moves": "레이드 기술 도감",
       "/gbl/tier/master": "티어표", "/gbl/meta": "실측 메타", "/gbl/sim": "배틀 시뮬레이터", "/gbl/cmp/master": "CMP 우선권", "/gbl/moves": "배틀 기술 도감", "/gbl/iv": "PvP IV 순위", "/gbl/schedule": "시즌 일정",
       "/gbl/trade": "교환 목록 메이커", "/gbl/board": "게시판", "/gbl/gallery": "자랑 갤러리", "/gbl/app": "내 전적", "/gbl/contact": "문의",
     },
@@ -39,7 +39,7 @@ const T: Record<Locale, Dict> = {
   en: {
     groups: { raid: "Raids", events: "Events", news: "News", pvp: "Battle League", guide: "Guides", community: "Community" },
     items: {
-      "/gbl/raid": "Attacker Tiers", "/gbl/raid/schedule": "Raid Schedule", "/gbl/raid/bosses": "Boss 100% CP", "/gbl/raid/moves": "Raid Move Dex",
+      "/gbl/raid": "Attacker Tiers", "/gbl/raid/schedule": "Raid Schedule", "/gbl/raid/bosses": "Boss 100% CP", "/gbl/raid/boss": "Boss Guides", "/gbl/raid/moves": "Raid Move Dex",
       "/gbl/tier/master": "Tier List", "/gbl/meta": "Live Meta", "/gbl/sim": "Battle Simulator", "/gbl/cmp/master": "CMP Priority", "/gbl/moves": "Battle Move Dex", "/gbl/iv": "PvP IV Ranks", "/gbl/schedule": "Season Schedule",
       "/gbl/trade": "Trade List Maker", "/gbl/board": "Board", "/gbl/gallery": "Gallery", "/gbl/app": "My Record", "/gbl/contact": "Contact",
     },
@@ -48,7 +48,7 @@ const T: Record<Locale, Dict> = {
   ja: {
     groups: { raid: "レイド", events: "イベント", news: "ニュース", pvp: "バトルリーグ", guide: "ガイド", community: "コミュニティ" },
     items: {
-      "/gbl/raid": "アタッカー", "/gbl/raid/schedule": "レイド日程", "/gbl/raid/bosses": "ボス100%CP", "/gbl/raid/moves": "レイド技図鑑",
+      "/gbl/raid": "アタッカー", "/gbl/raid/schedule": "レイド日程", "/gbl/raid/bosses": "ボス100%CP", "/gbl/raid/boss": "ボス別攻略", "/gbl/raid/moves": "レイド技図鑑",
       "/gbl/tier/master": "ティア表", "/gbl/meta": "実測メタ", "/gbl/sim": "バトルシミュレーター", "/gbl/cmp/master": "CMP優先", "/gbl/moves": "バトル技図鑑", "/gbl/iv": "PvP個体値", "/gbl/schedule": "シーズン日程",
       "/gbl/trade": "交換リストメーカー", "/gbl/board": "掲示板", "/gbl/gallery": "ギャラリー", "/gbl/app": "戦績記録", "/gbl/contact": "お問い合わせ",
     },
@@ -57,7 +57,7 @@ const T: Record<Locale, Dict> = {
   "zh-TW": {
     groups: { raid: "團體戰", events: "活動", news: "新聞", pvp: "對戰聯盟", guide: "攻略", community: "社群" },
     items: {
-      "/gbl/raid": "攻擊手排行", "/gbl/raid/schedule": "團體戰時程", "/gbl/raid/bosses": "頭目100%CP", "/gbl/raid/moves": "團體戰招式圖鑑",
+      "/gbl/raid": "攻擊手排行", "/gbl/raid/schedule": "團體戰時程", "/gbl/raid/bosses": "頭目100%CP", "/gbl/raid/boss": "頭目攻略", "/gbl/raid/moves": "團體戰招式圖鑑",
       "/gbl/tier/master": "強度表", "/gbl/meta": "實測環境", "/gbl/sim": "對戰模擬器", "/gbl/cmp/master": "CMP先攻權", "/gbl/moves": "對戰招式圖鑑", "/gbl/iv": "PvP個體值排名", "/gbl/schedule": "賽季時程",
       "/gbl/trade": "交換清單產生器", "/gbl/board": "討論板", "/gbl/gallery": "炫耀相簿", "/gbl/app": "我的戰績", "/gbl/contact": "聯絡我們",
     },

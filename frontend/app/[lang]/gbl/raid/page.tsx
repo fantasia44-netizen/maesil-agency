@@ -92,6 +92,17 @@ export default function RaidHubPage({ params }: { params: { lang: string } }) {
             </div>
             <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#ea580c" }}>→</span>
           </Link>
+          <Link href={L("/gbl/raid/boss")} style={{
+            display: "flex", alignItems: "center", gap: 10, textDecoration: "none",
+            padding: "12px 15px", borderRadius: 12, background: "linear-gradient(100deg,#ffeedd,#ffe4e4)", border: "1px solid #ffc9a8",
+          }}>
+            <span style={{ fontSize: "1.5rem" }}>⚔️</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: "0.92rem", fontWeight: 800, color: "#c2410c" }}>{t.guideH}</div>
+              <div style={{ fontSize: "0.76rem", color: "#9a3412" }}>{t.guideP}</div>
+            </div>
+            <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#ea580c" }}>→</span>
+          </Link>
           <Link href={L("/gbl/raid/moves")} style={{
             display: "flex", alignItems: "center", gap: 10, textDecoration: "none",
             padding: "12px 15px", borderRadius: 12, background: "linear-gradient(100deg,#fff4e0,#fde8d8)", border: "1px solid #ffd8b0",
