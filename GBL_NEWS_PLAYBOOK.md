@@ -1,12 +1,12 @@
 # GBL Note 뉴스 발행 지침 (예약 작업용)
 
-gblnote.com의 뉴스 섹션(`/gbl/news`)에 **하루 한 번, 글 1건**을 써서 발행하는 작업의 지침서다.
+gblnote.com의 뉴스 섹션(`/gbl/news`)에 **하루 한 번** 글을 써서 발행하는 작업의 지침서다. 보통 1건, **내일 시작하는 이벤트가 여럿이면 그만큼**(2-2).
 예약 작업은 매번 이 문서를 처음부터 읽고 그대로 따른다. 사람이 손으로 글을 쓸 때도 같은 규칙을 쓴다.
 
 - 목적: 네이버 검색 유입. 구글은 신경 쓰지 않는다(2026-10-08 사장님 결정).
 - 참고 모델: 포켓몬고 개인 블로그(글 약 700개 · 2년 · 일 700~1,000명). 글이 짧고, 제목이 "포켓몬고 ○○"으로 시작하며, 주제는 **이벤트 소식**과 **레이드 보스 공략**.
 - 우리의 강점: 딜러 티어표 · 도감 · 레이드 기술 도감 데이터. 글의 숫자는 이 데이터에서 자동으로 채운다.
-- 속도: **하루 1건**(같은 날 시작하는 보스가 둘이면 최대 2건). 한꺼번에 많이 찍어내지 않는다 — "차근차근"이 사장님 방침.
+- 속도: 보통 **하루 1건**. 다만 **이벤트는 늦어도 시작 전날까지 글이 있어야 한다**(2026-10-11 사장님 결정 — 10/10 조로아 커뮤니티 데이 당일 IV 체커 조회가 6배로 뛰었는데 전날 글이 없었다). 내일 시작하는 것이 여럿이면 그날은 최대 4건까지 쓴다.
 
 ---
 
@@ -30,37 +30,48 @@ gblnote.com의 뉴스 섹션(`/gbl/news`)에 **하루 한 번, 글 1건**을 써
 
 ## 2. 실행 절차
 
-작업 폴더는 `C:\maesil-agency`. 셸 명령은 Bash 도구(Git Bash) 기준이다.
+작업 폴더는 `C:\maesil-agency`(예약 실행의 시작 폴더). 셸 명령은 Bash 도구(Git Bash) 기준이다.
+
+**명령은 한 번에 하나씩 실행한다. `cd … &&`, `&&`, `|`, `;`로 이어 붙이지 않는다.** 이어 붙인 명령은 예약 실행에서 승인 창에 걸려 작업이 멈춘다(10/9~10/10 사흘간 한 건도 발행되지 않은 원인). 아래 명령을 적힌 그대로, 저장소 폴더에서 하나씩 실행한다.
 
 ### 2-1. 준비
 ```bash
-cd /c/maesil-agency && git status --short && git fetch origin && git rev-list --left-right --count HEAD...origin/main
+git status --short
+```
+```bash
+git fetch origin
+```
+```bash
+git rev-list --left-right --count HEAD...origin/main
 ```
 - 작업 트리에 `.claude/settings.local.json` 말고 다른 변경이 있으면 **중단**한다(누가 작업 중). 로그에 적고 끝낸다.
-- 원격보다 뒤처져 있으면 `git pull --ff-only origin main`. `.claude/settings.local.json` 때문에 막히면 아래 순서로 푼다(양쪽이 허용 목록에 항목을 추가만 하는 파일이라 합집합이면 된다).
-  ```bash
-  cp .claude/settings.local.json "$TEMP/settings.local.mine.json" && git checkout -- .claude/settings.local.json && git pull --ff-only origin main && node scripts/merge_claude_perms.cjs .claude/settings.local.json "$TEMP/settings.local.mine.json"
-  ```
-- `main` 브랜치가 아니면 중단한다.
+- 원격보다 뒤처져 있으면(둘째 숫자가 0보다 큼) `git pull --ff-only origin main`. `.claude/settings.local.json` 때문에 막히면 그날은 **중단**하고 로그에 적는다(사람이 합쳐야 한다 — `scripts/merge_claude_perms.cjs` 참고).
+- `main` 브랜치가 아니면 중단한다(`git branch --show-current`).
 
 ### 2-2. 소재 고르기
 ```bash
-cd /c/maesil-agency/frontend && node scripts/gbl/news_candidates.mjs 14
+node frontend/scripts/gbl/news_candidates.mjs 14
 ```
-`[미작성]` 표시가 붙은 것 중에서 **아래 순서의 첫 번째**를 고른다. 하루 1건.
+`[미작성]` 표시가 붙은 것 중에서 고른다.
 
-1. **레이드 보스 공략(A)** — 지금 진행 중이거나 **3일 안에 시작**하는 보스. 5성 → 메가 → 섀도우 순. 시작일이 가까운 것부터.
+**먼저 — 하루 전날 규칙.** 출력에서 **오늘 진행 중이거나 내일(오늘 날짜 + 1일) 시작하는 `[미작성]` 소재를 전부** 쓴다. 종류를 가리지 않는다: 레이드 보스 · 스포트라이트 아워 · 커뮤니티 데이 · 부화의 날 · 레이드 데이 · 확인된 이벤트. 여러 개면 시작 시각이 빠른 것부터, **그날 최대 4건**. 한 건씩 따로 커밋하지 말고 글을 다 쓴 뒤 한 번에 검증 · 발행한다.
+- 쓸 내용이 이름과 시간뿐인 것(`max-mondays` · `twitch-drops` · `go-pass` · 유성우류)은 따로 글을 쓰지 않는다 — 주간 일정 글에서만 언급한다.
+- 상세를 확인하지 못한 이벤트(D)는 건너뛴다(1장 규칙 1). 건너뛴 것은 로그에 이름을 적는다.
+
+**내일 시작하는 것이 없거나 다 썼으면** 아래 순서의 첫 번째 하나를 쓴다(미리 쓰기).
+
+1. **레이드 보스 공략(A)** — **3일 안에 시작**하는 보스. 5성 → 메가 → 섀도우 순. 시작일이 가까운 것부터.
 2. **스포트라이트 아워(B)** — **2일 안**에 열리는 것.
-3. **커뮤니티 데이(C)** — **5일 안**에 열리고, 피드에 등장 포켓몬이 공개된 것.
-4. **주간 일정 정리(E)** — 그 주에 아직 없으면. 월요일이 가장 좋고, 늦어도 수요일까지만 쓴다.
-5. **그 밖의 이벤트(D)** — **7일 안**에 시작하고, 상세가 `eventManual.ts`에 있거나 2곳 이상에서 확인되는 것. `max-mondays` · `twitch-drops` · `go-pass` · 유성우류는 쓰지 않는다(쓸 내용이 이름과 시간뿐).
-6. **레이드 보스 공략(A)** — 14일 안에 시작하는 나머지 보스(미리 쓰기).
+3. **커뮤니티 데이(C) · 부화의 날 · 레이드 데이(F)** — **5일 안**에 열리고, 피드에 등장 포켓몬이 공개된 것.
+4. **주간 일정 정리(E)** — 그 주에 아직 없으면. 일요일 · 월요일이 가장 좋고, 늦어도 수요일까지만 쓴다.
+5. **그 밖의 이벤트(D)** — **7일 안**에 시작하고, 상세가 `eventManual.ts`에 있거나 2곳 이상에서 확인되는 것.
+6. **레이드 보스 공략(A)** — 14일 안에 시작하는 나머지 보스.
 7. **데이터 정리 글** — 4장의 목록에서 아직 안 쓴 것 하나.
 
 아무것도 없으면 글을 쓰지 않고 로그에 "소재 없음"만 남기고 끝낸다.
 
 - `⚠ sid 못 찾음` / `⚠ 자동 블록 미지원 sid`가 붙은 소재는 건너뛴다.
-- 같은 날 시작하는 5성 보스와 메가 보스가 둘 다 미작성이면 그날은 2건까지 쓴다.
+- 내일 시작하는 것이 없는 날은 1건만 쓴다.
 
 ### 2-3. 글 쓰기
 `frontend/app/[lang]/gbl/news/posts.ts`의 `POSTS` 배열 **맨 위**에 항목을 추가한다. 파일 머리말의 규칙과 기존 글을 먼저 읽는다. 3장의 틀을 따른다.
@@ -72,29 +83,32 @@ cd /c/maesil-agency/frontend && node scripts/gbl/news_candidates.mjs 14
 
 ### 2-4. 검증 → 발행
 ```bash
-cd /c/maesil-agency/frontend && npx tsc --noEmit -p . && rm -rf .next && npm run build 2>&1 | grep -iE "error|failed|Compiled" ; rm -rf .next
+node frontend/scripts/gbl/news_build.mjs
 ```
-- 타입 검사와 빌드가 둘 다 통과해야 한다(빌드가 글 페이지를 미리 렌더하므로 블록이 깨지면 여기서 실패한다). 실패하면 고치고, 못 고치면 **글을 되돌리고**(`git checkout -- "frontend/app/[lang]/gbl/news/posts.ts"`) 로그에 적고 끝낸다.
+- 타입 검사와 빌드를 차례로 돌리고 "전부 통과"가 나와야 한다(빌드가 글 페이지를 미리 렌더하므로 블록이 깨지면 여기서 실패한다). 실패하면 고치고, 못 고치면 **글을 되돌리고**(`git checkout -- "frontend/app/[lang]/gbl/news/posts.ts"`) 로그에 적고 끝낸다.
 - 로컬 dev 서버(미리보기)가 켜져 있으면 빌드 전에 끈다. 켠 채로 빌드하면 `.next`가 꼬인다.
 
-커밋 메시지는 Write 도구로 임시 파일에 쓴 뒤 `-F`로 넘긴다(따옴표 문제 방지).
+커밋 메시지는 Write 도구로 임시 파일에 쓴 뒤 `-F`로 넘긴다(따옴표 문제 방지). 아래 세 명령을 하나씩 실행한다.
 ```bash
-cd /c/maesil-agency && git add "frontend/app/[lang]/gbl/news/posts.ts" GBL_NEWS_LOG.md && git commit -q -F "<메시지 파일>" && git push -q origin main
+git add "frontend/app/[lang]/gbl/news/posts.ts" GBL_NEWS_LOG.md
 ```
-- 메시지 첫 줄: `feat(gbl-news): <글 제목 요약>`
+```bash
+git commit -q -F "<메시지 파일>"
+```
+```bash
+git push -q origin main
+```
+- 메시지 첫 줄: `feat(gbl-news): <글 제목 요약>`(여러 건이면 `feat(gbl-news): <첫 글 요약> 외 N건`)
 - **`.claude/settings.local.json`은 절대 스테이징하지 않는다.** `git add -A`나 `git add .`를 쓰지 않는다.
+- 보스를 `raid/boss/bosses.ts`에 추가한 날은 그 파일도 같이 스테이징한다(3-A).
 
 ### 2-5. 배포 확인
-Render가 `main`을 자동 배포한다(보통 2~4분). 아래를 백그라운드 명령으로 돌려 반영을 기다린다.
+Render가 `main`을 자동 배포한다(보통 2~4분). 아래 한 명령이 반영을 기다렸다가(최대 9분) 실서버 검증을 돌리고, 통과하면 Bing · 네이버에 알린다(IndexNow).
 ```bash
-for i in $(seq 1 40); do c=$(curl -s -m 30 -o /dev/null -w "%{http_code}" "https://gblnote.com/gbl/news/<slug>?cb=$RANDOM"); [ "$c" = "200" ] && break; sleep 20; done; echo "final=$c"
+node frontend/scripts/gbl/news_live.mjs <slug> [slug…]
 ```
-반영되면:
-```bash
-cd /c/maesil-agency/frontend && node scripts/gbl/news_verify.mjs https://gblnote.com <slug>
-```
-- "전부 통과"가 나와야 한다. 실패하면 원인을 고쳐 다시 올리고, 못 고치면 `git revert --no-edit HEAD && git push origin main`으로 내린다.
-- 통과하면 Bing·네이버에 알린다: `node scripts/indexnow.mjs gblnote.com https://gblnote.com/gbl/news/<slug> https://gblnote.com/gbl/news`
+- "완료"가 나오면 끝. "아직 반영되지 않았습니다"(종료 코드 2)면 같은 명령을 한 번 더 실행한다.
+- "검증 실패"(종료 코드 1)면 원인을 고쳐 다시 올리고, 못 고치면 `git revert --no-edit HEAD` 뒤 `git push origin main`으로 내린다.
 
 ### 2-6. 기록
 `GBL_NEWS_LOG.md` 맨 아래에 한 줄을 추가한다(글을 쓰지 않은 날도 한 줄).
@@ -150,6 +164,26 @@ cd /c/maesil-agency/frontend && node scripts/gbl/news_verify.mjs https://gblnote
 
 ### 3-C. 커뮤니티 데이 (`cat: "event"`)
 피드의 등장 포켓몬 · 시간 · 보너스만으로 쓴다. 보너스는 실서버 이벤트 달력의 한국어 표현을 쓴다. 커뮤니티 데이 한정 기술 등 피드에 없는 내용은 2곳 이상에서 확인될 때만. `{ dex: "<sid>" }`와 진화형 카드를 넣는다.
+- **전날까지 반드시 발행한다.** 커뮤니티 데이 당일에는 잡은 개체를 확인하려는 방문이 몰린다 — 글에 `[[/gbl/iv|IV 순위 체커]]` 링크와 "야생 포획은 레벨 1~30(날씨 부스트 최대 35), 최소 개체값 0"(고정 게임 규칙)을 넣고, 진화형이 배틀리그에서 쓰이면 그 리그의 티어표로 연결한다.
+
+### 3-F. 부화의 날 · 레이드 데이 (`cat: "event"`)
+피드에 이름과 시간만 있는 경우가 많다. 그때는 **피드의 날짜 · 시간 + 사이트 데이터**만으로 짧게 쓴다(보너스 · 알 종류 · 이로치 확률 같은 상세는 2곳 이상에서 확인될 때만).
+1. `p` — 날짜 · 시간(현지 시각) · 주인공 포켓몬 · 이로치 여부(피드 값).
+2. `h` + `p` — 잡은(부화한) 개체를 보는 법: 아래 "고정 게임 규칙"의 레벨 · 최소 개체값을 쓰고, 100% CP는 `{ boss: "<sid>" }` 카드의 값(레벨 20 기준)을 쓴다. 개체값 순위는 `[[/gbl/iv|IV 순위 체커]]`로 연결한다.
+3. `h` + `{ dex: "<sid>" }`(+ 진화형) — 배틀리그 · 레이드에서의 쓸모(자동 카드).
+4. `note` — 시간은 현지 시각 기준, 수치는 GBL Note 자체 계산.
+- 레이드 데이는 보스가 정해져 있으면 3-A 틀을 쓰고, `/gbl/raid/boss/<id>` 페이지로 연결한다.
+
+**고정 게임 규칙(글에 써도 되는 것 — 이 표에 없는 규칙은 쓰지 않는다)**
+
+| 얻는 방법 | 레벨 | 최소 개체값 |
+|---|---|---|
+| 레이드 보스 포획 | 20 (날씨 부스트 25) | 10 / 10 / 10 |
+| 알 부화 | 20 | 10 / 10 / 10 |
+| 필드 리서치 보상 | 15 | 10 / 10 / 10 |
+| 야생 포획 | 1~30 (날씨 부스트 최대 35) | 0 / 0 / 0 |
+
+섀도우 레이드 · GO로켓단 보상의 최소 개체값은 이 표에 없다 — 쓰지 않는다. **포켓몬을 어떻게 얻는지(레이드인지, 로켓단 보상인지, 알인지)는 피드나 외부 출처로 확인한 뒤에만 쓴다**(2026-10-10 그림자 제크로무를 "섀도우 레이드"라고 잘못 쓴 일이 있었다 — 실제는 비주기 보상).
 
 ### 3-D. 이벤트 소식 (`cat: "event"`)
 기존 글 `fc-seoul-2026`, `halloween-2026-part-1`이 본보기다. `eventManual.ts`의 `notes` · `bonuses`를 풀어 쓰고, 같은 기간의 레이드 보스가 있으면 `{ boss }` 카드와 링크를 붙인다. 맥스 배틀 글에는 레이드 딜러표(`counters`)를 쓰지 않는다(맥스 배틀에는 다이맥스 포켓몬만 나간다) — `{ weak: "<sid>" }`만.
@@ -184,11 +218,13 @@ slug `weekly-<월요일 날짜>`. 제목 예: "포켓몬고 10월 3주차 일정
 
 ## 5. 도구
 
-| 명령 (frontend 폴더에서) | 용도 |
+| 명령 (저장소 폴더에서, 한 번에 하나씩) | 용도 |
 |---|---|
-| `node scripts/gbl/news_candidates.mjs [일수]` | 소재 뽑기 — 날짜 · 요일 · sid · slug · covers 키 |
-| `node scripts/gbl/news_verify.mjs <base> <slug>` | 글 렌더 · 내부 링크 · 목록/RSS/사이트맵 확인 |
-| `node scripts/indexnow.mjs gblnote.com <url…>` | Bing · 네이버에 새 주소 알리기 |
+| `node frontend/scripts/gbl/news_candidates.mjs [일수]` | 소재 뽑기 — 날짜 · 요일 · sid · slug · covers 키 |
+| `node frontend/scripts/gbl/news_build.mjs` | 발행 전 검사 — 타입 검사 + 빌드(앞뒤로 `.next` 정리) |
+| `node frontend/scripts/gbl/news_live.mjs <slug…>` | 발행 뒤 처리 — 배포 반영 대기 → 실서버 검증 → IndexNow 제출 |
+| `node frontend/scripts/gbl/news_verify.mjs <base> <slug>` | (위 명령이 부름) 글 렌더 · 내부 링크 · 목록/RSS/사이트맵 확인 |
+| `node frontend/scripts/indexnow.mjs gblnote.com <url…>` | (위 명령이 부름) Bing · 네이버에 새 주소 알리기 |
 
 자동 블록(글의 숫자를 사이트 데이터에서 채움 — `news/posts.ts` 머리말 참고):
 `{ boss }` · `{ weak }` · `{ counters }` · `{ raidTop }` · `{ dex }`
