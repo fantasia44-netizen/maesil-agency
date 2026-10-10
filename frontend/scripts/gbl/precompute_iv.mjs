@@ -22,6 +22,7 @@ const RIVALS = {
   groudon: "kyogre", kyogre: "groudon",
   kyurem_white: "kyurem_black", kyurem_black: "kyurem_white",   // 둘 다 백 CP 5206
   reshiram: "zekrom", zekrom: "reshiram",                       // 둘 다 백 CP 4565
+  reshiram_shadow: "zekrom_shadow", zekrom_shadow: "reshiram_shadow",   // 그림자끼리도 공격 실수치가 같다
 };
 const RIVAL = RIVALS[TARGET] || null;
 

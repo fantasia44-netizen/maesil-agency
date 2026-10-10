@@ -8,4 +8,5 @@ export const PUBLISHED_ANALYSIS: ReadonlySet<string> = new Set([
   "metagross", "gholdengo", "garchomp",
   "ursaluna", "kyurem_black", "reshiram_shadow", "lugia",
   "zamazenta_crowned_shield", "ursaluna_shadow", "necrozma_dawn_wings", "marshadow",
+  "zekrom_shadow",
 ]);

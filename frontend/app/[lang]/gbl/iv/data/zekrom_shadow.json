@@ -1,11 +1,11 @@
 {
-  "speciesId": "reshiram_shadow",
-  "dex": 643,
+  "speciesId": "zekrom_shadow",
+  "dex": 644,
   "league": "master",
   "metaLimit": 100,
   "season": 28,
-  "rival": "zekrom_shadow",
-  "rivalDex": 644,
+  "rival": "reshiram_shadow",
+  "rivalDex": 643,
   "normal": {
     "hundo": {
       "cp": 4565,
@@ -18,18 +18,18 @@
       "byShield": [
         {
           "shields": 0,
-          "wins": 62,
-          "losses": 38
+          "wins": 58,
+          "losses": 42
         },
         {
           "shields": 1,
-          "wins": 55,
-          "losses": 45
+          "wins": 50,
+          "losses": 50
         },
         {
           "shields": 2,
-          "wins": 57,
-          "losses": 43
+          "wins": 52,
+          "losses": 48
         }
       ]
     },
@@ -45,8 +45,8 @@
               "water",
               "dragon"
             ],
-            "rating": 365,
-            "win": false,
+            "rating": 788,
+            "win": true,
             "score": 98.7
           },
           {
@@ -57,7 +57,7 @@
               "fairy",
               "steel"
             ],
-            "rating": 551,
+            "rating": 510,
             "win": true,
             "score": 97.8
           },
@@ -69,8 +69,8 @@
               "dragon",
               "ground"
             ],
-            "rating": 548,
-            "win": true,
+            "rating": 500,
+            "win": false,
             "score": 94.4
           },
           {
@@ -81,8 +81,8 @@
               "steel",
               "psychic"
             ],
-            "rating": 902,
-            "win": true,
+            "rating": 450,
+            "win": false,
             "score": 94.3
           },
           {
@@ -93,8 +93,8 @@
               "dragon",
               "ice"
             ],
-            "rating": 733,
-            "win": true,
+            "rating": 419,
+            "win": false,
             "score": 94.2
           },
           {
@@ -105,8 +105,8 @@
               "dragon",
               "fire"
             ],
-            "rating": 500,
-            "win": false,
+            "rating": 570,
+            "win": true,
             "score": 94
           },
           {
@@ -116,8 +116,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 535,
-            "win": true,
+            "rating": 335,
+            "win": false,
             "score": 94
           },
           {
@@ -127,7 +127,7 @@
             "types": [
               "water"
             ],
-            "rating": 581,
+            "rating": 902,
             "win": true,
             "score": 93.9
           },
@@ -139,7 +139,7 @@
               "steel",
               "dragon"
             ],
-            "rating": 551,
+            "rating": 584,
             "win": true,
             "score": 93.8
           },
@@ -175,8 +175,8 @@
               "dragon",
               "ice"
             ],
-            "rating": 608,
-            "win": true,
+            "rating": 419,
+            "win": false,
             "score": 92.7
           },
           {
@@ -187,7 +187,7 @@
               "dragon",
               "fire"
             ],
-            "rating": 500,
+            "rating": 285,
             "win": false,
             "score": 92.7
           },
@@ -199,7 +199,7 @@
               "psychic",
               "flying"
             ],
-            "rating": 330,
+            "rating": 452,
             "win": false,
             "score": 92.4
           },
@@ -211,8 +211,8 @@
               "psychic",
               "ghost"
             ],
-            "rating": 573,
-            "win": true,
+            "rating": 128,
+            "win": false,
             "score": 92.4
           },
           {
@@ -223,7 +223,7 @@
               "fighting",
               "steel"
             ],
-            "rating": 485,
+            "rating": 323,
             "win": false,
             "score": 92.2
           },
@@ -247,7 +247,7 @@
               "psychic",
               "ghost"
             ],
-            "rating": 605,
+            "rating": 627,
             "win": true,
             "score": 91.8
           },
@@ -259,7 +259,7 @@
               "fighting",
               "ghost"
             ],
-            "rating": 532,
+            "rating": 551,
             "win": true,
             "score": 90.6
           },
@@ -271,7 +271,7 @@
               "dragon",
               "electric"
             ],
-            "rating": 429,
+            "rating": 500,
             "win": false,
             "score": 90.6
           },
@@ -283,8 +283,8 @@
               "dragon",
               "electric"
             ],
-            "rating": 714,
-            "win": true,
+            "rating": 500,
+            "win": false,
             "score": 90.4
           },
           {
@@ -295,8 +295,8 @@
               "psychic",
               "steel"
             ],
-            "rating": 665,
-            "win": true,
+            "rating": 480,
+            "win": false,
             "score": 90.3
           },
           {
@@ -307,7 +307,7 @@
               "psychic",
               "flying"
             ],
-            "rating": 152,
+            "rating": 488,
             "win": false,
             "score": 90.1
           },
@@ -319,8 +319,8 @@
               "water",
               "dragon"
             ],
-            "rating": 412,
-            "win": false,
+            "rating": 717,
+            "win": true,
             "score": 89.8
           },
           {
@@ -331,7 +331,7 @@
               "fire",
               "flying"
             ],
-            "rating": 554,
+            "rating": 923,
             "win": true,
             "score": 89.4
           },
@@ -343,7 +343,7 @@
               "dragon",
               "ground"
             ],
-            "rating": 434,
+            "rating": 244,
             "win": false,
             "score": 88.8
           },
@@ -355,7 +355,7 @@
               "steel",
               "psychic"
             ],
-            "rating": 885,
+            "rating": 616,
             "win": true,
             "score": 88.8
           },
@@ -366,7 +366,7 @@
             "types": [
               "ground"
             ],
-            "rating": 173,
+            "rating": 497,
             "win": false,
             "score": 88.7
           },
@@ -377,7 +377,7 @@
             "types": [
               "steel"
             ],
-            "rating": 739,
+            "rating": 616,
             "win": true,
             "score": 88.4
           },
@@ -389,7 +389,7 @@
               "water",
               "fighting"
             ],
-            "rating": 630,
+            "rating": 668,
             "win": true,
             "score": 88.2
           },
@@ -424,8 +424,8 @@
             "types": [
               "water"
             ],
-            "rating": 217,
-            "win": false,
+            "rating": 891,
+            "win": true,
             "score": 86.7
           },
           {
@@ -436,7 +436,7 @@
               "water",
               "dragon"
             ],
-            "rating": 538,
+            "rating": 690,
             "win": true,
             "score": 86.2
           },
@@ -460,7 +460,7 @@
               "water",
               "fighting"
             ],
-            "rating": 660,
+            "rating": 698,
             "win": true,
             "score": 86
           },
@@ -471,7 +471,7 @@
             "types": [
               "grass"
             ],
-            "rating": 834,
+            "rating": 532,
             "win": true,
             "score": 86
           },
@@ -483,7 +483,7 @@
               "dark",
               "flying"
             ],
-            "rating": 548,
+            "rating": 853,
             "win": true,
             "score": 86
           },
@@ -506,8 +506,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 519,
-            "win": true,
+            "rating": 360,
+            "win": false,
             "score": 85.8
           },
           {
@@ -518,8 +518,8 @@
               "ground",
               "flying"
             ],
-            "rating": 500,
-            "win": false,
+            "rating": 538,
+            "win": true,
             "score": 85.8
           },
           {
@@ -530,7 +530,7 @@
               "psychic",
               "steel"
             ],
-            "rating": 807,
+            "rating": 576,
             "win": true,
             "score": 85.7
           },
@@ -542,7 +542,7 @@
               "steel",
               "dragon"
             ],
-            "rating": 752,
+            "rating": 505,
             "win": true,
             "score": 85
           },
@@ -554,8 +554,8 @@
               "normal",
               "psychic"
             ],
-            "rating": 595,
-            "win": true,
+            "rating": 470,
+            "win": false,
             "score": 85
           },
           {
@@ -566,8 +566,8 @@
               "water",
               "fairy"
             ],
-            "rating": 345,
-            "win": false,
+            "rating": 913,
+            "win": true,
             "score": 84.1
           },
           {
@@ -578,8 +578,8 @@
               "steel",
               "dragon"
             ],
-            "rating": 500,
-            "win": false,
+            "rating": 581,
+            "win": true,
             "score": 84
           },
           {
@@ -590,8 +590,8 @@
               "steel",
               "ghost"
             ],
-            "rating": 913,
-            "win": true,
+            "rating": 478,
+            "win": false,
             "score": 83.9
           },
           {
@@ -602,8 +602,8 @@
               "dragon",
               "ice"
             ],
-            "rating": 578,
-            "win": true,
+            "rating": 256,
+            "win": false,
             "score": 83.8
           },
           {
@@ -614,8 +614,8 @@
               "dragon",
               "psychic"
             ],
-            "rating": 279,
-            "win": false,
+            "rating": 540,
+            "win": true,
             "score": 83.7
           },
           {
@@ -626,8 +626,8 @@
               "dragon",
               "flying"
             ],
-            "rating": 500,
-            "win": false,
+            "rating": 508,
+            "win": true,
             "score": 83.6
           },
           {
@@ -649,8 +649,8 @@
               "ghost",
               "dragon"
             ],
-            "rating": 191,
-            "win": false,
+            "rating": 502,
+            "win": true,
             "score": 83.5
           },
           {
@@ -660,7 +660,7 @@
             "types": [
               "ground"
             ],
-            "rating": 739,
+            "rating": 646,
             "win": true,
             "score": 83.2
           },
@@ -672,7 +672,7 @@
               "dark",
               "dragon"
             ],
-            "rating": 508,
+            "rating": 548,
             "win": true,
             "score": 83.1
           },
@@ -683,7 +683,7 @@
             "types": [
               "dragon"
             ],
-            "rating": 646,
+            "rating": 720,
             "win": true,
             "score": 82.6
           },
@@ -695,8 +695,8 @@
               "fire",
               "flying"
             ],
-            "rating": 166,
-            "win": false,
+            "rating": 913,
+            "win": true,
             "score": 82.6
           },
           {
@@ -707,8 +707,8 @@
               "dragon",
               "psychic"
             ],
-            "rating": 279,
-            "win": false,
+            "rating": 535,
+            "win": true,
             "score": 82
           },
           {
@@ -719,7 +719,7 @@
               "water",
               "flying"
             ],
-            "rating": 611,
+            "rating": 739,
             "win": true,
             "score": 81.8
           },
@@ -731,8 +731,8 @@
               "fairy",
               "flying"
             ],
-            "rating": 415,
-            "win": false,
+            "rating": 752,
+            "win": true,
             "score": 81.8
           },
           {
@@ -743,7 +743,7 @@
               "psychic",
               "fairy"
             ],
-            "rating": 496,
+            "rating": 445,
             "win": false,
             "score": 81.6
           },
@@ -755,7 +755,7 @@
               "steel",
               "psychic"
             ],
-            "rating": 877,
+            "rating": 584,
             "win": true,
             "score": 81.1
           },
@@ -767,8 +767,8 @@
               "dragon",
               "psychic"
             ],
-            "rating": 232,
-            "win": false,
+            "rating": 611,
+            "win": true,
             "score": 81.1
           },
           {
@@ -779,7 +779,7 @@
               "fairy",
               "flying"
             ],
-            "rating": 521,
+            "rating": 774,
             "win": true,
             "score": 81
           },
@@ -791,8 +791,8 @@
               "rock",
               "dark"
             ],
-            "rating": 186,
-            "win": false,
+            "rating": 573,
+            "win": true,
             "score": 80.7
           },
           {
@@ -825,7 +825,7 @@
               "dragon",
               "flying"
             ],
-            "rating": 502,
+            "rating": 584,
             "win": true,
             "score": 80.4
           },
@@ -860,8 +860,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 684,
-            "win": true,
+            "rating": 407,
+            "win": false,
             "score": 80.1
           },
           {
@@ -884,7 +884,7 @@
               "bug",
               "steel"
             ],
-            "rating": 769,
+            "rating": 703,
             "win": true,
             "score": 79.8
           },
@@ -896,8 +896,8 @@
               "bug",
               "steel"
             ],
-            "rating": 769,
-            "win": true,
+            "rating": 496,
+            "win": false,
             "score": 79.6
           },
           {
@@ -907,7 +907,7 @@
             "types": [
               "electric"
             ],
-            "rating": 703,
+            "rating": 730,
             "win": true,
             "score": 79.6
           },
@@ -931,8 +931,8 @@
               "dragon",
               "flying"
             ],
-            "rating": 278,
-            "win": false,
+            "rating": 589,
+            "win": true,
             "score": 79.5
           },
           {
@@ -966,8 +966,8 @@
               "dark",
               "steel"
             ],
-            "rating": 714,
-            "win": true,
+            "rating": 437,
+            "win": false,
             "score": 79
           },
           {
@@ -977,7 +977,7 @@
             "types": [
               "normal"
             ],
-            "rating": 679,
+            "rating": 687,
             "win": true,
             "score": 78.8
           },
@@ -989,7 +989,7 @@
               "dark",
               "dragon"
             ],
-            "rating": 554,
+            "rating": 586,
             "win": true,
             "score": 78.6
           },
@@ -1001,7 +1001,7 @@
               "fire",
               "water"
             ],
-            "rating": 565,
+            "rating": 923,
             "win": true,
             "score": 78.5
           },
@@ -1013,7 +1013,7 @@
               "bug",
               "water"
             ],
-            "rating": 679,
+            "rating": 663,
             "win": true,
             "score": 78.3
           },
@@ -1025,7 +1025,7 @@
               "fighting",
               "water"
             ],
-            "rating": 548,
+            "rating": 913,
             "win": true,
             "score": 78.1
           },
@@ -1049,8 +1049,8 @@
               "fire",
               "steel"
             ],
-            "rating": 529,
-            "win": true,
+            "rating": 454,
+            "win": false,
             "score": 77.9
           },
           {
@@ -1060,7 +1060,7 @@
             "types": [
               "electric"
             ],
-            "rating": 741,
+            "rating": 769,
             "win": true,
             "score": 77.8
           },
@@ -1072,7 +1072,7 @@
               "bug",
               "water"
             ],
-            "rating": 728,
+            "rating": 730,
             "win": true,
             "score": 77.7
           },
@@ -1084,7 +1084,7 @@
               "electric",
               "flying"
             ],
-            "rating": 739,
+            "rating": 834,
             "win": true,
             "score": 77.6
           },
@@ -1096,7 +1096,7 @@
               "electric",
               "flying"
             ],
-            "rating": 679,
+            "rating": 790,
             "win": true,
             "score": 77.6
           },
@@ -1107,7 +1107,7 @@
             "types": [
               "ground"
             ],
-            "rating": 488,
+            "rating": 164,
             "win": false,
             "score": 77.5
           },
@@ -1118,8 +1118,8 @@
             "types": [
               "normal"
             ],
-            "rating": 709,
-            "win": true,
+            "rating": 377,
+            "win": false,
             "score": 77.2
           },
           {
@@ -1130,7 +1130,7 @@
               "fighting",
               "ghost"
             ],
-            "rating": 673,
+            "rating": 635,
             "win": true,
             "score": 76.9
           },
@@ -1142,8 +1142,8 @@
               "ice",
               "ground"
             ],
-            "rating": 619,
-            "win": true,
+            "rating": 179,
+            "win": false,
             "score": 76.9
           },
           {
@@ -1165,8 +1165,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 562,
-            "win": true,
+            "rating": 375,
+            "win": false,
             "score": 76.8
           },
           {
@@ -1176,7 +1176,7 @@
             "types": [
               "fighting"
             ],
-            "rating": 521,
+            "rating": 739,
             "win": true,
             "score": 76.8
           },
@@ -1188,7 +1188,7 @@
               "bug",
               "steel"
             ],
-            "rating": 769,
+            "rating": 703,
             "win": true,
             "score": 76.7
           },
@@ -1200,8 +1200,8 @@
               "ground",
               "flying"
             ],
-            "rating": 589,
-            "win": true,
+            "rating": 176,
+            "win": false,
             "score": 76.6
           },
           {
@@ -1229,7 +1229,7 @@
               "water",
               "dragon"
             ],
-            "rating": 353,
+            "rating": 406,
             "win": false,
             "score": 98.7
           },
@@ -1241,8 +1241,8 @@
               "fairy",
               "steel"
             ],
-            "rating": 834,
-            "win": true,
+            "rating": 358,
+            "win": false,
             "score": 97.8
           },
           {
@@ -1253,8 +1253,8 @@
               "dragon",
               "ground"
             ],
-            "rating": 249,
-            "win": false,
+            "rating": 570,
+            "win": true,
             "score": 94.4
           },
           {
@@ -1300,7 +1300,7 @@
             "types": [
               "fairy"
             ],
-            "rating": 420,
+            "rating": 392,
             "win": false,
             "score": 94
           },
@@ -1311,8 +1311,8 @@
             "types": [
               "water"
             ],
-            "rating": 307,
-            "win": false,
+            "rating": 801,
+            "win": true,
             "score": 93.9
           },
           {
@@ -1323,8 +1323,8 @@
               "steel",
               "dragon"
             ],
-            "rating": 605,
-            "win": true,
+            "rating": 285,
+            "win": false,
             "score": 93.8
           },
           {
@@ -1347,8 +1347,8 @@
               "ground",
               "normal"
             ],
-            "rating": 589,
-            "win": true,
+            "rating": 257,
+            "win": false,
             "score": 92.9
           },
           {
@@ -1383,7 +1383,7 @@
               "psychic",
               "flying"
             ],
-            "rating": 202,
+            "rating": 483,
             "win": false,
             "score": 92.4
           },
@@ -1407,8 +1407,8 @@
               "fighting",
               "steel"
             ],
-            "rating": 736,
-            "win": true,
+            "rating": 407,
+            "win": false,
             "score": 92.2
           },
           {
@@ -1419,8 +1419,8 @@
               "ground",
               "normal"
             ],
-            "rating": 570,
-            "win": true,
+            "rating": 216,
+            "win": false,
             "score": 92
           },
           {
@@ -1479,7 +1479,7 @@
               "psychic",
               "steel"
             ],
-            "rating": 769,
+            "rating": 548,
             "win": true,
             "score": 90.3
           },
@@ -1491,8 +1491,8 @@
               "psychic",
               "flying"
             ],
-            "rating": 269,
-            "win": false,
+            "rating": 714,
+            "win": true,
             "score": 90.1
           },
           {
@@ -1515,7 +1515,7 @@
               "fire",
               "flying"
             ],
-            "rating": 875,
+            "rating": 845,
             "win": true,
             "score": 89.4
           },
@@ -1550,7 +1550,7 @@
             "types": [
               "ground"
             ],
-            "rating": 646,
+            "rating": 529,
             "win": true,
             "score": 88.7
           },
@@ -1561,8 +1561,8 @@
             "types": [
               "steel"
             ],
-            "rating": 703,
-            "win": true,
+            "rating": 476,
+            "win": false,
             "score": 88.4
           },
           {
@@ -1573,7 +1573,7 @@
               "water",
               "fighting"
             ],
-            "rating": 513,
+            "rating": 570,
             "win": true,
             "score": 88.2
           },
@@ -1608,7 +1608,7 @@
             "types": [
               "water"
             ],
-            "rating": 649,
+            "rating": 779,
             "win": true,
             "score": 86.7
           },
@@ -1620,8 +1620,8 @@
               "water",
               "dragon"
             ],
-            "rating": 371,
-            "win": false,
+            "rating": 508,
+            "win": true,
             "score": 86.2
           },
           {
@@ -1644,7 +1644,7 @@
               "water",
               "fighting"
             ],
-            "rating": 513,
+            "rating": 600,
             "win": true,
             "score": 86
           },
@@ -1655,7 +1655,7 @@
             "types": [
               "grass"
             ],
-            "rating": 263,
+            "rating": 266,
             "win": false,
             "score": 86
           },
@@ -1690,8 +1690,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 581,
-            "win": true,
+            "rating": 110,
+            "win": false,
             "score": 85.8
           },
           {
@@ -1714,8 +1714,8 @@
               "psychic",
               "steel"
             ],
-            "rating": 771,
-            "win": true,
+            "rating": 474,
+            "win": false,
             "score": 85.7
           },
           {
@@ -1750,8 +1750,8 @@
               "water",
               "fairy"
             ],
-            "rating": 372,
-            "win": false,
+            "rating": 823,
+            "win": true,
             "score": 84.1
           },
           {
@@ -1762,8 +1762,8 @@
               "steel",
               "dragon"
             ],
-            "rating": 605,
-            "win": true,
+            "rating": 459,
+            "win": false,
             "score": 84
           },
           {
@@ -1786,7 +1786,7 @@
               "dragon",
               "ice"
             ],
-            "rating": 355,
+            "rating": 341,
             "win": false,
             "score": 83.8
           },
@@ -1844,8 +1844,8 @@
             "types": [
               "ground"
             ],
-            "rating": 597,
-            "win": true,
+            "rating": 486,
+            "win": false,
             "score": 83.2
           },
           {
@@ -1867,7 +1867,7 @@
             "types": [
               "dragon"
             ],
-            "rating": 562,
+            "rating": 608,
             "win": true,
             "score": 82.6
           },
@@ -1879,7 +1879,7 @@
               "fire",
               "flying"
             ],
-            "rating": 861,
+            "rating": 823,
             "win": true,
             "score": 82.6
           },
@@ -1903,7 +1903,7 @@
               "water",
               "flying"
             ],
-            "rating": 513,
+            "rating": 519,
             "win": true,
             "score": 81.8
           },
@@ -1915,8 +1915,8 @@
               "fairy",
               "flying"
             ],
-            "rating": 474,
-            "win": false,
+            "rating": 695,
+            "win": true,
             "score": 81.8
           },
           {
@@ -1939,7 +1939,7 @@
               "steel",
               "psychic"
             ],
-            "rating": 752,
+            "rating": 540,
             "win": true,
             "score": 81.1
           },
@@ -1963,8 +1963,8 @@
               "fairy",
               "flying"
             ],
-            "rating": 646,
-            "win": true,
+            "rating": 144,
+            "win": false,
             "score": 81
           },
           {
@@ -2044,8 +2044,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 627,
-            "win": true,
+            "rating": 365,
+            "win": false,
             "score": 80.1
           },
           {
@@ -2056,7 +2056,7 @@
               "fire",
               "steel"
             ],
-            "rating": 866,
+            "rating": 779,
             "win": true,
             "score": 80
           },
@@ -2068,7 +2068,7 @@
               "bug",
               "steel"
             ],
-            "rating": 676,
+            "rating": 614,
             "win": true,
             "score": 79.8
           },
@@ -2080,7 +2080,7 @@
               "bug",
               "steel"
             ],
-            "rating": 676,
+            "rating": 614,
             "win": true,
             "score": 79.6
           },
@@ -2091,7 +2091,7 @@
             "types": [
               "electric"
             ],
-            "rating": 646,
+            "rating": 706,
             "win": true,
             "score": 79.6
           },
@@ -2103,7 +2103,7 @@
               "dragon",
               "ice"
             ],
-            "rating": 414,
+            "rating": 451,
             "win": false,
             "score": 79.5
           },
@@ -2115,7 +2115,7 @@
               "dragon",
               "flying"
             ],
-            "rating": 435,
+            "rating": 443,
             "win": false,
             "score": 79.5
           },
@@ -2150,7 +2150,7 @@
               "dark",
               "steel"
             ],
-            "rating": 630,
+            "rating": 581,
             "win": true,
             "score": 79
           },
@@ -2173,7 +2173,7 @@
               "dark",
               "dragon"
             ],
-            "rating": 391,
+            "rating": 410,
             "win": false,
             "score": 78.6
           },
@@ -2185,7 +2185,7 @@
               "fire",
               "water"
             ],
-            "rating": 513,
+            "rating": 845,
             "win": true,
             "score": 78.5
           },
@@ -2197,7 +2197,7 @@
               "bug",
               "water"
             ],
-            "rating": 586,
+            "rating": 540,
             "win": true,
             "score": 78.3
           },
@@ -2209,7 +2209,7 @@
               "fighting",
               "water"
             ],
-            "rating": 714,
+            "rating": 823,
             "win": true,
             "score": 78.1
           },
@@ -2221,8 +2221,8 @@
               "rock",
               "dark"
             ],
-            "rating": 241,
-            "win": false,
+            "rating": 519,
+            "win": true,
             "score": 78
           },
           {
@@ -2233,7 +2233,7 @@
               "fire",
               "steel"
             ],
-            "rating": 875,
+            "rating": 801,
             "win": true,
             "score": 77.9
           },
@@ -2244,7 +2244,7 @@
             "types": [
               "electric"
             ],
-            "rating": 714,
+            "rating": 733,
             "win": true,
             "score": 77.8
           },
@@ -2256,7 +2256,7 @@
               "bug",
               "water"
             ],
-            "rating": 687,
+            "rating": 638,
             "win": true,
             "score": 77.7
           },
@@ -2268,7 +2268,7 @@
               "electric",
               "flying"
             ],
-            "rating": 695,
+            "rating": 804,
             "win": true,
             "score": 77.6
           },
@@ -2280,7 +2280,7 @@
               "electric",
               "flying"
             ],
-            "rating": 622,
+            "rating": 747,
             "win": true,
             "score": 77.6
           },
@@ -2302,8 +2302,8 @@
             "types": [
               "normal"
             ],
-            "rating": 243,
-            "win": false,
+            "rating": 625,
+            "win": true,
             "score": 77.2
           },
           {
@@ -2314,7 +2314,7 @@
               "fighting",
               "ghost"
             ],
-            "rating": 709,
+            "rating": 736,
             "win": true,
             "score": 76.9
           },
@@ -2326,8 +2326,8 @@
               "ice",
               "ground"
             ],
-            "rating": 508,
-            "win": true,
+            "rating": 344,
+            "win": false,
             "score": 76.9
           },
           {
@@ -2338,7 +2338,7 @@
               "fighting",
               "ghost"
             ],
-            "rating": 644,
+            "rating": 671,
             "win": true,
             "score": 76.8
           },
@@ -2349,7 +2349,7 @@
             "types": [
               "fairy"
             ],
-            "rating": 482,
+            "rating": 459,
             "win": false,
             "score": 76.8
           },
@@ -2360,7 +2360,7 @@
             "types": [
               "fighting"
             ],
-            "rating": 736,
+            "rating": 605,
             "win": true,
             "score": 76.8
           },
@@ -2372,7 +2372,7 @@
               "bug",
               "steel"
             ],
-            "rating": 676,
+            "rating": 614,
             "win": true,
             "score": 76.7
           },
@@ -2425,8 +2425,8 @@
               "fairy",
               "steel"
             ],
-            "rating": 763,
-            "win": true,
+            "rating": 442,
+            "win": false,
             "score": 97.8
           },
           {
@@ -2461,7 +2461,7 @@
               "dragon",
               "ice"
             ],
-            "rating": 415,
+            "rating": 419,
             "win": false,
             "score": 94.2
           },
@@ -2495,7 +2495,7 @@
             "types": [
               "water"
             ],
-            "rating": 605,
+            "rating": 725,
             "win": true,
             "score": 93.9
           },
@@ -2531,7 +2531,7 @@
               "ground",
               "normal"
             ],
-            "rating": 340,
+            "rating": 320,
             "win": false,
             "score": 92.9
           },
@@ -2567,7 +2567,7 @@
               "psychic",
               "flying"
             ],
-            "rating": 605,
+            "rating": 665,
             "win": true,
             "score": 92.4
           },
@@ -2591,8 +2591,8 @@
               "fighting",
               "steel"
             ],
-            "rating": 625,
-            "win": true,
+            "rating": 401,
+            "win": false,
             "score": 92.2
           },
           {
@@ -2627,7 +2627,7 @@
               "fighting",
               "ghost"
             ],
-            "rating": 360,
+            "rating": 338,
             "win": false,
             "score": 90.6
           },
@@ -2687,7 +2687,7 @@
               "water",
               "dragon"
             ],
-            "rating": 447,
+            "rating": 453,
             "win": false,
             "score": 89.8
           },
@@ -2699,7 +2699,7 @@
               "fire",
               "flying"
             ],
-            "rating": 823,
+            "rating": 728,
             "win": true,
             "score": 89.4
           },
@@ -2734,7 +2734,7 @@
             "types": [
               "ground"
             ],
-            "rating": 375,
+            "rating": 342,
             "win": false,
             "score": 88.7
           },
@@ -2745,7 +2745,7 @@
             "types": [
               "steel"
             ],
-            "rating": 652,
+            "rating": 573,
             "win": true,
             "score": 88.4
           },
@@ -2792,8 +2792,8 @@
             "types": [
               "water"
             ],
-            "rating": 467,
-            "win": false,
+            "rating": 695,
+            "win": true,
             "score": 86.7
           },
           {
@@ -2828,7 +2828,7 @@
               "water",
               "fighting"
             ],
-            "rating": 335,
+            "rating": 367,
             "win": false,
             "score": 86
           },
@@ -2839,7 +2839,7 @@
             "types": [
               "grass"
             ],
-            "rating": 325,
+            "rating": 328,
             "win": false,
             "score": 86
           },
@@ -2874,8 +2874,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 567,
-            "win": true,
+            "rating": 142,
+            "win": false,
             "score": 85.8
           },
           {
@@ -2898,7 +2898,7 @@
               "psychic",
               "steel"
             ],
-            "rating": 692,
+            "rating": 581,
             "win": true,
             "score": 85.7
           },
@@ -2934,8 +2934,8 @@
               "water",
               "fairy"
             ],
-            "rating": 427,
-            "win": false,
+            "rating": 755,
+            "win": true,
             "score": 84.1
           },
           {
@@ -2970,7 +2970,7 @@
               "dragon",
               "ice"
             ],
-            "rating": 490,
+            "rating": 470,
             "win": false,
             "score": 83.8
           },
@@ -3051,8 +3051,8 @@
             "types": [
               "dragon"
             ],
-            "rating": 483,
-            "win": false,
+            "rating": 538,
+            "win": true,
             "score": 82.6
           },
           {
@@ -3063,7 +3063,7 @@
               "fire",
               "flying"
             ],
-            "rating": 804,
+            "rating": 690,
             "win": true,
             "score": 82.6
           },
@@ -3087,7 +3087,7 @@
               "water",
               "flying"
             ],
-            "rating": 365,
+            "rating": 391,
             "win": false,
             "score": 81.8
           },
@@ -3099,8 +3099,8 @@
               "fairy",
               "flying"
             ],
-            "rating": 494,
-            "win": false,
+            "rating": 627,
+            "win": true,
             "score": 81.8
           },
           {
@@ -3147,7 +3147,7 @@
               "fairy",
               "flying"
             ],
-            "rating": 180,
+            "rating": 177,
             "win": false,
             "score": 81
           },
@@ -3228,8 +3228,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 559,
-            "win": true,
+            "rating": 363,
+            "win": false,
             "score": 80.1
           },
           {
@@ -3240,7 +3240,7 @@
               "fire",
               "steel"
             ],
-            "rating": 815,
+            "rating": 695,
             "win": true,
             "score": 80
           },
@@ -3252,8 +3252,8 @@
               "bug",
               "steel"
             ],
-            "rating": 584,
-            "win": true,
+            "rating": 329,
+            "win": false,
             "score": 79.8
           },
           {
@@ -3264,8 +3264,8 @@
               "bug",
               "steel"
             ],
-            "rating": 584,
-            "win": true,
+            "rating": 329,
+            "win": false,
             "score": 79.6
           },
           {
@@ -3275,7 +3275,7 @@
             "types": [
               "electric"
             ],
-            "rating": 578,
+            "rating": 671,
             "win": true,
             "score": 79.6
           },
@@ -3369,7 +3369,7 @@
               "fire",
               "water"
             ],
-            "rating": 823,
+            "rating": 728,
             "win": true,
             "score": 78.5
           },
@@ -3381,7 +3381,7 @@
               "bug",
               "water"
             ],
-            "rating": 750,
+            "rating": 668,
             "win": true,
             "score": 78.3
           },
@@ -3393,7 +3393,7 @@
               "fighting",
               "water"
             ],
-            "rating": 605,
+            "rating": 755,
             "win": true,
             "score": 78.1
           },
@@ -3417,7 +3417,7 @@
               "fire",
               "steel"
             ],
-            "rating": 845,
+            "rating": 755,
             "win": true,
             "score": 77.9
           },
@@ -3428,7 +3428,7 @@
             "types": [
               "electric"
             ],
-            "rating": 663,
+            "rating": 709,
             "win": true,
             "score": 77.8
           },
@@ -3440,7 +3440,7 @@
               "bug",
               "water"
             ],
-            "rating": 625,
+            "rating": 546,
             "win": true,
             "score": 77.7
           },
@@ -3452,7 +3452,7 @@
               "electric",
               "flying"
             ],
-            "rating": 644,
+            "rating": 769,
             "win": true,
             "score": 77.6
           },
@@ -3464,7 +3464,7 @@
               "electric",
               "flying"
             ],
-            "rating": 554,
+            "rating": 695,
             "win": true,
             "score": 77.6
           },
@@ -3475,7 +3475,7 @@
             "types": [
               "ground"
             ],
-            "rating": 333,
+            "rating": 368,
             "win": false,
             "score": 77.5
           },
@@ -3510,8 +3510,8 @@
               "ice",
               "ground"
             ],
-            "rating": 690,
-            "win": true,
+            "rating": 458,
+            "win": false,
             "score": 76.9
           },
           {
@@ -3544,8 +3544,8 @@
             "types": [
               "fighting"
             ],
-            "rating": 625,
-            "win": true,
+            "rating": 352,
+            "win": false,
             "score": 76.8
           },
           {
@@ -3556,8 +3556,8 @@
               "bug",
               "steel"
             ],
-            "rating": 584,
-            "win": true,
+            "rating": 329,
+            "win": false,
             "score": 76.7
           },
           {
@@ -3568,7 +3568,7 @@
               "ground",
               "flying"
             ],
-            "rating": 426,
+            "rating": 453,
             "win": false,
             "score": 76.6
           },
@@ -3606,18 +3606,18 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 62,
-            "losses": 38
+            "wins": 58,
+            "losses": 42
           },
           {
             "shields": 1,
-            "wins": 55,
-            "losses": 45
+            "wins": 50,
+            "losses": 50
           },
           {
             "shields": 2,
-            "wins": 57,
-            "losses": 43
+            "wins": 52,
+            "losses": 48
           }
         ],
         "flips": [],
@@ -3641,24 +3641,24 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 62,
-            "losses": 38
+            "wins": 58,
+            "losses": 42
           },
           {
             "shields": 1,
-            "wins": 55,
-            "losses": 45
+            "wins": 50,
+            "losses": 50
           },
           {
             "shields": 2,
-            "wins": 57,
-            "losses": 43
+            "wins": 52,
+            "losses": 48
           }
         ],
         "flips": [],
         "nearFlips": [
           {
-            "shields": 1,
+            "shields": 0,
             "oppId": "zekrom",
             "dex": 644,
             "opp": "Zekrom",
@@ -3666,10 +3666,10 @@
               "dragon",
               "electric"
             ],
-            "delta": -123
+            "delta": -139
           },
           {
-            "shields": 0,
+            "shields": 1,
             "oppId": "reshiram",
             "dex": 643,
             "opp": "Reshiram",
@@ -3677,40 +3677,18 @@
               "dragon",
               "fire"
             ],
-            "delta": -106
+            "delta": -123
           },
           {
-            "shields": 1,
-            "oppId": "enamorus_therian",
-            "dex": 905,
-            "opp": "Enamorus (Therian)",
+            "shields": 0,
+            "oppId": "zekrom_shadow",
+            "dex": 644,
+            "opp": "Zekrom (Shadow)",
             "types": [
-              "fairy",
-              "flying"
+              "dragon",
+              "electric"
             ],
-            "delta": -81
-          },
-          {
-            "shields": 2,
-            "oppId": "lugia_shadow",
-            "dex": 249,
-            "opp": "Lugia (Shadow)",
-            "types": [
-              "psychic",
-              "flying"
-            ],
-            "delta": -70
-          },
-          {
-            "shields": 1,
-            "oppId": "lugia_shadow",
-            "dex": 249,
-            "opp": "Lugia (Shadow)",
-            "types": [
-              "psychic",
-              "flying"
-            ],
-            "delta": -67
+            "delta": -77
           },
           {
             "shields": 1,
@@ -3722,6 +3700,28 @@
               "fire"
             ],
             "delta": -60
+          },
+          {
+            "shields": 1,
+            "oppId": "zekrom_shadow",
+            "dex": 644,
+            "opp": "Zekrom (Shadow)",
+            "types": [
+              "dragon",
+              "electric"
+            ],
+            "delta": -60
+          },
+          {
+            "shields": 0,
+            "oppId": "lugia_shadow",
+            "dex": 249,
+            "opp": "Lugia (Shadow)",
+            "types": [
+              "psychic",
+              "flying"
+            ],
+            "delta": -38
           }
         ]
       },
@@ -3743,18 +3743,18 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 62,
-            "losses": 38
+            "wins": 58,
+            "losses": 42
           },
           {
             "shields": 1,
-            "wins": 55,
-            "losses": 45
+            "wins": 50,
+            "losses": 50
           },
           {
             "shields": 2,
-            "wins": 57,
-            "losses": 43
+            "wins": 52,
+            "losses": 48
           }
         ],
         "flips": [],
@@ -3778,18 +3778,18 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 60,
-            "losses": 40
+            "wins": 56,
+            "losses": 44
           },
           {
             "shields": 1,
-            "wins": 55,
-            "losses": 45
+            "wins": 50,
+            "losses": 50
           },
           {
             "shields": 2,
-            "wins": 57,
-            "losses": 43
+            "wins": 52,
+            "losses": 48
           }
         ],
         "flips": [
@@ -3807,43 +3807,6 @@
           },
           {
             "shields": 0,
-            "oppId": "dragonite",
-            "dex": 149,
-            "opp": "Dragonite",
-            "types": [
-              "dragon",
-              "flying"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -186
-          }
-        ],
-        "nearFlips": [
-          {
-            "shields": 0,
-            "oppId": "hydreigon",
-            "dex": 635,
-            "opp": "Hydreigon",
-            "types": [
-              "dark",
-              "dragon"
-            ],
-            "delta": -38
-          },
-          {
-            "shields": 1,
-            "oppId": "palkia",
-            "dex": 484,
-            "opp": "Palkia",
-            "types": [
-              "water",
-              "dragon"
-            ],
-            "delta": -18
-          },
-          {
-            "shields": 0,
             "oppId": "giratina_altered",
             "dex": 487,
             "opp": "Giratina (Altered)",
@@ -3851,7 +3814,44 @@
               "ghost",
               "dragon"
             ],
-            "delta": -12
+            "from": true,
+            "to": false,
+            "delta": -323
+          }
+        ],
+        "nearFlips": [
+          {
+            "shields": 1,
+            "oppId": "hydreigon",
+            "dex": 635,
+            "opp": "Hydreigon",
+            "types": [
+              "dark",
+              "dragon"
+            ],
+            "delta": -19
+          },
+          {
+            "shields": 2,
+            "oppId": "mamoswine_shadow",
+            "dex": 473,
+            "opp": "Mamoswine (Shadow)",
+            "types": [
+              "ice",
+              "ground"
+            ],
+            "delta": -17
+          },
+          {
+            "shields": 2,
+            "oppId": "keldeo_ordinary",
+            "dex": 647,
+            "opp": "Keldeo (Ordinary)",
+            "types": [
+              "water",
+              "fighting"
+            ],
+            "delta": -11
           }
         ]
       },
@@ -3873,21 +3873,34 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 60,
-            "losses": 40
+            "wins": 55,
+            "losses": 45
           },
           {
             "shields": 1,
-            "wins": 54,
-            "losses": 46
+            "wins": 50,
+            "losses": 50
           },
           {
             "shields": 2,
-            "wins": 56,
-            "losses": 44
+            "wins": 51,
+            "losses": 49
           }
         ],
         "flips": [
+          {
+            "shields": 0,
+            "oppId": "dialga_shadow",
+            "dex": 483,
+            "opp": "Dialga (Shadow)",
+            "types": [
+              "steel",
+              "dragon"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -302
+          },
           {
             "shields": 0,
             "oppId": "mewtwo_shadow",
@@ -3902,29 +3915,16 @@
           },
           {
             "shields": 0,
-            "oppId": "dragonite",
-            "dex": 149,
-            "opp": "Dragonite",
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
             "types": [
-              "dragon",
-              "flying"
+              "ghost",
+              "dragon"
             ],
             "from": true,
             "to": false,
-            "delta": -186
-          },
-          {
-            "shields": 1,
-            "oppId": "gyarados",
-            "dex": 130,
-            "opp": "Gyarados",
-            "types": [
-              "water",
-              "flying"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -13
+            "delta": -323
           },
           {
             "shields": 2,
@@ -3941,25 +3941,25 @@
         ],
         "nearFlips": [
           {
-            "shields": 0,
-            "oppId": "hydreigon",
-            "dex": 635,
-            "opp": "Hydreigon",
+            "shields": 1,
+            "oppId": "groudon_shadow",
+            "dex": 383,
+            "opp": "Groudon (Shadow)",
             "types": [
-              "dark",
-              "dragon"
+              "ground"
             ],
             "delta": -41
           },
           {
             "shields": 2,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
+            "oppId": "mamoswine_shadow",
+            "dex": 473,
+            "opp": "Mamoswine (Shadow)",
             "types": [
-              "water"
+              "ice",
+              "ground"
             ],
-            "delta": -37
+            "delta": -33
           },
           {
             "shields": 2,
@@ -3985,14 +3985,14 @@
           },
           {
             "shields": 1,
-            "oppId": "palkia",
-            "dex": 484,
-            "opp": "Palkia",
+            "oppId": "hydreigon",
+            "dex": 635,
+            "opp": "Hydreigon",
             "types": [
-              "water",
+              "dark",
               "dragon"
             ],
-            "delta": -18
+            "delta": -19
           },
           {
             "shields": 2,
@@ -4025,18 +4025,18 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 61,
-            "losses": 39
+            "wins": 57,
+            "losses": 43
           },
           {
             "shields": 1,
-            "wins": 55,
-            "losses": 45
+            "wins": 50,
+            "losses": 50
           },
           {
             "shields": 2,
-            "wins": 56,
-            "losses": 44
+            "wins": 51,
+            "losses": 49
           }
         ],
         "flips": [
@@ -4063,31 +4063,10 @@
             ],
             "from": true,
             "to": false,
-            "delta": -101
+            "delta": -95
           }
         ],
         "nearFlips": [
-          {
-            "shields": 0,
-            "oppId": "hydreigon",
-            "dex": 635,
-            "opp": "Hydreigon",
-            "types": [
-              "dark",
-              "dragon"
-            ],
-            "delta": -38
-          },
-          {
-            "shields": 2,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
-            "types": [
-              "water"
-            ],
-            "delta": -29
-          },
           {
             "shields": 1,
             "oppId": "groudon_shadow",
@@ -4096,7 +4075,18 @@
             "types": [
               "ground"
             ],
-            "delta": -19
+            "delta": -41
+          },
+          {
+            "shields": 0,
+            "oppId": "palkia_origin",
+            "dex": 484,
+            "opp": "Palkia (Origin)",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -36
           },
           {
             "shields": 1,
@@ -4107,17 +4097,18 @@
               "water",
               "dragon"
             ],
-            "delta": -17
+            "delta": -35
           },
           {
-            "shields": 0,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
+            "shields": 1,
+            "oppId": "hydreigon",
+            "dex": 635,
+            "opp": "Hydreigon",
             "types": [
-              "water"
+              "dark",
+              "dragon"
             ],
-            "delta": -14
+            "delta": -19
           },
           {
             "shields": 0,
@@ -4127,7 +4118,7 @@
             "types": [
               "ground"
             ],
-            "delta": -11
+            "delta": -13
           }
         ]
       },
@@ -4149,18 +4140,18 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 61,
-            "losses": 39
+            "wins": 57,
+            "losses": 43
           },
           {
             "shields": 1,
-            "wins": 55,
-            "losses": 45
+            "wins": 50,
+            "losses": 50
           },
           {
             "shields": 2,
-            "wins": 56,
-            "losses": 44
+            "wins": 51,
+            "losses": 49
           }
         ],
         "flips": [
@@ -4187,31 +4178,10 @@
             ],
             "from": true,
             "to": false,
-            "delta": -101
+            "delta": -95
           }
         ],
         "nearFlips": [
-          {
-            "shields": 0,
-            "oppId": "hydreigon",
-            "dex": 635,
-            "opp": "Hydreigon",
-            "types": [
-              "dark",
-              "dragon"
-            ],
-            "delta": -38
-          },
-          {
-            "shields": 2,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
-            "types": [
-              "water"
-            ],
-            "delta": -29
-          },
           {
             "shields": 1,
             "oppId": "groudon_shadow",
@@ -4220,7 +4190,18 @@
             "types": [
               "ground"
             ],
-            "delta": -19
+            "delta": -41
+          },
+          {
+            "shields": 0,
+            "oppId": "palkia_origin",
+            "dex": 484,
+            "opp": "Palkia (Origin)",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -36
           },
           {
             "shields": 1,
@@ -4231,17 +4212,18 @@
               "water",
               "dragon"
             ],
-            "delta": -17
+            "delta": -35
           },
           {
-            "shields": 0,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
+            "shields": 1,
+            "oppId": "hydreigon",
+            "dex": 635,
+            "opp": "Hydreigon",
             "types": [
-              "water"
+              "dark",
+              "dragon"
             ],
-            "delta": -14
+            "delta": -19
           },
           {
             "shields": 0,
@@ -4251,7 +4233,7 @@
             "types": [
               "ground"
             ],
-            "delta": -11
+            "delta": -13
           }
         ]
       },
@@ -4273,18 +4255,18 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 60,
-            "losses": 40
+            "wins": 56,
+            "losses": 44
           },
           {
             "shields": 1,
-            "wins": 54,
-            "losses": 46
+            "wins": 50,
+            "losses": 50
           },
           {
             "shields": 2,
-            "wins": 56,
-            "losses": 44
+            "wins": 51,
+            "losses": 49
           }
         ],
         "flips": [
@@ -4302,29 +4284,16 @@
           },
           {
             "shields": 0,
-            "oppId": "dragonite",
-            "dex": 149,
-            "opp": "Dragonite",
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
             "types": [
-              "dragon",
-              "flying"
+              "ghost",
+              "dragon"
             ],
             "from": true,
             "to": false,
-            "delta": -186
-          },
-          {
-            "shields": 1,
-            "oppId": "gyarados",
-            "dex": 130,
-            "opp": "Gyarados",
-            "types": [
-              "water",
-              "flying"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -13
+            "delta": -323
           },
           {
             "shields": 2,
@@ -4337,31 +4306,10 @@
             ],
             "from": true,
             "to": false,
-            "delta": -101
+            "delta": -95
           }
         ],
         "nearFlips": [
-          {
-            "shields": 0,
-            "oppId": "hydreigon",
-            "dex": 635,
-            "opp": "Hydreigon",
-            "types": [
-              "dark",
-              "dragon"
-            ],
-            "delta": -41
-          },
-          {
-            "shields": 2,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
-            "types": [
-              "water"
-            ],
-            "delta": -32
-          },
           {
             "shields": 1,
             "oppId": "groudon_shadow",
@@ -4370,18 +4318,18 @@
             "types": [
               "ground"
             ],
-            "delta": -21
+            "delta": -41
           },
           {
-            "shields": 1,
-            "oppId": "palkia",
+            "shields": 0,
+            "oppId": "palkia_origin",
             "dex": 484,
-            "opp": "Palkia",
+            "opp": "Palkia (Origin)",
             "types": [
               "water",
               "dragon"
             ],
-            "delta": -18
+            "delta": -37
           },
           {
             "shields": 1,
@@ -4392,17 +4340,39 @@
               "water",
               "dragon"
             ],
-            "delta": -17
+            "delta": -35
           },
           {
-            "shields": 0,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
+            "shields": 1,
+            "oppId": "melmetal",
+            "dex": 809,
+            "opp": "Melmetal",
             "types": [
-              "water"
+              "steel"
             ],
-            "delta": -16
+            "delta": -19
+          },
+          {
+            "shields": 1,
+            "oppId": "hydreigon",
+            "dex": 635,
+            "opp": "Hydreigon",
+            "types": [
+              "dark",
+              "dragon"
+            ],
+            "delta": -19
+          },
+          {
+            "shields": 2,
+            "oppId": "mamoswine_shadow",
+            "dex": 473,
+            "opp": "Mamoswine (Shadow)",
+            "types": [
+              "ice",
+              "ground"
+            ],
+            "delta": -17
           }
         ]
       },
@@ -4424,18 +4394,18 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 60,
-            "losses": 40
+            "wins": 56,
+            "losses": 44
           },
           {
             "shields": 1,
-            "wins": 55,
-            "losses": 45
+            "wins": 50,
+            "losses": 50
           },
           {
             "shields": 2,
-            "wins": 55,
-            "losses": 45
+            "wins": 50,
+            "losses": 50
           }
         ],
         "flips": [
@@ -4453,16 +4423,16 @@
           },
           {
             "shields": 0,
-            "oppId": "dragonite",
-            "dex": 149,
-            "opp": "Dragonite",
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
             "types": [
-              "dragon",
-              "flying"
+              "ghost",
+              "dragon"
             ],
             "from": true,
             "to": false,
-            "delta": -186
+            "delta": -323
           },
           {
             "shields": 2,
@@ -4475,7 +4445,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -101
+            "delta": -95
           },
           {
             "shields": 2,
@@ -4492,15 +4462,56 @@
         ],
         "nearFlips": [
           {
-            "shields": 0,
-            "oppId": "hydreigon",
-            "dex": 635,
-            "opp": "Hydreigon",
+            "shields": 2,
+            "oppId": "raikou_shadow",
+            "dex": 243,
+            "opp": "Raikou (Shadow)",
             "types": [
-              "dark",
+              "electric"
+            ],
+            "delta": -49
+          },
+          {
+            "shields": 1,
+            "oppId": "groudon_shadow",
+            "dex": 383,
+            "opp": "Groudon (Shadow)",
+            "types": [
+              "ground"
+            ],
+            "delta": -41
+          },
+          {
+            "shields": 0,
+            "oppId": "palkia_origin",
+            "dex": 484,
+            "opp": "Palkia (Origin)",
+            "types": [
+              "water",
               "dragon"
             ],
-            "delta": -38
+            "delta": -36
+          },
+          {
+            "shields": 1,
+            "oppId": "palkia_origin",
+            "dex": 484,
+            "opp": "Palkia (Origin)",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -35
+          },
+          {
+            "shields": 1,
+            "oppId": "raikou_shadow",
+            "dex": 243,
+            "opp": "Raikou (Shadow)",
+            "types": [
+              "electric"
+            ],
+            "delta": -33
           },
           {
             "shields": 1,
@@ -4511,48 +4522,6 @@
               "dark"
             ],
             "delta": -32
-          },
-          {
-            "shields": 2,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
-            "types": [
-              "water"
-            ],
-            "delta": -29
-          },
-          {
-            "shields": 0,
-            "oppId": "marshadow",
-            "dex": 802,
-            "opp": "Marshadow",
-            "types": [
-              "fighting",
-              "ghost"
-            ],
-            "delta": -27
-          },
-          {
-            "shields": 2,
-            "oppId": "jirachi",
-            "dex": 385,
-            "opp": "Jirachi",
-            "types": [
-              "steel",
-              "psychic"
-            ],
-            "delta": -22
-          },
-          {
-            "shields": 0,
-            "oppId": "darkrai_shadow",
-            "dex": 491,
-            "opp": "Darkrai (Shadow)",
-            "types": [
-              "dark"
-            ],
-            "delta": -19
           }
         ]
       },
@@ -4574,21 +4543,34 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 60,
-            "losses": 40
+            "wins": 55,
+            "losses": 45
           },
           {
             "shields": 1,
-            "wins": 54,
-            "losses": 46
+            "wins": 50,
+            "losses": 50
           },
           {
             "shields": 2,
-            "wins": 55,
-            "losses": 45
+            "wins": 50,
+            "losses": 50
           }
         ],
         "flips": [
+          {
+            "shields": 0,
+            "oppId": "dialga_shadow",
+            "dex": 483,
+            "opp": "Dialga (Shadow)",
+            "types": [
+              "steel",
+              "dragon"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -302
+          },
           {
             "shields": 0,
             "oppId": "mewtwo_shadow",
@@ -4603,29 +4585,16 @@
           },
           {
             "shields": 0,
-            "oppId": "dragonite",
-            "dex": 149,
-            "opp": "Dragonite",
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
             "types": [
-              "dragon",
-              "flying"
+              "ghost",
+              "dragon"
             ],
             "from": true,
             "to": false,
-            "delta": -186
-          },
-          {
-            "shields": 1,
-            "oppId": "gyarados",
-            "dex": 130,
-            "opp": "Gyarados",
-            "types": [
-              "water",
-              "flying"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -13
+            "delta": -323
           },
           {
             "shields": 2,
@@ -4638,7 +4607,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -101
+            "delta": -95
           },
           {
             "shields": 2,
@@ -4655,15 +4624,56 @@
         ],
         "nearFlips": [
           {
-            "shields": 0,
-            "oppId": "hydreigon",
-            "dex": 635,
-            "opp": "Hydreigon",
+            "shields": 2,
+            "oppId": "raikou_shadow",
+            "dex": 243,
+            "opp": "Raikou (Shadow)",
             "types": [
-              "dark",
-              "dragon"
+              "electric"
+            ],
+            "delta": -51
+          },
+          {
+            "shields": 1,
+            "oppId": "groudon_shadow",
+            "dex": 383,
+            "opp": "Groudon (Shadow)",
+            "types": [
+              "ground"
             ],
             "delta": -41
+          },
+          {
+            "shields": 0,
+            "oppId": "palkia_origin",
+            "dex": 484,
+            "opp": "Palkia (Origin)",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -37
+          },
+          {
+            "shields": 1,
+            "oppId": "palkia_origin",
+            "dex": 484,
+            "opp": "Palkia (Origin)",
+            "types": [
+              "water",
+              "dragon"
+            ],
+            "delta": -35
+          },
+          {
+            "shields": 1,
+            "oppId": "raikou_shadow",
+            "dex": 243,
+            "opp": "Raikou (Shadow)",
+            "types": [
+              "electric"
+            ],
+            "delta": -34
           },
           {
             "shields": 1,
@@ -4674,49 +4684,6 @@
               "dark"
             ],
             "delta": -34
-          },
-          {
-            "shields": 2,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
-            "types": [
-              "water"
-            ],
-            "delta": -32
-          },
-          {
-            "shields": 0,
-            "oppId": "marshadow",
-            "dex": 802,
-            "opp": "Marshadow",
-            "types": [
-              "fighting",
-              "ghost"
-            ],
-            "delta": -30
-          },
-          {
-            "shields": 1,
-            "oppId": "togekiss",
-            "dex": 468,
-            "opp": "Togekiss",
-            "types": [
-              "fairy",
-              "flying"
-            ],
-            "delta": -28
-          },
-          {
-            "shields": 2,
-            "oppId": "jirachi",
-            "dex": 385,
-            "opp": "Jirachi",
-            "types": [
-              "steel",
-              "psychic"
-            ],
-            "delta": -24
           }
         ]
       },
@@ -4738,33 +4705,33 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 59,
-            "losses": 41
+            "wins": 55,
+            "losses": 45
           },
           {
             "shields": 1,
-            "wins": 54,
-            "losses": 46
+            "wins": 49,
+            "losses": 51
           },
           {
             "shields": 2,
-            "wins": 55,
-            "losses": 45
+            "wins": 50,
+            "losses": 50
           }
         ],
         "flips": [
           {
             "shields": 0,
-            "oppId": "zekrom_shadow",
-            "dex": 644,
-            "opp": "Zekrom (Shadow)",
+            "oppId": "dialga_shadow",
+            "dex": 483,
+            "opp": "Dialga (Shadow)",
             "types": [
-              "dragon",
-              "electric"
+              "steel",
+              "dragon"
             ],
             "from": true,
             "to": false,
-            "delta": -244
+            "delta": -315
           },
           {
             "shields": 0,
@@ -4780,16 +4747,16 @@
           },
           {
             "shields": 0,
-            "oppId": "dragonite",
-            "dex": 149,
-            "opp": "Dragonite",
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
             "types": [
-              "dragon",
-              "flying"
+              "ghost",
+              "dragon"
             ],
             "from": true,
             "to": false,
-            "delta": -186
+            "delta": -323
           },
           {
             "shields": 1,
@@ -4815,7 +4782,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -101
+            "delta": -95
           },
           {
             "shields": 2,
@@ -4877,6 +4844,16 @@
           },
           {
             "shields": 2,
+            "oppId": "raikou_shadow",
+            "dex": 243,
+            "opp": "Raikou (Shadow)",
+            "types": [
+              "electric"
+            ],
+            "delta": -49
+          },
+          {
+            "shields": 2,
             "oppId": "urshifu_single_strike",
             "dex": 892,
             "opp": "Urshifu (Single Strike)",
@@ -4885,17 +4862,6 @@
               "dark"
             ],
             "delta": -49
-          },
-          {
-            "shields": 2,
-            "oppId": "dialga_shadow",
-            "dex": 483,
-            "opp": "Dialga (Shadow)",
-            "types": [
-              "steel",
-              "dragon"
-            ],
-            "delta": -41
           }
         ]
       },
@@ -4917,33 +4883,46 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 59,
-            "losses": 41
+            "wins": 54,
+            "losses": 46
           },
           {
             "shields": 1,
-            "wins": 52,
-            "losses": 48
+            "wins": 48,
+            "losses": 52
           },
           {
             "shields": 2,
-            "wins": 55,
-            "losses": 45
+            "wins": 49,
+            "losses": 51
           }
         ],
         "flips": [
           {
             "shields": 0,
-            "oppId": "zekrom_shadow",
-            "dex": 644,
-            "opp": "Zekrom (Shadow)",
+            "oppId": "dialga_shadow",
+            "dex": 483,
+            "opp": "Dialga (Shadow)",
             "types": [
-              "dragon",
-              "electric"
+              "steel",
+              "dragon"
             ],
             "from": true,
             "to": false,
-            "delta": -244
+            "delta": -315
+          },
+          {
+            "shields": 0,
+            "oppId": "dragonite_shadow",
+            "dex": 149,
+            "opp": "Dragonite (Shadow)",
+            "types": [
+              "dragon",
+              "flying"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -253
           },
           {
             "shields": 0,
@@ -4959,16 +4938,16 @@
           },
           {
             "shields": 0,
-            "oppId": "dragonite",
-            "dex": 149,
-            "opp": "Dragonite",
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
             "types": [
-              "dragon",
-              "flying"
+              "ghost",
+              "dragon"
             ],
             "from": true,
             "to": false,
-            "delta": -186
+            "delta": -323
           },
           {
             "shields": 1,
@@ -4982,19 +4961,6 @@
             "from": true,
             "to": false,
             "delta": -239
-          },
-          {
-            "shields": 1,
-            "oppId": "gyarados",
-            "dex": 130,
-            "opp": "Gyarados",
-            "types": [
-              "water",
-              "flying"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -13
           },
           {
             "shields": 1,
@@ -5019,7 +4985,19 @@
             ],
             "from": true,
             "to": false,
-            "delta": -101
+            "delta": -95
+          },
+          {
+            "shields": 2,
+            "oppId": "melmetal",
+            "dex": 809,
+            "opp": "Melmetal",
+            "types": [
+              "steel"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -76
           },
           {
             "shields": 2,
@@ -5081,6 +5059,16 @@
           },
           {
             "shields": 2,
+            "oppId": "raikou_shadow",
+            "dex": 243,
+            "opp": "Raikou (Shadow)",
+            "types": [
+              "electric"
+            ],
+            "delta": -52
+          },
+          {
+            "shields": 2,
             "oppId": "urshifu_single_strike",
             "dex": 892,
             "opp": "Urshifu (Single Strike)",
@@ -5089,17 +5077,6 @@
               "dark"
             ],
             "delta": -49
-          },
-          {
-            "shields": 0,
-            "oppId": "hydreigon",
-            "dex": 635,
-            "opp": "Hydreigon",
-            "types": [
-              "dark",
-              "dragon"
-            ],
-            "delta": -41
           }
         ]
       }
@@ -5117,18 +5094,18 @@
       "byShield": [
         {
           "shields": 0,
-          "wins": 68,
-          "losses": 32
+          "wins": 62,
+          "losses": 38
         },
         {
           "shields": 1,
-          "wins": 60,
-          "losses": 40
+          "wins": 55,
+          "losses": 45
         },
         {
           "shields": 2,
-          "wins": 63,
-          "losses": 37
+          "wins": 58,
+          "losses": 42
         }
       ]
     },
@@ -5144,8 +5121,8 @@
               "water",
               "dragon"
             ],
-            "rating": 365,
-            "win": false,
+            "rating": 789,
+            "win": true,
             "score": 98.7
           },
           {
@@ -5156,7 +5133,7 @@
               "fairy",
               "steel"
             ],
-            "rating": 878,
+            "rating": 513,
             "win": true,
             "score": 97.8
           },
@@ -5168,8 +5145,8 @@
               "dragon",
               "ground"
             ],
-            "rating": 554,
-            "win": true,
+            "rating": 500,
+            "win": false,
             "score": 94.4
           },
           {
@@ -5180,8 +5157,8 @@
               "steel",
               "psychic"
             ],
-            "rating": 902,
-            "win": true,
+            "rating": 453,
+            "win": false,
             "score": 94.3
           },
           {
@@ -5192,8 +5169,8 @@
               "dragon",
               "ice"
             ],
-            "rating": 735,
-            "win": true,
+            "rating": 419,
+            "win": false,
             "score": 94.2
           },
           {
@@ -5204,7 +5181,7 @@
               "dragon",
               "fire"
             ],
-            "rating": 610,
+            "rating": 572,
             "win": true,
             "score": 94
           },
@@ -5215,8 +5192,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 537,
-            "win": true,
+            "rating": 335,
+            "win": false,
             "score": 94
           },
           {
@@ -5226,7 +5203,7 @@
             "types": [
               "water"
             ],
-            "rating": 583,
+            "rating": 902,
             "win": true,
             "score": 93.9
           },
@@ -5238,7 +5215,7 @@
               "steel",
               "dragon"
             ],
-            "rating": 554,
+            "rating": 586,
             "win": true,
             "score": 93.8
           },
@@ -5274,8 +5251,8 @@
               "dragon",
               "ice"
             ],
-            "rating": 613,
-            "win": true,
+            "rating": 419,
+            "win": false,
             "score": 92.7
           },
           {
@@ -5286,8 +5263,8 @@
               "dragon",
               "fire"
             ],
-            "rating": 540,
-            "win": true,
+            "rating": 285,
+            "win": false,
             "score": 92.7
           },
           {
@@ -5298,7 +5275,7 @@
               "psychic",
               "flying"
             ],
-            "rating": 330,
+            "rating": 452,
             "win": false,
             "score": 92.4
           },
@@ -5310,8 +5287,8 @@
               "psychic",
               "ghost"
             ],
-            "rating": 575,
-            "win": true,
+            "rating": 440,
+            "win": false,
             "score": 92.4
           },
           {
@@ -5322,7 +5299,7 @@
               "fighting",
               "steel"
             ],
-            "rating": 488,
+            "rating": 326,
             "win": false,
             "score": 92.2
           },
@@ -5334,7 +5311,7 @@
               "ground",
               "normal"
             ],
-            "rating": 479,
+            "rating": 183,
             "win": false,
             "score": 92
           },
@@ -5346,7 +5323,7 @@
               "psychic",
               "ghost"
             ],
-            "rating": 608,
+            "rating": 629,
             "win": true,
             "score": 91.8
           },
@@ -5358,7 +5335,7 @@
               "fighting",
               "ghost"
             ],
-            "rating": 535,
+            "rating": 554,
             "win": true,
             "score": 90.6
           },
@@ -5370,8 +5347,8 @@
               "dragon",
               "electric"
             ],
-            "rating": 260,
-            "win": false,
+            "rating": 643,
+            "win": true,
             "score": 90.6
           },
           {
@@ -5382,8 +5359,8 @@
               "dragon",
               "electric"
             ],
-            "rating": 500,
-            "win": false,
+            "rating": 578,
+            "win": true,
             "score": 90.4
           },
           {
@@ -5394,8 +5371,8 @@
               "psychic",
               "steel"
             ],
-            "rating": 667,
-            "win": true,
+            "rating": 483,
+            "win": false,
             "score": 90.3
           },
           {
@@ -5406,7 +5383,7 @@
               "psychic",
               "flying"
             ],
-            "rating": 152,
+            "rating": 490,
             "win": false,
             "score": 90.1
           },
@@ -5418,8 +5395,8 @@
               "water",
               "dragon"
             ],
-            "rating": 456,
-            "win": false,
+            "rating": 754,
+            "win": true,
             "score": 89.8
           },
           {
@@ -5430,7 +5407,7 @@
               "fire",
               "flying"
             ],
-            "rating": 559,
+            "rating": 924,
             "win": true,
             "score": 89.4
           },
@@ -5442,7 +5419,7 @@
               "dragon",
               "ground"
             ],
-            "rating": 434,
+            "rating": 244,
             "win": false,
             "score": 88.8
           },
@@ -5454,7 +5431,7 @@
               "steel",
               "psychic"
             ],
-            "rating": 886,
+            "rating": 621,
             "win": true,
             "score": 88.8
           },
@@ -5465,8 +5442,8 @@
             "types": [
               "ground"
             ],
-            "rating": 173,
-            "win": false,
+            "rating": 697,
+            "win": true,
             "score": 88.7
           },
           {
@@ -5476,7 +5453,7 @@
             "types": [
               "steel"
             ],
-            "rating": 740,
+            "rating": 618,
             "win": true,
             "score": 88.4
           },
@@ -5488,7 +5465,7 @@
               "water",
               "fighting"
             ],
-            "rating": 632,
+            "rating": 670,
             "win": true,
             "score": 88.2
           },
@@ -5512,8 +5489,8 @@
               "water",
               "flying"
             ],
-            "rating": 180,
-            "win": false,
+            "rating": 521,
+            "win": true,
             "score": 87.5
           },
           {
@@ -5523,8 +5500,8 @@
             "types": [
               "water"
             ],
-            "rating": 217,
-            "win": false,
+            "rating": 891,
+            "win": true,
             "score": 86.7
           },
           {
@@ -5535,7 +5512,7 @@
               "water",
               "dragon"
             ],
-            "rating": 543,
+            "rating": 691,
             "win": true,
             "score": 86.2
           },
@@ -5559,7 +5536,7 @@
               "water",
               "fighting"
             ],
-            "rating": 664,
+            "rating": 702,
             "win": true,
             "score": 86
           },
@@ -5570,7 +5547,7 @@
             "types": [
               "grass"
             ],
-            "rating": 835,
+            "rating": 537,
             "win": true,
             "score": 86
           },
@@ -5582,7 +5559,7 @@
               "dark",
               "flying"
             ],
-            "rating": 567,
+            "rating": 854,
             "win": true,
             "score": 86
           },
@@ -5605,8 +5582,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 524,
-            "win": true,
+            "rating": 389,
+            "win": false,
             "score": 85.8
           },
           {
@@ -5617,7 +5594,7 @@
               "ground",
               "flying"
             ],
-            "rating": 502,
+            "rating": 540,
             "win": true,
             "score": 85.8
           },
@@ -5629,7 +5606,7 @@
               "psychic",
               "steel"
             ],
-            "rating": 821,
+            "rating": 586,
             "win": true,
             "score": 85.7
           },
@@ -5641,7 +5618,7 @@
               "steel",
               "dragon"
             ],
-            "rating": 754,
+            "rating": 508,
             "win": true,
             "score": 85
           },
@@ -5653,8 +5630,8 @@
               "normal",
               "psychic"
             ],
-            "rating": 597,
-            "win": true,
+            "rating": 472,
+            "win": false,
             "score": 85
           },
           {
@@ -5665,8 +5642,8 @@
               "water",
               "fairy"
             ],
-            "rating": 348,
-            "win": false,
+            "rating": 924,
+            "win": true,
             "score": 84.1
           },
           {
@@ -5677,7 +5654,7 @@
               "steel",
               "dragon"
             ],
-            "rating": 551,
+            "rating": 583,
             "win": true,
             "score": 84
           },
@@ -5689,8 +5666,8 @@
               "steel",
               "ghost"
             ],
-            "rating": 913,
-            "win": true,
+            "rating": 478,
+            "win": false,
             "score": 83.9
           },
           {
@@ -5701,8 +5678,8 @@
               "dragon",
               "ice"
             ],
-            "rating": 581,
-            "win": true,
+            "rating": 256,
+            "win": false,
             "score": 83.8
           },
           {
@@ -5713,8 +5690,8 @@
               "dragon",
               "psychic"
             ],
-            "rating": 279,
-            "win": false,
+            "rating": 545,
+            "win": true,
             "score": 83.7
           },
           {
@@ -5725,8 +5702,8 @@
               "dragon",
               "flying"
             ],
-            "rating": 500,
-            "win": false,
+            "rating": 510,
+            "win": true,
             "score": 83.6
           },
           {
@@ -5748,7 +5725,7 @@
               "ghost",
               "dragon"
             ],
-            "rating": 527,
+            "rating": 548,
             "win": true,
             "score": 83.5
           },
@@ -5759,7 +5736,7 @@
             "types": [
               "ground"
             ],
-            "rating": 740,
+            "rating": 648,
             "win": true,
             "score": 83.2
           },
@@ -5771,7 +5748,7 @@
               "dark",
               "dragon"
             ],
-            "rating": 510,
+            "rating": 554,
             "win": true,
             "score": 83.1
           },
@@ -5782,7 +5759,7 @@
             "types": [
               "dragon"
             ],
-            "rating": 648,
+            "rating": 721,
             "win": true,
             "score": 82.6
           },
@@ -5794,8 +5771,8 @@
               "fire",
               "flying"
             ],
-            "rating": 166,
-            "win": false,
+            "rating": 913,
+            "win": true,
             "score": 82.6
           },
           {
@@ -5818,7 +5795,7 @@
               "water",
               "flying"
             ],
-            "rating": 613,
+            "rating": 740,
             "win": true,
             "score": 81.8
           },
@@ -5830,8 +5807,8 @@
               "fairy",
               "flying"
             ],
-            "rating": 415,
-            "win": false,
+            "rating": 756,
+            "win": true,
             "score": 81.8
           },
           {
@@ -5842,8 +5819,8 @@
               "psychic",
               "fairy"
             ],
-            "rating": 510,
-            "win": true,
+            "rating": 449,
+            "win": false,
             "score": 81.6
           },
           {
@@ -5854,7 +5831,7 @@
               "steel",
               "psychic"
             ],
-            "rating": 878,
+            "rating": 589,
             "win": true,
             "score": 81.1
           },
@@ -5866,8 +5843,8 @@
               "dragon",
               "psychic"
             ],
-            "rating": 279,
-            "win": false,
+            "rating": 616,
+            "win": true,
             "score": 81.1
           },
           {
@@ -5878,7 +5855,7 @@
               "fairy",
               "flying"
             ],
-            "rating": 524,
+            "rating": 791,
             "win": true,
             "score": 81
           },
@@ -5890,8 +5867,8 @@
               "rock",
               "dark"
             ],
-            "rating": 186,
-            "win": false,
+            "rating": 575,
+            "win": true,
             "score": 80.7
           },
           {
@@ -5924,7 +5901,7 @@
               "dragon",
               "flying"
             ],
-            "rating": 505,
+            "rating": 586,
             "win": true,
             "score": 80.4
           },
@@ -5959,8 +5936,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 675,
-            "win": true,
+            "rating": 407,
+            "win": false,
             "score": 80.1
           },
           {
@@ -5983,7 +5960,7 @@
               "bug",
               "steel"
             ],
-            "rating": 770,
+            "rating": 705,
             "win": true,
             "score": 79.8
           },
@@ -5995,8 +5972,8 @@
               "bug",
               "steel"
             ],
-            "rating": 770,
-            "win": true,
+            "rating": 496,
+            "win": false,
             "score": 79.6
           },
           {
@@ -6006,7 +5983,7 @@
             "types": [
               "electric"
             ],
-            "rating": 705,
+            "rating": 732,
             "win": true,
             "score": 79.6
           },
@@ -6030,8 +6007,8 @@
               "dragon",
               "flying"
             ],
-            "rating": 278,
-            "win": false,
+            "rating": 591,
+            "win": true,
             "score": 79.5
           },
           {
@@ -6065,8 +6042,8 @@
               "dark",
               "steel"
             ],
-            "rating": 718,
-            "win": true,
+            "rating": 437,
+            "win": false,
             "score": 79
           },
           {
@@ -6076,7 +6053,7 @@
             "types": [
               "normal"
             ],
-            "rating": 683,
+            "rating": 691,
             "win": true,
             "score": 78.8
           },
@@ -6088,7 +6065,7 @@
               "dark",
               "dragon"
             ],
-            "rating": 556,
+            "rating": 589,
             "win": true,
             "score": 78.6
           },
@@ -6100,7 +6077,7 @@
               "fire",
               "water"
             ],
-            "rating": 570,
+            "rating": 924,
             "win": true,
             "score": 78.5
           },
@@ -6112,7 +6089,7 @@
               "bug",
               "water"
             ],
-            "rating": 683,
+            "rating": 667,
             "win": true,
             "score": 78.3
           },
@@ -6124,7 +6101,7 @@
               "fighting",
               "water"
             ],
-            "rating": 554,
+            "rating": 913,
             "win": true,
             "score": 78.1
           },
@@ -6148,8 +6125,8 @@
               "fire",
               "steel"
             ],
-            "rating": 535,
-            "win": true,
+            "rating": 454,
+            "win": false,
             "score": 77.9
           },
           {
@@ -6159,7 +6136,7 @@
             "types": [
               "electric"
             ],
-            "rating": 743,
+            "rating": 770,
             "win": true,
             "score": 77.8
           },
@@ -6171,7 +6148,7 @@
               "bug",
               "water"
             ],
-            "rating": 729,
+            "rating": 732,
             "win": true,
             "score": 77.7
           },
@@ -6183,7 +6160,7 @@
               "electric",
               "flying"
             ],
-            "rating": 740,
+            "rating": 835,
             "win": true,
             "score": 77.6
           },
@@ -6195,7 +6172,7 @@
               "electric",
               "flying"
             ],
-            "rating": 683,
+            "rating": 794,
             "win": true,
             "score": 77.6
           },
@@ -6206,7 +6183,7 @@
             "types": [
               "ground"
             ],
-            "rating": 490,
+            "rating": 164,
             "win": false,
             "score": 77.5
           },
@@ -6217,8 +6194,8 @@
             "types": [
               "normal"
             ],
-            "rating": 713,
-            "win": true,
+            "rating": 378,
+            "win": false,
             "score": 77.2
           },
           {
@@ -6229,7 +6206,7 @@
               "fighting",
               "ghost"
             ],
-            "rating": 675,
+            "rating": 637,
             "win": true,
             "score": 76.9
           },
@@ -6241,8 +6218,8 @@
               "ice",
               "ground"
             ],
-            "rating": 624,
-            "win": true,
+            "rating": 179,
+            "win": false,
             "score": 76.9
           },
           {
@@ -6264,8 +6241,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 567,
-            "win": true,
+            "rating": 375,
+            "win": false,
             "score": 76.8
           },
           {
@@ -6275,7 +6252,7 @@
             "types": [
               "fighting"
             ],
-            "rating": 527,
+            "rating": 740,
             "win": true,
             "score": 76.8
           },
@@ -6287,7 +6264,7 @@
               "bug",
               "steel"
             ],
-            "rating": 770,
+            "rating": 705,
             "win": true,
             "score": 76.7
           },
@@ -6299,8 +6276,8 @@
               "ground",
               "flying"
             ],
-            "rating": 594,
-            "win": true,
+            "rating": 176,
+            "win": false,
             "score": 76.6
           },
           {
@@ -6328,7 +6305,7 @@
               "water",
               "dragon"
             ],
-            "rating": 371,
+            "rating": 406,
             "win": false,
             "score": 98.7
           },
@@ -6340,8 +6317,8 @@
               "fairy",
               "steel"
             ],
-            "rating": 835,
-            "win": true,
+            "rating": 361,
+            "win": false,
             "score": 97.8
           },
           {
@@ -6352,8 +6329,8 @@
               "dragon",
               "ground"
             ],
-            "rating": 249,
-            "win": false,
+            "rating": 575,
+            "win": true,
             "score": 94.4
           },
           {
@@ -6388,8 +6365,8 @@
               "dragon",
               "fire"
             ],
-            "rating": 500,
-            "win": false,
+            "rating": 624,
+            "win": true,
             "score": 94
           },
           {
@@ -6399,7 +6376,7 @@
             "types": [
               "fairy"
             ],
-            "rating": 420,
+            "rating": 392,
             "win": false,
             "score": 94
           },
@@ -6410,8 +6387,8 @@
             "types": [
               "water"
             ],
-            "rating": 307,
-            "win": false,
+            "rating": 802,
+            "win": true,
             "score": 93.9
           },
           {
@@ -6422,8 +6399,8 @@
               "steel",
               "dragon"
             ],
-            "rating": 608,
-            "win": true,
+            "rating": 285,
+            "win": false,
             "score": 93.8
           },
           {
@@ -6446,8 +6423,8 @@
               "ground",
               "normal"
             ],
-            "rating": 591,
-            "win": true,
+            "rating": 257,
+            "win": false,
             "score": 92.9
           },
           {
@@ -6482,7 +6459,7 @@
               "psychic",
               "flying"
             ],
-            "rating": 202,
+            "rating": 483,
             "win": false,
             "score": 92.4
           },
@@ -6506,8 +6483,8 @@
               "fighting",
               "steel"
             ],
-            "rating": 737,
-            "win": true,
+            "rating": 410,
+            "win": false,
             "score": 92.2
           },
           {
@@ -6518,8 +6495,8 @@
               "ground",
               "normal"
             ],
-            "rating": 575,
-            "win": true,
+            "rating": 271,
+            "win": false,
             "score": 92
           },
           {
@@ -6554,8 +6531,8 @@
               "dragon",
               "electric"
             ],
-            "rating": 624,
-            "win": true,
+            "rating": 500,
+            "win": false,
             "score": 90.6
           },
           {
@@ -6578,7 +6555,7 @@
               "psychic",
               "steel"
             ],
-            "rating": 770,
+            "rating": 551,
             "win": true,
             "score": 90.3
           },
@@ -6590,8 +6567,8 @@
               "psychic",
               "flying"
             ],
-            "rating": 269,
-            "win": false,
+            "rating": 716,
+            "win": true,
             "score": 90.1
           },
           {
@@ -6602,7 +6579,7 @@
               "water",
               "dragon"
             ],
-            "rating": 391,
+            "rating": 412,
             "win": false,
             "score": 89.8
           },
@@ -6614,7 +6591,7 @@
               "fire",
               "flying"
             ],
-            "rating": 875,
+            "rating": 845,
             "win": true,
             "score": 89.4
           },
@@ -6649,7 +6626,7 @@
             "types": [
               "ground"
             ],
-            "rating": 651,
+            "rating": 532,
             "win": true,
             "score": 88.7
           },
@@ -6660,8 +6637,8 @@
             "types": [
               "steel"
             ],
-            "rating": 705,
-            "win": true,
+            "rating": 476,
+            "win": false,
             "score": 88.4
           },
           {
@@ -6672,7 +6649,7 @@
               "water",
               "fighting"
             ],
-            "rating": 516,
+            "rating": 572,
             "win": true,
             "score": 88.2
           },
@@ -6707,7 +6684,7 @@
             "types": [
               "water"
             ],
-            "rating": 651,
+            "rating": 781,
             "win": true,
             "score": 86.7
           },
@@ -6719,8 +6696,8 @@
               "water",
               "dragon"
             ],
-            "rating": 371,
-            "win": false,
+            "rating": 510,
+            "win": true,
             "score": 86.2
           },
           {
@@ -6743,7 +6720,7 @@
               "water",
               "fighting"
             ],
-            "rating": 516,
+            "rating": 605,
             "win": true,
             "score": 86
           },
@@ -6754,7 +6731,7 @@
             "types": [
               "grass"
             ],
-            "rating": 263,
+            "rating": 266,
             "win": false,
             "score": 86
           },
@@ -6789,8 +6766,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 583,
-            "win": true,
+            "rating": 110,
+            "win": false,
             "score": 85.8
           },
           {
@@ -6813,8 +6790,8 @@
               "psychic",
               "steel"
             ],
-            "rating": 643,
-            "win": true,
+            "rating": 476,
+            "win": false,
             "score": 85.7
           },
           {
@@ -6849,8 +6826,8 @@
               "water",
               "fairy"
             ],
-            "rating": 375,
-            "win": false,
+            "rating": 845,
+            "win": true,
             "score": 84.1
           },
           {
@@ -6861,8 +6838,8 @@
               "steel",
               "dragon"
             ],
-            "rating": 608,
-            "win": true,
+            "rating": 285,
+            "win": false,
             "score": 84
           },
           {
@@ -6885,7 +6862,7 @@
               "dragon",
               "ice"
             ],
-            "rating": 355,
+            "rating": 341,
             "win": false,
             "score": 83.8
           },
@@ -6943,8 +6920,8 @@
             "types": [
               "ground"
             ],
-            "rating": 600,
-            "win": true,
+            "rating": 486,
+            "win": false,
             "score": 83.2
           },
           {
@@ -6966,7 +6943,7 @@
             "types": [
               "dragon"
             ],
-            "rating": 564,
+            "rating": 610,
             "win": true,
             "score": 82.6
           },
@@ -6978,7 +6955,7 @@
               "fire",
               "flying"
             ],
-            "rating": 862,
+            "rating": 824,
             "win": true,
             "score": 82.6
           },
@@ -7002,7 +6979,7 @@
               "water",
               "flying"
             ],
-            "rating": 508,
+            "rating": 521,
             "win": true,
             "score": 81.8
           },
@@ -7014,8 +6991,8 @@
               "fairy",
               "flying"
             ],
-            "rating": 474,
-            "win": false,
+            "rating": 700,
+            "win": true,
             "score": 81.8
           },
           {
@@ -7038,7 +7015,7 @@
               "steel",
               "psychic"
             ],
-            "rating": 754,
+            "rating": 545,
             "win": true,
             "score": 81.1
           },
@@ -7062,8 +7039,8 @@
               "fairy",
               "flying"
             ],
-            "rating": 648,
-            "win": true,
+            "rating": 144,
+            "win": false,
             "score": 81
           },
           {
@@ -7143,8 +7120,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 629,
-            "win": true,
+            "rating": 368,
+            "win": false,
             "score": 80.1
           },
           {
@@ -7155,7 +7132,7 @@
               "fire",
               "steel"
             ],
-            "rating": 867,
+            "rating": 781,
             "win": true,
             "score": 80
           },
@@ -7167,7 +7144,7 @@
               "bug",
               "steel"
             ],
-            "rating": 678,
+            "rating": 616,
             "win": true,
             "score": 79.8
           },
@@ -7179,7 +7156,7 @@
               "bug",
               "steel"
             ],
-            "rating": 678,
+            "rating": 616,
             "win": true,
             "score": 79.6
           },
@@ -7190,7 +7167,7 @@
             "types": [
               "electric"
             ],
-            "rating": 648,
+            "rating": 708,
             "win": true,
             "score": 79.6
           },
@@ -7202,7 +7179,7 @@
               "dragon",
               "ice"
             ],
-            "rating": 414,
+            "rating": 451,
             "win": false,
             "score": 79.5
           },
@@ -7214,7 +7191,7 @@
               "dragon",
               "flying"
             ],
-            "rating": 435,
+            "rating": 443,
             "win": false,
             "score": 79.5
           },
@@ -7249,7 +7226,7 @@
               "dark",
               "steel"
             ],
-            "rating": 635,
+            "rating": 586,
             "win": true,
             "score": 79
           },
@@ -7272,7 +7249,7 @@
               "dark",
               "dragon"
             ],
-            "rating": 391,
+            "rating": 410,
             "win": false,
             "score": 78.6
           },
@@ -7284,7 +7261,7 @@
               "fire",
               "water"
             ],
-            "rating": 518,
+            "rating": 845,
             "win": true,
             "score": 78.5
           },
@@ -7296,7 +7273,7 @@
               "bug",
               "water"
             ],
-            "rating": 591,
+            "rating": 545,
             "win": true,
             "score": 78.3
           },
@@ -7308,7 +7285,7 @@
               "fighting",
               "water"
             ],
-            "rating": 716,
+            "rating": 824,
             "win": true,
             "score": 78.1
           },
@@ -7320,8 +7297,8 @@
               "rock",
               "dark"
             ],
-            "rating": 241,
-            "win": false,
+            "rating": 521,
+            "win": true,
             "score": 78
           },
           {
@@ -7332,7 +7309,7 @@
               "fire",
               "steel"
             ],
-            "rating": 875,
+            "rating": 802,
             "win": true,
             "score": 77.9
           },
@@ -7343,7 +7320,7 @@
             "types": [
               "electric"
             ],
-            "rating": 716,
+            "rating": 735,
             "win": true,
             "score": 77.8
           },
@@ -7355,7 +7332,7 @@
               "bug",
               "water"
             ],
-            "rating": 689,
+            "rating": 640,
             "win": true,
             "score": 77.7
           },
@@ -7367,7 +7344,7 @@
               "electric",
               "flying"
             ],
-            "rating": 697,
+            "rating": 805,
             "win": true,
             "score": 77.6
           },
@@ -7379,7 +7356,7 @@
               "electric",
               "flying"
             ],
-            "rating": 627,
+            "rating": 751,
             "win": true,
             "score": 77.6
           },
@@ -7401,8 +7378,8 @@
             "types": [
               "normal"
             ],
-            "rating": 243,
-            "win": false,
+            "rating": 629,
+            "win": true,
             "score": 77.2
           },
           {
@@ -7413,7 +7390,7 @@
               "fighting",
               "ghost"
             ],
-            "rating": 710,
+            "rating": 737,
             "win": true,
             "score": 76.9
           },
@@ -7425,8 +7402,8 @@
               "ice",
               "ground"
             ],
-            "rating": 513,
-            "win": true,
+            "rating": 344,
+            "win": false,
             "score": 76.9
           },
           {
@@ -7437,7 +7414,7 @@
               "fighting",
               "ghost"
             ],
-            "rating": 645,
+            "rating": 672,
             "win": true,
             "score": 76.8
           },
@@ -7448,7 +7425,7 @@
             "types": [
               "fairy"
             ],
-            "rating": 482,
+            "rating": 459,
             "win": false,
             "score": 76.8
           },
@@ -7459,7 +7436,7 @@
             "types": [
               "fighting"
             ],
-            "rating": 737,
+            "rating": 608,
             "win": true,
             "score": 76.8
           },
@@ -7471,7 +7448,7 @@
               "bug",
               "steel"
             ],
-            "rating": 678,
+            "rating": 616,
             "win": true,
             "score": 76.7
           },
@@ -7524,8 +7501,8 @@
               "fairy",
               "steel"
             ],
-            "rating": 764,
-            "win": true,
+            "rating": 445,
+            "win": false,
             "score": 97.8
           },
           {
@@ -7560,7 +7537,7 @@
               "dragon",
               "ice"
             ],
-            "rating": 415,
+            "rating": 419,
             "win": false,
             "score": 94.2
           },
@@ -7594,7 +7571,7 @@
             "types": [
               "water"
             ],
-            "rating": 608,
+            "rating": 727,
             "win": true,
             "score": 93.9
           },
@@ -7630,7 +7607,7 @@
               "ground",
               "normal"
             ],
-            "rating": 351,
+            "rating": 320,
             "win": false,
             "score": 92.9
           },
@@ -7666,7 +7643,7 @@
               "psychic",
               "flying"
             ],
-            "rating": 608,
+            "rating": 667,
             "win": true,
             "score": 92.4
           },
@@ -7690,8 +7667,8 @@
               "fighting",
               "steel"
             ],
-            "rating": 627,
-            "win": true,
+            "rating": 404,
+            "win": false,
             "score": 92.2
           },
           {
@@ -7726,7 +7703,7 @@
               "fighting",
               "ghost"
             ],
-            "rating": 360,
+            "rating": 338,
             "win": false,
             "score": 90.6
           },
@@ -7798,7 +7775,7 @@
               "fire",
               "flying"
             ],
-            "rating": 824,
+            "rating": 729,
             "win": true,
             "score": 89.4
           },
@@ -7833,7 +7810,7 @@
             "types": [
               "ground"
             ],
-            "rating": 375,
+            "rating": 342,
             "win": false,
             "score": 88.7
           },
@@ -7844,7 +7821,7 @@
             "types": [
               "steel"
             ],
-            "rating": 654,
+            "rating": 575,
             "win": true,
             "score": 88.4
           },
@@ -7880,7 +7857,7 @@
               "water",
               "flying"
             ],
-            "rating": 365,
+            "rating": 378,
             "win": false,
             "score": 87.5
           },
@@ -7891,8 +7868,8 @@
             "types": [
               "water"
             ],
-            "rating": 467,
-            "win": false,
+            "rating": 697,
+            "win": true,
             "score": 86.7
           },
           {
@@ -7927,7 +7904,7 @@
               "water",
               "fighting"
             ],
-            "rating": 335,
+            "rating": 367,
             "win": false,
             "score": 86
           },
@@ -7938,7 +7915,7 @@
             "types": [
               "grass"
             ],
-            "rating": 325,
+            "rating": 328,
             "win": false,
             "score": 86
           },
@@ -7973,8 +7950,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 570,
-            "win": true,
+            "rating": 142,
+            "win": false,
             "score": 85.8
           },
           {
@@ -7997,7 +7974,7 @@
               "psychic",
               "steel"
             ],
-            "rating": 724,
+            "rating": 591,
             "win": true,
             "score": 85.7
           },
@@ -8033,8 +8010,8 @@
               "water",
               "fairy"
             ],
-            "rating": 430,
-            "win": false,
+            "rating": 786,
+            "win": true,
             "score": 84.1
           },
           {
@@ -8069,7 +8046,7 @@
               "dragon",
               "ice"
             ],
-            "rating": 490,
+            "rating": 470,
             "win": false,
             "score": 83.8
           },
@@ -8150,8 +8127,8 @@
             "types": [
               "dragon"
             ],
-            "rating": 483,
-            "win": false,
+            "rating": 540,
+            "win": true,
             "score": 82.6
           },
           {
@@ -8162,7 +8139,7 @@
               "fire",
               "flying"
             ],
-            "rating": 805,
+            "rating": 691,
             "win": true,
             "score": 82.6
           },
@@ -8186,7 +8163,7 @@
               "water",
               "flying"
             ],
-            "rating": 365,
+            "rating": 391,
             "win": false,
             "score": 81.8
           },
@@ -8198,8 +8175,8 @@
               "fairy",
               "flying"
             ],
-            "rating": 494,
-            "win": false,
+            "rating": 632,
+            "win": true,
             "score": 81.8
           },
           {
@@ -8246,7 +8223,7 @@
               "fairy",
               "flying"
             ],
-            "rating": 180,
+            "rating": 177,
             "win": false,
             "score": 81
           },
@@ -8327,8 +8304,8 @@
             "types": [
               "fairy"
             ],
-            "rating": 562,
-            "win": true,
+            "rating": 363,
+            "win": false,
             "score": 80.1
           },
           {
@@ -8339,7 +8316,7 @@
               "fire",
               "steel"
             ],
-            "rating": 816,
+            "rating": 697,
             "win": true,
             "score": 80
           },
@@ -8351,8 +8328,8 @@
               "bug",
               "steel"
             ],
-            "rating": 586,
-            "win": true,
+            "rating": 329,
+            "win": false,
             "score": 79.8
           },
           {
@@ -8363,8 +8340,8 @@
               "bug",
               "steel"
             ],
-            "rating": 586,
-            "win": true,
+            "rating": 329,
+            "win": false,
             "score": 79.6
           },
           {
@@ -8374,7 +8351,7 @@
             "types": [
               "electric"
             ],
-            "rating": 581,
+            "rating": 672,
             "win": true,
             "score": 79.6
           },
@@ -8468,7 +8445,7 @@
               "fire",
               "water"
             ],
-            "rating": 824,
+            "rating": 729,
             "win": true,
             "score": 78.5
           },
@@ -8480,7 +8457,7 @@
               "bug",
               "water"
             ],
-            "rating": 751,
+            "rating": 670,
             "win": true,
             "score": 78.3
           },
@@ -8492,7 +8469,7 @@
               "fighting",
               "water"
             ],
-            "rating": 608,
+            "rating": 756,
             "win": true,
             "score": 78.1
           },
@@ -8516,7 +8493,7 @@
               "fire",
               "steel"
             ],
-            "rating": 845,
+            "rating": 756,
             "win": true,
             "score": 77.9
           },
@@ -8527,7 +8504,7 @@
             "types": [
               "electric"
             ],
-            "rating": 664,
+            "rating": 710,
             "win": true,
             "score": 77.8
           },
@@ -8539,7 +8516,7 @@
               "bug",
               "water"
             ],
-            "rating": 627,
+            "rating": 548,
             "win": true,
             "score": 77.7
           },
@@ -8551,7 +8528,7 @@
               "electric",
               "flying"
             ],
-            "rating": 645,
+            "rating": 770,
             "win": true,
             "score": 77.6
           },
@@ -8563,7 +8540,7 @@
               "electric",
               "flying"
             ],
-            "rating": 559,
+            "rating": 700,
             "win": true,
             "score": 77.6
           },
@@ -8574,7 +8551,7 @@
             "types": [
               "ground"
             ],
-            "rating": 333,
+            "rating": 368,
             "win": false,
             "score": 77.5
           },
@@ -8609,8 +8586,8 @@
               "ice",
               "ground"
             ],
-            "rating": 691,
-            "win": true,
+            "rating": 458,
+            "win": false,
             "score": 76.9
           },
           {
@@ -8643,8 +8620,8 @@
             "types": [
               "fighting"
             ],
-            "rating": 627,
-            "win": true,
+            "rating": 352,
+            "win": false,
             "score": 76.8
           },
           {
@@ -8655,8 +8632,8 @@
               "bug",
               "steel"
             ],
-            "rating": 586,
-            "win": true,
+            "rating": 329,
+            "win": false,
             "score": 76.7
           },
           {
@@ -8667,7 +8644,7 @@
               "ground",
               "flying"
             ],
-            "rating": 426,
+            "rating": 453,
             "win": false,
             "score": 76.6
           },
@@ -8705,18 +8682,18 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 68,
-            "losses": 32
+            "wins": 62,
+            "losses": 38
           },
           {
             "shields": 1,
-            "wins": 60,
-            "losses": 40
+            "wins": 55,
+            "losses": 45
           },
           {
             "shields": 2,
-            "wins": 63,
-            "losses": 37
+            "wins": 58,
+            "losses": 42
           }
         ],
         "flips": [],
@@ -8740,58 +8717,22 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 67,
-            "losses": 33
+            "wins": 62,
+            "losses": 38
           },
           {
             "shields": 1,
-            "wins": 60,
-            "losses": 40
+            "wins": 55,
+            "losses": 45
           },
           {
             "shields": 2,
-            "wins": 63,
-            "losses": 37
+            "wins": 58,
+            "losses": 42
           }
         ],
-        "flips": [
-          {
-            "shields": 0,
-            "oppId": "tapu_lele",
-            "dex": 786,
-            "opp": "Tapu Lele",
-            "types": [
-              "psychic",
-              "fairy"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -14
-          }
-        ],
+        "flips": [],
         "nearFlips": [
-          {
-            "shields": 0,
-            "oppId": "ursaluna_shadow",
-            "dex": 901,
-            "opp": "Ursaluna (Shadow)",
-            "types": [
-              "ground",
-              "normal"
-            ],
-            "delta": -326
-          },
-          {
-            "shields": 0,
-            "oppId": "zacian_crowned_sword",
-            "dex": 888,
-            "opp": "Zacian (Crowned Sword)",
-            "types": [
-              "fairy",
-              "steel"
-            ],
-            "delta": -324
-          },
           {
             "shields": 2,
             "oppId": "ursaluna_shadow",
@@ -8802,6 +8743,28 @@
               "normal"
             ],
             "delta": -63
+          },
+          {
+            "shields": 1,
+            "oppId": "ursaluna_shadow",
+            "dex": 901,
+            "opp": "Ursaluna (Shadow)",
+            "types": [
+              "ground",
+              "normal"
+            ],
+            "delta": -45
+          },
+          {
+            "shields": 0,
+            "oppId": "ursaluna_shadow",
+            "dex": 901,
+            "opp": "Ursaluna (Shadow)",
+            "types": [
+              "ground",
+              "normal"
+            ],
+            "delta": -30
           }
         ]
       },
@@ -8823,18 +8786,18 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 68,
-            "losses": 32
+            "wins": 62,
+            "losses": 38
           },
           {
             "shields": 1,
-            "wins": 60,
-            "losses": 40
+            "wins": 55,
+            "losses": 45
           },
           {
             "shields": 2,
-            "wins": 63,
-            "losses": 37
+            "wins": 58,
+            "losses": 42
           }
         ],
         "flips": [],
@@ -8858,34 +8821,21 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 67,
-            "losses": 33
+            "wins": 62,
+            "losses": 38
           },
           {
             "shields": 1,
-            "wins": 59,
-            "losses": 41
+            "wins": 54,
+            "losses": 46
           },
           {
             "shields": 2,
-            "wins": 63,
-            "losses": 37
+            "wins": 58,
+            "losses": 42
           }
         ],
         "flips": [
-          {
-            "shields": 0,
-            "oppId": "landorus_therian",
-            "dex": 645,
-            "opp": "Landorus (Therian)",
-            "types": [
-              "ground",
-              "flying"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -2
-          },
           {
             "shields": 1,
             "oppId": "mewtwo",
@@ -8910,28 +8860,6 @@
               "ghost"
             ],
             "delta": -28
-          },
-          {
-            "shields": 1,
-            "oppId": "palkia_origin",
-            "dex": 484,
-            "opp": "Palkia (Origin)",
-            "types": [
-              "water",
-              "dragon"
-            ],
-            "delta": -18
-          },
-          {
-            "shields": 2,
-            "oppId": "ursaluna",
-            "dex": 901,
-            "opp": "Ursaluna",
-            "types": [
-              "ground",
-              "normal"
-            ],
-            "delta": -11
           }
         ]
       },
@@ -8953,34 +8881,21 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 65,
-            "losses": 35
+            "wins": 61,
+            "losses": 39
           },
           {
             "shields": 1,
-            "wins": 58,
-            "losses": 42
+            "wins": 53,
+            "losses": 47
           },
           {
             "shields": 2,
-            "wins": 61,
-            "losses": 39
+            "wins": 56,
+            "losses": 44
           }
         ],
         "flips": [
-          {
-            "shields": 0,
-            "oppId": "landorus_therian",
-            "dex": 645,
-            "opp": "Landorus (Therian)",
-            "types": [
-              "ground",
-              "flying"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -2
-          },
           {
             "shields": 0,
             "oppId": "mewtwo_shadow",
@@ -8992,19 +8907,6 @@
             "from": true,
             "to": false,
             "delta": -349
-          },
-          {
-            "shields": 0,
-            "oppId": "dragonite",
-            "dex": 149,
-            "opp": "Dragonite",
-            "types": [
-              "dragon",
-              "flying"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -189
           },
           {
             "shields": 1,
@@ -9061,14 +8963,14 @@
         "nearFlips": [
           {
             "shields": 0,
-            "oppId": "hydreigon",
-            "dex": 635,
-            "opp": "Hydreigon",
+            "oppId": "lunala",
+            "dex": 792,
+            "opp": "Lunala",
             "types": [
-              "dark",
-              "dragon"
+              "psychic",
+              "ghost"
             ],
-            "delta": -40
+            "delta": -312
           },
           {
             "shields": 2,
@@ -9082,37 +8984,47 @@
             "delta": -28
           },
           {
-            "shields": 0,
-            "oppId": "yveltal",
-            "dex": 717,
-            "opp": "Yveltal",
+            "shields": 1,
+            "oppId": "hydreigon",
+            "dex": 635,
+            "opp": "Hydreigon",
             "types": [
               "dark",
-              "flying"
-            ],
-            "delta": -18
-          },
-          {
-            "shields": 1,
-            "oppId": "palkia_origin",
-            "dex": 484,
-            "opp": "Palkia (Origin)",
-            "types": [
-              "water",
               "dragon"
             ],
-            "delta": -18
+            "delta": -19
           },
           {
             "shields": 2,
-            "oppId": "ursaluna",
+            "oppId": "mamoswine_shadow",
+            "dex": 473,
+            "opp": "Mamoswine (Shadow)",
+            "types": [
+              "ice",
+              "ground"
+            ],
+            "delta": -17
+          },
+          {
+            "shields": 0,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "delta": -12
+          },
+          {
+            "shields": 1,
+            "oppId": "ursaluna_shadow",
             "dex": 901,
-            "opp": "Ursaluna",
+            "opp": "Ursaluna (Shadow)",
             "types": [
               "ground",
               "normal"
             ],
-            "delta": -11
+            "delta": -12
           }
         ]
       },
@@ -9134,33 +9046,33 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 67,
-            "losses": 33
+            "wins": 61,
+            "losses": 39
           },
           {
             "shields": 1,
-            "wins": 59,
-            "losses": 41
+            "wins": 54,
+            "losses": 46
           },
           {
             "shields": 2,
-            "wins": 62,
-            "losses": 38
+            "wins": 57,
+            "losses": 43
           }
         ],
         "flips": [
           {
             "shields": 0,
-            "oppId": "giratina_altered",
-            "dex": 487,
-            "opp": "Giratina (Altered)",
+            "oppId": "gyarados_shadow",
+            "dex": 130,
+            "opp": "Gyarados (Shadow)",
             "types": [
-              "ghost",
-              "dragon"
+              "water",
+              "flying"
             ],
             "from": true,
             "to": false,
-            "delta": -336
+            "delta": -367
           },
           {
             "shields": 1,
@@ -9185,7 +9097,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -78
+            "delta": -72
           }
         ],
         "nearFlips": [
@@ -9202,6 +9114,17 @@
           },
           {
             "shields": 0,
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
+            "types": [
+              "ghost",
+              "dragon"
+            ],
+            "delta": -40
+          },
+          {
+            "shields": 0,
             "oppId": "palkia_shadow",
             "dex": 484,
             "opp": "Palkia (Shadow)",
@@ -9209,18 +9132,39 @@
               "water",
               "dragon"
             ],
-            "delta": -41
+            "delta": -36
+          },
+          {
+            "shields": 2,
+            "oppId": "primarina",
+            "dex": 730,
+            "opp": "Primarina",
+            "types": [
+              "water",
+              "fairy"
+            ],
+            "delta": -30
           },
           {
             "shields": 0,
-            "oppId": "gyarados_shadow",
-            "dex": 130,
-            "opp": "Gyarados (Shadow)",
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "delta": -29
+          },
+          {
+            "shields": 1,
+            "oppId": "palkia_shadow",
+            "dex": 484,
+            "opp": "Palkia (Shadow)",
             "types": [
               "water",
-              "flying"
+              "dragon"
             ],
-            "delta": -26
+            "delta": -21
           }
         ]
       },
@@ -9242,33 +9186,33 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 67,
-            "losses": 33
+            "wins": 61,
+            "losses": 39
           },
           {
             "shields": 1,
-            "wins": 59,
-            "losses": 41
+            "wins": 54,
+            "losses": 46
           },
           {
             "shields": 2,
-            "wins": 62,
-            "losses": 38
+            "wins": 57,
+            "losses": 43
           }
         ],
         "flips": [
           {
             "shields": 0,
-            "oppId": "giratina_altered",
-            "dex": 487,
-            "opp": "Giratina (Altered)",
+            "oppId": "gyarados_shadow",
+            "dex": 130,
+            "opp": "Gyarados (Shadow)",
             "types": [
-              "ghost",
-              "dragon"
+              "water",
+              "flying"
             ],
             "from": true,
             "to": false,
-            "delta": -336
+            "delta": -367
           },
           {
             "shields": 1,
@@ -9293,7 +9237,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -78
+            "delta": -72
           }
         ],
         "nearFlips": [
@@ -9310,6 +9254,17 @@
           },
           {
             "shields": 0,
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
+            "types": [
+              "ghost",
+              "dragon"
+            ],
+            "delta": -40
+          },
+          {
+            "shields": 0,
             "oppId": "palkia_shadow",
             "dex": 484,
             "opp": "Palkia (Shadow)",
@@ -9317,18 +9272,39 @@
               "water",
               "dragon"
             ],
-            "delta": -41
+            "delta": -36
+          },
+          {
+            "shields": 2,
+            "oppId": "primarina",
+            "dex": 730,
+            "opp": "Primarina",
+            "types": [
+              "water",
+              "fairy"
+            ],
+            "delta": -30
           },
           {
             "shields": 0,
-            "oppId": "gyarados_shadow",
-            "dex": 130,
-            "opp": "Gyarados (Shadow)",
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "delta": -29
+          },
+          {
+            "shields": 1,
+            "oppId": "palkia_shadow",
+            "dex": 484,
+            "opp": "Palkia (Shadow)",
             "types": [
               "water",
-              "flying"
+              "dragon"
             ],
-            "delta": -26
+            "delta": -21
           }
         ]
       },
@@ -9350,46 +9326,33 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 66,
-            "losses": 34
+            "wins": 61,
+            "losses": 39
           },
           {
             "shields": 1,
-            "wins": 59,
-            "losses": 41
+            "wins": 54,
+            "losses": 46
           },
           {
             "shields": 2,
-            "wins": 62,
-            "losses": 38
+            "wins": 57,
+            "losses": 43
           }
         ],
         "flips": [
           {
             "shields": 0,
-            "oppId": "landorus_therian",
-            "dex": 645,
-            "opp": "Landorus (Therian)",
+            "oppId": "gyarados_shadow",
+            "dex": 130,
+            "opp": "Gyarados (Shadow)",
             "types": [
-              "ground",
+              "water",
               "flying"
             ],
             "from": true,
             "to": false,
-            "delta": -2
-          },
-          {
-            "shields": 0,
-            "oppId": "giratina_altered",
-            "dex": 487,
-            "opp": "Giratina (Altered)",
-            "types": [
-              "ghost",
-              "dragon"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -336
+            "delta": -367
           },
           {
             "shields": 1,
@@ -9414,7 +9377,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -98
+            "delta": -92
           }
         ],
         "nearFlips": [
@@ -9431,6 +9394,17 @@
           },
           {
             "shields": 0,
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
+            "types": [
+              "ghost",
+              "dragon"
+            ],
+            "delta": -43
+          },
+          {
+            "shields": 0,
             "oppId": "palkia_shadow",
             "dex": 484,
             "opp": "Palkia (Shadow)",
@@ -9438,7 +9412,28 @@
               "water",
               "dragon"
             ],
-            "delta": -41
+            "delta": -37
+          },
+          {
+            "shields": 2,
+            "oppId": "primarina",
+            "dex": 730,
+            "opp": "Primarina",
+            "types": [
+              "water",
+              "fairy"
+            ],
+            "delta": -31
+          },
+          {
+            "shields": 0,
+            "oppId": "florges",
+            "dex": 671,
+            "opp": "Florges",
+            "types": [
+              "fairy"
+            ],
+            "delta": -29
           },
           {
             "shields": 2,
@@ -9450,39 +9445,6 @@
               "ghost"
             ],
             "delta": -28
-          },
-          {
-            "shields": 0,
-            "oppId": "gyarados_shadow",
-            "dex": 130,
-            "opp": "Gyarados (Shadow)",
-            "types": [
-              "water",
-              "flying"
-            ],
-            "delta": -26
-          },
-          {
-            "shields": 0,
-            "oppId": "yveltal",
-            "dex": 717,
-            "opp": "Yveltal",
-            "types": [
-              "dark",
-              "flying"
-            ],
-            "delta": -19
-          },
-          {
-            "shields": 1,
-            "oppId": "palkia_origin",
-            "dex": 484,
-            "opp": "Palkia (Origin)",
-            "types": [
-              "water",
-              "dragon"
-            ],
-            "delta": -18
           }
         ]
       },
@@ -9504,46 +9466,33 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 66,
-            "losses": 34
+            "wins": 61,
+            "losses": 39
           },
           {
             "shields": 1,
-            "wins": 59,
-            "losses": 41
+            "wins": 54,
+            "losses": 46
           },
           {
             "shields": 2,
-            "wins": 61,
-            "losses": 39
+            "wins": 56,
+            "losses": 44
           }
         ],
         "flips": [
           {
             "shields": 0,
-            "oppId": "landorus_therian",
-            "dex": 645,
-            "opp": "Landorus (Therian)",
+            "oppId": "gyarados_shadow",
+            "dex": 130,
+            "opp": "Gyarados (Shadow)",
             "types": [
-              "ground",
+              "water",
               "flying"
             ],
             "from": true,
             "to": false,
-            "delta": -2
-          },
-          {
-            "shields": 0,
-            "oppId": "giratina_altered",
-            "dex": 487,
-            "opp": "Giratina (Altered)",
-            "types": [
-              "ghost",
-              "dragon"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -336
+            "delta": -367
           },
           {
             "shields": 1,
@@ -9568,7 +9517,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -103
+            "delta": -97
           },
           {
             "shields": 2,
@@ -9581,7 +9530,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -78
+            "delta": -72
           }
         ],
         "nearFlips": [
@@ -9597,14 +9546,25 @@
             "delta": -92
           },
           {
-            "shields": 2,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
+            "shields": 0,
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
             "types": [
-              "water"
+              "ghost",
+              "dragon"
             ],
-            "delta": -65
+            "delta": -43
+          },
+          {
+            "shields": 1,
+            "oppId": "groudon_shadow",
+            "dex": 383,
+            "opp": "Groudon (Shadow)",
+            "types": [
+              "ground"
+            ],
+            "delta": -41
           },
           {
             "shields": 0,
@@ -9615,10 +9575,10 @@
               "water",
               "dragon"
             ],
-            "delta": -41
+            "delta": -36
           },
           {
-            "shields": 1,
+            "shields": 0,
             "oppId": "palkia_origin",
             "dex": 484,
             "opp": "Palkia (Origin)",
@@ -9630,25 +9590,14 @@
           },
           {
             "shields": 2,
-            "oppId": "solgaleo",
-            "dex": 791,
-            "opp": "Solgaleo",
+            "oppId": "primarina",
+            "dex": 730,
+            "opp": "Primarina",
             "types": [
-              "psychic",
-              "steel"
+              "water",
+              "fairy"
             ],
             "delta": -30
-          },
-          {
-            "shields": 2,
-            "oppId": "annihilape_shadow",
-            "dex": 979,
-            "opp": "Annihilape (Shadow)",
-            "types": [
-              "fighting",
-              "ghost"
-            ],
-            "delta": -28
           }
         ]
       },
@@ -9670,33 +9619,33 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 65,
-            "losses": 35
+            "wins": 60,
+            "losses": 40
           },
           {
             "shields": 1,
-            "wins": 58,
-            "losses": 42
+            "wins": 53,
+            "losses": 47
           },
           {
             "shields": 2,
-            "wins": 61,
-            "losses": 39
+            "wins": 56,
+            "losses": 44
           }
         ],
         "flips": [
           {
             "shields": 0,
-            "oppId": "landorus_therian",
-            "dex": 645,
-            "opp": "Landorus (Therian)",
+            "oppId": "gyarados_shadow",
+            "dex": 130,
+            "opp": "Gyarados (Shadow)",
             "types": [
-              "ground",
+              "water",
               "flying"
             ],
             "from": true,
             "to": false,
-            "delta": -2
+            "delta": -367
           },
           {
             "shields": 0,
@@ -9709,19 +9658,6 @@
             "from": true,
             "to": false,
             "delta": -349
-          },
-          {
-            "shields": 0,
-            "oppId": "giratina_altered",
-            "dex": 487,
-            "opp": "Giratina (Altered)",
-            "types": [
-              "ghost",
-              "dragon"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -336
           },
           {
             "shields": 1,
@@ -9759,7 +9695,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -103
+            "delta": -97
           },
           {
             "shields": 2,
@@ -9772,10 +9708,21 @@
             ],
             "from": true,
             "to": false,
-            "delta": -98
+            "delta": -92
           }
         ],
         "nearFlips": [
+          {
+            "shields": 0,
+            "oppId": "lunala",
+            "dex": 792,
+            "opp": "Lunala",
+            "types": [
+              "psychic",
+              "ghost"
+            ],
+            "delta": -312
+          },
           {
             "shields": 2,
             "oppId": "giratina_altered",
@@ -9789,28 +9736,27 @@
           },
           {
             "shields": 0,
-            "oppId": "palkia_shadow",
-            "dex": 484,
-            "opp": "Palkia (Shadow)",
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
             "types": [
-              "water",
+              "ghost",
               "dragon"
+            ],
+            "delta": -46
+          },
+          {
+            "shields": 1,
+            "oppId": "groudon_shadow",
+            "dex": 383,
+            "opp": "Groudon (Shadow)",
+            "types": [
+              "ground"
             ],
             "delta": -41
           },
           {
             "shields": 0,
-            "oppId": "hydreigon",
-            "dex": 635,
-            "opp": "Hydreigon",
-            "types": [
-              "dark",
-              "dragon"
-            ],
-            "delta": -40
-          },
-          {
-            "shields": 1,
             "oppId": "palkia_origin",
             "dex": 484,
             "opp": "Palkia (Origin)",
@@ -9818,28 +9764,18 @@
               "water",
               "dragon"
             ],
-            "delta": -35
+            "delta": -37
           },
           {
-            "shields": 2,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
+            "shields": 0,
+            "oppId": "palkia_shadow",
+            "dex": 484,
+            "opp": "Palkia (Shadow)",
             "types": [
-              "water"
+              "water",
+              "dragon"
             ],
-            "delta": -32
-          },
-          {
-            "shields": 2,
-            "oppId": "solgaleo",
-            "dex": 791,
-            "opp": "Solgaleo",
-            "types": [
-              "psychic",
-              "steel"
-            ],
-            "delta": -32
+            "delta": -37
           }
         ]
       },
@@ -9861,46 +9797,33 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 66,
-            "losses": 34
+            "wins": 61,
+            "losses": 39
           },
           {
             "shields": 1,
-            "wins": 59,
-            "losses": 41
+            "wins": 54,
+            "losses": 46
           },
           {
             "shields": 2,
-            "wins": 60,
-            "losses": 40
+            "wins": 55,
+            "losses": 45
           }
         ],
         "flips": [
           {
             "shields": 0,
-            "oppId": "landorus_therian",
-            "dex": 645,
-            "opp": "Landorus (Therian)",
+            "oppId": "gyarados_shadow",
+            "dex": 130,
+            "opp": "Gyarados (Shadow)",
             "types": [
-              "ground",
+              "water",
               "flying"
             ],
             "from": true,
             "to": false,
-            "delta": -2
-          },
-          {
-            "shields": 0,
-            "oppId": "giratina_altered",
-            "dex": 487,
-            "opp": "Giratina (Altered)",
-            "types": [
-              "ghost",
-              "dragon"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -336
+            "delta": -367
           },
           {
             "shields": 1,
@@ -9925,7 +9848,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -103
+            "delta": -97
           },
           {
             "shields": 2,
@@ -9938,7 +9861,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -78
+            "delta": -72
           },
           {
             "shields": 2,
@@ -9955,6 +9878,17 @@
         ],
         "nearFlips": [
           {
+            "shields": 0,
+            "oppId": "lunala",
+            "dex": 792,
+            "opp": "Lunala",
+            "types": [
+              "psychic",
+              "ghost"
+            ],
+            "delta": -312
+          },
+          {
             "shields": 2,
             "oppId": "giratina_altered",
             "dex": 487,
@@ -9967,13 +9901,34 @@
           },
           {
             "shields": 2,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
+            "oppId": "raikou_shadow",
+            "dex": 243,
+            "opp": "Raikou (Shadow)",
             "types": [
-              "water"
+              "electric"
             ],
-            "delta": -65
+            "delta": -48
+          },
+          {
+            "shields": 0,
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
+            "types": [
+              "ghost",
+              "dragon"
+            ],
+            "delta": -43
+          },
+          {
+            "shields": 1,
+            "oppId": "groudon_shadow",
+            "dex": 383,
+            "opp": "Groudon (Shadow)",
+            "types": [
+              "ground"
+            ],
+            "delta": -41
           },
           {
             "shields": 0,
@@ -9984,39 +9939,7 @@
               "water",
               "dragon"
             ],
-            "delta": -41
-          },
-          {
-            "shields": 1,
-            "oppId": "palkia_origin",
-            "dex": 484,
-            "opp": "Palkia (Origin)",
-            "types": [
-              "water",
-              "dragon"
-            ],
-            "delta": -35
-          },
-          {
-            "shields": 1,
-            "oppId": "darkrai_shadow",
-            "dex": 491,
-            "opp": "Darkrai (Shadow)",
-            "types": [
-              "dark"
-            ],
-            "delta": -33
-          },
-          {
-            "shields": 2,
-            "oppId": "solgaleo",
-            "dex": 791,
-            "opp": "Solgaleo",
-            "types": [
-              "psychic",
-              "steel"
-            ],
-            "delta": -33
+            "delta": -36
           }
         ]
       },
@@ -10038,46 +9961,46 @@
         "byShield": [
           {
             "shields": 0,
-            "wins": 64,
-            "losses": 36
+            "wins": 59,
+            "losses": 41
           },
           {
             "shields": 1,
-            "wins": 55,
-            "losses": 45
+            "wins": 50,
+            "losses": 50
           },
           {
             "shields": 2,
-            "wins": 58,
-            "losses": 42
+            "wins": 53,
+            "losses": 47
           }
         ],
         "flips": [
           {
             "shields": 0,
-            "oppId": "reshiram_shadow",
-            "dex": 643,
-            "opp": "Reshiram (Shadow)",
+            "oppId": "gyarados_shadow",
+            "dex": 130,
+            "opp": "Gyarados (Shadow)",
             "types": [
-              "dragon",
-              "fire"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -217
-          },
-          {
-            "shields": 0,
-            "oppId": "landorus_therian",
-            "dex": 645,
-            "opp": "Landorus (Therian)",
-            "types": [
-              "ground",
+              "water",
               "flying"
             ],
             "from": true,
             "to": false,
-            "delta": -2
+            "delta": -367
+          },
+          {
+            "shields": 0,
+            "oppId": "dialga_shadow",
+            "dex": 483,
+            "opp": "Dialga (Shadow)",
+            "types": [
+              "steel",
+              "dragon"
+            ],
+            "from": true,
+            "to": false,
+            "delta": -318
           },
           {
             "shields": 0,
@@ -10090,19 +10013,6 @@
             "from": true,
             "to": false,
             "delta": -349
-          },
-          {
-            "shields": 0,
-            "oppId": "giratina_altered",
-            "dex": 487,
-            "opp": "Giratina (Altered)",
-            "types": [
-              "ghost",
-              "dragon"
-            ],
-            "from": true,
-            "to": false,
-            "delta": -336
           },
           {
             "shields": 1,
@@ -10179,7 +10089,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -103
+            "delta": -97
           },
           {
             "shields": 2,
@@ -10218,7 +10128,7 @@
             ],
             "from": true,
             "to": false,
-            "delta": -78
+            "delta": -72
           },
           {
             "shields": 2,
@@ -10235,6 +10145,17 @@
         ],
         "nearFlips": [
           {
+            "shields": 0,
+            "oppId": "lunala",
+            "dex": 792,
+            "opp": "Lunala",
+            "types": [
+              "psychic",
+              "ghost"
+            ],
+            "delta": -312
+          },
+          {
             "shields": 2,
             "oppId": "giratina_altered",
             "dex": 487,
@@ -10247,13 +10168,13 @@
           },
           {
             "shields": 2,
-            "oppId": "kyogre",
-            "dex": 382,
-            "opp": "Kyogre",
+            "oppId": "raikou_shadow",
+            "dex": 243,
+            "opp": "Raikou (Shadow)",
             "types": [
-              "water"
+              "electric"
             ],
-            "delta": -65
+            "delta": -51
           },
           {
             "shields": 2,
@@ -10268,36 +10189,25 @@
           },
           {
             "shields": 0,
-            "oppId": "palkia_shadow",
-            "dex": 484,
-            "opp": "Palkia (Shadow)",
+            "oppId": "giratina_altered",
+            "dex": 487,
+            "opp": "Giratina (Altered)",
             "types": [
-              "water",
+              "ghost",
               "dragon"
             ],
-            "delta": -41
+            "delta": -46
           },
           {
             "shields": 0,
-            "oppId": "hydreigon",
-            "dex": 635,
-            "opp": "Hydreigon",
+            "oppId": "zekrom_shadow",
+            "dex": 644,
+            "opp": "Zekrom (Shadow)",
             "types": [
-              "dark",
-              "dragon"
+              "dragon",
+              "electric"
             ],
-            "delta": -40
-          },
-          {
-            "shields": 0,
-            "oppId": "dialga_shadow",
-            "dex": 483,
-            "opp": "Dialga (Shadow)",
-            "types": [
-              "steel",
-              "dragon"
-            ],
-            "delta": -36
+            "delta": -43
           }
         ]
       }
@@ -10306,18 +10216,18 @@
       "byShield": [
         {
           "shields": 0,
-          "wins": 63,
-          "losses": 37
+          "wins": 58,
+          "losses": 42
         },
         {
           "shields": 1,
-          "wins": 56,
-          "losses": 44
+          "wins": 51,
+          "losses": 49
         },
         {
           "shields": 2,
-          "wins": 57,
-          "losses": 43
+          "wins": 52,
+          "losses": 48
         }
       ],
       "coverage": [
@@ -10332,8 +10242,8 @@
                 "water",
                 "dragon"
               ],
-              "rating": 363,
-              "win": false,
+              "rating": 789,
+              "win": true,
               "score": 98.7
             },
             {
@@ -10344,7 +10254,7 @@
                 "fairy",
                 "steel"
               ],
-              "rating": 864,
+              "rating": 513,
               "win": true,
               "score": 97.8
             },
@@ -10356,8 +10266,8 @@
                 "dragon",
                 "ground"
               ],
-              "rating": 551,
-              "win": true,
+              "rating": 500,
+              "win": false,
               "score": 94.4
             },
             {
@@ -10368,8 +10278,8 @@
                 "steel",
                 "psychic"
               ],
-              "rating": 902,
-              "win": true,
+              "rating": 447,
+              "win": false,
               "score": 94.3
             },
             {
@@ -10380,8 +10290,8 @@
                 "dragon",
                 "ice"
               ],
-              "rating": 735,
-              "win": true,
+              "rating": 417,
+              "win": false,
               "score": 94.2
             },
             {
@@ -10392,8 +10302,8 @@
                 "dragon",
                 "fire"
               ],
-              "rating": 500,
-              "win": false,
+              "rating": 572,
+              "win": true,
               "score": 94
             },
             {
@@ -10403,8 +10313,8 @@
               "types": [
                 "fairy"
               ],
-              "rating": 537,
-              "win": true,
+              "rating": 334,
+              "win": false,
               "score": 94
             },
             {
@@ -10414,7 +10324,7 @@
               "types": [
                 "water"
               ],
-              "rating": 583,
+              "rating": 902,
               "win": true,
               "score": 93.9
             },
@@ -10426,7 +10336,7 @@
                 "steel",
                 "dragon"
               ],
-              "rating": 554,
+              "rating": 586,
               "win": true,
               "score": 93.8
             },
@@ -10462,8 +10372,8 @@
                 "dragon",
                 "ice"
               ],
-              "rating": 610,
-              "win": true,
+              "rating": 417,
+              "win": false,
               "score": 92.7
             },
             {
@@ -10474,7 +10384,7 @@
                 "dragon",
                 "fire"
               ],
-              "rating": 500,
+              "rating": 283,
               "win": false,
               "score": 92.7
             },
@@ -10486,7 +10396,7 @@
                 "psychic",
                 "flying"
               ],
-              "rating": 329,
+              "rating": 450,
               "win": false,
               "score": 92.4
             },
@@ -10498,8 +10408,8 @@
                 "psychic",
                 "ghost"
               ],
-              "rating": 575,
-              "win": true,
+              "rating": 436,
+              "win": false,
               "score": 92.4
             },
             {
@@ -10510,7 +10420,7 @@
                 "fighting",
                 "steel"
               ],
-              "rating": 482,
+              "rating": 321,
               "win": false,
               "score": 92.2
             },
@@ -10534,7 +10444,7 @@
                 "psychic",
                 "ghost"
               ],
-              "rating": 608,
+              "rating": 629,
               "win": true,
               "score": 91.8
             },
@@ -10546,7 +10456,7 @@
                 "fighting",
                 "ghost"
               ],
-              "rating": 535,
+              "rating": 554,
               "win": true,
               "score": 90.6
             },
@@ -10558,7 +10468,7 @@
                 "dragon",
                 "electric"
               ],
-              "rating": 427,
+              "rating": 500,
               "win": false,
               "score": 90.6
             },
@@ -10570,8 +10480,8 @@
                 "dragon",
                 "electric"
               ],
-              "rating": 716,
-              "win": true,
+              "rating": 500,
+              "win": false,
               "score": 90.4
             },
             {
@@ -10582,8 +10492,8 @@
                 "psychic",
                 "steel"
               ],
-              "rating": 667,
-              "win": true,
+              "rating": 477,
+              "win": false,
               "score": 90.3
             },
             {
@@ -10594,7 +10504,7 @@
                 "psychic",
                 "flying"
               ],
-              "rating": 151,
+              "rating": 485,
               "win": false,
               "score": 90.1
             },
@@ -10606,8 +10516,8 @@
                 "water",
                 "dragon"
               ],
-              "rating": 409,
-              "win": false,
+              "rating": 718,
+              "win": true,
               "score": 89.8
             },
             {
@@ -10618,7 +10528,7 @@
                 "fire",
                 "flying"
               ],
-              "rating": 556,
+              "rating": 924,
               "win": true,
               "score": 89.4
             },
@@ -10630,7 +10540,7 @@
                 "dragon",
                 "ground"
               ],
-              "rating": 432,
+              "rating": 242,
               "win": false,
               "score": 88.8
             },
@@ -10642,7 +10552,7 @@
                 "steel",
                 "psychic"
               ],
-              "rating": 886,
+              "rating": 829,
               "win": true,
               "score": 88.8
             },
@@ -10653,7 +10563,7 @@
               "types": [
                 "ground"
               ],
-              "rating": 172,
+              "rating": 494,
               "win": false,
               "score": 88.7
             },
@@ -10664,7 +10574,7 @@
               "types": [
                 "steel"
               ],
-              "rating": 740,
+              "rating": 618,
               "win": true,
               "score": 88.4
             },
@@ -10676,7 +10586,7 @@
                 "water",
                 "fighting"
               ],
-              "rating": 632,
+              "rating": 670,
               "win": true,
               "score": 88.2
             },
@@ -10711,8 +10621,8 @@
               "types": [
                 "water"
               ],
-              "rating": 216,
-              "win": false,
+              "rating": 891,
+              "win": true,
               "score": 86.7
             },
             {
@@ -10723,7 +10633,7 @@
                 "water",
                 "dragon"
               ],
-              "rating": 540,
+              "rating": 691,
               "win": true,
               "score": 86.2
             },
@@ -10747,7 +10657,7 @@
                 "water",
                 "fighting"
               ],
-              "rating": 662,
+              "rating": 700,
               "win": true,
               "score": 86
             },
@@ -10758,7 +10668,7 @@
               "types": [
                 "grass"
               ],
-              "rating": 835,
+              "rating": 535,
               "win": true,
               "score": 86
             },
@@ -10770,7 +10680,7 @@
                 "dark",
                 "flying"
               ],
-              "rating": 567,
+              "rating": 854,
               "win": true,
               "score": 86
             },
@@ -10793,8 +10703,8 @@
               "types": [
                 "fairy"
               ],
-              "rating": 521,
-              "win": true,
+              "rating": 357,
+              "win": false,
               "score": 85.8
             },
             {
@@ -10805,7 +10715,7 @@
                 "ground",
                 "flying"
               ],
-              "rating": 502,
+              "rating": 540,
               "win": true,
               "score": 85.8
             },
@@ -10817,7 +10727,7 @@
                 "psychic",
                 "steel"
               ],
-              "rating": 808,
+              "rating": 578,
               "win": true,
               "score": 85.7
             },
@@ -10829,7 +10739,7 @@
                 "steel",
                 "dragon"
               ],
-              "rating": 754,
+              "rating": 508,
               "win": true,
               "score": 85
             },
@@ -10841,8 +10751,8 @@
                 "normal",
                 "psychic"
               ],
-              "rating": 597,
-              "win": true,
+              "rating": 467,
+              "win": false,
               "score": 85
             },
             {
@@ -10853,8 +10763,8 @@
                 "water",
                 "fairy"
               ],
-              "rating": 343,
-              "win": false,
+              "rating": 913,
+              "win": true,
               "score": 84.1
             },
             {
@@ -10865,8 +10775,8 @@
                 "steel",
                 "dragon"
               ],
-              "rating": 500,
-              "win": false,
+              "rating": 583,
+              "win": true,
               "score": 84
             },
             {
@@ -10877,8 +10787,8 @@
                 "steel",
                 "ghost"
               ],
-              "rating": 913,
-              "win": true,
+              "rating": 475,
+              "win": false,
               "score": 83.9
             },
             {
@@ -10889,8 +10799,8 @@
                 "dragon",
                 "ice"
               ],
-              "rating": 581,
-              "win": true,
+              "rating": 255,
+              "win": false,
               "score": 83.8
             },
             {
@@ -10901,8 +10811,8 @@
                 "dragon",
                 "psychic"
               ],
-              "rating": 277,
-              "win": false,
+              "rating": 543,
+              "win": true,
               "score": 83.7
             },
             {
@@ -10913,8 +10823,8 @@
                 "dragon",
                 "flying"
               ],
-              "rating": 500,
-              "win": false,
+              "rating": 510,
+              "win": true,
               "score": 83.6
             },
             {
@@ -10936,8 +10846,8 @@
                 "ghost",
                 "dragon"
               ],
-              "rating": 190,
-              "win": false,
+              "rating": 505,
+              "win": true,
               "score": 83.5
             },
             {
@@ -10947,7 +10857,7 @@
               "types": [
                 "ground"
               ],
-              "rating": 740,
+              "rating": 648,
               "win": true,
               "score": 83.2
             },
@@ -10959,7 +10869,7 @@
                 "dark",
                 "dragon"
               ],
-              "rating": 510,
+              "rating": 551,
               "win": true,
               "score": 83.1
             },
@@ -10970,7 +10880,7 @@
               "types": [
                 "dragon"
               ],
-              "rating": 648,
+              "rating": 721,
               "win": true,
               "score": 82.6
             },
@@ -10982,8 +10892,8 @@
                 "fire",
                 "flying"
               ],
-              "rating": 165,
-              "win": false,
+              "rating": 913,
+              "win": true,
               "score": 82.6
             },
             {
@@ -10994,8 +10904,8 @@
                 "dragon",
                 "psychic"
               ],
-              "rating": 277,
-              "win": false,
+              "rating": 537,
+              "win": true,
               "score": 82
             },
             {
@@ -11006,7 +10916,7 @@
                 "water",
                 "flying"
               ],
-              "rating": 613,
+              "rating": 740,
               "win": true,
               "score": 81.8
             },
@@ -11018,8 +10928,8 @@
                 "fairy",
                 "flying"
               ],
-              "rating": 411,
-              "win": false,
+              "rating": 754,
+              "win": true,
               "score": 81.8
             },
             {
@@ -11030,7 +10940,7 @@
                 "psychic",
                 "fairy"
               ],
-              "rating": 493,
+              "rating": 443,
               "win": false,
               "score": 81.6
             },
@@ -11042,7 +10952,7 @@
                 "steel",
                 "psychic"
               ],
-              "rating": 878,
+              "rating": 586,
               "win": true,
               "score": 81.1
             },
@@ -11054,8 +10964,8 @@
                 "dragon",
                 "psychic"
               ],
-              "rating": 231,
-              "win": false,
+              "rating": 613,
+              "win": true,
               "score": 81.1
             },
             {
@@ -11066,7 +10976,7 @@
                 "fairy",
                 "flying"
               ],
-              "rating": 524,
+              "rating": 775,
               "win": true,
               "score": 81
             },
@@ -11078,8 +10988,8 @@
                 "rock",
                 "dark"
               ],
-              "rating": 185,
-              "win": false,
+              "rating": 575,
+              "win": true,
               "score": 80.7
             },
             {
@@ -11112,7 +11022,7 @@
                 "dragon",
                 "flying"
               ],
-              "rating": 505,
+              "rating": 586,
               "win": true,
               "score": 80.4
             },
@@ -11147,8 +11057,8 @@
               "types": [
                 "fairy"
               ],
-              "rating": 672,
-              "win": true,
+              "rating": 405,
+              "win": false,
               "score": 80.1
             },
             {
@@ -11171,7 +11081,7 @@
                 "bug",
                 "steel"
               ],
-              "rating": 770,
+              "rating": 705,
               "win": true,
               "score": 79.8
             },
@@ -11183,8 +11093,8 @@
                 "bug",
                 "steel"
               ],
-              "rating": 770,
-              "win": true,
+              "rating": 493,
+              "win": false,
               "score": 79.6
             },
             {
@@ -11194,7 +11104,7 @@
               "types": [
                 "electric"
               ],
-              "rating": 705,
+              "rating": 732,
               "win": true,
               "score": 79.6
             },
@@ -11218,8 +11128,8 @@
                 "dragon",
                 "flying"
               ],
-              "rating": 276,
-              "win": false,
+              "rating": 591,
+              "win": true,
               "score": 79.5
             },
             {
@@ -11253,8 +11163,8 @@
                 "dark",
                 "steel"
               ],
-              "rating": 716,
-              "win": true,
+              "rating": 435,
+              "win": false,
               "score": 79
             },
             {
@@ -11264,7 +11174,7 @@
               "types": [
                 "normal"
               ],
-              "rating": 681,
+              "rating": 689,
               "win": true,
               "score": 78.8
             },
@@ -11276,7 +11186,7 @@
                 "dark",
                 "dragon"
               ],
-              "rating": 556,
+              "rating": 589,
               "win": true,
               "score": 78.6
             },
@@ -11288,7 +11198,7 @@
                 "fire",
                 "water"
               ],
-              "rating": 567,
+              "rating": 924,
               "win": true,
               "score": 78.5
             },
@@ -11300,7 +11210,7 @@
                 "bug",
                 "water"
               ],
-              "rating": 681,
+              "rating": 664,
               "win": true,
               "score": 78.3
             },
@@ -11312,7 +11222,7 @@
                 "fighting",
                 "water"
               ],
-              "rating": 551,
+              "rating": 913,
               "win": true,
               "score": 78.1
             },
@@ -11336,8 +11246,8 @@
                 "fire",
                 "steel"
               ],
-              "rating": 532,
-              "win": true,
+              "rating": 452,
+              "win": false,
               "score": 77.9
             },
             {
@@ -11347,7 +11257,7 @@
               "types": [
                 "electric"
               ],
-              "rating": 743,
+              "rating": 770,
               "win": true,
               "score": 77.8
             },
@@ -11359,7 +11269,7 @@
                 "bug",
                 "water"
               ],
-              "rating": 729,
+              "rating": 732,
               "win": true,
               "score": 77.7
             },
@@ -11371,7 +11281,7 @@
                 "electric",
                 "flying"
               ],
-              "rating": 740,
+              "rating": 835,
               "win": true,
               "score": 77.6
             },
@@ -11383,7 +11293,7 @@
                 "electric",
                 "flying"
               ],
-              "rating": 681,
+              "rating": 791,
               "win": true,
               "score": 77.6
             },
@@ -11394,7 +11304,7 @@
               "types": [
                 "ground"
               ],
-              "rating": 485,
+              "rating": 163,
               "win": false,
               "score": 77.5
             },
@@ -11405,8 +11315,8 @@
               "types": [
                 "normal"
               ],
-              "rating": 710,
-              "win": true,
+              "rating": 374,
+              "win": false,
               "score": 77.2
             },
             {
@@ -11417,7 +11327,7 @@
                 "fighting",
                 "ghost"
               ],
-              "rating": 675,
+              "rating": 637,
               "win": true,
               "score": 76.9
             },
@@ -11429,8 +11339,8 @@
                 "ice",
                 "ground"
               ],
-              "rating": 621,
-              "win": true,
+              "rating": 177,
+              "win": false,
               "score": 76.9
             },
             {
@@ -11452,8 +11362,8 @@
               "types": [
                 "fairy"
               ],
-              "rating": 564,
-              "win": true,
+              "rating": 373,
+              "win": false,
               "score": 76.8
             },
             {
@@ -11463,7 +11373,7 @@
               "types": [
                 "fighting"
               ],
-              "rating": 524,
+              "rating": 740,
               "win": true,
               "score": 76.8
             },
@@ -11475,7 +11385,7 @@
                 "bug",
                 "steel"
               ],
-              "rating": 770,
+              "rating": 705,
               "win": true,
               "score": 76.7
             },
@@ -11487,8 +11397,8 @@
                 "ground",
                 "flying"
               ],
-              "rating": 591,
-              "win": true,
+              "rating": 175,
+              "win": false,
               "score": 76.6
             },
             {
@@ -11516,7 +11426,7 @@
                 "water",
                 "dragon"
               ],
-              "rating": 369,
+              "rating": 404,
               "win": false,
               "score": 98.7
             },
@@ -11528,8 +11438,8 @@
                 "fairy",
                 "steel"
               ],
-              "rating": 835,
-              "win": true,
+              "rating": 356,
+              "win": false,
               "score": 97.8
             },
             {
@@ -11540,8 +11450,8 @@
                 "dragon",
                 "ground"
               ],
-              "rating": 247,
-              "win": false,
+              "rating": 572,
+              "win": true,
               "score": 94.4
             },
             {
@@ -11587,7 +11497,7 @@
               "types": [
                 "fairy"
               ],
-              "rating": 418,
+              "rating": 390,
               "win": false,
               "score": 94
             },
@@ -11598,8 +11508,8 @@
               "types": [
                 "water"
               ],
-              "rating": 305,
-              "win": false,
+              "rating": 802,
+              "win": true,
               "score": 93.9
             },
             {
@@ -11610,8 +11520,8 @@
                 "steel",
                 "dragon"
               ],
-              "rating": 608,
-              "win": true,
+              "rating": 283,
+              "win": false,
               "score": 93.8
             },
             {
@@ -11634,8 +11544,8 @@
                 "ground",
                 "normal"
               ],
-              "rating": 591,
-              "win": true,
+              "rating": 256,
+              "win": false,
               "score": 92.9
             },
             {
@@ -11670,7 +11580,7 @@
                 "psychic",
                 "flying"
               ],
-              "rating": 201,
+              "rating": 481,
               "win": false,
               "score": 92.4
             },
@@ -11694,8 +11604,8 @@
                 "fighting",
                 "steel"
               ],
-              "rating": 737,
-              "win": true,
+              "rating": 405,
+              "win": false,
               "score": 92.2
             },
             {
@@ -11706,8 +11616,8 @@
                 "ground",
                 "normal"
               ],
-              "rating": 572,
-              "win": true,
+              "rating": 225,
+              "win": false,
               "score": 92
             },
             {
@@ -11766,7 +11676,7 @@
                 "psychic",
                 "steel"
               ],
-              "rating": 770,
+              "rating": 751,
               "win": true,
               "score": 90.3
             },
@@ -11778,8 +11688,8 @@
                 "psychic",
                 "flying"
               ],
-              "rating": 267,
-              "win": false,
+              "rating": 716,
+              "win": true,
               "score": 90.1
             },
             {
@@ -11802,7 +11712,7 @@
                 "fire",
                 "flying"
               ],
-              "rating": 875,
+              "rating": 845,
               "win": true,
               "score": 89.4
             },
@@ -11837,7 +11747,7 @@
               "types": [
                 "ground"
               ],
-              "rating": 648,
+              "rating": 532,
               "win": true,
               "score": 88.7
             },
@@ -11848,8 +11758,8 @@
               "types": [
                 "steel"
               ],
-              "rating": 705,
-              "win": true,
+              "rating": 474,
+              "win": false,
               "score": 88.4
             },
             {
@@ -11860,7 +11770,7 @@
                 "water",
                 "fighting"
               ],
-              "rating": 516,
+              "rating": 572,
               "win": true,
               "score": 88.2
             },
@@ -11895,7 +11805,7 @@
               "types": [
                 "water"
               ],
-              "rating": 651,
+              "rating": 781,
               "win": true,
               "score": 86.7
             },
@@ -11907,8 +11817,8 @@
                 "water",
                 "dragon"
               ],
-              "rating": 369,
-              "win": false,
+              "rating": 510,
+              "win": true,
               "score": 86.2
             },
             {
@@ -11931,7 +11841,7 @@
                 "water",
                 "fighting"
               ],
-              "rating": 516,
+              "rating": 602,
               "win": true,
               "score": 86
             },
@@ -11942,7 +11852,7 @@
               "types": [
                 "grass"
               ],
-              "rating": 262,
+              "rating": 264,
               "win": false,
               "score": 86
             },
@@ -11977,8 +11887,8 @@
               "types": [
                 "fairy"
               ],
-              "rating": 583,
-              "win": true,
+              "rating": 109,
+              "win": false,
               "score": 85.8
             },
             {
@@ -12001,8 +11911,8 @@
                 "psychic",
                 "steel"
               ],
-              "rating": 772,
-              "win": true,
+              "rating": 472,
+              "win": false,
               "score": 85.7
             },
             {
@@ -12037,8 +11947,8 @@
                 "water",
                 "fairy"
               ],
-              "rating": 369,
-              "win": false,
+              "rating": 824,
+              "win": true,
               "score": 84.1
             },
             {
@@ -12049,8 +11959,8 @@
                 "steel",
                 "dragon"
               ],
-              "rating": 608,
-              "win": true,
+              "rating": 456,
+              "win": false,
               "score": 84
             },
             {
@@ -12073,7 +11983,7 @@
                 "dragon",
                 "ice"
               ],
-              "rating": 353,
+              "rating": 340,
               "win": false,
               "score": 83.8
             },
@@ -12131,8 +12041,8 @@
               "types": [
                 "ground"
               ],
-              "rating": 600,
-              "win": true,
+              "rating": 483,
+              "win": false,
               "score": 83.2
             },
             {
@@ -12154,7 +12064,7 @@
               "types": [
                 "dragon"
               ],
-              "rating": 564,
+              "rating": 610,
               "win": true,
               "score": 82.6
             },
@@ -12166,7 +12076,7 @@
                 "fire",
                 "flying"
               ],
-              "rating": 862,
+              "rating": 824,
               "win": true,
               "score": 82.6
             },
@@ -12190,7 +12100,7 @@
                 "water",
                 "flying"
               ],
-              "rating": 508,
+              "rating": 521,
               "win": true,
               "score": 81.8
             },
@@ -12202,8 +12112,8 @@
                 "fairy",
                 "flying"
               ],
-              "rating": 469,
-              "win": false,
+              "rating": 697,
+              "win": true,
               "score": 81.8
             },
             {
@@ -12226,7 +12136,7 @@
                 "steel",
                 "psychic"
               ],
-              "rating": 754,
+              "rating": 543,
               "win": true,
               "score": 81.1
             },
@@ -12250,8 +12160,8 @@
                 "fairy",
                 "flying"
               ],
-              "rating": 648,
-              "win": true,
+              "rating": 144,
+              "win": false,
               "score": 81
             },
             {
@@ -12331,8 +12241,8 @@
               "types": [
                 "fairy"
               ],
-              "rating": 629,
-              "win": true,
+              "rating": 364,
+              "win": false,
               "score": 80.1
             },
             {
@@ -12343,7 +12253,7 @@
                 "fire",
                 "steel"
               ],
-              "rating": 867,
+              "rating": 781,
               "win": true,
               "score": 80
             },
@@ -12355,7 +12265,7 @@
                 "bug",
                 "steel"
               ],
-              "rating": 678,
+              "rating": 616,
               "win": true,
               "score": 79.8
             },
@@ -12367,7 +12277,7 @@
                 "bug",
                 "steel"
               ],
-              "rating": 678,
+              "rating": 616,
               "win": true,
               "score": 79.6
             },
@@ -12378,7 +12288,7 @@
               "types": [
                 "electric"
               ],
-              "rating": 648,
+              "rating": 708,
               "win": true,
               "score": 79.6
             },
@@ -12390,7 +12300,7 @@
                 "dragon",
                 "ice"
               ],
-              "rating": 412,
+              "rating": 449,
               "win": false,
               "score": 79.5
             },
@@ -12402,7 +12312,7 @@
                 "dragon",
                 "flying"
               ],
-              "rating": 433,
+              "rating": 441,
               "win": false,
               "score": 79.5
             },
@@ -12437,7 +12347,7 @@
                 "dark",
                 "steel"
               ],
-              "rating": 632,
+              "rating": 567,
               "win": true,
               "score": 79
             },
@@ -12460,7 +12370,7 @@
                 "dark",
                 "dragon"
               ],
-              "rating": 387,
+              "rating": 405,
               "win": false,
               "score": 78.6
             },
@@ -12472,7 +12382,7 @@
                 "fire",
                 "water"
               ],
-              "rating": 516,
+              "rating": 845,
               "win": true,
               "score": 78.5
             },
@@ -12484,7 +12394,7 @@
                 "bug",
                 "water"
               ],
-              "rating": 589,
+              "rating": 543,
               "win": true,
               "score": 78.3
             },
@@ -12496,7 +12406,7 @@
                 "fighting",
                 "water"
               ],
-              "rating": 505,
+              "rating": 824,
               "win": true,
               "score": 78.1
             },
@@ -12508,8 +12418,8 @@
                 "rock",
                 "dark"
               ],
-              "rating": 240,
-              "win": false,
+              "rating": 521,
+              "win": true,
               "score": 78
             },
             {
@@ -12520,7 +12430,7 @@
                 "fire",
                 "steel"
               ],
-              "rating": 875,
+              "rating": 802,
               "win": true,
               "score": 77.9
             },
@@ -12531,7 +12441,7 @@
               "types": [
                 "electric"
               ],
-              "rating": 716,
+              "rating": 735,
               "win": true,
               "score": 77.8
             },
@@ -12543,7 +12453,7 @@
                 "bug",
                 "water"
               ],
-              "rating": 689,
+              "rating": 640,
               "win": true,
               "score": 77.7
             },
@@ -12555,7 +12465,7 @@
                 "electric",
                 "flying"
               ],
-              "rating": 697,
+              "rating": 805,
               "win": true,
               "score": 77.6
             },
@@ -12567,7 +12477,7 @@
                 "electric",
                 "flying"
               ],
-              "rating": 624,
+              "rating": 748,
               "win": true,
               "score": 77.6
             },
@@ -12589,8 +12499,8 @@
               "types": [
                 "normal"
               ],
-              "rating": 242,
-              "win": false,
+              "rating": 627,
+              "win": true,
               "score": 77.2
             },
             {
@@ -12601,7 +12511,7 @@
                 "fighting",
                 "ghost"
               ],
-              "rating": 710,
+              "rating": 737,
               "win": true,
               "score": 76.9
             },
@@ -12613,8 +12523,8 @@
                 "ice",
                 "ground"
               ],
-              "rating": 510,
-              "win": true,
+              "rating": 341,
+              "win": false,
               "score": 76.9
             },
             {
@@ -12625,7 +12535,7 @@
                 "fighting",
                 "ghost"
               ],
-              "rating": 645,
+              "rating": 672,
               "win": true,
               "score": 76.8
             },
@@ -12636,7 +12546,7 @@
               "types": [
                 "fairy"
               ],
-              "rating": 479,
+              "rating": 456,
               "win": false,
               "score": 76.8
             },
@@ -12647,7 +12557,7 @@
               "types": [
                 "fighting"
               ],
-              "rating": 737,
+              "rating": 608,
               "win": true,
               "score": 76.8
             },
@@ -12659,7 +12569,7 @@
                 "bug",
                 "steel"
               ],
-              "rating": 678,
+              "rating": 616,
               "win": true,
               "score": 76.7
             },
@@ -12712,8 +12622,8 @@
                 "fairy",
                 "steel"
               ],
-              "rating": 764,
-              "win": true,
+              "rating": 439,
+              "win": false,
               "score": 97.8
             },
             {
@@ -12748,7 +12658,7 @@
                 "dragon",
                 "ice"
               ],
-              "rating": 413,
+              "rating": 417,
               "win": false,
               "score": 94.2
             },
@@ -12782,7 +12692,7 @@
               "types": [
                 "water"
               ],
-              "rating": 608,
+              "rating": 727,
               "win": true,
               "score": 93.9
             },
@@ -12818,7 +12728,7 @@
                 "ground",
                 "normal"
               ],
-              "rating": 349,
+              "rating": 319,
               "win": false,
               "score": 92.9
             },
@@ -12854,7 +12764,7 @@
                 "psychic",
                 "flying"
               ],
-              "rating": 608,
+              "rating": 667,
               "win": true,
               "score": 92.4
             },
@@ -12878,8 +12788,8 @@
                 "fighting",
                 "steel"
               ],
-              "rating": 627,
-              "win": true,
+              "rating": 399,
+              "win": false,
               "score": 92.2
             },
             {
@@ -12914,7 +12824,7 @@
                 "fighting",
                 "ghost"
               ],
-              "rating": 358,
+              "rating": 336,
               "win": false,
               "score": 90.6
             },
@@ -12974,7 +12884,7 @@
                 "water",
                 "dragon"
               ],
-              "rating": 465,
+              "rating": 470,
               "win": false,
               "score": 89.8
             },
@@ -12986,7 +12896,7 @@
                 "fire",
                 "flying"
               ],
-              "rating": 824,
+              "rating": 729,
               "win": true,
               "score": 89.4
             },
@@ -13021,7 +12931,7 @@
               "types": [
                 "ground"
               ],
-              "rating": 372,
+              "rating": 340,
               "win": false,
               "score": 88.7
             },
@@ -13032,7 +12942,7 @@
               "types": [
                 "steel"
               ],
-              "rating": 654,
+              "rating": 575,
               "win": true,
               "score": 88.4
             },
@@ -13079,8 +12989,8 @@
               "types": [
                 "water"
               ],
-              "rating": 464,
-              "win": false,
+              "rating": 697,
+              "win": true,
               "score": 86.7
             },
             {
@@ -13115,7 +13025,7 @@
                 "water",
                 "fighting"
               ],
-              "rating": 333,
+              "rating": 365,
               "win": false,
               "score": 86
             },
@@ -13126,7 +13036,7 @@
               "types": [
                 "grass"
               ],
-              "rating": 324,
+              "rating": 326,
               "win": false,
               "score": 86
             },
@@ -13161,8 +13071,8 @@
               "types": [
                 "fairy"
               ],
-              "rating": 570,
-              "win": true,
+              "rating": 142,
+              "win": false,
               "score": 85.8
             },
             {
@@ -13185,7 +13095,7 @@
                 "psychic",
                 "steel"
               ],
-              "rating": 694,
+              "rating": 583,
               "win": true,
               "score": 85.7
             },
@@ -13221,8 +13131,8 @@
                 "water",
                 "fairy"
               ],
-              "rating": 424,
-              "win": false,
+              "rating": 756,
+              "win": true,
               "score": 84.1
             },
             {
@@ -13257,7 +13167,7 @@
                 "dragon",
                 "ice"
               ],
-              "rating": 488,
+              "rating": 468,
               "win": false,
               "score": 83.8
             },
@@ -13338,8 +13248,8 @@
               "types": [
                 "dragon"
               ],
-              "rating": 481,
-              "win": false,
+              "rating": 527,
+              "win": true,
               "score": 82.6
             },
             {
@@ -13350,7 +13260,7 @@
                 "fire",
                 "flying"
               ],
-              "rating": 805,
+              "rating": 691,
               "win": true,
               "score": 82.6
             },
@@ -13374,7 +13284,7 @@
                 "water",
                 "flying"
               ],
-              "rating": 364,
+              "rating": 389,
               "win": false,
               "score": 81.8
             },
@@ -13386,8 +13296,8 @@
                 "fairy",
                 "flying"
               ],
-              "rating": 488,
-              "win": false,
+              "rating": 629,
+              "win": true,
               "score": 81.8
             },
             {
@@ -13434,7 +13344,7 @@
                 "fairy",
                 "flying"
               ],
-              "rating": 180,
+              "rating": 177,
               "win": false,
               "score": 81
             },
@@ -13515,8 +13425,8 @@
               "types": [
                 "fairy"
               ],
-              "rating": 562,
-              "win": true,
+              "rating": 361,
+              "win": false,
               "score": 80.1
             },
             {
@@ -13527,7 +13437,7 @@
                 "fire",
                 "steel"
               ],
-              "rating": 816,
+              "rating": 697,
               "win": true,
               "score": 80
             },
@@ -13539,8 +13449,8 @@
                 "bug",
                 "steel"
               ],
-              "rating": 586,
-              "win": true,
+              "rating": 327,
+              "win": false,
               "score": 79.8
             },
             {
@@ -13551,8 +13461,8 @@
                 "bug",
                 "steel"
               ],
-              "rating": 586,
-              "win": true,
+              "rating": 327,
+              "win": false,
               "score": 79.6
             },
             {
@@ -13562,7 +13472,7 @@
               "types": [
                 "electric"
               ],
-              "rating": 581,
+              "rating": 672,
               "win": true,
               "score": 79.6
             },
@@ -13656,7 +13566,7 @@
                 "fire",
                 "water"
               ],
-              "rating": 824,
+              "rating": 729,
               "win": true,
               "score": 78.5
             },
@@ -13668,7 +13578,7 @@
                 "bug",
                 "water"
               ],
-              "rating": 751,
+              "rating": 670,
               "win": true,
               "score": 78.3
             },
@@ -13680,7 +13590,7 @@
                 "fighting",
                 "water"
               ],
-              "rating": 608,
+              "rating": 756,
               "win": true,
               "score": 78.1
             },
@@ -13704,7 +13614,7 @@
                 "fire",
                 "steel"
               ],
-              "rating": 845,
+              "rating": 756,
               "win": true,
               "score": 77.9
             },
@@ -13715,7 +13625,7 @@
               "types": [
                 "electric"
               ],
-              "rating": 664,
+              "rating": 710,
               "win": true,
               "score": 77.8
             },
@@ -13727,7 +13637,7 @@
                 "bug",
                 "water"
               ],
-              "rating": 627,
+              "rating": 548,
               "win": true,
               "score": 77.7
             },
@@ -13739,7 +13649,7 @@
                 "electric",
                 "flying"
               ],
-              "rating": 645,
+              "rating": 770,
               "win": true,
               "score": 77.6
             },
@@ -13751,7 +13661,7 @@
                 "electric",
                 "flying"
               ],
-              "rating": 556,
+              "rating": 697,
               "win": true,
               "score": 77.6
             },
@@ -13762,7 +13672,7 @@
               "types": [
                 "ground"
               ],
-              "rating": 331,
+              "rating": 366,
               "win": false,
               "score": 77.5
             },
@@ -13797,8 +13707,8 @@
                 "ice",
                 "ground"
               ],
-              "rating": 691,
-              "win": true,
+              "rating": 453,
+              "win": false,
               "score": 76.9
             },
             {
@@ -13831,8 +13741,8 @@
               "types": [
                 "fighting"
               ],
-              "rating": 627,
-              "win": true,
+              "rating": 350,
+              "win": false,
               "score": 76.8
             },
             {
@@ -13843,8 +13753,8 @@
                 "bug",
                 "steel"
               ],
-              "rating": 586,
-              "win": true,
+              "rating": 327,
+              "win": false,
               "score": 76.7
             },
             {
@@ -13855,7 +13765,7 @@
                 "ground",
                 "flying"
               ],
-              "rating": 424,
+              "rating": 451,
               "win": false,
               "score": 76.6
             },
@@ -13880,8 +13790,8 @@
     "mirror": [
       {
         "shields": 0,
-        "mine": 461,
-        "opp": 538,
+        "mine": 423,
+        "opp": 576,
         "result": "패"
       },
       {
@@ -13892,17 +13802,17 @@
       },
       {
         "shields": 2,
-        "mine": 491,
-        "opp": 508,
+        "mine": 497,
+        "opp": 502,
         "result": "패"
       }
     ],
     "rival": [
       {
         "shields": 0,
-        "mine": 714,
-        "opp": 285,
-        "result": "승"
+        "mine": 500,
+        "opp": 500,
+        "result": "무"
       },
       {
         "shields": 1,
@@ -13912,8 +13822,8 @@
       },
       {
         "shields": 2,
-        "mine": 491,
-        "opp": 508,
+        "mine": 497,
+        "opp": 502,
         "result": "패"
       }
     ]

@@ -16,6 +16,7 @@ const TARGETS = [
   // S28 상위권 신규 8종
   'ursaluna', 'kyurem_black', 'reshiram_shadow', 'lugia',
   'zamazenta_crowned_shield', 'ursaluna_shadow', 'necrozma_dawn_wings', 'marshadow',
+  'zekrom_shadow',
 ];
 
 const ok = [], fail = [];

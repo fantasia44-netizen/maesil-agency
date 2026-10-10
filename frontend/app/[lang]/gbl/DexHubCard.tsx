@@ -113,11 +113,13 @@ export default function DexHub({ lang, id, dex, league }: { lang: Locale; id: st
       )}
 
       {/* IV — 순위 체커(이 포켓몬 선택 상태로) + 타협 개체 분석(발행된 종만) */}
-      {dex > 0 && (ivKey || PUBLISHED_ANALYSIS.has(baseId)) && (
+      {dex > 0 && (ivKey || PUBLISHED_ANALYSIS.has(baseId) || PUBLISHED_ANALYSIS.has(`${baseId}_shadow`)) && (
         <div style={row}>
           <span style={label}>{t.iv}</span>
           {ivKey && <Link href={`${L("/gbl/iv")}?p=${encodeURIComponent(ivKey)}`} style={chip()}>{t.ivCheck}</Link>}
           {PUBLISHED_ANALYSIS.has(baseId) && <Link href={L(`/gbl/iv/${baseId}`)} style={chip()}>{t.ivDeep}</Link>}
+          {/* 그림자 폼의 분석이 따로 있으면 같이 — 그림자 도감 페이지는 기본 폼으로 통합된 종이 많아 여기서 이어 준다 */}
+          {PUBLISHED_ANALYSIS.has(`${baseId}_shadow`) && <Link href={L(`/gbl/iv/${baseId}_shadow`)} style={chip()}><span style={{ color: "#6d28d9" }}>{t.shadow}</span> {t.ivDeep}</Link>}
         </div>
       )}
     </div>

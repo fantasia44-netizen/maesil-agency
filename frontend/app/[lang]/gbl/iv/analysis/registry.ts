@@ -33,6 +33,8 @@ import ZAMAZENTA_CS from "../data/zamazenta_crowned_shield.json";
 import URSALUNA_S from "../data/ursaluna_shadow.json";
 import NECROZMA_DW from "../data/necrozma_dawn_wings.json";
 import MARSHADOW from "../data/marshadow.json";
+// 10월 신규(그림자 레이드 데뷔)
+import ZEKROM_S from "../data/zekrom_shadow.json";
 
 export type SimSpread = {
   iv: number[]; cp: number; level: number; stats: { atk: number; def: number; hp: number };
@@ -201,14 +203,14 @@ function monNames(id: string, dex: number): Record<Locale, string> {
 const SEASON = "시즌 28 (2026.09.08~12.01)";
 const UPDATED = "2026-10-09";
 // 자동 초안 IvEntry 빌더 — 시뮬 데이터 → genArticle(검수 후 손질 전제)
-function mk(data: unknown): IvEntry {
+function mk(data: unknown, updated: string = UPDATED): IvEntry {
   const sim = data as Sim;
   const dex = sim.dex ?? 0;
   const names = monNames(sim.speciesId, dex);
   const rivalNames = sim.rival && sim.rivalDex != null ? monNames(sim.rival, sim.rivalDex) : null;
   const en = genArticle(sim, names, rivalNames, SEASON, "en");
   return {
-    sim, dex, rivalName: rivalNames, name: names, updated: UPDATED, season: SEASON,
+    sim, dex, rivalName: rivalNames, name: names, updated, season: SEASON,
     article: {
       ko: genArticle(sim, names, rivalNames, SEASON, "ko"), en,
       ja: genArticle(sim, names, rivalNames, SEASON, "ja"),
@@ -244,6 +246,8 @@ export const IV_ANALYSIS: Record<string, IvEntry> = {
   ursaluna: mk(URSALUNA), kyurem_black: mk(KYUREM_B), reshiram_shadow: mk(RESHIRAM_S),
   lugia: mk(LUGIA), zamazenta_crowned_shield: mk(ZAMAZENTA_CS), ursaluna_shadow: mk(URSALUNA_S),
   necrozma_dawn_wings: mk(NECROZMA_DW), marshadow: mk(MARSHADOW),
+  // 10월 그림자 레이드 신규 — 그림자 레시라무와 공격 실수치가 같아 서로 CMP 라이벌
+  zekrom_shadow: mk(ZEKROM_S, "2026-10-10"),
 };
 
 export function ivEntry(id: string): IvEntry | null {

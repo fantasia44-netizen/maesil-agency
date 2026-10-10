@@ -15,6 +15,7 @@ const ENTRIES = [
   // 시즌28 신규
   "ursaluna", "kyurem_black", "reshiram_shadow", "lugia",
   "zamazenta_crowned_shield", "ursaluna_shadow", "necrozma_dawn_wings", "marshadow",
+  "zekrom_shadow",
 ];
 
 // registry.ts monNames() 로직 복제

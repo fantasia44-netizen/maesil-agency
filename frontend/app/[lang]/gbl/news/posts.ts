@@ -70,7 +70,7 @@ export const POSTS: Post[] = [
   },
   // ───────────────────────────────────────────────────────────────────────
   {
-    slug: "shadow-zekrom-raid-ranking", cat: "analysis", published: "2026-10-09", mons: ["zekrom_shadow"],
+    slug: "shadow-zekrom-raid-ranking", cat: "analysis", published: "2026-10-09", updated: "2026-10-10", mons: ["zekrom_shadow"],
     sources: [{ label: "순위·수치: GBL Note 자체 계산(딜러 티어표·레이드 기술 도감)" }],
     ko: {
       title: "포켓몬고 섀도우 제크로무 레이드 성능 — 전기 딜러 순위·추천 기술",
@@ -87,13 +87,13 @@ export const POSTS: Post[] = [
         { h: "드래곤 딜러로는" },
         { p: "용의숨결 + 역린으로 [[/gbl/raid/dragon|드래곤 딜러 순위]]에도 올라 있지만 10위 밖입니다. 섀도우 제크로무의 본업은 전기입니다." },
         { h: "배틀리그에서는" },
-        { p: "리그별 순위는 아래 카드에서 확인하세요. 마스터리그에서 어느 개체까지 키울 만한지는 [[/gbl/iv/zekrom|제크로무 개체값 타협 분석]]에 정리해 두었습니다." },
+        { p: "리그별 순위는 아래 카드에서 확인하세요. 마스터리그에서 어느 개체까지 키울 만한지는 [[/gbl/iv/zekrom_shadow|그림자 제크로무 개체값 타협 분석]]에 정리해 두었습니다(일반 제크로무는 [[/gbl/iv/zekrom|제크로무 개체값 타협 분석]])." },
         { dex: "zekrom" },
         { note: "수치는 레벨 40 · 개체값 15 · 상대 방어 180 · 전기가 약점인 보스 기준의 GBL Note 자체 계산입니다(2026년 10월 9일 기준). 실제 레이드에서는 보스의 타입·기술에 따라 달라집니다." },
       ],
       tools: [
         { path: "/gbl/raid/electric", label: "전기 딜러 순위" }, { path: "/gbl/raid/moves/fusion_bolt", label: "크로스썬더 레이드 수치" },
-        { path: "/gbl/iv/zekrom", label: "제크로무 개체값 분석" }, { path: "/gbl/raid/moves", label: "레이드 기술 도감" },
+        { path: "/gbl/iv/zekrom_shadow", label: "그림자 제크로무 개체값 분석" }, { path: "/gbl/raid/moves", label: "레이드 기술 도감" },
       ],
     },
   },
