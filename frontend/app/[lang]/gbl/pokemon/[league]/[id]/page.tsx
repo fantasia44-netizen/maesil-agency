@@ -197,7 +197,8 @@ export async function generateMetadata({ params, searchParams }: { params: { lan
   const desc = dynMetaDesc(lang, d, name, lgName, pr) || `${name} · ${lgName} — ${pk.metaDesc}`;
   return {
     // 색인 게이트 — PvPoke 편집 메타 밖 몬은 noindex,follow (페이지·데이터·IV찾기 유지, 구글 노출만 제외)
-    ...(isIndexableMon(params.league, d.id) ? {} : { robots: { index: false, follow: true } }),
+    // ?s=<시즌> 변형은 제목·설명이 기본 주소와 같다 → 색인 제외(네이버 진단 "동일 제목 웹문서"로 잡혔음). 표준 주소는 아래 canonical.
+    ...(isIndexableMon(params.league, d.id) && !searchParams?.s ? {} : { robots: { index: false, follow: true } }),
     title: `${name} ${lgName} ${pk.metaTitle.replace(" | GBL Note", "")} | GBL Note`,
     description: desc,
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },

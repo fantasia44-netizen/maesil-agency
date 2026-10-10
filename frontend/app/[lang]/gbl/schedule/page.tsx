@@ -13,7 +13,7 @@ import { currentSeason, nextSeason, seasonName, seasonBySlug, selectableSeasons,
 
 export const revalidate = 600;
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+export function generateMetadata({ params, searchParams }: { params: { lang: string }; searchParams?: { s?: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getSchedule(lang);
   const season = currentSeason();
@@ -24,6 +24,7 @@ export function generateMetadata({ params }: { params: { lang: string } }): Meta
     description: sub(t.metaDesc),
     keywords: t.metaKeywords.map(sub),
     alternates: { canonical: localizePath(lang, path), languages: hreflangLanguages(path) },
+    ...(searchParams?.s ? { robots: { index: false, follow: true } } : {}),
     openGraph: { title: sub(t.ogTitle), description: sub(t.ogDesc), url: localizePath(lang, path), images: [`https://gblnote.com${localizePath(lang, path + "/opengraph-image")}`], type: "website" },
   };
 }

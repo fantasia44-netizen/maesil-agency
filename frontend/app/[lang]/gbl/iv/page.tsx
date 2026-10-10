@@ -39,10 +39,12 @@ const DEEP_P: Record<Locale, string> = {
 export const revalidate = 3600;
 const PATH = "/gbl/iv";
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+export function generateMetadata({ params, searchParams }: { params: { lang: string }; searchParams?: { p?: string } }): Metadata {
   const lang: Locale = isLocale(params.lang) ? params.lang : defaultLocale;
   const t = getIv(lang);
   return {
+    // ?p=<포켓몬> 선택 상태 주소는 제목·설명이 기본 주소와 같다 → 색인 제외(표준 주소는 /gbl/iv).
+    ...(searchParams?.p ? { robots: { index: false, follow: true } } : {}),
     title: t.metaTitle,
     description: t.metaDesc,
     alternates: { canonical: localizePath(lang, PATH), languages: hreflangLanguages(PATH) },

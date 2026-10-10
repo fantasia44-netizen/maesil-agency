@@ -90,7 +90,7 @@ export function generateMetadata({ params, searchParams }: { params: { lang: str
     title: top.length ? d.metaTitleF(tName, top[0]) : `${tName} ${d.metaTitle}`,
     description: top.length ? d.metaDescF(tName, top.join(sep)) : `${tName} ${d.metaDesc}`,
     alternates: { canonical: localizePath(lang, `/gbl/raid/${params.type}`), languages: hreflangLanguages(`/gbl/raid/${params.type}`) },
-    ...(isCurrent ? {} : { robots: { index: false, follow: true } }),
+    ...(isCurrent && !searchParams?.v ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
       title: `${tName} ${d.ogTitle}`,
       description: `${tName} ${d.ogDesc}`,
